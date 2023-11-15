@@ -22,7 +22,10 @@ $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
 $(OBJSUBDIRS) :
 	$(MKDIR) $(OBJSUBDIRS)
 	
-.PHONY : dir clean
+.PHONY : dir clean game
+
+game: $(OBJSUBDIRS) $(ALLCPPOBJ)
+	$(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) && ./$(APP)
 
 dir :
 	$(info $(SUBDIRS))
