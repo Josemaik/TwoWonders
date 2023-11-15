@@ -31,4 +31,4 @@ dir :
 	$(info $(ALLCPPOBJ))
 
 clean:
-	rm -r ./$(OBJ)/
+	rm -r ./$(OBJ)/ ./$(APP)
