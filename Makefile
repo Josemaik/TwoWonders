@@ -1,4 +1,4 @@
-APP		  := Prueba
+APP		  := ZeldaWonders
 CC        := g++
 CCFLAGS   := -std=c++23 -Wall -Wpedantic -Wextra -Wconversion 
 LIBS      := -lraylib
