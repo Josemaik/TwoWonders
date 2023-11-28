@@ -1,6 +1,6 @@
 #include "game_engine.hpp"
 
-GameEngine::GameEngine(u16 const width, u16 const height)
+ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
 {
     InitWindow(width_, height_, "Zelda");
@@ -13,7 +13,7 @@ GameEngine::GameEngine(u16 const width, u16 const height)
     camera.projection = CAMERA_PERSPECTIVE;
 }
 
-void GameEngine::beginFrame()
+void ENGI::GameEngine::beginFrame()
 {
     BeginDrawing();
     ClearBackground(RAYWHITE);
@@ -21,32 +21,36 @@ void GameEngine::beginFrame()
     DrawGrid(20, 1.0f);
 }
 
-void GameEngine::drawAll(EntityManager<PhysicsComponent, RenderComponent, Entity>& em)
+void ENGI::GameEngine::drawAll(EntityManager& em)
 {
     for (auto const& e : em.getEntities())
     {
-        auto const& r{ e.render };
-
-        camera.position = { r.position.x, 25.0f, r.position.z + 25.0f };
-        camera.target = r.position;
-        DrawCube(r.position, r.scale.x, r.scale.y, r.scale.z, r.color);
-        DrawCube({ 2, 0, -2 }, r.scale.x, r.scale.y, r.scale.z, GREEN);
-        DrawCubeWires(r.position, r.scale.x, r.scale.y, r.scale.z, MAROON);
+        if (e.hasComponent<RenderComponent>())
+        {
+            auto const& r{ em.getComponent<RenderComponent>(e) };
+            if (e.hasTag<PlayerTag>())
+            {
+                camera.position = { r.position.x, 25.0f, r.position.z + 25.0f };
+                camera.target = r.position;
+            }
+            DrawCube(r.position, r.scale.x, r.scale.y, r.scale.z, r.color);
+            DrawCubeWires(r.position, r.scale.x, r.scale.y, r.scale.z, MAROON);
+        }
     }
 }
 
-void GameEngine::endFrame()
+void ENGI::GameEngine::endFrame()
 {
     EndMode3D();
     EndDrawing();
 }
 
-void GameEngine::endWindow()
+void ENGI::GameEngine::endWindow()
 {
     CloseWindow();
 }
 
-bool GameEngine::run()
+bool ENGI::GameEngine::run()
 {
     return !WindowShouldClose();
 }

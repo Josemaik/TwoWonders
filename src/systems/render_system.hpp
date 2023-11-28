@@ -6,7 +6,19 @@
 
 struct RenderSystem
 {
-    void update(EntityManager<PhysicsComponent, RenderComponent, Entity>& em, GameEngine& engine);
+    using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
+    using SYSTAGs = MP::TypeList<>;
+    void update(EntityManager& em, ENGI::GameEngine& engine)
+    {
+        em.forEach<SYSCMPs, SYSTAGs>([&em](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
+        {
+            ren.setPosition(phy.position);
+        });
+
+        engine.beginFrame();
+        engine.drawAll(em);
+        engine.endFrame();
+    }
 };
 
 #endif // !RENDER_SYSTEM

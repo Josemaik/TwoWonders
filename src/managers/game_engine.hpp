@@ -3,24 +3,30 @@
 #define GAME_ENGINE
 #include <cstdint>
 #include <iostream>
-#include "./entity_manager.hpp"
-#include "../entities/entity.hpp"
+#include "../utils/types.hpp"
 
-struct GameEngine
-{
-    using u16 = std::uint16_t;
+namespace ENGI {
 
-    GameEngine(u16 const width, u16 const height);
+    struct GameEngine
+    {
+        using CL = MP::TypeList<PhysicsComponent, RenderComponent>;
+        using TL = MP::TypeList<>;
 
-    void beginFrame();
-    void drawAll(EntityManager<PhysicsComponent, RenderComponent, Entity>& em);
-    void endFrame();
-    void endWindow();
-    bool run();
+        using u16 = std::uint16_t;
 
-private:
-    u16 const width_{}, height_{};
-    Camera3D camera{};
-};
+        GameEngine(u16 const width, u16 const height);
+
+        void beginFrame();
+        void drawAll(EntityManager& em);
+        void endFrame();
+        void endWindow();
+        bool run();
+
+    private:
+        u16 const width_{}, height_{};
+        Camera3D camera{};
+    };
 
 #endif // !GAME_ENGINE
+
+}
