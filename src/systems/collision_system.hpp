@@ -8,17 +8,20 @@
 
 struct CollisionSystem
 {
+    // Se van a buscar las entidad que tengan estos componentes y tags
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em)
     {
-        std::vector<std::pair<PhysicsComponent&, BoundingBox>> boxes;
+        // Vector que contendrá las entidades y sus bounding boxes pa calcular sus colisiones luego
+        std::vector<std::pair<Entity&, BoundingBox>> boxes;
         em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
         {
             BoundingBox b = phy.getBoundingBox(ren.scale);
-            boxes.push_back(std::make_pair(std::ref(phy), b));
+            boxes.push_back(std::make_pair(std::ref(e), b));
 
+            // Si es el jugador que no se choque contra las paredes, luego se cambiará para el resto
             if (e.hasTag<PlayerTag>())
             {
                 if (b.min.x < -10.0f)
@@ -32,6 +35,7 @@ struct CollisionSystem
             }
         });
 
+        // Calculo de colisiones de BoundingBoxes
         for (size_t i = 0; i < boxes.size(); ++i)
         {
             for (size_t j = i + 1; j < boxes.size(); ++j)
@@ -40,8 +44,12 @@ struct CollisionSystem
                 {
                     std::cout << "Colision detectada" << std::endl;
 
-                    PhysicsComponent& phy = boxes[i].first;
+                    Entity& e = boxes[i].first;
+                    auto& phy = em.getComponent<PhysicsComponent>(e);
+                    //auto const& ren = em.getComponent<RenderComponent>(e);
 
+
+                    // Falta cambiar, no funciona bien
                     if (boxes[i].second.max.x > boxes[j].second.min.x)
                         phy.position.x -= phy.direction.x;
                     if (boxes[i].second.min.x > boxes[j].second.max.x)

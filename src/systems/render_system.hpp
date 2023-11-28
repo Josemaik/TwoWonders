@@ -6,11 +6,13 @@
 
 struct RenderSystem
 {
+    // Se van a buscar las entidad que tengan estos componentes y tags
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
+
     void update(EntityManager& em, ENGI::GameEngine& engine)
     {
-        em.forEach<SYSCMPs, SYSTAGs>([&em](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
+        em.forEach<SYSCMPs, SYSTAGs>([&em](Entity&, PhysicsComponent& phy, RenderComponent& ren)
         {
             ren.setPosition(phy.position);
         });

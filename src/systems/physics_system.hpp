@@ -6,12 +6,13 @@
 
 struct PhysicsSystem
 {
+    // Se van a buscar las entidad que tengan estos componentes y tags
     using SYSCMPs = MP::TypeList<PhysicsComponent>;
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em)
     {
-        em.forEach<SYSCMPs, SYSTAGs>([&em](Entity& e, PhysicsComponent& phy)
+        em.forEach<SYSCMPs, SYSTAGs>([&em](Entity&, PhysicsComponent& phy)
         {
             phy.position.x += phy.velocity.x;
             phy.position.y += phy.velocity.y;

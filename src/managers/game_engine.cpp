@@ -28,6 +28,7 @@ void ENGI::GameEngine::drawAll(EntityManager& em)
         if (e.hasComponent<RenderComponent>())
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
+            // Revisamos si es el jugador para mover la cámara
             if (e.hasTag<PlayerTag>())
             {
                 camera.position = { r.position.x, 25.0f, r.position.z + 25.0f };
