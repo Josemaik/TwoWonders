@@ -1,7 +1,8 @@
 APP		  := ZeldaWonders
-CC        := g++
-CCFLAGS   := -std=c++23 -Wall -Wpedantic -Wextra -Wconversion 
+CC        := ccache g++
+CCFLAGS   := -std=c++23 -Wall -Wpedantic -Wextra -Wconversion -Isrc
 LIBS      := -lraylib
+SANITIZE  := -fsanitize=address,undefined
 
 MKDIR     := mkdir -p
 SRC  	  := src
@@ -13,10 +14,10 @@ SUBDIRS      := $(shell find $(SRC) -type d)
 OBJSUBDIRS   := $(patsubst $(SRC)%,$(OBJ)%,$(SUBDIRS))
 
 $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
-	$(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) 
+	$(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE)
 
 %.o : %.cpp
-	$(CC) -o $(patsubst $(SRC)%,$(OBJ)%,$@) -c $^ $(CCFLAGS) -g -lsanitize=address
+	$(CC) -o $(patsubst $(SRC)%,$(OBJ)%,$@) -c $^ $(CCFLAGS) -g $(SANITIZE)
 
 # TODO --> que cree solo lo que tenga que crear y no todo
 $(OBJSUBDIRS) :
@@ -25,7 +26,7 @@ $(OBJSUBDIRS) :
 .PHONY : dir clean game
 
 game: $(OBJSUBDIRS) $(ALLCPPOBJ)
-	$(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) && ./$(APP)
+	$(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(SANITIZE) $(LIBS) && ./$(APP)
 
 dir :
 	$(info $(SUBDIRS))

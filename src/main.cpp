@@ -1,4 +1,3 @@
-#include <iostream>
 #include "./managers/game.hpp"
 
 int main()

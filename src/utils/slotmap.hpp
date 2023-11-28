@@ -19,6 +19,19 @@ struct Slotmap
 
     constexpr explicit Slotmap() noexcept { clear(); }
 
+    // Operadores []
+    [[nodiscard]] data_type& operator[](key_type key) noexcept
+    {
+        assert(is_valid(key));
+        return data_[indexes_[key.id].id];
+    }
+
+    [[nodiscard]] data_type const& operator[](key_type key) const noexcept
+    {
+        assert(is_valid(key));
+        return data_[indexes_[key.id].id];
+    }
+
     // Pillamos el número de componentes ocupados
     [[nodiscard]] constexpr std::size_t getSize() const noexcept { return size_; }
     // Pillamos el tamaño del array
@@ -119,7 +132,14 @@ private:
     index_type size_{};
     index_type freelist_{};
     gen_type generation_{};
+    const char c[8] = "#INDEX#";
     content_type<key_type> indexes_{};
+    const char d[8] = "#FININD";
+
     content_type<data_type> data_{};
+    const char e[8] = "#FINATA";
+
     content_type<index_type> erase_{};
+    const char f[8] = "#FINERA";
+
 };
