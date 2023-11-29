@@ -1,8 +1,9 @@
 #include "game.hpp"
+#include "game_engine.hpp"
 
 void game()
 {
-    ENGI::GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
+    GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};
     PhysicsSystem physics_system{};
     RenderSystem render_system{};
@@ -12,10 +13,10 @@ void game()
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
     em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { 0.0f, 0.0f, 0.0f }, .velocity = { .1f, .0f, .0f } });
-    em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = RED });
+    em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
 
     auto& e2{ em.newEntity() };
-    em.addComponent<RenderComponent>(e2, RenderComponent{ .position = { 2.0f, 0.0f, 02.0f }, .scale = { 2.0f, 2.0f, 4.0f }, .color = BLUE });
+    em.addComponent<RenderComponent>(e2, RenderComponent{ .position = { 2.0f, 0.0f, 02.0f }, .scale = { 2.0f, 2.0f, 4.0f }, .color = YELLOW });
     em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = { 2.0f, 0.0f, 02.0f }, .velocity = { .0f, .0f, .0f } });
 
     // MemoryViewer mv{ em.getCMPStorage<PhysicsComponent>() };

@@ -24,7 +24,7 @@ struct cmp_tag_traits {
     template <typename CMPTAG>
     consteval static uint8_t id() noexcept
     {
-        static_assert(TLIST::template contains<CMPTAG>(), "Component tag not found");
+        static_assert(TLIST::template contains<CMPTAG>(), "Component or Tag not found");
         return TLIST::template pos<CMPTAG>();
     }
 
@@ -77,14 +77,6 @@ namespace ETMG {
         // Alias para sacar el tipo de dato de la key de cualquier Slotmap
         template <typename CMPType>
         using to_keytype = typename Slotmap<CMPType, SlotCapacity>::key_type;
-
-        // Plantilla para sacar una lista de componentes de la tupla que los guarda
-        template <typename CMP>
-        [[nodiscard]] constexpr auto& getCMPStorage() noexcept
-        {
-            constexpr auto id{ cmp_info::template id < CMP>() };
-            return std::get< id >(CMPTuple_);
-        }
 
         // Clase Entity
         struct Entity
@@ -188,17 +180,17 @@ namespace ETMG {
             alive_ -= 1;
         }
 
-        // Plantilla para recibir un componente específico de una entidad
+        // Plantilla para sacar una lista de componentes de la tupla que los guarda
         template <typename CMP>
-        CMP& getComponent(Entity& e)
+        [[nodiscard]] constexpr auto& getCMPStorage() noexcept
         {
-            auto key = e.template getComponentKey<CMP>();
-            auto& storage = getCMPStorage<CMP>();
-            return storage[key];
+            constexpr auto id{ cmp_info::template id < CMP>() };
+            return std::get< id >(CMPTuple_);
         }
-        // Plantilla const
-        template <typename CMP>
-        CMP const& getComponent(Entity const& e)
+
+        // Plantilla para recibir un componente específico de una entidad
+        template <typename CMP, typename EntityT>
+        auto& getComponent(EntityT& e)
         {
             auto key = e.template getComponentKey<CMP>();
             auto& storage = getCMPStorage<CMP>();
