@@ -34,6 +34,7 @@ void ENGI::GameEngine::drawAll(EntityManager& em)
                 camera.position = { r.position.x, 25.0f, r.position.z + 25.0f };
                 camera.target = r.position;
             }
+
             DrawCube(r.position, r.scale.x, r.scale.y, r.scale.z, r.color);
             DrawCubeWires(r.position, r.scale.x, r.scale.y, r.scale.z, MAROON);
         }
