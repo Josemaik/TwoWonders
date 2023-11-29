@@ -9,7 +9,7 @@ constexpr float SPEED = .4f;
 struct InputSystem
 {
     // Se van a buscar las entidad que tengan estos componentes y tags
-    using SYSCMPs = MP::TypeList<PhysicsComponent>;
+    using SYSCMPs = MP::TypeList<PhysicsComponent, InputComponent>;
     using SYSTAGs = MP::TypeList<PlayerTag>;
     void update(EntityManager& em);
     void normalize(Vector3& vel);
