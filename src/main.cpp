@@ -5,6 +5,6 @@ int main(){
         game();
     }
     catch (const std::exception& e){
-        std::cerr << "eyyy" << e.what() << '\n';
+        std::cerr << "[Exception]: " << e.what() << '\n';
     }
 }

@@ -13,6 +13,8 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     GameEngine::setProjectionCamera(CAMERA_PERSPECTIVE);
 }
 
+////// DRAWING //////
+
 void ENGI::GameEngine::beginDrawing(){
     BeginDrawing();
 }
