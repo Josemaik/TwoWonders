@@ -11,7 +11,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
 
     beginFrame(engine);
 
-    //engine.drawAll(em);
+    // Dibuja todas las entidades con componente de render
     for (auto const& e : em.getEntities()){
         if (e.hasComponent<RenderComponent>()){
             auto const& r{ em.getComponent<RenderComponent>(e) };
@@ -20,9 +20,8 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
                 engine.setPositionCamera({ r.position.x, 25.0f, r.position.z + 25.0f });
                 engine.setTargetCamera(r.position);
             }
-
-            DrawCube(r.position, r.scale.x, r.scale.y, r.scale.z, r.color);
-            DrawCubeWires(r.position, r.scale.x, r.scale.y, r.scale.z, MAROON);
+            engine.drawCube(r.position, r.scale.x, r.scale.y, r.scale.z, r.color);
+            engine.drawCubeWires(r.position, r.scale.x, r.scale.y, r.scale.z, MAROON);
         }
     }
 

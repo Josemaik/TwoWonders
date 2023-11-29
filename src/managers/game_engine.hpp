@@ -16,16 +16,21 @@ namespace ENGI {
 
         GameEngine(u16 const width, u16 const height);
 
+        // Drawing
         void beginDrawing();
         void clearBackground(Color color);
         void drawGrid(int slices, float spacing);
         void endDrawing();
-        void closeWindow();
-
-        bool windowShouldClose();
-
         void beginMode3D();
         void endMode3D();
+        void drawCube(Vector3 pos, float width, float height, float lenght, Color color);
+        void drawCubeWires(Vector3 pos, float width, float height, float lenght, Color color);
+
+        // Window
+        void initWindow(int width, int height, const char *title);
+        void closeWindow();
+        void setTargetFPS(int fps);
+        bool windowShouldClose();
 
         // Camera
         void setPositionCamera(Vector3 pos);
@@ -33,8 +38,6 @@ namespace ENGI {
         void setUpCamera(Vector3 up);
         void setFovyCamera(float fovy);
         void setProjectionCamera(int proj);
-
-        // void drawAll(EntityManager& em);
 
     private:
         u16 const width_{}, height_{};
