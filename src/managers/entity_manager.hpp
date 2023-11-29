@@ -221,12 +221,8 @@ namespace ETMG {
         }
 
         // Función que nos devuelve las entidades vivas
-        std::span<const Entity> getEntities() const
-        {
-            return std::span{ entities_.begin(), entities_.begin() + alive_ };
-        }
-        // const
-        std::span<Entity> getEntities()
+        template<typename T = Entity>
+        auto getEntities() -> std::span<std::conditional_t<std::is_const_v<T>, const Entity, Entity>>
         {
             return std::span{ entities_.begin(), entities_.begin() + alive_ };
         }

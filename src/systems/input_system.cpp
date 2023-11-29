@@ -3,16 +3,16 @@
 
 void InputSystem::update(EntityManager& em)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, PhysicsComponent& phy)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, PhysicsComponent& phy, InputComponent& in)
     {
         // Resetear la velocidad
         phy.velocity = {};
 
         // Actualizar la velocidad
-        if (IsKeyDown(KEY_D)) phy.velocity.x += SPEED;
-        if (IsKeyDown(KEY_A)) phy.velocity.x -= SPEED;
-        if (IsKeyDown(KEY_W)) phy.velocity.z -= SPEED;
-        if (IsKeyDown(KEY_S)) phy.velocity.z += SPEED;
+        if (IsKeyDown(in.right)) phy.velocity.x += SPEED;
+        if (IsKeyDown(in.left)) phy.velocity.x -= SPEED;
+        if (IsKeyDown(in.up)) phy.velocity.z -= SPEED;
+        if (IsKeyDown(in.down)) phy.velocity.z += SPEED;
 
         // Normalizar la velocidad si se está moviendo en diagonal
         if (phy.velocity.x != 0.0f && phy.velocity.z != 0.0f)

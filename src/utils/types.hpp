@@ -2,6 +2,7 @@
 
 #include "../components/physics_component.hpp"
 #include "../components/render_component.hpp"
+#include "../components/input_component.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
 
@@ -11,7 +12,7 @@ namespace ENGI { struct GameEngine; }
 // Tags - Colocar en TL
 struct PlayerTag {};
 
-using CL = MP::TypeList<PhysicsComponent, RenderComponent>;
+using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent>;
 using TL = MP::TypeList<PlayerTag>;
 using EntityManager = ETMG::EntityManager<CL, TL>;
 using Entity = EntityManager::Entity;
