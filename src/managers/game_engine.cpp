@@ -6,53 +6,63 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     InitWindow(width_, height_, "Zelda");
     SetTargetFPS(30);
 
-    camera.position = { 0.0f, 25.0f, 25.0f };
-    camera.target = { 0.0f, 03.0f, .0f };
-    camera.up = { 0.0f, 01.0f, 0.0f };
-    camera.fovy = 30.0f;
-    camera.projection = CAMERA_PERSPECTIVE;
+    setPositionCamera({ 0.0f, 25.0f, 25.0f });
+    setTargetCamera({ 0.0f, 03.0f, .0f });
+    setUpCamera({ 0.0f, 01.0f, 0.0f });
+    setFovyCamera(30.0f);
+    setProjectionCamera(CAMERA_PERSPECTIVE);
 }
 
-void ENGI::GameEngine::beginFrame()
-{
+void ENGI::GameEngine::beginDrawing(){
     BeginDrawing();
-    ClearBackground(RAYWHITE);
-    BeginMode3D(camera);
-    DrawGrid(20, 1.0f);
 }
 
-void ENGI::GameEngine::drawAll(EntityManager& em)
-{
-    for (auto const& e : em.getEntities())
-    {
-        if (e.hasComponent<RenderComponent>())
-        {
-            auto const& r{ em.getComponent<RenderComponent>(e) };
-            // Revisamos si es el jugador para mover la cámara
-            if (e.hasTag<PlayerTag>())
-            {
-                camera.position = { r.position.x, 25.0f, r.position.z + 25.0f };
-                camera.target = r.position;
-            }
-
-            DrawCube(r.position, r.scale.x, r.scale.y, r.scale.z, r.color);
-            DrawCubeWires(r.position, r.scale.x, r.scale.y, r.scale.z, MAROON);
-        }
-    }
+void ENGI::GameEngine::clearBackground(Color color){
+    ClearBackground(color);
 }
 
-void ENGI::GameEngine::endFrame()
-{
-    EndMode3D();
+void ENGI::GameEngine::drawGrid(int slices, float spacing){
+    DrawGrid(slices, spacing);
+}
+
+void ENGI::GameEngine::endDrawing(){
     EndDrawing();
 }
 
-void ENGI::GameEngine::endWindow()
-{
+void ENGI::GameEngine::closeWindow(){
     CloseWindow();
 }
 
-bool ENGI::GameEngine::run()
-{
-    return !WindowShouldClose();
+bool ENGI::GameEngine::windowShouldClose(){
+    return WindowShouldClose();
+}
+
+void ENGI::GameEngine::beginMode3D(){
+    BeginMode3D(camera);
+}
+
+void ENGI::GameEngine::endMode3D(){
+    EndMode3D();
+}
+
+////// CAMERA //////
+
+void ENGI::GameEngine::setPositionCamera(Vector3 pos){
+    camera.position = pos;
+}
+
+void ENGI::GameEngine::setTargetCamera(Vector3 tar){
+    camera.target = tar;
+}
+
+void ENGI::GameEngine::setUpCamera(Vector3 up){
+    camera.up = up;
+}
+
+void ENGI::GameEngine::setFovyCamera(float fovy){
+    camera.fovy = fovy;
+}
+
+void ENGI::GameEngine::setProjectionCamera(int proj){
+    camera.projection = proj;
 }

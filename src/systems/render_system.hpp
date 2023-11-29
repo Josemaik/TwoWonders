@@ -11,6 +11,11 @@ struct RenderSystem
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em, GameEngine& engine);
+
+    // Funciones privadas para organizar el codigo
+    private:
+        void beginFrame(ENGI::GameEngine&  engine);
+        void endFrame(ENGI::GameEngine&  engine);
 };
 
 #endif // !RENDER_SYSTEM

@@ -27,7 +27,7 @@ void game()
     // Cubo c{};
     // e.render.setAll({ c.position.x, c.position.y, c.position.z }, { c.scale.x, c.scale.y, c.scale.z }, c.color);
 
-    while (engine.run())
+    while (!engine.windowShouldClose())
     {
         input_system.update(em);
         physics_system.update(em);
@@ -35,6 +35,6 @@ void game()
         render_system.update(em, engine);
     }
 
-    engine.endWindow();
+    engine.closeWindow();
 
 }
