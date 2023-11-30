@@ -109,7 +109,21 @@ struct vec3D
 
     constexpr auto operator<=>(vec3D const&) const = default;
 
-    Vector3 toRaylib() const
+    bool operator<(const vec3D& rhs) const
+    {
+        if (x_ < rhs.x_ || y_ < rhs.y_ || z_ < rhs.z_)
+            return true;
+        return false;
+    }
+
+    bool operator>(const vec3D& rhs) const
+    {
+        if (x_ > rhs.x_ || y_ > rhs.y_ || z_ > rhs.z_)
+            return true;
+        return false;
+    }
+
+    constexpr Vector3 toRaylib() const noexcept
     {
         return Vector3{ x_, y_, z_ };
     }

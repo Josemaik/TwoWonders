@@ -1,6 +1,6 @@
 APP		  := ZeldaWonders
 CC        := ccache g++
-CCFLAGS   := -std=c++23 -Wall -Wpedantic -Wextra -Wconversion -Isrc
+CCFLAGS   := -std=c++23 -Wall -Wpedantic -Wextra -Wconversion -Isrc/
 LIBS      := -lraylib
 SANITIZE  := -fsanitize=address,undefined
 
