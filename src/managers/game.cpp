@@ -20,11 +20,13 @@ void game()
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
 
     // Wall
     auto& e2{ em.newEntity() };
-    em.addComponent<RenderComponent>(e2, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 2.0f, 2.0f, 8.0f }, .color = GRAY });
-    em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = { 4.0f, 0.0f, 2.0f }, .velocity = { .0f, .0f, .0f } });
+    auto& r2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = { 2.0f, 0.0f, 02.0f }, .scale = { 2.0f, 2.0f, 4.0f }, .color = YELLOW });
+    auto& p2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = { 2.0f, 0.0f, 02.0f }, .velocity = { .0f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(e2, ColliderComponent{ p2.position, r2.scale });
 
     // Enemy
     auto& e3{ em.newEntity() };
@@ -33,6 +35,7 @@ void game()
     auto& p3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = { 2.0f, 0.0f, 02.0f }, .velocity = { .0f, .0f, .0f } });
     em.addComponent<LifeComponent>(e3, LifeComponent{ .life = 1 });
     em.addComponent<ColliderComponent>(e3, ColliderComponent{ p3.position, r3.scale });
+
 
     // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
     // MemoryViewer mv2{ em.getCMPStorage<RenderComponent>() };

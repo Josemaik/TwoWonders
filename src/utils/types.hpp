@@ -15,7 +15,7 @@ namespace ENGI { struct GameEngine; }
 struct PlayerTag {};
 struct EnemyTag {};
 
-using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent>;
+using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, ColliderComponent, LifeComponent>;
 using TL = MP::TypeList<PlayerTag, EnemyTag>;
 using EntityManager = ETMG::EntityManager<CL, TL>;
 using Entity = EntityManager::Entity;
