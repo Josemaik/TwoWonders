@@ -21,10 +21,10 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
             if (e.hasTag<PlayerTag>())
             {
                 engine.setPositionCamera({ r.position.x(), 25.0f, r.position.z() + 25.0f });
-                engine.setTargetCamera(r.position.toRaylib());
+                engine.setTargetCamera(r.position);
             }
-            engine.drawCube(r.position.toRaylib(), r.scale.x(), r.scale.y(), r.scale.z(), r.color);
-            engine.drawCubeWires(r.position.toRaylib(), r.scale.x(), r.scale.y(), r.scale.z(), MAROON);
+            engine.drawCube(r.position, r.scale.x(), r.scale.y(), r.scale.z(), r.color);
+            engine.drawCubeWires(r.position, r.scale.x(), r.scale.y(), r.scale.z(), MAROON);
         }
     }
 

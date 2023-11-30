@@ -3,7 +3,8 @@
 #define GAME_ENGINE
 #include <cstdint>
 #include <iostream>
-#include "../utils/types.hpp"
+#include "utils/types.hpp"
+#include "utils/vec3D.hpp"
 
 namespace ENGI {
 
@@ -23,8 +24,8 @@ namespace ENGI {
         void endDrawing();
         void beginMode3D();
         void endMode3D();
-        void drawCube(Vector3 pos, float width, float height, float lenght, Color color);
-        void drawCubeWires(Vector3 pos, float width, float height, float lenght, Color color);
+        void drawCube(vec3f pos, float width, float height, float lenght, Color color);
+        void drawCubeWires(vec3f pos, float width, float height, float lenght, Color color);
 
         // Window
         void initWindow(int width, int height, const char *title);
@@ -33,9 +34,9 @@ namespace ENGI {
         bool windowShouldClose();
 
         // Camera
-        void setPositionCamera(Vector3 pos);
-        void setTargetCamera(Vector3 tar);
-        void setUpCamera(Vector3 up);
+        void setPositionCamera(vec3f pos);
+        void setTargetCamera(vec3f tar);
+        void setUpCamera(vec3f up);
         void setFovyCamera(float fovy);
         void setProjectionCamera(int proj);
 

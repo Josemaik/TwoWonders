@@ -45,14 +45,14 @@ void ENGI::GameEngine::endMode3D()
     EndMode3D();
 }
 
-void ENGI::GameEngine::drawCube(Vector3 pos, float width, float height, float lenght, Color color)
+void ENGI::GameEngine::drawCube(vec3f pos, float width, float height, float lenght, Color color)
 {
-    DrawCube(pos, height, width, lenght, color);
+    DrawCube(pos.toRaylib(), height, width, lenght, color);
 }
 
-void ENGI::GameEngine::drawCubeWires(Vector3 pos, float width, float height, float lenght, Color color)
+void ENGI::GameEngine::drawCubeWires(vec3f pos, float width, float height, float lenght, Color color)
 {
-    DrawCubeWires(pos, height, width, lenght, color);
+    DrawCubeWires(pos.toRaylib(), height, width, lenght, color);
 }
 
 ////// WINDOW //////
@@ -80,19 +80,19 @@ bool ENGI::GameEngine::windowShouldClose()
 
 ////// CAMERA //////
 
-void ENGI::GameEngine::setPositionCamera(Vector3 pos)
+void ENGI::GameEngine::setPositionCamera(vec3f pos)
 {
-    camera.position = pos;
+    camera.position = pos.toRaylib();
 }
 
-void ENGI::GameEngine::setTargetCamera(Vector3 tar)
+void ENGI::GameEngine::setTargetCamera(vec3f tar)
 {
-    camera.target = tar;
+    camera.target = tar.toRaylib();
 }
 
-void ENGI::GameEngine::setUpCamera(Vector3 up)
+void ENGI::GameEngine::setUpCamera(vec3f up)
 {
-    camera.up = up;
+    camera.up = up.toRaylib();
 }
 
 void ENGI::GameEngine::setFovyCamera(float fovy)
