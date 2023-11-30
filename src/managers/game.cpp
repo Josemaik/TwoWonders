@@ -20,7 +20,6 @@ void game()
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale });
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
 
     // Wall
     auto& e2{ em.newEntity() };
