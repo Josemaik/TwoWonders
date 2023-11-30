@@ -9,11 +9,13 @@ struct MemoryViewer
     template <typename T>
     MemoryViewer(T const& obj_or_ptr)
     {
-        if constexpr (std::is_pointer_v<T>) {
+        if constexpr (std::is_pointer_v<T>)
+        {
             p = reinterpret_cast<std::uint8_t const*>(obj_or_ptr);
             size = sizeof(*obj_or_ptr);
         }
-        else {
+        else
+        {
             p = reinterpret_cast<std::uint8_t const*>(&obj_or_ptr);
             size = sizeof(obj_or_ptr);
         }
@@ -66,11 +68,11 @@ private:
         for (std::size_t i{}; i < width; ++i)
         {
             auto c = (mem[i] > 31 && mem[i] < 128) ? mem[i] : '.';
-            if (cont2 < size) {
+            if (cont2 < size)
                 std::printf("\033[1;34m%c\033[0m", c);
-            }
             else
                 std::printf(" ");
+
             cont2 += 1;
         }
         std::printf(" ||\n");

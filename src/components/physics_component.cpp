@@ -1,9 +1,9 @@
 #include "physics_component.hpp"
 
-BoundingBox PhysicsComponent::getBoundingBox(Vector3 scale)
+BBox PhysicsComponent::getBoundingBox(vec3f scale)
 {
-    Vector3 min = { position.x - scale.x / 2, position.y - scale.y / 2, position.z - scale.z / 2 };
-    Vector3 max = { position.x + scale.x / 2, position.y + scale.y / 2, position.z + scale.z / 2 };
+    vec3f min = position - (scale / 2);
+    vec3f max = position + (scale / 2);
 
-    return BoundingBox{ min, max };
+    return BBox{ min, max };
 }

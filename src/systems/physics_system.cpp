@@ -4,9 +4,12 @@ void PhysicsSystem::update(EntityManager& em)
 {
     em.forEach<SYSCMPs, SYSTAGs>([&em](Entity&, PhysicsComponent& phy)
     {
-        phy.position.x += phy.velocity.x;
-        phy.position.y += phy.velocity.y;
-        phy.position.z += phy.velocity.z;
-        phy.direction = { phy.velocity.x, phy.velocity.y, phy.velocity.z };
+        auto& pos = phy.position;
+        auto& vel = phy.velocity;
+
+        pos.setX(pos.x() + vel.x());
+        pos.setY(pos.y() + vel.y());
+        pos.setZ(pos.z() + vel.z());
+        phy.direction = { vel.x(), vel.y(), vel.z() };
     });
 }

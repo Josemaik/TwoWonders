@@ -12,7 +12,6 @@ struct InputSystem
     using SYSCMPs = MP::TypeList<PhysicsComponent, InputComponent>;
     using SYSTAGs = MP::TypeList<PlayerTag>;
     void update(EntityManager& em);
-    void normalize(Vector3& vel);
 };
 
 #endif // !INPUT_MANAGER

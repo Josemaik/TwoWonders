@@ -1,10 +1,13 @@
 #include "./managers/game.hpp"
 
-int main(){
-    try{
+int main()
+{
+    try
+    {
         game();
     }
-    catch (const std::exception& e){
+    catch (const std::exception& e)
+    {
         std::cerr << "[Exception]: " << e.what() << '\n';
     }
 }
