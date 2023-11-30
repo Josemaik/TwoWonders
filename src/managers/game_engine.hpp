@@ -10,8 +10,8 @@ namespace ENGI {
 
     struct GameEngine
     {
-        // using CL = MP::TypeList<PhysicsComponent, RenderComponent>;
-        // using TL = MP::TypeList<>;
+        using CL = MP::TypeList<PhysicsComponent, RenderComponent>;
+        using TL = MP::TypeList<>;
 
         using u16 = std::uint16_t;
 
