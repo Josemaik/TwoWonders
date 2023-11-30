@@ -132,7 +132,7 @@ private:
     index_type size_{};
     index_type freelist_{};
     gen_type generation_{};
-    const char c[8] = "#INDEX#";
+    const char c[8] = "#BEEF#";
     content_type<key_type> indexes_{};
     const char d[8] = "#FININD";
 

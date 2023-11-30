@@ -8,7 +8,7 @@ constexpr float BORDER = 10.f;
 struct CollisionSystem
 {
     // Se van a buscar las entidad que tengan estos componentes y tags
-    using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
+    using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent, ColliderComponent>;
     using SYSTAGs = MP::TypeList<>;
     void update(EntityManager& em);
     void checkCollision(EntityManager& em, std::vector<std::pair<Entity&, BBox>>& boxes);
