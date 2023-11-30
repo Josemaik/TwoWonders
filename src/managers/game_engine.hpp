@@ -32,6 +32,8 @@ namespace ENGI {
         void closeWindow();
         void setTargetFPS(int fps);
         bool windowShouldClose();
+        int getScreenWidth();
+        int getScreenHeight();
 
         // Camera
         void setPositionCamera(vec3f pos);

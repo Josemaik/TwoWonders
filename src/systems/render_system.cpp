@@ -9,7 +9,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
         ren.setPosition(phy.position);
     });
 
-    beginFrame(engine);
+    beginFrame(engine, em);
 
     // Dibuja todas las entidades con componente de render
     for (auto const& e : em.getEntities())
@@ -32,10 +32,13 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
 }
 
 // Empieza el dibujado y se limpia la pantalla
-void RenderSystem::beginFrame(ENGI::GameEngine& engine)
+void RenderSystem::beginFrame(ENGI::GameEngine& engine, EntityManager& em)
 {
     engine.beginDrawing();
     engine.clearBackground(RAYWHITE);
+
+    drawHUD(em);
+
     engine.beginMode3D();
     engine.drawGrid(20, 1.0f);
 }
@@ -45,4 +48,19 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine)
 {
     engine.endMode3D();
     engine.endDrawing();
+}
+
+// Se dibuja el HUD
+void RenderSystem::drawHUD(EntityManager& em)
+{
+    // Visualizar las vidas del player
+    for (auto const& e : em.getEntities())
+    {
+        if (e.hasTag<PlayerTag>() && e.hasComponent<LifeComponent>())
+        {
+            auto const& l{ em.getComponent<LifeComponent>(e) };
+            std::string vida = "Vidas: " + std::to_string(l.life);
+            DrawText(vida.c_str(), 10, 10, 20, BLACK);
+        }
+    }
 }
