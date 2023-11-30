@@ -9,6 +9,7 @@ void game()
     RenderSystem render_system{};
     InputSystem input_system{};
     CollisionSystem collision_system{};
+    LifeSystem life_system{};
 
     // Player
     auto& e{ em.newEntity() };
@@ -42,6 +43,7 @@ void game()
         input_system.update(em);
         physics_system.update(em);
         collision_system.update(em);
+        life_system.update(em);
         render_system.update(em, engine);
     }
 

@@ -62,6 +62,11 @@ void CollisionSystem::checkCollision(EntityManager& em, std::vector<std::pair<En
                     else
                         pos.setZ(pos.z() + minOverlap.z());
                 }
+                // Se reduce la vida del player si colisiona con un enemigo
+                if(e.hasTag<PlayerTag>() && e2.hasTag<EnemyTag>()){
+                    auto& l{ em.getComponent<LifeComponent>(e) };
+                    l.decreaseLife();
+                }
             }
         }
     }
