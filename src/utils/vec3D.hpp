@@ -86,15 +86,20 @@ struct vec3D
         return *length_;
     }
 
-    constexpr void normalize()
+    constexpr vec3D& normalize() noexcept
     {
         vec3D v{ std::abs(x_), std::abs(y_), std::abs(z_) };
         *this /= length();
 
         // Aplicar la velocidad constante
         *this *= v;
+        return *this;
     }
-
+    constexpr vec3D normalized() const noexcept
+    {
+        auto v { *this };
+        return v.normalize();
+    }
     static constexpr vec3D min(const vec3D& a, const vec3D& b)
     {
         return { std::min(a.x_, b.x_), std::min(a.y_, b.y_), std::min(a.z_, b.z_) };
