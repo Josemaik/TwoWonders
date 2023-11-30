@@ -28,6 +28,7 @@ void game()
     em.addTag<EnemyTag>(e3);
     em.addComponent<RenderComponent>(e3, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 2.0f, 2.0f, 2.0f }, .color = RED });
     em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = { 0.0f, 0.0f, -6.0f }, .velocity = { .0f, .0f, .0f } });
+    em.addComponent<LifeComponent>(e3, LifeComponent{ .life = 1 });
 
     // MemoryViewer mv{ em.getCMPStorage<PhysicsComponent>() };
     // MemoryViewer mv2{ em.getCMPStorage<RenderComponent>() };
