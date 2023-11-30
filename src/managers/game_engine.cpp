@@ -73,9 +73,18 @@ void ENGI::GameEngine::setTargetFPS(int fps)
 }
 
 bool ENGI::GameEngine::windowShouldClose()
-
 {
     return WindowShouldClose();
+}
+
+int ENGI::GameEngine::getScreenWidth()
+{
+    return GetScreenWidth();
+}
+
+int ENGI::GameEngine::getScreenHeight()
+{
+    return GetScreenHeight();
 }
 
 ////// CAMERA //////
