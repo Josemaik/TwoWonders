@@ -4,14 +4,18 @@ void CollisionSystem::update(EntityManager& em)
 {
     // Vector que contendrá las entidades y sus bounding boxes pa calcular sus colisiones luego
     std::vector<std::pair<Entity&, BBox>> boxes;
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren, ColliderComponent& col)
     {
+        // Actualizar bounding box
         auto& pos = phy.position;
         auto& scl = ren.scale;
+        col.updateBox(pos, scl);
 
-        BBox b = phy.getBoundingBox(scl);
+        // Guardar para comprobar colisiones con otras entidades
+        auto& b = col.boundingBox;
         boxes.push_back(std::make_pair(std::ref(e), b));
 
+        // Comprobar colisiones con los bordes
         if (b.min.x() < -BORDER)
             pos.setX(-BORDER + scl.x() / 2);
         if (b.max.x() > BORDER)
@@ -74,12 +78,5 @@ void CollisionSystem::checkCollision(EntityManager& em, std::vector<std::pair<En
 
 bool CollisionSystem::CheckCollisionBoxes(BBox box1, BBox box2)
 {
-    if (box1.max.x() < box2.min.x() || box1.min.x() > box2.max.x())
-        return false;
-    if (box1.max.y() < box2.min.y() || box1.min.y() > box2.max.y())
-        return false;
-    if (box1.max.z() < box2.min.z() || box1.min.z() > box2.max.z())
-        return false;
-
-    return true;
+    return !(box1.max < box2.min || box1.min > box2.max);
 }

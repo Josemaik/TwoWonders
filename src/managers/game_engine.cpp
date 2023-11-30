@@ -3,7 +3,7 @@
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
 {
-    GameEngine::initWindow(width_, height_, "Zelda");
+    GameEngine::initWindow(width_, height_, "ZeldaWonders");
     GameEngine::setTargetFPS(30);
 
     GameEngine::setPositionCamera({ 0.0f, 25.0f, 25.0f });

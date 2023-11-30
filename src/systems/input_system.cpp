@@ -14,6 +14,17 @@ void InputSystem::update(EntityManager& em)
         if (IsKeyDown(in.up)) vel.setZ(vel.z() - SPEED);
         if (IsKeyDown(in.down)) vel.setZ(vel.z() + SPEED);
 
+        // Código pa correr
+        //
+        // if (IsKeyDown(in.space))
+        // {
+        //     if (vel.x() != 0.0f || vel.z() != 0.0f)
+        //     {
+        //         vel *= (SPEED * 3.5f);
+        //     }
+        // }
+
+
         // Normalizar la velocidad si se está moviendo en diagonal
         if (vel.x() != 0.0f && vel.z() != 0.0f)
         {

@@ -1,5 +1,6 @@
 #include "game.hpp"
 #include "game_engine.hpp"
+//#include "../utils/memory_viewer.hpp"
 
 void game()
 {
@@ -14,10 +15,11 @@ void game()
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { 0.0f, 0.0f, 0.0f }, .velocity = { .1f, .0f, .0f } });
-    em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { 0.0f, 0.0f, 0.0f }, .velocity = { .1f, .0f, .0f } });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale });
 
     // Wall
     auto& e2{ em.newEntity() };
@@ -27,16 +29,15 @@ void game()
     // Enemy
     auto& e3{ em.newEntity() };
     em.addTag<EnemyTag>(e3);
-    em.addComponent<RenderComponent>(e3, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 2.0f, 2.0f, 2.0f }, .color = RED });
-    em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = { 0.0f, 0.0f, -6.0f }, .velocity = { .0f, .0f, .0f } });
+    auto& r3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = { 2.0f, 0.0f, 02.0f }, .scale = { 2.0f, 2.0f, 4.0f }, .color = YELLOW });
+    auto& p3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = { 2.0f, 0.0f, 02.0f }, .velocity = { .0f, .0f, .0f } });
     em.addComponent<LifeComponent>(e3, LifeComponent{ .life = 1 });
+    em.addComponent<ColliderComponent>(e3, ColliderComponent{ p3.position, r3.scale });
 
-    // MemoryViewer mv{ em.getCMPStorage<PhysicsComponent>() };
+    // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
     // MemoryViewer mv2{ em.getCMPStorage<RenderComponent>() };
     // mv2.printMemory();
     // mv.printMemory();
-    // Cubo c{};
-    // e.render.setAll({ c.position.x, c.position.y, c.position.z }, { c.scale.x, c.scale.y, c.scale.z }, c.color);
 
     while (!engine.windowShouldClose())
     {

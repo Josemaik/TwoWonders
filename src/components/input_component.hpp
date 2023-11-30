@@ -8,4 +8,5 @@ struct InputComponent
     int down{ KEY_S };
     int left{ KEY_A };
     int right{ KEY_D };
+    int space{ KEY_SPACE };
 };
