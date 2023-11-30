@@ -1,30 +1,30 @@
 #include "render_component.hpp"
 
-void RenderComponent::setAll(Vector3 v, Vector3 s, Color c)
+void RenderComponent::setAll(vec3f p, vec3f s, Color c)
 {
-    position.x = v.x;
-    position.y = v.y;
-    position.z = v.z;
+    position.setX(p.x());
+    position.setY(p.y());
+    position.setZ(p.z());
 
-    scale.x = s.x;
-    scale.y = s.y;
-    scale.z = s.z;
+    scale.setX(s.x());
+    scale.setY(s.y());
+    scale.setZ(s.z());
 
     color = c;
 }
 
-void RenderComponent::setPosition(Vector3 v)
+void RenderComponent::setPosition(vec3f p)
 {
-    position.x = v.x;
-    position.y = v.y;
-    position.z = v.z;
+    position.setX(p.x());
+    position.setY(p.y());
+    position.setZ(p.z());
 }
 
-void RenderComponent::setScale(Vector3 v)
+void RenderComponent::setScale(vec3f s)
 {
-    scale.x = v.x;
-    scale.y = v.y;
-    scale.z = v.z;
+    scale.setX(s.x());
+    scale.setY(s.y());
+    scale.setZ(s.z());
 }
 
 void RenderComponent::setColor(Color c)

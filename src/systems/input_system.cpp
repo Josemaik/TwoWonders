@@ -7,28 +7,17 @@ void InputSystem::update(EntityManager& em)
     {
         // Resetear la velocidad
         phy.velocity = {};
-
+        auto& vel = phy.velocity;
         // Actualizar la velocidad
-        if (IsKeyDown(in.right)) phy.velocity.x += SPEED;
-        if (IsKeyDown(in.left)) phy.velocity.x -= SPEED;
-        if (IsKeyDown(in.up)) phy.velocity.z -= SPEED;
-        if (IsKeyDown(in.down)) phy.velocity.z += SPEED;
+        if (IsKeyDown(in.right)) vel.setX(vel.x() + SPEED);
+        if (IsKeyDown(in.left)) vel.setX(vel.x() - SPEED);
+        if (IsKeyDown(in.up)) vel.setZ(vel.z() - SPEED);
+        if (IsKeyDown(in.down)) vel.setZ(vel.z() + SPEED);
 
         // Normalizar la velocidad si se está moviendo en diagonal
-        if (phy.velocity.x != 0.0f && phy.velocity.z != 0.0f)
+        if (vel.x() != 0.0f && vel.z() != 0.0f)
         {
-            normalize(phy.velocity);
+            vel.normalize();
         }
     });
-}
-
-void InputSystem::normalize(Vector3& vel)
-{
-    float length = sqrt(vel.x * vel.x + vel.z * vel.z);
-    vel.x /= length;
-    vel.z /= length;
-
-    // Aplicar la velocidad constante
-    vel.x *= SPEED;
-    vel.z *= SPEED;
 }

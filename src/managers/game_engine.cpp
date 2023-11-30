@@ -15,74 +15,92 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
 ////// DRAWING //////
 
-void ENGI::GameEngine::beginDrawing(){
+void ENGI::GameEngine::beginDrawing()
+{
     BeginDrawing();
 }
 
-void ENGI::GameEngine::clearBackground(Color color){
+void ENGI::GameEngine::clearBackground(Color color)
+{
     ClearBackground(color);
 }
 
-void ENGI::GameEngine::drawGrid(int slices, float spacing){
+void ENGI::GameEngine::drawGrid(int slices, float spacing)
+{
     DrawGrid(slices, spacing);
 }
 
-void ENGI::GameEngine::endDrawing(){
+void ENGI::GameEngine::endDrawing()
+{
     EndDrawing();
 }
 
-void ENGI::GameEngine::beginMode3D(){
+void ENGI::GameEngine::beginMode3D()
+{
     BeginMode3D(camera);
 }
 
-void ENGI::GameEngine::endMode3D(){
+void ENGI::GameEngine::endMode3D()
+{
     EndMode3D();
 }
 
-void ENGI::GameEngine::drawCube(Vector3 pos, float width, float height, float lenght, Color color){
+void ENGI::GameEngine::drawCube(Vector3 pos, float width, float height, float lenght, Color color)
+{
     DrawCube(pos, height, width, lenght, color);
 }
 
-void ENGI::GameEngine::drawCubeWires(Vector3 pos, float width, float height, float lenght, Color color){
+void ENGI::GameEngine::drawCubeWires(Vector3 pos, float width, float height, float lenght, Color color)
+{
     DrawCubeWires(pos, height, width, lenght, color);
 }
 
 ////// WINDOW //////
 
-void ENGI::GameEngine::initWindow(int width, int height, const char *title){
+void ENGI::GameEngine::initWindow(int width, int height, const char* title)
+{
     InitWindow(width, height, title);
 }
 
-void ENGI::GameEngine::closeWindow(){
+void ENGI::GameEngine::closeWindow()
+{
     CloseWindow();
 }
 
-void ENGI::GameEngine::setTargetFPS(int fps){
+void ENGI::GameEngine::setTargetFPS(int fps)
+{
     SetTargetFPS(fps);
 }
 
-bool ENGI::GameEngine::windowShouldClose(){
+bool ENGI::GameEngine::windowShouldClose()
+
+{
     return WindowShouldClose();
 }
 
 ////// CAMERA //////
 
-void ENGI::GameEngine::setPositionCamera(Vector3 pos){
+void ENGI::GameEngine::setPositionCamera(Vector3 pos)
+{
     camera.position = pos;
 }
 
-void ENGI::GameEngine::setTargetCamera(Vector3 tar){
+void ENGI::GameEngine::setTargetCamera(Vector3 tar)
+{
     camera.target = tar;
 }
 
-void ENGI::GameEngine::setUpCamera(Vector3 up){
+void ENGI::GameEngine::setUpCamera(Vector3 up)
+{
     camera.up = up;
 }
 
-void ENGI::GameEngine::setFovyCamera(float fovy){
+void ENGI::GameEngine::setFovyCamera(float fovy)
+{
     camera.fovy = fovy;
 }
 
-void ENGI::GameEngine::setProjectionCamera(int proj){
+void ENGI::GameEngine::setProjectionCamera(int proj)
+{
     camera.projection = proj;
 }

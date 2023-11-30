@@ -3,22 +3,30 @@
 void CollisionSystem::update(EntityManager& em)
 {
     // Vector que contendrá las entidades y sus bounding boxes pa calcular sus colisiones luego
-    std::vector<std::pair<Entity&, BoundingBox>> boxes;
+    std::vector<std::pair<Entity&, BBox>> boxes;
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
     {
-        BoundingBox b = phy.getBoundingBox(ren.scale);
+        auto& pos = phy.position;
+        auto& scl = ren.scale;
+
+        BBox b = phy.getBoundingBox(scl);
         boxes.push_back(std::make_pair(std::ref(e), b));
 
-        if (b.min.x < -BORDER)
-            phy.position.x = -BORDER + ren.scale.x / 2;
-        if (b.max.x > BORDER)
-            phy.position.x = BORDER - ren.scale.x / 2;
-        if (b.min.z < -BORDER)
-            phy.position.z = -BORDER + ren.scale.z / 2;
-        if (b.max.z > BORDER)
-            phy.position.z = BORDER - ren.scale.z / 2;
+        if (b.min.x() < -BORDER)
+            pos.setX(-BORDER + scl.x() / 2);
+        if (b.max.x() > BORDER)
+            pos.setX(BORDER - scl.x() / 2);
+        if (b.min.z() < -BORDER)
+            pos.setZ(-BORDER + scl.z() / 2);
+        if (b.max.z() > BORDER)
+            pos.setZ(BORDER - scl.z() / 2);
     });
 
+    checkCollision(em, boxes);
+}
+
+void CollisionSystem::checkCollision(EntityManager& em, std::vector<std::pair<Entity&, BBox>>& boxes)
+{
     // Calculo de colisiones de BoundingBoxes
     for (size_t i = 0; i < boxes.size(); ++i)
     {
@@ -27,34 +35,46 @@ void CollisionSystem::update(EntityManager& em)
             if (CheckCollisionBoxes(boxes[i].second, boxes[j].second))
             {
                 Entity& e = boxes[i].first;
-                auto& phy = em.getComponent<PhysicsComponent>(e);
+                auto& pos = em.getComponent<PhysicsComponent>(e).position;
 
                 Entity& e2 = boxes[j].first;
-                auto& phy2 = em.getComponent<PhysicsComponent>(e2);
+                auto& pos2 = em.getComponent<PhysicsComponent>(e2).position;
 
                 auto& box1 = boxes[i].second;
                 auto& box2 = boxes[j].second;
 
-                Vector3 overlap = { box1.max.x - box2.min.x, box1.max.y - box2.min.y, box1.max.z - box2.min.z };
-                Vector3 overlap2 = { box2.max.x - box1.min.x, box2.max.y - box1.min.y, box2.max.z - box1.min.z };
+                vec3f overlap = box1.max - box2.min;
+                vec3f overlap2 = box2.max - box1.min;
 
-                Vector3 minOverlap = { std::min(overlap.x, overlap2.x), std::min(overlap.y, overlap2.y), std::min(overlap.z, overlap2.z) };
+                vec3f minOverlap = vec3f::min(overlap, overlap2);
 
-                if (minOverlap.x < minOverlap.z)
+                if (minOverlap.x() < minOverlap.z())
                 {
-                    if (phy.position.x < phy2.position.x)
-                        phy.position.x -= minOverlap.x;
+                    if (pos.x() < pos2.x())
+                        pos.setX(pos.x() - minOverlap.x());
                     else
-                        phy.position.x += minOverlap.x;
+                        pos.setX(pos.x() + minOverlap.x());
                 }
                 else
                 {
-                    if (phy.position.z < phy2.position.z)
-                        phy.position.z -= minOverlap.z;
+                    if (pos.z() < pos2.z())
+                        pos.setZ(pos.z() - minOverlap.z());
                     else
-                        phy.position.z += minOverlap.z;
+                        pos.setZ(pos.z() + minOverlap.z());
                 }
             }
         }
     }
+}
+
+bool CollisionSystem::CheckCollisionBoxes(BBox box1, BBox box2)
+{
+    if (box1.max.x() < box2.min.x() || box1.min.x() > box2.max.x())
+        return false;
+    if (box1.max.y() < box2.min.y() || box1.min.y() > box2.max.y())
+        return false;
+    if (box1.max.z() < box2.min.z() || box1.min.z() > box2.max.z())
+        return false;
+
+    return true;
 }

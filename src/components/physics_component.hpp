@@ -1,12 +1,13 @@
 #pragma once
 #include <raylib.h>
+#include "utils/vec3D.hpp"
 
 struct PhysicsComponent
 {
-    Vector3 position{};
-    Vector3 velocity{};
-    Vector3 direction{};
+    vec3f position{};
+    vec3f velocity{};
+    vec3f direction{};
 
-    BoundingBox getBoundingBox(Vector3 scale);
+    BBox getBoundingBox(vec3f scale);
 
 };
