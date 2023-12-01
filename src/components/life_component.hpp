@@ -5,7 +5,7 @@ struct LifeComponent
     int life{}, countdown{};
 
     void decreaseLife(){
-        if(countdown < 0){
+        if(countdown < 0 && life > 0){
             life -= 1;
             countdown = 30;
         }

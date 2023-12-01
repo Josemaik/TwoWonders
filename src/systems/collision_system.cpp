@@ -69,8 +69,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity* entity1, Entity
         case BehaviorType::ENEMY:
         {
             enemyCollision(physics1, physics2, minOverlap);
-            auto& life = em.getComponent<LifeComponent>(*entity1);
-            if (life.life > 0 && physics1.invincibilityTimer <= 0) life.decreaseLife();
+            em.getComponent<LifeComponent>(*entity1).decreaseLife();
             break;
         }
         case BehaviorType::STATIC:
@@ -109,10 +108,6 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity* entity1, Entity
 void CollisionSystem::enemyCollision(PhysicsComponent& playerPhysics, PhysicsComponent& enemyPhysics, vec3f& minOverlap)
 {
     classicCollision(playerPhysics, enemyPhysics, minOverlap);
-
-    // Inmovilizar al jugador si toca a un enemigo
-    if (playerPhysics.invincibilityTimer <= 0.f && playerPhysics.immobilizeTimer <= 0.f)
-        playerPhysics.immobilizeTimer = 30.0f;
 }
 
 void CollisionSystem::staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3f& minOverlap)
