@@ -13,6 +13,12 @@ void InputSystem::update(EntityManager& em)
         if (IsKeyDown(in.up)) vel.setZ(vel.z() - INP_SPEED);
         if (IsKeyDown(in.down)) vel.setZ(vel.z() + INP_SPEED);
 
+        // Codigo para el ataque
+        //if(IsKeyDown(in.space) && e.hasComponent<AttackComponent>()){
+        //    auto& a{ em.getComponent<AttackComponent>(e) };
+        //    a.attack(em);
+        //}   
+
         // Código pa correr
         //
         // if (IsKeyDown(in.space))

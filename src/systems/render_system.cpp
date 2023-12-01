@@ -62,22 +62,23 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
     // Visualizar las vidas del player
     for (auto const& e : em.getEntities())
     {
-        // Dibujar vidas restantes del player
+        // Dibujar vidas restantes del player en el HUD
         if (e.hasTag<PlayerTag>() && e.hasComponent<LifeComponent>())
         {
             auto const& l{ em.getComponent<LifeComponent>(e) };
             std::string vida = "Vidas: " + std::to_string(l.life);
             engine.drawText(vida.c_str(), 10, 10, 20, BLACK);
         }
+        
         // Dibujar la vida restante encima de las entidades // DEBUG
         if(e.hasComponent<LifeComponent>())
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
             auto const& l{ em.getComponent<LifeComponent>(e) };
-            
+
             engine.drawText(std::to_string(l.life).c_str(), 
-                            engine.getWorldToScreenX(r.position) - 5, 
-                            engine.getWorldToScreenY(r.position) - r.scale.y()*50, 
+                            static_cast<int>(engine.getWorldToScreenX(r.position) - 5), 
+                            static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y()*50), 
                             20, 
                             BLACK);
         }

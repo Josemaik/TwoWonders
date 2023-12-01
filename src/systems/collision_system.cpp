@@ -117,8 +117,8 @@ void CollisionSystem::staticCollision(PhysicsComponent& playerPhysics, PhysicsCo
 
 void CollisionSystem::nonPlayerCollision(PhysicsComponent& phy2, PhysicsComponent& phy1, vec3f& minOverlap)
 {
-    auto& pos1 = phy1.position;
-    auto& pos2 = phy2.position;
+    // auto& pos1 = phy1.position;
+    // auto& pos2 = phy2.position;
 
     classicCollision(phy1, phy2, minOverlap);
 
