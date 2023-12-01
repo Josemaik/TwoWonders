@@ -2,22 +2,13 @@
 #include "game_engine.hpp"
 //#include "../utils/memory_viewer.hpp"
 
-void game()
+void createEntities(EntityManager& em)
 {
-    GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
-    EntityManager em{};
-    PhysicsSystem physics_system{};
-    RenderSystem render_system{};
-    InputSystem input_system{};
-    CollisionSystem collision_system{};
-    LifeSystem life_system{};
-    AISystem   aisys{};
-
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { 0.0f, 0.0f, 0.0f }, .velocity = { .1f, .0f, .0f } });
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { 0.0f, 0.0f, 0.0f }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
@@ -47,22 +38,39 @@ void game()
     //patrol Enemy
     auto& e4{ em.newEntity() };
     em.addTag<EnemyTag>(e4);
-    auto& p4 = em.addComponent<PhysicsComponent>(e4, PhysicsComponent{ .position = {0.0f,0.0f,0.0f}, .velocity = {} });
+    auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 2.0f, 1.0f }, .color = ORANGE });
+    auto& p4 = em.addComponent<PhysicsComponent>(e4, PhysicsComponent{ .position = { -8.5f, 0.f, -8.0f }, .velocity = {} });
     em.addComponent<AIComponent>(e4, AIComponent{
         // .patrol = {
         //     vec3f{ -8.5f, 1.f, -8.0f }
         //     ,{-2.0f,1.f,-8.0f}
         //     ,AIComponent::invalid}
-             .patrol = {
-            vec3f{ -8.5f, 1.f, -8.0f},
-            {-4.5f, 1.f, 4.0f}
-            ,{-8.5f, 1.f, 8.0f}
-            ,{-3.0f, 1.f,8.0f}
-            ,{-3.0f,1.f,-8.0f},AIComponent::invalid}
+            .patrol =
+            {
+                vec3f{ -8.5f, 0.f, -8.0f}
+                ,{ -8.5f, 0.f, 8.0f }
+                ,{ 8.0f, 0.f, 8.0f }
+                ,{ 8.0f, 0.f, -8.0f },
+                AIComponent::invalid
+            }
         });
-    auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
     em.addComponent<LifeComponent>(e4, LifeComponent{ .life = 1 });
     em.addComponent<ColliderComponent>(e4, ColliderComponent{ p4.position, r4.scale, BehaviorType::ENEMY });
+}
+
+void game()
+{
+    GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
+    EntityManager em{};
+    PhysicsSystem physics_system{};
+    RenderSystem render_system{};
+    InputSystem input_system{};
+    CollisionSystem collision_system{};
+    LifeSystem life_system{};
+    AISystem   ai_sys{};
+
+    createEntities(em);
+
     // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
     // MemoryViewer mv2{ em.getCMPStorage<RenderComponent>() };
     // mv2.printMemory();
@@ -71,7 +79,7 @@ void game()
     while (!engine.windowShouldClose())
     {
         input_system.update(em);
-        aisys.update(em);
+        ai_sys.update(em);
         physics_system.update(em);
         collision_system.update(em);
         life_system.update(em);
