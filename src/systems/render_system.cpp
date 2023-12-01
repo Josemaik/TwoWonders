@@ -1,5 +1,4 @@
 #include "render_system.hpp"
-#include "../managers/entity_manager.hpp"
 
 void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
 {

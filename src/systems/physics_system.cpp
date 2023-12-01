@@ -1,5 +1,4 @@
 #include "physics_system.hpp"
-#include "../managers/entity_manager.hpp"
 
 void PhysicsSystem::update(EntityManager& em)
 {

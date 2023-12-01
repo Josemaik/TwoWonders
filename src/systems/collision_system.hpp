@@ -2,7 +2,6 @@
 #ifndef COLLISION_MANAGER
 #define COLLISION_MANAGER
 #include <unordered_map>
-#include <cstdint>
 #include "../utils/types.hpp"
 
 constexpr float BORDER = 10.f;

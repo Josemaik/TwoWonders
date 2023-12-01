@@ -1,6 +1,4 @@
 #include "collision_system.hpp"
-#include "../managers/entity_manager.hpp"
-#include <utility>
 
 void CollisionSystem::update(EntityManager& em)
 {
