@@ -18,7 +18,7 @@ void AISystem::update(EntityManager& em)
             return;
         }
         //calculo la distancia 
-        auto const distance = target - phy.position;
+        auto const distance = target - pos;
         // Si la distancia es < que el radio de llegada paso a la siguiente
         if (distance.length() < ai.arrival_radius) {
             ai.current++;

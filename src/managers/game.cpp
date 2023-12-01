@@ -15,8 +15,8 @@ void createEntities(EntityManager& em)
 
     // Wall
     auto& e2{ em.newEntity() };
-    auto& r2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = { 2.0f, 0.0f, 02.0f }, .scale = { 2.0f, 2.0f, 4.0f }, .color = YELLOW });
-    auto& p2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = { 2.0f, 0.0f, 02.0f }, .velocity = { .01f, .0f, .0f } });
+    auto& r2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = { 2.0f, 0.0f, 02.0f }, .scale = { 1.0f, 1.0f, 8.0f }, .color = GRAY });
+    auto& p2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = { 2.0f, 0.0f, 02.0f }, .velocity = { .0f, .0f, .0f } });
     em.addComponent<ColliderComponent>(e2, ColliderComponent{ p2.position, r2.scale, BehaviorType::STATIC });
 
     // Enemy
@@ -38,22 +38,21 @@ void createEntities(EntityManager& em)
     //patrol Enemy
     auto& e4{ em.newEntity() };
     em.addTag<EnemyTag>(e4);
-    auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 2.0f, 1.0f }, .color = ORANGE });
+    //auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 2.0f, 1.0f }, .color = ORANGE });
     auto& p4 = em.addComponent<PhysicsComponent>(e4, PhysicsComponent{ .position = { -8.5f, 0.f, -8.0f }, .velocity = {} });
     em.addComponent<AIComponent>(e4, AIComponent{
         // .patrol = {
         //     vec3f{ -8.5f, 1.f, -8.0f }
         //     ,{-2.0f,1.f,-8.0f}
         //     ,AIComponent::invalid}
-            .patrol =
-            {
-                vec3f{ -8.5f, 0.f, -8.0f}
-                ,{ -8.5f, 0.f, 8.0f }
-                ,{ 8.0f, 0.f, 8.0f }
-                ,{ 8.0f, 0.f, -8.0f },
-                AIComponent::invalid
-            }
+             .patrol = {
+            vec3f{ -8.5f, 1.f, -8.0f},
+            {-4.5f, 1.f, 4.0f}
+            ,{-8.5f, 1.f, 8.0f}
+            ,{-3.0f, 1.f,8.0f}
+            ,{-3.0f,1.f,-8.0f},AIComponent::invalid}
         });
+    auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
     em.addComponent<LifeComponent>(e4, LifeComponent{ .life = 1 });
     em.addComponent<ColliderComponent>(e4, ColliderComponent{ p4.position, r4.scale, BehaviorType::ENEMY });
 }
