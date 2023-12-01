@@ -13,10 +13,10 @@ struct RenderSystem
     void update(EntityManager& em, GameEngine& engine);
 
     // Funciones privadas para organizar el codigo
-    private:
-        void beginFrame(ENGI::GameEngine&  engine, EntityManager& em);
-        void endFrame(ENGI::GameEngine&  engine);
-        void drawHUD(EntityManager& em);
+private:
+    void beginFrame(ENGI::GameEngine& engine, EntityManager& em);
+    void endFrame(ENGI::GameEngine& engine);
+    void drawHUD(EntityManager& em);
 };
 
 #endif // !RENDER_SYSTEM

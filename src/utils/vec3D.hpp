@@ -135,9 +135,3 @@ private:
 
 using vec3f = vec3D<float>;
 using vec3d = vec3D<double>;
-
-struct BBox
-{
-    vec3f min{};
-    vec3f max{};
-};

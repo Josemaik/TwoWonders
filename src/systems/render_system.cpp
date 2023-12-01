@@ -4,7 +4,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
 {
 
     // Actualizamos la posicion de render del componente de fisicas
-    em.forEach<SYSCMPs, SYSTAGs>([&em](Entity&, PhysicsComponent& phy, RenderComponent& ren)
+    em.forEach<SYSCMPs, SYSTAGs>([](Entity&, PhysicsComponent& phy, RenderComponent& ren)
     {
         ren.setPosition(phy.position);
     });
