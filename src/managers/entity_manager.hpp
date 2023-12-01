@@ -7,7 +7,6 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
-#include "component_storage.hpp"
 #include "../utils/slotmap.hpp"
 #include "../utils/meta_program.hpp"
 

@@ -1,5 +1,7 @@
 #include "input_system.hpp"
 #include <math.h>
+#include "../managers/entity_manager.hpp"
+
 
 void InputSystem::update(EntityManager& em)
 {

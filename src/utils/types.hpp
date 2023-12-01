@@ -8,7 +8,7 @@
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
 
-// Forward Declaration de GameEngine
+// Forward Declarations
 namespace ENGI { struct GameEngine; }
 
 // Tags - Colocar en TL

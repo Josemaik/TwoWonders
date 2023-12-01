@@ -9,7 +9,7 @@ struct LifeSystem
     // using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     // using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em){
+    void update(EntityManager& em) {
         for (auto const& e : em.getEntities())
         {
             if (e.hasComponent<LifeComponent>())
