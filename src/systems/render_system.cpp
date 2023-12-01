@@ -24,15 +24,11 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
                 engine.setTargetCamera(r.position);
             }
             // Comprobar si tiene el componente vida
-            if(e.hasComponent<LifeComponent>()){
-                auto const& l{ em.getComponent<LifeComponent>(e) };
-                if(l.countdown > 0)
-                    engine.drawCube(r.position, r.scale.x(), r.scale.y(), r.scale.z(), YELLOW);
-                else
-                    engine.drawCube(r.position, r.scale.x(), r.scale.y(), r.scale.z(), r.color);
-            }
-            else
-                engine.drawCube(r.position, r.scale.x(), r.scale.y(), r.scale.z(), r.color);
+            Color colorEntidad = r.color;
+            if(e.hasComponent<LifeComponent>())
+                if(em.getComponent<LifeComponent>(e).countdown > 0)
+                    colorEntidad = YELLOW;
+            engine.drawCube(r.position, r.scale.x(), r.scale.y(), r.scale.z(), colorEntidad);
             
             // engine.drawCubeWires(r.position, r.scale.x(), r.scale.y(), r.scale.z(), MAROON);
         }
