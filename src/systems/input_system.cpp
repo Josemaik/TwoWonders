@@ -8,10 +8,10 @@ void InputSystem::update(EntityManager& em)
         phy.velocity = {};
         auto& vel = phy.velocity;
         // Actualizar la velocidad
-        if (IsKeyDown(in.right)) vel.setX(vel.x() + SPEED);
-        if (IsKeyDown(in.left)) vel.setX(vel.x() - SPEED);
-        if (IsKeyDown(in.up)) vel.setZ(vel.z() - SPEED);
-        if (IsKeyDown(in.down)) vel.setZ(vel.z() + SPEED);
+        if (IsKeyDown(in.right)) vel.setX(vel.x() + INP_SPEED);
+        if (IsKeyDown(in.left)) vel.setX(vel.x() - INP_SPEED);
+        if (IsKeyDown(in.up)) vel.setZ(vel.z() - INP_SPEED);
+        if (IsKeyDown(in.down)) vel.setZ(vel.z() + INP_SPEED);
 
         // Código pa correr
         //
@@ -19,10 +19,10 @@ void InputSystem::update(EntityManager& em)
         // {
         //     if (vel.x() != 0.0f || vel.z() != 0.0f)
         //     {
-        //         vel *= (SPEED * 3.5f);
+        //         // Esto no funcionará si la velocidad del input es igual a la velocidad máxima del PhysicsSystem
+        //         vel *= (INP_SPEED * 3.5f);
         //     }
         // }
-
 
         // Normalizar la velocidad si se está moviendo en diagonal
         if (vel.x() != 0.0f && vel.z() != 0.0f)

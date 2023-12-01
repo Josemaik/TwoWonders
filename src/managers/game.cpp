@@ -54,14 +54,15 @@ void game()
         //     ,{-2.0f,1.f,-8.0f}
         //     ,AIComponent::invalid}
              .patrol = {
-            vec3f{ -8.5f, 1.f, -8.0f}
+            vec3f{ -8.5f, 1.f, -8.0f},
+            {-4.5f, 1.f, 4.0f}
             ,{-8.5f, 1.f, 8.0f}
-            ,{-2.0f, 1.f,8.0f}
-            ,{-2.0f,1.f,-8.0f},AIComponent::invalid}
-    });
+            ,{-3.0f, 1.f,8.0f}
+            ,{-3.0f,1.f,-8.0f},AIComponent::invalid}
+        });
     auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
     em.addComponent<LifeComponent>(e4, LifeComponent{ .life = 1 });
-    em.addComponent<ColliderComponent>(e4, ColliderComponent{ p4.position, r4.scale });
+    em.addComponent<ColliderComponent>(e4, ColliderComponent{ p4.position, r4.scale, BehaviorType::ENEMY });
     // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
     // MemoryViewer mv2{ em.getCMPStorage<RenderComponent>() };
     // mv2.printMemory();

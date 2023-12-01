@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include <cmath>
-#include <math.h>
 #include <optional>
 #include <raylib.h>
 
@@ -82,20 +81,29 @@ struct vec3D
 
     constexpr DataT length() const
     {
-        return std::sqrt(lengthSQ());
+        if (!length_)
+            length_ = sqrt(lengthSQ());
+        return *length_;
     }
 
-    constexpr vec3D& normalize() noexcept
+    constexpr vec3D& normalize()
     {
-        auto const len = length();
-        if(len != 0){x_/=len;y_/=len;z_/=len;}
+        auto const& len = length();
+
+        if (len >= 1.f)
+            *this /= len;
+        else
+            *this /= (1.f / len);
+
         return *this;
     }
+
     constexpr vec3D normalized() const noexcept
     {
-        auto v { *this };
+        auto v{ *this };
         return v.normalize();
     }
+
     static constexpr vec3D min(const vec3D& a, const vec3D& b)
     {
         return { std::min(a.x_, b.x_), std::min(a.y_, b.y_), std::min(a.z_, b.z_) };

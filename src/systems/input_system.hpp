@@ -4,7 +4,7 @@
 #include <raylib.h>
 #include "../utils/types.hpp"
 
-constexpr float SPEED = .4f;
+constexpr float INP_SPEED = .4f;
 
 struct InputSystem
 {
