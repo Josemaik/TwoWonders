@@ -43,7 +43,7 @@ void RenderSystem::beginFrame(ENGI::GameEngine& engine, EntityManager& em)
     engine.beginDrawing();
     engine.clearBackground(RAYWHITE);
 
-    drawHUD(em);
+    drawHUD(em, engine);
 
     engine.beginMode3D();
     engine.drawGrid(20, 1.0f);
@@ -57,16 +57,29 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine)
 }
 
 // Se dibuja el HUD
-void RenderSystem::drawHUD(EntityManager& em)
+void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
 {
     // Visualizar las vidas del player
     for (auto const& e : em.getEntities())
     {
+        // Dibujar vidas restantes del player
         if (e.hasTag<PlayerTag>() && e.hasComponent<LifeComponent>())
         {
             auto const& l{ em.getComponent<LifeComponent>(e) };
             std::string vida = "Vidas: " + std::to_string(l.life);
-            DrawText(vida.c_str(), 10, 10, 20, BLACK);
+            engine.drawText(vida.c_str(), 10, 10, 20, BLACK);
+        }
+        // Dibujar la vida restante encima de las entidades // DEBUG
+        if(e.hasComponent<LifeComponent>())
+        {
+            auto const& r{ em.getComponent<RenderComponent>(e) };
+            auto const& l{ em.getComponent<LifeComponent>(e) };
+            
+            engine.drawText(std::to_string(l.life).c_str(), 
+                            engine.getWorldToScreenX(r.position) - 5, 
+                            engine.getWorldToScreenY(r.position) - r.scale.y()*50, 
+                            20, 
+                            BLACK);
         }
     }
 }

@@ -52,7 +52,7 @@ void createEntities(EntityManager& em)
             ,{-3.0f, 1.f,8.0f}
             ,{-3.0f,1.f,-8.0f},AIComponent::invalid}
         });
-    auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
+    auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = RED });
     em.addComponent<LifeComponent>(e4, LifeComponent{ .life = 1 });
     em.addComponent<ColliderComponent>(e4, ColliderComponent{ p4.position, r4.scale, BehaviorType::ENEMY });
 }

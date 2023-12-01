@@ -55,6 +55,12 @@ void ENGI::GameEngine::drawCubeWires(vec3f pos, float width, float height, float
     DrawCubeWires(pos.toRaylib(), width, height, lenght, color);
 }
 
+////// TEXT //////
+
+void ENGI::GameEngine::drawText(const char *text, int posX, int posY, int fontSize, Color color){
+    DrawText(text, posX, posY, fontSize, color);
+}
+
 ////// WINDOW //////
 
 void ENGI::GameEngine::initWindow(int width, int height, const char* title)
@@ -112,4 +118,16 @@ void ENGI::GameEngine::setFovyCamera(float fovy)
 void ENGI::GameEngine::setProjectionCamera(int proj)
 {
     camera.projection = proj;
+}
+
+////// AUX //////
+
+float ENGI::GameEngine::getWorldToScreenX(vec3f pos)
+{
+    return GetWorldToScreen(pos.toRaylib(), camera).x;
+}
+
+float ENGI::GameEngine::getWorldToScreenY(vec3f pos)
+{
+    return GetWorldToScreen(pos.toRaylib(), camera).y;
 }

@@ -16,7 +16,7 @@ struct RenderSystem
 private:
     void beginFrame(ENGI::GameEngine& engine, EntityManager& em);
     void endFrame(ENGI::GameEngine& engine);
-    void drawHUD(EntityManager& em);
+    void drawHUD(EntityManager& em, ENGI::GameEngine& engine);
 };
 
 #endif // !RENDER_SYSTEM
