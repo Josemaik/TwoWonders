@@ -1,5 +1,5 @@
 #include "physics_system.hpp"
-
+#include <printf.h>
 void PhysicsSystem::update(EntityManager& em)
 {
     em.forEach<SYSCMPs, SYSTAGs>([&em](Entity&, PhysicsComponent& phy)

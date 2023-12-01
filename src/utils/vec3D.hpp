@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <cmath>
+#include <math.h>
 #include <optional>
 #include <raylib.h>
 
@@ -79,20 +80,15 @@ struct vec3D
         return dotProduct(*this);
     }
 
-    DataT length() const
+    constexpr DataT length() const
     {
-        if (!length_)
-            length_ = sqrt(lengthSQ());
-        return *length_;
+        return std::sqrt(lengthSQ());
     }
 
     constexpr vec3D& normalize() noexcept
     {
-        vec3D v{ std::abs(x_), std::abs(y_), std::abs(z_) };
-        *this /= length();
-
-        // Aplicar la velocidad constante
-        *this *= v;
+        auto const len = length();
+        if(len != 0){x_/=len;y_/=len;z_/=len;}
         return *this;
     }
     constexpr vec3D normalized() const noexcept

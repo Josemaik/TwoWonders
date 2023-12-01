@@ -3,6 +3,7 @@
 #define AI_SYSTEM
 #include "../utils/types.hpp"
 #include "../utils/vec3D.hpp"
+#include <iostream>
 
 struct AISystem
 {
@@ -13,4 +14,4 @@ struct AISystem
     void update(EntityManager& em);
 };
 
-#endif // !PHYSICS_SYSTEM
+#endif // !AI_SYSTEM

@@ -11,7 +11,7 @@ void game()
     InputSystem input_system{};
     CollisionSystem collision_system{};
     LifeSystem life_system{};
-    AISystem   aisys;
+    AISystem   aisys{};
 
     // Player
     auto& e{ em.newEntity() };
@@ -39,21 +39,19 @@ void game()
     //patrol Enemy
     auto& e4{ em.newEntity() };
     em.addTag<EnemyTag>(e4);
-    auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
-    auto& p4 = em.addComponent<PhysicsComponent>(e4, PhysicsComponent{ .position = {0.f,1.f,-6.0f}, .velocity = { 0.0f, 0.0f, 0.0f } });
+    auto& p4 = em.addComponent<PhysicsComponent>(e4, PhysicsComponent{ .position = {0.0f,0.0f,0.0f}, .velocity = {} });
     em.addComponent<AIComponent>(e4, AIComponent{
         // .patrol = {
-        //     vec3f{ -7.5f, 1.f, -6.0f }
-        //     ,{-7.5f, 1.f, 6.0f}
-        //     ,{-2.0f, 1.f,6.0f}
-        //     ,{-2.0f,1.f,-6.0f},AIComponent::invalid}
+        //     vec3f{ -8.5f, 1.f, -8.0f }
+        //     ,{-2.0f,1.f,-8.0f}
+        //     ,AIComponent::invalid}
              .patrol = {
-            vec3f{ 2.f, 1.f, 6.f}
-            ,{-5.f, 1.f, 6.f}
-            ,{-5.0f, 1.f,6.f}
-            ,{-5.0f,1.f,0.f},AIComponent::invalid}
+            vec3f{ -8.5f, 1.f, -8.0f}
+            ,{-8.5f, 1.f, 8.0f}
+            ,{-2.0f, 1.f,8.0f}
+            ,{-2.0f,1.f,-8.0f},AIComponent::invalid}
     });
-
+    auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
     // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
     // MemoryViewer mv2{ em.getCMPStorage<RenderComponent>() };
     // mv2.printMemory();

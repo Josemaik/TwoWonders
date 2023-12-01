@@ -8,5 +8,5 @@ struct AIComponent
     static constexpr uint8_t max_patrol { 10 };
     std::array<vec3f,max_patrol> patrol{};
     uint8_t current{};
-    float arrival_radious { 1.f };
+    float arrival_radius { 1.f };
 };
