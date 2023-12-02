@@ -7,10 +7,16 @@ void AISystem::update(EntityManager& em)
         //local Variables
         // auto& pos = phy.position;
         //Player detection
+        if(ai.playerdetected){
+            auto const& distance = getPlayerDistance(em,phy,ai);
+            phy.velocity = distance.normalized() * SPEED_AI;
+            return;
+        }
         if(this->isPlayerDetected(em,phy,ai)){
             std::printf("DETECTO AL PLAYER");
             //Attack
-            phy.velocity = {};
+            // phy.velocity = {};
+            ai.playerdetected = true;
             return;
         }
         //Do patrol
@@ -42,6 +48,14 @@ void AISystem::update(EntityManager& em)
     auto& plphy = EM.getComponent<PhysicsComponent>(*playerEn);
     auto const distance = (p.position - plphy.position).lengthSQ();
     return  distance < (ai.detect_radius * ai.detect_radius); 
+}
+[[nodiscard]] vec3f AISystem::getPlayerDistance(EntityManager&EM,PhysicsComponent const p, AIComponent const ai) const noexcept{
+    auto& li = EM.getSingleton<LevelInfo>();
+    auto* playerEn = EM.getEntityByID (li.playerID);
+    if(not playerEn) return vec3f{};
+    auto& plphy = EM.getComponent<PhysicsComponent>(*playerEn);
+    auto const distance = plphy.position - p.position;
+    return  distance; 
 }
 
 

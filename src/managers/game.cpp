@@ -33,7 +33,7 @@ void game()
     auto& e3{ em.newEntity() };
     em.addTag<EnemyTag>(e3);
     auto& r3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 2.0f, 2.0f, 2.0f }, .color = RED });
-    auto& p3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = { 0.0f, 0.0f, -6.0f }, .velocity = { -.05f, .0f, .0f } });
+    auto& p3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = { 0.0f, 0.0f, -6.0f }, .velocity = { .0f, .0f, .0f } });
     em.addComponent<LifeComponent>(e3, LifeComponent{ .life = 1 });
     em.addComponent<ColliderComponent>(e3, ColliderComponent{ p3.position, r3.scale, BehaviorType::ENEMY });
 
