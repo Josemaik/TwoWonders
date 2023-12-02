@@ -25,9 +25,11 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
             }
             // Comprobar si tiene el componente vida
             Color colorEntidad = r.color;
-            if(e.hasComponent<LifeComponent>())
-                if(em.getComponent<LifeComponent>(e).countdown > 0)
+            if(e.hasComponent<LifeComponent>()){
+                auto& l { em.getComponent<LifeComponent>(e) };
+                if(l.elapsed < l.countdown)
                     colorEntidad = YELLOW;
+            }
             engine.drawCube(r.position, r.scale.x(), r.scale.y(), r.scale.z(), colorEntidad);
             
             // engine.drawCubeWires(r.position, r.scale.x(), r.scale.y(), r.scale.z(), MAROON);

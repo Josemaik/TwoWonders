@@ -2,16 +2,17 @@
 
 struct LifeComponent
 {
-    int life{}, countdown{};
+    int life{};
+    float countdown{ 1.0f }, elapsed{ 1.0f }; // En segundos
 
     void decreaseLife(){
-        if(countdown < 0 && life > 0){
+        if((elapsed >= countdown) && (life > 0)){
             life -= 1;
-            countdown = 30;
+            elapsed = 0;
         }
     }
 
     void decreaseCountdown(){
-        countdown -= 1;
+        elapsed += GetFrameTime(); // delta time
     }
 };
