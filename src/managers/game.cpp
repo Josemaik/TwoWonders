@@ -23,7 +23,7 @@ void createEntities(EntityManager& em)
     auto& e3{ em.newEntity() };
     em.addTag<EnemyTag>(e3);
     auto& r3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 2.0f, 2.0f, 2.0f }, .color = RED });
-    auto& p3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = { 0.0f, 0.0f, -6.0f }, .velocity = { -.05f, .0f, .0f } });
+    auto& p3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = { 0.0f, 0.0f, -6.0f }, .velocity = { .0f, .0f, .0f } });
     em.addComponent<LifeComponent>(e3, LifeComponent{ .life = 1 });
     em.addComponent<ColliderComponent>(e3, ColliderComponent{ p3.position, r3.scale, BehaviorType::ENEMY });
 
@@ -38,8 +38,11 @@ void createEntities(EntityManager& em)
     //patrol Enemy
     auto& e4{ em.newEntity() };
     em.addTag<EnemyTag>(e4);
+
+    auto& p4 = em.addComponent<PhysicsComponent>(e4, PhysicsComponent{ .position = {0.0f,0.0f,-8.0f}, .velocity = {}});
+
     //auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 2.0f, 1.0f }, .color = ORANGE });
-    auto& p4 = em.addComponent<PhysicsComponent>(e4, PhysicsComponent{ .position = { -8.5f, 0.f, -8.0f }, .velocity = {} });
+
     em.addComponent<AIComponent>(e4, AIComponent{
         // .patrol = {
         //     vec3f{ -8.5f, 1.f, -8.0f }
@@ -54,7 +57,10 @@ void createEntities(EntityManager& em)
         });
     auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
     em.addComponent<LifeComponent>(e4, LifeComponent{ .life = 1 });
-    em.addComponent<ColliderComponent>(e4, ColliderComponent{ p4.position, r4.scale, BehaviorType::ENEMY });
+    em.addComponent<ColliderComponent>(e4, ColliderComponent{ p4.position, r4.scale,BehaviorType::ENEMY });
+
+    auto& li = em.getSingleton<LevelInfo>();
+    li.playerID = e.getID();
 }
 
 void game()
@@ -67,22 +73,23 @@ void game()
     CollisionSystem collision_system{};
     LifeSystem life_system{};
     AISystem   ai_sys{};
-
+    GameTimer gtime{};
+  
     createEntities(em);
 
     // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
     // MemoryViewer mv2{ em.getCMPStorage<RenderComponent>() };
     // mv2.printMemory();
     // mv.printMemory();
-
+      // Inicializa el reloj para medir el tiempo entre frames
     while (!engine.windowShouldClose())
     {
         input_system.update(em);
+        render_system.update(em, engine);
         ai_sys.update(em);
         physics_system.update(em);
         collision_system.update(em);
         life_system.update(em);
-        render_system.update(em, engine);
     }
 
     engine.closeWindow();

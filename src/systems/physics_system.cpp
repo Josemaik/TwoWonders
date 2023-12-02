@@ -1,4 +1,5 @@
 #include "physics_system.hpp"
+#include <printf.h>
 
 void PhysicsSystem::update(EntityManager& em)
 {
@@ -13,8 +14,9 @@ void PhysicsSystem::update(EntityManager& em)
             vel.normalize();
             vel *= MAX_SPEED;
         }
+        auto& pos = phy.position;
+        auto& vel = phy.velocity;
 
-        // Actualizar la posición
         pos.setX(pos.x() + vel.x());
         pos.setY(pos.y() + vel.y());
         pos.setZ(pos.z() + vel.z());
