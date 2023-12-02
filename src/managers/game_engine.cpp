@@ -1,10 +1,10 @@
 #include "game_engine.hpp"
-
+#include "utils/gametimer.hpp"
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
 {
     GameEngine::initWindow(width_, height_, "ZeldaWonders");
-    GameEngine::setTargetFPS(10);
+    GameEngine::setTargetFPS(30);
 
     GameEngine::setPositionCamera({ 0.0f, 25.0f, 25.0f });
     GameEngine::setTargetCamera({ 0.0f, 03.0f, .0f });

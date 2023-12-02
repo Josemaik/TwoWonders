@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstdint>
 #include "../utils/types.hpp"
+#include "../utils/gametimer.hpp"
 #include "../systems/collision_system.hpp"
 #include "../systems/render_system.hpp"
 #include "../systems/physics_system.hpp"

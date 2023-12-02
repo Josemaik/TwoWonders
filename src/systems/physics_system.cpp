@@ -1,5 +1,6 @@
 #include "physics_system.hpp"
 #include <printf.h>
+
 void PhysicsSystem::update(EntityManager& em)
 {
     em.forEach<SYSCMPs, SYSTAGs>([](Entity&, PhysicsComponent& phy)
@@ -22,7 +23,6 @@ void PhysicsSystem::update(EntityManager& em)
 
         auto& pos = phy.position;
         auto& vel = phy.velocity;
-
         pos.setX(pos.x() + vel.x());
         pos.setY(pos.y() + vel.y());
         pos.setZ(pos.z() + vel.z());
