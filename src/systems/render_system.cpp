@@ -79,7 +79,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
             auto const& a{ em.getComponent<AttackComponent>(e) };
             std::string countdown_ataque;
             if(a.elapsed > a.countdown)
-                countdown_ataque = "Ataque Listo";
+                countdown_ataque = "Ataque listo";
             else
                 countdown_ataque = "Ataque listo en: " + std::to_string(-1*(a.elapsed - 1.0f)) + " segundos";
             
