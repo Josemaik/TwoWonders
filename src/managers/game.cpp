@@ -12,6 +12,7 @@ void createEntities(EntityManager& em)
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
+    em.addComponent<AttackComponent>(e, AttackComponent{});
 
     // Wall
     auto& e2{ em.newEntity() };
@@ -67,6 +68,7 @@ void game()
     CollisionSystem collision_system{};
     LifeSystem life_system{};
     AISystem   ai_sys{};
+    AttackSystem attack_system{};
 
     createEntities(em);
 
@@ -78,6 +80,7 @@ void game()
     while (!engine.windowShouldClose())
     {
         input_system.update(em);
+        attack_system.update(em);
         ai_sys.update(em);
         physics_system.update(em);
         collision_system.update(em);

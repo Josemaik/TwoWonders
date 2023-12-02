@@ -5,7 +5,7 @@
 #include <cassert>
 #include <span>
 
-template <typename T, std::size_t Capacity = 10, typename INDEXT = std::uint32_t>
+template <typename T, std::size_t Capacity = 100, typename INDEXT = std::uint32_t>
 struct Slotmap
 {
     using data_type = T;

@@ -54,7 +54,7 @@ namespace ETMG {
 
         // CONSTANTES
         //
-        static constexpr std::size_t MAX_ENTITIES{ 5 };
+        static constexpr std::size_t MAX_ENTITIES{ 10 };
 
         // ALIAS
         //

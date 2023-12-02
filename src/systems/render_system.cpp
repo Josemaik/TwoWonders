@@ -1,5 +1,7 @@
 #include "render_system.hpp"
 
+#include <iomanip>
+
 void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
 {
 
@@ -65,11 +67,23 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
     for (auto const& e : em.getEntities())
     {
         // Dibujar vidas restantes del player en el HUD
-        if (e.hasTag<PlayerTag>() && e.hasComponent<LifeComponent>())
+        if(e.hasTag<PlayerTag>() && e.hasComponent<LifeComponent>())
         {
             auto const& l{ em.getComponent<LifeComponent>(e) };
             std::string vida = "Vidas: " + std::to_string(l.life);
             engine.drawText(vida.c_str(), 10, 10, 20, BLACK);
+        }
+        // Dibujar el countdown restante del ataque del player en el HUD
+        if(e.hasTag<PlayerTag>() && e.hasComponent<AttackComponent>())
+        {
+            auto const& a{ em.getComponent<AttackComponent>(e) };
+            std::string countdown_ataque;
+            if(a.elapsed > a.countdown)
+                countdown_ataque = "Ataque Listo";
+            else
+                countdown_ataque = "Ataque listo en: " + std::to_string(-1*(a.elapsed - 1.0f)) + " segundos";
+            
+            engine.drawText(countdown_ataque.c_str(), 10, 30, 20, BLACK);
         }
         
         // Dibujar la vida restante encima de las entidades // DEBUG

@@ -2,7 +2,7 @@
 
 void InputSystem::update(EntityManager& em)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, PhysicsComponent& phy, InputComponent& in)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, InputComponent& in)
     {
         // Resetear la velocidad
         phy.velocity = {};
@@ -14,10 +14,8 @@ void InputSystem::update(EntityManager& em)
         if (IsKeyDown(in.down)) vel.setZ(vel.z() + INP_SPEED);
 
         // Codigo para el ataque
-        //if(IsKeyDown(in.space) && e.hasComponent<AttackComponent>()){
-        //    auto& a{ em.getComponent<AttackComponent>(e) };
-        //    a.attack(em);
-        //}   
+        if(IsKeyDown(in.space) && e.hasComponent<AttackComponent>())
+            em.getComponent<AttackComponent>(e).attack();   
 
         // Código pa correr
         //

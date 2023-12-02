@@ -10,6 +10,7 @@
 #include "../systems/input_system.hpp"
 #include "../systems/life_system.hpp"
 #include "../systems/ai.hpp"
+#include "../systems/attack_system.hpp"
 
 constexpr uint16_t SCREEN_WIDTH{ 800 };
 constexpr uint16_t SCREEN_HEIGHT{ 600 };
