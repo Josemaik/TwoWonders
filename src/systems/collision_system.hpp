@@ -21,6 +21,7 @@ struct CollisionSystem
     void staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3f& minOverlap);
     void nonPlayerCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
     void classicCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
+    void handleCollision(EntityManager& em, Entity* entity1, Entity* entity2, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
 };
 
 #endif // !INPUT_MANAGER

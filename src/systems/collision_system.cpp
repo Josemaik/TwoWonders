@@ -28,61 +28,79 @@ void CollisionSystem::checkCollision(EntityManager& em, EntColPair& ECPair)
         ++it2;
         for (; it2 != ECPair.end(); ++it2)
         {
+            BBox* bbox1 = &it1->second->boundingBox;
+            BBox* bbox2 = &it2->second->boundingBox;
 
-            // for (auto it1 = boxes.begin(); it1 != boxes.end(); ++it1)
-            // {
-            //     for (auto it2 = boxes.begin(); it2 != boxes.end(); ++it2)
-            //     {
-            //         if (it1 == it2) continue; // Skip checking collision with itself
-
-            BBox* playerBBox = &it1->second->boundingBox;
-            BBox* otherBBox = &it2->second->boundingBox;
-
-            if (CheckCollisionBoxes(*playerBBox, *otherBBox))
+            if (CheckCollisionBoxes(*bbox1, *bbox2))
             {
-                Entity* player = it1->first;
-                Entity* other = it2->first;
+                Entity* entity1 = it1->first;
+                Entity* entity2 = it2->first;
 
-                ColliderComponent* playerCollider = it1->second;
-                ColliderComponent* otherCollider = it2->second;
+                ColliderComponent* collider1 = it1->second;
+                ColliderComponent* collider2 = it2->second;
 
-                vec3f overlap = playerBBox->max - otherBBox->min;
-                vec3f overlap2 = otherBBox->max - playerBBox->min;
+                vec3f overlap = bbox1->max - bbox2->min;
+                vec3f overlap2 = bbox2->max - bbox1->min;
 
                 vec3f minOverlap = vec3f::min(overlap, overlap2);
 
-                if (otherCollider->behaviorType & BehaviorType::PLAYER)
+                if (collider2->behaviorType & BehaviorType::PLAYER)
                 {
-                    std::swap(player, other);
-                    std::swap(playerBBox, otherBBox);
-                    std::swap(playerCollider, otherCollider);
-
-                    switch (otherCollider->behaviorType)
-                    {
-                    case BehaviorType::ENEMY:
-                    {
-                        auto& p = em.getComponent<PhysicsComponent>(*player);
-                        enemyCollision(p, em.getComponent<PhysicsComponent>(*other), minOverlap);
-                        auto& l = em.getComponent<LifeComponent>(*player);
-
-                        if (l.life > 0 && p.invincibilityTimer <= 0) l.decreaseLife();
-                        break;
-                    }
-                    case BehaviorType::STATIC:
-                        staticCollision(em.getComponent<PhysicsComponent>(*player), em.getComponent<PhysicsComponent>(*other), minOverlap);
-                        break;
-                    case BehaviorType::PLAYER:
-                        break;
-                    case BehaviorType::NOTHING:
-                        break;
-                    }
-
+                    std::swap(entity1, entity2);
+                    std::swap(bbox1, bbox2);
+                    std::swap(collider1, collider2);
                 }
-                else if (!(playerCollider->behaviorType & BehaviorType::PLAYER))
-                {
-                    nonPlayerCollision(em.getComponent<PhysicsComponent>(*player), em.getComponent<PhysicsComponent>(*other), minOverlap);
-                }
+
+                handleCollision(em, entity1, entity2, minOverlap, collider1->behaviorType, collider2->behaviorType);
             }
+        }
+    }
+}
+
+void CollisionSystem::handleCollision(EntityManager& em, Entity* entity1, Entity* entity2, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
+{
+    auto& physics1 = em.getComponent<PhysicsComponent>(*entity1);
+    auto& physics2 = em.getComponent<PhysicsComponent>(*entity2);
+
+    if (behaviorType1 & BehaviorType::PLAYER)
+    {
+        switch (behaviorType2)
+        {
+        case BehaviorType::ENEMY:
+        {
+            enemyCollision(physics1, physics2, minOverlap);
+            em.getComponent<LifeComponent>(*entity1).decreaseLife();
+            break;
+        }
+        case BehaviorType::STATIC:
+            staticCollision(physics1, physics2, minOverlap);
+            break;
+        default:
+            break;
+        }
+    }
+    else if (behaviorType1 & BehaviorType::ENEMY)
+    {
+        if (behaviorType2 & BehaviorType::STATIC)
+        {
+            // Handle the case when one entity is an enemy and the other is static
+            staticCollision(physics1, physics2, minOverlap);
+        }
+        else if (behaviorType2 & BehaviorType::ENEMY)
+        {
+            // Handle the case when both entities are enemies
+            nonPlayerCollision(physics1, physics2, minOverlap);
+        }
+    }
+    else if (behaviorType1 & BehaviorType::STATIC)
+    {
+        if (behaviorType2 & BehaviorType::STATIC)
+        {
+            staticCollision(physics1, physics2, minOverlap);
+        }
+        else if (behaviorType2 & BehaviorType::ENEMY)
+        {
+            staticCollision(physics1, physics2, minOverlap);
         }
     }
 }
@@ -90,10 +108,6 @@ void CollisionSystem::checkCollision(EntityManager& em, EntColPair& ECPair)
 void CollisionSystem::enemyCollision(PhysicsComponent& playerPhysics, PhysicsComponent& enemyPhysics, vec3f& minOverlap)
 {
     classicCollision(playerPhysics, enemyPhysics, minOverlap);
-
-    // Inmovilizar al jugador si toca a un enemigo
-    if (playerPhysics.invincibilityTimer <= 0.f && playerPhysics.immobilizeTimer <= 0.f)
-        playerPhysics.immobilizeTimer = 30.0f;
 }
 
 void CollisionSystem::staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3f& minOverlap)
@@ -101,47 +115,49 @@ void CollisionSystem::staticCollision(PhysicsComponent& playerPhysics, PhysicsCo
     classicCollision(playerPhysics, staticPhysics, minOverlap);
 }
 
-void CollisionSystem::nonPlayerCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap)
+void CollisionSystem::nonPlayerCollision(PhysicsComponent& phy2, PhysicsComponent& phy1, vec3f& minOverlap)
 {
     auto& pos1 = phy1.position;
     auto& pos2 = phy2.position;
 
-    // Check the velocity of the entities
-    if (phy1.velocity.length() <= phy2.velocity.length())
-    {
-        if (minOverlap.x() < minOverlap.z())
-        {
-            if (pos1.x() < pos2.x())
-                pos1.setX(pos1.x() - minOverlap.x());
-            else
-                pos1.setX(pos1.x() + minOverlap.x());
-        }
-        else
-        {
-            if (pos1.z() < pos2.z())
-                pos1.setZ(pos1.z() - minOverlap.z());
-            else
-                pos1.setZ(pos1.z() + minOverlap.z());
-        }
-    }
+    classicCollision(phy1, phy2, minOverlap);
 
-    if (phy2.velocity.length() <= phy1.velocity.length())
-    {
-        if (minOverlap.x() < minOverlap.z())
-        {
-            if (pos2.x() < pos1.x())
-                pos2.setX(pos2.x() - minOverlap.x());
-            else
-                pos2.setX(pos2.x() + minOverlap.x());
-        }
-        else
-        {
-            if (pos2.z() < pos1.z())
-                pos2.setZ(pos2.z() - minOverlap.z());
-            else
-                pos2.setZ(pos2.z() + minOverlap.z());
-        }
-    }
+    // // Check the velocity of the entities
+    // if (phy1.velocity.length() <= phy2.velocity.length())
+    // {
+    //     if (minOverlap.x() < minOverlap.z())
+    //     {
+    //         if (pos1.x() < pos2.x())
+    //             pos1.setX(pos1.x() - minOverlap.x());
+    //         else
+    //             pos1.setX(pos1.x() + minOverlap.x());
+    //     }
+    //     else
+    //     {
+    //         if (pos1.z() < pos2.z())
+    //             pos1.setZ(pos1.z() - minOverlap.z());
+    //         else
+    //             pos1.setZ(pos1.z() + minOverlap.z());
+    //     }
+    // }
+
+    // if (phy2.velocity.length() <= phy1.velocity.length())
+    // {
+    //     if (minOverlap.x() < minOverlap.z())
+    //     {
+    //         if (pos2.x() < pos1.x())
+    //             pos2.setX(pos2.x() - minOverlap.x());
+    //         else
+    //             pos2.setX(pos2.x() + minOverlap.x());
+    //     }
+    //     else
+    //     {
+    //         if (pos2.z() < pos1.z())
+    //             pos2.setZ(pos2.z() - minOverlap.z());
+    //         else
+    //             pos2.setZ(pos2.z() + minOverlap.z());
+    //     }
+    // }
 }
 
 void CollisionSystem::classicCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap)

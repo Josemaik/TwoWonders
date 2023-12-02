@@ -6,18 +6,14 @@
 
 struct LifeSystem
 {
-    // using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
-    // using SYSTAGs = MP::TypeList<>;
+    using SYSCMPs = MP::TypeList<LifeComponent>;
+    using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em) {
-        for (auto const& e : em.getEntities())
+        em.forEach<SYSCMPs, SYSTAGs>([](Entity&, LifeComponent& lif)
         {
-            if (e.hasComponent<LifeComponent>())
-            {
-                auto& l{ em.getComponent<LifeComponent>(e) };
-                l.decreaseCountdown();
-            }
-        }
+            lif.decreaseCountdown();
+        });
     };
 };
 

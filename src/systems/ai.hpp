@@ -8,7 +8,7 @@ constexpr float SPEED_AI = .2f;
 struct AISystem
 {
     // Se van a buscar las entidad que tengan estos componentes y tags
-    using SYSCMPs = MP::TypeList<PhysicsComponent,AIComponent>;
+    using SYSCMPs = MP::TypeList<PhysicsComponent, AIComponent>;
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em);

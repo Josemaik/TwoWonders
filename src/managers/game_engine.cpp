@@ -47,12 +47,12 @@ void ENGI::GameEngine::endMode3D()
 
 void ENGI::GameEngine::drawCube(vec3f pos, float width, float height, float lenght, Color color)
 {
-    DrawCube(pos.toRaylib(), height, width, lenght, color);
+    DrawCube(pos.toRaylib(), width, height, lenght, color);
 }
 
 void ENGI::GameEngine::drawCubeWires(vec3f pos, float width, float height, float lenght, Color color)
 {
-    DrawCubeWires(pos.toRaylib(), height, width, lenght, color);
+    DrawCubeWires(pos.toRaylib(), width, height, lenght, color);
 }
 
 ////// WINDOW //////
