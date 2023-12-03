@@ -61,6 +61,15 @@ void createEnemies(EntityManager& em)
               { 8.5f, 0.f, -8.0f },
               { 8.5f, 0.f, 8.0f },
               AIComponent::invalid
+          }},
+          { "ShoterEnemy",
+          {2.8f, 0.0f, -2.8f},
+          {
+              vec3f{2.8f, 0.0f, -2.8f},
+              {-2.8f, 0.0f, -2.8f},
+               {-2.8f, 0.0f, 2.8f},
+               {2.8f, 0.0f, 2.8f},
+              AIComponent::invalid
           }}
     };
 
@@ -73,6 +82,8 @@ void createEnemies(EntityManager& em)
             em.addTag<PatrolEnemy>(enemy);
         } else if (enemyDataItem.enemyType == "PatrolFollowEnemy") {
             em.addTag<PatrolFollowEnemy>(enemy);
+        }else if(enemyDataItem.enemyType == "ShoterEnemy"){
+            em.addTag<ShoterEnemy>(enemy);
         }
 
         auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = enemyDataItem.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
