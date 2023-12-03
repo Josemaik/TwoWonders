@@ -67,7 +67,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto* playerEn = em.getEntityByID(li.playerID);
-    if (not playerEn) { drawDeath(); return; }
+    if (not playerEn) { drawDeath(engine); return; }
 
     // Visualizar las vidas del player
     for (auto const& e : em.getEntities())
@@ -107,8 +107,8 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
     }
 }
 
-void RenderSystem::drawDeath()
+void RenderSystem::drawDeath(ENGI::GameEngine& engine)
 {
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.5f));
-    DrawText("HAS MUERTO", 250, 250, 40, RED);
+    engine.drawRectangle(0, 0, engine.getScreenWidth(), engine.getScreenHeight(), Fade(BLACK, 0.5f));
+    engine.drawText("HAS MUERTO", 250, 250, 40, BLACK);
 }

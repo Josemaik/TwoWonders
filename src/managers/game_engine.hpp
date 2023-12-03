@@ -26,6 +26,7 @@ namespace ENGI {
         void endMode3D();
         void drawCube(vec3f pos, float width, float height, float lenght, Color color);
         void drawCubeWires(vec3f pos, float width, float height, float lenght, Color color);
+        void drawRectangle(int posX, int posY, int width, int height, Color color);
 
         // Text
         void drawText(const char *text, int posX, int posY, int fontSize, Color color);

@@ -22,7 +22,7 @@ void AttackSystem::update(EntityManager& em){
             em.addTag<HitPlayer>(e);
             /*auto& r = */em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 0.5f, 0.5f, 0.5f }, .color = BLACK });
             /*auto& p = */em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .velocity = vel, .gravity = 0 });
-            //em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATTACK });
+            //em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATTACK_PLAYER });
         
             att.createAttack =  false;
         }

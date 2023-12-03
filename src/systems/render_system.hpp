@@ -17,7 +17,7 @@ private:
     void beginFrame(ENGI::GameEngine& engine);
     void endFrame(ENGI::GameEngine& engine, EntityManager& em);
     void drawHUD(EntityManager& em, ENGI::GameEngine& engine);
-    void drawDeath();
+    void drawDeath(ENGI::GameEngine& engine);
 };
 
 #endif // !RENDER_SYSTEM
