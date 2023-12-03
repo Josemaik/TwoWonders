@@ -34,8 +34,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
                     colorEntidad = YELLOW;
             }
             engine.drawCube(r.position, r.scale.x(), r.scale.y(), r.scale.z(), colorEntidad);
-            
-            // engine.drawCubeWires(r.position, r.scale.x(), r.scale.y(), r.scale.z(), MAROON);
+            // engine.drawCubeWires(r.position, r.scale.x(), r.scale.y(), r.scale.z(), BLACK);
         }
         count++;
     }
@@ -49,7 +48,7 @@ void RenderSystem::beginFrame(ENGI::GameEngine& engine, EntityManager& em)
     engine.beginDrawing();
     engine.clearBackground(RAYWHITE);
 
-    drawHUD(em, engine);
+    //drawHUD(em, engine);
 
     engine.beginMode3D();
     // engine.drawGrid(20, 10.f);
@@ -71,10 +70,10 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
     if (not playerEn) { drawDeath(); return; }
 
     // Visualizar las vidas del player
-    if (playerEn->hasTag<PlayerTag>() && playerEn->hasComponent<LifeComponent>())
+    for (auto const& e : em.getEntities())
     {
         // Dibujar vidas restantes del player en el HUD
-        if(.hasTag<PlayerTag>() && e.hasComponent<LifeComponent>())
+        if(e.hasTag<PlayerTag>() && e.hasComponent<LifeComponent>())
         {
             auto const& l{ em.getComponent<LifeComponent>(e) };
             std::string vida = "Vidas: " + std::to_string(l.life);
