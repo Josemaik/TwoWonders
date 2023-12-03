@@ -46,7 +46,8 @@ struct cmp_traits : tag_traits<CMPS> {};
 
 namespace ETMG {
 
-    template <typename CMPList, typename  SNGCMPLIST, typename TAGList, std::size_t SlotCapacity = 25>
+    template <typename CMPList, typename TAGList, std::size_t SlotCapacity = 100>
+
     struct EntityManager
     {
         // Forward declarations - Se declara la clase Entity antes de que se defina
@@ -55,7 +56,7 @@ namespace ETMG {
 
         // CONSTANTES
         //
-        static constexpr std::size_t MAX_ENTITIES{ 25 };
+        static constexpr std::size_t MAX_ENTITIES{ 100 };
 
         // ALIAS
         //

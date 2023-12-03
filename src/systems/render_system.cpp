@@ -1,5 +1,7 @@
 #include "render_system.hpp"
 
+#include <iomanip>
+
 void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
 {
 
@@ -25,16 +27,15 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
                 engine.setTargetCamera(r.position);
             }
             // Comprobar si tiene el componente vida
-            Color entityColor = r.color;
-            if (e.hasComponent<LifeComponent>() && em.getComponent<LifeComponent>(e).countdown > 0)
-            {
-                entityColor = YELLOW;
-                if (em.getComponent<LifeComponent>(e).life == 0)
-                    em.destroyEntity(count);
+            Color colorEntidad = r.color;
+            if(e.hasComponent<LifeComponent>()){
+                auto& l { em.getComponent<LifeComponent>(e) };
+                if(l.elapsed < l.countdown)
+                    colorEntidad = YELLOW;
             }
-
-            engine.drawCube(r.position, r.scale.x(), r.scale.y(), r.scale.z(), entityColor);
-            engine.drawCubeWires(r.position, r.scale.x(), r.scale.y(), r.scale.z(), MAROON);
+            engine.drawCube(r.position, r.scale.x(), r.scale.y(), r.scale.z(), colorEntidad);
+            
+            // engine.drawCubeWires(r.position, r.scale.x(), r.scale.y(), r.scale.z(), MAROON);
         }
         count++;
     }
@@ -47,6 +48,9 @@ void RenderSystem::beginFrame(ENGI::GameEngine& engine)
 {
     engine.beginDrawing();
     engine.clearBackground(RAYWHITE);
+
+    drawHUD(em, engine);
+
     engine.beginMode3D();
     // engine.drawGrid(20, 10.f);
 }
@@ -60,7 +64,7 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em)
 }
 
 // Se dibuja el HUD
-void RenderSystem::drawHUD(EntityManager& em)
+void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto* playerEn = em.getEntityByID(li.playerID);
@@ -69,9 +73,38 @@ void RenderSystem::drawHUD(EntityManager& em)
     // Visualizar las vidas del player
     if (playerEn->hasTag<PlayerTag>() && playerEn->hasComponent<LifeComponent>())
     {
-        auto const& l{ em.getComponent<LifeComponent>(*playerEn) };
-        std::string vida = "Vidas: " + std::to_string(l.life);
-        DrawText(vida.c_str(), 10, 10, 20, BLACK);
+        // Dibujar vidas restantes del player en el HUD
+        if(e.hasTag<PlayerTag>() && e.hasComponent<LifeComponent>())
+        {
+            auto const& l{ em.getComponent<LifeComponent>(e) };
+            std::string vida = "Vidas: " + std::to_string(l.life);
+            engine.drawText(vida.c_str(), 10, 10, 20, BLACK);
+        }
+        // Dibujar el countdown restante del ataque del player en el HUD
+        if(e.hasTag<PlayerTag>() && e.hasComponent<AttackComponent>())
+        {
+            auto const& a{ em.getComponent<AttackComponent>(e) };
+            std::string countdown_ataque;
+            if(a.elapsed > a.countdown)
+                countdown_ataque = "Ataque listo";
+            else
+                countdown_ataque = "Ataque listo en: " + std::to_string(-1*(a.elapsed - 1.0f)) + " segundos";
+            
+            engine.drawText(countdown_ataque.c_str(), 10, 30, 20, BLACK);
+        }
+        
+        // Dibujar la vida restante encima de las entidades // DEBUG
+        if(e.hasComponent<LifeComponent>())
+        {
+            auto const& r{ em.getComponent<RenderComponent>(e) };
+            auto const& l{ em.getComponent<LifeComponent>(e) };
+
+            engine.drawText(std::to_string(l.life).c_str(), 
+                            static_cast<int>(engine.getWorldToScreenX(r.position) - 5), 
+                            static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y()*50), 
+                            20, 
+                            BLACK);
+        }
     }
 }
 

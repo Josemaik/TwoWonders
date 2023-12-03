@@ -86,7 +86,7 @@ void createEntities(EntityManager& em)
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-
+    em.addComponent<AttackComponent>(e, AttackComponent{});
 
     // Ground
     auto& e0{ em.newEntity() };
@@ -100,8 +100,6 @@ void createEntities(EntityManager& em)
 
     // // Enemy
     createEnemies(em);
-
-
 
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
@@ -117,6 +115,7 @@ void game()
     CollisionSystem collision_system{};
     LifeSystem life_system{};
     AISystem   ai_sys{};
+    AttackSystem attack_system{};
     GameTimer gtime{};
 
     createEntities(em);
@@ -129,11 +128,12 @@ void game()
     while (!engine.windowShouldClose())
     {
         input_system.update(em);
-        render_system.update(em, engine);
+        attack_system.update(em);
         ai_sys.update(em);
         physics_system.update(em);
         collision_system.update(em);
         life_system.update(em);
+        render_system.update(em, engine);
     }
 
     engine.closeWindow();

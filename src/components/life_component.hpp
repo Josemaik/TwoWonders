@@ -1,17 +1,11 @@
 #pragma once
+#include "raylib.h"
 
 struct LifeComponent
 {
-    int life{}, countdown{};
+    int life{};
+    float countdown{ 1.0f }, elapsed{ 1.0f }; // En segundos
 
-    void decreaseLife(){
-        if(countdown < 0 && life > 0){
-            life -= 1;
-            countdown = 30;
-        }
-    }
-
-    void decreaseCountdown(){
-        countdown -= 1;
-    }
+    void decreaseLife();
+    void decreaseCountdown(){ elapsed += GetFrameTime(); }; // delta time
 };
