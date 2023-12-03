@@ -16,6 +16,7 @@ struct AISystem
     void update(EntityManager& em);
     [[nodiscard]] bool isPlayerDetected(EntityManager& EM, PhysicsComponent const& p, AIComponent const& ai) const noexcept;
     [[nodiscard]] vec3f getPlayerDistance(EntityManager& EM, PhysicsComponent const& p, AIComponent& ai) const noexcept;
+    void FollowPatrol(AIComponent& ai,PhysicsComponent& p);
 };
 
 #endif // !AI_SYSTEM
