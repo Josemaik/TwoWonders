@@ -9,12 +9,7 @@ struct LifeSystem
     using SYSCMPs = MP::TypeList<LifeComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em) {
-        em.forEach<SYSCMPs, SYSTAGs>([](Entity&, LifeComponent& lif)
-        {
-            lif.decreaseCountdown();
-        });
-    };
+    void update(EntityManager& em);
 };
 
 #endif // !RENDER_SYSTEM
