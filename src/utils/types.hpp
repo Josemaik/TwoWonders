@@ -8,6 +8,7 @@
 #include "../components/life_component.hpp"
 #include "../components/attack_component.hpp"
 #include "../components/ai.hpp"
+#include "../components/levelinfo.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
 
@@ -18,9 +19,11 @@ namespace ENGI { struct GameEngine; }
 struct PlayerTag {};
 struct EnemyTag {};
 struct HitPlayer {};
+struct GroundTag {};
 
 using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, AIComponent, AttackComponent>;
-using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayer>;
-using EntityManager = ETMG::EntityManager<CL, TL>;
+using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayer, GroundTag>;
+using SCL = MP::TypeList<LevelInfo>;
+using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;

@@ -9,4 +9,6 @@ struct AIComponent
     std::array<vec3f,max_patrol> patrol{};
     uint8_t current{};
     float arrival_radius { 1.f };
+    float detect_radius { 2.f };
+    bool playerdetected {false};
 };

@@ -72,7 +72,9 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
-    },
-    "C_Cpp.errorSquiggles": "disabled"
+        "variant": "cpp",
+        "any": "cpp",
+        "valarray": "cpp",
+        "*.inc": "cpp"
+    }
 }

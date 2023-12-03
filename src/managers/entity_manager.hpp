@@ -7,6 +7,7 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include "../utils/slotmap.hpp"
 #include "../utils/meta_program.hpp"
 
@@ -46,6 +47,7 @@ struct cmp_traits : tag_traits<CMPS> {};
 namespace ETMG {
 
     template <typename CMPList, typename TAGList, std::size_t SlotCapacity = 100>
+
     struct EntityManager
     {
         // Forward declarations - Se declara la clase Entity antes de que se defina
@@ -65,7 +67,8 @@ namespace ETMG {
         // Alias para reemplazar directamente un TypeList por una tupla
         template <typename List>
         using tuple_replace = MP::replace_t<std::tuple, List>;
-
+        // tipo para Tupla de componentes singlenton
+        using singlestorage_t = MP::replace_t<std::tuple, SNGCMPLIST>;
         // Alias para convertir un TypeList<T, U, V, ...> a TypeList<Slotmap<T, 10>, Slotmap<U, 10>, Slotmap<V, 10>, ...>
         template<typename Type>
         using to_slotmap = Slotmap<Type, SlotCapacity>;
@@ -84,6 +87,8 @@ namespace ETMG {
             using keytype_list = MP::forall_insert_template_t<to_keytype, CMPList>;
             // Tupla de los tipos de las keys de los componentes
             using key_storage_type = tuple_replace<keytype_list>;
+
+            Entity() { id = nextID++; }
 
             // Plantilla para añadir un componente a la entidad
             template <typename CMP>
@@ -128,12 +133,16 @@ namespace ETMG {
                 return tag_mask & tag_info::template mask<TAG>();
             }
 
+            std::size_t  getID() const noexcept {
+                return id;
+            }
+
         private:
             std::size_t id{}; // ID de la entidad
             typename cmp_info::mask_type cmp_mask{}; // Máscara de componentes
             typename cmp_info::mask_type tag_mask{}; // Máscara de tags
             key_storage_type cmp_keys_{}; // Tupla de las claves de los componentes
-            inline static std::size_t nextID{ 1 }; // ID de la siguiente entidad a crear
+            inline static std::size_t nextID{ 0 }; // ID de la siguiente entidad a crear
         };
 
         // FUNCIONES
@@ -175,7 +184,23 @@ namespace ETMG {
         {
             assert(index < alive_);
             assert(alive_ > 0);
+            auto& e = entities_[index];
+
+            // Eliminamos los componentes de la entidad
+            tuple_replace<CMPList> cmps{};
+            MP::for_each_in_tuple(cmps, [&](auto cmpType)
+            {
+                using CMPType = decltype(cmpType);
+                if (e.template hasComponent<CMPType>())
+                {
+                    auto key = e.template getComponentKey<CMPType>();
+                    this->template getCMPStorage<CMPType>().erase(key);
+                }
+            });
+
+            // Eliminamos la entidad
             entities_[index] = entities_[alive_ - 1];
+
             alive_ -= 1;
         }
 
@@ -225,7 +250,25 @@ namespace ETMG {
         {
             return std::span{ entities_.begin(), entities_.begin() + alive_ };
         }
-
+        //Función que nos devuelve una tupla de componentes singleton
+        template<typename CMP>
+        [[nodiscard]] constexpr auto& getSingleton() noexcept {
+            return std::get<CMP>(singletonComponentTuple_);
+        }
+        template<typename CMP>
+        [[nodiscard]] constexpr auto const& getSingleton() const noexcept {
+            return std::get<CMP>(singletonComponentTuple_);
+        }
+        //Obtener entidad por su ID
+        Entity* getEntityByID(std::size_t const id) noexcept {
+            auto it = std::ranges::find_if(
+                entities_
+                , [=](Entity const& e) { return e.getID() == id; }
+            );
+            if (it != entities_.end())
+                return &(*it); //devuelvo la direccion de memoria a la que apunta el iterador
+            return nullptr;
+        }
     private:
         // Plantilla para recorrer todas las entidades que tengan los componentes y tags especificados
         template <typename... CMPs, typename... TAGs>
@@ -259,6 +302,7 @@ namespace ETMG {
         std::array<Entity, MAX_ENTITIES> entities_{};
 
         storage_type CMPTuple_{};
+        singlestorage_t singletonComponentTuple_{};
     };
 #endif // !ENTITY_MANAGER
 

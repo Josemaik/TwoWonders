@@ -3,8 +3,6 @@
 #define PHYSICS_SYSTEM
 #include "../utils/types.hpp"
 
-constexpr float MAX_SPEED{ .4f };
-
 struct PhysicsSystem
 {
     // Se van a buscar las entidad que tengan estos componentes y tags

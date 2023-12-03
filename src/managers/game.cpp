@@ -2,60 +2,107 @@
 #include "game_engine.hpp"
 //#include "../utils/memory_viewer.hpp"
 
+void createWalls(EntityManager& em)
+{
+    std::vector<std::pair<vec3f, vec3f>> wallData = {
+        { { 9.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 8.0f } },
+        { { -9.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 8.0f } },
+        { { 9.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 8.0f } },
+        { { -9.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 8.0f } },
+        { { -5.5f, 0.0f, -9.5f }, { 7.0f, 1.0f, 1.0f } },
+        { { -5.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },
+        { { 5.5f, 0.0f, -9.5f }, { 7.0f, 1.0f, 1.0f } },
+        { { 5.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },
+        { { 5.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },
+        { { 5.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },
+        { { -5.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },
+        { { -5.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },
+        { { 5.f, 0.0f, 0.f }, { 3.0f, 1.0f, 3.0f } },
+        { { -5.f, 0.0f, 0.f }, { 3.0f, 1.0f, 3.0f } },
+        { { 0.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },
+        { { 0.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },
+
+    };
+
+    for (const auto& [pos, scl] : wallData)
+    {
+        auto& wall{ em.newEntity() };
+        auto& wr = em.addComponent<RenderComponent>(wall, RenderComponent{ .position = pos, .scale = scl, .color = GRAY });
+        auto& wp = em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = { wr.position }, .velocity = { .0f, .0f, .0f } });
+        em.addComponent<ColliderComponent>(wall, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
+    }
+}
+
+void createEnemies(EntityManager& em)
+{
+    std::vector<std::pair<vec3f, std::array<vec3f, 10>>> enemyData = {
+    {
+        { 0.0f, 0.0f, -8.0f },
+        {
+            vec3f
+            { 0.f, 0.f, -8.0f },
+            { -8.5f, 0.f, -8.0f },
+            { -8.5f, 0.f, 8.0f },
+            { 0.f, 0.f, 8.0f },
+            { -8.5f, 0.f, 8.0f },
+            { -8.5f, 0.f, -8.0f },
+            AIComponent::invalid
+        }
+    },
+    {
+        { 0.0f, 0.0f, 8.0f },
+        {
+            vec3f
+            { 0.f, 0.f, 8.0f },
+            { 8.5f, 0.f, 8.0f },
+            { 8.5f, 0.f, -8.0f },
+            { 0.f, 0.f, -8.0f },
+            { 8.5f, 0.f, -8.0f },
+            { 8.5f, 0.f, 8.0f },
+            AIComponent::invalid
+        }
+    }
+    };
+
+    for (const auto& [pos, route] : enemyData)
+    {
+        auto& enemy{ em.newEntity() };
+        em.addTag<EnemyTag>(enemy);
+        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = pos, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
+        auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = {} });
+        em.addComponent<AIComponent>(enemy, AIComponent{ .patrol = route });
+        em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = 1 });
+        em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
+    }
+}
+
 void createEntities(EntityManager& em)
 {
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { 0.0f, 0.0f, 0.0f }, .velocity = { .1f, .0f, .0f } });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, -0.5f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<AttackComponent>(e, AttackComponent{});
 
-    // Wall
-    auto& e2{ em.newEntity() };
-    auto& r2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = { 2.0f, 0.0f, 02.0f }, .scale = { 1.0f, 1.0f, 8.0f }, .color = GRAY });
-    auto& p2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = { 2.0f, 0.0f, 02.0f }, .velocity = { .0f, .0f, .0f } });
-    em.addComponent<ColliderComponent>(e2, ColliderComponent{ p2.position, r2.scale, BehaviorType::STATIC });
+    // Ground
+    auto& e0{ em.newEntity() };
+    em.addTag<GroundTag>(e0);
+    auto& r0 = em.addComponent<RenderComponent>(e0, RenderComponent{ .position = { 0.0f, -1.5f, 0.0f }, .scale = { 20.0f, 2.f, 20.0f }, .color = GREEN });
+    auto& p0 = em.addComponent<PhysicsComponent>(e0, PhysicsComponent{ .position{ r0.position }, .velocity{ .0f, .0f, .0f }, .gravity{ .0f } });
+    em.addComponent<ColliderComponent>(e0, ColliderComponent{ p0.position, r0.scale, BehaviorType::STATIC });
 
-    // Enemy
-    auto& e3{ em.newEntity() };
-    em.addTag<EnemyTag>(e3);
-    auto& r3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 2.0f, 2.0f, 2.0f }, .color = RED });
-    auto& p3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = { 0.0f, 0.0f, -6.0f }, .velocity = { -.05f, .0f, .0f } });
-    em.addComponent<LifeComponent>(e3, LifeComponent{ .life = 1 });
-    em.addComponent<ColliderComponent>(e3, ColliderComponent{ p3.position, r3.scale, BehaviorType::ENEMY });
+    // Walls
+    createWalls(em);
 
-    // // Enemy2
-    // auto& e4{ em.newEntity() };
-    // em.addTag<EnemyTag>(e4);
-    // auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 2.0f, 2.0f, 2.0f }, .color = RED });
-    // auto& p4 = em.addComponent<PhysicsComponent>(e4, PhysicsComponent{ .position = { 5.0f, 0.0f, -6.0f }, .velocity = { -.05f, .0f, .0f } });
-    // em.addComponent<LifeComponent>(e4, LifeComponent{ .life = 1 });
-    // em.addComponent<ColliderComponent>(e4, ColliderComponent{ p4.position, r4.scale, BehaviorType::ENEMY });
+    // // Enemy
+    createEnemies(em);
 
-    //patrol Enemy
-    auto& e4{ em.newEntity() };
-    em.addTag<EnemyTag>(e4);
-    //auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 2.0f, 1.0f }, .color = ORANGE });
-    auto& p4 = em.addComponent<PhysicsComponent>(e4, PhysicsComponent{ .position = { -8.5f, 0.f, -8.0f }, .velocity = {} });
-    em.addComponent<AIComponent>(e4, AIComponent{
-        // .patrol = {
-        //     vec3f{ -8.5f, 1.f, -8.0f }
-        //     ,{-2.0f,1.f,-8.0f}
-        //     ,AIComponent::invalid}
-             .patrol = {
-            vec3f{ -8.5f, 1.f, -8.0f},
-            {-4.5f, 1.f, 4.0f}
-            ,{-8.5f, 1.f, 8.0f}
-            ,{-3.0f, 1.f,8.0f}
-            ,{-3.0f,1.f,-8.0f},AIComponent::invalid}
-        });
-    auto& r4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = RED });
-    em.addComponent<LifeComponent>(e4, LifeComponent{ .life = 1 });
-    em.addComponent<ColliderComponent>(e4, ColliderComponent{ p4.position, r4.scale, BehaviorType::ENEMY });
+    auto& li = em.getSingleton<LevelInfo>();
+    li.playerID = e.getID();
 }
 
 void game()
@@ -69,6 +116,7 @@ void game()
     LifeSystem life_system{};
     AISystem   ai_sys{};
     AttackSystem attack_system{};
+    GameTimer gtime{};
 
     createEntities(em);
 
@@ -76,7 +124,7 @@ void game()
     // MemoryViewer mv2{ em.getCMPStorage<RenderComponent>() };
     // mv2.printMemory();
     // mv.printMemory();
-
+      // Inicializa el reloj para medir el tiempo entre frames
     while (!engine.windowShouldClose())
     {
         input_system.update(em);
