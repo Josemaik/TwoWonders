@@ -104,7 +104,7 @@ void createEntities(EntityManager& em)
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-
+    em.addComponent<AttackComponent>(e, AttackComponent{});
 
     // Ground
     auto& e0{ em.newEntity() };
@@ -136,6 +136,7 @@ void game()
     LifeSystem life_system{};
     AISystem   ai_sys{};
     GameTimer gtime{};
+    AttackSystem attack_system{};
 
     createEntities(em);
 
@@ -147,11 +148,13 @@ void game()
     while (!engine.windowShouldClose())
     {
         input_system.update(em);
-        render_system.update(em, engine);
         ai_sys.update(em);
         physics_system.update(em);
         collision_system.update(em);
         life_system.update(em);
+        attack_system.update(em);
+
+        render_system.update(em, engine);
     }
 
     engine.closeWindow();
