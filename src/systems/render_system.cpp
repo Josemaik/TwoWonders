@@ -11,7 +11,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
         ren.setPosition(phy.position);
     });
 
-    beginFrame(engine, em);
+    beginFrame(engine);
 
     // Dibuja todas las entidades con componente de render
     size_t count = 0;
@@ -43,7 +43,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
 }
 
 // Empieza el dibujado y se limpia la pantalla
-void RenderSystem::beginFrame(ENGI::GameEngine& engine, EntityManager& em)
+void RenderSystem::beginFrame(ENGI::GameEngine& engine)
 {
     engine.beginDrawing();
     engine.clearBackground(RAYWHITE);
