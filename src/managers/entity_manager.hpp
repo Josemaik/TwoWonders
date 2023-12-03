@@ -46,7 +46,7 @@ struct cmp_traits : tag_traits<CMPS> {};
 
 namespace ETMG {
 
-    template <typename CMPList, typename TAGList, std::size_t SlotCapacity = 100>
+    template <typename CMPList, typename SNGCMPLIST, typename TAGList, std::size_t SlotCapacity = 100>
 
     struct EntityManager
     {
