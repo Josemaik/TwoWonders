@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include "../utils/types.hpp"
 
-constexpr float BORDER = 10.f;
+constexpr float BORDER = 20.f;
 
 struct CollisionSystem
 {
@@ -19,7 +19,7 @@ struct CollisionSystem
     void checkBorderCollision(EntityManager& em, EntColPair& boxes);
     void enemyCollision(PhysicsComponent& playerPhysics, PhysicsComponent& enemyPhysics, vec3f& minOverlap);
     void staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3f& minOverlap);
-    void nonPlayerCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
+    void nonStaticCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
     void classicCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
     void handleCollision(EntityManager& em, Entity* entity1, Entity* entity2, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
 };

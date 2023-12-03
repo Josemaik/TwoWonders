@@ -114,4 +114,17 @@ namespace MP
         IFT_t<LIST::size() <= 32, std::uint32_t,
         std::uint64_t>>>;
 
+    // Tuple dispatch
+    template<std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if<I == sizeof...(Tp), void>::type
+        for_each_in_tuple(const std::tuple<Tp...>&, auto)
+    { }
+
+    template<std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if < I < sizeof...(Tp), void>::type
+        for_each_in_tuple(const std::tuple<Tp...>& t, auto f)
+    {
+        f(std::get<I>(t));
+        for_each_in_tuple<I + 1, Tp...>(t, f);
+    }
 } // namespace MP

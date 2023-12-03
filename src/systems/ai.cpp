@@ -3,17 +3,17 @@
 
 void AISystem::update(EntityManager& em)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([&,&em](Entity&, PhysicsComponent& phy,AIComponent& ai)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, PhysicsComponent& phy, AIComponent& ai)
     {
         //local Variables
-        // auto& pos = phy.position;
+        auto& pos = phy.position;
         //Player detection
-        if(ai.playerdetected){
-            auto const& distance = getPlayerDistance(em,phy,ai);
+        if (ai.playerdetected) {
+            auto const& distance = getPlayerDistance(em, phy, ai);
             phy.velocity = distance.normalized() * SPEED_AI;
             return;
         }
-        if(this->isPlayerDetected(em,phy,ai)){
+        if (this->isPlayerDetected(em, phy, ai)) {
             std::printf("DETECTO AL PLAYER");
             //Attack
             // phy.velocity = {};
@@ -42,21 +42,21 @@ void AISystem::update(EntityManager& em)
         phy.velocity = distance.normalized() * SPEED_AI;
     });
 }
-[[nodiscard]] bool AISystem::isPlayerDetected(EntityManager&EM,PhysicsComponent const p, AIComponent const ai) const noexcept{
+[[nodiscard]] bool AISystem::isPlayerDetected(EntityManager& EM, PhysicsComponent const& p, AIComponent const& ai) const noexcept {
     auto& li = EM.getSingleton<LevelInfo>();
-    auto* playerEn = EM.getEntityByID (li.playerID);
-    if(not playerEn) return false;
+    auto* playerEn = EM.getEntityByID(li.playerID);
+    if (not playerEn) return false;
     auto& plphy = EM.getComponent<PhysicsComponent>(*playerEn);
     auto const distance = (p.position - plphy.position).lengthSQ();
-    return  distance < (ai.detect_radius * ai.detect_radius); 
+    return  distance < (ai.detect_radius * ai.detect_radius);
 }
-[[nodiscard]] vec3f AISystem::getPlayerDistance(EntityManager&EM,PhysicsComponent const p, AIComponent const ai) const noexcept{
+[[nodiscard]] vec3f AISystem::getPlayerDistance(EntityManager& EM, PhysicsComponent const& p, AIComponent& ai) const noexcept {
     auto& li = EM.getSingleton<LevelInfo>();
-    auto* playerEn = EM.getEntityByID (li.playerID);
-    if(not playerEn) return vec3f{};
+    auto* playerEn = EM.getEntityByID(li.playerID);
+    if (not playerEn) { ai.playerdetected = false; return vec3f{}; };
     auto& plphy = EM.getComponent<PhysicsComponent>(*playerEn);
     auto const distance = plphy.position - p.position;
-    return  distance; 
+    return  distance;
 }
 
 

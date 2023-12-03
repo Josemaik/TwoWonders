@@ -16,6 +16,8 @@ constexpr uint16_t SCREEN_WIDTH{ 800 };
 constexpr uint16_t SCREEN_HEIGHT{ 600 };
 
 void createEntities(EntityManager& em);
+void createWalls(EntityManager& em);
+void createEnemies(EntityManager& em);
 void game();
 
 #endif // !GAME
