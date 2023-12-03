@@ -32,45 +32,63 @@ void createWalls(EntityManager& em)
         em.addComponent<ColliderComponent>(wall, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
     }
 }
-
+struct EnemyData {
+    std::string enemyType;
+    vec3f position;
+    std::array<vec3f, 10> route;
+};
 void createEnemies(EntityManager& em)
 {
-    std::vector<std::pair<vec3f, std::array<vec3f, 10>>> enemyData = {
-    {
-        { 0.0f, 0.0f, -8.0f },
-        {
-            vec3f
-            { 0.f, 0.f, -8.0f },
-            { -8.5f, 0.f, -8.0f },
-            { -8.5f, 0.f, 8.0f },
-            { 0.f, 0.f, 8.0f },
-            { -8.5f, 0.f, 8.0f },
-            { -8.5f, 0.f, -8.0f },
-            AIComponent::invalid
-        }
-    },
-    {
-        { 0.0f, 0.0f, 8.0f },
-        {
-            vec3f
-            { 0.f, 0.f, 8.0f },
-            { 8.5f, 0.f, 8.0f },
-            { 8.5f, 0.f, -8.0f },
-            { 0.f, 0.f, -8.0f },
-            { 8.5f, 0.f, -8.0f },
-            { 8.5f, 0.f, 8.0f },
-            AIComponent::invalid
-        }
-    }
+     std::vector<EnemyData> enemyData = {
+        { "PatrolEnemy",
+          {0.0f, 0.0f, -8.0f},
+          {
+              vec3f{0.f, 0.f, -8.0f},
+              { -8.5f, 0.f, -8.0f },
+              { -8.5f, 0.f, 8.0f },
+              { 0.f, 0.f, 8.0f },
+              { -8.5f, 0.f, 8.0f },
+              { -8.5f, 0.f, -8.0f },
+              AIComponent::invalid
+          }},
+        { "PatrolFollowEnemy",
+          {0.0f, 0.0f, 8.0f},
+          {
+              vec3f{0.f, 0.f, 8.0f},
+              { 8.5f, 0.f, 8.0f },
+              { 8.5f, 0.f, -8.0f },
+              { 0.f, 0.f, -8.0f },
+              { 8.5f, 0.f, -8.0f },
+              { 8.5f, 0.f, 8.0f },
+              AIComponent::invalid
+          }},
+          { "ShoterEnemy",
+          {2.8f, 0.0f, -2.8f},
+          {
+              vec3f{2.8f, 0.0f, -2.8f},
+              {-2.8f, 0.0f, -2.8f},
+               {-2.8f, 0.0f, 2.8f},
+               {2.8f, 0.0f, 2.8f},
+              AIComponent::invalid
+          }}
     };
 
-    for (const auto& [pos, route] : enemyData)
+     for (const auto& enemyDataItem : enemyData)
     {
         auto& enemy{ em.newEntity() };
-        em.addTag<EnemyTag>(enemy);
-        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = pos, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
+
+        // Agrega la etiqueta específica para cada tipo de enemigo
+        if (enemyDataItem.enemyType == "PatrolEnemy") {
+            em.addTag<PatrolEnemy>(enemy);
+        } else if (enemyDataItem.enemyType == "PatrolFollowEnemy") {
+            em.addTag<PatrolFollowEnemy>(enemy);
+        }else if(enemyDataItem.enemyType == "ShoterEnemy"){
+            em.addTag<ShoterEnemy>(enemy);
+        }
+
+        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = enemyDataItem.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = {} });
-        em.addComponent<AIComponent>(enemy, AIComponent{ .patrol = route });
+        em.addComponent<AIComponent>(enemy, AIComponent{ .patrol = enemyDataItem.route });
         em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = 1 });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
     }
@@ -86,7 +104,7 @@ void createEntities(EntityManager& em)
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e, AttackComponent{});
+
 
     // Ground
     auto& e0{ em.newEntity() };
@@ -100,6 +118,8 @@ void createEntities(EntityManager& em)
 
     // // Enemy
     createEnemies(em);
+
+
 
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
@@ -115,7 +135,6 @@ void game()
     CollisionSystem collision_system{};
     LifeSystem life_system{};
     AISystem   ai_sys{};
-    AttackSystem attack_system{};
     GameTimer gtime{};
 
     createEntities(em);
@@ -128,12 +147,11 @@ void game()
     while (!engine.windowShouldClose())
     {
         input_system.update(em);
-        attack_system.update(em);
+        render_system.update(em, engine);
         ai_sys.update(em);
         physics_system.update(em);
         collision_system.update(em);
         life_system.update(em);
-        render_system.update(em, engine);
     }
 
     engine.closeWindow();
