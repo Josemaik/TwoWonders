@@ -1,16 +1,21 @@
 #include "life_system.hpp"
 
 void LifeSystem::update(EntityManager& em) {
-    em.forEach<SYSCMPs, SYSTAGs>([](Entity&, LifeComponent& lif)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, LifeComponent& lif)
     {
         lif.decreaseCountdown();
-    });
 
-    // Destruir las entidades que tengan vida a 0
-    size_t count = 0;
-    for (auto const& e : em.getEntities()){
-        if (e.hasComponent<LifeComponent>() &&  em.getComponent<LifeComponent>(e).life == 0)
-            em.destroyEntity(count);
-        count += 1;
-    }
+        if (lif.life == 0)
+        {
+            // Eliminamos la entidad
+            em.destroyEntity(e.getID());
+        }
+
+        // Esto sirve pa que el entity manager no se raye si dos entidades se destruyen a la vez
+        if (lif.decreaseLifeNextFrame)
+        {
+            lif.decreaseLife();
+            lif.decreaseLifeNextFrame = false;
+        }
+    });
 }

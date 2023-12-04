@@ -39,50 +39,52 @@ struct EnemyData {
 };
 void createEnemies(EntityManager& em)
 {
-     std::vector<EnemyData> enemyData = {
-        { "PatrolEnemy",
-          {0.0f, 0.0f, -8.0f},
-          {
-              vec3f{0.f, 0.f, -8.0f},
-              { -8.5f, 0.f, -8.0f },
-              { -8.5f, 0.f, 8.0f },
-              { 0.f, 0.f, 8.0f },
-              { -8.5f, 0.f, 8.0f },
-              { -8.5f, 0.f, -8.0f },
-              AIComponent::invalid
-          }},
-        { "PatrolFollowEnemy",
-          {0.0f, 0.0f, 8.0f},
-          {
-              vec3f{0.f, 0.f, 8.0f},
-              { 8.5f, 0.f, 8.0f },
-              { 8.5f, 0.f, -8.0f },
-              { 0.f, 0.f, -8.0f },
-              { 8.5f, 0.f, -8.0f },
-              { 8.5f, 0.f, 8.0f },
-              AIComponent::invalid
-          }},
-          { "ShoterEnemy",
-          {2.8f, 0.0f, -2.8f},
-          {
-              vec3f{2.8f, 0.0f, -2.8f},
-              {-2.8f, 0.0f, -2.8f},
-               {-2.8f, 0.0f, 2.8f},
-               {2.8f, 0.0f, 2.8f},
-              AIComponent::invalid
-          }}
+    std::vector<EnemyData> enemyData = {
+       { "PatrolEnemy",
+         {0.0f, 0.0f, -8.0f},
+         {
+             vec3f{0.f, 0.f, -8.0f},
+             { -8.5f, 0.f, -8.0f },
+             { -8.5f, 0.f, 8.0f },
+             { 0.f, 0.f, 8.0f },
+             { -8.5f, 0.f, 8.0f },
+             { -8.5f, 0.f, -8.0f },
+             AIComponent::invalid
+         }},
+       { "PatrolFollowEnemy",
+         {0.0f, 0.0f, 8.0f},
+         {
+             vec3f{0.f, 0.f, 8.0f},
+             { 8.5f, 0.f, 8.0f },
+             { 8.5f, 0.f, -8.0f },
+             { 0.f, 0.f, -8.0f },
+             { 8.5f, 0.f, -8.0f },
+             { 8.5f, 0.f, 8.0f },
+             AIComponent::invalid
+         }},
+         { "ShoterEnemy",
+         {2.8f, 0.0f, -2.8f},
+         {
+             vec3f{2.8f, 0.0f, -2.8f},
+             {-2.8f, 0.0f, -2.8f},
+              {-2.8f, 0.0f, 2.8f},
+              {2.8f, 0.0f, 2.8f},
+             AIComponent::invalid
+         }}
     };
 
-     for (const auto& enemyDataItem : enemyData)
+    for (const auto& enemyDataItem : enemyData)
     {
         auto& enemy{ em.newEntity() };
 
         // Agrega la etiqueta específica para cada tipo de enemigo
         if (enemyDataItem.enemyType == "PatrolEnemy") {
             em.addTag<PatrolEnemy>(enemy);
-        } else if (enemyDataItem.enemyType == "PatrolFollowEnemy") {
+        }
+        else if (enemyDataItem.enemyType == "PatrolFollowEnemy") {
             em.addTag<PatrolFollowEnemy>(enemy);
-        }else if(enemyDataItem.enemyType == "ShoterEnemy"){
+        }
+        else if (enemyDataItem.enemyType == "ShoterEnemy") {
             em.addTag<ShoterEnemy>(enemy);
         }
 
@@ -110,7 +112,7 @@ void createEntities(EntityManager& em)
     auto& e0{ em.newEntity() };
     em.addTag<GroundTag>(e0);
     auto& r0 = em.addComponent<RenderComponent>(e0, RenderComponent{ .position = { 0.0f, -1.5f, 0.0f }, .scale = { 20.0f, 2.f, 20.0f }, .color = GREEN });
-    auto& p0 = em.addComponent<PhysicsComponent>(e0, PhysicsComponent{ .position{ r0.position }, .velocity{ .0f, .0f, .0f }, .gravity{ .0f } });
+    auto& p0 = em.addComponent<PhysicsComponent>(e0, PhysicsComponent{ .position{ r0.position }, .velocity{ .0f, .0f, .0f }, .gravity = .0f });
     em.addComponent<ColliderComponent>(e0, ColliderComponent{ p0.position, r0.scale, BehaviorType::STATIC });
 
     // Walls

@@ -3,18 +3,19 @@
 struct AttackComponent
 {
     enum struct AttackType { Melee, Ranged };
-    AttackType type;
+    AttackType type{ AttackType::Ranged };
     u_int16_t damage{};
     float range{};
     bool createAttack{ false };
     float countdown{ 1.0f }, elapsed{ 1.0f };
+    vec3f vel{};
 
-    void attack(){
-        if(elapsed >= countdown){
+    void attack() {
+        if (elapsed >= countdown) {
             createAttack = true;
             elapsed = 0;
         }
     }
 
-    void decreaseCountdown(){ elapsed += GetFrameTime(); }; // delta time
+    void decreaseCountdown() { elapsed += GetFrameTime(); }; // delta time
 };

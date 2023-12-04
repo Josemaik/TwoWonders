@@ -10,6 +10,7 @@
 #include <algorithm>
 #include "../utils/slotmap.hpp"
 #include "../utils/meta_program.hpp"
+#include <typeinfo>
 
 template <typename TLIST>
 struct cmp_tag_traits {
@@ -57,6 +58,10 @@ namespace ETMG {
         // CONSTANTES
         //
         static constexpr std::size_t MAX_ENTITIES{ 100 };
+
+        // VARIABLES ESTÁTICAS
+        //
+        inline static std::size_t nextID{ 0 }; // ID de la siguiente entidad a crear
 
         // ALIAS
         //
@@ -137,12 +142,21 @@ namespace ETMG {
                 return id;
             }
 
+            void setID(std::size_t const id) noexcept {
+                this->id = id;
+            }
+
+            void reset() noexcept {
+                cmp_mask = 0;
+                tag_mask = 0;
+                cmp_keys_ = {};
+            }
+
         private:
             std::size_t id{}; // ID de la entidad
             typename cmp_info::mask_type cmp_mask{}; // Máscara de componentes
             typename cmp_info::mask_type tag_mask{}; // Máscara de tags
             key_storage_type cmp_keys_{}; // Tupla de las claves de los componentes
-            inline static std::size_t nextID{ 0 }; // ID de la siguiente entidad a crear
         };
 
         // FUNCIONES
@@ -159,11 +173,11 @@ namespace ETMG {
         template <typename CMP, typename... InitTypes>
         CMP& addComponent(Entity& e, InitTypes&&... args)
         {
-            std::cout << "Adding component" << std::endl;
+            std::cout << "Adding component " << typeid(CMP).name() << std::endl;
             // Revisamos si ya tiene el componente
             if (e.template hasComponent<CMP>())
             {
-                std::cout << "Component already present" << std::endl;
+                std::cout << "Component " << typeid(CMP).name() << " already present" << std::endl;
                 return getComponent<CMP>(e);
             }
 
@@ -193,13 +207,20 @@ namespace ETMG {
                 using CMPType = decltype(cmpType);
                 if (e.template hasComponent<CMPType>())
                 {
+                    std::cout << "Destroying component " << typeid(CMPType).name() << std::endl;
                     auto key = e.template getComponentKey<CMPType>();
                     this->template getCMPStorage<CMPType>().erase(key);
                 }
             });
+            printf("\n");
+            // Reseteamos la entidad
+            e.reset();
 
             // Eliminamos la entidad
-            entities_[index] = entities_[alive_ - 1];
+            e = entities_[alive_ - 1];
+            entities_[alive_ - 1].reset();
+            e.setID(index);
+            nextID--;
 
             alive_ -= 1;
         }
