@@ -40,7 +40,7 @@ vec3f AISystem::FollowPatrol(AIComponent& ai, PhysicsComponent& p) {
         ai.nexttarget = 0;
         return vec3f{0,0,0};
     }
-    //calculo la distancia 
+    //calculo la distancia
     auto const distance = target - pos;
     // Si la distancia es < que el radio de llegada paso a la siguiente
     if (distance.length() < ai.arrival_radius) {
@@ -88,46 +88,59 @@ void AISystem::FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, Entity
         return;
     }
 }
-void AISystem::changePosition(AIComponent& ai, PhysicsComponent& p){
-    // decrementar contador y cuando llegue a 0, utilizar un enum{shooting,moving}
-    // en el caso de llegar a 0 cambiar al estado de moving
-    // en ese estado, se tiene un target y mientras se siga en ese estado el enemeigo
-    // se mueve hacia ese target.
-    // Cuando llegue se cambia al estado shooting
-    // aqui se volvera a decrementar contador
-    // se dispara en la direccion al player
-    //-------------------------------------------------
-    // auto const& target = ai.patrol[ai.current];
-    // ai.contador_change_position--;
-    // if(ai.contador_change_position <= 0){
-    //     p.position 
-    // }
+void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p,EntityManager& em,Entity& ent){
+        //local Variables
+    auto& pos = p.position;
+    auto& vel = p.velocity;
+    //Do patrol
+        vec3f distance = FollowPatrol(ai,p);
+        setVelocity(p,distance);
+        auto& att = em.getComponent<AttackComponent>(ent);
+        auto old_vel = (getPlayerDistance(em,p,ai)).normalized() * SPEED_AI;
+        att.vel = old_vel;
+        att.attack();
 }
 void AISystem::update(EntityManager& em)
 {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, AIComponent& ai)
     {
-        if (e.hasTag<PatrolEnemy>() == true) {
-            vec3f distance = FollowPatrol(ai, phy);
-            setVelocity(phy,distance);
+         switch (ai.current_type)
+        {
+            case AIComponent::AI_type::PatrolEnemy:
+                {
+                    vec3f distance = FollowPatrol(ai, phy);
+                    setVelocity(phy, distance);
+                }
+                break;
+
+            case AIComponent::AI_type::PatrolFollowEnemy:
+                {
+                    // Player detection
+                    ai.playerdetected = this->isPlayerDetected(em, phy, ai);
+                    if (ai.playerdetected) {
+                        auto const& distance = getPlayerDistance(em, phy, ai);
+                        phy.velocity = distance.normalized() * SPEED_AI;
+                    }
+                    else {
+                        vec3f distance = FollowPatrol(ai, phy);
+                        setVelocity(phy, distance);
+                    }
+                }
+                break;
+
+            case AIComponent::AI_type::ShoterEnemy:
+                {
+                    FollowPatrolandShoot(ai, phy, em, e);
+                }
+                break;
+            case AIComponent::AI_type::ShoterEnemy2:
+                {
+                    ShotandMove(ai,phy,em,e);
+                }
+                break;
+            default:
+                break;
         }
-        if (e.hasTag<PatrolFollowEnemy>() == true) {
-            //Player detection
-            ai.playerdetected = this->isPlayerDetected(em, phy, ai);
-            if (ai.playerdetected) {
-                auto const& distance = getPlayerDistance(em, phy, ai);
-                phy.velocity = distance.normalized() * SPEED_AI;
-                return;
-            }
-            vec3f distance = FollowPatrol(ai, phy);
-            setVelocity(phy,distance);
-        }
-        if (e.hasTag<ShoterEnemy>() == true) {
-            FollowPatrolandShoot(ai, phy, em, e);
-        }
-        // if (e.hasTag<ShoterEnemy2>() == true) {
-        //     changePosition(ai,phy);
-        // }
     });
 }
 

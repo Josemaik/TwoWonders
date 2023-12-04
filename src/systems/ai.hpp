@@ -19,7 +19,7 @@ struct AISystem
     vec3f FollowPatrol(AIComponent& ai,PhysicsComponent& p);
     void FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p,EntityManager& em,Entity& e);
     void setVelocity(PhysicsComponent& p,vec3f distance);
-    void changePosition(AIComponent& ai, PhysicsComponent& p);
+    void ShotandMove(AIComponent& ai, PhysicsComponent& p,EntityManager& em,Entity& e);
 };
 
 #endif // !AI_SYSTEM

@@ -33,42 +33,49 @@ void createWalls(EntityManager& em)
     }
 }
 struct EnemyData {
-    std::string enemyType;
+    AIComponent::AI_type aiType;
     vec3f position;
     std::array<vec3f, 10> route;
 };
 void createEnemies(EntityManager& em)
 {
     std::vector<EnemyData> enemyData = {
-       { "PatrolEnemy",
-         {0.0f, 0.0f, -8.0f},
-         {
-             vec3f{0.f, 0.f, -8.0f},
-             { -8.5f, 0.f, -8.0f },
-             { -8.5f, 0.f, 8.0f },
-             { 0.f, 0.f, 8.0f },
-             { -8.5f, 0.f, 8.0f },
-             { -8.5f, 0.f, -8.0f },
-             AIComponent::invalid
-         }},
-       { "PatrolFollowEnemy",
-         {0.0f, 0.0f, 8.0f},
-         {
-             vec3f{0.f, 0.f, 8.0f},
-             { 8.5f, 0.f, 8.0f },
-             { 8.5f, 0.f, -8.0f },
-             { 0.f, 0.f, -8.0f },
-             { 8.5f, 0.f, -8.0f },
-             { 8.5f, 0.f, 8.0f },
-             AIComponent::invalid
-         }},
-         { "ShoterEnemy",
+    //    {  AIComponent::AI_type::PatrolEnemy,
+    //      {0.0f, 0.0f, -8.0f},
+    //      {
+    //          vec3f{0.f, 0.f, -8.0f},
+    //          { -8.5f, 0.f, -8.0f },
+    //          { -8.5f, 0.f, 8.0f },
+    //          { 0.f, 0.f, 8.0f },
+    //          { -8.5f, 0.f, 8.0f },
+    //          { -8.5f, 0.f, -8.0f },
+    //          AIComponent::invalid
+    //      }},
+    //    {  AIComponent::AI_type::PatrolFollowEnemy,
+    //      {0.0f, 0.0f, 8.0f},
+    //      {
+    //          vec3f{0.f, 0.f, 8.0f},
+    //          { 8.5f, 0.f, 8.0f },
+    //          { 8.5f, 0.f, -8.0f },
+    //          { 0.f, 0.f, -8.0f },
+    //          { 8.5f, 0.f, -8.0f },
+    //          { 8.5f, 0.f, 8.0f },
+    //          AIComponent::invalid
+    //      }},
+        //  { AIComponent::AI_type::ShoterEnemy,
+        //  {2.8f, 0.0f, -2.8f},
+        //  {
+        //      vec3f{2.8f, 0.0f, -2.8f},
+        //      {-2.8f, 0.0f, -2.8f},
+        //       {-2.8f, 0.0f, 2.8f},
+        //       {2.8f, 0.0f, 2.8f},
+        //      AIComponent::invalid
+        //  }}
+         { AIComponent::AI_type::ShoterEnemy2,
          {2.8f, 0.0f, -2.8f},
          {
              vec3f{2.8f, 0.0f, -2.8f},
              {-2.8f, 0.0f, -2.8f},
-              {-2.8f, 0.0f, 2.8f},
-              {2.8f, 0.0f, 2.8f},
              AIComponent::invalid
          }}
     };
@@ -78,21 +85,24 @@ void createEnemies(EntityManager& em)
         auto& enemy{ em.newEntity() };
 
         // Agrega la etiqueta específica para cada tipo de enemigo
-        if (enemyDataItem.enemyType == "PatrolEnemy") {
-            em.addTag<PatrolEnemy>(enemy);
-        }
-        else if (enemyDataItem.enemyType == "PatrolFollowEnemy") {
-            em.addTag<PatrolFollowEnemy>(enemy);
-        }
-        else if (enemyDataItem.enemyType == "ShoterEnemy") {
-            em.addTag<ShoterEnemy>(enemy);
-        }
+        // if (enemyDataItem.enemyType == "PatrolEnemy") {
+        //     em.addTag<PatrolEnemy>(enemy);
+        // }
+        // else if (enemyDataItem.enemyType == "PatrolFollowEnemy") {
+        //     em.addTag<PatrolFollowEnemy>(enemy);
+        // }
+        // else if (enemyDataItem.enemyType == "ShoterEnemy") {
+        //     em.addTag<ShoterEnemy>(enemy);
+        // }
 
         auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = enemyDataItem.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = {} });
-        em.addComponent<AIComponent>(enemy, AIComponent{ .patrol = enemyDataItem.route });
+        em.addComponent<AIComponent>(enemy, AIComponent{.current_type = enemyDataItem.aiType,.patrol = enemyDataItem.route });
         em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = 1 });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
+        if(enemyDataItem.aiType == AIComponent::AI_type::ShoterEnemy2){
+             em.addComponent<AttackComponent>(enemy, AttackComponent{.countdown = 2.5f});
+        }
     }
 }
 

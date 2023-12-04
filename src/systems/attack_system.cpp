@@ -17,7 +17,6 @@ void AttackSystem::update(EntityManager& em) {
                 else if (i.last_key == i.left)
                     att.vel = { -0.5f , 0 , 0 };
             }
-
             auto& e{ em.newEntity() };
             em.addTag<HitPlayer>(e);
             auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 0.5f, 0.5f, 0.5f }, .color = BLACK });
