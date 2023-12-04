@@ -57,6 +57,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity* staticEnt, Enti
 
     if (behaviorType1 & BehaviorType::STATIC || behaviorType2 & BehaviorType::STATIC)
     {
+
         if (behaviorType2 & BehaviorType::STATIC)
         {
             std::swap(staticPhy, otherPhy);
@@ -65,13 +66,24 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity* staticEnt, Enti
         }
 
         if (otherEnt->hasTag<GroundTag>())
+        {
             std::swap(staticPhy, otherPhy);
+            std::swap(staticEnt, otherEnt);
+        }
+
+        if (staticEnt->hasTag<GroundTag>() && !(behaviorType2 & BehaviorType::STATIC))
+        {
+            if (behaviorType1 & BehaviorType::PLAYER || behaviorType2 & BehaviorType::PLAYER) { std::cout << "Player collision" << std::endl; }
+            groundCollision(*otherPhy, *staticPhy, minOverlap);
+            return;
+        }
 
         if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
         {
             em.getComponent<LifeComponent>(*otherEnt).decreaseLife();
             return;
         }
+
         staticCollision(*otherPhy, *staticPhy, minOverlap);
         return;
     }
@@ -120,6 +132,29 @@ void CollisionSystem::bulletCollision(bool& bulletPl1, bool& bulletPl2, bool& bu
             em.getComponent<LifeComponent>(*entity2).decreaseLifeNextFrame = true;
         }
     }
+}
+
+void CollisionSystem::groundCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3f& minOverlap)
+{
+    auto& pos1 = playerPhysics.position;
+    auto& pos2 = staticPhysics.position;
+
+    //std::cout << "Ground collision" << std::endl;
+    if (minOverlap.y() < minOverlap.x() && minOverlap.y() < minOverlap.z())
+    {
+        if (pos1.y() < pos2.y())
+            pos1.setY(pos1.y() - minOverlap.y());
+        else
+            pos1.setY(pos1.y() + minOverlap.y());
+
+        posY = pos1.y();
+        // if (playerPhysics.unCheckGravity)
+        //     playerPhysics.unCheckGravity = false;
+    }
+    // else if (minOverlap.x() < minOverlap.z())
+    // {
+    //     playerPhysics.unCheckGravity = true;
+    // }
 }
 
 void CollisionSystem::enemyCollision(EntityManager& em, Entity* damagedEntity)
