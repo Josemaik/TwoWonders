@@ -50,6 +50,13 @@ struct vec3D
         return *this * (1 / s);
     }
 
+    constexpr vec3D& operator+=(vec3D const& nhs) {
+        x_ += nhs.x_;
+        y_ += nhs.y_;
+        z_ += nhs.z_;
+        return *this;
+    }
+
     constexpr vec3D& operator-=(vec3D const& rhs)
     {
         return *this += -rhs;
