@@ -22,9 +22,10 @@ struct PatrolFollowEnemy {};
 struct ShoterEnemy {};
 struct HitPlayer {};
 struct GroundTag {};
+struct WaterTag {};
 
 using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, AIComponent, AttackComponent>;
-using TL = MP::TypeList<PlayerTag, PatrolEnemy,PatrolFollowEnemy,ShoterEnemy, HitPlayer, GroundTag>;
+using TL = MP::TypeList<PlayerTag, PatrolEnemy, PatrolFollowEnemy, ShoterEnemy, HitPlayer, GroundTag, WaterTag>;
 using SCL = MP::TypeList<LevelInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
