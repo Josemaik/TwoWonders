@@ -1,4 +1,4 @@
-#include "ai.hpp"
+#include "ai_system.hpp"
 #include <cmath>
 
 [[nodiscard]] bool AISystem::isPlayerDetected(EntityManager& EM, PhysicsComponent const& p, AIComponent const& ai) const noexcept {

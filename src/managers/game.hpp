@@ -10,7 +10,7 @@
 #include "../systems/physics_system.hpp"
 #include "../systems/input_system.hpp"
 #include "../systems/life_system.hpp"
-#include "../systems/ai.hpp"
+#include "../systems/ai_system.hpp"
 #include "../systems/attack_system.hpp"
 #include "../systems/projectile_system.hpp"
 
