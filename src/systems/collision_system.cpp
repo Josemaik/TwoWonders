@@ -39,10 +39,10 @@ void CollisionSystem::checkCollision(EntityManager& em, EntColPair& ECPair)
                 ColliderComponent* collider1 = it1->second;
                 ColliderComponent* collider2 = it2->second;
 
-                vec3f overlap = bbox1->max - bbox2->min;
-                vec3f overlap2 = bbox2->max - bbox1->min;
+                vec3f overlap1 = (bbox1->max - bbox2->min);
+                vec3f overlap2 = (bbox2->max - bbox1->min);
 
-                vec3f minOverlap = vec3f::min(overlap, overlap2);
+                vec3f minOverlap = vec3f::min(overlap1, overlap2);
 
                 handleCollision(em, entity1, entity2, minOverlap, collider1->behaviorType, collider2->behaviorType);
             }
@@ -73,8 +73,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity* staticEnt, Enti
 
         if (staticEnt->hasTag<GroundTag>() && !(behaviorType2 & BehaviorType::STATIC))
         {
-            if (behaviorType1 & BehaviorType::PLAYER || behaviorType2 & BehaviorType::PLAYER) { std::cout << "Player collision" << std::endl; }
-            groundCollision(*otherPhy, *staticPhy, minOverlap);
+            groundCollision(*otherPhy, em.getComponent<RenderComponent>(*staticEnt).scale, minOverlap);
             return;
         }
 
@@ -134,27 +133,16 @@ void CollisionSystem::bulletCollision(bool& bulletPl1, bool& bulletPl2, bool& bu
     }
 }
 
-void CollisionSystem::groundCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3f& minOverlap)
+void CollisionSystem::groundCollision(PhysicsComponent& playerPhysics, vec3f& playerEsc, vec3f& minOverlap)
 {
     auto& pos1 = playerPhysics.position;
-    auto& pos2 = staticPhysics.position;
+    minOverlap += vec3f{ playerEsc.x() / 2, 0.f, playerEsc.z() / 2 };
 
-    //std::cout << "Ground collision" << std::endl;
-    if (minOverlap.y() < minOverlap.x() && minOverlap.y() < minOverlap.z())
+    if (!playerPhysics.alreadyGrounded && minOverlap.y() < minOverlap.x() && minOverlap.y() < minOverlap.z())
     {
-        if (pos1.y() < pos2.y())
-            pos1.setY(pos1.y() - minOverlap.y());
-        else
-            pos1.setY(pos1.y() + minOverlap.y());
-
-        posY = pos1.y();
-        // if (playerPhysics.unCheckGravity)
-        //     playerPhysics.unCheckGravity = false;
+        pos1.setY(pos1.y() + minOverlap.y());
+        playerPhysics.alreadyGrounded = true;
     }
-    // else if (minOverlap.x() < minOverlap.z())
-    // {
-    //     playerPhysics.unCheckGravity = true;
-    // }
 }
 
 void CollisionSystem::enemyCollision(EntityManager& em, Entity* damagedEntity)
