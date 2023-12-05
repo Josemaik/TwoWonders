@@ -127,6 +127,7 @@ void createEnemies(EntityManager& em)
     for (const auto& enemyDataItem : enemyData)
     {
         auto& enemy{ em.newEntity() };
+        em.addTag<EnemyTag>(enemy);
         auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = enemyDataItem.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = {} });
         em.addComponent<AIComponent>(enemy, AIComponent{.current_type = enemyDataItem.aiType,
@@ -198,7 +199,7 @@ void createEntities(EntityManager& em)
     // Walls
     createWalls(em);
 
-    // // Enemy
+    // Enemy
     createEnemies(em);
 
     auto& li = em.getSingleton<LevelInfo>();
