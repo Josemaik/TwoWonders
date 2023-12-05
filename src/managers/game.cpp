@@ -92,10 +92,11 @@ void createEnemies(EntityManager& em)
     for (const auto& enemyDataItem : enemyData)
     {
         auto& enemy{ em.newEntity() };
+        em.addTag<EnemyTag>(enemy);
         auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = enemyDataItem.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = {} });
         em.addComponent<AIComponent>(enemy, AIComponent{.current_type = enemyDataItem.aiType,.patrol = enemyDataItem.route,.detect_radius=enemyDataItem.detect_radius });
-        em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = 3 });
+        em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = 1 });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
         if(enemyDataItem.aiType == AIComponent::AI_type::ShoterEnemy2){
              em.addComponent<AttackComponent>(enemy, AttackComponent{.countdown = 3.5f});
@@ -160,7 +161,7 @@ void createEntities(EntityManager& em)
     // Walls
     createWalls(em);
 
-    // // Enemy
+    // Enemy
     createEnemies(em);
 
     auto& li = em.getSingleton<LevelInfo>();

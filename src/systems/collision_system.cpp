@@ -57,6 +57,19 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity* staticEnt, Enti
 
     if (behaviorType1 & BehaviorType::STATIC || behaviorType2 & BehaviorType::STATIC)
     {
+        // Logica de recoger vidas
+        if(staticEnt->hasTag<PlayerTag>() && otherEnt->hasTag<ObjectLifeTag>())
+        {
+            em.getComponent<LifeComponent>(*staticEnt).increaseLife();    
+            em.destroyEntity(otherEnt->getID()); 
+            return;
+        }
+        else if(otherEnt->hasTag<PlayerTag>() && staticEnt->hasTag<ObjectLifeTag>())
+        {
+            em.getComponent<LifeComponent>(*otherEnt).increaseLife();    
+            em.destroyEntity(staticEnt->getID()); 
+            return;
+        }
 
         if (behaviorType2 & BehaviorType::STATIC)
         {

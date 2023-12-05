@@ -1,14 +1,23 @@
 #include "life_system.hpp"
 
 void LifeSystem::update(EntityManager& em) {
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, LifeComponent& lif)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, LifeComponent& lif)
     {
         lif.decreaseCountdown();
 
         if (lif.life == 0)
-        {
+        {   
+            // Si es enemigo creamos un objeto que cura
+            if(ent.hasTag<EnemyTag>()){
+                auto& e{ em.newEntity() };
+                em.addTag<ObjectLifeTag>(e);
+                auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 0.5f, 0.5f, 0.5f }, .color = RED });
+                auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
+                em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+            }
+
             // Eliminamos la entidad
-            em.destroyEntity(e.getID());
+            em.destroyEntity(ent.getID());
         }
 
         // Esto sirve pa que el entity manager no se raye si dos entidades se destruyen a la vez

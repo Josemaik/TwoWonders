@@ -6,3 +6,8 @@ void LifeComponent::decreaseLife(){
         elapsed = 0;
     }
 }
+
+void LifeComponent::increaseLife(){
+    if(life < maxLife)
+        life += 1;
+}
