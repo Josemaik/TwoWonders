@@ -23,6 +23,7 @@ void AttackSystem::update(EntityManager& em) {
             auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 0.5f, 0.5f, 0.5f }, .color = BLACK });
             auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .gravity = 0 });
             em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
+            em.addComponent<ProjectileComponent>(e, ProjectileComponent{});
             if (ent.hasTag<PlayerTag>())
                 em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
             else

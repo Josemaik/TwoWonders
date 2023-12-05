@@ -1,15 +1,15 @@
 #pragma once 
-#ifndef LIFE_SYSTEM
-#define LIFE_SYSTEM
+#ifndef PROJECTILE_SYSTEM
+#define PROJECTILE_SYSTEM
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
 
-struct LifeSystem
+struct ProjectileSystem
 {
-    using SYSCMPs = MP::TypeList<LifeComponent>;
+    using SYSCMPs = MP::TypeList<ProjectileComponent>;
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em);
 };
 
-#endif // !LIFE_SYSTEM
+#endif // !PROJECTILE_SYSTEM

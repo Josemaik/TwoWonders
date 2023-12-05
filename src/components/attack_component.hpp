@@ -5,9 +5,9 @@ struct AttackComponent
     enum struct AttackType { Melee, Ranged };
     AttackType type{ AttackType::Ranged };
     u_int16_t damage{};
-    float range{};
+    float range{}; // en segundos
     bool createAttack{ false };
-    float countdown{ 1.0f }, elapsed{ 1.0f };
+    float countdown{ 1.0f }, elapsed{ 1.0f }; // en segundos
     vec3f vel{};
 
     void attack() {

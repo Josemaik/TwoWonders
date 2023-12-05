@@ -171,6 +171,7 @@ void game()
     AISystem   ai_sys{};
     GameTimer gtime{};
     AttackSystem attack_system{};
+    ProjectileSystem projectile_system{};
 
     createEntities(em);
 
@@ -185,8 +186,9 @@ void game()
         ai_sys.update(em);
         physics_system.update(em);
         collision_system.update(em);
-        life_system.update(em);
         attack_system.update(em);
+        projectile_system.update(em);
+        life_system.update(em);
 
         render_system.update(em, engine);
     }
