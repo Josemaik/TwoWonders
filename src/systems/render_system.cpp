@@ -45,18 +45,18 @@ void RenderSystem::beginFrame(ENGI::GameEngine& engine)
 {
     engine.beginDrawing();
     engine.clearBackground(RAYWHITE);
-
     //drawHUD(em, engine);
-
     engine.beginMode3D();
-    // engine.drawGrid(20, 10.f);
+    //engine.drawGrid(50, 1.f);
 }
 
 // Se termina el dibujado
 void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em)
 {
     engine.endMode3D();
+
     drawHUD(em, engine);
+
     engine.endDrawing();
 }
 
@@ -92,6 +92,19 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
                     countdown_ataque = "Ataque listo en: " + std::to_string(-1 * (a.elapsed - 1.0f)) + " segundos";
 
                 engine.drawText(countdown_ataque.c_str(), 10, 30, 20, BLACK);
+            }
+
+            // Dibujar la posicion del player en el HUD // DEBUG
+            if (e.hasComponent<RenderComponent>())
+            {
+                engine.drawText("Posicion", 10, 70, 20, BLACK);
+                auto const& r{ em.getComponent<RenderComponent>(e) };
+                std::string posX = "X: " + std::to_string(static_cast<int>(r.position.x()));
+                engine.drawText(posX.c_str(), 10, 90, 20, BLACK);
+                std::string posY = "Y: " + std::to_string(static_cast<int>(r.position.y()));
+                engine.drawText(posY.c_str(), 10, 110, 20, BLACK);
+                std::string posZ = "Z: " + std::to_string(static_cast<int>(r.position.z()));
+                engine.drawText(posZ.c_str(), 10, 130, 20, BLACK);
             }
         }
 
