@@ -17,7 +17,13 @@
     auto const distance = plphy.position - p.position;
     return  distance;
 }
-void AISystem::FollowPatrol(AIComponent& ai, PhysicsComponent& p) {
+void AISystem::setVelocity(PhysicsComponent& p,vec3f distance){
+    if(distance != vec3f{0,0,0}){
+         //Normalizo la distancia y se la asigno a la velocidad
+        p.velocity = distance.normalized() * SPEED_AI;
+    }
+}
+vec3f AISystem::FollowPatrol(AIComponent& ai, PhysicsComponent& p) {
     //local Variables
     auto& pos = p.position;
     auto& vel = p.velocity;
@@ -31,16 +37,17 @@ void AISystem::FollowPatrol(AIComponent& ai, PhysicsComponent& p) {
     auto const& target = ai.patrol[ai.current];
     if (target == ai.invalid) {
         ai.current = 0;
-        return;
+        ai.nexttarget = 0;
+        return vec3f{0,0,0};
     }
-    //calculo la distancia 
+    //calculo la distancia
     auto const distance = target - pos;
     // Si la distancia es < que el radio de llegada paso a la siguiente
     if (distance.length() < ai.arrival_radius) {
         ai.current++;
+        ai.arrived = true;
     }
-    //Normalizo la distancia y se la asigno a la velocidad
-    vel = distance.normalized() * SPEED_AI;
+    return distance;
 }
 void AISystem::FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, EntityManager& em, Entity& ent) {
     //local Variables
@@ -48,37 +55,17 @@ void AISystem::FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, Entity
     auto& vel = p.velocity;
     if (ai.shooting == false) {
         //Do patrol
-        //si la pos actual es >= que el maximo patron vuelvo al principio
-        if (ai.current >= ai.max_patrol) {
-            ai.current = 0;
-        }
-
-        // Set del objetivo, next position
-        auto const& target = ai.patrol[ai.current];
-        if (target == ai.invalid) {
-            ai.current = 0;
-            ai.nexttarget = 0;
-            return;
-        }
-        //calculo la distancia 
-        auto const distance = target - pos;
-        // Si la distancia es < que el radio de llegada paso a la siguiente
-        if (distance.length() < ai.arrival_radius) {
-            ai.current++;
-        }
-        //Normalizo la distancia y se la asigno a la velocidad
-        vel = distance.normalized() * SPEED_AI;
-        // Si la distancia es menor o igual a 2 unidades, detener y disparar
+        vec3f distance = FollowPatrol(ai,p);
+        setVelocity(p,distance);
         std::printf("%i,%i\n", ai.current, ai.nexttarget);
+        //Check when ai should stop
         if (ai.current == ai.nexttarget) { // 0
             if (static_cast<int>(distance.length()) == 2) {
                 // Detener y disparar
                 ai.shooting = true;
-                ai.contador_stop = 50;
+                // ai.contador_stop = stop_value;
                 ai.nexttarget = ai.current + 1;
                 // Almacenar la velocidad original para poder restablecerla más tarde
-                // ai.originalVelocity = vel;
-                // ai.originalcurrent = ai.current;
                 auto old_vel = vel;
                 vel = vec3f{};  // Velocidad a cero
                 //disparar
@@ -97,37 +84,74 @@ void AISystem::FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, Entity
         ai.contador_stop -= 1;
         if (ai.contador_stop <= 0) {
             ai.shooting = false;
-            ai.contador_stop = 0;
-
-            // Restablecer la velocidad para reanudar la patrulla
-            // vel = ai.originalVelocity;
-
-            // // Asegurarse de que la patrulla continúe avanzando
-            // ai.current = ai.originalcurrent;
+            ai.contador_stop = 50;
         }
         return;
     }
 }
-
+void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p,EntityManager& em,Entity& ent){
+        //local Variables
+        auto& pos = p.position;
+        auto& vel = p.velocity;
+        //Compruebo si ha llegado al siguiente point
+        if(ai.arrived){
+            p.velocity = {0,0,0};
+            ai.contador_change_position -= 1;
+            if(ai.contador_change_position == 0){
+                ai.contador_change_position = 70;
+                ai.arrived = false;
+            }
+             //Attack
+            auto& att = em.getComponent<AttackComponent>(ent);
+            auto old_vel = (getPlayerDistance(em,p,ai)).normalized() * SPEED_AI;
+            att.vel = old_vel;
+            att.attack();
+        }else{
+             vec3f distance = FollowPatrol(ai,p);
+             setVelocity(p,distance);
+        }
+       
+}
 void AISystem::update(EntityManager& em)
 {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, AIComponent& ai)
     {
-        if (e.hasTag<PatrolEnemy>() == true) {
-            FollowPatrol(ai, phy);
-        }
-        if (e.hasTag<PatrolFollowEnemy>() == true) {
-            //Player detection
-            ai.playerdetected = this->isPlayerDetected(em, phy, ai);
-            if (ai.playerdetected) {
-                auto const& distance = getPlayerDistance(em, phy, ai);
-                phy.velocity = distance.normalized() * SPEED_AI;
-                return;
-            }
-            FollowPatrol(ai, phy);
-        }
-        if (e.hasTag<ShoterEnemy>() == true) {
-            FollowPatrolandShoot(ai, phy, em, e);
+         switch (ai.current_type)
+        {
+            case AIComponent::AI_type::PatrolEnemy:
+                {
+                    vec3f distance = FollowPatrol(ai, phy);
+                    setVelocity(phy, distance);
+                }
+                break;
+
+            case AIComponent::AI_type::PatrolFollowEnemy:
+                {
+                    // Player detection
+                    ai.playerdetected = this->isPlayerDetected(em, phy, ai);
+                    if (ai.playerdetected) {
+                        auto const& distance = getPlayerDistance(em, phy, ai);
+                        phy.velocity = distance.normalized() * SPEED_AI;
+                    }
+                    else {
+                        vec3f distance = FollowPatrol(ai, phy);
+                        setVelocity(phy, distance);
+                    }
+                }
+                break;
+
+            case AIComponent::AI_type::ShoterEnemy:
+                {
+                    FollowPatrolandShoot(ai, phy, em, e);
+                }
+                break;
+            case AIComponent::AI_type::ShoterEnemy2:
+                {
+                    ShotandMove(ai,phy,em,e);
+                }
+                break;
+            default:
+                break;
         }
     });
 }

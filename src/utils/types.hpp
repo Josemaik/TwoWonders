@@ -18,15 +18,13 @@ namespace ENGI { struct GameEngine; }
 
 // Tags - Colocar en TL
 struct PlayerTag {};
-struct PatrolEnemy {};
-struct PatrolFollowEnemy {};
-struct ShoterEnemy {};
+struct EnemyTag{};
 struct HitPlayer {};
 struct GroundTag {};
 struct WaterTag {};
 
 using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, AIComponent, AttackComponent, ProjectileComponent>;
-using TL = MP::TypeList<PlayerTag, PatrolEnemy, PatrolFollowEnemy, ShoterEnemy, HitPlayer, GroundTag, WaterTag>;
+using TL = MP::TypeList<PlayerTag, EnemyTag,HitPlayer, GroundTag>;
 using SCL = MP::TypeList<LevelInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
