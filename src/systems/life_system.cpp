@@ -9,11 +9,15 @@ void LifeSystem::update(EntityManager& em) {
         {   
             // Si es enemigo creamos un objeto que cura
             if(ent.hasTag<EnemyTag>()){
-                auto& e{ em.newEntity() };
-                em.addTag<ObjectLifeTag>(e);
-                auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 0.5f, 0.5f, 0.5f }, .color = RED });
-                auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
-                em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+                // Crera la vida solo la mitad de las veces
+                int random_value = std::rand();
+                if(random_value % 2 == 0){
+                    auto& e{ em.newEntity() };
+                    em.addTag<ObjectLifeTag>(e);
+                    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 0.5f, 0.5f, 0.5f }, .color = RED });
+                    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
+                    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+                }
             }
 
             // Eliminamos la entidad

@@ -77,7 +77,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
             if (e.hasComponent<LifeComponent>())
             {
                 auto const& l{ em.getComponent<LifeComponent>(e) };
-                std::string vida = "Vidas: " + std::to_string(l.life);
+                std::string vida = "Vidas: " + std::to_string(l.life) + " (max 3)";
                 engine.drawText(vida.c_str(), 10, 10, 20, BLACK);
             }
 
