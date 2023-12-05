@@ -37,6 +37,7 @@ struct EnemyData {
     AIComponent::AI_type aiType;
     vec3f position;
     std::array<vec3f, 10> route;
+    float detect_radius;
 };
 void createEnemies(EntityManager& em)
 {
@@ -73,12 +74,12 @@ void createEnemies(EntityManager& em)
         //      AIComponent::invalid
         //  }}
          { AIComponent::AI_type::ShoterEnemy2,
-         {2.8f, 0.0f, -2.8f},
+         {15.0f, 0.0f, -4.0f},
          {
-             vec3f{-2.8f, 0.0f, -2.8f},
-             {2.8f, 0.0f, -2.8f},
+             vec3f{13.0f, 0.0f, -8.0f},
+             {15.0f, 0.0f, -4.0f},
              AIComponent::invalid
-         }}
+         },10.0f}
     };
 
     for (const auto& enemyDataItem : enemyData)
@@ -86,7 +87,7 @@ void createEnemies(EntityManager& em)
         auto& enemy{ em.newEntity() };
         auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = enemyDataItem.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = {} });
-        em.addComponent<AIComponent>(enemy, AIComponent{.current_type = enemyDataItem.aiType,.patrol = enemyDataItem.route });
+        em.addComponent<AIComponent>(enemy, AIComponent{.current_type = enemyDataItem.aiType,.patrol = enemyDataItem.route,.detect_radius=enemyDataItem.detect_radius });
         em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = 1 });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
         if(enemyDataItem.aiType == AIComponent::AI_type::ShoterEnemy2){

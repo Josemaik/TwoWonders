@@ -24,9 +24,6 @@ void AISystem::setVelocity(PhysicsComponent& p,vec3f distance){
     }
 }
 vec3f AISystem::FollowPatrol(AIComponent& ai, PhysicsComponent& p) {
-    //local Variables
-    auto& pos = p.position;
-    auto& vel = p.velocity;
     //Do patrol
     //si la pos actual es >= que el maximo patron vuelvo al principio
     if (ai.current >= ai.max_patrol) {
@@ -41,7 +38,7 @@ vec3f AISystem::FollowPatrol(AIComponent& ai, PhysicsComponent& p) {
         return vec3f{0,0,0};
     }
     //calculo la distancia
-    auto const distance = target - pos;
+    auto const distance = target - p.position;
     // Si la distancia es < que el radio de llegada paso a la siguiente
     if (distance.length() < ai.arrival_radius) {
         ai.current++;
@@ -50,9 +47,6 @@ vec3f AISystem::FollowPatrol(AIComponent& ai, PhysicsComponent& p) {
     return distance;
 }
 void AISystem::FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, EntityManager& em, Entity& ent) {
-    //local Variables
-    auto& pos = p.position;
-    auto& vel = p.velocity;
     if (ai.shooting == false) {
         //Do patrol
         vec3f distance = FollowPatrol(ai,p);
@@ -66,8 +60,8 @@ void AISystem::FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, Entity
                 // ai.contador_stop = stop_value;
                 ai.nexttarget = ai.current + 1;
                 // Almacenar la velocidad original para poder restablecerla más tarde
-                auto old_vel = vel;
-                vel = vec3f{};  // Velocidad a cero
+                auto old_vel = p.velocity;
+                p.velocity = vec3f{};  // Velocidad a cero
                 //disparar
                 if (ent.hasComponent<AttackComponent>()) {
                     auto& att = em.getComponent<AttackComponent>(ent);
@@ -90,9 +84,6 @@ void AISystem::FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, Entity
     }
 }
 void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p,EntityManager& em,Entity& ent){
-        //local Variables
-        auto& pos = p.position;
-        auto& vel = p.velocity;
         //Compruebo si ha llegado al siguiente point
         if(ai.arrived){
             p.velocity = {0,0,0};
@@ -102,10 +93,12 @@ void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p,EntityManager& e
                 ai.arrived = false;
             }
              //Attack
-            auto& att = em.getComponent<AttackComponent>(ent);
-            auto old_vel = (getPlayerDistance(em,p,ai)).normalized() * SPEED_AI;
-            att.vel = old_vel;
-            att.attack();
+             if(isPlayerDetected(em,p,ai))  {
+                auto& att = em.getComponent<AttackComponent>(ent);
+                auto old_vel = (getPlayerDistance(em,p,ai)).normalized() * SPEED_AI;
+                att.vel = old_vel;
+                att.attack();
+             }
         }else{
              vec3f distance = FollowPatrol(ai,p);
              setVelocity(p,distance);
