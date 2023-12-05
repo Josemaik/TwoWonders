@@ -5,14 +5,14 @@
 void createWalls(EntityManager& em)
 {
     std::vector<std::pair<vec3f, vec3f>> wallData = {
-        { { 39.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 8.0f } },   // |
-        { { 22.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 8.0f } },  // |
-        { { 39.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 8.0f } },  // |
-        { { 22.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 8.0f } }, // | - Paredes
-        { { 25.5f, 0.0f, -9.5f }, { 7.0f, 1.0f, 1.0f } }, // | - Exteriores
-        { { 25.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },  // |
-        { { 35.5f, 0.0f, -9.5f }, { 7.0f, 1.0f, 1.0f } },  // |
-        { { 35.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },   // |
+        { { 38.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 7.0f } },  // |
+        { { 21.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 7.0f } },  // |
+        { { 38.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 7.0f } }, // |
+        { { 21.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 7.0f } }, // | - Paredes
+        { { 24.5f, 0.0f, -9.5f }, { 7.0f, 1.0f, 1.0f } }, // | - Exteriores
+        { { 24.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },  // |
+        { { 35.5f, 0.0f, -9.5f }, { 7.0f, 1.0, 1.0f } },  // |
+        { { 35.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },  // |
 
         { { 5.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },     // |
         { { 5.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },    // |
@@ -22,7 +22,6 @@ void createWalls(EntityManager& em)
         { { -5.f, 0.0f, 0.f }, { 3.0f, 1.0f, 3.0f } },    // |
         { { 0.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },    // |
         { { 0.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },     // |
-
     };
 
     for (const auto& [pos, scl] : wallData)
@@ -130,14 +129,14 @@ void createEnemies(EntityManager& em)
         em.addTag<EnemyTag>(enemy);
         auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = enemyDataItem.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = {} });
-        em.addComponent<AIComponent>(enemy, AIComponent{.current_type = enemyDataItem.aiType,
+        em.addComponent<AIComponent>(enemy, AIComponent{ .current_type = enemyDataItem.aiType,
         .patrol = enemyDataItem.route,
-        .detect_radius=enemyDataItem.detect_radius
-         });
+        .detect_radius = enemyDataItem.detect_radius
+            });
         em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = enemyDataItem.num_lifes });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
-        if(enemyDataItem.aiType == AIComponent::AI_type::ShoterEnemy2){
-             em.addComponent<AttackComponent>(enemy, AttackComponent{.countdown = 3.5f});
+        if (enemyDataItem.aiType == AIComponent::AI_type::ShoterEnemy2) {
+            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.5f });
         }
     }
 }
@@ -168,7 +167,11 @@ void createGroundWater(EntityManager& em)
 
     EntityData entitiesW[] = {
     { { 15.f, -1.5f, -8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
-    { { 15.f, -1.5f, 8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE }
+    { { 15.f, -1.5f, 8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
+    { { 15.f, -1.5f, 17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
+    { { 15.f, -1.5f, -17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
+    { { -15.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE },
+    { { 45.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE }
     };
 
     for (const auto& data : entitiesW)
@@ -186,7 +189,7 @@ void createEntities(EntityManager& em)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 25.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 28.0f, 0.f, 10.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });

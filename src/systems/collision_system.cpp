@@ -57,20 +57,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity* staticEnt, Enti
 
     if (behaviorType1 & BehaviorType::STATIC || behaviorType2 & BehaviorType::STATIC)
     {
-        // Logica de recoger vidas
-        if(staticEnt->hasTag<PlayerTag>() && otherEnt->hasTag<ObjectLifeTag>())
-        {
-            em.getComponent<LifeComponent>(*staticEnt).increaseLife();    
-            em.destroyEntity(otherEnt->getID()); 
-            return;
-        }
-        else if(otherEnt->hasTag<PlayerTag>() && staticEnt->hasTag<ObjectLifeTag>())
-        {
-            em.getComponent<LifeComponent>(*otherEnt).increaseLife();    
-            em.destroyEntity(staticEnt->getID()); 
-            return;
-        }
-
+        // Comprobar si es un objeto estático - el objeto estático quedará en staticEnt y el otro en otherEnt
         if (behaviorType2 & BehaviorType::STATIC)
         {
             std::swap(staticPhy, otherPhy);
@@ -78,24 +65,36 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity* staticEnt, Enti
             std::swap(behaviorType1, behaviorType2);
         }
 
+        // Nos aseguramos que el suelo siempre esté en staticEnt
         if (otherEnt->hasTag<GroundTag>())
         {
             std::swap(staticPhy, otherPhy);
             std::swap(staticEnt, otherEnt);
         }
 
+        // Colisiones con el suelo
         if (staticEnt->hasTag<GroundTag>() && !(behaviorType2 & BehaviorType::STATIC))
         {
             groundCollision(*otherPhy, em.getComponent<RenderComponent>(*staticEnt).scale, minOverlap);
             return;
         }
 
+        // Si el objeto estático es un objeto de vida, aumentar la vida del jugador
+        if (otherEnt->hasTag<PlayerTag>() && staticEnt->hasTag<ObjectLifeTag>())
+        {
+            em.getComponent<LifeComponent>(*otherEnt).increaseLife();
+            em.destroyEntity(staticEnt->getID());
+            return;
+        }
+
+        // Si cualquiera de los impactos es con una bala, se baja la vida del otro
         if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
         {
             em.getComponent<LifeComponent>(*otherEnt).decreaseLife();
             return;
         }
 
+        // Colisiones con paredes
         staticCollision(*otherPhy, *staticPhy, minOverlap);
         return;
     }
