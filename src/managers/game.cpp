@@ -74,8 +74,8 @@ void createEnemies(EntityManager& em)
          { AIComponent::AI_type::ShoterEnemy2,
          {2.8f, 0.0f, -2.8f},
          {
-             vec3f{2.8f, 0.0f, -2.8f},
-             {-2.8f, 0.0f, -2.8f},
+             vec3f{-2.8f, 0.0f, -2.8f},
+             {2.8f, 0.0f, -2.8f},
              AIComponent::invalid
          }}
     };
@@ -83,25 +83,13 @@ void createEnemies(EntityManager& em)
     for (const auto& enemyDataItem : enemyData)
     {
         auto& enemy{ em.newEntity() };
-
-        // Agrega la etiqueta específica para cada tipo de enemigo
-        // if (enemyDataItem.enemyType == "PatrolEnemy") {
-        //     em.addTag<PatrolEnemy>(enemy);
-        // }
-        // else if (enemyDataItem.enemyType == "PatrolFollowEnemy") {
-        //     em.addTag<PatrolFollowEnemy>(enemy);
-        // }
-        // else if (enemyDataItem.enemyType == "ShoterEnemy") {
-        //     em.addTag<ShoterEnemy>(enemy);
-        // }
-
         auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = enemyDataItem.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = {} });
         em.addComponent<AIComponent>(enemy, AIComponent{.current_type = enemyDataItem.aiType,.patrol = enemyDataItem.route });
         em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = 1 });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
         if(enemyDataItem.aiType == AIComponent::AI_type::ShoterEnemy2){
-             em.addComponent<AttackComponent>(enemy, AttackComponent{.countdown = 2.5f});
+             em.addComponent<AttackComponent>(enemy, AttackComponent{.countdown = 3.5f});
         }
     }
 }

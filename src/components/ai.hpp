@@ -14,6 +14,7 @@ struct AIComponent
     float detect_radius { 5.f };
     bool playerdetected {false};
     bool shooting {false};
+    bool arrived{false};
     int contador_stop{50};
     int contador_change_position{70};
     uint8_t nexttarget{1};

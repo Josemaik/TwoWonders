@@ -45,6 +45,7 @@ vec3f AISystem::FollowPatrol(AIComponent& ai, PhysicsComponent& p) {
     // Si la distancia es < que el radio de llegada paso a la siguiente
     if (distance.length() < ai.arrival_radius) {
         ai.current++;
+        ai.arrived = true;
     }
     return distance;
 }
@@ -90,15 +91,26 @@ void AISystem::FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, Entity
 }
 void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p,EntityManager& em,Entity& ent){
         //local Variables
-    auto& pos = p.position;
-    auto& vel = p.velocity;
-    //Do patrol
-        vec3f distance = FollowPatrol(ai,p);
-        setVelocity(p,distance);
-        auto& att = em.getComponent<AttackComponent>(ent);
-        auto old_vel = (getPlayerDistance(em,p,ai)).normalized() * SPEED_AI;
-        att.vel = old_vel;
-        att.attack();
+        auto& pos = p.position;
+        auto& vel = p.velocity;
+        //Compruebo si ha llegado al siguiente point
+        if(ai.arrived){
+            p.velocity = {0,0,0};
+            ai.contador_change_position -= 1;
+            if(ai.contador_change_position == 0){
+                ai.contador_change_position = 70;
+                ai.arrived = false;
+            }
+             //Attack
+            auto& att = em.getComponent<AttackComponent>(ent);
+            auto old_vel = (getPlayerDistance(em,p,ai)).normalized() * SPEED_AI;
+            att.vel = old_vel;
+            att.attack();
+        }else{
+             vec3f distance = FollowPatrol(ai,p);
+             setVelocity(p,distance);
+        }
+       
 }
 void AISystem::update(EntityManager& em)
 {
