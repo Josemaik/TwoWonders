@@ -38,6 +38,7 @@ struct EnemyData {
     vec3f position;
     std::array<vec3f, 10> route;
     float detect_radius;
+    int num_lifes;
 };
 void createEnemies(EntityManager& em)
 {
@@ -52,8 +53,8 @@ void createEnemies(EntityManager& em)
              { -8.5f, 0.f, 8.0f },
              { -8.5f, 0.f, -8.0f },
              AIComponent::invalid
-         },5.0f},
-       {  AIComponent::AI_type::PatrolFollowEnemy,
+         },5.0f,1},
+       {  AIComponent::AI_type::PatrolEnemy,
          {0.0f, 0.0f, 8.0f},
          {
              vec3f{0.f, 0.f, 8.0f},
@@ -63,30 +64,64 @@ void createEnemies(EntityManager& em)
              { 8.5f, 0.f, -8.0f },
              { 8.5f, 0.f, 8.0f },
              AIComponent::invalid
-         },5.0f},
-         { AIComponent::AI_type::ShoterEnemy,
-         {2.8f, 0.0f, -2.8f},
+         },5.0f,1},
+         {  AIComponent::AI_type::PatrolFollowEnemy,
+         {-2.0f, 0.0f, 10.0f},
          {
-             vec3f{2.8f, 0.0f, -2.8f},
-             {-2.8f, 0.0f, -2.8f},
-              {-2.8f, 0.0f, 2.8f},
-              {2.8f, 0.0f, 2.8f},
+             vec3f{0.0f, 0.f, 13.0f},
+             { 2.0f, 0.f, 10.0f },
+             { -2.0f, 0.0f, 10.0f },
              AIComponent::invalid
-         },5.0f},
+         },5.0f,1},
+         {  AIComponent::AI_type::PatrolFollowEnemy,
+         {-2.0f, 0.f, -13.0f},
+         {
+             vec3f{-1.0f, 0.f, -9.0f},
+             { 2.0f, 0.f, -12.0f },
+             {-2.0f, 0.f, -13.0f },
+             AIComponent::invalid
+         },5.0f,1},
+         { AIComponent::AI_type::ShoterEnemy,
+         {25.0f, 0.0f, -7.0f},
+         {
+             vec3f{25.0f, 0.0f, -2.0f},
+             {37.0f, 0.0f, -2.0f},
+              {37.0f, 0.0f, -7.0f},
+              {25.0f, 0.0f, -7.0f},
+             AIComponent::invalid
+         },5.0f,1},
+         { AIComponent::AI_type::ShoterEnemy,
+         {31.0f, 0.0f, 1.0f},
+         {
+             vec3f{31.0f, 0.0f, 6.0f},
+             {24.0f, 0.0f, 6.0f},
+              {24.0f, 0.0f, 1.0f},
+              {31.0f, 0.0f, 1.0f},
+             AIComponent::invalid
+         },5.0f,1},
+         { AIComponent::AI_type::ShoterEnemy,
+         {35.0f, 0.0f, 0.0f},
+         {
+             vec3f{33.0f, 0.0f, 3.0f},
+             {35.0f, 0.0f, 7.0f},
+              {37.0f, 0.0f, 4.0f},
+              {35.0f, 0.0f, 0.0f},
+             AIComponent::invalid
+         },5.0f,1},
          { AIComponent::AI_type::ShoterEnemy2,
          {15.0f, 0.0f, -4.0f},
          {
              vec3f{13.0f, 0.0f, -8.0f},
              {15.0f, 0.0f, -4.0f},
              AIComponent::invalid
-         },10.0f},
+         },10.0f,2},
           { AIComponent::AI_type::ShoterEnemy2,
          {16.0f, 0.0f, 4.0f},
          {
              vec3f{13.0f, 0.0f, 10.0f},
              {16.0f, 0.0f, 4.0f},
              AIComponent::invalid
-         },10.0f}
+         },10.0f,2}
     };
 
     for (const auto& enemyDataItem : enemyData)
@@ -95,8 +130,11 @@ void createEnemies(EntityManager& em)
         em.addTag<EnemyTag>(enemy);
         auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = enemyDataItem.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = {} });
-        em.addComponent<AIComponent>(enemy, AIComponent{.current_type = enemyDataItem.aiType,.patrol = enemyDataItem.route,.detect_radius=enemyDataItem.detect_radius });
-        em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = 1 });
+        em.addComponent<AIComponent>(enemy, AIComponent{.current_type = enemyDataItem.aiType,
+        .patrol = enemyDataItem.route,
+        .detect_radius=enemyDataItem.detect_radius
+         });
+        em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = enemyDataItem.num_lifes });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
         if(enemyDataItem.aiType == AIComponent::AI_type::ShoterEnemy2){
              em.addComponent<AttackComponent>(enemy, AttackComponent{.countdown = 3.5f});
@@ -148,7 +186,7 @@ void createEntities(EntityManager& em)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 25.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
