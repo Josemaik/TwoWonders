@@ -116,6 +116,23 @@ struct vec3D
         return { std::min(a.x_, b.x_), std::min(a.y_, b.y_), std::min(a.z_, b.z_) };
     }
 
+    static constexpr vec3D max(const vec3D& a, const vec3D& b)
+    {
+        return { std::max(a.x_, b.x_), std::max(a.y_, b.y_), std::max(a.z_, b.z_) };
+    }
+
+    static constexpr vec3D abs(const vec3D& a)
+    {
+        return { std::abs(a.x_), std::abs(a.y_), std::abs(a.z_) };
+    }
+
+    constexpr vec3D abs()
+    {
+        return { std::abs(x_), std::abs(y_), std::abs(z_) };
+    }
+
+    static constexpr vec3D zero() { return { 0, 0, 0 }; }
+
     constexpr DataT x() const noexcept { return x_; }
     constexpr DataT y() const noexcept { return y_; }
     constexpr DataT z() const noexcept { return z_; }

@@ -24,5 +24,7 @@ void PhysicsSystem::update(EntityManager& em)
         pos.setY(pos.y() + vel.y());
         pos.setZ(pos.z() + vel.z());
 
+        if (phy.alreadyGrounded)
+            phy.alreadyGrounded = false;
     });
 }

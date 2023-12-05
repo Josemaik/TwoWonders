@@ -21,7 +21,7 @@ struct CollisionSystem
     void staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3f& minOverlap);
     void nonStaticCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
     void bulletCollision(bool& bulletPl1, bool& bulletPl2, bool& bulletEn1, bool& bulletEn2, EntityManager& em, Entity* entity1, Entity* entity2);
-    void groundCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
+    void groundCollision(PhysicsComponent& playerPhysics, vec3f& playerEsc, vec3f& minOverlap);
     void handleCollision(EntityManager& em, Entity* entity1, Entity* entity2, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
     void classicCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
 

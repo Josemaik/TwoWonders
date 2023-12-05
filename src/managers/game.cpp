@@ -107,7 +107,7 @@ void createGroundWater(EntityManager& em)
 
     EntityData entitiesG[] = {
         { { 0.0f, -1.5f, 0.0f }, { 25.0f, 2.f, 30.0f }, GREEN },
-        { { 14.8f, -1.5f, 0.f }, { 5.0f, 2.f, 5.f }, GREEN },
+        { { 15.f, -1.5f, 0.f }, { 5.0f, 2.f, 5.f }, GREEN },
     };
 
     for (const auto& data : entitiesG)
@@ -139,7 +139,7 @@ void createEntities(EntityManager& em)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 14.0f, -0.5f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
