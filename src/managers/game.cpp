@@ -42,42 +42,49 @@ struct EnemyData {
 void createEnemies(EntityManager& em)
 {
     std::vector<EnemyData> enemyData = {
-    //    {  AIComponent::AI_type::PatrolEnemy,
-    //      {0.0f, 0.0f, -8.0f},
-    //      {
-    //          vec3f{0.f, 0.f, -8.0f},
-    //          { -8.5f, 0.f, -8.0f },
-    //          { -8.5f, 0.f, 8.0f },
-    //          { 0.f, 0.f, 8.0f },
-    //          { -8.5f, 0.f, 8.0f },
-    //          { -8.5f, 0.f, -8.0f },
-    //          AIComponent::invalid
-    //      }},
-    //    {  AIComponent::AI_type::PatrolFollowEnemy,
-    //      {0.0f, 0.0f, 8.0f},
-    //      {
-    //          vec3f{0.f, 0.f, 8.0f},
-    //          { 8.5f, 0.f, 8.0f },
-    //          { 8.5f, 0.f, -8.0f },
-    //          { 0.f, 0.f, -8.0f },
-    //          { 8.5f, 0.f, -8.0f },
-    //          { 8.5f, 0.f, 8.0f },
-    //          AIComponent::invalid
-    //      }},
-        //  { AIComponent::AI_type::ShoterEnemy,
-        //  {2.8f, 0.0f, -2.8f},
-        //  {
-        //      vec3f{2.8f, 0.0f, -2.8f},
-        //      {-2.8f, 0.0f, -2.8f},
-        //       {-2.8f, 0.0f, 2.8f},
-        //       {2.8f, 0.0f, 2.8f},
-        //      AIComponent::invalid
-        //  }}
+       {  AIComponent::AI_type::PatrolEnemy,
+         {0.0f, 0.0f, -8.0f},
+         {
+             vec3f{0.f, 0.f, -8.0f},
+             { -8.5f, 0.f, -8.0f },
+             { -8.5f, 0.f, 8.0f },
+             { 0.f, 0.f, 8.0f },
+             { -8.5f, 0.f, 8.0f },
+             { -8.5f, 0.f, -8.0f },
+             AIComponent::invalid
+         },5.0f},
+       {  AIComponent::AI_type::PatrolFollowEnemy,
+         {0.0f, 0.0f, 8.0f},
+         {
+             vec3f{0.f, 0.f, 8.0f},
+             { 8.5f, 0.f, 8.0f },
+             { 8.5f, 0.f, -8.0f },
+             { 0.f, 0.f, -8.0f },
+             { 8.5f, 0.f, -8.0f },
+             { 8.5f, 0.f, 8.0f },
+             AIComponent::invalid
+         },5.0f},
+         { AIComponent::AI_type::ShoterEnemy,
+         {2.8f, 0.0f, -2.8f},
+         {
+             vec3f{2.8f, 0.0f, -2.8f},
+             {-2.8f, 0.0f, -2.8f},
+              {-2.8f, 0.0f, 2.8f},
+              {2.8f, 0.0f, 2.8f},
+             AIComponent::invalid
+         },5.0f},
          { AIComponent::AI_type::ShoterEnemy2,
          {15.0f, 0.0f, -4.0f},
          {
              vec3f{13.0f, 0.0f, -8.0f},
              {15.0f, 0.0f, -4.0f},
+             AIComponent::invalid
+         },10.0f},
+          { AIComponent::AI_type::ShoterEnemy2,
+         {16.0f, 0.0f, 4.0f},
+         {
+             vec3f{13.0f, 0.0f, 10.0f},
+             {16.0f, 0.0f, 4.0f},
              AIComponent::invalid
          },10.0f}
     };
@@ -88,7 +95,7 @@ void createEnemies(EntityManager& em)
         auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = enemyDataItem.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = {} });
         em.addComponent<AIComponent>(enemy, AIComponent{.current_type = enemyDataItem.aiType,.patrol = enemyDataItem.route,.detect_radius=enemyDataItem.detect_radius });
-        em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = 1 });
+        em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = 3 });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
         if(enemyDataItem.aiType == AIComponent::AI_type::ShoterEnemy2){
              em.addComponent<AttackComponent>(enemy, AttackComponent{.countdown = 3.5f});
