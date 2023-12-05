@@ -39,10 +39,10 @@ void CollisionSystem::checkCollision(EntityManager& em, EntColPair& ECPair)
                 ColliderComponent* collider1 = it1->second;
                 ColliderComponent* collider2 = it2->second;
 
-                vec3f overlap = bbox1->max - bbox2->min;
-                vec3f overlap2 = bbox2->max - bbox1->min;
+                vec3f overlap1 = (bbox1->max - bbox2->min);
+                vec3f overlap2 = (bbox2->max - bbox1->min);
 
-                vec3f minOverlap = vec3f::min(overlap, overlap2);
+                vec3f minOverlap = vec3f::min(overlap1, overlap2);
 
                 handleCollision(em, entity1, entity2, minOverlap, collider1->behaviorType, collider2->behaviorType);
             }
@@ -57,6 +57,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity* staticEnt, Enti
 
     if (behaviorType1 & BehaviorType::STATIC || behaviorType2 & BehaviorType::STATIC)
     {
+        // Comprobar si es un objeto estático - el objeto estático quedará en staticEnt y el otro en otherEnt
         if (behaviorType2 & BehaviorType::STATIC)
         {
             std::swap(staticPhy, otherPhy);
@@ -64,10 +65,48 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity* staticEnt, Enti
             std::swap(behaviorType1, behaviorType2);
         }
 
+        // Nos aseguramos que el suelo siempre esté en staticEnt
         if (otherEnt->hasTag<GroundTag>())
+        {
             std::swap(staticPhy, otherPhy);
+            std::swap(staticEnt, otherEnt);
+        }
 
+        // Colisiones con el suelo
+        if (staticEnt->hasTag<GroundTag>() && !(behaviorType2 & BehaviorType::STATIC))
+        {
+            groundCollision(*otherPhy, em.getComponent<RenderComponent>(*staticEnt).scale, minOverlap);
+            return;
+        }
+
+        // Si el objeto estático es un objeto de vida, aumentar la vida del jugador
+        if (otherEnt->hasTag<PlayerTag>() && staticEnt->hasTag<ObjectLifeTag>())
+        {
+            em.getComponent<LifeComponent>(*otherEnt).increaseLife();
+            em.destroyEntity(staticEnt->getID());
+            return;
+        }
+
+        // Si cualquiera de los impactos es con una bala, se baja la vida del otro
+        if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
+        {
+            em.getComponent<LifeComponent>(*otherEnt).decreaseLife();
+            return;
+        }
+
+        // Colisiones con paredes
         staticCollision(*otherPhy, *staticPhy, minOverlap);
+        return;
+    }
+
+    bool isBulletPlayer1 = behaviorType1 & BehaviorType::ATK_PLAYER;
+    bool isBulletPlayer2 = behaviorType2 & BehaviorType::ATK_PLAYER;
+    bool isBulletEnemy1 = behaviorType1 & BehaviorType::ATK_ENEMY;
+    bool isBulletEnemy2 = behaviorType2 & BehaviorType::ATK_ENEMY;
+
+    if (isBulletPlayer1 || isBulletPlayer2 || isBulletEnemy1 || isBulletEnemy2)
+    {
+        bulletCollision(isBulletPlayer1, isBulletPlayer2, isBulletEnemy1, isBulletEnemy2, em, staticEnt, otherEnt);
         return;
     }
 
@@ -78,18 +117,49 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity* staticEnt, Enti
             std::swap(staticEnt, otherEnt);
             std::swap(staticPhy, otherPhy);
         }
-        enemyCollision(*staticPhy, *otherPhy, minOverlap);
-        em.getComponent<LifeComponent>(*staticEnt).decreaseLife();
+        classicCollision(*staticPhy, *otherPhy, minOverlap);
+        enemyCollision(em, staticEnt);
         return;
     }
 
     nonStaticCollision(*staticPhy, *otherPhy, minOverlap);
-
 }
 
-void CollisionSystem::enemyCollision(PhysicsComponent& playerPhysics, PhysicsComponent& enemyPhysics, vec3f& minOverlap)
+void CollisionSystem::bulletCollision(bool& bulletPl1, bool& bulletPl2, bool& bulletEn1, bool& bulletEn2, EntityManager& em, Entity* entity1, Entity* entity2)
 {
-    classicCollision(playerPhysics, enemyPhysics, minOverlap);
+    if (bulletPl1 || bulletPl2 || bulletEn1 || bulletEn2)
+    {
+        if (bulletPl2 || bulletEn2)
+        {
+            std::swap(entity1, entity2);
+        }
+
+        bool isPlayer2 = em.getComponent<ColliderComponent>(*entity2).behaviorType & BehaviorType::PLAYER;
+        bool isEnemy2 = em.getComponent<ColliderComponent>(*entity2).behaviorType & BehaviorType::ENEMY;
+
+        if ((isPlayer2 && bulletEn1) || (isEnemy2 && bulletPl1))
+        {
+            em.getComponent<LifeComponent>(*entity1).decreaseLife();
+            em.getComponent<LifeComponent>(*entity2).decreaseLifeNextFrame = true;
+        }
+    }
+}
+
+void CollisionSystem::groundCollision(PhysicsComponent& playerPhysics, vec3f& playerEsc, vec3f& minOverlap)
+{
+    auto& pos1 = playerPhysics.position;
+    minOverlap += vec3f{ playerEsc.x() / 2, 0.f, playerEsc.z() / 2 };
+
+    if (!playerPhysics.alreadyGrounded && minOverlap.y() < minOverlap.x() && minOverlap.y() < minOverlap.z())
+    {
+        pos1.setY(pos1.y() + minOverlap.y());
+        playerPhysics.alreadyGrounded = true;
+    }
+}
+
+void CollisionSystem::enemyCollision(EntityManager& em, Entity* damagedEntity)
+{
+    em.getComponent<LifeComponent>(*damagedEntity).decreaseLife();
 }
 
 void CollisionSystem::staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3f& minOverlap)

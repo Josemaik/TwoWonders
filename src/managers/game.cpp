@@ -5,23 +5,23 @@
 void createWalls(EntityManager& em)
 {
     std::vector<std::pair<vec3f, vec3f>> wallData = {
-        { { 9.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 8.0f } },
-        { { -9.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 8.0f } },
-        { { 9.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 8.0f } },
-        { { -9.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 8.0f } },
-        { { -5.5f, 0.0f, -9.5f }, { 7.0f, 1.0f, 1.0f } },
-        { { -5.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },
-        { { 5.5f, 0.0f, -9.5f }, { 7.0f, 1.0f, 1.0f } },
-        { { 5.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },
-        { { 5.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },
-        { { 5.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },
-        { { -5.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },
-        { { -5.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },
-        { { 5.f, 0.0f, 0.f }, { 3.0f, 1.0f, 3.0f } },
-        { { -5.f, 0.0f, 0.f }, { 3.0f, 1.0f, 3.0f } },
-        { { 0.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },
-        { { 0.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },
+        { { 38.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 7.0f } },  // |
+        { { 21.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 7.0f } },  // |
+        { { 38.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 7.0f } }, // |
+        { { 21.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 7.0f } }, // | - Paredes
+        { { 24.5f, 0.0f, -9.5f }, { 7.0f, 1.0f, 1.0f } }, // | - Exteriores
+        { { 24.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },  // |
+        { { 35.5f, 0.0f, -9.5f }, { 7.0f, 1.0, 1.0f } },  // |
+        { { 35.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },  // |
 
+        { { 5.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },     // |
+        { { 5.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },    // |
+        { { -5.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },    // |
+        { { -5.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },   // | - Cuadrados
+        { { 5.f, 0.0f, 0.f }, { 3.0f, 1.0f, 3.0f } },     // | - Interiores
+        { { -5.f, 0.0f, 0.f }, { 3.0f, 1.0f, 3.0f } },    // |
+        { { 0.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },    // |
+        { { 0.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },     // |
     };
 
     for (const auto& [pos, scl] : wallData)
@@ -32,47 +32,155 @@ void createWalls(EntityManager& em)
         em.addComponent<ColliderComponent>(wall, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
     }
 }
-
+struct EnemyData {
+    AIComponent::AI_type aiType;
+    vec3f position;
+    std::array<vec3f, 10> route;
+    float detect_radius;
+    int num_lifes;
+};
 void createEnemies(EntityManager& em)
 {
-    std::vector<std::pair<vec3f, std::array<vec3f, 10>>> enemyData = {
-    {
-        { 0.0f, 0.0f, -8.0f },
-        {
-            vec3f
-            { 0.f, 0.f, -8.0f },
-            { -8.5f, 0.f, -8.0f },
-            { -8.5f, 0.f, 8.0f },
-            { 0.f, 0.f, 8.0f },
-            { -8.5f, 0.f, 8.0f },
-            { -8.5f, 0.f, -8.0f },
-            AIComponent::invalid
-        }
-    },
-    {
-        { 0.0f, 0.0f, 8.0f },
-        {
-            vec3f
-            { 0.f, 0.f, 8.0f },
-            { 8.5f, 0.f, 8.0f },
-            { 8.5f, 0.f, -8.0f },
-            { 0.f, 0.f, -8.0f },
-            { 8.5f, 0.f, -8.0f },
-            { 8.5f, 0.f, 8.0f },
-            AIComponent::invalid
-        }
-    }
+    std::vector<EnemyData> enemyData = {
+       {  AIComponent::AI_type::PatrolEnemy,
+         {0.0f, 0.0f, -8.0f},
+         {
+             vec3f{0.f, 0.f, -8.0f},
+             { -8.5f, 0.f, -8.0f },
+             { -8.5f, 0.f, 8.0f },
+             { 0.f, 0.f, 8.0f },
+             { -8.5f, 0.f, 8.0f },
+             { -8.5f, 0.f, -8.0f },
+             AIComponent::invalid
+         },5.0f,1},
+       {  AIComponent::AI_type::PatrolEnemy,
+         {0.0f, 0.0f, 8.0f},
+         {
+             vec3f{0.f, 0.f, 8.0f},
+             { 8.5f, 0.f, 8.0f },
+             { 8.5f, 0.f, -8.0f },
+             { 0.f, 0.f, -8.0f },
+             { 8.5f, 0.f, -8.0f },
+             { 8.5f, 0.f, 8.0f },
+             AIComponent::invalid
+         },5.0f,1},
+         {  AIComponent::AI_type::PatrolFollowEnemy,
+         {-2.0f, 0.0f, 10.0f},
+         {
+             vec3f{0.0f, 0.f, 13.0f},
+             { 2.0f, 0.f, 10.0f },
+             { -2.0f, 0.0f, 10.0f },
+             AIComponent::invalid
+         },5.0f,1},
+         {  AIComponent::AI_type::PatrolFollowEnemy,
+         {-2.0f, 0.f, -13.0f},
+         {
+             vec3f{-1.0f, 0.f, -9.0f},
+             { 2.0f, 0.f, -12.0f },
+             {-2.0f, 0.f, -13.0f },
+             AIComponent::invalid
+         },5.0f,1},
+         { AIComponent::AI_type::ShoterEnemy,
+         {25.0f, 0.0f, -7.0f},
+         {
+             vec3f{25.0f, 0.0f, -2.0f},
+             {37.0f, 0.0f, -2.0f},
+              {37.0f, 0.0f, -7.0f},
+              {25.0f, 0.0f, -7.0f},
+             AIComponent::invalid
+         },5.0f,1},
+         { AIComponent::AI_type::ShoterEnemy,
+         {31.0f, 0.0f, 1.0f},
+         {
+             vec3f{31.0f, 0.0f, 6.0f},
+             {24.0f, 0.0f, 6.0f},
+              {24.0f, 0.0f, 1.0f},
+              {31.0f, 0.0f, 1.0f},
+             AIComponent::invalid
+         },5.0f,1},
+         { AIComponent::AI_type::ShoterEnemy,
+         {35.0f, 0.0f, 0.0f},
+         {
+             vec3f{33.0f, 0.0f, 3.0f},
+             {35.0f, 0.0f, 7.0f},
+              {37.0f, 0.0f, 4.0f},
+              {35.0f, 0.0f, 0.0f},
+             AIComponent::invalid
+         },5.0f,1},
+         { AIComponent::AI_type::ShoterEnemy2,
+         {15.0f, 0.0f, -4.0f},
+         {
+             vec3f{13.0f, 0.0f, -8.0f},
+             {15.0f, 0.0f, -4.0f},
+             AIComponent::invalid
+         },10.0f,2},
+          { AIComponent::AI_type::ShoterEnemy2,
+         {16.0f, 0.0f, 4.0f},
+         {
+             vec3f{13.0f, 0.0f, 10.0f},
+             {16.0f, 0.0f, 4.0f},
+             AIComponent::invalid
+         },10.0f,2}
     };
 
-    for (const auto& [pos, route] : enemyData)
+    for (const auto& enemyDataItem : enemyData)
     {
         auto& enemy{ em.newEntity() };
         em.addTag<EnemyTag>(enemy);
-        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = pos, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
+        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = enemyDataItem.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = {} });
-        em.addComponent<AIComponent>(enemy, AIComponent{ .patrol = route });
-        em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = 1 });
+        em.addComponent<AIComponent>(enemy, AIComponent{ .current_type = enemyDataItem.aiType,
+        .patrol = enemyDataItem.route,
+        .detect_radius = enemyDataItem.detect_radius
+            });
+        em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = enemyDataItem.num_lifes });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
+        if (enemyDataItem.aiType == AIComponent::AI_type::ShoterEnemy2) {
+            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.5f });
+        }
+    }
+}
+
+void createGroundWater(EntityManager& em)
+{
+    struct EntityData
+    {
+        vec3f position;
+        vec3f scale;
+        Color color;
+    };
+
+    EntityData entitiesG[] = {
+        { { 0.0f, -1.5f, 0.0f }, { 25.0f, 2.f, 30.0f }, GREEN },
+        { { 15.f, -1.5f, 0.f }, { 5.0f, 2.f, 5.f }, GREEN },
+        { { 30.0f, -1.5f, 0.0f }, { 25.0f, 2.f, 30.0f }, GREEN },
+    };
+
+    for (const auto& data : entitiesG)
+    {
+        auto& entity = em.newEntity();
+        em.addTag<GroundTag>(entity);
+        auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
+        auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
+    }
+
+    EntityData entitiesW[] = {
+    { { 15.f, -1.5f, -8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
+    { { 15.f, -1.5f, 8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
+    { { 15.f, -1.5f, 17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
+    { { 15.f, -1.5f, -17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
+    { { -15.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE },
+    { { 45.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE }
+    };
+
+    for (const auto& data : entitiesW)
+    {
+        auto& entity = em.newEntity();
+        em.addTag<WaterTag>(entity);
+        auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
+        auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
     }
 }
 
@@ -81,24 +189,20 @@ void createEntities(EntityManager& em)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, -0.5f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 28.0f, 0.f, 10.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<AttackComponent>(e, AttackComponent{});
 
-    // Ground
-    auto& e0{ em.newEntity() };
-    em.addTag<GroundTag>(e0);
-    auto& r0 = em.addComponent<RenderComponent>(e0, RenderComponent{ .position = { 0.0f, -1.5f, 0.0f }, .scale = { 20.0f, 2.f, 20.0f }, .color = GREEN });
-    auto& p0 = em.addComponent<PhysicsComponent>(e0, PhysicsComponent{ .position{ r0.position }, .velocity{ .0f, .0f, .0f }, .gravity{ .0f } });
-    em.addComponent<ColliderComponent>(e0, ColliderComponent{ p0.position, r0.scale, BehaviorType::STATIC });
+    // Ground and water
+    createGroundWater(em);
 
     // Walls
     createWalls(em);
 
-    // // Enemy
+    // Enemy
     createEnemies(em);
 
     auto& li = em.getSingleton<LevelInfo>();
@@ -115,8 +219,9 @@ void game()
     CollisionSystem collision_system{};
     LifeSystem life_system{};
     AISystem   ai_sys{};
-    AttackSystem attack_system{};
     GameTimer gtime{};
+    AttackSystem attack_system{};
+    ProjectileSystem projectile_system{};
 
     createEntities(em);
 
@@ -128,11 +233,13 @@ void game()
     while (!engine.windowShouldClose())
     {
         input_system.update(em);
-        attack_system.update(em);
         ai_sys.update(em);
         physics_system.update(em);
         collision_system.update(em);
+        attack_system.update(em);
+        projectile_system.update(em);
         life_system.update(em);
+
         render_system.update(em, engine);
     }
 

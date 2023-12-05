@@ -1,30 +1,34 @@
 #include "attack_system.hpp"
 
-void AttackSystem::update(EntityManager& em){
+void AttackSystem::update(EntityManager& em) {
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, AttackComponent& att)
     {
-        if(att.createAttack){
-            vec3f vel = { 0 , 0 , 0 };
-            if(ent.hasTag<PlayerTag>() && ent.hasComponent<InputComponent>()){
+        if (att.createAttack) {
+            att.vel != vec3f{ 0, 0, 0 } ? att.vel : att.vel = { 0, 0, -0.5f };
+            if (ent.hasTag<PlayerTag>() && ent.hasComponent<InputComponent>()) {
                 auto& i = em.getComponent<InputComponent>(ent);
-                if(i.last_key == i.down)
-                    vel = { 0 , 0 , 0.5f };
-                else if(i.last_key == i.up)
-                    vel = { 0 , 0 , -0.5f };
-                else if(i.last_key == i.right)
-                    vel = { 0.5f , 0 , 0 };
-                else if(i.last_key == i.left)
-                    vel = { -0.5f , 0 , 0 };
+                if (i.last_key == i.down)
+                    att.vel = { 0 , 0 , 0.5f };
+                else if (i.last_key == i.up)
+                    att.vel = { 0 , 0 , -0.5f };
+                else if (i.last_key == i.right)
+                    att.vel = { 0.5f , 0 , 0 };
+                else if (i.last_key == i.left)
+                    att.vel = { -0.5f , 0 , 0 };
             }
-
             auto& e{ em.newEntity() };
             em.addTag<HitPlayer>(e);
-            /*auto& r = */em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 0.5f, 0.5f, 0.5f }, .color = BLACK });
-            /*auto& p = */em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .velocity = vel, .gravity = 0 });
-            //em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATTACK_PLAYER });
-        
-            att.createAttack =  false;
+            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 0.5f, 0.5f, 0.5f }, .color = BLACK });
+            auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .gravity = 0 });
+            em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
+            em.addComponent<ProjectileComponent>(e, ProjectileComponent{});
+            if (ent.hasTag<PlayerTag>())
+                em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+            else
+                em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_ENEMY });
+
+            att.createAttack = false;
         }
 
         att.decreaseCountdown();

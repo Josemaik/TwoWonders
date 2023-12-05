@@ -3,9 +3,11 @@
 
 struct LifeComponent
 {
-    int life{};
+    int life{}, maxLife{ 3 };
     float countdown{ 1.0f }, elapsed{ 1.0f }; // En segundos
+    bool decreaseLifeNextFrame{ false };
 
     void decreaseLife();
-    void decreaseCountdown(){ elapsed += GetFrameTime(); }; // delta time
+    void increaseLife();
+    void decreaseCountdown() { elapsed += GetFrameTime(); }; // delta time
 };

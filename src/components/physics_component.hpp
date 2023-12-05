@@ -11,4 +11,5 @@ struct PhysicsComponent
     vec3f position{};
     vec3f velocity{};
     float gravity{ KGravity };
+    bool alreadyGrounded{ false };
 };
