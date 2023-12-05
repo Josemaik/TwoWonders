@@ -9,6 +9,7 @@ void PhysicsSystem::update(EntityManager& em)
         auto& vel = phy.velocity;
 
         // Aplicar gravedad y hacer Clamp
+        //if (!phy.unCheckGravity)
         vel.setY(vel.y() - phy.gravity);
         //vel.setY(std::clamp(vel.x(), phy.KMinVy, phy.KMaxVy));
 
@@ -23,5 +24,7 @@ void PhysicsSystem::update(EntityManager& em)
         pos.setY(pos.y() + vel.y());
         pos.setZ(pos.z() + vel.z());
 
+        if (phy.alreadyGrounded)
+            phy.alreadyGrounded = false;
     });
 }

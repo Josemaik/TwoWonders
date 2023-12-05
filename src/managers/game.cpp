@@ -94,32 +94,64 @@ void createEnemies(EntityManager& em)
     }
 }
 
+void createGroundWater(EntityManager& em)
+{
+    struct EntityData
+    {
+        vec3f position;
+        vec3f scale;
+        Color color;
+    };
+
+    EntityData entitiesG[] = {
+        { { 0.0f, -1.5f, 0.0f }, { 25.0f, 2.f, 30.0f }, GREEN },
+        { { 15.f, -1.5f, 0.f }, { 5.0f, 2.f, 5.f }, GREEN },
+    };
+
+    for (const auto& data : entitiesG)
+    {
+        auto& entity = em.newEntity();
+        em.addTag<GroundTag>(entity);
+        auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
+        auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
+    }
+
+    EntityData entitiesW[] = {
+    { { 15.f, -1.5f, -8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
+    { { 15.f, -1.5f, 8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE }
+    };
+
+    for (const auto& data : entitiesW)
+    {
+        auto& entity = em.newEntity();
+        em.addTag<WaterTag>(entity);
+        auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
+        auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
+    }
+}
+
 void createEntities(EntityManager& em)
 {
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, -0.5f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<AttackComponent>(e, AttackComponent{});
 
-    // Ground
-    auto& e0{ em.newEntity() };
-    em.addTag<GroundTag>(e0);
-    auto& r0 = em.addComponent<RenderComponent>(e0, RenderComponent{ .position = { 0.0f, -1.5f, 0.0f }, .scale = { 20.0f, 2.f, 20.0f }, .color = GREEN });
-    auto& p0 = em.addComponent<PhysicsComponent>(e0, PhysicsComponent{ .position{ r0.position }, .velocity{ .0f, .0f, .0f }, .gravity = .0f });
-    em.addComponent<ColliderComponent>(e0, ColliderComponent{ p0.position, r0.scale, BehaviorType::STATIC });
+    // Ground and water
+    createGroundWater(em);
 
     // Walls
     createWalls(em);
 
     // // Enemy
     createEnemies(em);
-
-
 
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
@@ -137,6 +169,7 @@ void game()
     AISystem   ai_sys{};
     GameTimer gtime{};
     AttackSystem attack_system{};
+    ProjectileSystem projectile_system{};
 
     createEntities(em);
 
@@ -151,8 +184,9 @@ void game()
         ai_sys.update(em);
         physics_system.update(em);
         collision_system.update(em);
-        life_system.update(em);
         attack_system.update(em);
+        projectile_system.update(em);
+        life_system.update(em);
 
         render_system.update(em, engine);
     }
