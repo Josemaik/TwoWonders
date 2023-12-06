@@ -6,12 +6,12 @@ void LifeSystem::update(EntityManager& em) {
         lif.decreaseCountdown();
 
         if (lif.life == 0)
-        {   
+        {
             // Si es enemigo creamos un objeto que cura
-            if(ent.hasTag<EnemyTag>()){
+            if (ent.hasTag<EnemyTag>()) {
                 // Crera la vida solo la mitad de las veces
                 int random_value = std::rand();
-                if(random_value % 2 == 0){
+                if (random_value % 2 == 0) {
                     auto& e{ em.newEntity() };
                     em.addTag<ObjectLifeTag>(e);
                     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 0.5f, 0.5f, 0.5f }, .color = RED });

@@ -231,9 +231,7 @@ void game()
     // Inicializa el reloj para medir el tiempo entre frames
     while (!engine.windowShouldClose())
     {
-        if (!input_system.update(em))
-            em.destroyAll();
-
+        input_system.update(em);
         ai_sys.update(em);
         physics_system.update(em);
         collision_system.update(em);

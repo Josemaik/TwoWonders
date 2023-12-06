@@ -291,12 +291,7 @@ namespace ETMG {
             return nullptr;
         }
 
-        void destroyAll() {
-            while (alive_ > 0)
-            {
-                destroyEntity(0);
-            }
-        }
+        void destroyAll() { while (alive_ > 0) destroyEntity(0); }
 
     private:
         // Plantilla para recorrer todas las entidades que tengan los componentes y tags especificados

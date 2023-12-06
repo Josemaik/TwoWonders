@@ -29,10 +29,10 @@ namespace ENGI {
         void drawRectangle(int posX, int posY, int width, int height, Color color);
 
         // Text
-        void drawText(const char *text, int posX, int posY, int fontSize, Color color);
+        void drawText(const char* text, int posX, int posY, int fontSize, Color color);
 
         // Window
-        void initWindow(int width, int height, const char *title);
+        void initWindow(int width, int height, const char* title);
         void closeWindow();
         void setTargetFPS(int fps);
         bool windowShouldClose();

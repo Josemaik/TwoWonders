@@ -55,13 +55,13 @@ void ENGI::GameEngine::drawCubeWires(vec3f pos, float width, float height, float
     DrawCubeWires(pos.toRaylib(), width, height, lenght, color);
 }
 
-void ENGI::GameEngine::drawRectangle(int posX, int posY, int width, int height, Color color){
+void ENGI::GameEngine::drawRectangle(int posX, int posY, int width, int height, Color color) {
     DrawRectangle(posX, posY, width, height, color);
 }
 
 ////// TEXT //////
 
-void ENGI::GameEngine::drawText(const char *text, int posX, int posY, int fontSize, Color color){
+void ENGI::GameEngine::drawText(const char* text, int posX, int posY, int fontSize, Color color) {
     DrawText(text, posX, posY, fontSize, color);
 }
 

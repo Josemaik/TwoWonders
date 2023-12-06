@@ -1,11 +1,11 @@
 #include "input_system.hpp"
 
-bool InputSystem::update(EntityManager& em)
+void InputSystem::update(EntityManager& em)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto* playerEn = em.getEntityByID(li.playerID);
     if (!playerEn->hasTag<PlayerTag>() && IsKeyDown(KEY_ENTER))
-        return false;
+        em.destroyAll();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, InputComponent& in)
     {
@@ -55,6 +55,4 @@ bool InputSystem::update(EntityManager& em)
             vel.normalize();
         }
     });
-
-    return true;
 }
