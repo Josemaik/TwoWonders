@@ -1,33 +1,38 @@
 #include "input_system.hpp"
 
-void InputSystem::update(EntityManager& em)
+bool InputSystem::update(EntityManager& em)
 {
+    auto& li = em.getSingleton<LevelInfo>();
+    auto* playerEn = em.getEntityByID(li.playerID);
+    if (!playerEn->hasTag<PlayerTag>() && IsKeyDown(KEY_ENTER))
+        return false;
+
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, InputComponent& in)
     {
         // Resetear la velocidad
         phy.velocity = {};
         auto& vel = phy.velocity;
         // Actualizar la velocidad
-        if (IsKeyDown(in.right)){
+        if (IsKeyDown(in.right)) {
             vel.setX(vel.x() + INP_SPEED);
             in.last_key = in.right;
         }
-        if (IsKeyDown(in.left)){
+        if (IsKeyDown(in.left)) {
             vel.setX(vel.x() - INP_SPEED);
             in.last_key = in.left;
-        } 
-        if (IsKeyDown(in.up)){
+        }
+        if (IsKeyDown(in.up)) {
             vel.setZ(vel.z() - INP_SPEED);
             in.last_key = in.up;
-        } 
-        if (IsKeyDown(in.down)){
+        }
+        if (IsKeyDown(in.down)) {
             vel.setZ(vel.z() + INP_SPEED);
             in.last_key = in.down;
-        } 
+        }
 
         // Codigo para el ataque
-        if(IsKeyDown(in.space) && e.hasComponent<AttackComponent>())
-            em.getComponent<AttackComponent>(e).attack(); 
+        if (IsKeyDown(in.space) && e.hasComponent<AttackComponent>())
+            em.getComponent<AttackComponent>(e).attack();
 
         // Codigo para curarse // DEBUG
         // if(IsKeyDown(KEY_Z) && e.hasComponent<LifeComponent>())
@@ -50,4 +55,6 @@ void InputSystem::update(EntityManager& em)
             vel.normalize();
         }
     });
+
+    return true;
 }

@@ -8,9 +8,9 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <typeinfo>
 #include "../utils/slotmap.hpp"
 #include "../utils/meta_program.hpp"
-#include <typeinfo>
 
 template <typename TLIST>
 struct cmp_tag_traits {
@@ -47,7 +47,7 @@ struct cmp_traits : tag_traits<CMPS> {};
 
 namespace ETMG {
 
-    template <typename CMPList, typename SNGCMPLIST, typename TAGList, std::size_t SlotCapacity = 100>
+    template <typename CMPList, typename SNGCMPLIST, typename TAGList, std::size_t SlotCapacity = 50>
 
     struct EntityManager
     {
@@ -57,7 +57,7 @@ namespace ETMG {
 
         // CONSTANTES
         //
-        static constexpr std::size_t MAX_ENTITIES{ 100 };
+        static constexpr std::size_t MAX_ENTITIES{ 50 };
 
         // VARIABLES ESTÁTICAS
         //
@@ -173,11 +173,11 @@ namespace ETMG {
         template <typename CMP, typename... InitTypes>
         CMP& addComponent(Entity& e, InitTypes&&... args)
         {
-            std::cout << "Adding component " << typeid(CMP).name() << std::endl;
+            // std::cout << "Adding component " << typeid(CMP).name() << std::endl;
             // Revisamos si ya tiene el componente
             if (e.template hasComponent<CMP>())
             {
-                std::cout << "Component " << typeid(CMP).name() << " already present" << std::endl;
+                // std::cout << "Component " << typeid(CMP).name() << " already present" << std::endl;
                 return getComponent<CMP>(e);
             }
 
@@ -207,12 +207,12 @@ namespace ETMG {
                 using CMPType = decltype(cmpType);
                 if (e.template hasComponent<CMPType>())
                 {
-                    std::cout << "Destroying component " << typeid(CMPType).name() << std::endl;
+                    // std::cout << "Destroying component " << typeid(CMPType).name() << std::endl;
                     auto key = e.template getComponentKey<CMPType>();
                     this->template getCMPStorage<CMPType>().erase(key);
                 }
             });
-            printf("\n");
+            // printf("\n");
             // Reseteamos la entidad
             e.reset();
 
@@ -290,6 +290,14 @@ namespace ETMG {
                 return &(*it); //devuelvo la direccion de memoria a la que apunta el iterador
             return nullptr;
         }
+
+        void destroyAll() {
+            while (alive_ > 0)
+            {
+                destroyEntity(0);
+            }
+        }
+
     private:
         // Plantilla para recorrer todas las entidades que tengan los componentes y tags especificados
         template <typename... CMPs, typename... TAGs>
@@ -317,7 +325,6 @@ namespace ETMG {
 
             return storage[key];
         }
-
 
         std::size_t alive_{};
         std::array<Entity, MAX_ENTITIES> entities_{};

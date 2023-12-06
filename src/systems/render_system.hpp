@@ -10,13 +10,14 @@ struct RenderSystem
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, GameEngine& engine);
+    bool update(EntityManager& em, GameEngine& engine);
 
     // Funciones privadas para organizar el codigo
 private:
     void beginFrame(ENGI::GameEngine& engine);
     void endFrame(ENGI::GameEngine& engine, EntityManager& em);
     void drawHUD(EntityManager& em, ENGI::GameEngine& engine);
+    bool drawEntities(EntityManager& em, ENGI::GameEngine& engine);
     void drawDeath(ENGI::GameEngine& engine);
 };
 
