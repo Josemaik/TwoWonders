@@ -226,13 +226,14 @@ void game()
     createEntities(em);
 
     // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
-    // MemoryViewer mv2{ em.getCMPStorage<RenderComponent>() };
-    // mv2.printMemory();
     // mv.printMemory();
-      // Inicializa el reloj para medir el tiempo entre frames
+
+    // Inicializa el reloj para medir el tiempo entre frames
     while (!engine.windowShouldClose())
     {
-        input_system.update(em);
+        if (!input_system.update(em))
+            em.destroyAll();
+
         ai_sys.update(em);
         physics_system.update(em);
         collision_system.update(em);
@@ -240,7 +241,9 @@ void game()
         projectile_system.update(em);
         life_system.update(em);
 
-        render_system.update(em, engine);
+        if (!render_system.update(em, engine))
+            createEntities(em);
+
     }
 
     engine.closeWindow();

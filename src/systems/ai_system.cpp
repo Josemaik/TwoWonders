@@ -9,6 +9,7 @@
     auto const distance = (p.position - plphy.position).lengthSQ();
     return  distance < (ai.detect_radius * ai.detect_radius);
 }
+
 [[nodiscard]] vec3f AISystem::getPlayerDistance(EntityManager& EM, PhysicsComponent const& p, AIComponent& ai) const noexcept {
     auto& li = EM.getSingleton<LevelInfo>();
     auto* playerEn = EM.getEntityByID(li.playerID);
@@ -17,12 +18,14 @@
     auto const distance = plphy.position - p.position;
     return  distance;
 }
+
 void AISystem::setVelocity(PhysicsComponent& p, vec3f distance) {
     if (distance != vec3f{ 0,0,0 }) {
         //Normalizo la distancia y se la asigno a la velocidad
         p.velocity = distance.normalized() * SPEED_AI;
     }
 }
+
 vec3f AISystem::FollowPatrol(AIComponent& ai, PhysicsComponent& p) {
     //Do patrol
     //si la pos actual es >= que el maximo patron vuelvo al principio
@@ -46,12 +49,13 @@ vec3f AISystem::FollowPatrol(AIComponent& ai, PhysicsComponent& p) {
     }
     return distance;
 }
+
 void AISystem::FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, EntityManager& em, Entity& ent) {
     if (ai.shooting == false) {
         //Do patrol
         vec3f distance = FollowPatrol(ai, p);
         setVelocity(p, distance);
-        std::printf("%i,%i\n", ai.current, ai.nexttarget);
+        // std::printf("%i,%i\n", ai.current, ai.nexttarget);
         //Check when ai should stop
         if (ai.current == ai.nexttarget) { // 0
             if (static_cast<int>(distance.length()) == 2) {
@@ -83,6 +87,7 @@ void AISystem::FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, Entity
         return;
     }
 }
+
 void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& em, Entity& ent) {
     //Compruebo si ha llegado al siguiente point
     if (ai.arrived) {
@@ -106,6 +111,7 @@ void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& 
     }
 
 }
+
 void AISystem::update(EntityManager& em)
 {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, AIComponent& ai)

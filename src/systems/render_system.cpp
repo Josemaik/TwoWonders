@@ -2,7 +2,7 @@
 
 #include <iomanip>
 
-void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
+bool RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
 {
 
     // Actualizamos la posicion de render del componente de fisicas
@@ -14,6 +14,19 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
     beginFrame(engine);
 
     // Dibuja todas las entidades con componente de render
+    bool notReset = drawEntities(em, engine);
+
+    endFrame(engine, em);
+
+    return notReset;
+}
+
+bool RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
+{
+    auto const& entities = em.getEntities();
+    if (entities.empty())
+        return false;
+
     for (auto const& e : em.getEntities())
     {
         if (e.hasComponent<RenderComponent>())
@@ -37,15 +50,16 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
         }
     }
 
-    endFrame(engine, em);
+    return true;
 }
 
 // Empieza el dibujado y se limpia la pantalla
 void RenderSystem::beginFrame(ENGI::GameEngine& engine)
 {
     engine.beginDrawing();
+
     engine.clearBackground(RAYWHITE);
-    //drawHUD(em, engine);
+
     engine.beginMode3D();
     //engine.drawGrid(50, 1.f);
 }
@@ -127,4 +141,5 @@ void RenderSystem::drawDeath(ENGI::GameEngine& engine)
 {
     engine.drawRectangle(0, 0, engine.getScreenWidth(), engine.getScreenHeight(), Fade(BLACK, 0.5f));
     engine.drawText("HAS MUERTO", 250, 250, 40, RED);
+    engine.drawText("[ENTER] para volver a jugar", 165, 300, 30, RED);
 }
