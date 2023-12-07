@@ -192,7 +192,7 @@ void createEntities(EntityManager& em)
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 28.0f, 0.f, 10.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<AttackComponent>(e, AttackComponent{});
     em.addComponent<InformationComponent>(e, InformationComponent{});

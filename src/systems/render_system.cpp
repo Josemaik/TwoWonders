@@ -87,11 +87,15 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
     {
         if (e.hasTag<PlayerTag>())
         {
+            // Dibujar background HUD
+            engine.drawRectangle(0, 0, 525, 60, WHITE);
+            engine.drawRectangle(0, 50, 100, 120, WHITE);
+
             // Dibujar vidas restantes del player en el HUD
             if (e.hasComponent<LifeComponent>())
             {
                 auto const& l{ em.getComponent<LifeComponent>(e) };
-                std::string vida = "Vidas: " + std::to_string(l.life) + " (max 3) - ";
+                std::string vida = "Vidas: " + std::to_string(l.life) + " (max " + std::to_string(l.maxLife) + ") - ";
                 engine.drawText(vida.c_str(), 10, 10, 20, BLACK);
             }
 
@@ -99,7 +103,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
             if (e.hasComponent<InformationComponent>())
             {
                 auto const& info{ em.getComponent<InformationComponent>(e) };
-                std::string info_text = "Bombas: " + std::to_string(info.bombs) + " - Monedas: " + std::to_string(info.coins);
+                std::string info_text = "Bombas: " + std::to_string(info.bombs) + " (max " + std::to_string(info.max_bombs) + ") - Monedas: " + std::to_string(info.coins);
                 engine.drawText(info_text.c_str(), 200, 10, 20, BLACK);
             }
 
@@ -113,7 +117,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
                 else
                     countdown_ataque = "Ataque listo en: " + std::to_string(-1 * (a.elapsed - 1.0f)) + " segundos";
 
-                engine.drawText(countdown_ataque.c_str(), 10, 30, 20, BLACK);
+                engine.drawText(countdown_ataque.c_str(), 10, 35, 20, BLACK);
             }
 
             // Dibujar la posicion del player en el HUD // DEBUG
@@ -122,11 +126,11 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
                 engine.drawText("Posicion", 10, 70, 20, BLACK);
                 auto const& r{ em.getComponent<RenderComponent>(e) };
                 std::string posX = "X: " + std::to_string(static_cast<int>(r.position.x()));
-                engine.drawText(posX.c_str(), 10, 90, 20, BLACK);
+                engine.drawText(posX.c_str(), 10, 95, 20, BLACK);
                 std::string posY = "Y: " + std::to_string(static_cast<int>(r.position.y()));
-                engine.drawText(posY.c_str(), 10, 110, 20, BLACK);
+                engine.drawText(posY.c_str(), 10, 120, 20, BLACK);
                 std::string posZ = "Z: " + std::to_string(static_cast<int>(r.position.z()));
-                engine.drawText(posZ.c_str(), 10, 130, 20, BLACK);
+                engine.drawText(posZ.c_str(), 10, 145, 20, BLACK);
             }
         }
 
