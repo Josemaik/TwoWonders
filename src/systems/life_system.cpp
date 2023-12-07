@@ -7,18 +7,9 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
 
         if (lif.life == 0)
         {
-            // Si es enemigo creamos un objeto que cura
+            // Si es enemigo creamos un objeto
             if (ent.hasTag<EnemyTag>()) {
-                // Crera la vida solo la mitad de las veces
-                int random_value = std::rand();
-                if (random_value % 2 == 0) {
-                    auto& e{ em.newEntity() };
-                    em.addTag<Object>(e);
-                    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 0.5f, 0.5f, 0.5f }, .color = RED });
-                    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
-                    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-                    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Life});
-                }
+                createObject(em, em.getComponent<PhysicsComponent>(ent).position);
             }
 
             // Eliminamos la entidad
@@ -32,4 +23,36 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
             lif.decreaseLifeNextFrame = false;
         }
     });
+}
+
+// Se podra crear objetos: vida, bomba, moneda o nada
+void LifeSystem::createObject(EntityManager& em, vec3f pos){
+    int random_value = std::rand();
+    if (random_value % 4 > 0) {
+        Object_type tipo_nuevo_objeto;
+        Color color_nuevo_objeto;
+        if (random_value % 4 == 1) 
+        {
+            tipo_nuevo_objeto = Object_type::Bomb;
+            color_nuevo_objeto = GRAY;
+        }
+        else if (random_value % 4 == 2) 
+        {
+            tipo_nuevo_objeto = Object_type::Coin;
+            color_nuevo_objeto = YELLOW;
+        }
+        else if (random_value % 4 == 3)
+        {
+            tipo_nuevo_objeto = Object_type::Life;
+            color_nuevo_objeto = RED;
+        } 
+
+        // Se crea el nuevo objeto
+        auto& e{ em.newEntity() };
+        em.addTag<Object>(e);
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = { 0.5f, 0.5f, 0.5f }, .color = color_nuevo_objeto });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = tipo_nuevo_objeto}); 
+    }
 }

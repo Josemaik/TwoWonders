@@ -195,6 +195,7 @@ void createEntities(EntityManager& em)
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<AttackComponent>(e, AttackComponent{});
+    em.addComponent<InformationComponent>(e, InformationComponent{});
 
     // Ground and water
     createGroundWater(em);

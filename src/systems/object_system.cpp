@@ -23,9 +23,13 @@ void ObjectSystem::update(EntityManager& em, float deltaTime){
                     break;
 
                 case Object_type::Bomb:
+                    if(playerEnt->hasComponent<InformationComponent>())
+                        em.getComponent<InformationComponent>(*playerEnt).addBomb();
                     break;
 
                 case Object_type::Coin:
+                    if(playerEnt->hasComponent<InformationComponent>())
+                        em.getComponent<InformationComponent>(*playerEnt).addCoin();
                     break;
 
                 default:

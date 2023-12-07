@@ -91,8 +91,16 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
             if (e.hasComponent<LifeComponent>())
             {
                 auto const& l{ em.getComponent<LifeComponent>(e) };
-                std::string vida = "Vidas: " + std::to_string(l.life) + " (max 3)";
+                std::string vida = "Vidas: " + std::to_string(l.life) + " (max 3) - ";
                 engine.drawText(vida.c_str(), 10, 10, 20, BLACK);
+            }
+
+            // Dibujar las bombas y monedas actuales
+            if (e.hasComponent<InformationComponent>())
+            {
+                auto const& info{ em.getComponent<InformationComponent>(e) };
+                std::string info_text = "Bombas: " + std::to_string(info.bombs) + " - Monedas: " + std::to_string(info.coins);
+                engine.drawText(info_text.c_str(), 200, 10, 20, BLACK);
             }
 
             // Dibujar el countdown restante del ataque del player en el HUD

@@ -10,6 +10,7 @@ struct LifeSystem
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em, float deltaTime);
+    void createObject(EntityManager& em, vec3f pos);
 };
 
 #endif // !LIFE_SYSTEM
