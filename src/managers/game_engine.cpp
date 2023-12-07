@@ -4,7 +4,6 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
 {
     GameEngine::initWindow(width_, height_, "ZeldaWonders");
-    GameEngine::setTargetFPS(30);
 
     GameEngine::setPositionCamera({ 0.0f, 25.0f, 25.0f });
     GameEngine::setTargetCamera({ 0.0f, 03.0f, .0f });
@@ -12,6 +11,16 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     GameEngine::setFovyCamera(30.0f);
     GameEngine::setProjectionCamera(CAMERA_PERSPECTIVE);
 }
+
+////// TIMIING RELATED FUNCTIONS //////
+
+void ENGI::GameEngine::setTargetFPS(int fps){
+    SetTargetFPS(fps);
+}
+
+float ENGI::GameEngine::getFrameTime(){
+    return GetFrameTime();
+}  
 
 ////// DRAWING //////
 
@@ -75,11 +84,6 @@ void ENGI::GameEngine::initWindow(int width, int height, const char* title)
 void ENGI::GameEngine::closeWindow()
 {
     CloseWindow();
-}
-
-void ENGI::GameEngine::setTargetFPS(int fps)
-{
-    SetTargetFPS(fps);
 }
 
 bool ENGI::GameEngine::windowShouldClose()

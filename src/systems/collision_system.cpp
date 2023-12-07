@@ -79,11 +79,10 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity* staticEnt, Enti
             return;
         }
 
-        // Si el objeto estático es un objeto de vida, aumentar la vida del jugador
-        if (otherEnt->hasTag<PlayerTag>() && staticEnt->hasTag<ObjectLifeTag>())
+        // Si el objeto estático es un objeto
+        if (otherEnt->hasTag<PlayerTag>() && staticEnt->hasTag<Object>())
         {
-            em.getComponent<LifeComponent>(*otherEnt).increaseLife();
-            em.destroyEntity(staticEnt->getID());
+            em.getComponent<ObjectComponent>(*staticEnt).effect();
             return;
         }
 

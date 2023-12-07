@@ -13,6 +13,7 @@
 #include "../systems/ai_system.hpp"
 #include "../systems/attack_system.hpp"
 #include "../systems/projectile_system.hpp"
+#include "../systems/object_system.hpp"
 
 constexpr uint16_t SCREEN_WIDTH{ 800 };
 constexpr uint16_t SCREEN_HEIGHT{ 600 };

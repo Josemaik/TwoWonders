@@ -1,15 +1,15 @@
 #pragma once 
-#ifndef PROJECTILE_SYSTEM
-#define PROJECTILE_SYSTEM
+#ifndef OBJECT_SYSTEM
+#define OBJECT_SYSTEM
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
 
-struct ProjectileSystem
+struct ObjectSystem
 {
-    using SYSCMPs = MP::TypeList<ProjectileComponent>;
+    using SYSCMPs = MP::TypeList<ObjectComponent>;
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em, float deltaTime);
 };
 
-#endif // !PROJECTILE_SYSTEM
+#endif // !OBJECT_SYSTEM

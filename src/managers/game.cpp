@@ -184,6 +184,16 @@ void createGroundWater(EntityManager& em)
     }
 }
 
+void createSword(EntityManager& em)
+{
+    auto& e{ em.newEntity() };
+    em.addTag<Object>(e);
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 40.0f, 0.f, 10.0f }, .scale = { 1.0f, 0.3f, 0.3f }, .color = LIGHTGRAY });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword});
+}
+
 void createEntities(EntityManager& em)
 {
     // Player
@@ -192,10 +202,13 @@ void createEntities(EntityManager& em)
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 28.0f, 0.f, 10.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e, AttackComponent{});
+    em.addComponent<InformationComponent>(e, InformationComponent{});
 
+    // Sword
+    createSword(em);
+    
     // Ground and water
     createGroundWater(em);
 
@@ -222,22 +235,30 @@ void game()
     GameTimer gtime{};
     AttackSystem attack_system{};
     ProjectileSystem projectile_system{};
+    ObjectSystem object_system{};
 
     createEntities(em);
+
+    engine.setTargetFPS(30);
 
     // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
     // mv.printMemory();
 
-    // Inicializa el reloj para medir el tiempo entre frames
+    // Inicializa una variabloe donde tener el tiempo entre frames
+    float deltaTime;
     while (!engine.windowShouldClose())
     {
+        deltaTime = engine.getFrameTime();
+
         input_system.update(em);
         ai_sys.update(em);
         physics_system.update(em);
         collision_system.update(em);
-        attack_system.update(em);
-        projectile_system.update(em);
-        life_system.update(em);
+
+        object_system.update(em, deltaTime);
+        attack_system.update(em, deltaTime);
+        projectile_system.update(em, deltaTime);
+        life_system.update(em, deltaTime);
 
         if (!render_system.update(em, engine))
             createEntities(em);
