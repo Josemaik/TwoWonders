@@ -9,5 +9,5 @@ struct LifeComponent
 
     void decreaseLife();
     void increaseLife();
-    void decreaseCountdown() { elapsed += GetFrameTime(); }; // delta time
+    void decreaseCountdown(float deltaTime) { elapsed += deltaTime; };
 };

@@ -225,19 +225,25 @@ void game()
 
     createEntities(em);
 
+    engine.setTargetFPS(30);
+    float deltaTime;
+
     // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
     // mv.printMemory();
 
     // Inicializa el reloj para medir el tiempo entre frames
     while (!engine.windowShouldClose())
     {
+        deltaTime = engine.getFrameTime();
+
         input_system.update(em);
         ai_sys.update(em);
         physics_system.update(em);
         collision_system.update(em);
-        attack_system.update(em);
-        projectile_system.update(em);
-        life_system.update(em);
+
+        attack_system.update(em, deltaTime);
+        projectile_system.update(em, deltaTime);
+        life_system.update(em, deltaTime);
 
         if (!render_system.update(em, engine))
             createEntities(em);

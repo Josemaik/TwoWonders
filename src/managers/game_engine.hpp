@@ -17,6 +17,10 @@ namespace ENGI {
 
         GameEngine(u16 const width, u16 const height);
 
+        // Timing Related Functions
+        void setTargetFPS(int fps);
+        float getFrameTime();  
+
         // Drawing
         void beginDrawing();
         void clearBackground(Color color);
@@ -34,7 +38,6 @@ namespace ENGI {
         // Window
         void initWindow(int width, int height, const char* title);
         void closeWindow();
-        void setTargetFPS(int fps);
         bool windowShouldClose();
         int getScreenWidth();
         int getScreenHeight();

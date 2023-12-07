@@ -9,7 +9,7 @@ struct AttackSystem
     using SYSCMPs = MP::TypeList<AttackComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em);
+    void update(EntityManager& em, float deltaTime);
 };
 
 #endif // !ATTACK_SYSTEM

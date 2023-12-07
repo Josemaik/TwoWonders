@@ -1,6 +1,6 @@
 #include "attack_system.hpp"
 
-void AttackSystem::update(EntityManager& em) {
+void AttackSystem::update(EntityManager& em, float deltaTime) {
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, AttackComponent& att)
     {
@@ -31,6 +31,6 @@ void AttackSystem::update(EntityManager& em) {
             att.createAttack = false;
         }
 
-        att.decreaseCountdown();
+        att.decreaseCountdown(deltaTime);
     });
 }

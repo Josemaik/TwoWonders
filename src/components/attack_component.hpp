@@ -17,5 +17,5 @@ struct AttackComponent
         }
     }
 
-    void decreaseCountdown() { elapsed += GetFrameTime(); }; // delta time
+    void decreaseCountdown(float deltaTime) { elapsed += deltaTime; }; // delta time
 };

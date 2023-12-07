@@ -1,9 +1,9 @@
 #include "life_system.hpp"
 
-void LifeSystem::update(EntityManager& em) {
+void LifeSystem::update(EntityManager& em, float deltaTime) {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, LifeComponent& lif)
     {
-        lif.decreaseCountdown();
+        lif.decreaseCountdown(deltaTime);
 
         if (lif.life == 0)
         {

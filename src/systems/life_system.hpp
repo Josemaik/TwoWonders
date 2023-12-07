@@ -9,7 +9,7 @@ struct LifeSystem
     using SYSCMPs = MP::TypeList<LifeComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em);
+    void update(EntityManager& em, float deltaTime);
 };
 
 #endif // !LIFE_SYSTEM
