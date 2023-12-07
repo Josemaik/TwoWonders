@@ -184,6 +184,16 @@ void createGroundWater(EntityManager& em)
     }
 }
 
+void createSword(EntityManager& em)
+{
+    auto& e{ em.newEntity() };
+    em.addTag<Object>(e);
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 40.0f, 0.f, 10.0f }, .scale = { 1.0f, 0.3f, 0.3f }, .color = LIGHTGRAY });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword});
+}
+
 void createEntities(EntityManager& em)
 {
     // Player
@@ -194,9 +204,11 @@ void createEntities(EntityManager& em)
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e, AttackComponent{});
     em.addComponent<InformationComponent>(e, InformationComponent{});
 
+    // Sword
+    createSword(em);
+    
     // Ground and water
     createGroundWater(em);
 

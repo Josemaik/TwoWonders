@@ -20,6 +20,8 @@ void ObjectSystem::update(EntityManager& em, float deltaTime){
                     break;
 
                 case Object_type::Sword:
+                    if(!playerEnt->hasComponent<AttackComponent>())
+                        em.addComponent<AttackComponent>(*playerEnt, AttackComponent{});
                     break;
 
                 case Object_type::Bomb:
