@@ -13,10 +13,11 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
                 int random_value = std::rand();
                 if (random_value % 2 == 0) {
                     auto& e{ em.newEntity() };
-                    em.addTag<ObjectLifeTag>(e);
+                    em.addTag<Object>(e);
                     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 0.5f, 0.5f, 0.5f }, .color = RED });
                     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
                     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+                    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Life});
                 }
             }
 

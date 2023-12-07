@@ -222,16 +222,17 @@ void game()
     GameTimer gtime{};
     AttackSystem attack_system{};
     ProjectileSystem projectile_system{};
+    ObjectSystem object_system{};
 
     createEntities(em);
 
     engine.setTargetFPS(30);
-    float deltaTime;
 
     // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
     // mv.printMemory();
 
-    // Inicializa el reloj para medir el tiempo entre frames
+    // Inicializa una variabloe donde tener el tiempo entre frames
+    float deltaTime;
     while (!engine.windowShouldClose())
     {
         deltaTime = engine.getFrameTime();
@@ -241,6 +242,7 @@ void game()
         physics_system.update(em);
         collision_system.update(em);
 
+        object_system.update(em, deltaTime);
         attack_system.update(em, deltaTime);
         projectile_system.update(em, deltaTime);
         life_system.update(em, deltaTime);
