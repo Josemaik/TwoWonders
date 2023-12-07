@@ -1,8 +1,9 @@
 #pragma once
 
+enum struct AttackType { Melee, Ranged };
+
 struct AttackComponent
 {
-    enum struct AttackType { Melee, Ranged };
     AttackType type{ AttackType::Ranged };
     u_int16_t damage{};
     float range{}; // en segundos
