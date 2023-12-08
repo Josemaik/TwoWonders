@@ -4,7 +4,7 @@
 #include <utils/vec3D.hpp>
 struct AIComponent
 {
-    enum struct AI_type { PatrolEnemy, PatrolFollowEnemy, ShoterEnemy, ShoterEnemy2 };
+    enum struct AI_type { PatrolEnemy, PatrolFollowEnemy, ShoterEnemy, ShoterEnemy2,RandomEnemy };
     AI_type current_type{};
     static constexpr vec3f invalid{};
     static constexpr uint8_t max_patrol{ 10 };
@@ -17,7 +17,10 @@ struct AIComponent
     bool arrived{ false };
     int contador_stop{ 50 };
     int contador_change_position{ 70 };
+    int contador_change_direction{ 40 };
     uint8_t nexttarget{ 1 };
     enum struct AI_shoot_states { shooting, moving };
     AI_shoot_states current_state{ AI_shoot_states::shooting };
+    //random
+    vec3f oldvel{0.5f,0.0f,0.0f};
 };

@@ -1,5 +1,6 @@
 #include "ai_system.hpp"
 #include <cmath>
+#include <random>
 
 [[nodiscard]] bool AISystem::isPlayerDetected(EntityManager& EM, PhysicsComponent const& p, AIComponent const& ai) const noexcept {
     auto& li = EM.getSingleton<LevelInfo>();
@@ -70,7 +71,6 @@ vec3f AISystem::getVelocityonDirecion(vec3f vector){
         // Izquierda
         return vec3f{-0.5f,0.0f,0.0f};
     }
-
 }
 void AISystem::FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, EntityManager& em, Entity& ent,float dt) {
     if (ai.shooting == false) {
@@ -133,7 +133,25 @@ void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& 
     }
 
 }
+ void AISystem::RandomAI(AIComponent& ai,PhysicsComponent& p,EntityManager& em,float dt){
+       vec3f direction{};
+    ai.contador_change_direction--;
 
+    if (ai.contador_change_direction <= 0) {
+        // Genero direccion aleatoria
+        switch (std::rand() % 4) {
+            case 0: direction = {0.5f, 0.0f, 0.0f}; break;
+            case 1: direction = {-0.5f, 0.0f, 0.0f}; break;
+            case 2: direction = {0.0f, 0.0f, 0.5f}; break;
+            case 3: direction = {0.0f, 0.0f, -0.5f}; break;
+            default: direction = {-0.5f, 0.0f, 0.0f}; break;
+        }
+        // setVelocity(p, ai, direction, dt);
+        ai.oldvel = direction;
+        ai.contador_change_direction = 40;
+    }
+    p.velocity = ai.oldvel;
+ }
 void AISystem::update(EntityManager& em,float dt)
 {
     em.forEach<SYSCMPs, SYSTAGs>([&,dt](Entity& e, PhysicsComponent& phy, AIComponent& ai)
@@ -167,11 +185,19 @@ void AISystem::update(EntityManager& em,float dt)
             FollowPatrolandShoot(ai, phy, em, e,dt);
         }
         break;
+
         case AIComponent::AI_type::ShoterEnemy2:
         {
             ShotandMove(ai, phy, em, e,dt);
         }
         break;
+
+        case AIComponent::AI_type::RandomEnemy:
+        {
+            RandomAI(ai,phy,em,dt);
+        }
+        break;
+
         default:
             break;
         }
