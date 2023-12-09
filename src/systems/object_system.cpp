@@ -3,14 +3,14 @@
 void ObjectSystem::update(EntityManager& em, float deltaTime){
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ObjectComponent& obj)
     {
-        if(obj.decreaseLifeTime(deltaTime)) 
+        if(obj.decreaseLifeTime(deltaTime) && (obj.type != Object_type::Sword)) 
             em.destroyEntity(ent.getID());
 
         // Recuperamos la entidad del player
         auto& li = em.getSingleton<LevelInfo>();
         auto* playerEnt = em.getEntityByID(li.playerID);
 
-        // Si es player se aplica el efecto del objeto
+        // Si existe el player se aplica el efecto del objeto
         if(playerEnt && obj.active){
             switch (obj.type)
             {
