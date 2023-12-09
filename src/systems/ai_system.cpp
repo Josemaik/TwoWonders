@@ -137,10 +137,10 @@ void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& 
 // Function to check if the direction is in the desired range
 bool AISystem::isInDesiredRange(const vec3f& direction,PhysicsComponent& p) {
     // Define your desired range here
-    float minX = 22.0f; // minimum X coordinate
-    float maxX = 36.0f; // maximum X coordinate
-    float minZ = -7.0f; // minimum Z coordinate
-    float maxZ = 7.0f;  // maximum Z coordinate
+    float minX = 23.1f; // minimum X coordinate
+    float maxX = 34.9f; // maximum X coordinate
+    float minZ = -6.5f; // minimum Z coordinate
+    float maxZ = 6.5f;  // maximum Z coordinate
 
     // Check if the direction results in a position within the desired range
     return direction.x() >= minX && direction.x() <= maxX &&
