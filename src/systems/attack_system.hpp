@@ -10,7 +10,11 @@ struct AttackSystem
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em, float deltaTime);
-    void createAttack(EntityManager& em, Entity& e, AttackComponent& att);
+
+    private:
+        void createAttack(EntityManager& em, Entity& e, AttackComponent& att);
+        void createAttackRanged(EntityManager& em, Entity& e, AttackComponent& att);
+        void createAttackMelee(EntityManager& em, Entity& e, AttackComponent& att);
 };
 
 #endif // !ATTACK_SYSTEM
