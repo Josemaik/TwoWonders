@@ -97,10 +97,11 @@ struct vec3D
     {
         auto const& len = length();
 
-        if (len >= 1.f)
-            *this /= len;
-        else
-            *this /= (1.f / len);
+        // if (len >= 1.f)
+        //     *this /= len;
+        // else
+        //     *this /= (1.f / len);
+        if (len != 0) { x_/=len; y_/=len; z_/=len; }
 
         return *this;
     }
