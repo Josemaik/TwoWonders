@@ -144,6 +144,9 @@ void createEnemies(EntityManager& em)
         if (data.aiType == AIComponent::AI_type::ShoterEnemy2) {
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.5f });
         }
+        if(data.aiType == AIComponent::AI_type::RandomEnemy){
+             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 4.0f });
+        }
     }
 }
 

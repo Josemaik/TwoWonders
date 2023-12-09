@@ -133,6 +133,18 @@ void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& 
     }
 
 }
+// Function to check if the direction is in the desired range
+bool AISystem::isInDesiredRange(const vec3f& direction,PhysicsComponent& p) {
+    // Define your desired range here
+    float minX = 22.0f; // minimum X coordinate
+    float maxX = 36.0f; // maximum X coordinate
+    float minZ = -7.0f; // minimum Z coordinate
+    float maxZ = 7.0f;  // maximum Z coordinate
+
+    // Check if the direction results in a position within the desired range
+    return direction.x() >= minX && direction.x() <= maxX &&
+            direction.z() >= minZ && direction.z() <= maxZ;
+}
 vec3f AISystem::getRandomDir(){
         // Genero direccion aleatoria
         switch (std::rand() % 4) {
@@ -151,35 +163,49 @@ vec3f AISystem::getRandomDir(){
             //set random dir
             direction = getRandomDir();
             ai.oldvel = direction;
-            p.velocity = ai.oldvel;
             ai.elapsed_change_dir = 0;
         }else{
             ai.dec_countdown_change_dir(dt);
         }
     }
-    //check if ai have to stop
+    // //check if ai have to stop
     if(!ai.shoot){
         if(ai.elapsed_stop>=ai.countdown_stop){
             ai.stoped = true;
             ai.shoot = true;
-            p.velocity = {};
             ai.elapsed_stop = 0;
+            ai.elapsed_change_dir = 0;
+            //shoot one time
+            auto& att = em.getComponent<AttackComponent>(e);
+            att.vel = ai.oldvel;
+            att.attack();
         }else{
             ai.dec_countdown_stop(dt);
         }
     }
     
-    //
+    // //time while shooting
     if(ai.shoot){
         if(ai.elapsed_shoot >= ai.countdown_shoot){
             //Shoot
-            auto& att = em.getComponent<AttackComponent>(e);
-            att.vel = ai.oldvel;
-            att.attack();
+            ai.shoot = false;
+            ai.stoped = false;
+            ai.elapsed_shoot = 0;
         }else{
             ai.dec_countdown_shoot(dt);
         }
     }
+    // //Set velocity
+    if(!ai.stoped){
+        if(!isInDesiredRange(p.position+ai.oldvel,p)){
+                std::cout << "hola";
+                ai.oldvel *= -1.0f;
+        }
+        p.velocity = ai.oldvel;
+    }else{
+        p.velocity = {};
+    }
+     
  }
 void AISystem::update(EntityManager& em,float dt)
 {
