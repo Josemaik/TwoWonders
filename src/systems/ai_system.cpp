@@ -178,7 +178,7 @@ vec3f AISystem::getRandomDir(){
             //shoot one time
             auto& att = em.getComponent<AttackComponent>(e);
             att.vel = ai.oldvel;
-            att.attack();
+            att.attack(AttackType::Ranged);
         }
         ai.dec_countdown_stop(dt);
     }

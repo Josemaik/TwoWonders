@@ -266,7 +266,7 @@ void game()
         deltaTime = engine.getFrameTime();
 
         input_system.update(em);
-        ai_sys.update(em,deltaTime);
+        ai_sys.update(em, deltaTime);
         physics_system.update(em);
         collision_system.update(em);
 
