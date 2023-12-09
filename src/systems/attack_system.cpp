@@ -27,40 +27,70 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             att.vel = { -0.5f , 0 , 0 };
     }
 
-    // Comprobar si la vida del player es la maxima y elegir que tipo de ataque usa
-    if(ent.hasTag<PlayerTag>()){
+    // Comprobar si la vida de la entidad es la maxima y elegir que tipo de ataque usa
+    if(att.type == AttackType::AttackPlayer){
         if(ent.hasComponent<LifeComponent>() && em.getComponent<LifeComponent>(ent).vidaMax())
             att.type = AttackType::Ranged;
         else
             att.type = AttackType::Melee;
     }
 
-    // Se crea la entidad de ataque a distancia
-    if(att.type == AttackType::Ranged){
-        auto& e{ em.newEntity() };
-        em.addTag<HitPlayer>(e);
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 0.5f, 0.5f, 0.5f }, .color = BLACK });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .gravity = 0 });
-        em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-        em.addComponent<ProjectileComponent>(e, ProjectileComponent{});
-        if (ent.hasTag<PlayerTag>())
-            em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
-        else
-            em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_ENEMY });
-    }
-    // Se crea la entidad de ataque a melee
-    else if(att.type == AttackType::Melee){
-        auto& e{ em.newEntity() };
-        em.addTag<HitPlayer>(e);
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel*2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
-        em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f});
-        if (ent.hasTag<PlayerTag>())
-            em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
-        else
-            em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_ENEMY });
+    // Tipo de ataque
+    switch (att.type)
+    {
+        case AttackType::Ranged:
+            createAttackRanged(em, ent, att);
+            break;
+
+        case AttackType::Melee:
+            createAttackMelee(em, ent, att);
+            break;
+
+        case AttackType::Bomb:
+            if (ent.hasComponent<InformationComponent>())
+            {
+                auto& inf = em.getComponent<InformationComponent>(ent);
+                if(inf.bombs > 0){
+                    auto& e{ em.newEntity() };
+                    em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel*2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
+                    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::BombExplode, .life_time = 2.0f });
+                    inf.decreaseBomb();
+                }
+            }
+            break;
+
+        case AttackType::AttackPlayer:
+            break;
+
+        default:
+            break;
     }
 
     att.createAttack = false;
+}
+
+void AttackSystem::createAttackRanged(EntityManager& em, Entity& ent, AttackComponent& att){
+    auto& e{ em.newEntity() };
+    em.addTag<HitPlayer>(e);
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 0.5f, 0.5f, 0.5f }, .color = BLACK });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .gravity = 0 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
+    em.addComponent<ProjectileComponent>(e, ProjectileComponent{});
+    if (ent.hasTag<PlayerTag>())
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+    else
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_ENEMY });
+}
+
+void AttackSystem::createAttackMelee(EntityManager& em, Entity& ent, AttackComponent& att){
+    auto& e{ em.newEntity() };
+    em.addTag<HitPlayer>(e);
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel*2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
+    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f});
+    if (ent.hasTag<PlayerTag>())
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+    else
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_ENEMY });
 }

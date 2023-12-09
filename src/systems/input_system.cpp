@@ -32,7 +32,11 @@ void InputSystem::update(EntityManager& em)
 
         // Codigo para el ataque
         if (IsKeyDown(in.space) && e.hasComponent<AttackComponent>())
-            em.getComponent<AttackComponent>(e).attack();
+            em.getComponent<AttackComponent>(e).attack(AttackType::AttackPlayer);
+
+        // Codigo para la bomba
+        if (IsKeyDown(KEY_B) && e.hasComponent<AttackComponent>())
+            em.getComponent<AttackComponent>(e).attack(AttackType::Bomb);
 
         // Codigo para curarse // DEBUG
         // if(IsKeyDown(KEY_Z) && e.hasComponent<LifeComponent>())

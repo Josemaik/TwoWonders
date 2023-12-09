@@ -1,6 +1,6 @@
 #pragma once
 
-enum struct AttackType { Melee, Ranged };
+enum struct AttackType { Melee, Ranged, Bomb, AttackPlayer };
 
 struct AttackComponent
 {
@@ -11,10 +11,11 @@ struct AttackComponent
     float countdown{ 1.0f }, elapsed{ 1.0f }; // en segundos
     vec3f vel{};
 
-    void attack() {
+    void attack(AttackType typeAttack) {
         if (elapsed >= countdown) {
             createAttack = true;
             elapsed = 0;
+            type = typeAttack;
         }
     }
 

@@ -3,14 +3,19 @@
 void ObjectSystem::update(EntityManager& em, float deltaTime){
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ObjectComponent& obj)
     {
-        if(obj.decreaseLifeTime(deltaTime)) 
-            em.destroyEntity(ent.getID());
+        if(obj.decreaseLifeTime(deltaTime) && (obj.type != Object_type::Sword)) 
+        {
+            if(obj.type == Object_type::BombExplode)
+                obj.effect();
+            else
+                em.destroyEntity(ent.getID());
+        }
 
         // Recuperamos la entidad del player
         auto& li = em.getSingleton<LevelInfo>();
         auto* playerEnt = em.getEntityByID(li.playerID);
 
-        // Si es player se aplica el efecto del objeto
+        // Si existe el player se aplica el efecto del objeto
         if(playerEnt && obj.active){
             switch (obj.type)
             {
@@ -34,10 +39,33 @@ void ObjectSystem::update(EntityManager& em, float deltaTime){
                         em.getComponent<InformationComponent>(*playerEnt).addCoin();
                     break;
 
+                case Object_type::BombExplode:
+                    explodeBomb(em, ent);
+                    break;
+
                 default:
                     break;
             }
             em.destroyEntity(ent.getID());
         }
     });
+}
+
+void ObjectSystem::explodeBomb(EntityManager& em, Entity& ent){
+    createExplodeBomb(em, ent, BehaviorType::ATK_PLAYER);
+    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY);
+}
+
+void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type){
+    if(ent.hasComponent<RenderComponent>()){
+        auto& ren = em.getComponent<RenderComponent>(ent);
+        // Crear una entidad que quite vida
+        auto& e{ em.newEntity() };
+        em.addTag<HitPlayer>(e);
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = ren.position, .scale = { 3.0f, 1.0f, 3.0f }, .color = BLACK });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
+        em.addComponent<LifeComponent>(e, LifeComponent{ .life = 5, .countdown = 0.0f });
+        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f});
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, type });
+    }
 }

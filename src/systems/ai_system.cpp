@@ -91,8 +91,8 @@ void AISystem::FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, Entity
                 //disparar
                 if (ent.hasComponent<AttackComponent>()) {
                     auto& att = em.getComponent<AttackComponent>(ent);
-                    att.createAttack = true;
                     att.vel = old_vel;
+                    att.attack(AttackType::Ranged);
                 }
                 else
                     em.addComponent<AttackComponent>(ent, AttackComponent{ .createAttack = true, .countdown = 50, .vel = old_vel });
@@ -125,7 +125,7 @@ void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& 
             auto& att = em.getComponent<AttackComponent>(ent);
             auto old_vel = (getPlayerDistance(em, p, ai)).normalized() * SPEED_AI;
             att.vel = old_vel;
-            att.attack();
+            att.attack(AttackType::Ranged);
         }
     }
     else {
