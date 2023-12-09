@@ -27,8 +27,8 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             att.vel = { -0.5f , 0 , 0 };
     }
 
-    // Comprobar si la vida del player es la maxima y elegir que tipo de ataque usa
-    if(ent.hasTag<PlayerTag>()){
+    // Comprobar si la vida de la entidad es la maxima y elegir que tipo de ataque usa
+    if(att.type == AttackType::AttackPlayer){
         if(ent.hasComponent<LifeComponent>() && em.getComponent<LifeComponent>(ent).vidaMax())
             att.type = AttackType::Ranged;
         else
@@ -60,6 +60,16 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
         else
             em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_ENEMY });
+    }
+    // Se crea la entidad bomba
+    else if(att.type == AttackType::Bomb){
+        auto& inf = em.getComponent<InformationComponent>(ent);
+        if (ent.hasComponent<InformationComponent>() && inf.bombs > 0){
+            auto& e{ em.newEntity() };
+            em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel*2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
+            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::BombExplode, .life_time = 2.0f });
+            inf.decreaseBomb();
+        }
     }
 
     att.createAttack = false;

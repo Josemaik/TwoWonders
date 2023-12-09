@@ -10,6 +10,7 @@ struct ObjectSystem
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em, float deltaTime);
+    void explodeBomb(EntityManager& em, Entity& ent);
 };
 
 #endif // !OBJECT_SYSTEM
