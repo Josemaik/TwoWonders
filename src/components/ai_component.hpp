@@ -28,6 +28,9 @@ struct AIComponent
     void dec_countdown_stop(float deltaTime) { elapsed_stop += deltaTime; }; 
     void dec_countdown_shoot(float deltaTime) { elapsed_shoot += deltaTime; };
     //random aishooter player
-    float countdown_change_position{3.0f}, elapsed_change_position{1.0f};
+    float countdown_change_position{5.0f}, elapsed_change_position{1.0f};
+    float countdown_shoot_rap{2.0f}, elapsed_shoot_rap{1.0f};
     void dec_countdown_change_pos(float deltaTime) { elapsed_change_position += deltaTime; };
+    void dec_countdown_shoot_rap(float deltaTime) { elapsed_shoot_rap += deltaTime; };
+    float Xmin{},Xmax{},Zmin{},Zmax{};
 };

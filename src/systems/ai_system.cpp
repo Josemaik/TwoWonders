@@ -126,33 +126,31 @@ vec3f AISystem::getRandomPosinRange(float xmin, float xmax,float zmin,float zmax
 }
 void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& em, Entity& ent,float dt) {
     //cada x segundos cambia de posicion
-    if(ai.elapsed_change_position>=ai.countdown_change_position){
-        auto randomPos = getRandomPosinRange(13.0f,16.0f,4.0f,10.0f);
-        p.position.setX(randomPos.x());
-        p.position.setZ(randomPos.z());
-        ai.elapsed_change_position = 0;
+    if(!ai.shoot){
+        if(ai.elapsed_change_position>=ai.countdown_change_position){
+            //Set random position
+            auto randomPos = getRandomPosinRange(ai.Xmin,ai.Xmax,ai.Zmin,ai.Zmax);
+            p.position.setX(randomPos.x());
+            p.position.setZ(randomPos.z());
+            //Attack
+            ai.shoot = true;
+            ai.elapsed_change_position = 0;
+        }
+        ai.dec_countdown_change_pos(dt);
+    }else{
+        if(ai.elapsed_shoot_rap>=ai.countdown_shoot_rap){
+            if (isPlayerDetected(em, p, ai)) {
+                //Attack
+                auto& att = em.getComponent<AttackComponent>(ent);
+                auto old_vel = (getPlayerDistance(em, p, ai)).normalized() * SPEED_AI;
+                att.vel = old_vel;
+                att.attack(AttackType::Ranged);
+                ai.elapsed_shoot_rap = 0;
+                ai.shoot = false;
+            }
+        }
+        ai.dec_countdown_shoot_rap(dt);
     }
-    ai.dec_countdown_change_pos(dt);
-    //Compruebo si ha llegado al siguiente point
-    // if (ai.arrived) {
-    //     p.velocity = { 0,0,0 };
-    //     ai.contador_change_position -= 1;
-    //     if (ai.contador_change_position == 0) {
-    //         ai.contador_change_position = 70;
-    //         ai.arrived = false;
-    //     }
-    //     //Attack
-    //     if (isPlayerDetected(em, p, ai)) {
-    //         auto& att = em.getComponent<AttackComponent>(ent);
-    //         auto old_vel = (getPlayerDistance(em, p, ai)).normalized() * SPEED_AI;
-    //         att.vel = old_vel;
-    //         att.attack(AttackType::Ranged);
-    //     }
-    // }
-    // else {
-    //     vec3f distance = FollowPatrol(ai, p);
-    //     setVelocity(p,distance);
-    // }
 }
 // Function to check if the direction is in the desired range
 bool AISystem::isInDesiredRange(const vec3f& direction) {
