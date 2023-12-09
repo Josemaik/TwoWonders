@@ -22,7 +22,7 @@ struct AIComponent
     AI_shoot_states current_state{ AI_shoot_states::shooting };
     //random
     bool stoped{false}, shoot{false};
-    vec3f oldvel{0.5f,0.0f,0.0f};
+    vec3f oldvel{0.25f,0.0f,0.0f};
     float countdown_change_dir{ 1.5f },countdown_stop{3.5f},countdown_shoot{2.0f}; //segundos
     float elapsed_stop{1.0f},elapsed_change_dir{1.0f},elapsed_shoot{1.0f}; //segundos
     void dec_countdown_change_dir(float deltaTime) { elapsed_change_dir += deltaTime; }; // delta time

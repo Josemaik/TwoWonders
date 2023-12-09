@@ -23,7 +23,7 @@
 void AISystem::setVelocity(PhysicsComponent& p, AIComponent& ai, vec3f distance,float dt) {
     if (distance != vec3f{ 0,0,0 }) {
         //Normalizo la distancia y se la asigno a la velocidad
-        p.velocity = distance.normalized() * SPEED_AI;
+        p.velocity = distance.normalize() * SPEED_AI;
     }
 }
 
@@ -149,11 +149,11 @@ bool AISystem::isInDesiredRange(const vec3f& direction,PhysicsComponent& p) {
 vec3f AISystem::getRandomDir(){
         // Genero direccion aleatoria
         switch (std::rand() % 4) {
-            case 0:  return {0.5f, 0.0f, 0.0f}; break;
-            case 1:  return {-0.5f, 0.0f, 0.0f}; break;
-            case 2:  return {0.0f, 0.0f, 0.5f}; break;
-            case 3:  return {0.0f, 0.0f, -0.5f}; break;
-            default: return {-0.5f, 0.0f, 0.0f}; break;
+            case 0:  return {0.25f, 0.0f, 0.0f}; break;
+            case 1:  return {-0.25f, 0.0f, 0.0f}; break;
+            case 2:  return {0.0f, 0.0f, 0.25f}; break;
+            case 3:  return {0.0f, 0.0f, -0.25f}; break;
+            default: return {-0.25f, 0.0f, 0.0f}; break;
         }
 }
  void AISystem::RandomAI(AIComponent& ai,PhysicsComponent& p,EntityManager& em,Entity& e,float dt){
@@ -182,6 +182,8 @@ vec3f AISystem::getRandomDir(){
         }
         ai.dec_countdown_stop(dt);
     }
+    // auto& rend = em.getComponent<RenderComponent>(e);
+    // rend.visible = false;
     //time while shooting
     if(ai.shoot){
         if(ai.elapsed_shoot >= ai.countdown_shoot){

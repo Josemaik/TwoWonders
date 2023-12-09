@@ -32,21 +32,23 @@ bool RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
         if (e.hasComponent<RenderComponent>())
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
-            // Revisamos si es el jugador para mover la cámara
-            if (e.hasTag<PlayerTag>())
-            {
-                engine.setPositionCamera({ r.position.x(), 25.0f, r.position.z() + 25.0f });
-                engine.setTargetCamera(r.position);
+            if(r.visible){
+                // Revisamos si es el jugador para mover la cámara
+                if (e.hasTag<PlayerTag>())
+                {
+                    engine.setPositionCamera({ r.position.x(), 25.0f, r.position.z() + 25.0f });
+                    engine.setTargetCamera(r.position);
+                }
+                // Comprobar si tiene el componente vida
+                Color colorEntidad = r.color;
+                if (e.hasComponent<LifeComponent>()) {
+                    auto& l{ em.getComponent<LifeComponent>(e) };
+                    if (l.elapsed < l.countdown)
+                        colorEntidad = YELLOW;
+                }
+                engine.drawCube(r.position, r.scale.x(), r.scale.y(), r.scale.z(), colorEntidad);
+                engine.drawCubeWires(r.position, r.scale.x(), r.scale.y(), r.scale.z(), BLACK);
             }
-            // Comprobar si tiene el componente vida
-            Color colorEntidad = r.color;
-            if (e.hasComponent<LifeComponent>()) {
-                auto& l{ em.getComponent<LifeComponent>(e) };
-                if (l.elapsed < l.countdown)
-                    colorEntidad = YELLOW;
-            }
-            engine.drawCube(r.position, r.scale.x(), r.scale.y(), r.scale.z(), colorEntidad);
-            engine.drawCubeWires(r.position, r.scale.x(), r.scale.y(), r.scale.z(), BLACK);
         }
     }
 
