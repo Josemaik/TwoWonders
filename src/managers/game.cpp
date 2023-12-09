@@ -112,13 +112,13 @@ void createEnemies(EntityManager& em)
         // { AIComponent::AI_type::ShoterEnemy, //**********
         //  {30.0f, 0.0f, 2.0f},
         //  {},5.0f,1}
-         { AIComponent::AI_type::ShoterEnemy2,
-         {15.0f, 0.0f, -4.0f},vec3f{},
-         {
-             vec3f{13.0f, 0.0f, -8.0f},
-             {15.0f, 0.0f, -4.0f},
-             AIComponent::invalid
-         },0.0f,10.0f,2},
+        //  { AIComponent::AI_type::ShoterEnemy2,
+        //  {15.0f, 0.0f, -4.0f},vec3f{},
+        //  {
+        //      vec3f{13.0f, 0.0f, -8.0f},
+        //      {15.0f, 0.0f, -4.0f},
+        //      AIComponent::invalid
+        //  },0.0f,10.0f,2},
           { AIComponent::AI_type::ShoterEnemy2,
          {16.0f, 0.0f, 4.0f},vec3f{},
          {
