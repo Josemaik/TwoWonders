@@ -21,10 +21,11 @@ struct AISystem
     vec3f FollowPatrol(AIComponent& ai, PhysicsComponent& p);
     void FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, EntityManager& em, Entity& e,float dt);
     void ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& em, Entity& e,float dt);
-    void RandomAI(AIComponent& ai,PhysicsComponent& p,EntityManager& em,float dt);
+    void RandomAI(AIComponent& ai,PhysicsComponent& p,EntityManager& em,Entity& e,float dt);
     //Operations
     void setVelocity(PhysicsComponent& p, AIComponent& ai, vec3f distance,float dt);
     vec3f getVelocityonDirecion(vec3f vector);
+    vec3f getRandomDir();
     
 };
 

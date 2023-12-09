@@ -17,10 +17,15 @@ struct AIComponent
     bool arrived{ false };
     int contador_stop{ 50 };
     int contador_change_position{ 70 };
-    int contador_change_direction{ 40 };
     uint8_t nexttarget{ 1 };
     enum struct AI_shoot_states { shooting, moving };
     AI_shoot_states current_state{ AI_shoot_states::shooting };
     //random
+    bool stoped{false}, shoot{false};
     vec3f oldvel{0.5f,0.0f,0.0f};
+    float countdown_change_dir{ 2.0f },countdown_stop{5.0f},countdown_shoot{2.0f}; //segundos
+    float elapsed_stop{1.0f},elapsed_change_dir{1.0f},elapsed_shoot{1.0f}; //segundos
+    void dec_countdown_change_dir(float deltaTime) { elapsed_change_dir += deltaTime; }; // delta time
+    void dec_countdown_stop(float deltaTime) { elapsed_stop += deltaTime; }; 
+    void dec_countdown_shoot(float deltaTime) { elapsed_shoot += deltaTime; };
 };

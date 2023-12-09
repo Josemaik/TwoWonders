@@ -133,24 +133,53 @@ void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& 
     }
 
 }
- void AISystem::RandomAI(AIComponent& ai,PhysicsComponent& p,EntityManager& em,float dt){
-       vec3f direction{};
-    ai.contador_change_direction--;
-
-    if (ai.contador_change_direction <= 0) {
+vec3f AISystem::getRandomDir(){
         // Genero direccion aleatoria
         switch (std::rand() % 4) {
-            case 0: direction = {0.5f, 0.0f, 0.0f}; break;
-            case 1: direction = {-0.5f, 0.0f, 0.0f}; break;
-            case 2: direction = {0.0f, 0.0f, 0.5f}; break;
-            case 3: direction = {0.0f, 0.0f, -0.5f}; break;
-            default: direction = {-0.5f, 0.0f, 0.0f}; break;
+            case 0:  return {0.5f, 0.0f, 0.0f}; break;
+            case 1:  return {-0.5f, 0.0f, 0.0f}; break;
+            case 2:  return {0.0f, 0.0f, 0.5f}; break;
+            case 3:  return {0.0f, 0.0f, -0.5f}; break;
+            default: return {-0.5f, 0.0f, 0.0f}; break;
         }
-        // setVelocity(p, ai, direction, dt);
-        ai.oldvel = direction;
-        ai.contador_change_direction = 40;
+}
+ void AISystem::RandomAI(AIComponent& ai,PhysicsComponent& p,EntityManager& em,Entity& e,float dt){
+    vec3f direction{};
+    //check change direction when not shooting
+    if(!ai.stoped){
+        if (ai.elapsed_change_dir >= ai.countdown_change_dir) {
+            //set random dir
+            direction = getRandomDir();
+            ai.oldvel = direction;
+            p.velocity = ai.oldvel;
+            ai.elapsed_change_dir = 0;
+        }else{
+            ai.dec_countdown_change_dir(dt);
+        }
     }
-    p.velocity = ai.oldvel;
+    //check if ai have to stop
+    if(!ai.shoot){
+        if(ai.elapsed_stop>=ai.countdown_stop){
+            ai.stoped = true;
+            ai.shoot = true;
+            p.velocity = {};
+            ai.elapsed_stop = 0;
+        }else{
+            ai.dec_countdown_stop(dt);
+        }
+    }
+    
+    //
+    if(ai.shoot){
+        if(ai.elapsed_shoot >= ai.countdown_shoot){
+            //Shoot
+            auto& att = em.getComponent<AttackComponent>(e);
+            att.vel = ai.oldvel;
+            att.attack();
+        }else{
+            ai.dec_countdown_shoot(dt);
+        }
+    }
  }
 void AISystem::update(EntityManager& em,float dt)
 {
@@ -194,7 +223,7 @@ void AISystem::update(EntityManager& em,float dt)
 
         case AIComponent::AI_type::RandomEnemy:
         {
-            RandomAI(ai,phy,em,dt);
+            RandomAI(ai,phy,em,e,dt);
         }
         break;
 
