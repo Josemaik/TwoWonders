@@ -52,27 +52,20 @@ void ObjectSystem::update(EntityManager& em, float deltaTime){
 }
 
 void ObjectSystem::explodeBomb(EntityManager& em, Entity& ent){
+    createExplodeBomb(em, ent, BehaviorType::ATK_PLAYER);
+    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY);
+}
+
+void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type){
     if(ent.hasComponent<RenderComponent>()){
         auto& ren = em.getComponent<RenderComponent>(ent);
-        // Crear una entidad que quite vida a los enemigos
+        // Crear una entidad que quite vida
         auto& e{ em.newEntity() };
         em.addTag<HitPlayer>(e);
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = ren.position, .scale = { 3.0f, 1.0f, 3.0f }, .color = BLACK });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
         em.addComponent<LifeComponent>(e, LifeComponent{ .life = 5, .countdown = 0.0f });
         em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f});
-        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
-
-        // Crear una entidad que quite vida al player
-        auto& e2{ em.newEntity() };
-        em.addTag<HitPlayer>(e);
-        auto& r2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = ren.position, .scale = { 3.0f, 1.0f, 3.0f }, .color = BLACK });
-        auto& p2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position{ r2.position }, .gravity = 0 });
-        em.addComponent<LifeComponent>(e2, LifeComponent{ .life = 5 });
-        em.addComponent<ProjectileComponent>(e2, ProjectileComponent{ .range = 0.2f});
-        em.addComponent<ColliderComponent>(e2, ColliderComponent{ p2.position, r2.scale, BehaviorType::ATK_ENEMY });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, type });
     }
-    
-    // else
-    //     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_ENEMY });
 }
