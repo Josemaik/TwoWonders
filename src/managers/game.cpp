@@ -44,44 +44,44 @@ struct EnemyData {
 void createEnemies(EntityManager& em)
 {
     std::vector<EnemyData> enemyData = {
-    //    {  AIComponent::AI_type::PatrolEnemy,
-    //      {0.0f, 0.0f, -8.0f},
-    //      {
-    //          vec3f{0.f, 0.f, -8.0f},
-    //          { -8.5f, 0.f, -8.0f },
-    //          { -8.5f, 0.f, 8.0f },
-    //          { 0.f, 0.f, 8.0f },
-    //          { -8.5f, 0.f, 8.0f },
-    //          { -8.5f, 0.f, -8.0f },
-    //          AIComponent::invalid
-    //      },5.0f,1},
-    //    {  AIComponent::AI_type::PatrolEnemy,
-    //      {0.0f, 0.0f, 8.0f},
-    //      {
-    //          vec3f{0.f, 0.f, 8.0f},
-    //          { 8.5f, 0.f, 8.0f },
-    //          { 8.5f, 0.f, -8.0f },
-    //          { 0.f, 0.f, -8.0f },
-    //          { 8.5f, 0.f, -8.0f },
-    //          { 8.5f, 0.f, 8.0f },
-    //          AIComponent::invalid
-    //      },5.0f,1},
-    //      {  AIComponent::AI_type::PatrolFollowEnemy,
-    //      {-2.0f, 0.0f, 10.0f},
-    //      {
-    //          vec3f{0.0f, 0.f, 13.0f},
-    //          { 2.0f, 0.f, 10.0f },
-    //          { -2.0f, 0.0f, 10.0f },
-    //          AIComponent::invalid
-    //      },5.0f,1},
-    //      {  AIComponent::AI_type::PatrolFollowEnemy,
-    //      {-2.0f, 0.f, -13.0f},
-    //      {
-    //          vec3f{-1.0f, 0.f, -9.0f},
-    //          { 2.0f, 0.f, -12.0f },
-    //          {-2.0f, 0.f, -13.0f },
-    //          AIComponent::invalid
-    //      },5.0f,1},
+       {  AIComponent::AI_type::PatrolEnemy,
+         {0.0f, 0.0f, -8.0f},vec3f{},
+         {
+             vec3f{0.f, 0.f, -8.0f},
+             { -8.5f, 0.f, -8.0f },
+             { -8.5f, 0.f, 8.0f },
+             { 0.f, 0.f, 8.0f },
+             { -8.5f, 0.f, 8.0f },
+             { -8.5f, 0.f, -8.0f },
+             AIComponent::invalid
+         },0.0f,5.0f,1},
+       {  AIComponent::AI_type::PatrolEnemy,
+         {0.0f, 0.0f, 8.0f},vec3f{},
+         {
+             vec3f{0.f, 0.f, 8.0f},
+             { 8.5f, 0.f, 8.0f },
+             { 8.5f, 0.f, -8.0f },
+             { 0.f, 0.f, -8.0f },
+             { 8.5f, 0.f, -8.0f },
+             { 8.5f, 0.f, 8.0f },
+             AIComponent::invalid
+         },0.0f,5.0f,1},
+         {  AIComponent::AI_type::PatrolFollowEnemy,
+         {-2.0f, 0.0f, 10.0f},vec3f{},
+         {
+             vec3f{0.0f, 0.f, 13.0f},
+             { 2.0f, 0.f, 10.0f },
+             { -2.0f, 0.0f, 10.0f },
+             AIComponent::invalid
+         },0.0f,5.0f,1},
+         {  AIComponent::AI_type::PatrolFollowEnemy,
+         {-2.0f, 0.f, -13.0f},vec3f{},
+         {
+             vec3f{-1.0f, 0.f, -9.0f},
+             { 2.0f, 0.f, -12.0f },
+             {-2.0f, 0.f, -13.0f },
+             AIComponent::invalid
+         },0.0f,5.0f,1},
     //      { AIComponent::AI_type::ShoterEnemy,
     //      {25.0f, 0.0f, -7.0f},
     //      {
@@ -112,20 +112,20 @@ void createEnemies(EntityManager& em)
         // { AIComponent::AI_type::ShoterEnemy, //**********
         //  {30.0f, 0.0f, 2.0f},
         //  {},5.0f,1}
-        //  { AIComponent::AI_type::ShoterEnemy2,
-        //  {15.0f, 0.0f, -4.0f},
-        //  {
-        //      vec3f{13.0f, 0.0f, -8.0f},
-        //      {15.0f, 0.0f, -4.0f},
-        //      AIComponent::invalid
-        //  },10.0f,2},
-        //   { AIComponent::AI_type::ShoterEnemy2,
-        //  {16.0f, 0.0f, 4.0f},
-        //  {
-        //      vec3f{13.0f, 0.0f, 10.0f},
-        //      {16.0f, 0.0f, 4.0f},
-        //      AIComponent::invalid
-        //  },10.0f,2}
+         { AIComponent::AI_type::ShoterEnemy2,
+         {15.0f, 0.0f, -4.0f},vec3f{},
+         {
+             vec3f{13.0f, 0.0f, -8.0f},
+             {15.0f, 0.0f, -4.0f},
+             AIComponent::invalid
+         },0.0f,10.0f,2},
+          { AIComponent::AI_type::ShoterEnemy2,
+         {16.0f, 0.0f, 4.0f},vec3f{},
+         {
+             vec3f{13.0f, 0.0f, 10.0f},
+             {16.0f, 0.0f, 4.0f},
+             AIComponent::invalid
+         },0.0f,10.0f,2},
         {AIComponent::AI_type::RandomEnemy,
         {30.0f, 0.0f, 2.0f},{0.2f,0.0f,0.0f},{},3.5f,0.f,2},
         {AIComponent::AI_type::RandomEnemy,
