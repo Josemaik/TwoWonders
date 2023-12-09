@@ -37,6 +37,7 @@ struct EnemyData {
     vec3f position;
     vec3f velocity;
     std::array<vec3f, 10> route;
+    float stop{};
     float detect_radius;
     int num_lifes;
 };
@@ -126,9 +127,13 @@ void createEnemies(EntityManager& em)
         //      AIComponent::invalid
         //  },10.0f,2}
         {AIComponent::AI_type::RandomEnemy,
-        {30.0f, 0.0f, 2.0f},{0.2f,0.0f,0.0f},{},0.f,2}
+        {30.0f, 0.0f, 2.0f},{0.2f,0.0f,0.0f},{},3.5f,0.f,2},
+        {AIComponent::AI_type::RandomEnemy,
+        {24.0f, 0.0f, 6.0f},{0.2f,0.0f,0.0f},{},2.0f,0.f,2},
+        {AIComponent::AI_type::RandomEnemy,
+        {31.0f, 0.0f, -4.0f},{0.2f,0.0f,0.0f},{},1.0f,0.f,2}
     };
-
+    //POner por parametro tiempo de culldown para disparar
     for (const auto& data : enemyData)
     {
         auto& enemy{ em.newEntity() };
@@ -137,7 +142,8 @@ void createEnemies(EntityManager& em)
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = { .2f, .0f, .0f } });
         em.addComponent<AIComponent>(enemy, AIComponent{ .current_type = data.aiType,
         .patrol = data.route,
-        .detect_radius = data.detect_radius
+        .detect_radius = data.detect_radius,
+        .elapsed_stop = data.stop
             });
         em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = data.num_lifes });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
@@ -145,7 +151,7 @@ void createEnemies(EntityManager& em)
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.5f });
         }
         if(data.aiType == AIComponent::AI_type::RandomEnemy){
-             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 4.0f });
+             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
         }
     }
 }

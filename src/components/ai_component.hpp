@@ -23,7 +23,7 @@ struct AIComponent
     //random
     bool stoped{false}, shoot{false};
     vec3f oldvel{0.5f,0.0f,0.0f};
-    float countdown_change_dir{ 1.0f },countdown_stop{3.5f},countdown_shoot{3.0f}; //segundos
+    float countdown_change_dir{ 1.5f },countdown_stop{3.5f},countdown_shoot{2.0f}; //segundos
     float elapsed_stop{1.0f},elapsed_change_dir{1.0f},elapsed_shoot{1.0f}; //segundos
     void dec_countdown_change_dir(float deltaTime) { elapsed_change_dir += deltaTime; }; // delta time
     void dec_countdown_stop(float deltaTime) { elapsed_stop += deltaTime; }; 

@@ -109,7 +109,8 @@ void AISystem::FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, Entity
         return;
     }
 }
-
+//hacerlo con deltatime y que en vez de seguir un patron que cambie de posicion a una aleatoria dentro de un
+//rango de x y z.
 void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& em, Entity& ent,float dt) {
     //Compruebo si ha llegado al siguiente point
     if (ai.arrived) {
@@ -164,9 +165,8 @@ vec3f AISystem::getRandomDir(){
             direction = getRandomDir();
             ai.oldvel = direction;
             ai.elapsed_change_dir = 0;
-        }else{
-            ai.dec_countdown_change_dir(dt);
         }
+        ai.dec_countdown_change_dir(dt);
     }
     // //check if ai have to stop
     if(!ai.shoot){
@@ -179,26 +179,23 @@ vec3f AISystem::getRandomDir(){
             auto& att = em.getComponent<AttackComponent>(e);
             att.vel = ai.oldvel;
             att.attack();
-        }else{
-            ai.dec_countdown_stop(dt);
         }
+        ai.dec_countdown_stop(dt);
     }
-    
-    // //time while shooting
+    //time while shooting
     if(ai.shoot){
         if(ai.elapsed_shoot >= ai.countdown_shoot){
             //Shoot
             ai.shoot = false;
             ai.stoped = false;
             ai.elapsed_shoot = 0;
-        }else{
-            ai.dec_countdown_shoot(dt);
         }
+        ai.dec_countdown_shoot(dt);
     }
     // //Set velocity
     if(!ai.stoped){
+        //Range Control
         if(!isInDesiredRange(p.position+ai.oldvel,p)){
-                std::cout << "hola";
                 ai.oldvel *= -1.0f;
         }
         p.velocity = ai.oldvel;
