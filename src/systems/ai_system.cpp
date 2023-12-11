@@ -128,6 +128,9 @@ void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& 
     //cada x segundos cambia de posicion
     if(!ai.shoot){
         if(ai.elapsed_change_position>=ai.countdown_change_position){
+            //before change position go visible
+            auto& rend = em.getComponent<RenderComponent>(ent);
+            rend.visible = true;
             //Set random position
             auto randomPos = getRandomPosinRange(ai.Xmin,ai.Xmax,ai.Zmin,ai.Zmax);
             p.position.setX(randomPos.x());
@@ -139,15 +142,18 @@ void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& 
         ai.dec_countdown_change_pos(dt);
     }else{
         if(ai.elapsed_shoot_rap>=ai.countdown_shoot_rap){
+            //set entitites invisible
+            auto& rend1 = em.getComponent<RenderComponent>(ent);
+            rend1.visible = false;
             if (isPlayerDetected(em, p, ai)) {
                 //Attack
                 auto& att = em.getComponent<AttackComponent>(ent);
                 auto old_vel = (getPlayerDistance(em, p, ai)).normalized() * SPEED_AI;
                 att.vel = old_vel;
                 att.attack(AttackType::Ranged);
-                ai.elapsed_shoot_rap = 0;
-                ai.shoot = false;
             }
+            ai.shoot = false;
+            ai.elapsed_shoot_rap = 0;
         }
         ai.dec_countdown_shoot_rap(dt);
     }

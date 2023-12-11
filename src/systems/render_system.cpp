@@ -137,7 +137,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
         }
 
         // Dibujar la vida restante encima de las entidades // DEBUG
-        if (e.hasComponent<LifeComponent>())
+        if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
             auto const& l{ em.getComponent<LifeComponent>(e) };
