@@ -40,6 +40,8 @@ struct EnemyData {
     float stop{};
     float detect_radius;
     int num_lifes;
+    float Xmin{},Xmax{},Zmin{},Zmax{};
+    bool visible{};
 };
 void createEnemies(EntityManager& em)
 {
@@ -54,7 +56,7 @@ void createEnemies(EntityManager& em)
              { -8.5f, 0.f, 8.0f },
              { -8.5f, 0.f, -8.0f },
              AIComponent::invalid
-         },0.0f,5.0f,1},
+         },0.0f,5.0f,1,0.0f,0.0f,0.0f,0.0f,true},
        {  AIComponent::AI_type::PatrolEnemy,
          {0.0f, 0.0f, 8.0f},vec3f{},
          {
@@ -65,7 +67,7 @@ void createEnemies(EntityManager& em)
              { 8.5f, 0.f, -8.0f },
              { 8.5f, 0.f, 8.0f },
              AIComponent::invalid
-         },0.0f,5.0f,1},
+         },0.0f,5.0f,1,0.0f,0.0f,0.0f,0.0f,true},
          {  AIComponent::AI_type::PatrolFollowEnemy,
          {-2.0f, 0.0f, 10.0f},vec3f{},
          {
@@ -73,7 +75,7 @@ void createEnemies(EntityManager& em)
              { 2.0f, 0.f, 10.0f },
              { -2.0f, 0.0f, 10.0f },
              AIComponent::invalid
-         },0.0f,5.0f,1},
+         },0.0f,5.0f,1,0.0f,0.0f,0.0f,0.0f,true},
          {  AIComponent::AI_type::PatrolFollowEnemy,
          {-2.0f, 0.f, -13.0f},vec3f{},
          {
@@ -81,7 +83,7 @@ void createEnemies(EntityManager& em)
              { 2.0f, 0.f, -12.0f },
              {-2.0f, 0.f, -13.0f },
              AIComponent::invalid
-         },0.0f,5.0f,1},
+         },0.0f,5.0f,1,0.0f,0.0f,0.0f,0.0f,true},
     //      { AIComponent::AI_type::ShoterEnemy,
     //      {25.0f, 0.0f, -7.0f},
     //      {
@@ -118,37 +120,41 @@ void createEnemies(EntityManager& em)
              vec3f{13.0f, 0.0f, -8.0f},
              {15.0f, 0.0f, -4.0f},
              AIComponent::invalid
-         },0.0f,10.0f,2},
+         },0.0f,10.0f,2,13.0f,16.0f,-10.0f,-3.0f,false},
           { AIComponent::AI_type::ShoterEnemy2,
          {16.0f, 0.0f, 4.0f},vec3f{},
          {
              vec3f{13.0f, 0.0f, 10.0f},
              {16.0f, 0.0f, 4.0f},
              AIComponent::invalid
-         },0.0f,10.0f,2},
+         },0.0f,10.0f,2,13.0f,16.0f,4.0f,10.0f,false},
         {AIComponent::AI_type::RandomEnemy,
-        {30.0f, 0.0f, 2.0f},{0.2f,0.0f,0.0f},{},3.5f,0.f,2},
+        {30.0f, 0.0f, 2.0f},{0.2f,0.0f,0.0f},{},3.5f,0.f,1,0.0f,0.0f,0.0f,0.0f,true},
         {AIComponent::AI_type::RandomEnemy,
-        {24.0f, 0.0f, 6.0f},{0.2f,0.0f,0.0f},{},2.0f,0.f,2},
+        {24.0f, 0.0f, 6.0f},{0.2f,0.0f,0.0f},{},2.0f,0.f,1,0.0f,0.0f,0.0f,0.0f,true},
         {AIComponent::AI_type::RandomEnemy,
-        {31.0f, 0.0f, -4.0f},{0.2f,0.0f,0.0f},{},1.0f,0.f,2}
+        {31.0f, 0.0f, -4.0f},{0.2f,0.0f,0.0f},{},1.0f,0.f,1,0.0f,0.0f,0.0f,0.0f,true}
     };
     //POner por parametro tiempo de culldown para disparar
     for (const auto& data : enemyData)
     {
         auto& enemy{ em.newEntity() };
         em.addTag<EnemyTag>(enemy);
-        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = data.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
+        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = data.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE ,.visible=data.visible});
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = { .2f, .0f, .0f } });
         em.addComponent<AIComponent>(enemy, AIComponent{ .current_type = data.aiType,
         .patrol = data.route,
         .detect_radius = data.detect_radius,
-        .elapsed_stop = data.stop
+        .elapsed_stop = data.stop,
+        .Xmin = data.Xmin,
+        .Xmax = data.Xmax,
+        .Zmin = data.Zmin,
+        .Zmax = data.Zmax
             });
         em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = data.num_lifes });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
         if (data.aiType == AIComponent::AI_type::ShoterEnemy2) {
-            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.5f });
+            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.0f });
         }
         if(data.aiType == AIComponent::AI_type::RandomEnemy){
              em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });

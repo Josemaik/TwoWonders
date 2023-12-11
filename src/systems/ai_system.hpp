@@ -23,10 +23,11 @@ struct AISystem
     void ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& em, Entity& e,float dt);
     void RandomAI(AIComponent& ai,PhysicsComponent& p,EntityManager& em,Entity& e,float dt);
     //Operations
-    void setVelocity(PhysicsComponent& p, AIComponent& ai, vec3f distance,float dt);
+    void setVelocity(PhysicsComponent& p, vec3f distance);
     vec3f getVelocityonDirecion(vec3f vector);
     vec3f getRandomDir();
-    bool isInDesiredRange(const vec3f& direction,PhysicsComponent& p);
+    vec3f getRandomPosinRange(float xmin, float xmax,float zmin,float zmax);
+    bool isInDesiredRange(const vec3f& direction);
     
 };
 

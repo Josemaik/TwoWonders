@@ -38,13 +38,15 @@ void CollisionSystem::checkCollision(EntityManager& em, EntColPair& ECPair)
 
                 ColliderComponent* collider1 = it1->second;
                 ColliderComponent* collider2 = it2->second;
+                //Solo compruebo colisiones cuando no sean ENMEY ambas.
+                if (!(collider1->behaviorType & BehaviorType::ENEMY) || !(collider2->behaviorType & BehaviorType::ENEMY)){
+                    vec3f overlap1 = (bbox1->max - bbox2->min);
+                    vec3f overlap2 = (bbox2->max - bbox1->min);
 
-                vec3f overlap1 = (bbox1->max - bbox2->min);
-                vec3f overlap2 = (bbox2->max - bbox1->min);
+                    vec3f minOverlap = vec3f::min(overlap1, overlap2);
 
-                vec3f minOverlap = vec3f::min(overlap1, overlap2);
-
-                handleCollision(em, entity1, entity2, minOverlap, collider1->behaviorType, collider2->behaviorType);
+                    handleCollision(em, entity1, entity2, minOverlap, collider1->behaviorType, collider2->behaviorType);
+                }
             }
         }
     }

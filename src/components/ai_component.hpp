@@ -4,6 +4,7 @@
 #include <utils/vec3D.hpp>
 struct AIComponent
 {
+    //patrol enemy
     enum struct AI_type { PatrolEnemy, PatrolFollowEnemy, ShoterEnemy, ShoterEnemy2,RandomEnemy };
     AI_type current_type{};
     static constexpr vec3f invalid{};
@@ -18,9 +19,7 @@ struct AIComponent
     int contador_stop{ 50 };
     int contador_change_position{ 70 };
     uint8_t nexttarget{ 1 };
-    enum struct AI_shoot_states { shooting, moving };
-    AI_shoot_states current_state{ AI_shoot_states::shooting };
-    //random
+    //random shoot ai
     bool stoped{false}, shoot{false};
     vec3f oldvel{0.25f,0.0f,0.0f};
     float countdown_change_dir{ 1.5f },countdown_stop{3.5f},countdown_shoot{2.0f}; //segundos
@@ -28,4 +27,10 @@ struct AIComponent
     void dec_countdown_change_dir(float deltaTime) { elapsed_change_dir += deltaTime; }; // delta time
     void dec_countdown_stop(float deltaTime) { elapsed_stop += deltaTime; }; 
     void dec_countdown_shoot(float deltaTime) { elapsed_shoot += deltaTime; };
+    //random aishooter player
+    float countdown_change_position{5.0f}, elapsed_change_position{1.0f};
+    float countdown_shoot_rap{2.0f}, elapsed_shoot_rap{1.0f};
+    void dec_countdown_change_pos(float deltaTime) { elapsed_change_position += deltaTime; };
+    void dec_countdown_shoot_rap(float deltaTime) { elapsed_shoot_rap += deltaTime; };
+    float Xmin{},Xmax{},Zmin{},Zmax{};
 };
