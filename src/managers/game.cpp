@@ -452,7 +452,6 @@ void createEntities(EntityManager& em)
 
     // Ground and water (Zelda NES)
     createGroundWaterZelda(em);
-
     // Ground and water
     // createGroundWater(em);
 
