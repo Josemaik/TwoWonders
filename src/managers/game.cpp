@@ -2,6 +2,92 @@
 #include "game_engine.hpp"
 //#include "../utils/memory_viewer.hpp"
 
+void createWallsZelda(EntityManager& em) 
+{
+    std::vector<std::pair<vec3f, vec3f>> wallData = {
+
+        // ZONA 1
+
+        { { -5.5f, 0.0f, -8.0f }, { 8.0f, 1.0f, 3.0f } },  // |
+        { { 5.5f, 0.0f, -8.0f }, { 8.0f, 1.0f, 3.0f } },   // | Pared Horizontal Arriba
+
+        { { -11.0f, 0.0f, -5.5f }, { 3.0f, 1.0f, 8.0f } }, // | 
+        { { -11.0f, 0.0f, 5.5f }, { 3.0f, 1.0f, 8.0f } },  // | Pared Vertical Izquierda
+        
+        { { 0.0f, 0.0f, 8.0f }, { 19.0f, 1.0f, 3.0f } },   // | Pared Horizontal Abajo
+        { { 11.0f, 0.0f, 0.0f }, { 3.0f, 1.0f, 19.0f } },  // | Pared Vertical Derecha
+
+        // ZONA 2
+
+        { { -11.0f, 0.0f, -12.0f }, { 3.0f, 1.0f, 5.0f } },   // | 
+        { { -11.0f, 0.0f, -21.5f }, { 3.0f, 1.0f, 8.0f } },    // | Pared Vertical Izquierda
+
+        { { 11.0f, 0.0f, -17.5f }, { 3.0f, 1.0f, 16.0f } },  // | Pared Vertical Derecha
+        { { 0.0f, 0.0f, -24.0f }, { 19.0f, 1.0f, 3.0f } },   // | Pared Horizontal Abajo
+
+        { { 7.0f, 0.0f, -20.0f }, { 1.0f, 1.0f, 1.0f } },    // | 
+        { { 7.0f, 0.0f, -16.0f }, { 1.0f, 1.0f, 1.0f } },    // | Paredes Chiquitas Derecha
+        { { 7.0f, 0.0f, -12.0f }, { 1.0f, 1.0f, 1.0f } },    // | 
+
+        { { -7.0f, 0.0f, -20.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+        { { -7.0f, 0.0f, -16.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+        { { -7.0f, 0.0f, -12.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+        { { -4.0f, 0.0f, -20.0f }, { 1.0f, 1.0f, 1.0f } },   // | Paredes Chiquitas Izquierda
+        { { -4.0f, 0.0f, -16.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+        { { -4.0f, 0.0f, -12.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+
+    };
+
+    for (const auto& [pos, scl] : wallData)
+    {
+        auto& wall{ em.newEntity() };
+        auto& wr = em.addComponent<RenderComponent>(wall, RenderComponent{ .position = pos, .scale = scl, .color = GRAY });
+        auto& wp = em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = { wr.position }, .velocity = { .0f, .0f, .0f } });
+        em.addComponent<ColliderComponent>(wall, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
+    }
+}
+
+void createGroundWaterZelda(EntityManager& em){
+    struct EntityData
+    {
+        vec3f position;
+        vec3f scale;
+        Color color;
+    };
+
+    EntityData entitiesG[] = {
+        { { 0.f, -1.5f, 0.f }, { 100.0f, 2.f, 100.f }, GREEN },
+        //{ { 30.0f, -1.5f, 0.0f }, { 25.0f, 2.f, 30.0f }, GREEN },
+    };
+
+    for (const auto& data : entitiesG)
+    {
+        auto& entity = em.newEntity();
+        em.addTag<GroundTag>(entity);
+        auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
+        auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
+    }
+
+    //EntityData entitiesW[] = {
+    //{ { 15.f, -1.5f, -8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
+    //{ { 15.f, -1.5f, 8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
+    //{ { 15.f, -1.5f, 17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
+    //{ { 15.f, -1.5f, -17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
+    //{ { -15.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE },
+    //{ { 45.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE }
+    //};
+
+    //for (const auto& data : entitiesW)
+    //{
+    //    auto& entity = em.newEntity();
+    //    em.addTag<WaterTag>(entity);
+    //    auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
+    //    auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
+    //    em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
+    //}
+} 
+
 void createWalls(EntityManager& em)
 {
     std::vector<std::pair<vec3f, vec3f>> wallData = {
@@ -209,7 +295,7 @@ void createSword(EntityManager& em)
 {
     auto& e{ em.newEntity() };
     em.addTag<Object>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 40.0f, 0.f, 10.0f }, .scale = { 1.0f, 0.3f, 0.3f }, .color = LIGHTGRAY });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -6.0f, 0.f, -5.0f }, .scale = { 1.0f, 0.3f, 0.3f }, .color = LIGHTGRAY });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword});
@@ -220,7 +306,7 @@ void createEntities(EntityManager& em)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 28.0f, 0.f, 10.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
@@ -229,15 +315,21 @@ void createEntities(EntityManager& em)
 
     // Sword
     createSword(em);
+
+    // Ground and water (Zelda NES)
+    createGroundWaterZelda(em);
     
     // Ground and water
-    createGroundWater(em);
+    // createGroundWater(em);
+
+    // Walls (Zelda NES)
+    createWallsZelda(em);
 
     // Walls
-    createWalls(em);
+    // createWalls(em);
 
-    // Enemy
-    createEnemies(em);
+    // Enemies
+    // createEnemies(em);
 
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();

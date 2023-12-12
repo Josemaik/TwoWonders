@@ -24,4 +24,7 @@ void createEnemies(EntityManager& em);
 void createGroundWater(EntityManager& em);
 void game();
 
+void createWallsZelda(EntityManager& em);
+void createGroundWaterZelda(EntityManager& em);
+
 #endif // !GAME
