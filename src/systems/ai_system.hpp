@@ -27,7 +27,7 @@ struct AISystem
     vec3f getVelocityonDirecion(vec3f vector);
     vec3f getRandomDir();
     vec3f getRandomPosinRange(float xmin, float xmax,float zmin,float zmax);
-    bool isInDesiredRange(const vec3f& direction);
+    bool isInDesiredRange(const vec3f& direction,float xmin, float xmax,float zmin,float zmax);
     
 };
 
