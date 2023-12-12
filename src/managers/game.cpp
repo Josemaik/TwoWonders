@@ -23,7 +23,7 @@ void createWallsZelda(EntityManager& em)
         { { -11.0f, 0.0f, -21.5f }, { 3.0f, 1.0f, 8.0f } },  // | Pared Vertical Izquierda
 
         { { 11.0f, 0.0f, -17.5f }, { 3.0f, 1.0f, 16.0f } },  // | Pared Vertical Derecha
-        { { 0.0f, 0.0f, -24.0f }, { 19.0f, 1.0f, 3.0f } },   // | Pared Horizontal Abajo
+        { { 0.0f, 0.0f, -24.0f }, { 19.0f, 1.0f, 3.0f } },   // | Pared Horizontal Arriba
 
         { { 7.0f, 0.0f, -20.0f }, { 1.0f, 1.0f, 1.0f } },    // | 
         { { 7.0f, 0.0f, -16.0f }, { 1.0f, 1.0f, 1.0f } },    // | Paredes Chiquitas Derecha
@@ -49,6 +49,50 @@ void createWallsZelda(EntityManager& em)
         { { -25.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
         { { -28.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
 
+        // ZONA 4
+
+        { { -22.0f, 0.0f, -24.0f }, { 19.0f, 1.0f, 3.0f } },  // | Pared Horizontal Arriba
+
+        { { -20.0f, 0.0f, -18.0f }, { 3.0f, 1.0f, 1.0f } },   // | 
+        { { -20.0f, 0.0f, -14.0f }, { 3.0f, 1.0f, 1.0f } },   // | 
+        { { -25.0f, 0.0f, -20.0f }, { 4.0f, 1.0f, 1.0f } },   // | Paredes Chiquitas
+        { { -25.0f, 0.0f, -16.0f }, { 4.0f, 1.0f, 1.0f } },   // | 
+        { { -25.0f, 0.0f, -12.0f }, { 4.0f, 1.0f, 1.0f } },   // | 
+
+        // ZONA 5
+
+        { { -37.0f, 0.0f, 8.0f }, { 11.0f, 1.0f, 3.0f } },   // | 
+        { { -50.0f, 0.0f, 8.0f }, { 5.0f, 1.0f, 3.0f } },    // | Pared Horizontal Abajo
+        
+        { { -51.5f, 0.0f, -8.0f }, { 2.0f, 1.0f, 3.0f } },   // | 
+        { { -37.0f, 0.0f, -8.0f }, { 11.0f, 1.0f, 3.0f } },  // | Pared Horizontal Arriba
+
+        { { -40.5f, 0.0f, -4.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+        { { -40.5f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } },    // | 
+        { { -40.5f, 0.0f, 4.0f }, { 1.0f, 1.0f, 1.0f } },    // | 
+        { { -37.5f, 0.0f, -2.0f }, { 1.0f, 1.0f, 1.0f } },   // | Paredes Chiquitas
+        { { -37.5f, 0.0f, 2.0f }, { 1.0f, 1.0f, 1.0f } },    // | 
+        { { -34.5f, 0.0f, -4.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+        { { -34.5f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } },    // | 
+        { { -34.5f, 0.0f, 4.0f }, { 1.0f, 1.0f, 1.0f } },    // | 
+        { { -50.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } },    // | 
+
+        { { -54.0f, 0.0f, 0.0f }, { 3.0f, 1.0f, 19.0f } },   // | Pared Vertical Izquierda
+
+
+        // ZONA 6
+
+        { { -37.0f, 0.0f, -24.0f }, { 11.0f, 1.0f, 3.0f } },   // | 
+        { { -50.0f, 0.0f, -24.0f }, { 5.0f, 1.0f, 3.0f } },    // | Pared Horizontal Arriba
+
+        { { -54.0f, 0.0f, -17.5f }, { 3.0f, 1.0f, 16.0f } },   // | Pared Vertical Izquierda
+
+        { { -40.5f, 0.0f, -20.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+        { { -40.5f, 0.0f, -16.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+        { { -40.5f, 0.0f, -12.0f }, { 1.0f, 1.0f, 1.0f } },   // | Paredes Chiquitas
+        { { -37.5f, 0.0f, -18.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+        { { -37.5f, 0.0f, -14.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+
 
 
     };
@@ -71,7 +115,9 @@ void createGroundWaterZelda(EntityManager& em){
     };
 
     EntityData entitiesG[] = {
-        { { 0.f, -1.5f, 0.f }, { 100.0f, 2.f, 100.f }, GREEN },
+        { { 0.f, -1.5f, 0.f }, { 85.0f, 2.f, 100.f }, GREEN },
+        { { -52.5f, -1.5f, 0.f }, { 10.0f, 2.f, 100.f }, GREEN },
+        { { -45.f, -1.5f, -16.f }, { 5.0f, 2.f, 2.0f }, ORANGE },
         //{ { 30.0f, -1.5f, 0.0f }, { 25.0f, 2.f, 30.0f }, GREEN },
     };
 
@@ -84,23 +130,24 @@ void createGroundWaterZelda(EntityManager& em){
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
     }
 
-    //EntityData entitiesW[] = {
-    //{ { 15.f, -1.5f, -8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
+    EntityData entitiesW[] = {
+    { { -45.f, -1.5f, -0.0f }, { 5.0f, 2.f, 30.f }, SKYBLUE },
+    { { -45.f, -1.5f, -30.0f }, { 5.0f, 2.f, 30.f }, SKYBLUE },
     //{ { 15.f, -1.5f, 8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
     //{ { 15.f, -1.5f, 17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
     //{ { 15.f, -1.5f, -17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
     //{ { -15.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE },
     //{ { 45.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE }
-    //};
+    };
 
-    //for (const auto& data : entitiesW)
-    //{
-    //    auto& entity = em.newEntity();
-    //    em.addTag<WaterTag>(entity);
-    //    auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
-    //    auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
-    //    em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
-    //}
+    for (const auto& data : entitiesW)
+    {
+        auto& entity = em.newEntity();
+        em.addTag<WaterTag>(entity);
+        auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
+        auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
+    }
 } 
 
 void createWalls(EntityManager& em)
@@ -321,7 +368,7 @@ void createEntities(EntityManager& em)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -52.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
