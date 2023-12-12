@@ -121,6 +121,9 @@ vec3f AISystem::getRandomPosinRange(float xmin, float xmax,float zmin,float zmax
         // obtengo x y z aleatoria
         float x = rangoX(gen);
         float z = rangoZ(gen);
+        if(z<= -15 && z>=-16){
+            getRandomPosinRange(xmin,xmax,zmin,zmax);
+        }
         //devuelvo vector
         return vec3f{x,0.0f,z};
 }
@@ -159,16 +162,16 @@ void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& 
     }
 }
 // Function to check if the direction is in the desired range
-bool AISystem::isInDesiredRange(const vec3f& direction) {
+bool AISystem::isInDesiredRange(const vec3f& direction,float xmin, float xmax,float zmin,float zmax) {
     // Define your desired range here
-    float minX = 23.1f; // minimum X coordinate
-    float maxX = 34.9f; // maximum X coordinate
-    float minZ = -6.5f; // minimum Z coordinate
-    float maxZ = 6.5f;  // maximum Z coordinate
+    // float minX = 23.1f; // minimum X coordinate
+    // float maxX = 34.9f; // maximum X coordinate
+    // float minZ = -6.5f; // minimum Z coordinate
+    // float maxZ = 6.5f;  // maximum Z coordinate
 
     // Check if the direction results in a position within the desired range
-    return direction.x() >= minX && direction.x() <= maxX &&
-            direction.z() >= minZ && direction.z() <= maxZ;
+    return direction.x() >= xmin && direction.x() <= xmax &&
+            direction.z() >=zmin  && direction.z() <= zmax;
 }
 vec3f AISystem::getRandomDir(){
         // Genero direccion aleatoria
@@ -221,7 +224,7 @@ vec3f AISystem::getRandomDir(){
     // //Set velocity
     if(!ai.stoped){
         //Range Control
-        if(!isInDesiredRange(p.position+ai.oldvel)){
+        if(!isInDesiredRange(p.position+ai.oldvel,ai.Xmin,ai.Xmax,ai.Zmin,ai.Zmax)){
                 ai.oldvel *= -1.0f;
         }
         p.velocity = ai.oldvel;
