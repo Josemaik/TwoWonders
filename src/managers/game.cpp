@@ -62,7 +62,6 @@ void createWallsZelda(EntityManager& em)
 
         { { -37.0f, 0.0f, 8.0f }, { 11.0f, 1.0f, 3.0f } },   // | 
         { { -50.0f, 0.0f, 8.0f }, { 5.0f, 1.0f, 3.0f } },    // | Pared Horizontal Abajo
-
         { { -51.5f, 0.0f, -8.0f }, { 2.0f, 1.0f, 3.0f } },   // | 
         { { -37.0f, 0.0f, -8.0f }, { 11.0f, 1.0f, 3.0f } },  // | Pared Horizontal Arriba
 
