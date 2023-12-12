@@ -120,10 +120,11 @@ vec3f AISystem::getRandomPosinRange(float xmin, float xmax,float zmin,float zmax
         std::uniform_real_distribution<float> rangoZ(zmin, zmax);
         // obtengo x y z aleatoria
         float x = rangoX(gen);
-        float z = rangoZ(gen);
-        if(z<= -15 && z>=-16){
-            getRandomPosinRange(xmin,xmax,zmin,zmax);
-        }
+        float z;
+         do {
+            z = rangoZ(gen);
+        } while (z >= -18.0f && z <= -13.0f);
+
         //devuelvo vector
         return vec3f{x,0.0f,z};
 }
@@ -135,7 +136,7 @@ void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& 
             auto& rend = em.getComponent<RenderComponent>(ent);
             rend.visible = true;
             //Set random position
-            auto randomPos = getRandomPosinRange(ai.Xmin,ai.Xmax,ai.Zmin,ai.Zmax);
+            vec3f randomPos = getRandomPosinRange(ai.Xmin,ai.Xmax,ai.Zmin,ai.Zmax);
             p.position.setX(randomPos.x());
             p.position.setZ(randomPos.z());
             //Attack

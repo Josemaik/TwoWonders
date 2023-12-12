@@ -348,11 +348,11 @@ void createEnemiesZelda(EntityManager& em)
              vec3f{}
          },0.0f,10.0f,2,-43.0f,-46.0f,3.0f,-4.0f,false},
         {AIComponent::AI_type::RandomEnemy,
-        {-35.0f, 0.0f, -20.0f},{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-40.0f,-14.0f,-10.0f,-20.0f,true},
+        {-33.0f, 0.0f, -12.0f},{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-36.0f,-28.0f,-21.0f,-10.0f,true},
         {AIComponent::AI_type::RandomEnemy,
-        {-22.0f, 0.0f, -13.0f},{0.2f,0.0f,0.0f},{},2.0f,0.f,1,-40.0f,-14.0f,-10.0f,-20.0f,true},
+        {-32.0f, 0.0f, -20.0f},{0.2f,0.0f,0.0f},{},2.0f,0.f,1,-36.0f,-28.0f,-21.0f,-10.0f,true},
         {AIComponent::AI_type::RandomEnemy,
-        {-30.0f, 0.0f, -10.0f},{0.2f,0.0f,0.0f},{},1.0f,0.f,1,-40.0f,-14.0f,-10.0f,-20.0f,true}
+        {-28.0f, 0.0f, -11.0f},{0.2f,0.0f,0.0f},{},1.0f,0.f,1,-36.0f,-28.0f,-21.0f,-10.0f,true}
     };
     //POner por parametro tiempo de culldown para disparar
     for (const auto& data : enemyData)
@@ -439,7 +439,7 @@ void createEntities(EntityManager& em)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -52.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -38.0f, 0.f, -10.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
