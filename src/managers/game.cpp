@@ -8,19 +8,19 @@ void createWallsZelda(EntityManager& em)
 
         // ZONA 1
 
-        { { -5.5f, 0.0f, -8.0f }, { 8.0f, 1.0f, 3.0f } },  // |
-        { { 5.5f, 0.0f, -8.0f }, { 8.0f, 1.0f, 3.0f } },   // | Pared Horizontal Arriba
+        { { -5.5f, 0.0f, -8.0f }, { 8.0f, 1.0f, 3.0f } },    // |
+        { { 5.5f, 0.0f, -8.0f }, { 8.0f, 1.0f, 3.0f } },     // | Pared Horizontal Arriba
 
-        { { -11.0f, 0.0f, -5.5f }, { 3.0f, 1.0f, 8.0f } }, // | 
-        { { -11.0f, 0.0f, 5.5f }, { 3.0f, 1.0f, 8.0f } },  // | Pared Vertical Izquierda
+        { { -11.0f, 0.0f, -5.5f }, { 3.0f, 1.0f, 8.0f } },   // | 
+        { { -11.0f, 0.0f, 5.5f }, { 3.0f, 1.0f, 8.0f } },    // | Pared Vertical Izquierda
         
-        { { 0.0f, 0.0f, 8.0f }, { 19.0f, 1.0f, 3.0f } },   // | Pared Horizontal Abajo
-        { { 11.0f, 0.0f, 0.0f }, { 3.0f, 1.0f, 19.0f } },  // | Pared Vertical Derecha
+        { { 0.0f, 0.0f, 8.0f }, { 19.0f, 1.0f, 3.0f } },     // | Pared Horizontal Abajo
+        { { 11.0f, 0.0f, 0.0f }, { 3.0f, 1.0f, 19.0f } },    // | Pared Vertical Derecha
 
         // ZONA 2
 
-        { { -11.0f, 0.0f, -12.0f }, { 3.0f, 1.0f, 5.0f } },   // | 
-        { { -11.0f, 0.0f, -21.5f }, { 3.0f, 1.0f, 8.0f } },    // | Pared Vertical Izquierda
+        { { -11.0f, 0.0f, -12.0f }, { 3.0f, 1.0f, 5.0f } },  // | 
+        { { -11.0f, 0.0f, -21.5f }, { 3.0f, 1.0f, 8.0f } },  // | Pared Vertical Izquierda
 
         { { 11.0f, 0.0f, -17.5f }, { 3.0f, 1.0f, 16.0f } },  // | Pared Vertical Derecha
         { { 0.0f, 0.0f, -24.0f }, { 19.0f, 1.0f, 3.0f } },   // | Pared Horizontal Abajo
@@ -35,6 +35,21 @@ void createWallsZelda(EntityManager& em)
         { { -4.0f, 0.0f, -20.0f }, { 1.0f, 1.0f, 1.0f } },   // | Paredes Chiquitas Izquierda
         { { -4.0f, 0.0f, -16.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
         { { -4.0f, 0.0f, -12.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+
+        // ZONA 3
+
+        { { -22.0f, 0.0f, 8.0f }, { 19.0f, 1.0f, 3.0f } },   // | Pared Horizontal Abajo
+        { { -23.5f, 0.0f, -8.0f }, { 16.0f, 1.0f, 3.0f } },  // | Pared Horizontal Arriba
+
+        { { -22.0f, 0.0f, -4.0f }, { 1.0f, 1.0f, 1.0f } },  // | 
+        { { -22.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+        { { -22.0f, 0.0f, 4.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+        { { -19.0f, 0.0f, -2.0f }, { 1.0f, 1.0f, 1.0f } },  // | Paredes Chiquitas
+        { { -19.0f, 0.0f, 2.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+        { { -25.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+        { { -28.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } },   // | 
+
+
 
     };
 
