@@ -180,7 +180,7 @@ void Map::createZonesOverworld(EntityManager& em){
         auto& entity = em.newEntity();
         em.addTag<ZoneTag>(entity);
         em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = data.zone });
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color, .visible = false });
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::NOTHING });
     }
