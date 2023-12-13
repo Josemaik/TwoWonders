@@ -14,6 +14,9 @@
 #include "../systems/attack_system.hpp"
 #include "../systems/projectile_system.hpp"
 #include "../systems/object_system.hpp"
+#include "../systems/zone_system.hpp"
+
+#include "map.hpp"
 
 constexpr uint16_t SCREEN_WIDTH{ 800 };
 constexpr uint16_t SCREEN_HEIGHT{ 600 };
