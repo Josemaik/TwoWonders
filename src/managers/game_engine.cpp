@@ -3,13 +3,13 @@
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
 {
-    GameEngine::initWindow(width_, height_, "ZeldaWonders");
+    initWindow(width_, height_, "ZeldaWonders");
 
-    GameEngine::setPositionCamera({ 0.0f, 25.0f, 25.0f });
-    GameEngine::setTargetCamera({ 0.0f, 03.0f, .0f });
-    GameEngine::setUpCamera({ 0.0f, 01.0f, 0.0f });
-    GameEngine::setFovyCamera(30.0f);
-    GameEngine::setProjectionCamera(CAMERA_PERSPECTIVE);
+    setPositionCamera({ 0.0f, 30.0f, 12.0f });
+    setTargetCamera({ 0.0f, 03.0f, .0f });
+    setUpCamera({ 0.0f, 01.0f, 0.0f });
+    setFovyCamera(30.0f);
+    setProjectionCamera(CAMERA_PERSPECTIVE);
 }
 
 ////// TIMIING RELATED FUNCTIONS //////

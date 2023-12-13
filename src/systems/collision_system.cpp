@@ -20,7 +20,9 @@ void CollisionSystem::update(EntityManager& em)
     // Vector para saber qué colisiones se han calculado ya
     pairsType checkedPairs;
 
+    // Comprobar colisiones
     checkCollision(em, octree, checkedPairs);
+
     // checkBorderCollision(em, ECPair);
 }
 
@@ -28,50 +30,49 @@ void CollisionSystem::update(EntityManager& em)
 void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsType& checkedPairs)
 {
     // Si el octree está dividido, revisar sus hijos
-    if (octree.divided)
+    if (octree.isDivided())
     {
-        for (auto& octant : octree.octants)
+        for (auto& octant : octree.getOctants())
         {
             // Si el octante tiene entidades o está dividido, revisar sus colisiones
-            if (octant.get()->entities.size() > 0 || octant.get()->divided)
+            if (octant.get()->getNumEntities() > 0 || octant.get()->isDivided())
                 checkCollision(em, *octant, checkedPairs);
         }
         return;
     }
 
     // Auxiliar octree para guardar las entidades del mismo octante que el que se está comprobando
-    Octree auxOct(octree.depth, octree.bounds, octree.parent, static_cast<uint8_t>(octree.entities.size()));
+    Octree auxOct(octree.getDepth(), octree.getBounds(), octree.getParent(), static_cast<uint8_t>(octree.getNumEntities()));
 
-    // Check collisions between the entities in the sorted order
-    for (auto it1 = octree.entities.begin(); it1 != octree.entities.end(); ++it1)
+    for (auto const& [e, c] : octree.getOctEntities())
     {
-        BBox& bbox1 = it1->second->boundingBox;
+        BBox& bbox1 = c->boundingBox;
 
         // Guardamos las entidades del mismo octante en el auxiliar
-        for (auto it2 = std::next(it1); it2 != octree.entities.end(); ++it2)
-            auxOct.insert(*it2->first, *it2->second);
-
+        for (auto const& [e2, c2] : octree.getOctEntities())
+            if (e != e2 && c != c2)
+                auxOct.insert(*e2, *c2);
 
         // Revisamos las entidades de los octantes vecinos
-        auto neighbors = octree.getNeighbors(*it1->second);
+        auto neighbors = octree.getNeighbors(*c);
         neighbors.push_back(&auxOct);
         for (auto& neighbor : neighbors)
         {
-            for (auto& neighborEntity : neighbor->entities)
+            for (auto const& [nEnt, nCol] : neighbor->getOctEntities())
             {
                 // Si la colisión entre estas dos entidades no se ha comprobado ya, se hace ahora
-                if (checkedPairs.find({ it1->first->getID(), neighborEntity.first->getID() }) == checkedPairs.end() &&
-                    checkedPairs.find({ neighborEntity.first->getID(), it1->first->getID() }) == checkedPairs.end())
+                if (checkedPairs.find({ e->getID(), nEnt->getID() }) == checkedPairs.end() &&
+                    checkedPairs.find({ nEnt->getID(), e->getID() }) == checkedPairs.end())
                 {
-                    BBox& bbox2 = neighborEntity.second->boundingBox;
+                    BBox& bbox2 = nCol->boundingBox;
 
                     if (bbox1.intersects(bbox2))
                     {
-                        Entity& entity1 = *it1->first;
-                        Entity& entity2 = *neighborEntity.first;
+                        Entity& entity1 = *e;
+                        Entity& entity2 = *nEnt;
 
-                        ColliderComponent& collider1 = *it1->second;
-                        ColliderComponent& collider2 = *neighborEntity.second;
+                        ColliderComponent& collider1 = *c;
+                        ColliderComponent& collider2 = *nCol;
 
                         // Solo compruebo colisiones cuando no sean ENEMY ambas.
                         if (!(collider1.behaviorType & BehaviorType::ENEMY) || !(collider2.behaviorType & BehaviorType::ENEMY))
@@ -83,8 +84,8 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
                         }
 
                         // Marcamos la colisión entre ambas entidades como comprobada
-                        checkedPairs.insert({ it1->first->getID(), neighborEntity.first->getID() });
-                        checkedPairs.insert({ neighborEntity.first->getID(), it1->first->getID() });
+                        checkedPairs.insert({ e->getID(), nEnt->getID() });
+                        checkedPairs.insert({ nEnt->getID(), e->getID() });
                     }
                 }
             }
@@ -94,21 +95,67 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
 
 void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
 {
+    // Sacamos las físicas para pasarlas por parámetro swaps
+    auto& staticPhy = em.getComponent<PhysicsComponent>(staticEnt);
+    auto& otherPhy = em.getComponent<PhysicsComponent>(otherEnt);
+
+    // Si el objeto es el suelo o una pared - importante que sea el primero porque es el tipo de colisión más común
+    if (behaviorType1 & BehaviorType::STATIC || behaviorType2 & BehaviorType::STATIC)
+    {
+        handleStaticCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, minOverlap, behaviorType1, behaviorType2);
+        return;
+    }
+
+    // Segundo tipo de colisión más común, colisiones con zonas
+    if ((behaviorType1 & BehaviorType::ZONE || behaviorType2 & BehaviorType::ZONE))
+    {
+        handleZoneCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, behaviorType1, behaviorType2);
+        return;
+    }
+
+    // Colisiones de balas con enemigos o jugadores
+    bool isAtkPlayer1 = behaviorType1 & BehaviorType::ATK_PLAYER;
+    bool isAtkPlayer2 = behaviorType2 & BehaviorType::ATK_PLAYER;
+    bool isAtkEnemy1 = behaviorType1 & BehaviorType::ATK_ENEMY;
+    bool isAtkEnemy2 = behaviorType2 & BehaviorType::ATK_ENEMY;
+
+
+    if (isAtkPlayer1 || isAtkPlayer2 || isAtkEnemy1 || isAtkEnemy2)
+    {
+        handleAtkCollision(em, isAtkPlayer1, isAtkPlayer2, isAtkEnemy1, isAtkEnemy2, staticEnt, otherEnt);
+        return;
+    }
+
+    // Colisiones de enemigos con el jugador
+    if (behaviorType1 & BehaviorType::PLAYER || behaviorType2 & BehaviorType::PLAYER)
+    {
+        handlePlayerCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, minOverlap, behaviorType1, behaviorType2);
+        return;
+    }
+
+    // Esto ya es cualquier colisión que no sea de player, paredes, zonas o ataques
+    nonStaticCollision(staticPhy, otherPhy, minOverlap);
+}
+
+void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
+{
     // Sacamos punteros de las físicas y de las entidades para poder hacer swaps
-    auto* staticPhy = &em.getComponent<PhysicsComponent>(staticEnt);
-    auto* otherPhy = &em.getComponent<PhysicsComponent>(otherEnt);
+    auto* staticPhy = &statPhy;
+    auto* otherPhy = &othrPhy;
 
     auto* staticEntPtr = &staticEnt;
     auto* otherEntPtr = &otherEnt;
 
-    if(staticEntPtr->hasTag<ZoneTag>() || otherEntPtr->hasTag<ZoneTag>()){
-        if(otherEntPtr->hasTag<ZoneTag>()){
-            std::swap(staticEntPtr, otherEntPtr);
-            std::swap(staticPhy, otherPhy);
-        }
-        if(otherEntPtr->hasTag<PlayerTag>())
-            em.getComponent<ZoneComponent>(*staticEntPtr).changeZone = true;
-        
+    // Comprobar si es un objeto estático - el objeto estático quedará en staticEnt y el otro en otherEnt
+    if (behaviorType2 & BehaviorType::STATIC)
+    {
+        std::swap(staticPhy, otherPhy);
+        std::swap(staticEntPtr, otherEntPtr);
+        std::swap(behaviorType1, behaviorType2);
+    }
+
+    if (behaviorType2 & BehaviorType::ZONE)
+    {
         return;
     }
     //Compruebo si el enemigo colisiona con un objeto estatico
@@ -135,98 +182,99 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     
     if (behaviorType1 & BehaviorType::STATIC || behaviorType2 & BehaviorType::STATIC)
     {
-        // Comprobar si es un objeto estático - el objeto estático quedará en staticEnt y el otro en otherEnt
-        if (behaviorType2 & BehaviorType::STATIC)
-        {
-            std::swap(staticPhy, otherPhy);
-            std::swap(staticEntPtr, otherEntPtr);
-            std::swap(behaviorType1, behaviorType2);
-        }
+        std::swap(staticPhy, otherPhy);
+        std::swap(staticEntPtr, otherEntPtr);
+        std::swap(behaviorType1, behaviorType2);
 
-        // Nos aseguramos que el suelo siempre esté en staticEntPtr
         if (otherEntPtr->hasTag<GroundTag>() || otherEntPtr->hasTag<WaterTag>())
-        {
-            std::swap(staticPhy, otherPhy);
-            std::swap(staticEntPtr, otherEntPtr);
-            std::swap(behaviorType1, behaviorType2);
-
-            if (otherEntPtr->hasTag<GroundTag>() || otherEntPtr->hasTag<WaterTag>())
-            {
-                floorCollision(*staticPhy, *otherPhy, minOverlap);
-                return;
-            }
-        }
-
-        // Colisiones con el suelo
-        if (staticEntPtr->hasTag<GroundTag>())
-        {
-            groundCollision(*otherPhy, em.getComponent<RenderComponent>(*otherEntPtr).scale, minOverlap);
-            return;
-        }
-
-        // Si las paredes chocan entre ellas
-        if (behaviorType1 & BehaviorType::STATIC && behaviorType2 & BehaviorType::STATIC)
         {
             floorCollision(*staticPhy, *otherPhy, minOverlap);
             return;
         }
+    }
 
-        // Si el objeto estático es un objeto
-        if (otherEntPtr->hasTag<PlayerTag>() && staticEntPtr->hasTag<ObjectTag>())
-        {
-            em.getComponent<ObjectComponent>(*staticEntPtr).effect();
-            return;
-        }
-
-        // Si cualquiera de los impactos es con una bala, se baja la vida del otro
-        if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
-        {
-            em.getComponent<LifeComponent>(*otherEntPtr).decreaseLife();
-            return;
-        }
-
-        // Colisiones con paredes
-        staticCollision(*otherPhy, *staticPhy, minOverlap);
+    // Colisiones con el suelo
+    if (staticEntPtr->hasTag<GroundTag>())
+    {
+        groundCollision(*otherPhy, em.getComponent<RenderComponent>(*otherEntPtr).scale, minOverlap);
         return;
     }
 
-    bool isBulletPlayer1 = behaviorType1 & BehaviorType::ATK_PLAYER;
-    bool isBulletPlayer2 = behaviorType2 & BehaviorType::ATK_PLAYER;
-    bool isBulletEnemy1 = behaviorType1 & BehaviorType::ATK_ENEMY;
-    bool isBulletEnemy2 = behaviorType2 & BehaviorType::ATK_ENEMY;
-
-    if (isBulletPlayer1 || isBulletPlayer2 || isBulletEnemy1 || isBulletEnemy2)
+    // Si las paredes chocan entre ellas
+    if (behaviorType1 & BehaviorType::STATIC && behaviorType2 & BehaviorType::STATIC)
     {
-        bulletCollision(isBulletPlayer1, isBulletPlayer2, isBulletEnemy1, isBulletEnemy2, em, *staticEntPtr, *otherEntPtr);
+        floorCollision(*staticPhy, *otherPhy, minOverlap);
         return;
     }
 
-    if (behaviorType2 & BehaviorType::PLAYER || behaviorType1 & BehaviorType::PLAYER)
+    // Si el objeto estático es un objeto
+    if (otherEntPtr->hasTag<PlayerTag>() && staticEntPtr->hasTag<ObjectTag>())
     {
-        if (behaviorType2 & BehaviorType::PLAYER)
+        em.getComponent<ObjectComponent>(*staticEntPtr).effect();
+        return;
+    }
+
+    // Si cualquiera de los impactos es con una bala, se baja la vida del otro
+    if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
+    {
+        em.getComponent<LifeComponent>(*otherEntPtr).decreaseLife();
+        return;
+    }
+
+    // Colisiones con paredes
+    staticCollision(*otherPhy, *staticPhy, minOverlap);
+}
+
+void CollisionSystem::handleZoneCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, BehaviorType behaviorType1, BehaviorType behaviorType2)
+{
+    if (behaviorType1 & BehaviorType::PLAYER || behaviorType2 & BehaviorType::PLAYER)
+    {
+        // Sacamos punteros de las físicas y de las entidades para poder hacer swaps
+        auto* staticPhy = &statPhy;
+        auto* otherPhy = &othrPhy;
+
+        auto* staticEntPtr = &staticEnt;
+        auto* otherEntPtr = &otherEnt;
+
+        if (behaviorType2 & BehaviorType::ZONE)
         {
             std::swap(staticEntPtr, otherEntPtr);
             std::swap(staticPhy, otherPhy);
         }
-        classicCollision(*staticPhy, *otherPhy, minOverlap);
-        enemyCollision(em, *staticEntPtr);
-        return;
-    }
 
-    nonStaticCollision(*staticPhy, *otherPhy, minOverlap);
+        em.getComponent<ZoneComponent>(*staticEntPtr).changeZone = true;
+    }
 }
 
-void CollisionSystem::bulletCollision(bool& bulletPl1, bool& bulletPl2, bool& bulletEn1, bool& bulletEn2, EntityManager& em, Entity& entity1, Entity& entity2)
+void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, vec3f& minOverlap, BehaviorType, BehaviorType behaviorType2)
+{
+    // Sacamos punteros de las físicas y de las entidades para poder hacer swaps
+    auto* staticPhy = &statPhy;
+    auto* otherPhy = &othrPhy;
+
+    auto* staticEntPtr = &staticEnt;
+    auto* otherEntPtr = &otherEnt;
+
+    if (behaviorType2 & BehaviorType::PLAYER)
+    {
+        std::swap(staticEntPtr, otherEntPtr);
+        std::swap(staticPhy, otherPhy);
+    }
+    classicCollision(*staticPhy, *otherPhy, minOverlap);
+    enemyCollision(em, *staticEntPtr);
+}
+
+void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& atkPl2, bool& atkEn1, bool& atkEn2, Entity& entity1, Entity& entity2)
 {
     // Nos aseguramos que haya una bala que provenga de alguna de las dos entidades
-    if (bulletPl1 || bulletPl2 || bulletEn1 || bulletEn2)
+    if (atkPl1 || atkPl2 || atkEn1 || atkEn2)
     {
         // Punteros a las entidades
         auto* ent1Ptr = &entity1;
         auto* ent2Ptr = &entity2;
 
         // Nos aseguramos que la bala esté en sea la de la entidad 1
-        if (bulletPl2 || bulletEn2)
+        if (atkPl2 || atkEn2)
         {
             std::swap(ent1Ptr, ent2Ptr);
         }
@@ -237,7 +285,7 @@ void CollisionSystem::bulletCollision(bool& bulletPl1, bool& bulletPl2, bool& bu
         bool isEnemy2 = em.getComponent<ColliderComponent>(*ent2Ptr).behaviorType & BehaviorType::ENEMY;
 
         // Si la bala es del jugador y ha colisionado con un enemigo, o si la bala es de un enemigo y ha colisionado con el jugador, se baja la vida
-        if ((isPlayer2 && (bulletEn1 || bulletEn2)) || (isEnemy2 && (bulletPl1 || bulletPl2)))
+        if ((isPlayer2 && (atkEn1 || atkEn2)) || (isEnemy2 && (atkPl1 || atkPl2)))
         {
             em.getComponent<LifeComponent>(*ent1Ptr).decreaseLife();
             em.getComponent<LifeComponent>(*ent2Ptr).decreaseLifeNextFrame = true;
@@ -280,7 +328,7 @@ void CollisionSystem::enemyCollision(EntityManager& em, Entity& damagedEntity)
     em.getComponent<LifeComponent>(damagedEntity).decreaseLife();
 }
 
-// Efecto de cuando se choca contra una pared
+// Efecto de cuando se choca contra una pared - podría expandirse para más usos en el futuro
 void CollisionSystem::staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3f& minOverlap)
 {
     classicCollision(playerPhysics, staticPhysics, minOverlap);
