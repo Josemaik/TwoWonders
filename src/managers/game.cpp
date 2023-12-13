@@ -151,9 +151,9 @@ void game()
         projectile_system.update(em, deltaTime);
         life_system.update(em, deltaTime);
 
-        if (!render_system.update(em, engine)){
-            map.createMap(em);
+        if (!render_system.update(em, engine)) {
             createEntities(em);
+            map.createMap(em);
         }
     }
 

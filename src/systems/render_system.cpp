@@ -46,7 +46,7 @@ bool RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     if (l.elapsed < l.countdown)
                         colorEntidad = YELLOW;
                 }
-                if(!e.hasTag<ZoneTag>())
+                if (!e.hasTag<ZoneTag>())
                     engine.drawCube(r.position, r.scale.x(), r.scale.y(), r.scale.z(), colorEntidad);
                 engine.drawCubeWires(r.position, r.scale.x(), r.scale.y(), r.scale.z(), BLACK);
             }

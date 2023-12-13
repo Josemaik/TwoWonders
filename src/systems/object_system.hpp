@@ -11,9 +11,9 @@ struct ObjectSystem
 
     void update(EntityManager& em, float deltaTime);
 
-    private:
-        void explodeBomb(EntityManager& em, Entity& ent);
-        void createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type);
+private:
+    void explodeBomb(EntityManager& em, Entity& ent);
+    void createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type);
 };
 
 #endif // !OBJECT_SYSTEM

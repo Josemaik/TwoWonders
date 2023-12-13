@@ -4,21 +4,21 @@
 void Octree::insert(Entity& entity, ColliderComponent& collider)
 {
     //std::size_t s = countEntities();
-    if (!divided && entities.size() < max_ent)
+    if (!divided_ && octEntities_.size() < max_ent_)
     {
-        entities.push_back({ &entity, &collider });
+        octEntities_.push_back({ &entity, &collider });
     }
-    else if (depth < MAX_DEPTH)
+    else if (depth_ < MAX_DEPTH)
     {
-        if (!divided)
+        if (!divided_)
         {
             subdivide();
-            divided = true;
+            divided_ = true;
         }
 
-        for (auto& octant : octants)
+        for (auto& octant : octants_)
         {
-            if (octant->bounds.intersects(collider.boundingBox))
+            if (octant->bounds_.intersects(collider.boundingBox))
             {
                 octant->insert(entity, collider);
             }
@@ -30,8 +30,8 @@ void Octree::insert(Entity& entity, ColliderComponent& collider)
 // Cuando el octree excede su capacidad de entidades, se divide en 8 octantes
 void Octree::subdivide()
 {
-    vec3f size = bounds.size() / 2.0f;
-    vec3f center = bounds.center();
+    vec3f size = bounds_.size() / 2.0f;
+    vec3f center = bounds_.center();
 
     std::array<vec3f, 8> offsets =
     {
@@ -49,16 +49,16 @@ void Octree::subdivide()
     {
         vec3f octantCenter = center + offsets[i] * size;
         BBox octantBounds(octantCenter, size);
-        octants[i] = std::make_unique<Octree>(depth + 1, octantBounds, this);
+        octants_[i] = std::make_unique<Octree>(depth_ + 1, octantBounds, this);
     }
 
     // // Redistribute existing entities to new octants
     OctVector toRemove;
-    for (auto& entity : entities)
+    for (auto& entity : octEntities_)
     {
-        for (auto& octant : octants)
+        for (auto& octant : octants_)
         {
-            if (octant->bounds.intersects(entity.second->boundingBox))
+            if (octant->bounds_.intersects(entity.second->boundingBox))
             {
                 octant->insert(*entity.first, *entity.second);
                 toRemove.push_back(entity);
@@ -73,7 +73,7 @@ void Octree::subdivide()
         remove(entity);
     }
 
-    divided = true;
+    divided_ = true;
 }
 
 // Función para obtener los vecinos con los que una entidad interacciona fuera de su octante
@@ -83,7 +83,7 @@ std::vector<Octree*> Octree::getNeighbors(ColliderComponent const& collider)
     std::set<std::size_t> removeFromNeighbors;
 
     // Check the parent node and its ancestors
-    getParentsRecursive(parent, collider, neighbors);
+    getParentsRecursive(parent_, collider, neighbors);
 
     // Check the children of the neighboring nodes
     std::vector<Octree*> newNeighbors = neighbors;
@@ -107,20 +107,20 @@ std::vector<Octree*> Octree::getNeighbors(ColliderComponent const& collider)
 // Función para buscar los hijos de un nodo específico recursivamente
 void Octree::getChildrenRecursive(Octree* node, ColliderComponent const& collider, std::vector<Octree*>& neighbors, std::set<std::size_t>& removeFromNeighbors, std::size_t position)
 {
-    if (node->divided)
+    if (node->divided_)
     {
         removeFromNeighbors.insert(position);
 
-        for (const auto& octant : node->octants)
+        for (const auto& octant : node->octants_)
         {
-            if (octant->bounds.intersects(collider.boundingBox) && octant.get() != this)
+            if (octant->bounds_.intersects(collider.boundingBox) && octant.get() != this)
             {
                 neighbors.push_back(octant.get());
                 getChildrenRecursive(octant.get(), collider, neighbors, removeFromNeighbors, neighbors.size() - 1);
             }
         }
     }
-    else if (node->entities.empty())
+    else if (node->octEntities_.empty())
     {
         removeFromNeighbors.insert(position);
     }
@@ -133,18 +133,18 @@ void Octree::getParentsRecursive(Octree* node, ColliderComponent const& collider
     {
         neighbors.push_back(node);
 
-        if (node->parent != nullptr)
+        if (node->parent_ != nullptr)
         {
-            for (const auto& octant : node->parent->octants)
+            for (const auto& octant : node->parent_->octants_)
             {
-                if (octant->bounds.intersects(collider.boundingBox) && octant.get() != node)
+                if (octant->bounds_.intersects(collider.boundingBox) && octant.get() != node)
                 {
                     neighbors.push_back(octant.get());
                 }
             }
         }
 
-        getParentsRecursive(node->parent, collider, neighbors);
+        getParentsRecursive(node->parent_, collider, neighbors);
     }
 }
 
@@ -154,13 +154,13 @@ Octree::OctVector Octree::query(const BBox& box)
     Octree::OctVector found{};
 
     // Revisar si la entidad se encuentra en el nodo actual
-    if (!bounds.intersects(box))
+    if (!bounds_.intersects(box))
         return found;
 
     // Si está dividido, buscar en los octantes
-    if (divided)
+    if (divided_)
     {
-        for (const auto& octant : octants)
+        for (const auto& octant : octants_)
         {
             auto octantFound = octant->query(box);
             found.insert(found.end(), octantFound.begin(), octantFound.end());
@@ -169,7 +169,7 @@ Octree::OctVector Octree::query(const BBox& box)
     else
     {
         // Si no está dividido, buscar en las entidades
-        for (const auto& entity : entities)
+        for (const auto& entity : octEntities_)
         {
             if (box.intersects(entity.second->boundingBox))
             {
@@ -184,11 +184,11 @@ Octree::OctVector Octree::query(const BBox& box)
 // Contamos las entidades que hay en el octante y en sus hijos
 std::size_t Octree::countEntities() const
 {
-    std::size_t count = entities.size();
+    std::size_t count = octEntities_.size();
 
-    if (divided)
+    if (divided_)
     {
-        for (const auto& octant : octants)
+        for (const auto& octant : octants_)
         {
             count += octant->countEntities();
         }
@@ -200,16 +200,16 @@ std::size_t Octree::countEntities() const
 // Función para recombinar hijos del cotree - no usada
 void Octree::recombine()
 {
-    if (divided)
+    if (divided_)
     {
-        for (auto& octant : octants)
+        for (auto& octant : octants_)
         {
-            auto& octantEntities = octant->entities;
-            entities.insert(entities.end(), octantEntities.begin(), octantEntities.end());
+            auto& octantEntities = octant->octEntities_;
+            octEntities_.insert(octEntities_.end(), octantEntities.begin(), octantEntities.end());
             octant.reset();
         }
 
-        divided = false;
+        divided_ = false;
     }
 }
 
@@ -217,11 +217,11 @@ void Octree::recombine()
 void Octree::remove(std::pair<Entity*, ColliderComponent*>& entity)
 {
     // Check if the entity is in the current Octree node
-    for (auto it = entities.begin(); it != entities.end(); ++it)
+    for (auto it = octEntities_.begin(); it != octEntities_.end(); ++it)
     {
         if (it->first == entity.first && it->second == entity.second)
         {
-            entities.erase(it);
+            octEntities_.erase(it);
             return;
         }
     }
