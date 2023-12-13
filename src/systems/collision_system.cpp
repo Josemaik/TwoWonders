@@ -111,7 +111,28 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         
         return;
     }
-
+    //Compruebo si el enemigo colisiona con un objeto estatico
+    if ((behaviorType1 & BehaviorType::ENEMY && behaviorType2 & BehaviorType::STATIC) ||
+    (behaviorType2 & BehaviorType::ENEMY && behaviorType1 & BehaviorType::STATIC))
+    {
+        //Compruebo colision vertical
+        if(em.getComponent<PhysicsComponent>(otherEnt).velocity.x() < 0.0f && 
+        em.getComponent<PhysicsComponent>(otherEnt).velocity.x() != 0.0f){
+            //iZQUIERDA
+            //elegir de forma aleatoria entre arriba,abajo y derecha
+            //poner la velocidad
+        }else{
+            //Derecha
+        }
+        //Compruebo colision horizontal
+        if(em.getComponent<PhysicsComponent>(otherEnt).velocity.z() < 0.0f && 
+        em.getComponent<PhysicsComponent>(otherEnt).velocity.z() != 0.0f){
+            //Arriba
+        }else{
+            //Abajo
+        }
+    }
+    
     if (behaviorType1 & BehaviorType::STATIC || behaviorType2 & BehaviorType::STATIC)
     {
         // Comprobar si es un objeto estático - el objeto estático quedará en staticEnt y el otro en otherEnt

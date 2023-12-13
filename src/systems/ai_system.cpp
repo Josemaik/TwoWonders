@@ -123,10 +123,10 @@ bool AISystem::isInDesiredRange(const vec3f& direction, float xmin, float xmax, 
 vec3f AISystem::getRandomDir() {
     // Genero direccion aleatoria
     switch (std::rand() % 4) {
-    case 0:  return { 0.25f, 0.0f, 0.0f }; break;
-    case 1:  return { -0.25f, 0.0f, 0.0f }; break;
-    case 2:  return { 0.0f, 0.0f, 0.25f }; break;
-    case 3:  return { 0.0f, 0.0f, -0.25f }; break;
+    case 0:  return { 0.25f, 0.0f, 0.0f }; break; //derecha
+    case 1:  return { -0.25f, 0.0f, 0.0f }; break; //izquieda
+    case 2:  return { 0.0f, 0.0f, 0.25f }; break; //Abajo
+    case 3:  return { 0.0f, 0.0f, -0.25f }; break; //Arriba
     default: return { -0.25f, 0.0f, 0.0f }; break;
     }
 }
