@@ -77,4 +77,5 @@
         "valarray": "cpp",
         "*.inc": "cpp"
     },
+    "C_Cpp.codeAnalysis.clangTidy.enabled": true,
 }

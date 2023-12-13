@@ -32,7 +32,7 @@ bool RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
         if (e.hasComponent<RenderComponent>())
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
-            if(r.visible){
+            if (r.visible) {
                 // Revisamos si es el jugador para mover la cámara
                 if (e.hasTag<PlayerTag>())
                 {

@@ -2,7 +2,7 @@
 #include "game_engine.hpp"
 //#include "../utils/memory_viewer.hpp"
 
-void createWallsZelda(EntityManager& em) 
+void createWallsZelda(EntityManager& em)
 {
     std::vector<std::pair<vec3f, vec3f>> wallData = {
 
@@ -13,7 +13,6 @@ void createWallsZelda(EntityManager& em)
 
         { { -11.0f, 0.0f, -5.5f }, { 3.0f, 1.0f, 8.0f } },   // | 
         { { -11.0f, 0.0f, 5.5f }, { 3.0f, 1.0f, 8.0f } },    // | Pared Vertical Izquierda
-        
         { { 0.0f, 0.0f, 8.0f }, { 19.0f, 1.0f, 3.0f } },     // | Pared Horizontal Abajo
         { { 11.0f, 0.0f, 0.0f }, { 3.0f, 1.0f, 19.0f } },    // | Pared Vertical Derecha
 
@@ -63,7 +62,6 @@ void createWallsZelda(EntityManager& em)
 
         { { -37.0f, 0.0f, 8.0f }, { 11.0f, 1.0f, 3.0f } },   // | 
         { { -50.0f, 0.0f, 8.0f }, { 5.0f, 1.0f, 3.0f } },    // | Pared Horizontal Abajo
-        
         { { -51.5f, 0.0f, -8.0f }, { 2.0f, 1.0f, 3.0f } },   // | 
         { { -37.0f, 0.0f, -8.0f }, { 11.0f, 1.0f, 3.0f } },  // | Pared Horizontal Arriba
 
@@ -106,7 +104,8 @@ void createWallsZelda(EntityManager& em)
     }
 }
 
-void createGroundWaterZelda(EntityManager& em){
+void createGroundWaterZelda(EntityManager& em) {
+
     struct EntityData
     {
         vec3f position;
@@ -132,7 +131,8 @@ void createGroundWaterZelda(EntityManager& em){
 
     EntityData entitiesW[] = {
     { { -45.f, -1.5f, -0.0f }, { 5.0f, 2.f, 30.f }, SKYBLUE },
-    { { -45.f, -1.5f, -30.0f }, { 5.0f, 2.f, 30.f }, SKYBLUE },
+    { { -45.f, -1.5f, -32.0f }, { 5.0f, 2.f, 30.f }, SKYBLUE },
+
     //{ { 15.f, -1.5f, 8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
     //{ { 15.f, -1.5f, 17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
     //{ { 15.f, -1.5f, -17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
@@ -148,7 +148,8 @@ void createGroundWaterZelda(EntityManager& em){
         auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
     }
-} 
+}
+
 
 void createWalls(EntityManager& em)
 {
@@ -188,7 +189,7 @@ struct EnemyData {
     float stop{};
     float detect_radius;
     int num_lifes;
-    float Xmin{},Xmax{},Zmin{},Zmax{};
+    float Xmin{}, Xmax{}, Zmin{}, Zmax{};
     bool visible{};
 };
 // void createEnemies(EntityManager& em)
@@ -359,7 +360,7 @@ void createEnemiesZelda(EntityManager& em)
     {
         auto& enemy{ em.newEntity() };
         em.addTag<EnemyTag>(enemy);
-        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = data.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE ,.visible=data.visible});
+        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = data.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE ,.visible = data.visible });
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = { .2f, .0f, .0f } });
         em.addComponent<AIComponent>(enemy, AIComponent{ .current_type = data.aiType,
         .patrol = data.route,
@@ -375,11 +376,12 @@ void createEnemiesZelda(EntityManager& em)
         if (data.aiType == AIComponent::AI_type::ShoterEnemy2) {
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.0f });
         }
-        if(data.aiType == AIComponent::AI_type::RandomEnemy){
-             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
+        if (data.aiType == AIComponent::AI_type::RandomEnemy) {
+            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
         }
     }
 }
+
 
 void createGroundWater(EntityManager& em)
 {
@@ -406,12 +408,12 @@ void createGroundWater(EntityManager& em)
     }
 
     EntityData entitiesW[] = {
-    { { 15.f, -1.5f, -8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
-    { { 15.f, -1.5f, 8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
-    { { 15.f, -1.5f, 17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
-    { { 15.f, -1.5f, -17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
-    { { -15.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE },
-    { { 45.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE }
+        { { 15.f, -1.5f, -8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
+        { { 15.f, -1.5f, 8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
+        { { 15.f, -1.5f, 17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
+         { { 15.f, -1.5f, -17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
+          { { -15.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE },
+           { { 45.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE }
     };
 
     for (const auto& data : entitiesW)
@@ -427,11 +429,13 @@ void createGroundWater(EntityManager& em)
 void createSword(EntityManager& em)
 {
     auto& e{ em.newEntity() };
-    em.addTag<Object>(e);
+
+    em.addTag<ObjectTag>(e);
+
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -6.0f, 0.f, -5.0f }, .scale = { 1.0f, 0.3f, 0.3f }, .color = LIGHTGRAY });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword});
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword });
 }
 
 void createEntities(EntityManager& em)
@@ -451,7 +455,7 @@ void createEntities(EntityManager& em)
 
     // Ground and water (Zelda NES)
     createGroundWaterZelda(em);
-    
+
     // Ground and water
     // createGroundWater(em);
 
@@ -509,7 +513,6 @@ void game()
 
         if (!render_system.update(em, engine))
             createEntities(em);
-
     }
 
     engine.closeWindow();

@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cstdio>
+#include <type_traits>
 
 constexpr std::size_t default_width{ 16 };
 
