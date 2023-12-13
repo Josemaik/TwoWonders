@@ -98,7 +98,7 @@ void createWallsZelda(EntityManager& em)
     for (const auto& [pos, scl] : wallData)
     {
         auto& wall{ em.newEntity() };
-        auto& wr = em.addComponent<RenderComponent>(wall, RenderComponent{ .position = pos, .scale = scl, .color = GRAY });
+        auto& wr = em.addComponent<RenderComponent>(wall, RenderComponent{ .position = pos, .scale = scl, .color = LIME });
         auto& wp = em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = { wr.position }, .velocity = { .0f, .0f, .0f } });
         em.addComponent<ColliderComponent>(wall, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
     }
@@ -114,10 +114,9 @@ void createGroundWaterZelda(EntityManager& em) {
     };
 
     EntityData entitiesG[] = {
-        { { 0.f, -1.5f, 0.f }, { 85.0f, 2.f, 100.f }, GREEN },
-        { { -52.5f, -1.5f, 0.f }, { 10.0f, 2.f, 100.f }, GREEN },
+        { { 0.f, -1.5f, 0.f }, { 85.0f, 2.f, 100.f }, BEIGE },
+        { { -52.5f, -1.5f, 0.f }, { 10.0f, 2.f, 100.f }, BEIGE },
         { { -45.f, -1.5f, -16.f }, { 5.0f, 2.f, 2.0f }, ORANGE },
-        //{ { 30.0f, -1.5f, 0.0f }, { 25.0f, 2.f, 30.0f }, GREEN },
     };
 
     for (const auto& data : entitiesG)
@@ -151,36 +150,36 @@ void createGroundWaterZelda(EntityManager& em) {
 }
 
 
-void createWalls(EntityManager& em)
-{
-    std::vector<std::pair<vec3f, vec3f>> wallData = {
-        { { 38.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 7.0f } },  // |
-        { { 21.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 7.0f } },  // |
-        { { 38.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 7.0f } }, // |
-        { { 21.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 7.0f } }, // | - Paredes
-        { { 24.5f, 0.0f, -9.5f }, { 7.0f, 1.0f, 1.0f } }, // | - Exteriores
-        { { 24.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },  // |
-        { { 35.5f, 0.0f, -9.5f }, { 7.0f, 1.0, 1.0f } },  // |
-        { { 35.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },  // |
-
-        { { 5.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },     // |
-        { { 5.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },    // |
-        { { -5.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },    // |
-        { { -5.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },   // | - Cuadrados
-        { { 5.f, 0.0f, 0.f }, { 3.0f, 1.0f, 3.0f } },     // | - Interiores
-        { { -5.f, 0.0f, 0.f }, { 3.0f, 1.0f, 3.0f } },    // |
-        { { 0.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },    // |
-        { { 0.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },     // |
-    };
-
-    for (const auto& [pos, scl] : wallData)
-    {
-        auto& wall{ em.newEntity() };
-        auto& wr = em.addComponent<RenderComponent>(wall, RenderComponent{ .position = pos, .scale = scl, .color = GRAY });
-        auto& wp = em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = { wr.position }, .velocity = { .0f, .0f, .0f } });
-        em.addComponent<ColliderComponent>(wall, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
-    }
-}
+//void createWalls(EntityManager& em)
+//{
+//    std::vector<std::pair<vec3f, vec3f>> wallData = {
+//        { { 38.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 7.0f } },  // |
+//        { { 21.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 7.0f } },  // |
+//        { { 38.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 7.0f } }, // |
+//        { { 21.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 7.0f } }, // | - Paredes
+//        { { 24.5f, 0.0f, -9.5f }, { 7.0f, 1.0f, 1.0f } }, // | - Exteriores
+//        { { 24.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },  // |
+//        { { 35.5f, 0.0f, -9.5f }, { 7.0f, 1.0, 1.0f } },  // |
+//        { { 35.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },  // |
+//
+//        { { 5.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },     // |
+//        { { 5.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },    // |
+//        { { -5.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },    // |
+//        { { -5.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },   // | - Cuadrados
+//        { { 5.f, 0.0f, 0.f }, { 3.0f, 1.0f, 3.0f } },     // | - Interiores
+//        { { -5.f, 0.0f, 0.f }, { 3.0f, 1.0f, 3.0f } },    // |
+//        { { 0.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },    // |
+//        { { 0.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },     // |
+//    };
+//
+//    for (const auto& [pos, scl] : wallData)
+//    {
+//        auto& wall{ em.newEntity() };
+//        auto& wr = em.addComponent<RenderComponent>(wall, RenderComponent{ .position = pos, .scale = scl, .color = GRAY });
+//        auto& wp = em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = { wr.position }, .velocity = { .0f, .0f, .0f } });
+//        em.addComponent<ColliderComponent>(wall, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
+//    }
+//}
 struct EnemyData {
     AIComponent::AI_type aiType;
     vec3f position;
@@ -443,7 +442,7 @@ void createEntities(EntityManager& em)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -38.0f, 0.f, -10.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });

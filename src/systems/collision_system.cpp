@@ -229,8 +229,8 @@ void CollisionSystem::groundCollision(PhysicsComponent& playerPhysics, vec3f& pl
 // Si el suelo choca contra el suelo, solo se desplaza en X o Z (también se usa para paredes con paredes)
 void CollisionSystem::floorCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap)
 {
-    auto& pos1 = phy1.position;
-    auto& pos2 = phy2.position;
+    // auto& pos1 = phy1.position;
+    // auto& pos2 = phy2.position;
 
     if (minOverlap.x() < minOverlap.y() && minOverlap.x() < minOverlap.z())
     {
@@ -263,8 +263,8 @@ void CollisionSystem::nonStaticCollision(PhysicsComponent& phy2, PhysicsComponen
 // Colisión que desplaza una entidad en el eje que tenga el mínimo solape con quien haya chocado
 void CollisionSystem::classicCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap)
 {
-    auto& pos1 = phy1.position;
-    auto& pos2 = phy2.position;
+    // auto& pos1 = phy1.position;
+    // auto& pos2 = phy2.position;
 
     // Si el solape en X es menor que el solape en Y y Z, desplazar en X, la misma lógica para el resto
     if (minOverlap.x() < minOverlap.y() && minOverlap.x() < minOverlap.z())
