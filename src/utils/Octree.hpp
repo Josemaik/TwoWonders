@@ -28,6 +28,6 @@ struct Octree {
     Octree* parent;
     uint8_t max_ent{ MAX_ENTITIES };
 
-    static const uint8_t MAX_ENTITIES = 5;
+    static const uint8_t MAX_ENTITIES = 10;
     static const uint8_t MAX_DEPTH = 10;
 };
