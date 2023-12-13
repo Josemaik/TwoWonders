@@ -52,22 +52,6 @@ vec3f AISystem::FollowPatrol(PhysicsComponent& p,PatrolComponent& pc) {
     }
     return distance;
 }
-vec3f AISystem::getRandomPosinRange(float xmin, float xmax,float zmin,float zmax){
-        //Semilla para generar numeros aleatorios
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        // creo rangos
-        std::uniform_real_distribution<float> rangoX(xmin, xmax);
-        std::uniform_real_distribution<float> rangoZ(zmin, zmax);
-        // obtengo x y z aleatoria
-        float x = rangoX(gen);
-        float z;
-         do {
-            z = rangoZ(gen);
-        } while (z >= -18.0f && z <= -13.0f);
-
-
-
 vec3f AISystem::getRandomPosinRange(float xmin, float xmax, float zmin, float zmax) {
     //Semilla para generar numeros aleatorios
     std::random_device rd;
