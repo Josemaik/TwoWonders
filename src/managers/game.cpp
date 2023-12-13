@@ -40,7 +40,7 @@ struct EnemyData {
     float stop{};
     float detect_radius;
     int num_lifes;
-    float Xmin{},Xmax{},Zmin{},Zmax{};
+    float Xmin{}, Xmax{}, Zmin{}, Zmax{};
     bool visible{};
 };
 void createEnemies(EntityManager& em)
@@ -84,63 +84,63 @@ void createEnemies(EntityManager& em)
              {-2.0f, 0.f, -13.0f },
              AIComponent::invalid
          },0.0f,5.0f,1,0.0f,0.0f,0.0f,0.0f,true},
-    //      { AIComponent::AI_type::ShoterEnemy,
-    //      {25.0f, 0.0f, -7.0f},
-    //      {
-    //          vec3f{25.0f, 0.0f, -2.0f},
-    //          {37.0f, 0.0f, -2.0f},
-    //           {37.0f, 0.0f, -7.0f},
-    //           {25.0f, 0.0f, -7.0f},
-    //          AIComponent::invalid
-    //      },5.0f,1},
-        //  { AIComponent::AI_type::ShoterEnemy,
-        //  {31.0f, 0.0f, 1.0f},
-        //  {
-        //      vec3f{31.0f, 0.0f, 6.0f},
-        //      {24.0f, 0.0f, 6.0f},
-        //       {24.0f, 0.0f, 1.0f},
-        //       {31.0f, 0.0f, 1.0f},
-        //      AIComponent::invalid
-        //  },5.0f,1}
-        //  { AIComponent::AI_type::ShoterEnemy,
-        //  {35.0f, 0.0f, 0.0f},
-        //  {
-        //      vec3f{33.0f, 0.0f, 3.0f},
-        //      {35.0f, 0.0f, 7.0f},
-        //       {37.0f, 0.0f, 4.0f},
-        //       {35.0f, 0.0f, 0.0f},
-        //      AIComponent::invalid
-        //  },5.0f,1},
-        // { AIComponent::AI_type::ShoterEnemy, //**********
-        //  {30.0f, 0.0f, 2.0f},
-        //  {},5.0f,1}
-         { AIComponent::AI_type::ShoterEnemy2,
-         {15.0f, 0.0f, -4.0f},vec3f{},
-         {
-             vec3f{13.0f, 0.0f, -8.0f},
-             {15.0f, 0.0f, -4.0f},
-             AIComponent::invalid
-         },0.0f,10.0f,2,13.0f,16.0f,-10.0f,-3.0f,false},
-          { AIComponent::AI_type::ShoterEnemy2,
-         {16.0f, 0.0f, 4.0f},vec3f{},
-         {
-             vec3f{13.0f, 0.0f, 10.0f},
-             {16.0f, 0.0f, 4.0f},
-             AIComponent::invalid
-         },0.0f,10.0f,2,13.0f,16.0f,4.0f,10.0f,false},
-        {AIComponent::AI_type::RandomEnemy,
-        {30.0f, 0.0f, 2.0f},{0.2f,0.0f,0.0f},{},3.5f,0.f,1,0.0f,0.0f,0.0f,0.0f,true},
-        {AIComponent::AI_type::RandomEnemy,
-        {24.0f, 0.0f, 6.0f},{0.2f,0.0f,0.0f},{},2.0f,0.f,1,0.0f,0.0f,0.0f,0.0f,true},
-        {AIComponent::AI_type::RandomEnemy,
-        {31.0f, 0.0f, -4.0f},{0.2f,0.0f,0.0f},{},1.0f,0.f,1,0.0f,0.0f,0.0f,0.0f,true}
+        //      { AIComponent::AI_type::ShoterEnemy,
+        //      {25.0f, 0.0f, -7.0f},
+        //      {
+        //          vec3f{25.0f, 0.0f, -2.0f},
+        //          {37.0f, 0.0f, -2.0f},
+        //           {37.0f, 0.0f, -7.0f},
+        //           {25.0f, 0.0f, -7.0f},
+        //          AIComponent::invalid
+        //      },5.0f,1},
+            //  { AIComponent::AI_type::ShoterEnemy,
+            //  {31.0f, 0.0f, 1.0f},
+            //  {
+            //      vec3f{31.0f, 0.0f, 6.0f},
+            //      {24.0f, 0.0f, 6.0f},
+            //       {24.0f, 0.0f, 1.0f},
+            //       {31.0f, 0.0f, 1.0f},
+            //      AIComponent::invalid
+            //  },5.0f,1}
+            //  { AIComponent::AI_type::ShoterEnemy,
+            //  {35.0f, 0.0f, 0.0f},
+            //  {
+            //      vec3f{33.0f, 0.0f, 3.0f},
+            //      {35.0f, 0.0f, 7.0f},
+            //       {37.0f, 0.0f, 4.0f},
+            //       {35.0f, 0.0f, 0.0f},
+            //      AIComponent::invalid
+            //  },5.0f,1},
+            // { AIComponent::AI_type::ShoterEnemy, //**********
+            //  {30.0f, 0.0f, 2.0f},
+            //  {},5.0f,1}
+             { AIComponent::AI_type::ShoterEnemy2,
+             {15.0f, 0.0f, -4.0f},vec3f{},
+             {
+                 vec3f{13.0f, 0.0f, -8.0f},
+                 {15.0f, 0.0f, -4.0f},
+                 AIComponent::invalid
+             },0.0f,10.0f,2,13.0f,16.0f,-10.0f,-3.0f,false},
+              { AIComponent::AI_type::ShoterEnemy2,
+             {16.0f, 0.0f, 4.0f},vec3f{},
+             {
+                 vec3f{13.0f, 0.0f, 10.0f},
+                 {16.0f, 0.0f, 4.0f},
+                 AIComponent::invalid
+             },0.0f,10.0f,2,13.0f,16.0f,4.0f,10.0f,false},
+            {AIComponent::AI_type::RandomEnemy,
+            {30.0f, 0.0f, 2.0f},{0.2f,0.0f,0.0f},{},3.5f,0.f,1,0.0f,0.0f,0.0f,0.0f,true},
+            {AIComponent::AI_type::RandomEnemy,
+            {24.0f, 0.0f, 6.0f},{0.2f,0.0f,0.0f},{},2.0f,0.f,1,0.0f,0.0f,0.0f,0.0f,true},
+            {AIComponent::AI_type::RandomEnemy,
+            {31.0f, 0.0f, -4.0f},{0.2f,0.0f,0.0f},{},1.0f,0.f,1,0.0f,0.0f,0.0f,0.0f,true}
     };
     //POner por parametro tiempo de culldown para disparar
     for (const auto& data : enemyData)
     {
         auto& enemy{ em.newEntity() };
         em.addTag<EnemyTag>(enemy);
-        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = data.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE ,.visible=data.visible});
+        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = data.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE ,.visible = data.visible });
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = { .2f, .0f, .0f } });
         em.addComponent<AIComponent>(enemy, AIComponent{ .current_type = data.aiType,
         .patrol = data.route,
@@ -156,8 +156,8 @@ void createEnemies(EntityManager& em)
         if (data.aiType == AIComponent::AI_type::ShoterEnemy2) {
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.0f });
         }
-        if(data.aiType == AIComponent::AI_type::RandomEnemy){
-             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
+        if (data.aiType == AIComponent::AI_type::RandomEnemy) {
+            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
         }
     }
 }
@@ -187,12 +187,12 @@ void createGroundWater(EntityManager& em)
     }
 
     EntityData entitiesW[] = {
-    { { 15.f, -1.5f, -8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
-    { { 15.f, -1.5f, 8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
-    { { 15.f, -1.5f, 17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
-    { { 15.f, -1.5f, -17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
-    { { -15.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE },
-    { { 45.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE }
+        { { 15.f, -1.5f, -8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
+        { { 15.f, -1.5f, 8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
+        { { 15.f, -1.5f, 17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
+         { { 15.f, -1.5f, -17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
+          { { -15.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE },
+           { { 45.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE }
     };
 
     for (const auto& data : entitiesW)
@@ -208,11 +208,11 @@ void createGroundWater(EntityManager& em)
 void createSword(EntityManager& em)
 {
     auto& e{ em.newEntity() };
-    em.addTag<Object>(e);
+    em.addTag<ObjectTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 40.0f, 0.f, 10.0f }, .scale = { 1.0f, 0.3f, 0.3f }, .color = LIGHTGRAY });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword});
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword });
 }
 
 void createEntities(EntityManager& em)
@@ -220,7 +220,7 @@ void createEntities(EntityManager& em)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 28.0f, 0.f, 10.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 15.0f, 10.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
@@ -229,7 +229,7 @@ void createEntities(EntityManager& em)
 
     // Sword
     createSword(em);
-    
+
     // Ground and water
     createGroundWater(em);
 
@@ -283,7 +283,6 @@ void game()
 
         if (!render_system.update(em, engine))
             createEntities(em);
-
     }
 
     engine.closeWindow();

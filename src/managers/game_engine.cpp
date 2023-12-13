@@ -14,13 +14,13 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
 ////// TIMIING RELATED FUNCTIONS //////
 
-void ENGI::GameEngine::setTargetFPS(int fps){
+void ENGI::GameEngine::setTargetFPS(int fps) {
     SetTargetFPS(fps);
 }
 
-float ENGI::GameEngine::getFrameTime(){
+float ENGI::GameEngine::getFrameTime() {
     return GetFrameTime();
-}  
+}
 
 ////// DRAWING //////
 

@@ -49,7 +49,7 @@ void LifeSystem::createObject(EntityManager& em, vec3f pos){
 
         // Se crea el nuevo objeto
         auto& e{ em.newEntity() };
-        em.addTag<Object>(e);
+        em.addTag<ObjectTag>(e);
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = { 0.5f, 0.5f, 0.5f }, .color = color_nuevo_objeto });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
