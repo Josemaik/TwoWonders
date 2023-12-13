@@ -5,7 +5,7 @@
 struct AIComponent
 {
     //patrol enemy
-    enum struct AI_type { PatrolEnemy, PatrolFollowEnemy, ShoterEnemy, ShoterEnemy2,RandomEnemy };
+    enum struct AI_type { PatrolEnemy, PatrolFollowEnemy, ShoterEnemy, ShootPlayer,RandomEnemy };
     AI_type current_type{};
     static constexpr vec3f invalid{};
     static constexpr uint8_t max_patrol{ 10 };

@@ -180,17 +180,6 @@ void createWalls(EntityManager& em)
         em.addComponent<ColliderComponent>(wall, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
     }
 }
-struct EnemyData {
-    AIComponent::AI_type aiType;
-    vec3f position;
-    vec3f velocity;
-    std::array<vec3f, 10> route;
-    float stop{};
-    float detect_radius;
-    int num_lifes;
-    float Xmin{},Xmax{},Zmin{},Zmax{};
-    bool visible{};
-};
 // void createEnemies(EntityManager& em)
 // {
 //     std::vector<EnemyData> enemyData = {
@@ -309,10 +298,49 @@ struct EnemyData {
 //         }
 //     }
 // }
+// IN=> vector de datos de enemigos, tipo de enemigo
+// Recorre el vector y para cada enemigo=> añade sus cmps dependiendo de el tipo
+// 0=>patrolAI 1=>ShootPlayerAI
+void createEnemiesofType(EntityManager& em,std::vector<EnemyData>vec,uint16_t type){
+    for (const auto& data : vec)
+    {
+        auto& enemy{ em.newEntity() };
+        em.addTag<EnemyTag>(enemy);
+        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = data.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE ,.visible=data.visible});
+        auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = { .2f, .0f, .0f } });
+        switch (type)
+        {
+        case 0: em.addComponent<PatrolComponent>(enemy,PatrolComponent{ .patrol=data.route });
+                em.addComponent<AIComponent>(enemy, AIComponent{ .current_type = data.aiType});
+            break;
+        case 1:
+            em.addComponent<ShootPlayerComponent>(enemy,ShootPlayerComponent{ 
+                .Xmin = data.Xmin,
+                .Xmax = data.Xmax,
+                .Zmin = data.Zmin,
+                .Zmax = data.Zmax
+             });
+            em.addComponent<AIComponent>(enemy, AIComponent{ .current_type = data.aiType});
+             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.0f });
+            break;
+        default:
+            break;
+        }
+        em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = data.num_lifes });
+        em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
+
+           
+
+        if(data.aiType == AIComponent::AI_type::RandomEnemy){
+             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
+        }
+    }
+}
 void createEnemiesZelda(EntityManager& em)
 {
-    std::vector<EnemyData> enemyData = {
-       {  AIComponent::AI_type::PatrolEnemy,
+    //Creamos Patrol Enemies
+     std::vector<EnemyData> Vec_patrolData = {
+        {  AIComponent::AI_type::PatrolEnemy,
          {-9.0f, 0.f, -14.0f},vec3f{},
          {
              vec3f{-9.0f, 0.f, -14.0f},
@@ -320,7 +348,24 @@ void createEnemiesZelda(EntityManager& em)
              { 9.0f, 0.f, -10.0f },
              { 9.0f, 0.f, -14.0f },
              AIComponent::invalid
-         },0.0f,5.0f,1,0.0f,0.0f,0.0f,0.0f,true},
+         },0.0f,5.0f,1,0.0f,0.0f,0.0f,0.0f,true}
+     };
+    createEnemiesofType(em,Vec_patrolData,0);
+    //Creamos Shoot Player Enemies
+    std::vector<EnemyData> Vec_ShootPlayerData = {
+        { AIComponent::AI_type::ShootPlayer,
+         {-46.0f, 0.0f, -20.0f},vec3f{},
+         {
+             vec3f{},
+         },0.0f,10.0f,2,-43.0f,-46.0f,-11.0f,-20.0f,false},
+          { AIComponent::AI_type::ShootPlayer,
+         {-45.0f, 0.0f, 4.0f},vec3f{},
+         {
+             vec3f{}
+         },0.0f,10.0f,2,-43.0f,-46.0f,3.0f,-4.0f,false}
+    };
+    createEnemiesofType(em,Vec_ShootPlayerData,1);
+    std::vector<EnemyData> enemyData = {
         //  {  AIComponent::AI_type::PatrolFollowEnemy,
         //  {-2.0f, 0.0f, 10.0f},vec3f{},
         //  {
@@ -337,16 +382,6 @@ void createEnemiesZelda(EntityManager& em)
         //      {-2.0f, 0.f, -13.0f },
         //      AIComponent::invalid
         //  },0.0f,5.0f,1,0.0f,0.0f,0.0f,0.0f,true},
-         { AIComponent::AI_type::ShoterEnemy2,
-         {-46.0f, 0.0f, -20.0f},vec3f{},
-         {
-             vec3f{},
-         },0.0f,10.0f,2,-43.0f,-46.0f,-11.0f,-20.0f,false},
-          { AIComponent::AI_type::ShoterEnemy2,
-         {-45.0f, 0.0f, 4.0f},vec3f{},
-         {
-             vec3f{}
-         },0.0f,10.0f,2,-43.0f,-46.0f,3.0f,-4.0f,false},
         {AIComponent::AI_type::RandomEnemy,
         {-33.0f, 0.0f, -12.0f},{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-36.0f,-28.0f,-21.0f,-10.0f,true},
         {AIComponent::AI_type::RandomEnemy,
@@ -372,7 +407,7 @@ void createEnemiesZelda(EntityManager& em)
             });
         em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = data.num_lifes });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
-        if (data.aiType == AIComponent::AI_type::ShoterEnemy2) {
+        if (data.aiType == AIComponent::AI_type::ShootPlayer) {
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.0f });
         }
         if(data.aiType == AIComponent::AI_type::RandomEnemy){

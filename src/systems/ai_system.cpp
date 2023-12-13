@@ -2,19 +2,19 @@
 #include <cmath>
 #include <random>
 
-[[nodiscard]] bool AISystem::isPlayerDetected(EntityManager& EM, PhysicsComponent const& p, AIComponent const& ai) const noexcept {
+[[nodiscard]] bool AISystem::isPlayerDetected(EntityManager& EM, PhysicsComponent const& p, ShootPlayerComponent const& spc) const noexcept {
     auto& li = EM.getSingleton<LevelInfo>();
     auto* playerEn = EM.getEntityByID(li.playerID);
     if (not playerEn) return false;
     auto& plphy = EM.getComponent<PhysicsComponent>(*playerEn);
     auto const distance = (p.position - plphy.position).lengthSQ();
-    return  distance < (ai.detect_radius * ai.detect_radius);
+    return  distance < (spc.detect_radius * spc.detect_radius);
 }
 
-[[nodiscard]] vec3f AISystem::getPlayerDistance(EntityManager& EM, PhysicsComponent const& p, AIComponent& ai) const noexcept {
+[[nodiscard]] vec3f AISystem::getPlayerDistance(EntityManager& EM, PhysicsComponent const& p,  ShootPlayerComponent& spc) const noexcept {
     auto& li = EM.getSingleton<LevelInfo>();
     auto* playerEn = EM.getEntityByID(li.playerID);
-    if (not playerEn) { ai.playerdetected = false; return vec3f{}; };
+    if (not playerEn) { spc.playerdetected = false; return vec3f{}; };
     auto& plphy = EM.getComponent<PhysicsComponent>(*playerEn);
     auto const distance = plphy.position - p.position;
     return  distance;
@@ -27,18 +27,18 @@ void AISystem::setVelocity(PhysicsComponent& p, vec3f distance) {
     }
 }
 
-vec3f AISystem::FollowPatrol(AIComponent& ai, PhysicsComponent& p) {
+vec3f AISystem::FollowPatrol(PhysicsComponent& p,PatrolComponent& pc) {
     //Do patrol
     //si la pos actual es >= que el maximo patron vuelvo al principio
-    if (ai.current >= ai.max_patrol) {
-        ai.current = 0;
+    if (pc.current >= pc.max_patrol) {
+        pc.current = 0;
     }
 
     // Set del objetivo, next position
-    auto const& target = ai.patrol[ai.current];
-    if (target == ai.invalid) {
-        ai.current = 0;
-        ai.nexttarget = 0;
+    auto const& target = pc.patrol[pc.current];
+    if (target == pc.invalid) {
+        pc.current = 0;
+        pc.nexttarget = 0;
         return vec3f{ 0,0,0 };
     }
 //    std::cout << p.position.x() << ", " << p.position.y() << ", " << p.position.z() << "\n";
@@ -46,9 +46,9 @@ vec3f AISystem::FollowPatrol(AIComponent& ai, PhysicsComponent& p) {
     auto const distance = target - p.position;
     //std::cout << distance.x() << ", " << distance.y() << ", " << distance.z() << "\n";
     // Si la distancia es < que el radio de llegada paso a la siguiente
-    if (distance.length() < ai.arrival_radius) {
-        ai.current++;
-        ai.arrived = true;
+    if (distance.length() < pc.arrival_radius) {
+        pc.current++;
+        pc.arrived = true;
     }
     return distance;
 }
@@ -128,38 +128,38 @@ vec3f AISystem::getRandomPosinRange(float xmin, float xmax,float zmin,float zmax
         //devuelvo vector
         return vec3f{x,0.0f,z};
 }
-void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& em, Entity& ent,float dt) {
+void AISystem::ShotandMove(ShootPlayerComponent& spc, PhysicsComponent& p, EntityManager& em, Entity& ent,float dt) {
     //cada x segundos cambia de posicion
-    if(!ai.shoot){
-        if(ai.elapsed_change_position>=ai.countdown_change_position){
+    if(!spc.shoot){
+        if(spc.elapsed_change_position>=spc.countdown_change_position){
             //before change position go visible
             auto& rend = em.getComponent<RenderComponent>(ent);
             rend.visible = true;
             //Set random position
-            vec3f randomPos = getRandomPosinRange(ai.Xmin,ai.Xmax,ai.Zmin,ai.Zmax);
+            vec3f randomPos = getRandomPosinRange(spc.Xmin,spc.Xmax,spc.Zmin,spc.Zmax);
             p.position.setX(randomPos.x());
             p.position.setZ(randomPos.z());
             //Attack
-            ai.shoot = true;
-            ai.elapsed_change_position = 0;
+            spc.shoot = true;
+            spc.elapsed_change_position = 0;
         }
-        ai.dec_countdown_change_pos(dt);
+        spc.dec_countdown_change_pos(dt);
     }else{
-        if(ai.elapsed_shoot_rap>=ai.countdown_shoot_rap){
+        if(spc.elapsed_shoot_rap>=spc.countdown_shoot_rap){
             //set entitites invisible
             auto& rend1 = em.getComponent<RenderComponent>(ent);
             rend1.visible = false;
-            if (isPlayerDetected(em, p, ai)) {
+            if (isPlayerDetected(em, p, spc)) {
                 //Attack
                 auto& att = em.getComponent<AttackComponent>(ent);
-                auto old_vel = (getPlayerDistance(em, p, ai)).normalized() * SPEED_AI;
+                auto old_vel = (getPlayerDistance(em, p, spc)).normalized() * SPEED_AI;
                 att.vel = old_vel;
                 att.attack(AttackType::Ranged);
             }
-            ai.shoot = false;
-            ai.elapsed_shoot_rap = 0;
+            spc.shoot = false;
+            spc.elapsed_shoot_rap = 0;
         }
-        ai.dec_countdown_shoot_rap(dt);
+        spc.dec_countdown_shoot_rap(dt);
     }
 }
 // Function to check if the direction is in the desired range
@@ -236,31 +236,26 @@ vec3f AISystem::getRandomDir(){
  }
 void AISystem::update(EntityManager& em,float dt)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([&,dt](Entity& e, PhysicsComponent& phy, AIComponent& ai)
+    em.forEach<SYSCMPs_Patrol, SYSTAGs>([&,dt](Entity& e,PhysicsComponent& phy,PatrolComponent& pc)
     {
-        switch (ai.current_type)
-        {
-        case AIComponent::AI_type::PatrolEnemy:
-        {
-            vec3f distance = FollowPatrol(ai, phy);
-            setVelocity(phy,distance);
-        }
-        break;
 
-        case AIComponent::AI_type::PatrolFollowEnemy:
-        {
-            // Player detection
-            ai.playerdetected = this->isPlayerDetected(em, phy, ai);
-            if (ai.playerdetected) {
-                auto const& distance = getPlayerDistance(em, phy, ai);
-                phy.velocity = distance.normalized() * SPEED_AI;
-            }
-            else {
-                vec3f distance = FollowPatrol(ai, phy);
-                setVelocity(phy,distance);
-            }
-        }
-        break;
+            vec3f distance = FollowPatrol(phy, pc);
+            setVelocity(phy,distance);
+    });
+        // case AIComponent::AI_type::PatrolFollowEnemy:
+        // {
+        //     // Player detection
+        //     ai.playerdetected = this->isPlayerDetected(em, phy, ai);
+        //     if (ai.playerdetected) {
+        //         auto const& distance = getPlayerDistance(em, phy, ai);
+        //         phy.velocity = distance.normalized() * SPEED_AI;
+        //     }
+        //     else {
+        //         vec3f distance = FollowPatrol(ai,phy,pc);
+        //         setVelocity(phy,distance);
+        //     }
+        // }
+        // break;
 
         // case AIComponent::AI_type::ShoterEnemy:
         // {
@@ -268,21 +263,20 @@ void AISystem::update(EntityManager& em,float dt)
         // }
         // break;
 
-        case AIComponent::AI_type::ShoterEnemy2:
-        {
-            ShotandMove(ai, phy, em, e,dt);
-        }
-        break;
+        // case AIComponent::AI_type::ShootPlayer:
+        // {
+        //     ShotandMove(ai, phy, em, e,dt);
+        // }
+        // break;
 
-        case AIComponent::AI_type::RandomEnemy:
-        {
-            RandomAI(ai,phy,em,e,dt);
-        }
-        break;
-
-        default:
-            break;
-        }
+        // case AIComponent::AI_type::RandomEnemy:
+        // {
+        //     RandomAI(ai,phy,em,e,dt);
+        // }
+        // break;
+    
+    em.forEach<SYSCMPs_ShootPlayer, SYSTAGs>([&,dt](Entity& ent,PhysicsComponent& phy,ShootPlayerComponent& spc){
+         ShotandMove(spc,phy, em, ent,dt);
     });
 }
 
