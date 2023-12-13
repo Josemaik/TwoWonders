@@ -30,5 +30,15 @@ void game();
 void createWallsZelda(EntityManager& em);
 void createGroundWaterZelda(EntityManager& em);
 void createEnemiesZelda(EntityManager& em);
-
+struct EnemyData {
+    vec3f position;
+    vec3f velocity;
+    std::array<vec3f, 10> route;
+    float stop{};
+    float detect_radius;
+    int num_lifes;
+    float Xmin{},Xmax{},Zmin{},Zmax{};
+    bool visible{};
+};
+void createEnemiesofType(EntityManager& em,std::vector<EnemyData>vec,uint16_t type);
 #endif // !GAME
