@@ -3,6 +3,8 @@
 void Map::createMap(EntityManager& em){
     createGroundWaterOverworld(em);
     createWallsOverworld(em);
+
+    createZonesOverworld(em);
 }
 
 // Se encarga de crear las paredes del OverWorld
@@ -149,5 +151,37 @@ void Map::createGroundWaterOverworld(EntityManager& em){
         auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
         auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
+    }
+}
+
+// Se encarga de crear las zonas
+void Map::createZonesOverworld(EntityManager& em){
+
+    struct EntityData
+    {
+        vec3f position;
+        vec3f scale;
+        uint16_t zone;
+        Color color;
+    };
+
+    EntityData entitiesG[] = {
+        //{ { 5.f, 0.f, 0.f }, { 3.f, 1.f, 3.f }, 1 , BLACK },
+        { { 0.f, 0.f, 0.f }, { 20.f, 1.f, 14.f }, 1 , BLACK },
+        { { 0.f, 0.f, -16.f }, { 20.f, 1.f, 14.f }, 2 , BLACK },
+        { { -22.f, 0.f, 0.f }, { 20.f, 1.f, 14.f }, 3 , BLACK },
+        { { -22.f, 0.f, -16.f }, { 20.f, 1.f, 14.f }, 4 , BLACK },
+        { { -43.f, 0.f, 0.f }, { 20.f, 1.f, 14.f }, 5 , BLACK },
+        { { -43.f, 0.f, -16.f }, { 20.f, 1.f, 14.f }, 6 , BLACK },
+    };
+
+    for (const auto& data : entitiesG)
+    {
+        auto& entity = em.newEntity();
+        em.addTag<ZoneTag>(entity);
+        em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = data.zone });
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::NOTHING });
     }
 }

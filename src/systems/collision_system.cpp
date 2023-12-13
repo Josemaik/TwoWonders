@@ -101,6 +101,17 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     auto* staticEntPtr = &staticEnt;
     auto* otherEntPtr = &otherEnt;
 
+    if(staticEntPtr->hasTag<ZoneTag>() || otherEntPtr->hasTag<ZoneTag>()){
+        if(otherEntPtr->hasTag<ZoneTag>()){
+            std::swap(staticEntPtr, otherEntPtr);
+            std::swap(staticPhy, otherPhy);
+        }
+        if(otherEntPtr->hasTag<PlayerTag>())
+            em.getComponent<ZoneComponent>(*staticEntPtr).changeZone = true;
+        
+        return;
+    }
+
     if (behaviorType1 & BehaviorType::STATIC || behaviorType2 & BehaviorType::STATIC)
     {
         // Comprobar si es un objeto estático - el objeto estático quedará en staticEnt y el otro en otherEnt

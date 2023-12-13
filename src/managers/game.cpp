@@ -134,6 +134,7 @@ void game()
     AttackSystem attack_system{};
     ProjectileSystem projectile_system{};
     ObjectSystem object_system{};
+    ZoneSystem zone_system{};
 
     createEntities(em);
 
@@ -155,6 +156,7 @@ void game()
         ai_sys.update(em, deltaTime);
         physics_system.update(em);
         collision_system.update(em);
+        zone_system.update(em, engine);
 
         object_system.update(em, deltaTime);
         attack_system.update(em, deltaTime);
