@@ -41,8 +41,8 @@ vec3f AISystem::FollowPatrol(PhysicsComponent& p,PatrolComponent& pc) {
         pc.nexttarget = 0;
         return vec3f{ 0,0,0 };
     }
-//    std::cout << p.position.x() << ", " << p.position.y() << ", " << p.position.z() << "\n";
-    //calculo la distancia
+    //    std::cout << p.position.x() << ", " << p.position.y() << ", " << p.position.z() << "\n";
+        //calculo la distancia
     auto const distance = target - p.position;
     //std::cout << distance.x() << ", " << distance.y() << ", " << distance.z() << "\n";
     // Si la distancia es < que el radio de llegada paso a la siguiente
@@ -66,8 +66,25 @@ vec3f AISystem::getRandomPosinRange(float xmin, float xmax,float zmin,float zmax
             z = rangoZ(gen);
         } while (z >= -18.0f && z <= -13.0f);
 
-        //devuelvo vector
-        return vec3f{x,0.0f,z};
+
+
+vec3f AISystem::getRandomPosinRange(float xmin, float xmax, float zmin, float zmax) {
+    //Semilla para generar numeros aleatorios
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    // creo rangos
+    std::uniform_real_distribution<float> rangoX(xmin, xmax);
+    std::uniform_real_distribution<float> rangoZ(zmin, zmax);
+    // obtengo x y z aleatoria
+    float x = rangoX(gen);
+    float z;
+    do {
+        z = rangoZ(gen);
+    } while (z >= -18.0f && z <= -13.0f);
+
+    //devuelvo vector
+    return vec3f{ x,0.0f,z };
+
 }
 void AISystem::ShotandMove(ShootPlayerComponent& spc, PhysicsComponent& p, EntityManager& em, Entity& ent,float dt) {
     //cada x segundos cambia de posicion
@@ -104,7 +121,9 @@ void AISystem::ShotandMove(ShootPlayerComponent& spc, PhysicsComponent& p, Entit
     }
 }
 // Function to check if the direction is in the desired range
-bool AISystem::isInDesiredRange(const vec3f& direction,float xmin, float xmax,float zmin,float zmax) {
+
+bool AISystem::isInDesiredRange(const vec3f& direction, float xmin, float xmax, float zmin, float zmax) {
+
     // Define your desired range here
     // float minX = 23.1f; // minimum X coordinate
     // float maxX = 34.9f; // maximum X coordinate
@@ -113,17 +132,19 @@ bool AISystem::isInDesiredRange(const vec3f& direction,float xmin, float xmax,fl
 
     // Check if the direction results in a position within the desired range
     return direction.x() >= xmin && direction.x() <= xmax &&
-            direction.z() >=zmin  && direction.z() <= zmax;
+
+        direction.z() >= zmin && direction.z() <= zmax;
+
 }
-vec3f AISystem::getRandomDir(){
-        // Genero direccion aleatoria
-        switch (std::rand() % 4) {
-            case 0:  return {0.25f, 0.0f, 0.0f}; break;
-            case 1:  return {-0.25f, 0.0f, 0.0f}; break;
-            case 2:  return {0.0f, 0.0f, 0.25f}; break;
-            case 3:  return {0.0f, 0.0f, -0.25f}; break;
-            default: return {-0.25f, 0.0f, 0.0f}; break;
-        }
+vec3f AISystem::getRandomDir() {
+    // Genero direccion aleatoria
+    switch (std::rand() % 4) {
+    case 0:  return { 0.25f, 0.0f, 0.0f }; break;
+    case 1:  return { -0.25f, 0.0f, 0.0f }; break;
+    case 2:  return { 0.0f, 0.0f, 0.25f }; break;
+    case 3:  return { 0.0f, 0.0f, -0.25f }; break;
+    default: return { -0.25f, 0.0f, 0.0f }; break;
+    }
 }
  void AISystem::RandomAI(RandomShootComponent& rsc,PhysicsComponent& p,EntityManager& em,Entity& e,float dt){
     vec3f direction{};
@@ -137,7 +158,7 @@ vec3f AISystem::getRandomDir(){
         }
         rsc.dec_countdown_change_dir(dt);
     }
-    // //check if ai have to stop
+    // //check if ai have to stops
     if(!rsc.shoot){
         if(rsc.elapsed_stop>=rsc.countdown_stop){
             rsc.stoped = true;
@@ -174,36 +195,15 @@ vec3f AISystem::getRandomDir(){
         p.velocity = {};
     }
 
- }
-void AISystem::update(EntityManager& em,float dt)
+}
+void AISystem::update(EntityManager& em, float dt)
 {
     em.forEach<SYSCMPs_Patrol, SYSTAGs>([&,dt](Entity& e,PhysicsComponent& phy,PatrolComponent& pc)
     {
            (void)e;
             vec3f distance = FollowPatrol(phy, pc);
             setVelocity(phy,distance);
-    });
-        // case AIComponent::AI_type::PatrolFollowEnemy:
-        // {
-        //     // Player detection
-        //     ai.playerdetected = this->isPlayerDetected(em, phy, ai);
-        //     if (ai.playerdetected) {
-        //         auto const& distance = getPlayerDistance(em, phy, ai);
-        //         phy.velocity = distance.normalized() * SPEED_AI;
-        //     }
-        //     else {
-        //         vec3f distance = FollowPatrol(ai,phy,pc);
-        //         setVelocity(phy,distance);
-        //     }
-        // }
-        // break;
-
-        // case AIComponent::AI_type::ShoterEnemy:
-        // {
-        //     FollowPatrolandShoot(ai, phy, em, e,dt);
-        // }
-        // break;
-    
+    });    
     em.forEach<SYSCMPs_ShootPlayer, SYSTAGs>([&,dt](Entity& ent,PhysicsComponent& phy,ShootPlayerComponent& spc){
          ShotandMove(spc,phy, em, ent,dt);
     });
@@ -211,330 +211,3 @@ void AISystem::update(EntityManager& em,float dt)
          RandomAI(rsc,phy,em,ent,dt);
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

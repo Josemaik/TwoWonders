@@ -16,6 +16,7 @@
 #include "../components/projectile_component.hpp"
 #include "../components/object_component.hpp"
 #include "../components/information_component.hpp"
+#include "../components/zone_component.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
 
@@ -28,10 +29,11 @@ struct EnemyTag {};
 struct HitPlayer {};
 struct GroundTag {};
 struct WaterTag {};
-struct Object {};
+struct ObjectTag {};
+struct ZoneTag {};
 
-using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent,PatrolComponent,ShootPlayerComponent,RandomShootComponent,AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent>;
-using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayer, GroundTag, WaterTag, Object>;
+using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent,PatrolComponent,ShootPlayerComponent,RandomShootComponent,AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent,ZoneComponent>;
+using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayer, GroundTag, WaterTag, ObjectTag, ZoneTag>;
 using SCL = MP::TypeList<LevelInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;

@@ -161,6 +161,12 @@ struct vec3D
         return Vector3{ x_, y_, z_ };
     }
 
+    friend std::ostream& operator<<(std::ostream& os, vec3D const& v)
+    {
+        os << '(' << v.x_ << ", " << v.y_ << ", " << v.z_ << ')';
+        return os;
+    }
+
 private:
     DataT x_{}, y_{}, z_{};
     mutable std::optional<DataT> length_{};
