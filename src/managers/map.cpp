@@ -1,6 +1,6 @@
 #include "map.hpp"
 
-void Map::createMap(EntityManager& em){
+void Map::createMap(EntityManager& em) {
     createGroundWaterOverworld(em);
     createWallsOverworld(em);
 
@@ -8,7 +8,7 @@ void Map::createMap(EntityManager& em){
 }
 
 // Se encarga de crear las paredes del OverWorld
-void Map::createWallsOverworld(EntityManager& em){
+void Map::createWallsOverworld(EntityManager& em) {
 
     struct WallData
     {
@@ -18,7 +18,7 @@ void Map::createWallsOverworld(EntityManager& em){
     };
 
     WallData wallData[] = {
-        
+
         // ZONA 1
 
         { { -5.5f, 0.0f, -8.0f }, { 8.0f, 1.0f, 3.0f }, LIME },    // |
@@ -115,7 +115,7 @@ void Map::createWallsOverworld(EntityManager& em){
 }
 
 // Se encarga de crear el suelo del OverWorld
-void Map::createGroundWaterOverworld(EntityManager& em){
+void Map::createGroundWaterOverworld(EntityManager& em) {
 
     struct EntityData
     {
@@ -155,7 +155,7 @@ void Map::createGroundWaterOverworld(EntityManager& em){
 }
 
 // Se encarga de crear las zonas
-void Map::createZonesOverworld(EntityManager& em){
+void Map::createZonesOverworld(EntityManager& em) {
 
     struct EntityData
     {
@@ -181,7 +181,7 @@ void Map::createZonesOverworld(EntityManager& em){
         em.addTag<ZoneTag>(entity);
         em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = data.zone });
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color, .visible = false });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::NOTHING });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3f::zero(), .gravity = .0f });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::ZONE });
     }
 }

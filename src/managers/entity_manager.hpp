@@ -138,15 +138,12 @@ namespace ETMG {
                 return tag_mask & tag_info::template mask<TAG>();
             }
 
-            std::size_t  getID() const noexcept {
-                return id;
-            }
+            std::size_t  getID() const noexcept { return id; }
 
-            void setID(std::size_t const id) noexcept {
-                this->id = id;
-            }
+            void setID(std::size_t const id) noexcept { this->id = id; }
 
-            void reset() noexcept {
+            void reset() noexcept
+            {
                 cmp_mask = 0;
                 tag_mask = 0;
                 cmp_keys_ = {};

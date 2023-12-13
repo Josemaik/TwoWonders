@@ -8,7 +8,8 @@ enum BehaviorType {
     ENEMY = 0x02,
     STATIC = 0x04,
     ATK_PLAYER = 0x08,
-    ATK_ENEMY = 0x10
+    ATK_ENEMY = 0x10,
+    ZONE = 0x20,
 };
 
 struct ColliderComponent

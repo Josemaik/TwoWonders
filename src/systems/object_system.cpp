@@ -1,11 +1,11 @@
 #include "object_system.hpp"
 
-void ObjectSystem::update(EntityManager& em, float deltaTime){
+void ObjectSystem::update(EntityManager& em, float deltaTime) {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ObjectComponent& obj)
     {
-        if(obj.decreaseLifeTime(deltaTime) && (obj.type != Object_type::Sword)) 
+        if (obj.decreaseLifeTime(deltaTime) && (obj.type != Object_type::Sword))
         {
-            if(obj.type == Object_type::BombExplode)
+            if (obj.type == Object_type::BombExplode)
                 obj.effect();
             else
                 em.destroyEntity(ent.getID());
@@ -16,48 +16,48 @@ void ObjectSystem::update(EntityManager& em, float deltaTime){
         auto* playerEnt = em.getEntityByID(li.playerID);
 
         // Si existe el player se aplica el efecto del objeto
-        if(playerEnt && obj.active){
+        if (playerEnt && obj.active) {
             switch (obj.type)
             {
-                case Object_type::Life:
-                    if(playerEnt->hasComponent<LifeComponent>())
-                        em.getComponent<LifeComponent>(*playerEnt).increaseLife();
-                    break;
+            case Object_type::Life:
+                if (playerEnt->hasComponent<LifeComponent>())
+                    em.getComponent<LifeComponent>(*playerEnt).increaseLife();
+                break;
 
-                case Object_type::Sword:
-                    if(!playerEnt->hasComponent<AttackComponent>())
-                        em.addComponent<AttackComponent>(*playerEnt, AttackComponent{});
-                    break;
+            case Object_type::Sword:
+                if (!playerEnt->hasComponent<AttackComponent>())
+                    em.addComponent<AttackComponent>(*playerEnt, AttackComponent{});
+                break;
 
-                case Object_type::Bomb:
-                    if(playerEnt->hasComponent<InformationComponent>())
-                        em.getComponent<InformationComponent>(*playerEnt).addBomb();
-                    break;
+            case Object_type::Bomb:
+                if (playerEnt->hasComponent<InformationComponent>())
+                    em.getComponent<InformationComponent>(*playerEnt).addBomb();
+                break;
 
-                case Object_type::Coin:
-                    if(playerEnt->hasComponent<InformationComponent>())
-                        em.getComponent<InformationComponent>(*playerEnt).addCoin();
-                    break;
+            case Object_type::Coin:
+                if (playerEnt->hasComponent<InformationComponent>())
+                    em.getComponent<InformationComponent>(*playerEnt).addCoin();
+                break;
 
-                case Object_type::BombExplode:
-                    explodeBomb(em, ent);
-                    break;
+            case Object_type::BombExplode:
+                explodeBomb(em, ent);
+                break;
 
-                default:
-                    break;
+            default:
+                break;
             }
             em.destroyEntity(ent.getID());
         }
     });
 }
 
-void ObjectSystem::explodeBomb(EntityManager& em, Entity& ent){
+void ObjectSystem::explodeBomb(EntityManager& em, Entity& ent) {
     createExplodeBomb(em, ent, BehaviorType::ATK_PLAYER);
     createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY);
 }
 
-void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type){
-    if(ent.hasComponent<RenderComponent>()){
+void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type) {
+    if (ent.hasComponent<RenderComponent>()) {
         auto& ren = em.getComponent<RenderComponent>(ent);
         // Crear una entidad que quite vida
         auto& e{ em.newEntity() };
@@ -65,7 +65,7 @@ void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorTyp
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = ren.position, .scale = { 3.0f, 1.0f, 3.0f }, .color = BLACK });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
         em.addComponent<LifeComponent>(e, LifeComponent{ .life = 5, .countdown = 0.0f });
-        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f});
+        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, type });
     }
 }

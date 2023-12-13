@@ -75,7 +75,8 @@
         "variant": "cpp",
         "any": "cpp",
         "valarray": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "complex": "cpp"
     },
     "C_Cpp.codeAnalysis.clangTidy.enabled": true,
 }

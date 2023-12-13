@@ -8,10 +8,10 @@ struct ObjectComponent
     float life_time{ 10.0f }, elapsed{ 0.0f };
     bool active{ false };
 
-    bool decreaseLifeTime(float deltaTime){ 
-        elapsed += deltaTime; 
+    bool decreaseLifeTime(float deltaTime) {
+        elapsed += deltaTime;
         return elapsed >= life_time ? true : false;
     }
 
-    void effect(){ active = true; }
+    void effect() { active = true; }
 };

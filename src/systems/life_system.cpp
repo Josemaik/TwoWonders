@@ -26,17 +26,17 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
 }
 
 // Se podra crear objetos: vida, bomba, moneda o nada
-void LifeSystem::createObject(EntityManager& em, vec3f pos){
+void LifeSystem::createObject(EntityManager& em, vec3f pos) {
     int random_value = std::rand();
     if (random_value % 4 > 0) {
         Object_type tipo_nuevo_objeto;
         Color color_nuevo_objeto;
-        if (random_value % 4 == 1) 
+        if (random_value % 4 == 1)
         {
             tipo_nuevo_objeto = Object_type::Bomb;
             color_nuevo_objeto = GRAY;
         }
-        else if (random_value % 4 == 2) 
+        else if (random_value % 4 == 2)
         {
             tipo_nuevo_objeto = Object_type::Coin;
             color_nuevo_objeto = YELLOW;
@@ -45,7 +45,7 @@ void LifeSystem::createObject(EntityManager& em, vec3f pos){
         {
             tipo_nuevo_objeto = Object_type::Life;
             color_nuevo_objeto = RED;
-        } 
+        }
 
         // Se crea el nuevo objeto
         auto& e{ em.newEntity() };
@@ -53,6 +53,6 @@ void LifeSystem::createObject(EntityManager& em, vec3f pos){
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = { 0.5f, 0.5f, 0.5f }, .color = color_nuevo_objeto });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = tipo_nuevo_objeto}); 
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = tipo_nuevo_objeto });
     }
 }

@@ -43,16 +43,18 @@ struct CollisionSystem
     using pairsType = std::unordered_set<std::pair<std::size_t, std::size_t>, pair_hash, pair_equal>;
 
     void update(EntityManager& em);
-
 private:
     void checkCollision(EntityManager& em, Octree& boxes, pairsType& checkedPairs);
     void enemyCollision(EntityManager& em, Entity& damagedEntity);
     void staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3f& minOverlap);
     void nonStaticCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
-    void bulletCollision(bool& bulletPl1, bool& bulletPl2, bool& bulletEn1, bool& bulletEn2, EntityManager& em, Entity& entity1, Entity& entity2);
     void groundCollision(PhysicsComponent& playerPhysics, vec3f& playerEsc, vec3f& minOverlap);
     void floorCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
     void handleCollision(EntityManager& em, Entity& entity1, Entity& entity2, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
+    void handleStaticCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
+    void handleZoneCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, BehaviorType behaviorType1, BehaviorType behaviorType2);
+    void handlePlayerCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
+    void handleAtkCollision(EntityManager& em, bool& atkPl1, bool& atkPl2, bool& atkEn1, bool& atkEn2, Entity& entity1, Entity& entity2);
     void classicCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
     void resolveCollisionX(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap);
     void resolveCollisionY(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap);
