@@ -158,29 +158,9 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     {
         return;
     }
-    //Compruebo si el enemigo colisiona con un objeto estatico
-    if ((behaviorType1 & BehaviorType::ENEMY && behaviorType2 & BehaviorType::STATIC) ||
-    (behaviorType2 & BehaviorType::ENEMY && behaviorType1 & BehaviorType::STATIC))
-    {
-        //Compruebo colision vertical
-        if(em.getComponent<PhysicsComponent>(otherEnt).velocity.x() < 0.0f && 
-        em.getComponent<PhysicsComponent>(otherEnt).velocity.x() != 0.0f){
-            //iZQUIERDA
-            //elegir de forma aleatoria entre arriba,abajo y derecha
-            //poner la velocidad
-        }else{
-            //Derecha
-        }
-        //Compruebo colision horizontal
-        if(em.getComponent<PhysicsComponent>(otherEnt).velocity.z() < 0.0f && 
-        em.getComponent<PhysicsComponent>(otherEnt).velocity.z() != 0.0f){
-            //Arriba
-        }else{
-            //Abajo
-        }
-    }
-    
-    if (behaviorType1 & BehaviorType::STATIC || behaviorType2 & BehaviorType::STATIC)
+
+    // Nos aseguramos que el suelo siempre esté en staticEntPtr
+    if (otherEntPtr->hasTag<GroundTag>() || otherEntPtr->hasTag<WaterTag>())
     {
         std::swap(staticPhy, otherPhy);
         std::swap(staticEntPtr, otherEntPtr);
@@ -220,11 +200,65 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         em.getComponent<LifeComponent>(*otherEntPtr).decreaseLife();
         return;
     }
-
+    //Si impacta enemigo con pared
+    if(behaviorType2 & BehaviorType::ENEMY){
+        EnemiesWallCollision(em, otherEnt,statPhy,*otherPhy,minOverlap, behaviorType1, behaviorType2);
+        staticCollision(*otherPhy, *staticPhy, minOverlap);
+        return;
+    }
     // Colisiones con paredes
     staticCollision(*otherPhy, *staticPhy, minOverlap);
 }
-
+void CollisionSystem::EnemiesWallCollision(EntityManager& em, Entity& entity2,PhysicsComponent& staticPhy, PhysicsComponent& otherPhy,vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2){
+    //Compruebo si el enemigo colisiona con un objeto estatico
+        if(entity2.hasComponent<RandomShootComponent>()){
+            otherPhy.velocity = RandomShootComponent::up;
+            vec3f randir{};
+            auto &rands =  em.getComponent<RandomShootComponent>(entity2);
+            //Compruebo colision vertical
+            if(minOverlap.z() < minOverlap.x()){
+                bool dir = resolveCollisionZ(otherPhy,staticPhy,minOverlap.z());
+                if(dir){ //abajo
+                      randir = rands.getRandomDirection(rands.right,rands.up,rands.left);
+                }else{
+                      randir = rands.getRandomDirection(rands.right,rands.left,rands.down);
+                }
+                otherPhy.velocity = randir;
+            }
+            if(minOverlap.x() < minOverlap.z()){
+                bool dir = resolveCollisionX(otherPhy,staticPhy,minOverlap.x());
+                if(dir){ //derecha
+                      randir = rands.getRandomDirection(rands.down,rands.up,rands.left);
+                }else{
+                      randir = rands.getRandomDirection(rands.right,rands.up,rands.down);
+                }
+                otherPhy.velocity = randir;
+            }
+            // if(otherPhy.velocity.x() < 0.0f && otherPhy.velocity.x() != 0.0f){
+            //     //iZQUIERDA
+            //     //elegir de forma aleatoria entre arriba,abajo y derecha
+            //     //poner la velocidad
+            //     if(entity2.hasComponent<RandomShootComponent>()){
+            //         vec3f randir = rands.getRandomDirection(rands.right,rands.up,rands.down);
+            //         otherPhy.velocity = randir;
+            //     }
+            // }else{
+            //     //Derecha
+            //     vec3f randir = rands.getRandomDirection(rands.left,rands.up,rands.down);
+            //     otherPhy.velocity = randir;
+            // }
+            //Compruebo colision horizontal
+            // if(otherPhy.velocity.z() < 0.0f && otherPhy.velocity.z() != 0.0f){
+            //     //Arriba
+            //     vec3f randir = rands.getRandomDirection(rands.right,rands.left,rands.down);
+            //     otherPhy.velocity = randir;
+            // }else{
+            //     //Abajo
+            //     vec3f randir = rands.getRandomDirection(rands.right,rands.up,rands.left);
+            //     otherPhy.velocity = randir;
+            // }
+        }
+}
 void CollisionSystem::handleZoneCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, BehaviorType behaviorType1, BehaviorType behaviorType2)
 {
     if (behaviorType1 & BehaviorType::PLAYER || behaviorType2 & BehaviorType::PLAYER)
@@ -362,15 +396,19 @@ void CollisionSystem::classicCollision(PhysicsComponent& phy1, PhysicsComponent&
 }
 
 // Desplazar la entidad en el eje X
-void CollisionSystem::resolveCollisionX(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap)
+bool CollisionSystem::resolveCollisionX(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap)
 {
     auto& pos1 = phy1.position;
     auto& pos2 = phy2.position;
 
-    if (pos1.x() < pos2.x())
+    if (pos1.x() < pos2.x()){ //derecha
         pos1.setX(pos1.x() - overlap);
-    else
+        return true;
+    }
+    else{ //izquierda
         pos1.setX(pos1.x() + overlap);
+        return false;
+    }
 }
 
 // Desplazar la entidad en el eje Y
@@ -386,15 +424,18 @@ void CollisionSystem::resolveCollisionY(PhysicsComponent& phy1, PhysicsComponent
 }
 
 // Desplazar la entidad en el eje Z
-void CollisionSystem::resolveCollisionZ(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap)
+bool CollisionSystem::resolveCollisionZ(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap)
 {
     auto& pos1 = phy1.position;
     auto& pos2 = phy2.position;
 
-    if (pos1.z() < pos2.z())
+    if (pos1.z() < pos2.z()){ //abajo
         pos1.setZ(pos1.z() - overlap);
-    else
+        return true;
+    }else{ //Arriba
         pos1.setZ(pos1.z() + overlap);
+        return false;
+    }
 }
 
 // Función para que no se salgan de los bordes, no se usa
