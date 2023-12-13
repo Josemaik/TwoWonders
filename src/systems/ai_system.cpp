@@ -112,6 +112,7 @@ vec3f AISystem::FollowPatrol(AIComponent& ai, PhysicsComponent& p) {
 
 //hacerlo con deltatime y que en vez de seguir un patron que cambie de posicion a una aleatoria dentro de un
 //rango de x y z.
+
 vec3f AISystem::getRandomPosinRange(float xmin, float xmax, float zmin, float zmax) {
     //Semilla para generar numeros aleatorios
     std::random_device rd;
@@ -128,7 +129,9 @@ vec3f AISystem::getRandomPosinRange(float xmin, float xmax, float zmin, float zm
 
     //devuelvo vector
     return vec3f{ x,0.0f,z };
+
 }
+
 void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& em, Entity& ent, float dt) {
     //cada x segundos cambia de posicion
     if (!ai.shoot) {
@@ -137,7 +140,9 @@ void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& 
             auto& rend = em.getComponent<RenderComponent>(ent);
             rend.visible = true;
             //Set random position
+
             vec3f randomPos = getRandomPosinRange(ai.Xmin, ai.Xmax, ai.Zmin, ai.Zmax);
+
             p.position.setX(randomPos.x());
             p.position.setZ(randomPos.z());
             //Attack
@@ -165,7 +170,9 @@ void AISystem::ShotandMove(AIComponent& ai, PhysicsComponent& p, EntityManager& 
     }
 }
 // Function to check if the direction is in the desired range
+
 bool AISystem::isInDesiredRange(const vec3f& direction, float xmin, float xmax, float zmin, float zmax) {
+
     // Define your desired range here
     // float minX = 23.1f; // minimum X coordinate
     // float maxX = 34.9f; // maximum X coordinate
@@ -174,7 +181,9 @@ bool AISystem::isInDesiredRange(const vec3f& direction, float xmin, float xmax, 
 
     // Check if the direction results in a position within the desired range
     return direction.x() >= xmin && direction.x() <= xmax &&
+
         direction.z() >= zmin && direction.z() <= zmax;
+
 }
 vec3f AISystem::getRandomDir() {
     // Genero direccion aleatoria
@@ -227,8 +236,10 @@ void AISystem::RandomAI(AIComponent& ai, PhysicsComponent& p, EntityManager& em,
     // //Set velocity
     if (!ai.stoped) {
         //Range Control
+
         if (!isInDesiredRange(p.position + ai.oldvel, ai.Xmin, ai.Xmax, ai.Zmin, ai.Zmax)) {
             ai.oldvel *= -1.0f;
+
         }
         p.velocity = ai.oldvel;
     }
@@ -288,330 +299,3 @@ void AISystem::update(EntityManager& em, float dt)
         }
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

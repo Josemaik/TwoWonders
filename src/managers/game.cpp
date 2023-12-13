@@ -105,6 +105,7 @@ void createWallsZelda(EntityManager& em)
 }
 
 void createGroundWaterZelda(EntityManager& em) {
+
     struct EntityData
     {
         vec3f position;
@@ -131,6 +132,7 @@ void createGroundWaterZelda(EntityManager& em) {
     EntityData entitiesW[] = {
     { { -45.f, -1.5f, -0.0f }, { 5.0f, 2.f, 30.f }, SKYBLUE },
     { { -45.f, -1.5f, -32.0f }, { 5.0f, 2.f, 30.f }, SKYBLUE },
+
     //{ { 15.f, -1.5f, 8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
     //{ { 15.f, -1.5f, 17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
     //{ { 15.f, -1.5f, -17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
@@ -147,6 +149,7 @@ void createGroundWaterZelda(EntityManager& em) {
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
     }
 }
+
 
 void createWalls(EntityManager& em)
 {
@@ -426,7 +429,9 @@ void createGroundWater(EntityManager& em)
 void createSword(EntityManager& em)
 {
     auto& e{ em.newEntity() };
+
     em.addTag<ObjectTag>(e);
+
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -6.0f, 0.f, -5.0f }, .scale = { 1.0f, 0.3f, 0.3f }, .color = LIGHTGRAY });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
@@ -450,6 +455,7 @@ void createEntities(EntityManager& em)
 
     // Ground and water (Zelda NES)
     createGroundWaterZelda(em);
+
     // Ground and water
     // createGroundWater(em);
 
