@@ -65,11 +65,11 @@ void Map::createWallsOverworld(EntityManager& em){
 
         { { -22.0f, 0.0f, -24.0f }, { 19.0f, 1.0f, 3.0f }, LIME },  // | Pared Horizontal Arriba
 
-        { { -20.0f, 0.0f, -18.0f }, { 3.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -20.0f, 0.0f, -14.0f }, { 3.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -25.0f, 0.0f, -20.0f }, { 4.0f, 1.0f, 1.0f }, LIME },   // | Paredes Chiquitas
-        { { -25.0f, 0.0f, -16.0f }, { 4.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -25.0f, 0.0f, -12.0f }, { 4.0f, 1.0f, 1.0f }, LIME },   // | 
+        { { -20.0f, 0.0f, -18.0f }, { 3.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
+        { { -20.0f, 0.0f, -14.0f }, { 3.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
+        { { -25.0f, 0.0f, -20.0f }, { 4.0f, 1.0f, 1.0f }, DARKBROWN },   // | Paredes Chiquitas
+        { { -25.0f, 0.0f, -16.0f }, { 4.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
+        { { -25.0f, 0.0f, -12.0f }, { 4.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
 
         // ZONA 5
 
@@ -98,11 +98,11 @@ void Map::createWallsOverworld(EntityManager& em){
 
         { { -54.0f, 0.0f, -17.5f }, { 3.0f, 1.0f, 16.0f }, LIME },   // | Pared Vertical Izquierda
 
-        { { -40.5f, 0.0f, -20.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -40.5f, 0.0f, -16.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -40.5f, 0.0f, -12.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | Paredes Chiquitas
-        { { -37.5f, 0.0f, -18.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -37.5f, 0.0f, -14.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
+        { { -40.5f, 0.0f, -20.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
+        { { -40.5f, 0.0f, -16.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
+        { { -40.5f, 0.0f, -12.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | Paredes Chiquitas
+        { { -37.5f, 0.0f, -18.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
+        { { -37.5f, 0.0f, -14.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
     };
 
     for (const auto& data : wallData)
