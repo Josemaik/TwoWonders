@@ -28,7 +28,6 @@ void createWallsZelda(EntityManager& em);
 void createGroundWaterZelda(EntityManager& em);
 void createEnemiesZelda(EntityManager& em);
 struct EnemyData {
-    AIComponent::AI_type aiType;
     vec3f position;
     vec3f velocity;
     std::array<vec3f, 10> route;

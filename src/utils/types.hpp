@@ -8,9 +8,9 @@
 #include "../components/input_component.hpp"
 #include "../components/life_component.hpp"
 //ia
-#include "../components/ai_components/ai_component.hpp"
 #include "../components/ai_components/patrol_component.hpp"
 #include "../components/ai_components/shootplayer_component.hpp"
+#include "../components/ai_components/randomshoot_component.hpp"
 
 #include "../components/levelinfo.hpp"
 #include "../components/projectile_component.hpp"
@@ -30,7 +30,7 @@ struct GroundTag {};
 struct WaterTag {};
 struct Object {};
 
-using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, AIComponent,PatrolComponent,ShootPlayerComponent,AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent>;
+using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent,PatrolComponent,ShootPlayerComponent,RandomShootComponent,AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent>;
 using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayer, GroundTag, WaterTag, Object>;
 using SCL = MP::TypeList<LevelInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

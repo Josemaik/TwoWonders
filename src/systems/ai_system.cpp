@@ -52,65 +52,6 @@ vec3f AISystem::FollowPatrol(PhysicsComponent& p,PatrolComponent& pc) {
     }
     return distance;
 }
-// vec3f AISystem::getVelocityonDirecion(vec3f vector){
-//     vector.normalized();
-
-//     float angle = atan2(vector.z(), vector.x());
-//     float degrees = angle * (180.0 / M_PI);
-
-//     if (degrees >= -45 && degrees < 45) {
-//         // Derecha
-//         return vec3f{0.5f,0.0f,0.0f};
-//     } else if (degrees >= 45 && degrees < 135) {
-//         // Arriba
-//          return vec3f{0.0f,0.0f,0.5f};
-//     } else if (degrees >= -135 && degrees < -45) {
-//         // Abajo
-//          return vec3f{0.0f,0.0f,-0.5f};
-//     } else {
-//         // Izquierda
-//         return vec3f{-0.5f,0.0f,0.0f};
-//     }
-// }
-// void AISystem::FollowPatrolandShoot(AIComponent& ai, PhysicsComponent& p, EntityManager& em, Entity& ent,float dt) {
-//     if (ai.shooting == false) {
-//         //Do patrol
-//         vec3f distance = FollowPatrol(ai, p);
-//         setVelocity(p, ai,distance,dt);
-//         // std::printf("%i,%i\n", ai.current, ai.nexttarget);
-//         //Check when ai should stop
-//         if (ai.current == ai.nexttarget) { // 0
-//             if (static_cast<int>(distance.length()) == 2) {
-//                 // Detener y disparar
-//                 ai.shooting = true;
-//                 // ai.contador_stop = stop_value;
-//                 ai.nexttarget = ai.current + 1;
-//                 // Almacenar la velocidad original para poder restablecerla más tarde
-//                 auto old_vel = getVelocityonDirecion(p.velocity);
-//                 p.velocity = vec3f{};  // Velocidad a cero
-//                 //disparar
-//                 if (ent.hasComponent<AttackComponent>()) {
-//                     auto& att = em.getComponent<AttackComponent>(ent);
-//                     att.vel = old_vel;
-//                     att.attack(AttackType::Ranged);
-//                 }
-//                 else
-//                     em.addComponent<AttackComponent>(ent, AttackComponent{ .createAttack = true, .countdown = 50, .vel = old_vel });
-//                 return;
-//             }
-//         }
-//     }
-//     if (ai.shooting) {
-//         ai.contador_stop -= 1;
-//         if (ai.contador_stop <= 0) {
-//             ai.shooting = false;
-//             ai.contador_stop = 50;
-//         }
-//         return;
-//     }
-// }
-//hacerlo con deltatime y que en vez de seguir un patron que cambie de posicion a una aleatoria dentro de un
-//rango de x y z.
 vec3f AISystem::getRandomPosinRange(float xmin, float xmax,float zmin,float zmax){
         //Semilla para generar numeros aleatorios
         std::random_device rd;
@@ -184,51 +125,51 @@ vec3f AISystem::getRandomDir(){
             default: return {-0.25f, 0.0f, 0.0f}; break;
         }
 }
- void AISystem::RandomAI(AIComponent& ai,PhysicsComponent& p,EntityManager& em,Entity& e,float dt){
+ void AISystem::RandomAI(RandomShootComponent& rsc,PhysicsComponent& p,EntityManager& em,Entity& e,float dt){
     vec3f direction{};
     //check change direction when not shooting
-    if(!ai.stoped){
-        if (ai.elapsed_change_dir >= ai.countdown_change_dir) {
+    if(!rsc.stoped){
+        if (rsc.elapsed_change_dir >= rsc.countdown_change_dir) {
             //set random dir
             direction = getRandomDir();
-            ai.oldvel = direction;
-            ai.elapsed_change_dir = 0;
+            rsc.oldvel = direction;
+            rsc.elapsed_change_dir = 0;
         }
-        ai.dec_countdown_change_dir(dt);
+        rsc.dec_countdown_change_dir(dt);
     }
     // //check if ai have to stop
-    if(!ai.shoot){
-        if(ai.elapsed_stop>=ai.countdown_stop){
-            ai.stoped = true;
-            ai.shoot = true;
-            ai.elapsed_stop = 0;
-            ai.elapsed_change_dir = 0;
+    if(!rsc.shoot){
+        if(rsc.elapsed_stop>=rsc.countdown_stop){
+            rsc.stoped = true;
+            rsc.shoot = true;
+            rsc.elapsed_stop = 0;
+            rsc.elapsed_change_dir = 0;
             //shoot one time
             auto& att = em.getComponent<AttackComponent>(e);
-            att.vel = ai.oldvel;
+            att.vel = rsc.oldvel;
             att.attack(AttackType::Ranged);
         }
-        ai.dec_countdown_stop(dt);
+        rsc.dec_countdown_stop(dt);
     }
     // auto& rend = em.getComponent<RenderComponent>(e);
     // rend.visible = false;
     //time while shooting
-    if(ai.shoot){
-        if(ai.elapsed_shoot >= ai.countdown_shoot){
+    if(rsc.shoot){
+        if(rsc.elapsed_shoot >= rsc.countdown_shoot){
             //Shoot
-            ai.shoot = false;
-            ai.stoped = false;
-            ai.elapsed_shoot = 0;
+            rsc.shoot = false;
+            rsc.stoped = false;
+            rsc.elapsed_shoot = 0;
         }
-        ai.dec_countdown_shoot(dt);
+        rsc.dec_countdown_shoot(dt);
     }
     // //Set velocity
-    if(!ai.stoped){
+    if(!rsc.stoped){
         //Range Control
-        if(!isInDesiredRange(p.position+ai.oldvel,ai.Xmin,ai.Xmax,ai.Zmin,ai.Zmax)){
-                ai.oldvel *= -1.0f;
+        if(!isInDesiredRange(p.position+rsc.oldvel,rsc.Xmin,rsc.Xmax,rsc.Zmin,rsc.Zmax)){
+                rsc.oldvel *= -1.0f;
         }
-        p.velocity = ai.oldvel;
+        p.velocity = rsc.oldvel;
     }else{
         p.velocity = {};
     }
@@ -238,7 +179,7 @@ void AISystem::update(EntityManager& em,float dt)
 {
     em.forEach<SYSCMPs_Patrol, SYSTAGs>([&,dt](Entity& e,PhysicsComponent& phy,PatrolComponent& pc)
     {
-
+           (void)e;
             vec3f distance = FollowPatrol(phy, pc);
             setVelocity(phy,distance);
     });
@@ -262,21 +203,12 @@ void AISystem::update(EntityManager& em,float dt)
         //     FollowPatrolandShoot(ai, phy, em, e,dt);
         // }
         // break;
-
-        // case AIComponent::AI_type::ShootPlayer:
-        // {
-        //     ShotandMove(ai, phy, em, e,dt);
-        // }
-        // break;
-
-        // case AIComponent::AI_type::RandomEnemy:
-        // {
-        //     RandomAI(ai,phy,em,e,dt);
-        // }
-        // break;
     
     em.forEach<SYSCMPs_ShootPlayer, SYSTAGs>([&,dt](Entity& ent,PhysicsComponent& phy,ShootPlayerComponent& spc){
          ShotandMove(spc,phy, em, ent,dt);
+    });
+     em.forEach<SYSCMPs_RandomShoot, SYSTAGs>([&,dt](Entity& ent,PhysicsComponent& phy,RandomShootComponent& rsc){
+         RandomAI(rsc,phy,em,ent,dt);
     });
 }
 
