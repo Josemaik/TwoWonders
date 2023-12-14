@@ -4,7 +4,7 @@
 void CollisionSystem::update(EntityManager& em)
 {
     // Octree que contendrá las entidades y sus colliders boxes pa calcular sus colisiones luego
-    Octree octree(0, BBox(vec3f{ 0, 0, 0 }, vec3f{ 120, 30, 120 }));
+    Octree octree(0, BBox(vec3f{ 0, 0, 0 }, vec3f{ 220, 30, 200 }));
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren, ColliderComponent& col)
     {

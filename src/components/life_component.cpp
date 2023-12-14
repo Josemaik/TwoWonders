@@ -11,3 +11,7 @@ void LifeComponent::increaseLife() {
     if (life < maxLife)
         life += 1;
 }
+
+void LifeComponent::increaseMaxLife(){
+    maxLife += 2;
+}

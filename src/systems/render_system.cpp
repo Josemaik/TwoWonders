@@ -91,7 +91,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
         if (e.hasTag<PlayerTag>())
         {
             // Dibujar background HUD
-            engine.drawRectangle(0, 0, 525, 60, WHITE);
+            engine.drawRectangle(0, 0, 550, 60, WHITE);
             engine.drawRectangle(0, 50, 100, 120, WHITE);
 
             // Dibujar vidas restantes del player en el HUD
@@ -134,6 +134,33 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
                 engine.drawText(posY.c_str(), 10, 120, 20, BLACK);
                 std::string posZ = "Z: " + std::to_string(static_cast<int>(r.position.z()));
                 engine.drawText(posZ.c_str(), 10, 145, 20, BLACK);
+            }
+        }
+
+        // Dibujar el precio d elos objetos de la tienda
+        if(e.hasTag<ObjectTag>()){
+            if(e.hasComponent<ObjectComponent>() && e.hasComponent<RenderComponent>())
+            {
+                auto& ren{ em.getComponent<RenderComponent>(e) };
+                auto& obj{ em.getComponent<ObjectComponent>(e) };
+                if(obj.type == Object_type::ShopItem_Bomb)
+                    engine.drawText("20",
+                        static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
+                        static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
+                        20,
+                        BLACK);
+                else if(obj.type == Object_type::ShopItem_Life)
+                    engine.drawText("10",
+                        static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
+                        static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
+                        20,
+                        BLACK);
+                else if(obj.type == Object_type::ShopItem_ExtraLife)
+                    engine.drawText("30",
+                        static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
+                        static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
+                        20,
+                        BLACK);
             }
         }
 
