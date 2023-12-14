@@ -55,10 +55,11 @@ private:
     void handleZoneCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, BehaviorType behaviorType1, BehaviorType behaviorType2);
     void handlePlayerCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
     void handleAtkCollision(EntityManager& em, bool& atkPl1, bool& atkPl2, bool& atkEn1, bool& atkEn2, Entity& entity1, Entity& entity2);
+    void enemiesWallCollision(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3f& minOverlap);
     void classicCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
-    void resolveCollisionX(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap);
-    void resolveCollisionY(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap);
-    void resolveCollisionZ(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap);
+    void resolveEnemyDirection(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, float overlap, bool isZAxis);
+    template <auto getPos, auto setPos>
+    bool resolveCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap);
     // void checkBorderCollision(EntityManager& em, Octree& boxes);
 };
 

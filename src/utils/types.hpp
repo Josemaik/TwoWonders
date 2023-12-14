@@ -32,7 +32,7 @@ struct WaterTag {};
 struct ObjectTag {};
 struct ZoneTag {};
 
-using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent,PatrolComponent,ShootPlayerComponent,RandomShootComponent,AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent,ZoneComponent>;
+using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, PatrolComponent, ShootPlayerComponent, RandomShootComponent, AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent>;
 using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayer, GroundTag, WaterTag, ObjectTag, ZoneTag>;
 using SCL = MP::TypeList<LevelInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

@@ -11,7 +11,7 @@
     return  distance < (spc.detect_radius * spc.detect_radius);
 }
 
-[[nodiscard]] vec3f AISystem::getPlayerDistance(EntityManager& EM, PhysicsComponent const& p,  ShootPlayerComponent& spc) const noexcept {
+[[nodiscard]] vec3f AISystem::getPlayerDistance(EntityManager& EM, PhysicsComponent const& p, ShootPlayerComponent& spc) const noexcept {
     auto& li = EM.getSingleton<LevelInfo>();
     auto* playerEn = EM.getEntityByID(li.playerID);
     if (not playerEn) { spc.playerdetected = false; return vec3f{}; };
@@ -27,7 +27,7 @@ void AISystem::setVelocity(PhysicsComponent& p, vec3f distance) {
     }
 }
 
-vec3f AISystem::FollowPatrol(PhysicsComponent& p,PatrolComponent& pc) {
+vec3f AISystem::FollowPatrol(PhysicsComponent& p, PatrolComponent& pc) {
     //Do patrol
     //si la pos actual es >= que el maximo patron vuelvo al principio
     if (pc.current >= pc.max_patrol) {
@@ -70,15 +70,15 @@ vec3f AISystem::getRandomPosinRange(float xmin, float xmax, float zmin, float zm
     return vec3f{ x,0.0f,z };
 
 }
-void AISystem::ShotandMove(ShootPlayerComponent& spc, PhysicsComponent& p, EntityManager& em, Entity& ent,float dt) {
+void AISystem::ShotandMove(ShootPlayerComponent& spc, PhysicsComponent& p, EntityManager& em, Entity& ent, float dt) {
     //cada x segundos cambia de posicion
-    if(!spc.shoot){
-        if(spc.elapsed_change_position>=spc.countdown_change_position){
+    if (!spc.shoot) {
+        if (spc.elapsed_change_position >= spc.countdown_change_position) {
             //before change position go visible
             auto& rend = em.getComponent<RenderComponent>(ent);
             rend.visible = true;
             //Set random position
-            vec3f randomPos = getRandomPosinRange(spc.Xmin,spc.Xmax,spc.Zmin,spc.Zmax);
+            vec3f randomPos = getRandomPosinRange(spc.Xmin, spc.Xmax, spc.Zmin, spc.Zmax);
             p.position.setX(randomPos.x());
             p.position.setZ(randomPos.z());
             //Attack
@@ -86,8 +86,9 @@ void AISystem::ShotandMove(ShootPlayerComponent& spc, PhysicsComponent& p, Entit
             spc.elapsed_change_position = 0;
         }
         spc.dec_countdown_change_pos(dt);
-    }else{
-        if(spc.elapsed_shoot_rap>=spc.countdown_shoot_rap){
+    }
+    else {
+        if (spc.elapsed_shoot_rap >= spc.countdown_shoot_rap) {
             //set entitites invisible
             auto& rend1 = em.getComponent<RenderComponent>(ent);
             rend1.visible = false;
@@ -123,17 +124,17 @@ bool AISystem::isInDesiredRange(const vec3f& direction, float xmin, float xmax, 
 vec3f AISystem::getRandomDir() {
     // Genero direccion aleatoria
     switch (std::rand() % 4) {
-    case 0:  return { 0.25f, 0.0f, 0.0f }; break;
-    case 1:  return { -0.25f, 0.0f, 0.0f }; break;
-    case 2:  return { 0.0f, 0.0f, 0.25f }; break;
-    case 3:  return { 0.0f, 0.0f, -0.25f }; break;
+    case 0:  return { 0.25f, 0.0f, 0.0f }; break; //derecha
+    case 1:  return { -0.25f, 0.0f, 0.0f }; break; //izquieda
+    case 2:  return { 0.0f, 0.0f, 0.25f }; break; //Abajo
+    case 3:  return { 0.0f, 0.0f, -0.25f }; break; //Arriba
     default: return { -0.25f, 0.0f, 0.0f }; break;
     }
 }
- void AISystem::RandomAI(RandomShootComponent& rsc,PhysicsComponent& p,EntityManager& em,Entity& e,float dt){
+void AISystem::RandomAI(RandomShootComponent& rsc, PhysicsComponent& p, EntityManager& em, Entity& e, float dt) {
     vec3f direction{};
     //check change direction when not shooting
-    if(!rsc.stoped){
+    if (!rsc.stoped) {
         if (rsc.elapsed_change_dir >= rsc.countdown_change_dir) {
             //set random dir
             direction = getRandomDir();
@@ -143,8 +144,8 @@ vec3f AISystem::getRandomDir() {
         rsc.dec_countdown_change_dir(dt);
     }
     // //check if ai have to stops
-    if(!rsc.shoot){
-        if(rsc.elapsed_stop>=rsc.countdown_stop){
+    if (!rsc.shoot) {
+        if (rsc.elapsed_stop >= rsc.countdown_stop) {
             rsc.stoped = true;
             rsc.shoot = true;
             rsc.elapsed_stop = 0;
@@ -159,8 +160,8 @@ vec3f AISystem::getRandomDir() {
     // auto& rend = em.getComponent<RenderComponent>(e);
     // rend.visible = false;
     //time while shooting
-    if(rsc.shoot){
-        if(rsc.elapsed_shoot >= rsc.countdown_shoot){
+    if (rsc.shoot) {
+        if (rsc.elapsed_shoot >= rsc.countdown_shoot) {
             //Shoot
             rsc.shoot = false;
             rsc.stoped = false;
@@ -169,29 +170,30 @@ vec3f AISystem::getRandomDir() {
         rsc.dec_countdown_shoot(dt);
     }
     // //Set velocity
-    if(!rsc.stoped){
+    if (!rsc.stoped) {
         //Range Control
         if(!isInDesiredRange(p.position+rsc.oldvel,rsc.Xmin,rsc.Xmax,rsc.Zmin,rsc.Zmax)){
                 rsc.oldvel *= -1.0f;
         }
         p.velocity = rsc.oldvel;
-    }else{
+    }
+    else {
         p.velocity = {};
     }
 
 }
 void AISystem::update(EntityManager& em, float dt)
 {
-    em.forEach<SYSCMPs_Patrol, SYSTAGs>([&,dt](Entity& e,PhysicsComponent& phy,PatrolComponent& pc)
+    em.forEach<SYSCMPs_Patrol, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, PatrolComponent& pc)
     {
-           (void)e;
-            vec3f distance = FollowPatrol(phy, pc);
-            setVelocity(phy,distance);
-    });    
-    em.forEach<SYSCMPs_ShootPlayer, SYSTAGs>([&,dt](Entity& ent,PhysicsComponent& phy,ShootPlayerComponent& spc){
-         ShotandMove(spc,phy, em, ent,dt);
+        (void)e;
+        vec3f distance = FollowPatrol(phy, pc);
+        setVelocity(phy, distance);
     });
-     em.forEach<SYSCMPs_RandomShoot, SYSTAGs>([&,dt](Entity& ent,PhysicsComponent& phy,RandomShootComponent& rsc){
-         RandomAI(rsc,phy,em,ent,dt);
+    em.forEach<SYSCMPs_ShootPlayer, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, ShootPlayerComponent& spc) {
+        ShotandMove(spc, phy, em, ent, dt);
+    });
+    em.forEach<SYSCMPs_RandomShoot, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, RandomShootComponent& rsc) {
+        RandomAI(rsc, phy, em, ent, dt);
     });
 }

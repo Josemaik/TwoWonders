@@ -7,15 +7,27 @@
 #include "../components/collider_component.hpp"
 
 struct Octree {
-    using OctVector = std::vector<std::pair<Entity*, ColliderComponent*>>;
+
+    struct pair_compare
+    {
+        template <class T1, class T2>
+        bool operator () (const std::pair<T1*, T2*>& p1, const std::pair<T1*, T2*>& p2) const
+        {
+            if (p1.first != p2.first)
+                return p1.first < p2.first;
+            return p1.second < p2.second;
+        }
+    };
+
+    using OctSet = std::set<std::pair<Entity*, ColliderComponent*>, pair_compare>;
 
     Octree(uint8_t depth, const BBox& bounds, const Octree* parent = nullptr, uint8_t max = MAX_ENTITIES)
         : bounds_(bounds), depth_(depth), parent_(const_cast<Octree*>(parent)), max_ent_(max) {};
 
     void insert(Entity& entity, ColliderComponent& collider);
     void subdivide();
-    OctVector query(const BBox& box);
-    void remove(std::pair<Entity*, ColliderComponent*>& entity);
+    OctSet query(const BBox& box);
+    void remove(std::pair<Entity*, ColliderComponent*> const& entity);
     std::size_t countEntities() const;
     void recombine();
     std::vector<Octree*> getNeighbors(ColliderComponent const& collider);
@@ -24,9 +36,8 @@ struct Octree {
 
     // Función que nos devuelve las entidades en el octree
     template<typename T = std::pair<Entity*, ColliderComponent*>>
-    auto getOctEntities() -> std::span<std::conditional_t<std::is_const_v<T>, const std::pair<Entity*, ColliderComponent*>, std::pair<Entity*, ColliderComponent*>>>
-    {
-        return std::span{ octEntities_.begin(), octEntities_.end() };
+    auto getOctEntities() -> std::conditional_t<std::is_const_v<T>, const OctSet&, OctSet&> {
+        return octEntities_;
     }
 
     // Función que nos devuelve el número de entidades en nodo
@@ -54,7 +65,7 @@ struct Octree {
     static const uint8_t MAX_DEPTH = 10;
 
 private:
-    OctVector octEntities_;
+    OctSet octEntities_;
     std::array<std::unique_ptr<Octree>, 8> octants_{};
     BBox bounds_{};
     uint8_t depth_{};
