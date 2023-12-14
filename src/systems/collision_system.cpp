@@ -204,6 +204,11 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
 
     //Si impacta enemigo con pared
     if (behaviorType2 & BehaviorType::ENEMY) {
+        if (staticEntPtr->hasTag<WaterTag>()) {
+            groundCollision(*otherPhy, em.getComponent<RenderComponent>(*otherEntPtr).scale, minOverlap);
+            return;
+        }
+
         enemiesWallCollision(em, *otherEntPtr, *staticPhy, *otherPhy, minOverlap);
         return;
     }
