@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include <set>
+#include <unordered_set>
 #include "../utils/types.hpp"
 #include "../utils/BBox.hpp"
 #include "../components/collider_component.hpp"
@@ -21,18 +22,16 @@ struct Octree {
 
     using OctSet = std::set<std::pair<Entity*, ColliderComponent*>, pair_compare>;
 
-    Octree(uint8_t depth, const BBox& bounds, const Octree* parent = nullptr, uint8_t max = MAX_ENTITIES)
+    Octree(uint8_t depth, const BBox& bounds, const Octree* parent = nullptr, std::size_t max = MAX_ENTITIES)
         : bounds_(bounds), depth_(depth), parent_(const_cast<Octree*>(parent)), max_ent_(max) {};
 
     void insert(Entity& entity, ColliderComponent& collider);
     void subdivide();
-    OctSet query(const BBox& box);
-    void remove(std::pair<Entity*, ColliderComponent*> const& entity);
     std::size_t countEntities() const;
-    void recombine();
-    std::vector<Octree*> getNeighbors(ColliderComponent const& collider);
-    void getChildrenRecursive(Octree* node, ColliderComponent const& collider, std::vector<Octree*>& neighbors, std::set<std::size_t>& removeFromNeighbors, std::size_t position);
-    void getParentsRecursive(Octree* node, ColliderComponent const& collider, std::vector<Octree*>& neighbors);
+    void remove(std::pair<Entity*, ColliderComponent*> const& entity);
+    std::unordered_set<Octree*> getNeighbors(ColliderComponent const& collider);
+    void getChildrenRecursive(Octree* node, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors);
+    void getParentsRecursive(Octree* node, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors);
 
     // Función que nos devuelve las entidades en el octree
     template<typename T = std::pair<Entity*, ColliderComponent*>>
@@ -59,10 +58,21 @@ struct Octree {
     [[nodiscard]] Octree const* getParent() const noexcept { return parent_; }
 
     // Función que nos devuelve el número máximo de entidades en el nodo
-    [[nodiscard]] uint8_t getMaxEntities() const noexcept { return max_ent_; }
+    [[nodiscard]] std::size_t getMaxEntities() const noexcept { return max_ent_; }
 
-    static const uint8_t MAX_ENTITIES = 100;
-    static const uint8_t MAX_DEPTH = 10;
+    static const std::size_t MAX_ENTITIES = 10;
+    static const std::size_t MAX_DEPTH = 10;
+    static constexpr std::array<vec3f, 8> offsets =
+    {
+        vec3f(-0.5f, -0.5f, -0.5f),
+        vec3f(0.5f, -0.5f, -0.5f),
+        vec3f(-0.5f, 0.5f, -0.5f),
+        vec3f(0.5f, 0.5f, -0.5f),
+        vec3f(-0.5f, -0.5f, 0.5f),
+        vec3f(0.5f, -0.5f, 0.5f),
+        vec3f(-0.5f, 0.5f, 0.5f),
+        vec3f(0.5f, 0.5f, 0.5f)
+    };
 
 private:
     OctSet octEntities_;
@@ -71,5 +81,5 @@ private:
     uint8_t depth_{};
     bool divided_ = false;
     Octree* parent_;
-    uint8_t max_ent_{ MAX_ENTITIES };
+    std::size_t max_ent_{ MAX_ENTITIES };
 };

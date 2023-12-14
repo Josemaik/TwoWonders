@@ -24,7 +24,7 @@ struct BBox
         return vec3f::min(overlap1, overlap2);
     }
 
-    vec3f size() const { return max - min; }
-    vec3f center() const { return (min + max) / 2.f; }
+    constexpr vec3f size() const { return max - min; }
+    constexpr vec3f center() const { return (min + max) / 2.f; }
     bool intersects(const BBox& other) const { return !(max < other.min || min > other.max); }
 };
