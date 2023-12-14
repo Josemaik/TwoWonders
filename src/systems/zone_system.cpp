@@ -1,17 +1,22 @@
 #include "zone_system.hpp"
 
-void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine){
+void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine,Ia_man& iam){
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ZoneComponent& zon)
     {
         if (zon.changeZone) {
             // Comprobar en que zona estamos
             auto& li = em.getSingleton<LevelInfo>();
             if (li.num_zone != zon.zone) {
+                //Crear enemigos de la zona nueva
+                // if(!iam.checkEnemiesCreaeted(zon.zone)){
+                     iam.createEnemiesZone(em,zon.zone);
+                // }
+                //borro enemigos si cambio de zona
+                iam.deleteEnemiesZone(em,li.num_zone);
                 // Es una zona
                 li.num_zone = zon.zone;
                 if(zon.zone <= 12)
                 {
-                    //std::cout << "Acabo de entrar a la zona: " + std::to_string(zon.zone) << std::endl;
                     if (ent.hasComponent<RenderComponent>()) {
                         auto& r = em.getComponent<RenderComponent>(ent);
                         engine.setPositionCamera({ r.position.x(), 30.0f, r.position.z() + 12.0f });
@@ -21,7 +26,6 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine){
                 // Es un TP
                 else
                 {
-                    //std::cout << "Acabo de entrar en un tp" << std::endl;
                     auto* playerEn = em.getEntityByID(li.playerID);
                     auto& p = em.getComponent<PhysicsComponent>(*playerEn);
                     switch (zon.zone)

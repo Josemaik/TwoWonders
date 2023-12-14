@@ -15,8 +15,10 @@ struct EnemyData {
 // 1=>shoot player
 // 2=> ia random
 void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, uint16_t type, uint16_t z) {
+    // int num = 0;
     for (const auto& data : vec)
     {
+        // num++;
         auto& enemy{ em.newEntity() };
         em.addTag<EnemyTag>(enemy);
         auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = data.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE ,.visible = data.visible });
@@ -52,6 +54,7 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, uint16_t 
         em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = data.num_lifes });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
     }
+    // std::printf("Creados: %d\n",num);
 }
 bool Ia_man::checkEnemiesCreaeted(uint16_t zone){
     switch (zone)
@@ -116,11 +119,11 @@ void Ia_man::createEnemiesZone3(EntityManager& em,uint16_t z){
     createdzone3 = true;
     //Crearemos IA random
      std::vector<EnemyData> Vec_RandomShoot_3 = {
-        {getRandomPosinRange(-31.0f,-13.0f,-6.0f,6.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f,true},
-        {getRandomPosinRange(-31.0f,-13.0f,-6.0f,6.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f,true},
-        {getRandomPosinRange(-31.0f,-13.0f,-6.0f,6.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f,true},
-        {getRandomPosinRange(-31.0f,-13.0f,-6.0f,6.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f,true},
-        {getRandomPosinRange(-31.0f,-13.0f,-6.0f,6.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f,true}
+        {getRandomPosinRange(-31.0f,-13.0f,-6.0f,-3.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f,true},
+        {getRandomPosinRange(-31.0f,-13.0f,-3.0f,-1.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f,true},
+        {getRandomPosinRange(-31.0f,-13.0f,-1.0f,2.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f,true},
+        {getRandomPosinRange(-31.0f,-13.0f,2.0f,4.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f,true},
+        {getRandomPosinRange(-31.0f,-13.0f,4.0f,6.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f,true}
      };
      createEnemiesofType(em, Vec_RandomShoot_3,2,z);
 }
@@ -173,15 +176,21 @@ void Ia_man::deleteEnemiesZone(EntityManager& em,uint16_t zone){
     };
 }
 void Ia_man::deleteEnemiesinZone(EntityManager& em,uint16_t z){
-    auto entities = em.getEntities(); 
-    for(auto &ent: entities){
-        if(ent.hasComponent<ZoneComponent>() && ent.hasTag<EnemyTag>()){
-            if(em.getComponent<ZoneComponent>(ent).zone == z){
+    // int xd = 0;
+    auto entities = em.getEntities();
+    auto entitiesCopy = entities;  // Hacer una copia de la colección
+
+    for (auto &ent : entitiesCopy) {
+        if (ent.hasComponent<ZoneComponent>() && ent.hasTag<EnemyTag>()) {
+            if (em.getComponent<ZoneComponent>(ent).zone == z) {
+                // std::printf("Zona: %d\n",z);
                 em.destroyEntity(ent.getID());
-                std::printf("XD\n");
+                // xd++;
             }
         }
     }
+
+    // std::printf("Eliminados: %d\n", xd);
     setCreatedtofalse(z);
 }
 void Ia_man::setCreatedtofalse(uint16_t z){
