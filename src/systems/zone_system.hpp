@@ -3,6 +3,7 @@
 #define ZONE_SYSTEM
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
+#include "../managers/ia_manager.hpp"
 
 struct ZoneSystem
 {
