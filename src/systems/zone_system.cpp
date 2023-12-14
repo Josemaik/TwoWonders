@@ -26,24 +26,36 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine){
                     auto& p = em.getComponent<PhysicsComponent>(*playerEn);
                     switch (zon.zone)
                     {
+
+                    // SWORD //
+
                     case 13: // TP a la cueva de la espada
                         p.position.setX(49.0f);
-                        p.position.setZ(84.0f);
+                        p.position.setZ(85.0f);
                         break;
 
                     case 14: // TP desde la cueva de la espada
-                        p.position.setX(0.0f); // -5
-                        p.position.setZ(0.0f); // -3.5
+                        p.position.setX(-5.0f);
+                        p.position.setZ(-4.5f);
                         break;
 
-                    case 15: // TP a la cueva de la tienda
+                    // COINS //
+
+                    case 15: // TP a la cueva de las monedas
                         p.position.setX(71.0f);
-                        p.position.setZ(84.0f);
+                        p.position.setZ(85.0f);
                         break;
 
-                    case 17: // TP a la cueva de las monedas
+                    case 16: // TP desde la cueva de las monedas
+                        p.position.setX(3.0f);
+                        p.position.setZ(-20.0f);
+                        break;
+
+                    // SHOP //
+
+                    case 17: // TP a la cueva de la tienda
                         p.position.setX(93.0f);
-                        p.position.setZ(84.0f);
+                        p.position.setZ(85.0f);
                         break;
                     
                     default:

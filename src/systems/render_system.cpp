@@ -91,7 +91,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
         if (e.hasTag<PlayerTag>())
         {
             // Dibujar background HUD
-            engine.drawRectangle(0, 0, 525, 60, WHITE);
+            engine.drawRectangle(0, 0, 550, 60, WHITE);
             engine.drawRectangle(0, 50, 100, 120, WHITE);
 
             // Dibujar vidas restantes del player en el HUD

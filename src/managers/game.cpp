@@ -83,9 +83,25 @@ void createSword(EntityManager& em)
     em.addTag<ObjectTag>(e);
 
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 49.0f, 0.f, 78.0f }, .scale = { 1.0f, 0.3f, 0.3f }, .color = LIGHTGRAY });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword });
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword, .inmortal = true });
+}
+
+void createCoin(EntityManager& em){
+    std::cout << "Creo moneda" << std::endl;
+    auto& e{ em.newEntity() };
+
+    em.addTag<ObjectTag>(e);
+
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 71.0f, 0.f, 78.0f }, .scale = { 0.5f, 0.5f, 0.5f }, .color = YELLOW });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Coin30, .inmortal = true});
+}
+
+void createShop(EntityManager& em){
+    
 }
 
 void createEntities(EntityManager& em)
@@ -102,6 +118,12 @@ void createEntities(EntityManager& em)
 
     // Sword
     createSword(em);
+
+    // Coin
+    createCoin(em);
+
+    // Shop
+    createShop(em);
 
     // Enemies
     // createEnemiesZelda(em);

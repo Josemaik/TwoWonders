@@ -3,7 +3,7 @@
 void ObjectSystem::update(EntityManager& em, float deltaTime) {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ObjectComponent& obj)
     {
-        if (obj.decreaseLifeTime(deltaTime) && (obj.type != Object_type::Sword))
+        if (obj.decreaseLifeTime(deltaTime) && (!obj.inmortal))
         {
             if (obj.type == Object_type::BombExplode)
                 obj.effect();
@@ -37,6 +37,11 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             case Object_type::Coin:
                 if (playerEnt->hasComponent<InformationComponent>())
                     em.getComponent<InformationComponent>(*playerEnt).addCoin();
+                break;
+
+            case Object_type::Coin30:
+                if (playerEnt->hasComponent<InformationComponent>())
+                    em.getComponent<InformationComponent>(*playerEnt).add30Coins();
                 break;
 
             case Object_type::BombExplode:
