@@ -55,7 +55,7 @@ private:
     void handleZoneCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, BehaviorType behaviorType1, BehaviorType behaviorType2);
     void handlePlayerCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
     void handleAtkCollision(EntityManager& em, bool& atkPl1, bool& atkPl2, bool& atkEn1, bool& atkEn2, Entity& entity1, Entity& entity2);
-    void EnemiesWallCollision(EntityManager& em, Entity& entity2,PhysicsComponent& staticPhy, PhysicsComponent& otherPhy,vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
+    void enemiesWallCollision(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3f& minOverlap, BehaviorType behaviorType1);
     void classicCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
     bool resolveCollisionX(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap);
     void resolveCollisionY(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap);

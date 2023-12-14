@@ -6,7 +6,11 @@ void Octree::insert(Entity& entity, ColliderComponent& collider)
     //std::size_t s = countEntities();
     if (!divided_ && octEntities_.size() < max_ent_)
     {
-        octEntities_.push_back({ &entity, &collider });
+        auto it = std::find(octEntities_.begin(), octEntities_.end(), std::make_pair(&entity, &collider));
+        if (it == octEntities_.end()) // Si el par no se encuentra en octEntities_
+        {
+            octEntities_.push_back({ &entity, &collider });
+        }
     }
     else if (depth_ < MAX_DEPTH)
     {

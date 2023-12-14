@@ -2,33 +2,33 @@
 #include "game_engine.hpp"
 //#include "../utils/memory_viewer.hpp"
 
-void createEnemiesofType(EntityManager& em,std::vector<EnemyData>vec,uint16_t type){
+void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, uint16_t type) {
     for (const auto& data : vec)
     {
         auto& enemy{ em.newEntity() };
         em.addTag<EnemyTag>(enemy);
-        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = data.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE ,.visible=data.visible});
+        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = data.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE ,.visible = data.visible });
         auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = { .2f, .0f, .0f } });
         switch (type)
         {
-        case 0: em.addComponent<PatrolComponent>(enemy,PatrolComponent{ .patrol=data.route });
+        case 0: em.addComponent<PatrolComponent>(enemy, PatrolComponent{ .patrol = data.route });
             break;
         case 1:
-            em.addComponent<ShootPlayerComponent>(enemy,ShootPlayerComponent{ 
+            em.addComponent<ShootPlayerComponent>(enemy, ShootPlayerComponent{
                 .Xmin = data.Xmin,
                 .Xmax = data.Xmax,
                 .Zmin = data.Zmin,
                 .Zmax = data.Zmax
-             });
-             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.0f });
+                });
+            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.0f });
             break;
         case 2:
-            em.addComponent<RandomShootComponent>(enemy,RandomShootComponent{ 
+            em.addComponent<RandomShootComponent>(enemy, RandomShootComponent{
                 .Xmin = data.Xmin,
                 .Xmax = data.Xmax,
                 .Zmin = data.Zmin,
                 .Zmax = data.Zmax
-             });
+                });
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
             break;
         default:
@@ -42,17 +42,17 @@ void createEnemiesofType(EntityManager& em,std::vector<EnemyData>vec,uint16_t ty
 void createEnemiesZelda(EntityManager& em)
 {
     //Creamos Patrol Enemies
-     std::vector<EnemyData> Vec_patrolData = {
-        { {-9.0f, 0.f, -14.0f},vec3f{},
-         {
-             vec3f{-9.0f, 0.f, -14.0f},
-             { -9.0f, 0.f, -10.0f },
-             { 9.0f, 0.f, -10.0f },
-             { 9.0f, 0.f, -14.0f },
-             PatrolComponent::invalid
-         },0.0f,5.0f,1,0.0f,0.0f,0.0f,0.0f,true}
-     };
-    createEnemiesofType(em,Vec_patrolData,0);
+    std::vector<EnemyData> Vec_patrolData = {
+       { {-9.0f, 0.f, -14.0f},vec3f{},
+        {
+            vec3f{-9.0f, 0.f, -14.0f},
+            { -9.0f, 0.f, -10.0f },
+            { 9.0f, 0.f, -10.0f },
+            { 9.0f, 0.f, -14.0f },
+            PatrolComponent::invalid
+        },0.0f,5.0f,1,0.0f,0.0f,0.0f,0.0f,true}
+    };
+    createEnemiesofType(em, Vec_patrolData, 0);
     //Creamos Shoot Player Enemies
     std::vector<EnemyData> Vec_ShootPlayerData = {
         { {-46.0f, 0.0f, -20.0f},vec3f{},
@@ -64,14 +64,14 @@ void createEnemiesZelda(EntityManager& em)
              vec3f{}
          },0.0f,10.0f,2,-43.0f,-46.0f,3.0f,-4.0f,false}
     };
-    createEnemiesofType(em,Vec_ShootPlayerData,1);
+    createEnemiesofType(em, Vec_ShootPlayerData, 1);
     //Creamos Random enemies
     std::vector<EnemyData> Vec_RandomShoot = {
         {{-33.0f, 0.0f, -12.0f},{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-36.0f,-28.0f,-21.0f,-10.0f,true},
         {{-32.0f, 0.0f, -20.0f},{0.2f,0.0f,0.0f},{},2.0f,0.f,1,-36.0f,-28.0f,-21.0f,-10.0f,true},
         {{-28.0f, 0.0f, -11.0f},{0.2f,0.0f,0.0f},{},1.0f,0.f,1,-36.0f,-28.0f,-21.0f,-10.0f,true}
     };
-    createEnemiesofType(em,Vec_RandomShoot,2);
+    createEnemiesofType(em, Vec_RandomShoot, 2);
 }
 
 void createSword(EntityManager& em)
