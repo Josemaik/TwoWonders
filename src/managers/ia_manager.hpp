@@ -10,6 +10,7 @@ struct Ia_man
     void createEnemiesZone(EntityManager& em,uint16_t zone);
     void deleteEnemiesZone(EntityManager& em,uint16_t zone);
     bool checkEnemiesCreaeted(uint16_t zone);
+
     // private:
     //     void createWallsOverworld(EntityManager& em);
     //     void createGroundWaterOverworld(EntityManager& em);
@@ -18,11 +19,15 @@ struct Ia_man
     private:
         bool createdzone2{false},createdzone3{false},createdzone4{false},
         createdzone5{false},createdzone6{false};
-        void createEnemiesZone2(EntityManager& em);
-        void createEnemiesZone3(EntityManager& em);
-        void createEnemiesZone4(EntityManager& em);
-        void createEnemiesZone5(EntityManager& em);
-        void createEnemiesZone6(EntityManager& em);
+
+        void createEnemiesZone2(EntityManager& em,uint16_t z);
+        void createEnemiesZone3(EntityManager& em,uint16_t z);
+        void createEnemiesZone4(EntityManager& em,uint16_t z);
+        void createEnemiesZone5(EntityManager& em,uint16_t z);
+        void createEnemiesZone6(EntityManager& em,uint16_t z);
+
+        void deleteEnemiesinZone(EntityManager& em,uint16_t zone);
+        void setCreatedtofalse(uint16_t z);
 };
 
 #endif // !MAP
