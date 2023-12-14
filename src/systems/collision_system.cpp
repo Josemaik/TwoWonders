@@ -201,15 +201,16 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
+
     //Si impacta enemigo con pared
     if (behaviorType2 & BehaviorType::ENEMY) {
         enemiesWallCollision(em, *otherEntPtr, *staticPhy, *otherPhy, minOverlap);
         return;
     }
-
     // Colisiones con paredes
     staticCollision(*otherPhy, *staticPhy, minOverlap);
 }
+
 
 void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3f& minOverlap)
 {
