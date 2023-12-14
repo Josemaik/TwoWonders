@@ -34,11 +34,11 @@ bool RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
             auto const& r{ em.getComponent<RenderComponent>(e) };
             if (r.visible) {
                 // Revisamos si es el jugador para mover la cámara
-                if (e.hasTag<PlayerTag>())
-                {
-                    engine.setPositionCamera({ r.position.x(), 25.0f, r.position.z() + 25.0f });
-                    engine.setTargetCamera(r.position);
-                }
+                // if (e.hasTag<PlayerTag>())
+                // {
+                //     engine.setPositionCamera({ r.position.x(), 25.0f, r.position.z() + 25.0f });
+                //     engine.setTargetCamera(r.position);
+                // }
                 // Comprobar si tiene el componente vida
                 Color colorEntidad = r.color;
                 if (e.hasComponent<LifeComponent>()) {

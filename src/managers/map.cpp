@@ -103,6 +103,13 @@ void Map::createWallsOverworld(EntityManager& em) {
         { { -37.5f, 0.0f, -18.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
         { { -37.5f, 0.0f, -14.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
 
+        // CUEVAS EN EL OVERWORLD
+
+        { { -3.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
+        { { -5.0f, 0.0f, -6.0f }, { 2.0f, 1.0f, 1.0f }, BLACK },   // | 
+        { { -6.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
+
+
         // CUEVAS
 
         { { 38.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },    // | Pared Vertical Izquierda
@@ -114,8 +121,8 @@ void Map::createWallsOverworld(EntityManager& em) {
         { { 71.f, 0.f, 72.f }, { 19.f, 1.f, 3.f }, DARKBROWN }, // | Paredes Horizontales Arriba
         { { 93.f, 0.f, 72.f }, { 19.f, 1.f, 3.f }, DARKBROWN }, // |
 
-        { { 43.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // |
-        { { 54.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // |
+        { { 43.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | 
+        { { 54.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | Paredes Horizontales Abajo
 
 
 
@@ -195,7 +202,7 @@ void Map::createZonesOverworld(EntityManager& em) {
         { { -43.f, 0.f, 0.f }, {19.f, 1.f, 13.f }, 5 , BLACK },
         { { -43.f, 0.f, -16.f }, {19.f, 1.f, 13.f }, 6 , BLACK },
         // TP //
-        { { -5.f, 0.f, -5.f }, { 3.f, 1.f, 3.f }, 13 , BLACK },
+        { { -5.f, 0.f, -5.5f }, { 2.f, 1.f, 0.5f }, 13 , BLACK },
 
 
         // CUEVAS //
