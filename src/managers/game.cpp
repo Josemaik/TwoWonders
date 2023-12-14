@@ -104,7 +104,7 @@ void createEntities(EntityManager& em)
     createSword(em);
 
     // Enemies
-    createEnemiesZelda(em);
+    // createEnemiesZelda(em);
 
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
