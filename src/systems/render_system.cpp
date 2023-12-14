@@ -138,23 +138,25 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine)
         }
 
         // Dibujar la vida restante encima de las entidades // DEBUG
-        // if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
-        // {
-        //     auto const& r{ em.getComponent<RenderComponent>(e) };
-        //     auto const& l{ em.getComponent<LifeComponent>(e) };
+        if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
+        {
+            auto const& r{ em.getComponent<RenderComponent>(e) };
+            auto const& l{ em.getComponent<LifeComponent>(e) };
 
-        //     engine.drawText(std::to_string(l.life).c_str(),
-        //         static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-        //         static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
-        //         20,
-        //         BLACK);
-        // }
-        auto const& r{ em.getComponent<RenderComponent>(e) };
-        engine.drawText(std::to_string(e.getID()).c_str(),
-            static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-            static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
-            20,
-            BLACK);
+            engine.drawText(std::to_string(l.life).c_str(),
+                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+                20,
+                BLACK);
+        }
+
+        // Dibujar el ID de las entidades // DEBUG
+        // auto const& r{ em.getComponent<RenderComponent>(e) };
+        // engine.drawText(std::to_string(e.getID()).c_str(),
+        //     static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+        //     static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+        //     20,
+        //     BLACK);
     }
 }
 

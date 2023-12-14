@@ -3,14 +3,9 @@
 // Función para insertar una entidad en el octree o en sus hijos
 void Octree::insert(Entity& entity, ColliderComponent& collider)
 {
-    //std::size_t s = countEntities();
     if (!divided_ && octEntities_.size() < max_ent_)
     {
-        auto it = std::find(octEntities_.begin(), octEntities_.end(), std::make_pair(&entity, &collider));
-        if (it == octEntities_.end()) // Si el par no se encuentra en octEntities_
-        {
-            octEntities_.push_back({ &entity, &collider });
-        }
+        octEntities_.insert({ &entity, &collider });
     }
     else if (depth_ < MAX_DEPTH)
     {
@@ -57,7 +52,7 @@ void Octree::subdivide()
     }
 
     // // Redistribute existing entities to new octants
-    OctVector toRemove;
+    OctSet toRemove;
     for (auto& entity : octEntities_)
     {
         for (auto& octant : octants_)
@@ -65,14 +60,14 @@ void Octree::subdivide()
             if (octant->bounds_.intersects(entity.second->boundingBox))
             {
                 octant->insert(*entity.first, *entity.second);
-                toRemove.push_back(entity);
+                toRemove.insert(entity);
                 break;
             }
         }
     }
 
     // Remove entities that have been redistributed
-    for (auto& entity : toRemove)
+    for (auto const& entity : toRemove)
     {
         remove(entity);
     }
@@ -153,37 +148,37 @@ void Octree::getParentsRecursive(Octree* node, ColliderComponent const& collider
 }
 
 // Función defectuosa
-Octree::OctVector Octree::query(const BBox& box)
-{
-    Octree::OctVector found{};
+// Octree::OctSet Octree::query(const BBox& box)
+// {
+//     Octree::OctSet found{};
 
-    // Revisar si la entidad se encuentra en el nodo actual
-    if (!bounds_.intersects(box))
-        return found;
+//     // Revisar si la entidad se encuentra en el nodo actual
+//     if (!bounds_.intersects(box))
+//         return found;
 
-    // Si está dividido, buscar en los octantes
-    if (divided_)
-    {
-        for (const auto& octant : octants_)
-        {
-            auto octantFound = octant->query(box);
-            found.insert(found.end(), octantFound.begin(), octantFound.end());
-        }
-    }
-    else
-    {
-        // Si no está dividido, buscar en las entidades
-        for (const auto& entity : octEntities_)
-        {
-            if (box.intersects(entity.second->boundingBox))
-            {
-                found.push_back(entity);
-            }
-        }
-    }
+//     // Si está dividido, buscar en los octantes
+//     if (divided_)
+//     {
+//         for (const auto& octant : octants_)
+//         {
+//             auto octantFound = octant->query(box);
+//             found.insert(found.end(), octantFound.begin(), octantFound.end());
+//         }
+//     }
+//     else
+//     {
+//         // Si no está dividido, buscar en las entidades
+//         for (const auto& entity : octEntities_)
+//         {
+//             if (box.intersects(entity.second->boundingBox))
+//             {
+//                 found.push_back(entity);
+//             }
+//         }
+//     }
 
-    return found;
-}
+//     return found;
+// }
 
 // Contamos las entidades que hay en el octante y en sus hijos
 std::size_t Octree::countEntities() const
@@ -202,23 +197,23 @@ std::size_t Octree::countEntities() const
 }
 
 // Función para recombinar hijos del cotree - no usada
-void Octree::recombine()
-{
-    if (divided_)
-    {
-        for (auto& octant : octants_)
-        {
-            auto& octantEntities = octant->octEntities_;
-            octEntities_.insert(octEntities_.end(), octantEntities.begin(), octantEntities.end());
-            octant.reset();
-        }
+// void Octree::recombine()
+// {
+//     if (divided_)
+//     {
+//         for (auto& octant : octants_)
+//         {
+//             auto& octantEntities = octant->octEntities_;
+//             octEntities_.insert(octEntities_.end(), octantEntities.begin(), octantEntities.end());
+//             octant.reset();
+//         }
 
-        divided_ = false;
-    }
-}
+//         divided_ = false;
+//     }
+// }
 
 // Función para eliminar una entidad del octree
-void Octree::remove(std::pair<Entity*, ColliderComponent*>& entity)
+void Octree::remove(std::pair<Entity*, ColliderComponent*> const& entity)
 {
     // Check if the entity is in the current Octree node
     for (auto it = octEntities_.begin(); it != octEntities_.end(); ++it)
