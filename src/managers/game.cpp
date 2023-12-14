@@ -148,7 +148,7 @@ void createEntities(EntityManager& em)
     createShop(em);
 
     // Enemies
-    // createEnemiesZelda(em);
+    createEnemiesZelda(em);
 
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
