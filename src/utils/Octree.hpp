@@ -61,7 +61,7 @@ struct Octree {
     // Función que nos devuelve el número máximo de entidades en el nodo
     [[nodiscard]] uint8_t getMaxEntities() const noexcept { return max_ent_; }
 
-    static const uint8_t MAX_ENTITIES = 10;
+    static const uint8_t MAX_ENTITIES = 100;
     static const uint8_t MAX_DEPTH = 10;
 
 private:

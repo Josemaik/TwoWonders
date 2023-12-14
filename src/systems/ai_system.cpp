@@ -172,8 +172,8 @@ void AISystem::RandomAI(RandomShootComponent& rsc, PhysicsComponent& p, EntityMa
     // //Set velocity
     if (!rsc.stoped) {
         //Range Control
-        if(!isInDesiredRange(p.position+rsc.oldvel,rsc.Xmin,rsc.Xmax,rsc.Zmin,rsc.Zmax)){
-                rsc.oldvel *= -1.0f;
+        if (!isInDesiredRange(p.position + rsc.oldvel, rsc.Xmin, rsc.Xmax, rsc.Zmin, rsc.Zmax)) {
+            rsc.oldvel *= -1.0f;
         }
         p.velocity = rsc.oldvel;
     }

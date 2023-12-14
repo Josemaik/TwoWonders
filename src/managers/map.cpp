@@ -90,7 +90,6 @@ void Map::createWallsOverworld(EntityManager& em) {
 
         { { -54.0f, 0.0f, 0.0f }, { 3.0f, 1.0f, 19.0f }, LIME },   // | Pared Vertical Izquierda
 
-
         // ZONA 6
 
         { { -37.0f, 0.0f, -24.0f }, { 11.0f, 1.0f, 3.0f }, LIME },   // | 
@@ -103,6 +102,38 @@ void Map::createWallsOverworld(EntityManager& em) {
         { { -40.5f, 0.0f, -12.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | Paredes Chiquitas
         { { -37.5f, 0.0f, -18.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
         { { -37.5f, 0.0f, -14.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
+
+        // CUEVAS EN EL OVERWORLD
+
+        { { -3.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
+        { { -5.0f, 0.0f, -6.0f }, { 2.0f, 1.0f, 1.0f }, BLACK },  // | Cueva Espada
+        { { -6.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // |
+
+        { { 1.5f, 0.0f, -22.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
+        { { 3.0f, 0.0f, -22.0f }, { 2.0f, 1.0f, 1.0f }, BLACK },  // | Cueva Monedas
+        { { 4.5f, 0.0f, -22.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // |  
+
+        { { -15.5f, 0.0f, -22.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
+        { { -17.0f, 0.0f, -22.0f }, { 2.0f, 1.0f, 1.0f }, BLACK },  // | Cueva Tienda
+        { { -18.5f, 0.0f, -22.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // |  
+
+        // CUEVAS
+
+        { { 38.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },    // | Pared Vertical Izquierda
+        { { 60.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },    // | Pared Vertical Central - I
+        { { 82.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },    // | Pared Vertical Central - D
+        { { 104.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },   // | Pared Vertical Derecha
+
+        { { 49.f, 0.f, 72.f }, { 19.f, 1.f, 3.f }, DARKBROWN }, // |
+        { { 71.f, 0.f, 72.f }, { 19.f, 1.f, 3.f }, DARKBROWN }, // | Paredes Horizontales Arriba
+        { { 93.f, 0.f, 72.f }, { 19.f, 1.f, 3.f }, DARKBROWN }, // |
+
+        { { 43.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | 
+        { { 54.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | 
+        { { 65.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | 
+        { { 76.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | Paredes Horizontales Abajo
+        { { 87.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | 
+        { { 98.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | 
     };
 
     for (const auto& data : wallData)
@@ -125,9 +156,13 @@ void Map::createGroundWaterOverworld(EntityManager& em) {
     };
 
     EntityData entitiesG[] = {
+        // OverWorld
         { { 0.f, -1.5f, 0.f }, { 85.0f, 2.f, 100.f }, BEIGE },
         { { -52.5f, -1.5f, 0.f }, { 10.0f, 2.f, 100.f }, BEIGE },
         { { -45.f, -1.5f, -16.f }, { 5.0f, 2.f, 2.0f }, ORANGE },
+        // Cuevas
+        { { 71.f, -1.5f, 80.f }, { 69.0f, 2.f, 19.0f }, BROWN },
+        // Mazmorra
     };
 
     for (const auto& data : entitiesG)
@@ -162,17 +197,37 @@ void Map::createZonesOverworld(EntityManager& em) {
         vec3f position;
         vec3f scale;
         uint16_t zone;
-        Color color;
     };
 
     EntityData entitiesG[] = {
-        //{ { 5.f, 0.f, 0.f }, { 3.f, 1.f, 3.f }, 1 , BLACK },
-        { { 0.f, 0.f, 0.f }, { 20.f, 1.f, 14.f }, 1 , BLACK },
-        { { 0.f, 0.f, -16.f }, { 20.f, 1.f, 14.f }, 2 , BLACK },
-        { { -22.f, 0.f, 0.f }, { 20.f, 1.f, 14.f }, 3 , BLACK },
-        { { -22.f, 0.f, -16.f }, { 20.f, 1.f, 14.f }, 4 , BLACK },
-        { { -43.f, 0.f, 0.f }, { 20.f, 1.f, 14.f }, 5 , BLACK },
-        { { -43.f, 0.f, -16.f }, { 20.f, 1.f, 14.f }, 6 , BLACK },
+        // OVERWORLD //
+        // Zonas //
+        { { 0.f, 0.f, 0.f }, {19.f, 1.f, 13.f }, 1 },
+        { { 0.f, 0.f, -16.f }, {19.f, 1.f, 13.f }, 2 },
+        { { -22.f, 0.f, 0.f }, {19.f, 1.f, 13.f }, 3 },
+        { { -22.f, 0.f, -16.f }, {19.f, 1.f, 13.f }, 4 },
+        { { -43.f, 0.f, 0.f }, {19.f, 1.f, 13.f }, 5 },
+        { { -43.f, 0.f, -16.f }, {19.f, 1.f, 13.f }, 6 },
+        // TP //
+        { { -5.f, 0.f, -5.5f }, { 2.f, 1.f, 0.5f }, 13 },   // Espada
+        { {  3.f, 0.f, -21.5f }, { 2.f, 1.f, 0.5f }, 15 },  // Monedas
+        { { -17.f, 0.f, -21.5f }, { 2.f, 1.f, 0.5f }, 17 }, // Tienda
+        // CUEVAS //
+        // Zonas //
+        { { 49.f, 0.f, 80.f }, { 19.f, 1.f, 13.f }, 7 },
+        { { 71.f, 0.f, 80.f }, { 19.f, 1.f, 13.f }, 8 },
+        { { 93.f, 0.f, 80.f }, { 19.f, 1.f, 13.f }, 9 },
+        // TP //
+        { { 49.f, 0.f, 88.5f }, { 3.f, 1.f, 2.f }, 14 }, // OverWorld
+        { { 71.f, 0.f, 88.5f }, { 3.f, 1.f, 2.f }, 16 }, // OverWorld
+        { { 93.f, 0.f, 88.5f }, { 3.f, 1.f, 2.f }, 18 }, // OverWorld
+        // MAZMORRA //
+        // 10
+        // 11
+        // 12
+        // TP //
+        // 19 // Mazmorra
+        // 20 // OverWorld
     };
 
     for (const auto& data : entitiesG)
@@ -180,7 +235,7 @@ void Map::createZonesOverworld(EntityManager& em) {
         auto& entity = em.newEntity();
         em.addTag<ZoneTag>(entity);
         em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = data.zone });
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color, .visible = false });
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .visible = false });
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3f::zero(), .gravity = .0f });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::ZONE });
     }
