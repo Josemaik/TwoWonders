@@ -3,18 +3,23 @@
 #define ZONE_SYSTEM
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
+#include "../managers/ia_manager.hpp"
 
 struct ZoneSystem
 {
     using SYSCMPs = MP::TypeList<ZoneComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, ENGI::GameEngine& engine) {
+    void update(EntityManager& em, ENGI::GameEngine& engine,Ia_man& iam) {
         em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ZoneComponent& zon)
         {
             if (zon.changeZone) {
                 // Comprobar en que zona estamos
                 auto& li = em.getSingleton<LevelInfo>();
+                //Creo enemigos de esa zona
+                if(!iam.checkEnemiesCreaeted(li.num_zone)){
+                    iam.createEnemiesZone(em,li.num_zone);
+                }
                 if (li.num_zone != zon.zone) {
                     //std::cout << "Acabo de entrar a la zona: " + std::to_string(zon.zone) << std::endl;
                     li.num_zone = zon.zone;
