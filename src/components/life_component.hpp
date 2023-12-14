@@ -8,6 +8,7 @@ struct LifeComponent
 
     void decreaseLife();
     void increaseLife();
+    void increaseMaxLife();
     void decreaseCountdown(float deltaTime) { elapsed += deltaTime; };
     bool vidaMax() { return (life == maxLife); };
 };

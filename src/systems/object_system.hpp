@@ -14,6 +14,10 @@ struct ObjectSystem
 private:
     void explodeBomb(EntityManager& em, Entity& ent);
     void createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type);
+    // Shop
+    bool buyBomb(EntityManager& em, Entity* ent);
+    bool buyExtraLife(EntityManager& em, Entity* ent);
+    bool buyLife(EntityManager& em, Entity* ent);
 };
 
 #endif // !OBJECT_SYSTEM

@@ -11,7 +11,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine){
                 li.num_zone = zon.zone;
                 if(zon.zone <= 12)
                 {
-                    std::cout << "Acabo de entrar a la zona: " + std::to_string(zon.zone) << std::endl;
+                    //std::cout << "Acabo de entrar a la zona: " + std::to_string(zon.zone) << std::endl;
                     if (ent.hasComponent<RenderComponent>()) {
                         auto& r = em.getComponent<RenderComponent>(ent);
                         engine.setPositionCamera({ r.position.x(), 30.0f, r.position.z() + 12.0f });
@@ -21,7 +21,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine){
                 // Es un TP
                 else
                 {
-                    std::cout << "Acabo de entrar en un tp" << std::endl;
+                    //std::cout << "Acabo de entrar en un tp" << std::endl;
                     auto* playerEn = em.getEntityByID(li.playerID);
                     auto& p = em.getComponent<PhysicsComponent>(*playerEn);
                     switch (zon.zone)
@@ -57,7 +57,12 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine){
                         p.position.setX(93.0f);
                         p.position.setZ(85.0f);
                         break;
-                    
+
+                    case 18: // TP desde la cueva de la tienda
+                        p.position.setX(-17.0f);
+                        p.position.setZ(-20.0f);
+                        break;
+
                     default:
                         break;
                     }

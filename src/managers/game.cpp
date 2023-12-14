@@ -89,7 +89,6 @@ void createSword(EntityManager& em)
 }
 
 void createCoin(EntityManager& em){
-    std::cout << "Creo moneda" << std::endl;
     auto& e{ em.newEntity() };
 
     em.addTag<ObjectTag>(e);
@@ -101,7 +100,30 @@ void createCoin(EntityManager& em){
 }
 
 void createShop(EntityManager& em){
-    
+
+    // Bomba
+    auto& e{ em.newEntity() };
+    em.addTag<ObjectTag>(e);
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 93.0f, 0.f, 78.0f }, .scale = { 0.5f, 0.5f, 0.5f }, .color = GRAY });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::ShopItem_Bomb, .inmortal = true});
+
+    // Vida
+    auto& e2{ em.newEntity() };
+    em.addTag<ObjectTag>(e2);
+    auto& r2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = { 88.0f, 0.f, 78.0f }, .scale = { 0.5f, 0.5f, 0.5f }, .color = RED });
+    auto& p2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = { r2.position }, .velocity = { .0f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(e2, ColliderComponent{ p2.position, r2.scale, BehaviorType::STATIC });
+    em.addComponent<ObjectComponent>(e2, ObjectComponent{ .type = Object_type::ShopItem_Life, .inmortal = true});
+
+    // Vida extra
+    auto& e3{ em.newEntity() };
+    em.addTag<ObjectTag>(e3);
+    auto& r3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = { 98.0f, 0.f, 78.0f }, .scale = { 0.5f, 0.5f, 0.5f }, .color = MAROON });
+    auto& p3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = { r3.position }, .velocity = { .0f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(e3, ColliderComponent{ p3.position, r3.scale, BehaviorType::STATIC });
+    em.addComponent<ObjectComponent>(e3, ObjectComponent{ .type = Object_type::ShopItem_ExtraLife, .inmortal = true});
 }
 
 void createEntities(EntityManager& em)
