@@ -16,11 +16,8 @@ struct ZoneSystem
             if (zon.changeZone) {
                 // Comprobar en que zona estamos
                 auto& li = em.getSingleton<LevelInfo>();
-                //Creo enemigos de esa zona si no habían
-                if(!iam.checkEnemiesCreaeted(li.num_zone)){
-                    iam.createEnemiesZone(em,li.num_zone);
-                }
                 if (li.num_zone != zon.zone) {
+                    iam.createEnemiesZone(em,zon.zone);
                     //borro enemigos si cambio de zona
                     iam.deleteEnemiesZone(em,li.num_zone);
                     //std::cout << "Acabo de entrar a la zona: " + std::to_string(zon.zone) << std::endl;
