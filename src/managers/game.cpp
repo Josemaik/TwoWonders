@@ -82,7 +82,7 @@ void createSword(EntityManager& em)
 
     em.addTag<ObjectTag>(e);
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -6.0f, 0.f, -5.0f }, .scale = { 1.0f, 0.3f, 0.3f }, .color = LIGHTGRAY });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 49.0f, 0.f, 78.0f }, .scale = { 1.0f, 0.3f, 0.3f }, .color = LIGHTGRAY });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword });
