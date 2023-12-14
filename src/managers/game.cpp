@@ -67,9 +67,11 @@ void createEnemiesZelda(EntityManager& em)
     createEnemiesofType(em, Vec_ShootPlayerData, 1);
     //Creamos Random enemies
     std::vector<EnemyData> Vec_RandomShoot = {
-        {{-33.0f, 0.0f, -12.0f},{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-36.0f,-28.0f,-21.0f,-10.0f,true},
-        {{-32.0f, 0.0f, -20.0f},{0.2f,0.0f,0.0f},{},2.0f,0.f,1,-36.0f,-28.0f,-21.0f,-10.0f,true},
-        {{-28.0f, 0.0f, -11.0f},{0.2f,0.0f,0.0f},{},1.0f,0.f,1,-36.0f,-28.0f,-21.0f,-10.0f,true}
+        {{-33.0f, 0.0f, -12.0f},{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-43.0f,-11.0f,-24.0f,-9.0f,true},
+        {{-32.0f, 0.0f, -20.0f},{0.2f,0.0f,0.0f},{},2.0f,0.f,1,-43.0f,-11.0f,-24.0f,-9.0f,true},
+        {{-28.0f, 0.0f, -11.0f},{0.2f,0.0f,0.0f},{},1.0f,0.f,1,-43.0f,-11.0f,-24.0f,-9.0f,true},
+        {{-21.0f, 0.0f, -10.0f},{0.2f,0.0f,0.0f},{},1.0f,0.f,1,-43.0f,-11.0f,-24.0f,-9.0f,true},
+        {{-39.0f, 0.0f, -18.0f},{0.2f,0.0f,0.0f},{},1.0f,0.f,1,-43.0f,-11.0f,-24.0f,-9.0f,true}
     };
     createEnemiesofType(em, Vec_RandomShoot, 2);
 }
