@@ -131,6 +131,9 @@ void game()
 
     engine.setTargetFPS(30);
 
+    // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
+    srand((unsigned int)time(NULL));
+
     // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
     // mv.printMemory();
 
