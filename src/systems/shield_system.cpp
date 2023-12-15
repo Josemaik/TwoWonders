@@ -13,16 +13,21 @@ void ShieldSystem::update(EntityManager& em){
             if(!shi.shield){
                 std::cout << "No existe el escudo, se va a crear" << std::endl;
                 auto& e { em.newEntity() };
+                auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f}, .scale = { 1.0f, 1.0f, 1.0f}, .color = BROWN });
+                auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }});
+                em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
 
                 // Se asigna a shi.shield
                 shi.shield = e.getID();
             }
-            // si no existe shi.shield, se crea
-            // se posiciona shi.shield respecto a la entidad
+            // Se posiciona respecto a la entidad y a la direccion
+
         }
         else
         {
-            // se elimina shi.shield
+            // Se elimina shi.shield
+            std::cout << "Se borra el escudo" << std::endl;
+            em.destroyEntity(shi.shield);
         }
     });
 }
