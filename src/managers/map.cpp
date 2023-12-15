@@ -164,11 +164,14 @@ void Map::createWallsOverworld(EntityManager& em) {
         { { 55.0f, 0.0f, -75.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
         { { 55.0f, 0.0f, -71.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
         { { 55.0f, 0.0f, -67.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
-
-        { { 67.0f, 0.0f, -75.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
+        { { 67.0f, 0.0f, -75.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | Paredes Chiquitas
         { { 67.0f, 0.0f, -71.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
         { { 67.0f, 0.0f, -67.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
 
+        // ZONA 12
+
+        { { 78.0f, 0.0f, -71.0f }, { 2.0f, 1.0f, 3.0f }, DARKBLUE },  // | 
+        { { 88.0f, 0.0f, -71.0f }, { 2.0f, 1.0f, 3.0f }, DARKBLUE },  // | 
 
     };
 
