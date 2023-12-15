@@ -151,11 +151,11 @@ void Map::createWallsOverworld(EntityManager& em) {
 
         { { 72.0f, 0.0f, -95.0f }, { 41.0f, 1.0f, 3.0f }, DARKBLUE },  // | Pared Horizontal Arriba
 
-        { { 55.0f, 0.0f, -79.0f }, { 8.0f, 1.0f, 3.0f }, DARKBLUE },  // | 
+        { { 55.5f, 0.0f, -79.0f }, { 8.0f, 1.0f, 3.0f }, DARKBLUE },  // | 
         { { 66.5f, 0.0f, -79.0f }, { 8.0f, 1.0f, 3.0f }, DARKBLUE },  // | Pared Horizontal Enmedio
         { { 83.0f, 0.0f, -79.0f }, { 19.0f, 1.0f, 3.0f }, DARKBLUE }, // | 
 
-        { { 55.0f, 0.0f, -63.0f }, { 8.0f, 1.0f, 3.0f }, DARKBLUE },  // | 
+        { { 55.5f, 0.0f, -63.0f }, { 8.0f, 1.0f, 3.0f }, DARKBLUE },  // | 
         { { 66.5f, 0.0f, -63.0f }, { 8.0f, 1.0f, 3.0f }, DARKBLUE },  // | Pared Horizontal Abajo
         { { 83.0f, 0.0f, -63.0f }, { 19.0f, 1.0f, 3.0f }, DARKBLUE }, // | 
 
