@@ -62,6 +62,7 @@ void createEntities(EntityManager& em)
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<InformationComponent>(e, InformationComponent{});
+    em.addComponent<ShieldComponent>(e, ShieldComponent{});
 
     // Sword
     createSword(em);
@@ -95,6 +96,7 @@ void game()
     ProjectileSystem projectile_system{};
     ObjectSystem object_system{};
     ZoneSystem zone_system{};
+    ShieldSystem shield_system{};
 
     createEntities(em);
 
@@ -136,6 +138,7 @@ void game()
         collision_system.update(em);
         zone_system.update(em, engine, iam);
 
+        shield_system.update(em);
         object_system.update(em, deltaTime);
         attack_system.update(em, deltaTime);
         projectile_system.update(em, deltaTime);
