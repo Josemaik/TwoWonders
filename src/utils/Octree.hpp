@@ -29,10 +29,19 @@ struct Octree {
     void subdivide();
     std::size_t countEntities() const;
     void remove(std::pair<Entity*, ColliderComponent*> const& entity);
-    std::unordered_set<Octree*> getNeighbors(ColliderComponent const& collider);
-    void getChildrenRecursive(Octree* node, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors);
-    void getParentsRecursive(Octree* node, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors);
+    std::unordered_set<Octree*> getNeighbors(Entity const& entity, ColliderComponent const& collider);
+    void getChildrenRecursive(Octree* node, Entity const& entity, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors);
+    void getParentsRecursive(Octree* node, Entity const& entity, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors);
+    Entity* query(Entity const& entity)
+    {
+        for (const auto& pair : octEntities_)
+        {
+            if (pair.first == &entity)
+                return pair.first;
 
+        }
+        return nullptr;
+    }
     // Función que nos devuelve las entidades en el octree
     template<typename T = std::pair<Entity*, ColliderComponent*>>
     auto getOctEntities() -> std::conditional_t<std::is_const_v<T>, const OctSet&, OctSet&> {
@@ -60,7 +69,7 @@ struct Octree {
     // Función que nos devuelve el número máximo de entidades en el nodo
     [[nodiscard]] std::size_t getMaxEntities() const noexcept { return max_ent_; }
 
-    static const std::size_t MAX_ENTITIES = 10;
+    static const std::size_t MAX_ENTITIES = 15;
     static const std::size_t MAX_DEPTH = 10;
     static constexpr std::array<vec3f, 8> offsets =
     {

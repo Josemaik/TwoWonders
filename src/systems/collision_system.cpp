@@ -51,7 +51,7 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
 
         // Guardamos las entidades del mismo octante en el auxiliar
         for (auto const& [e2, c2] : octree.getOctEntities())
-            if (e != e2 && c != c2)
+            if (checkedPairs.find({ e->getID(), e2->getID() }) == checkedPairs.end())
                 auxOct.insert(*e2, *c2);
 
         // Revisamos las entidades de los octantes vecinos
@@ -59,7 +59,7 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
         neighbors.reserve(octree.getNumEntities() * 2);
         if (neighborsMap.find(e->getID()) == neighborsMap.end())
         {
-            neighbors = octree.getNeighbors(*c);
+            neighbors = octree.getNeighbors(*e, *c);
             neighborsMap.insert({ e->getID(), neighbors });
         }
         else
@@ -71,8 +71,7 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
             for (auto const& [nEnt, nCol] : neighbor->getOctEntities())
             {
                 // Si la colisión entre estas dos entidades no se ha comprobado ya, se hace ahora
-                if (checkedPairs.find({ e->getID(), nEnt->getID() }) == checkedPairs.end() &&
-                    checkedPairs.find({ nEnt->getID(), e->getID() }) == checkedPairs.end())
+                if (checkedPairs.find({ e->getID(), nEnt->getID() }) == checkedPairs.end() && e != nEnt)
                 {
                     BBox& bbox2 = nCol->boundingBox;
 
@@ -95,7 +94,6 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
 
                         // Marcamos la colisión entre ambas entidades como comprobada
                         checkedPairs.insert({ e->getID(), nEnt->getID() });
-                        checkedPairs.insert({ nEnt->getID(), e->getID() });
                     }
                 }
             }

@@ -10,10 +10,7 @@ void Octree::insert(Entity& entity, ColliderComponent& collider)
     else if (depth_ < MAX_DEPTH)
     {
         if (!divided_)
-        {
             subdivide();
-            divided_ = true;
-        }
 
         for (auto& octant : octants_)
         {
@@ -22,7 +19,6 @@ void Octree::insert(Entity& entity, ColliderComponent& collider)
                 octant->insert(entity, collider);
             }
         }
-
     }
 }
 
@@ -64,33 +60,33 @@ void Octree::subdivide()
 }
 
 // Función para obtener los vecinos con los que una entidad interacciona fuera de su octante
-std::unordered_set<Octree*> Octree::getNeighbors(ColliderComponent const& collider)
+std::unordered_set<Octree*> Octree::getNeighbors(Entity const& entity, ColliderComponent const& collider)
 {
     std::unordered_set<Octree*> neighbors;
 
     // Check the parent node and its ancestors
-    getParentsRecursive(parent_, collider, neighbors);
+    getParentsRecursive(parent_, entity, collider, neighbors);
 
     return neighbors;
 }
 
 // Función para buscar los hijos de un nodo específico recursivamente
-void Octree::getChildrenRecursive(Octree* node, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors)
+void Octree::getChildrenRecursive(Octree* node, Entity const& entity, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors)
 {
     for (const auto& octant : node->octants_)
     {
         if (octant.get() != this && octant->bounds_.intersects(collider.boundingBox))
         {
-            if (!octant->octEntities_.empty())
+            if (!octant->octEntities_.empty() && octant->query(entity) == nullptr)
                 neighbors.insert(octant.get());
             else if (octant->divided_)
-                getChildrenRecursive(octant.get(), collider, neighbors);
+                getChildrenRecursive(octant.get(), entity, collider, neighbors);
         }
     }
 }
 
 // Función para buscar los padres del nodo padre recursivamente
-void Octree::getParentsRecursive(Octree* node, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors)
+void Octree::getParentsRecursive(Octree* node, Entity const& entity, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors)
 {
     if (node != nullptr)
     {
@@ -100,13 +96,13 @@ void Octree::getParentsRecursive(Octree* node, ColliderComponent const& collider
             {
                 if (octant->bounds_.intersects(collider.boundingBox) && octant.get() != node)
                 {
-                    if (!octant->octEntities_.empty())
+                    if (!octant->octEntities_.empty() && octant->query(entity) == nullptr)
                         neighbors.insert(octant.get());
                 }
             }
-            getParentsRecursive(node->parent_, collider, neighbors);
         }
-        getChildrenRecursive(node, collider, neighbors);
+        getChildrenRecursive(node, entity, collider, neighbors);
+        getParentsRecursive(node->parent_, entity, collider, neighbors);
     }
 }
 

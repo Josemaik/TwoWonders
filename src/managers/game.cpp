@@ -109,6 +109,21 @@ void game()
     // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
     // mv.printMemory();
 
+    // Cosas pa contar milisegundos
+    // using std::chrono::high_resolution_clock;
+    // using std::chrono::duration_cast;
+    // using std::chrono::duration;
+    // using std::chrono::milliseconds;
+
+    // Colocar antes de donde se quiere medir el tiempo
+    //auto t1 = high_resolution_clock::now();
+
+    // Colocar despues de donde se quiere medir el tiempo
+    // auto t2 = high_resolution_clock::now();
+    // auto duration = duration_cast<milliseconds>(t2 - t1);
+    // std::cout << "el _System se ejecutó en " << duration.count() << " ms.\n";
+
+
     // Inicializa una variabloe donde tener el tiempo entre frames
     float deltaTime;
     while (!engine.windowShouldClose())
