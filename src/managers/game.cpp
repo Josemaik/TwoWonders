@@ -116,7 +116,7 @@ void game()
     // using std::chrono::milliseconds;
 
     // Colocar antes de donde se quiere medir el tiempo
-    //auto t1 = high_resolution_clock::now();
+    // auto t1 = high_resolution_clock::now();
 
     // Colocar despues de donde se quiere medir el tiempo
     // auto t2 = high_resolution_clock::now();
@@ -133,7 +133,6 @@ void game()
         input_system.update(em);
         ai_sys.update(em, deltaTime);
         physics_system.update(em);
-        // Obtén el tiempo antes de ejecutar la función
         collision_system.update(em);
         zone_system.update(em, engine, iam);
 

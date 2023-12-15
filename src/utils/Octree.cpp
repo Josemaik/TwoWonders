@@ -35,8 +35,7 @@ void Octree::subdivide()
         octants_[i] = std::make_unique<Octree>(depth_ + 1, octantBounds, this);
     }
 
-    // Redistribute existing entities to new octants
-    OctSet toRemove;
+    // Pasamos las entidades del nodo padre a los hijos
     for (auto& entity : octEntities_)
     {
         for (auto& octant : octants_)
@@ -44,17 +43,13 @@ void Octree::subdivide()
             if (octant->bounds_.intersects(entity.second->boundingBox))
             {
                 octant->insert(*entity.first, *entity.second);
-                toRemove.insert(entity);
-                break;
+                break; // Quitar este break para arreglar lo de las zonas pero revienta el rendimiento
             }
         }
     }
 
-    // Remove entities that have been redistributed
-    for (auto const& entity : toRemove)
-    {
-        remove(entity);
-    }
+    // Liberamos el espacio del nodo padre
+    octEntities_.clear();
 
     divided_ = true;
 }
@@ -62,10 +57,12 @@ void Octree::subdivide()
 // Función para obtener los vecinos con los que una entidad interacciona fuera de su octante
 std::unordered_set<Octree*> Octree::getNeighbors(Entity const& entity, ColliderComponent const& collider)
 {
-    std::unordered_set<Octree*> neighbors;
+    std::unordered_set<Octree*> neighbors{};
+    neighbors.insert(this);
 
     // Check the parent node and its ancestors
-    getParentsRecursive(parent_, entity, collider, neighbors);
+    if (parent_ != nullptr)
+        getParentsRecursive(parent_, entity, collider, neighbors);
 
     return neighbors;
 }
@@ -77,7 +74,7 @@ void Octree::getChildrenRecursive(Octree* node, Entity const& entity, ColliderCo
     {
         if (octant.get() != this && octant->bounds_.intersects(collider.boundingBox))
         {
-            if (!octant->octEntities_.empty() && octant->query(entity) == nullptr)
+            if (!octant->octEntities_.empty() && !octant->query(entity, collider))
                 neighbors.insert(octant.get());
             else if (octant->divided_)
                 getChildrenRecursive(octant.get(), entity, collider, neighbors);
@@ -88,22 +85,27 @@ void Octree::getChildrenRecursive(Octree* node, Entity const& entity, ColliderCo
 // Función para buscar los padres del nodo padre recursivamente
 void Octree::getParentsRecursive(Octree* node, Entity const& entity, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors)
 {
-    if (node != nullptr)
+    if (node->parent_ != nullptr)
     {
-        if (node->parent_ != nullptr)
+        for (const auto& octant : node->parent_->octants_)
         {
-            for (const auto& octant : node->parent_->octants_)
+            if (octant->bounds_.intersects(collider.boundingBox) && octant.get() != node)
             {
-                if (octant->bounds_.intersects(collider.boundingBox) && octant.get() != node)
-                {
-                    if (!octant->octEntities_.empty() && octant->query(entity) == nullptr)
-                        neighbors.insert(octant.get());
-                }
+                if (!octant->octEntities_.empty() && !octant->query(entity, collider))
+                    neighbors.insert(octant.get());
             }
         }
-        getChildrenRecursive(node, entity, collider, neighbors);
         getParentsRecursive(node->parent_, entity, collider, neighbors);
     }
+    getChildrenRecursive(node, entity, collider, neighbors);
+}
+
+bool Octree::query(Entity const& entity, ColliderComponent const& collider)
+{
+    if (octEntities_.find({ const_cast<Entity*>(&entity), const_cast<ColliderComponent*>(&collider) }) != octEntities_.end())
+        return true;
+
+    return false;
 }
 
 // Contamos las entidades que hay en el octante y en sus hijos
@@ -126,12 +128,9 @@ std::size_t Octree::countEntities() const
 void Octree::remove(std::pair<Entity*, ColliderComponent*> const& entity)
 {
     // Check if the entity is in the current Octree node
-    for (auto it = octEntities_.begin(); it != octEntities_.end(); ++it)
+    auto it = octEntities_.find(entity);
+    if (it != octEntities_.end())
     {
-        if (it->first == entity.first && it->second == entity.second)
-        {
-            octEntities_.erase(it);
-            return;
-        }
+        octEntities_.erase(it);
     }
 }

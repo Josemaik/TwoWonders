@@ -9,21 +9,34 @@
 
 struct Octree {
 
-    struct pair_compare
+    struct pair_hash
     {
         template <class T1, class T2>
-        bool operator () (const std::pair<T1*, T2*>& p1, const std::pair<T1*, T2*>& p2) const
+        std::size_t operator () (const std::pair<T1*, T2*>& p) const
         {
-            if (p1.first != p2.first)
-                return p1.first < p2.first;
-            return p1.second < p2.second;
+            auto h1 = std::hash<T1*>{}(p.first);
+            auto h2 = std::hash<T2*>{}(p.second);
+
+            return h1 ^ h2;
         }
     };
 
-    using OctSet = std::set<std::pair<Entity*, ColliderComponent*>, pair_compare>;
+    struct pair_equal
+    {
+        template <class T1, class T2>
+        bool operator () (const std::pair<T1*, T2*>& lhs, const std::pair<T1*, T2*>& rhs) const
+        {
+            return lhs.first == rhs.first && lhs.second == rhs.second;
+        }
+    };
+
+    using OctSet = std::unordered_set<std::pair<Entity*, ColliderComponent*>, pair_hash, pair_equal>;
 
     Octree(uint8_t depth, const BBox& bounds, const Octree* parent = nullptr, std::size_t max = MAX_ENTITIES)
-        : bounds_(bounds), depth_(depth), parent_(const_cast<Octree*>(parent)), max_ent_(max) {};
+        : bounds_(bounds), depth_(depth), parent_(const_cast<Octree*>(parent)), max_ent_(max)
+    {
+        octEntities_.reserve(max_ent_);
+    };
 
     void insert(Entity& entity, ColliderComponent& collider);
     void subdivide();
@@ -32,16 +45,7 @@ struct Octree {
     std::unordered_set<Octree*> getNeighbors(Entity const& entity, ColliderComponent const& collider);
     void getChildrenRecursive(Octree* node, Entity const& entity, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors);
     void getParentsRecursive(Octree* node, Entity const& entity, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors);
-    Entity* query(Entity const& entity)
-    {
-        for (const auto& pair : octEntities_)
-        {
-            if (pair.first == &entity)
-                return pair.first;
-
-        }
-        return nullptr;
-    }
+    bool query(Entity const& entity, ColliderComponent const& collider);
     // Función que nos devuelve las entidades en el octree
     template<typename T = std::pair<Entity*, ColliderComponent*>>
     auto getOctEntities() -> std::conditional_t<std::is_const_v<T>, const OctSet&, OctSet&> {
