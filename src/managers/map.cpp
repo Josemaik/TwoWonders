@@ -115,14 +115,18 @@ void Map::createWallsOverworld(EntityManager& em) {
 
         { { -15.5f, 0.0f, -22.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
         { { -17.0f, 0.0f, -22.0f }, { 2.0f, 1.0f, 1.0f }, BLACK },  // | Cueva Tienda
-        { { -18.5f, 0.0f, -22.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // |  
+        { { -18.5f, 0.0f, -22.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
+
+        { { -52.0f, 0.0f, -2.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
+        { { -52.0f, 0.0f, -3.5f }, { 1.0f, 1.0f, 2.0f }, BLACK },     // | Cueva Mazmorra
+        { { -52.0f, 0.0f, -5.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // |  
 
         // CUEVAS
 
-        { { 38.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },    // | Pared Vertical Izquierda
-        { { 60.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },    // | Pared Vertical Central - I
-        { { 82.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },    // | Pared Vertical Central - D
-        { { 104.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },   // | Pared Vertical Derecha
+        { { 38.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },  // | Pared Vertical Izquierda
+        { { 60.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },  // | Pared Vertical Central - I
+        { { 82.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },  // | Pared Vertical Central - D
+        { { 104.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN }, // | Pared Vertical Derecha
 
         { { 49.f, 0.f, 72.f }, { 19.f, 1.f, 3.f }, DARKBROWN }, // |
         { { 71.f, 0.f, 72.f }, { 19.f, 1.f, 3.f }, DARKBROWN }, // | Paredes Horizontales Arriba
@@ -134,6 +138,41 @@ void Map::createWallsOverworld(EntityManager& em) {
         { { 76.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | Paredes Horizontales Abajo
         { { 87.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | 
         { { 98.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | 
+
+        // MAZMORRA
+
+        { { 50.0f, 0.0f, -79.0f }, { 3.0f, 1.0f, 35.0f }, DARKBLUE },  // | Pared Vertical Izquierda
+        { { 94.0f, 0.0f, -79.0f }, { 3.0f, 1.0f, 35.0f }, DARKBLUE },  // | Pared Vertical Derecha
+
+        { { 72.0f, 0.0f, -91.0f }, { 3.0f, 1.0f, 5.0f }, DARKBLUE },  // | 
+        { { 72.0f, 0.0f, -81.5f }, { 3.0f, 1.0f, 8.0f }, DARKBLUE },  // | 
+        { { 72.0f, 0.0f, -75.0f }, { 3.0f, 1.0f, 5.0f }, DARKBLUE },  // | Pared Vertical Enmedio
+        { { 72.0f, 0.0f, -65.5f }, { 3.0f, 1.0f, 8.0f }, DARKBLUE },  // | 
+
+        { { 72.0f, 0.0f, -95.0f }, { 41.0f, 1.0f, 3.0f }, DARKBLUE },  // | Pared Horizontal Arriba
+
+        { { 55.0f, 0.0f, -79.0f }, { 8.0f, 1.0f, 3.0f }, DARKBLUE },  // | 
+        { { 66.5f, 0.0f, -79.0f }, { 8.0f, 1.0f, 3.0f }, DARKBLUE },  // | Pared Horizontal Enmedio
+        { { 83.0f, 0.0f, -79.0f }, { 19.0f, 1.0f, 3.0f }, DARKBLUE }, // | 
+
+        { { 55.0f, 0.0f, -63.0f }, { 8.0f, 1.0f, 3.0f }, DARKBLUE },  // | 
+        { { 66.5f, 0.0f, -63.0f }, { 8.0f, 1.0f, 3.0f }, DARKBLUE },  // | Pared Horizontal Abajo
+        { { 83.0f, 0.0f, -63.0f }, { 19.0f, 1.0f, 3.0f }, DARKBLUE }, // | 
+
+        // ZONA 10
+
+        { { 55.0f, 0.0f, -75.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
+        { { 55.0f, 0.0f, -71.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
+        { { 55.0f, 0.0f, -67.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
+        { { 67.0f, 0.0f, -75.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | Paredes Chiquitas
+        { { 67.0f, 0.0f, -71.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
+        { { 67.0f, 0.0f, -67.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
+
+        // ZONA 12
+
+        { { 78.0f, 0.0f, -71.0f }, { 2.0f, 1.0f, 3.0f }, DARKBLUE },  // | 
+        { { 88.0f, 0.0f, -71.0f }, { 2.0f, 1.0f, 3.0f }, DARKBLUE },  // | 
+
     };
 
     for (const auto& data : wallData)
@@ -163,6 +202,7 @@ void Map::createGroundWaterOverworld(EntityManager& em) {
         // Cuevas
         { { 71.f, -1.5f, 80.f }, { 69.0f, 2.f, 19.0f }, BROWN },
         // Mazmorra
+        { { 72.f, -1.5f, -79.f }, { 47.0f, 2.f, 35.0f }, BLUE },
     };
 
     for (const auto& data : entitiesG)
@@ -209,25 +249,26 @@ void Map::createZonesOverworld(EntityManager& em) {
         { { -43.f, 0.f, 0.f }, {19.f, 1.f, 13.f }, 5 },
         { { -43.f, 0.f, -16.f }, {19.f, 1.f, 13.f }, 6 },
         // TP //
-        { { -5.f, 0.f, -5.5f }, { 2.f, 1.f, 0.5f }, 13 },   // Espada
-        { {  3.f, 0.f, -21.5f }, { 2.f, 1.f, 0.5f }, 15 },  // Monedas
-        { { -17.f, 0.f, -21.5f }, { 2.f, 1.f, 0.5f }, 17 }, // Tienda
+        { { -5.f, 0.f, -5.5f }, { 2.f, 1.f, 0.5f }, 14 },   // Espada
+        { {  3.f, 0.f, -21.5f }, { 2.f, 1.f, 0.5f }, 16 },  // Monedas
+        { { -17.f, 0.f, -21.5f }, { 2.f, 1.f, 0.5f }, 18 }, // Tienda
         // CUEVAS //
         // Zonas //
         { { 49.f, 0.f, 80.f }, { 19.f, 1.f, 13.f }, 7 },
         { { 71.f, 0.f, 80.f }, { 19.f, 1.f, 13.f }, 8 },
         { { 93.f, 0.f, 80.f }, { 19.f, 1.f, 13.f }, 9 },
         // TP //
-        { { 49.f, 0.f, 88.5f }, { 3.f, 1.f, 2.f }, 14 }, // OverWorld
-        { { 71.f, 0.f, 88.5f }, { 3.f, 1.f, 2.f }, 16 }, // OverWorld
-        { { 93.f, 0.f, 88.5f }, { 3.f, 1.f, 2.f }, 18 }, // OverWorld
+        { { 49.f, 0.f, 88.5f }, { 3.f, 1.f, 2.f }, 15 }, // OverWorld
+        { { 71.f, 0.f, 88.5f }, { 3.f, 1.f, 2.f }, 17 }, // OverWorld
+        { { 93.f, 0.f, 88.5f }, { 3.f, 1.f, 2.f }, 19 }, // OverWorld
         // MAZMORRA //
-        // 10
-        // 11
-        // 12
+        { { 61.f, 0.0f, -71.f }, { 19.0f, 1.f, 13.0f }, 10 },
+        { { 61.f, 0.0f, -87.f }, { 19.0f, 1.f, 13.0f }, 11 }, 
+        { { 83.f, 0.0f, -71.f }, { 19.0f, 1.f, 13.0f }, 12 }, 
+        { { 83.f, 0.0f, -87.f }, { 19.0f, 1.f, 13.0f }, 13 },
         // TP //
-        // 19 // Mazmorra
-        // 20 // OverWorld
+        { { -51.5f, 0.f, -3.5f }, { 0.5f, 1.f, 2.0f }, 20 }, // Mazmorra
+        { { 61.0f, 0.f, -62.5f }, { 3.0f, 1.f, 2.0f }, 21 }, // OverWorld
     };
 
     for (const auto& data : entitiesG)

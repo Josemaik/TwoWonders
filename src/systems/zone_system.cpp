@@ -15,7 +15,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine,Ia_man& iam)
                 iam.deleteEnemiesZone(em,li.num_zone);
                 // Es una zona
                 li.num_zone = zon.zone;
-                if(zon.zone <= 12)
+                if(zon.zone <= 13)
                 {
                     if (ent.hasComponent<RenderComponent>()) {
                         auto& r = em.getComponent<RenderComponent>(ent);
@@ -33,38 +33,50 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine,Ia_man& iam)
 
                     // SWORD //
 
-                    case 13: // TP a la cueva de la espada
+                    case 14: // TP a la cueva de la espada
                         p.position.setX(49.0f);
                         p.position.setZ(85.0f);
                         break;
 
-                    case 14: // TP desde la cueva de la espada
+                    case 15: // TP desde la cueva de la espada
                         p.position.setX(-5.0f);
                         p.position.setZ(-4.5f);
                         break;
 
                     // COINS //
 
-                    case 15: // TP a la cueva de las monedas
+                    case 16: // TP a la cueva de las monedas
                         p.position.setX(71.0f);
                         p.position.setZ(85.0f);
                         break;
 
-                    case 16: // TP desde la cueva de las monedas
+                    case 17: // TP desde la cueva de las monedas
                         p.position.setX(3.0f);
                         p.position.setZ(-20.0f);
                         break;
 
                     // SHOP //
 
-                    case 17: // TP a la cueva de la tienda
+                    case 18: // TP a la cueva de la tienda
                         p.position.setX(93.0f);
                         p.position.setZ(85.0f);
                         break;
 
-                    case 18: // TP desde la cueva de la tienda
+                    case 19: // TP desde la cueva de la tienda
                         p.position.setX(-17.0f);
                         p.position.setZ(-20.0f);
+                        break;
+
+                    // MAZMORRA //
+
+                    case 20: // TP a la cueva de la mazmorra
+                        p.position.setX(61.0f);
+                        p.position.setZ(-65.0f);
+                        break;
+
+                    case 21: // TP desde la cueva de la mazmorra
+                        p.position.setX(-50.0f);
+                        p.position.setZ(-3.5f);
                         break;
 
                     default:
