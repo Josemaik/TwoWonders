@@ -24,7 +24,7 @@ struct AISystem
     vec3f FollowPatrol(PhysicsComponent& p, PatrolComponent& pc);
     void ShotandMove(ShootPlayerComponent& spc, PhysicsComponent& p, EntityManager& em, Entity& e, float dt);
     void RandomAI(RandomShootComponent& rsc, PhysicsComponent& p, EntityManager& em, Entity& e, float dt);
-    void DiagonalAI(DiagonalComponent& dc,PhysicsComponent& p,EntityManager& em, Entity& e, float dt);
+    void DiagonalAI(DiagonalComponent& dc,PhysicsComponent& p, float dt);
     //Operations
     void setVelocity(PhysicsComponent& p, vec3f distance);
     vec3f getVelocityonDirecion(vec3f vector);

@@ -195,9 +195,9 @@ void AISystem::RandomAI(RandomShootComponent& rsc, PhysicsComponent& p, EntityMa
         p.velocity = {};
     }
 }
-void AISystem::DiagonalAI(DiagonalComponent& dc, PhysicsComponent& p, EntityManager& em, Entity& e, float dt){
-         vec3f direction{};
-    //check change direction when not shooting
+void AISystem::DiagonalAI(DiagonalComponent& dc, PhysicsComponent& p, float dt){
+    vec3f direction{};
+    //check change direction
     if (!dc.stoped) {
         if (dc.elapsed_change_dir >= dc.countdown_change_dir) {
             //set random dir
@@ -208,28 +208,26 @@ void AISystem::DiagonalAI(DiagonalComponent& dc, PhysicsComponent& p, EntityMana
         dc.dec_countdown_change_dir(dt);
     }
     // //check if ai have to stops
-    if (!dc.shoot) {
+    if (!dc.moving) {
         if (dc.elapsed_stop >= dc.countdown_stop) {
             dc.stoped = true;
-            dc.shoot = true;
+            dc.moving = true;
             dc.elapsed_stop = 0;
             dc.elapsed_change_dir = 0;
         }
         dc.dec_countdown_stop(dt);
     }
-    // auto& rend = em.getComponent<RenderComponent>(e);
-    // rend.visible = false;
-    //time while shooting
-    if (dc.shoot) {
-        if (dc.elapsed_shoot >= dc.countdown_shoot) {
+    //time to return moving
+    if (dc.moving) {
+        if (dc.elapsed_moving >= dc.countdown_moving) {
             //Shoot
-            dc.shoot = false;
+            dc.moving = false;
             dc.stoped = false;
-            dc.elapsed_shoot = 0;
+            dc.elapsed_moving = 0;
         }
-        dc.dec_countdown_shoot(dt);
+        dc.dec_countdown_moving(dt);
     }
-    // //Set velocity
+    //Set velocity
     if (!dc.stoped) {
         //Range Control
         if (!isInDesiredRange(p.position + dc.oldvel, dc.Xmin, dc.Xmax, dc.Zmin, dc.Zmax)) {
@@ -256,6 +254,7 @@ void AISystem::update(EntityManager& em, float dt)
         RandomAI(rsc, phy, em, ent, dt);
     });
     em.forEach<SYSCMPs_Diagonal, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, DiagonalComponent& dc) {
-        DiagonalAI(dc, phy, em, ent, dt);
+        (void)ent;
+        DiagonalAI(dc, phy, dt);
     });
 }

@@ -2,11 +2,11 @@
 
 float getRandomStop() {
     switch (std::rand() % 2) {
-    case 0:  return 4.0f; break;
-    case 1:  return 6.0f; break;
-    case 2:  return 8.0f; break;
+        case 0:  return 10.0f; break;
+        case 1:  return 6.0f; break;
+        case 2:  return 8.0f; break;
+        default: return 6.5f; break;
     }
-    return 4.0f;
 }
 
 struct EnemyData {
@@ -64,14 +64,14 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, uint16_t 
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
             em.addComponent<ZoneComponent>(enemy, ZoneComponent{ .zone = z });
             break;
-        case 3: em.addComponent<DiagonalComponent>(enemy, DiagonalComponent{
-                .countdown_stop = getRandomStop(),
-                .Xmin = data.Xmin,
-                .Xmax = data.Xmax,
-                .Zmin = data.Zmin,
-                .Zmax = data.Zmax
-            });
-            em.addComponent<ZoneComponent>(enemy, ZoneComponent{ .zone = z });
+        case 3:  em.addComponent<DiagonalComponent>(enemy, DiagonalComponent{
+                    .countdown_stop = getRandomStop(),
+                    .Xmin = data.Xmin,
+                    .Xmax = data.Xmax,
+                    .Zmin = data.Zmin,
+                    .Zmax = data.Zmax
+                });
+                em.addComponent<ZoneComponent>(enemy, ZoneComponent{ .zone = z });
             break;
         default:
             break;
