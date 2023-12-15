@@ -12,6 +12,7 @@
 #include "../components/ai_components/shootplayer_component.hpp"
 #include "../components/ai_components/randomshoot_component.hpp"
 #include "../components/ai_components/diagonal_component.hpp"
+#include "../components/ai_components//drake_component.hpp"
 
 #include "../components/levelinfo.hpp"
 #include "../components/projectile_component.hpp"
@@ -33,7 +34,7 @@ struct WaterTag {};
 struct ObjectTag {};
 struct ZoneTag {};
 
-using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, PatrolComponent, ShootPlayerComponent, RandomShootComponent,DiagonalComponent,AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent>;
+using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, PatrolComponent, ShootPlayerComponent, RandomShootComponent,DiagonalComponent,DrakeComponent,AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent>;
 using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayer, GroundTag, WaterTag, ObjectTag, ZoneTag>;
 using SCL = MP::TypeList<LevelInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

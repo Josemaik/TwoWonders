@@ -239,6 +239,40 @@ void AISystem::DiagonalAI(DiagonalComponent& dc, PhysicsComponent& p, float dt){
         p.velocity = {};
     }
 }
+vec3f AISystem::DrakeAI(DrakeComponent& drc,PhysicsComponent& p,EntityManager& em, Entity& e,float dt){
+//Do patrol
+    //si la pos actual es >= que el maximo patron vuelvo al principio
+    if (drc.current >= drc.max_patrol) {
+        drc.current = 0;
+    }
+
+    // Set del objetivo, next position
+    auto const& target = drc.patrol[drc.current];
+    if (target == drc.invalid) {
+        drc.current = 0;
+        drc.nexttarget = 0;
+        return vec3f{ 0,0,0 };
+    }
+    //    std::cout << p.position.x() << ", " << p.position.y() << ", " << p.position.z() << "\n";
+        //calculo la distancia
+    auto const distance = target - p.position;
+    //std::cout << distance.x() << ", " << distance.y() << ", " << distance.z() << "\n";
+    // Si la distancia es < que el radio de llegada paso a la siguiente
+    if (distance.length() < drc.arrival_radius) {
+        drc.current++;
+        drc.arrived = true;
+    }
+
+    if (drc.elapsed_shoot >= drc.countdown_shoot) {
+            drc.elapsed_shoot = 0;
+            //shoot one time
+            auto& att = em.getComponent<AttackComponent>(e);
+            att.attack(AttackType::TripleShot);
+    }
+    drc.dec_countdown_shoot(dt);
+
+    return distance;
+}
 void AISystem::update(EntityManager& em, float dt)
 {
     em.forEach<SYSCMPs_Patrol, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, PatrolComponent& pc)
@@ -256,5 +290,10 @@ void AISystem::update(EntityManager& em, float dt)
     em.forEach<SYSCMPs_Diagonal, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, DiagonalComponent& dc) {
         (void)ent;
         DiagonalAI(dc, phy, dt);
+    });
+    em.forEach<SYSCMPs_Drake, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, DrakeComponent& drc) {
+        (void)ent;
+        vec3f distance = DrakeAI(drc, phy, em ,ent,dt);
+        setVelocity(phy, distance);
     });
 }

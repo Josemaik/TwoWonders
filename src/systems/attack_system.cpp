@@ -62,14 +62,21 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
 
     case AttackType::AttackPlayer:
         break;
-
+    case AttackType::TripleShot: createAttackTripleShot(em,ent,att);
     default:
         break;
     }
 
     att.createAttack = false;
 }
-
+void AttackSystem::createAttackTripleShot(EntityManager& em, Entity& ent, AttackComponent& att){
+    att.vel = {-0.25,0.0f,0.0f};
+    createAttackRanged(em,ent,att);
+    att.vel = {-0.25,0.0f,-0.15f};
+    createAttackRanged(em,ent,att);
+    att.vel = {-0.25,0.0f,0.15f};
+    createAttackRanged(em,ent,att);
+}
 void AttackSystem::createAttackRanged(EntityManager& em, Entity& ent, AttackComponent& att) {
     auto& e{ em.newEntity() };
     em.addTag<HitPlayer>(e);
