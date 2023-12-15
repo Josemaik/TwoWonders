@@ -79,4 +79,5 @@
         "complex": "cpp"
     },
     "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+    "C_Cpp.default.compilerPath": "/usr/bin/clang++",
 }

@@ -19,15 +19,16 @@ void CollisionSystem::update(EntityManager& em)
 
     // Vector para saber qué colisiones se han calculado ya
     pairsType checkedPairs;
+    octreeMap neighborsMap{};
 
     // Comprobar colisiones
-    checkCollision(em, octree, checkedPairs);
+    checkCollision(em, octree, checkedPairs, neighborsMap);
 
     // checkBorderCollision(em, ECPair);
 }
 
 // Función recursiva qué revisa las colisiones de las entidades del octree actual con otras entidades
-void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsType& checkedPairs)
+void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsType& checkedPairs, octreeMap& neighborsMap)
 {
     // Si el octree está dividido, revisar sus hijos
     if (octree.isDivided())
@@ -36,56 +37,45 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
         {
             // Si el octante tiene entidades o está dividido, revisar sus colisiones
             if (octant.get()->getNumEntities() > 0 || octant.get()->isDivided())
-                checkCollision(em, *octant, checkedPairs);
+                checkCollision(em, *octant, checkedPairs, neighborsMap);
         }
         return;
     }
-
-    // Auxiliar octree para guardar las entidades del mismo octante que el que se está comprobando
-    Octree auxOct(octree.getDepth(), octree.getBounds(), octree.getParent(), static_cast<uint8_t>(octree.getNumEntities() * 2));
 
     for (auto const& [e, c] : octree.getOctEntities())
     {
         BBox& bbox1 = c->boundingBox;
 
-        // Guardamos las entidades del mismo octante en el auxiliar
-        for (auto const& [e2, c2] : octree.getOctEntities())
-            if (e != e2 && c != c2)
-                auxOct.insert(*e2, *c2);
-
         // Revisamos las entidades de los octantes vecinos
-        auto neighbors = octree.getNeighbors(*c);
-        neighbors.push_back(&auxOct);
+        std::unordered_set<Octree*> neighbors{};
+
+        if (neighborsMap.find(e->getID()) == neighborsMap.end())
+        {
+            neighbors = octree.getNeighbors(*e, *c);
+            neighborsMap.insert({ e->getID(), neighbors });
+        }
+        else
+            neighbors = neighborsMap[e->getID()];
+
         for (auto& neighbor : neighbors)
         {
             for (auto const& [nEnt, nCol] : neighbor->getOctEntities())
             {
                 // Si la colisión entre estas dos entidades no se ha comprobado ya, se hace ahora
-                if (checkedPairs.find({ e->getID(), nEnt->getID() }) == checkedPairs.end() &&
-                    checkedPairs.find({ nEnt->getID(), e->getID() }) == checkedPairs.end())
+                if (checkedPairs.find({ e->getID(), nEnt->getID() }) == checkedPairs.end() && e != nEnt)
                 {
                     BBox& bbox2 = nCol->boundingBox;
 
                     if (bbox1.intersects(bbox2))
                     {
-                        Entity& entity1 = *e;
-                        Entity& entity2 = *nEnt;
+                        // Calculamos el mínimo solape entre las dos entidades
+                        vec3f minOverlap = BBox::minOverlap(bbox1, bbox2);
 
-                        ColliderComponent& collider1 = *c;
-                        ColliderComponent& collider2 = *nCol;
-
-                        // Solo compruebo colisiones cuando no sean ENEMY ambas.
-                        if (!(collider1.behaviorType & BehaviorType::ENEMY) || !(collider2.behaviorType & BehaviorType::ENEMY))
-                        {
-                            // Calculamos el mínimo solape entre las dos entidades
-                            vec3f minOverlap = BBox::minOverlap(bbox1, bbox2);
-
-                            handleCollision(em, entity1, entity2, minOverlap, collider1.behaviorType, collider2.behaviorType);
-                        }
+                        // Manejamos la colisión
+                        handleCollision(em, *e, *nEnt, minOverlap, c->behaviorType, nCol->behaviorType);
 
                         // Marcamos la colisión entre ambas entidades como comprobada
                         checkedPairs.insert({ e->getID(), nEnt->getID() });
-                        checkedPairs.insert({ nEnt->getID(), e->getID() });
                     }
                 }
             }
@@ -110,6 +100,12 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     if ((behaviorType1 & BehaviorType::ZONE || behaviorType2 & BehaviorType::ZONE))
     {
         handleZoneCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, behaviorType1, behaviorType2);
+        return;
+    }
+
+    // Colisiones de enemigos con enemigos - creo que son más o menos comunes
+    if (behaviorType1 & BehaviorType::ENEMY && behaviorType2 & BehaviorType::ENEMY)
+    {
         return;
     }
 
@@ -201,21 +197,22 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
-
     //Si impacta enemigo con pared
-    if (behaviorType2 & BehaviorType::ENEMY) {
-        if (staticEntPtr->hasTag<WaterTag>()) {
-            groundCollision(*otherPhy, em.getComponent<RenderComponent>(*otherEntPtr).scale, minOverlap);
+    if (behaviorType2 & BehaviorType::ENEMY)
+    {
+        if (staticEntPtr->hasTag<WaterTag>())
+        {
+            staticCollision(*otherPhy, *staticPhy, minOverlap);
             return;
         }
 
         enemiesWallCollision(em, *otherEntPtr, *staticPhy, *otherPhy, minOverlap);
         return;
     }
+
     // Colisiones con paredes
     staticCollision(*otherPhy, *staticPhy, minOverlap);
 }
-
 
 void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3f& minOverlap)
 {
