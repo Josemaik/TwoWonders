@@ -118,7 +118,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
 
     if (isAtkPlayer1 || isAtkPlayer2 || isAtkEnemy1 || isAtkEnemy2)
     {
-        if ((behaviorType2 & BehaviorType::SHIELD && behaviorType1 & BehaviorType::SHIELD)
+        if ((behaviorType2 & BehaviorType::SHIELD || behaviorType1 & BehaviorType::SHIELD)
             && (isAtkEnemy1 || isAtkEnemy2))
         {
             if (isAtkEnemy2)
@@ -128,7 +128,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
                 std::swap(behaviorType1, behaviorType2);
             }
 
-            em.getComponent<LifeComponent>(staticEnt).decreaseLifeNextFrame = true;
+            em.getComponent<LifeComponent>(staticEnt).decreaseLife();
             return;
         }
 
