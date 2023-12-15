@@ -1,6 +1,8 @@
 #include "zone_system.hpp"
 
-void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine,Ia_man& iam){
+void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam) {
+
+
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ZoneComponent& zon)
     {
         if (zon.changeZone) {
@@ -9,13 +11,13 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine,Ia_man& iam)
             if (li.num_zone != zon.zone) {
                 //Crear enemigos de la zona nueva
                 // if(!iam.checkEnemiesCreaeted(zon.zone)){
-                     iam.createEnemiesZone(em,zon.zone);
                 // }
                 //borro enemigos si cambio de zona
-                iam.deleteEnemiesZone(em,li.num_zone);
+                deleteEnemiesinZone(em, li.num_zone);
+                iam.createEnemiesZone(em, zon.zone);
                 // Es una zona
                 li.num_zone = zon.zone;
-                if(zon.zone <= 13)
+                if (zon.zone <= 13)
                 {
                     if (ent.hasComponent<RenderComponent>()) {
                         auto& r = em.getComponent<RenderComponent>(ent);
@@ -31,7 +33,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine,Ia_man& iam)
                     switch (zon.zone)
                     {
 
-                    // SWORD //
+                        // SWORD //
 
                     case 14: // TP a la cueva de la espada
                         p.position.setX(49.0f);
@@ -43,7 +45,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine,Ia_man& iam)
                         p.position.setZ(-4.5f);
                         break;
 
-                    // COINS //
+                        // COINS //
 
                     case 16: // TP a la cueva de las monedas
                         p.position.setX(71.0f);
@@ -55,7 +57,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine,Ia_man& iam)
                         p.position.setZ(-20.0f);
                         break;
 
-                    // SHOP //
+                        // SHOP //
 
                     case 18: // TP a la cueva de la tienda
                         p.position.setX(93.0f);
@@ -67,7 +69,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine,Ia_man& iam)
                         p.position.setZ(-20.0f);
                         break;
 
-                    // MAZMORRA //
+                        // MAZMORRA //
 
                     case 20: // TP a la cueva de la mazmorra
                         p.position.setX(61.0f);
@@ -87,4 +89,15 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine,Ia_man& iam)
             zon.changeZone = false;
         }
     });
+}
+
+void ZoneSystem::deleteEnemiesinZone(EntityManager& em, uint16_t z)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    if (z == li.num_zone)
+    {
+        std::unordered_set<std::size_t> enemies = li.enemiesID;
+        for (auto& enemy : enemies)
+            em.destroyEntity(enemy);
+    }
 }

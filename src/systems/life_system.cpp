@@ -15,13 +15,6 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
             // Eliminamos la entidad
             em.destroyEntity(ent.getID());
         }
-
-        // Esto sirve pa que el entity manager no se raye si dos entidades se destruyen a la vez
-        if (lif.decreaseLifeNextFrame)
-        {
-            lif.decreaseLife();
-            lif.decreaseLifeNextFrame = false;
-        }
     });
 }
 

@@ -304,7 +304,7 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
         if ((isPlayer2 && (atkEn1 || atkEn2)) || (isEnemy2 && (atkPl1 || atkPl2)))
         {
             em.getComponent<LifeComponent>(*ent1Ptr).decreaseLife();
-            em.getComponent<LifeComponent>(*ent2Ptr).decreaseLifeNextFrame = true;
+            em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife();
         }
     }
 }
