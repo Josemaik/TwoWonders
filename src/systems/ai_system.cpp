@@ -131,6 +131,20 @@ vec3f AISystem::getRandomDir() {
     default: return { -0.25f, 0.0f, 0.0f }; break;
     }
 }
+vec3f AISystem::getRandomDirwithDiagonals() {
+    // Genero direccion aleatoria
+    switch (std::rand() % 8) {
+    case 0:  return { 0.25f, 0.0f, 0.0f }; break; //derecha
+    case 1:  return { -0.25f, 0.0f, 0.0f }; break; //izquieda
+    case 2:  return { 0.0f, 0.0f, 0.25f }; break; //Abajo
+    case 3:  return { 0.0f, 0.0f, -0.25f }; break; //Arriba
+    case 4:  return { -0.25f, 0.0f, -0.25f}; break; //up-left
+    case 5:  return { 0.25f, 0.0f, 0.25f }; break; //down-right
+    case 6:  return { 0.25f, 0.0f, -0.25f }; break; //up-right
+    case 7:  return { -0.25f, 0.0f, 0.25f }; break; //down-left
+    default: return { -0.25f, 0.0f, 0.0f }; break;
+    }
+}
 void AISystem::RandomAI(RandomShootComponent& rsc, PhysicsComponent& p, EntityManager& em, Entity& e, float dt) {
     vec3f direction{};
     //check change direction when not shooting
@@ -180,7 +194,52 @@ void AISystem::RandomAI(RandomShootComponent& rsc, PhysicsComponent& p, EntityMa
     else {
         p.velocity = {};
     }
-
+}
+void AISystem::DiagonalAI(DiagonalComponent& dc, PhysicsComponent& p, EntityManager& em, Entity& e, float dt){
+         vec3f direction{};
+    //check change direction when not shooting
+    if (!dc.stoped) {
+        if (dc.elapsed_change_dir >= dc.countdown_change_dir) {
+            //set random dir
+            direction = getRandomDirwithDiagonals();
+            dc.oldvel = direction;
+            dc.elapsed_change_dir = 0;
+        }
+        dc.dec_countdown_change_dir(dt);
+    }
+    // //check if ai have to stops
+    if (!dc.shoot) {
+        if (dc.elapsed_stop >= dc.countdown_stop) {
+            dc.stoped = true;
+            dc.shoot = true;
+            dc.elapsed_stop = 0;
+            dc.elapsed_change_dir = 0;
+        }
+        dc.dec_countdown_stop(dt);
+    }
+    // auto& rend = em.getComponent<RenderComponent>(e);
+    // rend.visible = false;
+    //time while shooting
+    if (dc.shoot) {
+        if (dc.elapsed_shoot >= dc.countdown_shoot) {
+            //Shoot
+            dc.shoot = false;
+            dc.stoped = false;
+            dc.elapsed_shoot = 0;
+        }
+        dc.dec_countdown_shoot(dt);
+    }
+    // //Set velocity
+    if (!dc.stoped) {
+        //Range Control
+        if (!isInDesiredRange(p.position + dc.oldvel, dc.Xmin, dc.Xmax, dc.Zmin, dc.Zmax)) {
+            dc.oldvel *= -1.0f;
+        }
+        p.velocity = dc.oldvel;
+    }
+    else {
+        p.velocity = {};
+    }
 }
 void AISystem::update(EntityManager& em, float dt)
 {
@@ -195,5 +254,8 @@ void AISystem::update(EntityManager& em, float dt)
     });
     em.forEach<SYSCMPs_RandomShoot, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, RandomShootComponent& rsc) {
         RandomAI(rsc, phy, em, ent, dt);
+    });
+    em.forEach<SYSCMPs_Diagonal, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, DiagonalComponent& dc) {
+        DiagonalAI(dc, phy, em, ent, dt);
     });
 }

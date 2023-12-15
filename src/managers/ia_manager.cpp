@@ -1,5 +1,14 @@
 #include "ia_manager.hpp"
 
+
+
+ float getRandomStop(){
+        switch (std::rand() % 2){
+            case 0:  return 4.0f; break;
+            case 1:  return 6.0f; break;
+            case 2:  return 8.0f; break; 
+        }
+}
 struct EnemyData {
             vec3f position;
             vec3f velocity;
@@ -14,6 +23,7 @@ struct EnemyData {
 // 0=>Patrol
 // 1=>shoot player
 // 2=> ia random
+// 3=> diagonal
 void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, uint16_t type, uint16_t z) {
     // int num = 0;
     for (const auto& data : vec)
@@ -40,6 +50,7 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, uint16_t 
             break;
         case 2:
             em.addComponent<RandomShootComponent>(enemy, RandomShootComponent{
+                .countdown_stop = getRandomStop(),
                 .Xmin = data.Xmin,
                 .Xmax = data.Xmax,
                 .Zmin = data.Zmin,
@@ -47,6 +58,15 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, uint16_t 
                 });
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
             em.addComponent<ZoneComponent>(enemy,ZoneComponent{.zone = z});
+            break;
+        case 3: em.addComponent<DiagonalComponent>(enemy, DiagonalComponent{
+                .countdown_stop = getRandomStop(),
+                .Xmin = data.Xmin,
+                .Xmax = data.Xmax,
+                .Zmin = data.Zmin,
+                .Zmax = data.Zmax
+                });
+                em.addComponent<ZoneComponent>(enemy,ZoneComponent{.zone = z});
             break;
         default:
             break;
@@ -64,6 +84,7 @@ bool Ia_man::checkEnemiesCreaeted(uint16_t zone){
         case 4: return createdzone4; break;
         case 5: return createdzone5; break;
         case 6: return createdzone6; break;
+        case 12: return createdzone12; break;
         default:
             break;
     }
@@ -81,6 +102,8 @@ void Ia_man::createEnemiesZone(EntityManager& em,uint16_t zone){
     case 5: this->createEnemiesZone5(em,zone);
         break;
     case 6: this->createEnemiesZone6(em,zone);
+        break;
+    case 12: this->createEnemiesZone12(em,zone);
         break;
     default:
         break;
@@ -113,6 +136,9 @@ vec3f getRandomPosinRange(float xmin, float xmax, float zmin, float zmax) {
     float z = rangoZ(gen);
     //devuelvo vector
     return vec3f{ x,0.0f,z };
+
+}
+void getRandomtimetoStop(){
 
 }
 void Ia_man::createEnemiesZone3(EntityManager& em,uint16_t z){
@@ -157,7 +183,17 @@ void Ia_man::createEnemiesZone6(EntityManager& em,uint16_t z){
     };
     createEnemiesofType(em, Vec_ShootPlayerData, 1,z);
 }
-
+void Ia_man::createEnemiesZone12(EntityManager& em,uint16_t z){
+    createdzone12 = true;
+    std::vector<EnemyData> Vec_Diagonal = {
+        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,74.0f,92.0f,-77.0f,-65.0f,true},
+        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{0.2f,0.0f,0.0f},{},2.0f,0.f,1,74.0f,92.0f,-77.0f,-65.0f,true},
+        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{0.2f,0.0f,0.0f},{},1.0f,0.f,1,74.0f,92.0f,-77.0f,-65.0f,true},
+        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{0.2f,0.0f,0.0f},{},1.0f,0.f,1,74.0f,92.0f,-77.0f,-65.0f,true},
+        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{0.2f,0.0f,0.0f},{},1.0f,0.f,1,74.0f,92.0f,-77.0f,-65.0f,true}
+    };
+    createEnemiesofType(em,Vec_Diagonal,3,z);
+}
 void Ia_man::deleteEnemiesZone(EntityManager& em,uint16_t zone){
     switch (zone)
     {
@@ -171,26 +207,20 @@ void Ia_man::deleteEnemiesZone(EntityManager& em,uint16_t zone){
         break;
     case 6: this->deleteEnemiesinZone(em,zone);
         break;
+    case 12: this->deleteEnemiesinZone(em,zone);
+        break;
     default:
         break;
     };
 }
 void Ia_man::deleteEnemiesinZone(EntityManager& em,uint16_t z){
-    // int xd = 0;
-    auto entities = em.getEntities();
-    auto entitiesCopy = entities;  // Hacer una copia de la colección
-
-    for (auto &ent : entitiesCopy) {
+    for (auto const &ent : em.getEntities()) {
         if (ent.hasComponent<ZoneComponent>() && ent.hasTag<EnemyTag>()) {
             if (em.getComponent<ZoneComponent>(ent).zone == z) {
-                // std::printf("Zona: %d\n",z);
                 em.destroyEntity(ent.getID());
-                // xd++;
             }
         }
     }
-
-    // std::printf("Eliminados: %d\n", xd);
     setCreatedtofalse(z);
 }
 void Ia_man::setCreatedtofalse(uint16_t z){
@@ -201,6 +231,7 @@ void Ia_man::setCreatedtofalse(uint16_t z){
         case 4: createdzone4=false; break;
         case 5: createdzone5=false; break;
         case 6: createdzone6=false; break;
+        case 12: createdzone12=false; break;
         default:
             break;
     }

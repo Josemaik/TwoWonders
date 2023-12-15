@@ -4,7 +4,7 @@
 #include <utils/vec3D.hpp>
 struct ShootPlayerComponent
 {
-    float detect_radius{ 6.f };
+    float detect_radius{ 15.f };
     bool playerdetected{ false };
     bool shoot{false};
     float countdown_change_position{5.0f}, elapsed_change_position{1.0f};
