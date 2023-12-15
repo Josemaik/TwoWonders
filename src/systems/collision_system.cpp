@@ -118,6 +118,20 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
 
     if (isAtkPlayer1 || isAtkPlayer2 || isAtkEnemy1 || isAtkEnemy2)
     {
+        if ((behaviorType2 & BehaviorType::SHIELD || behaviorType1 & BehaviorType::SHIELD)
+            && (isAtkEnemy1 || isAtkEnemy2))
+        {
+            if (isAtkEnemy2)
+            {
+                std::swap(staticEnt, otherEnt);
+                std::swap(staticPhy, otherPhy);
+                std::swap(behaviorType1, behaviorType2);
+            }
+
+            em.getComponent<LifeComponent>(staticEnt).decreaseLife();
+            return;
+        }
+
         handleAtkCollision(em, isAtkPlayer1, isAtkPlayer2, isAtkEnemy1, isAtkEnemy2, staticEnt, otherEnt);
         return;
     }
@@ -125,7 +139,8 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     // Colisiones de enemigos con el jugador
     if (behaviorType1 & BehaviorType::PLAYER || behaviorType2 & BehaviorType::PLAYER)
     {
-        handlePlayerCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, minOverlap, behaviorType1, behaviorType2);
+        if (!(behaviorType1 & BehaviorType::SHIELD || behaviorType2 & BehaviorType::SHIELD))
+            handlePlayerCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, minOverlap, behaviorType1, behaviorType2);
         return;
     }
 

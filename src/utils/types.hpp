@@ -19,6 +19,7 @@
 #include "../components/object_component.hpp"
 #include "../components/information_component.hpp"
 #include "../components/zone_component.hpp"
+#include "../components/shield_component.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
 
@@ -33,6 +34,7 @@ struct GroundTag {};
 struct WaterTag {};
 struct ObjectTag {};
 struct ZoneTag {};
+
 
 using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, PatrolComponent, ShootPlayerComponent, RandomShootComponent,DiagonalComponent,DrakeComponent,AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent>;
 using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayer, GroundTag, WaterTag, ObjectTag, ZoneTag>;
