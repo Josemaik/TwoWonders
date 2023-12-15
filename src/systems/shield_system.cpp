@@ -9,55 +9,50 @@ void ShieldSystem::update(EntityManager& em){
 
         if(shi.activeShield)
         {
-            // Si no existe el escudo se crea
-            if(!shi.shield){
-                std::cout << "No existe el escudo, se va a crear" << std::endl;
-                auto& e { em.newEntity() };
-                auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 1.0f}, .color = BROWN });
-                auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }});
-                em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
+            // Recuperamos el player
+            auto& li = em.getSingleton<LevelInfo>();
+            auto* playerEn = em.getEntityByID(li.playerID);
 
-                // Se asigna a shi.shield
-                shi.shield = e.getID();
-            }
-            // Se posiciona respecto a la entidad y a la direccion
-            if(shi.shield && ent.hasComponent<PhysicsComponent>() && em.getEntityByID(shi.shield)->hasComponent<PhysicsComponent>())
+            if(playerEn)
             {
-                auto& ep = em.getComponent<PhysicsComponent>(*em.getEntityByID(shi.shield));
-                ep.position = em.getComponent<PhysicsComponent>(ent).position;
-                if(ent.hasComponent<InputComponent>() && em.getEntityByID(shi.shield)->hasComponent<RenderComponent>() && em.getEntityByID(shi.shield)->hasComponent<ColliderComponent>())
+                if(ent.hasComponent<RenderComponent>() && ent.hasComponent<PhysicsComponent>() && 
+                   playerEn->hasComponent<PhysicsComponent>() && playerEn->hasComponent<InputComponent>())
                 {
-                    auto& inp = em.getComponent<InputComponent>(ent);
-                    auto& r =  em.getComponent<RenderComponent>(*em.getEntityByID(shi.shield));
-                    auto& c =  em.getComponent<ColliderComponent>(*em.getEntityByID(shi.shield));
-                    if(inp.last_key == inp.up)
+                    auto& inp_pl = em.getComponent<InputComponent>(*playerEn);
+                    auto& phy_pl = em.getComponent<PhysicsComponent>(*playerEn);
+                    auto& r = em.getComponent<RenderComponent>(ent);
+                    auto& p = em.getComponent<PhysicsComponent>(ent);
+                    // Reposicionamos el escudo segun el player
+                    p.position = phy_pl.position;
+                    // Reposicionamos y escalamos segun la direccion
+                    if(inp_pl.last_key == inp_pl.left)
                     {
-                        ep.position += {0.0f, 0.0f, -0.75f};
-                        r.scale = { 1.0f, 1.0f, 0.5f};
+                        p.position += { -0.75f, 0.0f, 0.0f };
+                        r.scale = { 0.5f, 1.0f, 1.0f };
                     }
-                    else if(inp.last_key == inp.down)
+                    else if(inp_pl.last_key == inp_pl.right)
                     {
-                        ep.position += {0.0f, 0.0f, 0.75f};
-                        r.scale = { 1.0f, 1.0f, 0.5f};
+                        p.position += { 0.75f, 0.0f, 0.0f };
+                        r.scale = { 0.5f, 1.0f, 1.0f };
                     }
-                    else if(inp.last_key == inp.right)
+                    else if(inp_pl.last_key == inp_pl.up)
                     {
-                        ep.position += {0.75f, 0.0f, 0.0f};
-                        r.scale = { 0.5f, 1.0f, 1.0f};
+                        p.position += { 0.0f, 0.0f, -0.75f };
+                        r.scale = { 1.0f, 1.0f, 0.5f };
                     }
-                    else if(inp.last_key == inp.left)
+                    else
                     {
-                        ep.position += {-0.75f, 0.0f, 0.0f};
-                        r.scale = { 0.5f, 1.0f, 1.0f};
+                        p.position += { 0.0f, 0.0f, 0.75f };
+                        r.scale = { 1.0f, 1.0f, 0.5f };
                     }
                 }
-            }
+            } 
         }
         else
         {
             // Se elimina shi.shield
             std::cout << "Se borra el escudo" << std::endl;
-            //em.destroyEntity(shi.shield);
+            //em.destroyEntity(ent.getID());
         }
     });
 }

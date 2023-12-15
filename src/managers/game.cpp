@@ -51,6 +51,15 @@ void createShop(EntityManager& em) {
     em.addComponent<ColliderComponent>(e3, ColliderComponent{ p3.position, r3.scale, BehaviorType::STATIC });
     em.addComponent<ObjectComponent>(e3, ObjectComponent{ .type = Object_type::ShopItem_ExtraLife, .inmortal = true });
 }
+
+void createShield(EntityManager& em, Entity& ent){
+    auto& e{ em.newEntity() };
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .color = DARKBROWN });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position});
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
+    em.addComponent<ShieldComponent>(e, ShieldComponent{});
+}
+
 void createEntities(EntityManager& em)
 {
     // Player
@@ -62,10 +71,12 @@ void createEntities(EntityManager& em)
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<InformationComponent>(e, InformationComponent{});
-    em.addComponent<ShieldComponent>(e, ShieldComponent{});
 
     // Sword
     createSword(em);
+
+    // Shield
+    createShield(em, e);
 
     // Coin
     createCoin(em);
