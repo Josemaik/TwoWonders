@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <utils/vec3D.hpp>
 #include <random>
-struct DiagonalComponent : RandomShootComponent
+struct DiagonalComponent
 {
     static constexpr vec3f up_left =    vec3f{ -0.25f, 0.0f, -0.25f };
     static constexpr vec3f up_right =   vec3f{ 0.25f, 0.0f, -0.25f };
@@ -19,6 +19,12 @@ struct DiagonalComponent : RandomShootComponent
             default: return dir2; break;
          }
     }
-    float countdown_stop{};
+    bool stoped{false}, moving{false};
+    vec3f oldvel{0.25f,0.0f,0.0f};
+    float countdown_change_dir{ 1.5f },countdown_stop{3.5f},countdown_moving{2.0f}; //segundos
+    float elapsed_stop{1.0f},elapsed_change_dir{1.0f},elapsed_moving{1.0f}; //segundos
+    void dec_countdown_change_dir(float deltaTime) { elapsed_change_dir += deltaTime; }; // delta time
+    void dec_countdown_stop(float deltaTime) { elapsed_stop += deltaTime; }; 
+    void dec_countdown_moving(float deltaTime) { elapsed_moving += deltaTime; };
     float Xmin{},Xmax{},Zmin{},Zmax{};
 };
