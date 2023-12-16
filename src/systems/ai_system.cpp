@@ -2,6 +2,7 @@
 #include <cmath>
 #include <random>
 
+//Funcion para saber si el player ha sido detectado o no
 [[nodiscard]] bool AISystem::isPlayerDetected(EntityManager& EM, PhysicsComponent const& p, ShootPlayerComponent const& spc) const noexcept {
     auto& li = EM.getSingleton<LevelInfo>();
     auto* playerEn = EM.getEntityByID(li.playerID);
@@ -10,7 +11,7 @@
     auto const distance = (p.position - plphy.position).lengthSQ();
     return  distance < (spc.detect_radius * spc.detect_radius);
 }
-
+// Obtener la distancia del enemigo con respecto al player
 [[nodiscard]] vec3f AISystem::getPlayerDistance(EntityManager& EM, PhysicsComponent const& p, ShootPlayerComponent& spc) const noexcept {
     auto& li = EM.getSingleton<LevelInfo>();
     auto* playerEn = EM.getEntityByID(li.playerID);
@@ -19,39 +20,28 @@
     auto const distance = plphy.position - p.position;
     return  distance;
 }
-
+// Poner la velocidad al compponente de físicas
 void AISystem::setVelocity(PhysicsComponent& p, vec3f distance) {
     if (distance != vec3f{ 0,0,0 }) {
         //Normalizo la distancia y se la asigno a la velocidad
         p.velocity = distance.normalize() * SPEED_AI;
     }
 }
-
-vec3f AISystem::FollowPatrol(PhysicsComponent& p, PatrolComponent& pc) {
-    //Do patrol
-    //si la pos actual es >= que el maximo patron vuelvo al principio
-    if (pc.current >= pc.max_patrol) {
-        pc.current = 0;
+//FUncion para poner la Velocidad dado un rango
+template <typename CMP>
+void AISystem::setVelocityinRange(PhysicsComponent& p,CMP& cmp){
+    if (!cmp.stoped) {
+        //Range Control
+        if (!isInDesiredRange(p.position + cmp.oldvel, cmp.Xmin, cmp.Xmax, cmp.Zmin, cmp.Zmax)) {
+            cmp.oldvel *= -1.0f;
+        }
+        p.velocity = cmp.oldvel;
     }
-
-    // Set del objetivo, next position
-    auto const& target = pc.patrol[pc.current];
-    if (target == pc.invalid) {
-        pc.current = 0;
-        pc.nexttarget = 0;
-        return vec3f{ 0,0,0 };
+    else {
+        p.velocity = {};
     }
-    //    std::cout << p.position.x() << ", " << p.position.y() << ", " << p.position.z() << "\n";
-        //calculo la distancia
-    auto const distance = target - p.position;
-    //std::cout << distance.x() << ", " << distance.y() << ", " << distance.z() << "\n";
-    // Si la distancia es < que el radio de llegada paso a la siguiente
-    if (distance.length() < pc.arrival_radius) {
-        pc.current++;
-        pc.arrived = true;
-    }
-    return distance;
 }
+//función que devuelve una posición aleatoria dentro de un rango específico
 vec3f AISystem::getRandomPosinRange(float xmin, float xmax, float zmin, float zmax) {
     //Semilla para generar numeros aleatorios
     std::random_device rd;
@@ -68,8 +58,69 @@ vec3f AISystem::getRandomPosinRange(float xmin, float xmax, float zmin, float zm
 
     //devuelvo vector
     return vec3f{ x,0.0f,z };
-
 }
+//Función para comprobar si la dirección está fuera de rango
+bool AISystem::isInDesiredRange(const vec3f& direction, float xmin, float xmax, float zmin, float zmax) {
+    return direction.x() >= xmin && direction.x() <= xmax &&
+        direction.z() >= zmin && direction.z() <= zmax;
+}
+// Devuelve una dirección aleatoria
+vec3f AISystem::getRandomDir() {
+    // Genero direccion aleatoria
+    switch (std::rand() % 4) {
+    case 0:  return { 0.25f, 0.0f, 0.0f }; break;//derecha
+    case 1:  return { -0.25f, 0.0f, 0.0f }; break; //izquieda
+    case 2:  return { 0.0f, 0.0f, 0.25f }; break; //Abajo
+    case 3:  return { 0.0f, 0.0f, -0.25f }; break; //Arriba
+    default: return { -0.25f, 0.0f, 0.0f }; break;
+    }
+}
+// Devuelve una dirección aleatoria incluida diagonales
+vec3f AISystem::getRandomDirwithDiagonals() {
+    // Genero direccion aleatoria
+    switch (std::rand() % 8) {
+    case 0:  return { 0.25f, 0.0f, 0.0f }; break; //derecha
+    case 1:  return { -0.25f, 0.0f, 0.0f }; break; //izquieda
+    case 2:  return { 0.0f, 0.0f, 0.25f }; break; //Abajo
+    case 3:  return { 0.0f, 0.0f, -0.25f }; break; //Arriba
+    case 4:  return { -0.25f, 0.0f, -0.25f}; break; //up-left
+    case 5:  return { 0.25f, 0.0f, 0.25f }; break; //down-right
+    case 6:  return { 0.25f, 0.0f, -0.25f }; break; //up-right
+    case 7:  return { -0.25f, 0.0f, 0.25f }; break; //down-left
+    default: return { -0.25f, 0.0f, 0.0f }; break;
+    }
+}
+/////////////////////////////////////////////////////////////////
+/// TIPOS DE IA /////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////----------------------------------------------------------
+//IA que sigue un patrón especifico
+template <typename CMP>
+vec3f AISystem::FollowPatrol(PhysicsComponent& p, CMP& cmp) {
+    //Do patrol
+    //si la pos actual es >= que el maximo patron vuelvo al principio
+    if (cmp.current >= cmp.max_patrol) {
+        cmp.current = 0;
+    }
+
+    // Set del objetivo, next position
+    auto const& target = cmp.patrol[cmp.current];
+    if (target == cmp.invalid) {
+        cmp.current = 0;
+        cmp.nexttarget = 0;
+        return vec3f{ 0,0,0 };
+    }
+    //    std::cout << p.position.x() << ", " << p.position.y() << ", " << p.position.z() << "\n";
+        //calculo la distancia
+    auto const distance = target - p.position;
+    //std::cout << distance.x() << ", " << distance.y() << ", " << distance.z() << "\n";
+    // Si la distancia es < que el radio de llegada paso a la siguiente
+    if (distance.length() < cmp.arrival_radius) {
+        cmp.current++;
+        cmp.arrived = true;
+    }
+    return distance;
+}
+//IA del río ( dispara al player, se esconde y cambia de posición)
 void AISystem::ShotandMove(ShootPlayerComponent& spc, PhysicsComponent& p, EntityManager& em, Entity& ent, float dt) {
     //cada x segundos cambia de posicion
     if (!spc.shoot) {
@@ -105,46 +156,7 @@ void AISystem::ShotandMove(ShootPlayerComponent& spc, PhysicsComponent& p, Entit
         spc.dec_countdown_shoot_rap(dt);
     }
 }
-// Function to check if the direction is in the desired range
-
-bool AISystem::isInDesiredRange(const vec3f& direction, float xmin, float xmax, float zmin, float zmax) {
-
-    // Define your desired range here
-    // float minX = 23.1f; // minimum X coordinate
-    // float maxX = 34.9f; // maximum X coordinate
-    // float minZ = -6.5f; // minimum Z coordinate
-    // float maxZ = 6.5f;  // maximum Z coordinate
-
-    // Check if the direction results in a position within the desired range
-    return direction.x() >= xmin && direction.x() <= xmax &&
-
-        direction.z() >= zmin && direction.z() <= zmax;
-
-}
-vec3f AISystem::getRandomDir() {
-    // Genero direccion aleatoria
-    switch (std::rand() % 4) {
-    case 0:  return { 0.25f, 0.0f, 0.0f }; break; //derecha
-    case 1:  return { -0.25f, 0.0f, 0.0f }; break; //izquieda
-    case 2:  return { 0.0f, 0.0f, 0.25f }; break; //Abajo
-    case 3:  return { 0.0f, 0.0f, -0.25f }; break; //Arriba
-    default: return { -0.25f, 0.0f, 0.0f }; break;
-    }
-}
-vec3f AISystem::getRandomDirwithDiagonals() {
-    // Genero direccion aleatoria
-    switch (std::rand() % 8) {
-    case 0:  return { 0.25f, 0.0f, 0.0f }; break; //derecha
-    case 1:  return { -0.25f, 0.0f, 0.0f }; break; //izquieda
-    case 2:  return { 0.0f, 0.0f, 0.25f }; break; //Abajo
-    case 3:  return { 0.0f, 0.0f, -0.25f }; break; //Arriba
-    case 4:  return { -0.25f, 0.0f, -0.25f}; break; //up-left
-    case 5:  return { 0.25f, 0.0f, 0.25f }; break; //down-right
-    case 6:  return { 0.25f, 0.0f, -0.25f }; break; //up-right
-    case 7:  return { -0.25f, 0.0f, 0.25f }; break; //down-left
-    default: return { -0.25f, 0.0f, 0.0f }; break;
-    }
-}
+//Ia que se mueve de forma aleatoria y realiza disparos en la dirección que mira
 void AISystem::RandomAI(RandomShootComponent& rsc, PhysicsComponent& p, EntityManager& em, Entity& e, float dt) {
     vec3f direction{};
     //check change direction when not shooting
@@ -157,7 +169,7 @@ void AISystem::RandomAI(RandomShootComponent& rsc, PhysicsComponent& p, EntityMa
         }
         rsc.dec_countdown_change_dir(dt);
     }
-    // //check if ai have to stops
+    //check if ai have to stops
     if (!rsc.shoot) {
         if (rsc.elapsed_stop >= rsc.countdown_stop) {
             rsc.stoped = true;
@@ -171,29 +183,17 @@ void AISystem::RandomAI(RandomShootComponent& rsc, PhysicsComponent& p, EntityMa
         }
         rsc.dec_countdown_stop(dt);
     }
-    // auto& rend = em.getComponent<RenderComponent>(e);
-    // rend.visible = false;
     //time while shooting
     if (rsc.shoot) {
         if (rsc.elapsed_shoot >= rsc.countdown_shoot) {
-            //Shoot
             rsc.shoot = false;
             rsc.stoped = false;
             rsc.elapsed_shoot = 0;
         }
         rsc.dec_countdown_shoot(dt);
     }
-    // //Set velocity
-    if (!rsc.stoped) {
-        //Range Control
-        if (!isInDesiredRange(p.position + rsc.oldvel, rsc.Xmin, rsc.Xmax, rsc.Zmin, rsc.Zmax)) {
-            rsc.oldvel *= -1.0f;
-        }
-        p.velocity = rsc.oldvel;
-    }
-    else {
-        p.velocity = {};
-    }
+    //Set velocity
+    setVelocityinRange(p,rsc);
 }
 void AISystem::DiagonalAI(DiagonalComponent& dc, PhysicsComponent& p, float dt){
     vec3f direction{};
@@ -207,7 +207,7 @@ void AISystem::DiagonalAI(DiagonalComponent& dc, PhysicsComponent& p, float dt){
         }
         dc.dec_countdown_change_dir(dt);
     }
-    // //check if ai have to stops
+    //check if ai have to stops
     if (!dc.moving) {
         if (dc.elapsed_stop >= dc.countdown_stop) {
             dc.stoped = true;
@@ -228,41 +228,9 @@ void AISystem::DiagonalAI(DiagonalComponent& dc, PhysicsComponent& p, float dt){
         dc.dec_countdown_moving(dt);
     }
     //Set velocity
-    if (!dc.stoped) {
-        //Range Control
-        if (!isInDesiredRange(p.position + dc.oldvel, dc.Xmin, dc.Xmax, dc.Zmin, dc.Zmax)) {
-            dc.oldvel *= -1.0f;
-        }
-        p.velocity = dc.oldvel;
-    }
-    else {
-        p.velocity = {};
-    }
+    setVelocityinRange(p,dc);
 }
 vec3f AISystem::DrakeAI(DrakeComponent& drc,PhysicsComponent& p,EntityManager& em, Entity& e,float dt){
-//Do patrol
-    //si la pos actual es >= que el maximo patron vuelvo al principio
-    if (drc.current >= drc.max_patrol) {
-        drc.current = 0;
-    }
-
-    // Set del objetivo, next position
-    auto const& target = drc.patrol[drc.current];
-    if (target == drc.invalid) {
-        drc.current = 0;
-        drc.nexttarget = 0;
-        return vec3f{ 0,0,0 };
-    }
-    //    std::cout << p.position.x() << ", " << p.position.y() << ", " << p.position.z() << "\n";
-        //calculo la distancia
-    auto const distance = target - p.position;
-    //std::cout << distance.x() << ", " << distance.y() << ", " << distance.z() << "\n";
-    // Si la distancia es < que el radio de llegada paso a la siguiente
-    if (distance.length() < drc.arrival_radius) {
-        drc.current++;
-        drc.arrived = true;
-    }
-
     if (drc.elapsed_shoot >= drc.countdown_shoot) {
             drc.elapsed_shoot = 0;
             //shoot one time
@@ -270,9 +238,11 @@ vec3f AISystem::DrakeAI(DrakeComponent& drc,PhysicsComponent& p,EntityManager& e
             att.attack(AttackType::TripleShot);
     }
     drc.dec_countdown_shoot(dt);
-
+    vec3f distance = FollowPatrol(p,drc);
     return distance;
 }
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Actualizar las IA
 void AISystem::update(EntityManager& em, float dt)
 {
     em.forEach<SYSCMPs_Patrol, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, PatrolComponent& pc)
