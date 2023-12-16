@@ -1,5 +1,9 @@
 #include "ia_manager.hpp"
+////////////////////////////////////////////////////
+//Funciones para obtener datos de forma aleatoria///
+//////////////////////////////////////////////////////---------------------------------
 
+//DEvuelve un tiempo en segundos random
 float getRandomStop() {
     switch (std::rand() % 2) {
     case 0:  return 10.0f; break;
@@ -8,32 +12,46 @@ float getRandomStop() {
     default: return 6.5f; break;
     }
 }
-
+//Devuelve una posición random dado un rango
+vec3f getRandomPosinRange(float xmin, float xmax, float zmin, float zmax) {
+    //Semilla para generar numeros aleatorios
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    // creo rangos
+    std::uniform_real_distribution<float> rangoX(xmin, xmax);
+    std::uniform_real_distribution<float> rangoZ(zmin, zmax);
+    // obtengo x y z aleatoria
+    float x = rangoX(gen);
+    float z = rangoZ(gen);
+    //devuelvo vector
+    return vec3f{ x,0.0f,z };
+}
+//-----------------------------------------------------------------------------------
+/////////////////////////////////////////////////////7
+///Clase con los Datos necesarios para los enemigos
+///////////////////////////////////////////////////////----------------------------
 struct EnemyData {
     vec3f position;
-    vec3f velocity;
     std::array<vec3f, 10> route;
-    float stop{};
-    float detect_radius;
     int num_lifes;
     float Xmin{}, Xmax{}, Zmin{}, Zmax{};
     bool visible{};
-    vec3f pos1;
-    vec3f pos2;
 };
-//Creamos enemigos dado el type
+//------------------------------------------------------------------------------------------------
+// Función que crea enemigos dado un tipo ,vector de datos y zona //
 // 0=>Patrol
 // 1=>shoot player
 // 2=> ia random
 // 3=> diagonal
 // 4=> drake
 void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, uint16_t type, uint16_t z) {
-    // int num = 0;
+    // Obtenemos la clase con información del nivel
     auto& li = em.getSingleton<LevelInfo>();
+    // Vacíamos enemigos de la zona anterior del vector
     li.enemiesID.clear();
+    //Creamos enemigos
     for (const auto& data : vec)
     {
-        // num++;
         auto& enemy{ em.newEntity() };
         em.addTag<EnemyTag>(enemy);
         auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = data.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE ,.visible = data.visible });
@@ -45,32 +63,14 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, uint16_t 
         {
         case 0: em.addComponent<PatrolComponent>(enemy, PatrolComponent{ .patrol = data.route });
             break;
-        case 1:
-            em.addComponent<ShootPlayerComponent>(enemy, ShootPlayerComponent{
-                .Xmin = data.Xmin,
-                .Xmax = data.Xmax,
-                .Zmin = data.Zmin,
-                .Zmax = data.Zmax
-                });
+        case 1:em.addComponent<ShootPlayerComponent>(enemy, ShootPlayerComponent{.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax});
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.0f });
             break;
         case 2:
-            em.addComponent<RandomShootComponent>(enemy, RandomShootComponent{
-                .countdown_stop = getRandomStop(),
-                .Xmin = data.Xmin,
-                .Xmax = data.Xmax,
-                .Zmin = data.Zmin,
-                .Zmax = data.Zmax
-                });
+            em.addComponent<RandomShootComponent>(enemy, RandomShootComponent{.countdown_stop = getRandomStop(),.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax});
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
             break;
-        case 3:  em.addComponent<DiagonalComponent>(enemy, DiagonalComponent{
-                    .countdown_stop = getRandomStop(),
-                    .Xmin = data.Xmin,
-                    .Xmax = data.Xmax,
-                    .Zmin = data.Zmin,
-                    .Zmax = data.Zmax
-            });
+        case 3:  em.addComponent<DiagonalComponent>(enemy, DiagonalComponent{.countdown_stop = getRandomStop(),.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax});
             em.addComponent<ZoneComponent>(enemy, ZoneComponent{ .zone = z });
             break;
         case 4: em.addComponent<DrakeComponent>(enemy, DrakeComponent{ .patrol = data.route });
@@ -80,25 +80,98 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, uint16_t 
         default:
             break;
         }
+        //Insertamos enemigos en el vector
         li.enemiesID.insert(enemy.getID());
     }
-    // std::printf("Creados: %d\n",num);
 }
-bool Ia_man::checkEnemiesCreaeted(uint16_t zone) {
-    switch (zone)
-    {
-    case 2: return createdzone2; break;
-    case 3: return createdzone3; break;
-    case 4: return createdzone4; break;
-    case 5: return createdzone5; break;
-    case 6: return createdzone6; break;
-    case 11: return createdzone11; break;
-    case 12: return createdzone12; break;
-    default:
-        break;
-    }
-    return false;
+/////////////////////////////////////////////////////////////
+//Funciones para crear los enemigos de cada Zona ////////////
+/////////////////////////////////////////////////////////////--------------------------------------------------------
+//Creamos los enemigos de la Zona 2
+void Ia_man::createEnemiesZone2(EntityManager& em, uint16_t z) {
+    createdzone2 = true;
+    //Creamos Patrol Enemies
+    std::vector<EnemyData> Vec_patrolData = {
+       { {-9.0f, 0.f, -14.0f},
+        {
+            vec3f{-9.0f, 0.f, -14.0f},
+            { -9.0f, 0.f, -10.0f },
+            { 9.0f, 0.f, -10.0f },
+            { 9.0f, 0.f, -14.0f },
+            PatrolComponent::invalid
+        },1,0.0f,0.0f,0.0f,0.0f,true}
+    };
+    createEnemiesofType(em, Vec_patrolData, 0, z);
 }
+
+void Ia_man::createEnemiesZone3(EntityManager& em, uint16_t z) {
+    createdzone3 = true;
+    //Crearemos IA random
+    std::vector<EnemyData> Vec_RandomShoot_3 = {
+       {getRandomPosinRange(-31.0f,-13.0f,-6.0f,-3.0f),{},1,-31.0f,-11.0f,-7.0f,8.0f, true},
+       {getRandomPosinRange(-31.0f,-13.0f,-3.0f,-1.0f),{},1,-31.0f,-11.0f,-7.0f,8.0f, true},
+       {getRandomPosinRange(-31.0f,-13.0f,-1.0f,2.0f), {},1,-31.0f,-11.0f,-7.0f,8.0f, true},
+       {getRandomPosinRange(-31.0f,-13.0f,2.0f,4.0f),  {},1,-31.0f,-11.0f,-7.0f,8.0f, true},
+       {getRandomPosinRange(-31.0f,-13.0f,4.0f,6.0f),  {},1,-31.0f,-11.0f,-7.0f,8.0f, true}
+    };
+    createEnemiesofType(em, Vec_RandomShoot_3, 2, z);
+}
+void Ia_man::createEnemiesZone4(EntityManager& em, uint16_t z) {
+    createdzone4 = true;
+    //Creamos Random enemies
+    std::vector<EnemyData> Vec_RandomShoot = {
+        {getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),{},1,-32.0f,-11.0f,-24.0f,-9.0f,true},
+        {getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),{},1,-32.0f,-11.0f,-24.0f,-9.0f,true},
+        {getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),{},1,-32.0f,-11.0f,-24.0f,-9.0f,true},
+        {getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),{},1,-32.0f,-11.0f,-24.0f,-9.0f,true},
+        {getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),{},1,-32.0f,-11.0f,-24.0f,-9.0f,true}
+    };
+    createEnemiesofType(em, Vec_RandomShoot, 2, z);
+}
+void Ia_man::createEnemiesZone5(EntityManager& em, uint16_t z) {
+    createdzone5 = true;
+    std::vector<EnemyData> Vec_ShootPlayerData = {
+        { {-45.0f, 0.0f, 4.0f},
+         { vec3f{}},2,-43.0f,-46.0f,3.0f,-4.0f,false
+        }
+    };
+    createEnemiesofType(em, Vec_ShootPlayerData, 1, z);
+}
+void Ia_man::createEnemiesZone6(EntityManager& em, uint16_t z) {
+    createdzone6 = true;
+    std::vector<EnemyData> Vec_ShootPlayerData = {
+        { {-46.0f, 0.0f, -20.0f},
+         {vec3f{},},2,-43.0f,-46.0f,-11.0f,-20.0f,false
+        }
+    };
+    createEnemiesofType(em, Vec_ShootPlayerData, 1, z);
+}
+void Ia_man::createEnemiesZone11(EntityManager& em, uint16_t z) {
+    createdzone11 = true;
+    std::vector<EnemyData> Vec_Drake = {
+      { {73.0f, 0.f, -87.0f},
+       {
+           vec3f{73.0f, 0.f, -87.0f},
+           { 69.0f, 0.f, -87.0f },
+           DrakeComponent::invalid
+       },10,0.0f,0.0f,0.0f,0.0f,true}
+    };
+    createEnemiesofType(em, Vec_Drake, 4, z);
+}
+void Ia_man::createEnemiesZone12(EntityManager& em, uint16_t z) {
+    createdzone12 = true;
+    std::vector<EnemyData> Vec_Diagonal = {
+        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{},1,74.0f,92.0f,-77.0f,-65.0f,true},
+        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{},1,74.0f,92.0f,-77.0f,-65.0f,true},
+        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{},1,74.0f,92.0f,-77.0f,-65.0f,true},
+        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{},1,74.0f,92.0f,-77.0f,-65.0f,true},
+        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{},1,74.0f,92.0f,-77.0f,-65.0f,true}
+    };
+    createEnemiesofType(em, Vec_Diagonal, 3, z);
+}
+// //----------------------------------------------------------------------------------------------------------------
+
+// //Funcion principal que llama a las funciones de creación de enemigos dado una zona
 void Ia_man::createEnemiesZone(EntityManager& em, uint16_t zone) {
     switch (zone)
     {
@@ -119,118 +192,4 @@ void Ia_man::createEnemiesZone(EntityManager& em, uint16_t zone) {
     default:
         break;
     };
-}
-void Ia_man::createEnemiesZone2(EntityManager& em, uint16_t z) {
-    createdzone2 = true;
-    //Creamos Patrol Enemies
-    std::vector<EnemyData> Vec_patrolData = {
-       { {-9.0f, 0.f, -14.0f},vec3f{},
-        {
-            vec3f{-9.0f, 0.f, -14.0f},
-            { -9.0f, 0.f, -10.0f },
-            { 9.0f, 0.f, -10.0f },
-            { 9.0f, 0.f, -14.0f },
-            PatrolComponent::invalid
-        },0.0f,5.0f,1,0.0f,0.0f,0.0f,0.0f,true,{},{}}
-    };
-    createEnemiesofType(em, Vec_patrolData, 0, z);
-}
-vec3f getRandomPosinRange(float xmin, float xmax, float zmin, float zmax) {
-    //Semilla para generar numeros aleatorios
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    // creo rangos
-    std::uniform_real_distribution<float> rangoX(xmin, xmax);
-    std::uniform_real_distribution<float> rangoZ(zmin, zmax);
-    // obtengo x y z aleatoria
-    float x = rangoX(gen);
-    float z = rangoZ(gen);
-    //devuelvo vector
-    return vec3f{ x,0.0f,z };
-
-}
-void getRandomtimetoStop() {
-
-}
-void Ia_man::createEnemiesZone3(EntityManager& em, uint16_t z) {
-    createdzone3 = true;
-    //Crearemos IA random
-    std::vector<EnemyData> Vec_RandomShoot_3 = {
-       {getRandomPosinRange(-31.0f,-13.0f,-6.0f,-3.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f,true,{},{}},
-       {getRandomPosinRange(-31.0f,-13.0f,-3.0f,-1.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f,true,{},{}},
-       {getRandomPosinRange(-31.0f,-13.0f,-1.0f,2.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f, true,{},{}},
-       {getRandomPosinRange(-31.0f,-13.0f,2.0f,4.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f,  true,{},{}},
-       {getRandomPosinRange(-31.0f,-13.0f,4.0f,6.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-31.0f,-11.0f,-7.0f,8.0f,  true,{},{}}
-    };
-    createEnemiesofType(em, Vec_RandomShoot_3, 2, z);
-}
-void Ia_man::createEnemiesZone4(EntityManager& em, uint16_t z) {
-    createdzone4 = true;
-    //Creamos Random enemies
-    std::vector<EnemyData> Vec_RandomShoot = {
-        {getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,-32.0f,-11.0f,-24.0f,-9.0f,true,{},{}},
-        {getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),{0.2f,0.0f,0.0f},{},2.0f,0.f,1,-32.0f,-11.0f,-24.0f,-9.0f,true,{},{}},
-        {getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),{0.2f,0.0f,0.0f},{},1.0f,0.f,1,-32.0f,-11.0f,-24.0f,-9.0f,true,{},{}},
-        {getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),{0.2f,0.0f,0.0f},{},1.0f,0.f,1,-32.0f,-11.0f,-24.0f,-9.0f,true,{},{}},
-        {getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),{0.2f,0.0f,0.0f},{},1.0f,0.f,1,-32.0f,-11.0f,-24.0f,-9.0f,true,{},{}}
-    };
-    createEnemiesofType(em, Vec_RandomShoot, 2, z);
-}
-void Ia_man::createEnemiesZone5(EntityManager& em, uint16_t z) {
-    createdzone5 = true;
-    std::vector<EnemyData> Vec_ShootPlayerData = {
-        { {-45.0f, 0.0f, 4.0f},vec3f{},
-         { vec3f{}},0.0f,10.0f,2,-43.0f,-46.0f,3.0f,-4.0f,false,{},{}
-        }
-    };
-    createEnemiesofType(em, Vec_ShootPlayerData, 1, z);
-}
-void Ia_man::createEnemiesZone6(EntityManager& em, uint16_t z) {
-    createdzone6 = true;
-    std::vector<EnemyData> Vec_ShootPlayerData = {
-        { {-46.0f, 0.0f, -20.0f},vec3f{},
-         {vec3f{},},0.0f,10.0f,2,-43.0f,-46.0f,-11.0f,-20.0f,false,{},{}
-        }
-    };
-    createEnemiesofType(em, Vec_ShootPlayerData, 1, z);
-}
-void Ia_man::createEnemiesZone12(EntityManager& em, uint16_t z) {
-    createdzone12 = true;
-    std::vector<EnemyData> Vec_Diagonal = {
-        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{0.2f,0.0f,0.0f},{},3.5f,0.f,1,74.0f,92.0f,-77.0f,-65.0f,true,{},{}},
-        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{0.2f,0.0f,0.0f},{},2.0f,0.f,1,74.0f,92.0f,-77.0f,-65.0f,true,{},{}},
-        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{0.2f,0.0f,0.0f},{},1.0f,0.f,1,74.0f,92.0f,-77.0f,-65.0f,true,{},{}},
-        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{0.2f,0.0f,0.0f},{},1.0f,0.f,1,74.0f,92.0f,-77.0f,-65.0f,true,{},{}},
-        {getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),{0.2f,0.0f,0.0f},{},1.0f,0.f,1,74.0f,92.0f,-77.0f,-65.0f,true,{},{}}
-    };
-    createEnemiesofType(em, Vec_Diagonal, 3, z);
-}
-
-
-void Ia_man::createEnemiesZone11(EntityManager& em, uint16_t z) {
-    createdzone11 = true;
-    std::vector<EnemyData> Vec_Drake = {
-      { {73.0f, 0.f, -87.0f},vec3f{},
-       {
-           vec3f{73.0f, 0.f, -87.0f},
-           { 69.0f, 0.f, -87.0f },
-           DrakeComponent::invalid
-       },0.0f,5.0f,10,0.0f,0.0f,0.0f,0.0f,true,{},{}}
-    };
-    createEnemiesofType(em, Vec_Drake, 4, z);
-}
-
-void Ia_man::setCreatedtofalse(uint16_t z) {
-    switch (z)
-    {
-    case 2: createdzone2 = false; break;
-    case 3: createdzone3 = false; break;
-    case 4: createdzone4 = false; break;
-    case 5: createdzone5 = false; break;
-    case 6: createdzone6 = false; break;
-    case 11: createdzone11 = false; break;
-    case 12: createdzone12 = false; break;
-    default:
-        break;
-    }
 }
