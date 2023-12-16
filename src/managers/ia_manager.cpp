@@ -2,10 +2,10 @@
 
 float getRandomStop() {
     switch (std::rand() % 2) {
-        case 0:  return 10.0f; break;
-        case 1:  return 6.0f; break;
-        case 2:  return 8.0f; break;
-        default: return 6.5f; break;
+    case 0:  return 10.0f; break;
+    case 1:  return 6.0f; break;
+    case 2:  return 8.0f; break;
+    default: return 6.5f; break;
     }
 }
 
@@ -44,7 +44,6 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, uint16_t 
         switch (type)
         {
         case 0: em.addComponent<PatrolComponent>(enemy, PatrolComponent{ .patrol = data.route });
-            em.addComponent<ZoneComponent>(enemy, ZoneComponent{ .zone = z });
             break;
         case 1:
             em.addComponent<ShootPlayerComponent>(enemy, ShootPlayerComponent{
@@ -54,7 +53,6 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, uint16_t 
                 .Zmax = data.Zmax
                 });
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.0f });
-            em.addComponent<ZoneComponent>(enemy, ZoneComponent{ .zone = z });
             break;
         case 2:
             em.addComponent<RandomShootComponent>(enemy, RandomShootComponent{
@@ -65,7 +63,6 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, uint16_t 
                 .Zmax = data.Zmax
                 });
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
-            em.addComponent<ZoneComponent>(enemy, ZoneComponent{ .zone = z });
             break;
         case 3:  em.addComponent<DiagonalComponent>(enemy, DiagonalComponent{
                     .countdown_stop = getRandomStop(),
@@ -73,13 +70,12 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, uint16_t 
                     .Xmax = data.Xmax,
                     .Zmin = data.Zmin,
                     .Zmax = data.Zmax
-                });
-                em.addComponent<ZoneComponent>(enemy, ZoneComponent{ .zone = z });
+            });
+            em.addComponent<ZoneComponent>(enemy, ZoneComponent{ .zone = z });
             break;
-        case 4: em.addComponent<DrakeComponent>(enemy, DrakeComponent{.patrol=data.route});
-                em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
-                em.addComponent<ZoneComponent>(enemy, ZoneComponent{ .zone = z });
-                r.scale = {1.5f,2.0f,1.5f};
+        case 4: em.addComponent<DrakeComponent>(enemy, DrakeComponent{ .patrol = data.route });
+            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
+            r.scale = { 1.5f,2.0f,1.5f };
             break;
         default:
             break;
@@ -213,13 +209,13 @@ void Ia_man::createEnemiesZone12(EntityManager& em, uint16_t z) {
 
 void Ia_man::createEnemiesZone11(EntityManager& em, uint16_t z) {
     createdzone11 = true;
-     std::vector<EnemyData> Vec_Drake = {
-       { {73.0f, 0.f, -87.0f},vec3f{},
-        {
-            vec3f{73.0f, 0.f, -87.0f},
-            { 69.0f, 0.f, -87.0f },
-            DrakeComponent::invalid
-        },0.0f,5.0f,10,0.0f,0.0f,0.0f,0.0f,true,{},{}}
+    std::vector<EnemyData> Vec_Drake = {
+      { {73.0f, 0.f, -87.0f},vec3f{},
+       {
+           vec3f{73.0f, 0.f, -87.0f},
+           { 69.0f, 0.f, -87.0f },
+           DrakeComponent::invalid
+       },0.0f,5.0f,10,0.0f,0.0f,0.0f,0.0f,true,{},{}}
     };
     createEnemiesofType(em, Vec_Drake, 4, z);
 }

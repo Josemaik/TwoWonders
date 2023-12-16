@@ -18,6 +18,11 @@ struct BBox
     // Sacamos el solape entre dos bounding boxes
     [[nodiscard]] inline static constexpr vec3f minOverlap(const BBox& bbox1, const BBox& bbox2) noexcept
     {
+        // vec3f overlapMin = vec3f::max(bbox1.min, bbox2.min);
+        // vec3f overlapMax = vec3f::min(bbox1.max, bbox2.max);
+        // vec3f overlapSize = overlapMax - overlapMin;
+        // return overlapSize;
+
         vec3f overlap1 = (bbox1.max - bbox2.min);
         vec3f overlap2 = (bbox2.max - bbox1.min);
 

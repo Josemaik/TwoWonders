@@ -14,7 +14,8 @@ void createSword(EntityManager& em)
     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword, .inmortal = true });
 }
 
-void createCoin(EntityManager& em) {
+void createCoin(EntityManager& em)
+{
     auto& e{ em.newEntity() };
 
     em.addTag<ObjectTag>(e);
@@ -25,7 +26,8 @@ void createCoin(EntityManager& em) {
     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Coin30, .inmortal = true });
 }
 
-void createShop(EntityManager& em) {
+void createShop(EntityManager& em)
+{
 
     // Bomba
     auto& e{ em.newEntity() };
@@ -52,10 +54,11 @@ void createShop(EntityManager& em) {
     em.addComponent<ObjectComponent>(e3, ObjectComponent{ .type = Object_type::ShopItem_ExtraLife, .inmortal = true });
 }
 
-void createShield(EntityManager& em, Entity& ent){
+void createShield(EntityManager& em, Entity& ent)
+{
     auto& e{ em.newEntity() };
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .color = DARKBROWN });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position});
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
     em.addComponent<ShieldComponent>(e, ShieldComponent{});
 }

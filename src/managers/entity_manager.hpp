@@ -321,25 +321,20 @@ namespace ETMG {
             return storage[key];
         }
 
-        void updateLevelEnemies(std::size_t index, Entity& e)
+        void updateLevelEnemies(std::size_t& index, Entity& e)
         {
             auto& li = getSingleton<LevelInfo>();
-            if (li.enemiesID.size() > 0)
-            {
-                std::unordered_set<std::size_t> enemiesIDCopy = li.enemiesID;
-                for (auto& enemyID : li.enemiesID)
-                {
-                    if (e.getID() == enemyID)
-                    {
-                        enemiesIDCopy.erase(enemyID);
-                    }
-                    else if (entities_[alive_ - 1].getID() == enemyID)
-                    {
-                        enemiesIDCopy.erase(enemyID);
-                        enemiesIDCopy.insert(index);
-                    }
-                }
-                li.enemiesID = enemiesIDCopy;
+            if (li.enemiesID.empty()) return;
+
+            auto it = li.enemiesID.find(e.getID());
+            if (it != li.enemiesID.end()) {
+                li.enemiesID.erase(it);
+            }
+
+            it = li.enemiesID.find(entities_[alive_ - 1].getID());
+            if (it != li.enemiesID.end()) {
+                li.enemiesID.erase(it);
+                li.enemiesID.insert(index);
             }
         }
 

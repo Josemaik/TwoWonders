@@ -19,7 +19,7 @@ struct ColliderComponent
     ColliderComponent(vec3f pos, vec3f scale, BehaviorType behavior)
         : boundingBox{ pos, scale }, behaviorType{ behavior } {};
 
-    void updateBox(vec3f pos, vec3f scale);
+    void updateBox(vec3f pos, vec3f scale, float gravity);
     BBox boundingBox{};
     BehaviorType behaviorType;
 };

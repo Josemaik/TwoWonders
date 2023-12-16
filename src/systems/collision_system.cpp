@@ -4,14 +4,16 @@
 void CollisionSystem::update(EntityManager& em)
 {
     // Octree que contendrá las entidades y sus colliders boxes pa calcular sus colisiones luego
-    Octree octree(0, BBox(vec3f{ 0, 0, 0 }, vec3f{ 220, 30, 200 }));
+    Octree octree(0, BBox(vec3f{ 0, 0, 0 }, vec3f{ 300, 50, 300 }));
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren, ColliderComponent& col)
     {
         // Actualizar bounding box
         auto& pos = phy.position;
         auto& scl = ren.scale;
-        col.updateBox(pos, scl);
+
+        // if (phy.velocity != vec3f::zero())
+        col.updateBox(pos, scl, phy.gravity);
 
         // Insertar en el Octree
         octree.insert(e, col);
@@ -76,6 +78,10 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
 
                         // Marcamos la colisión entre ambas entidades como comprobada
                         checkedPairs.insert({ e->getID(), nEnt->getID() });
+                    }
+                    else if (bbox1.min.y() < -10.f)
+                    {
+                        em.destroyEntity(e->getID());
                     }
                 }
             }
@@ -191,7 +197,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
-    // Si las paredes chocan entre ellas
+    // Si el suelo choca entre sí o las paredes chocan entre ellas
     if (behaviorType1 & BehaviorType::STATIC && behaviorType2 & BehaviorType::STATIC)
     {
         floorCollision(*staticPhy, *otherPhy, minOverlap);
@@ -208,7 +214,8 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Si cualquiera de los impactos es con una bala, se baja la vida del otro
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
-        em.getComponent<LifeComponent>(*otherEntPtr).decreaseLife();
+        if (!staticEntPtr->hasTag<WaterTag>())
+            em.getComponent<LifeComponent>(*otherEntPtr).decreaseLife();
         return;
     }
 
@@ -217,6 +224,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     {
         if (staticEntPtr->hasTag<WaterTag>())
         {
+            //groundCollision(*otherPhy, em.getComponent<RenderComponent>(*otherEntPtr).scale, minOverlap);
             staticCollision(*otherPhy, *staticPhy, minOverlap);
             return;
         }
@@ -382,6 +390,7 @@ void CollisionSystem::classicCollision(PhysicsComponent& phy1, PhysicsComponent&
     }
     else
     {
+        // minOverlap += vec3f{ 0.f, phy2.gravity, 0.f };
         resolveCollision<&vec3f::y, &vec3f::setY>(phy1, phy2, minOverlap.y());
     }
 }

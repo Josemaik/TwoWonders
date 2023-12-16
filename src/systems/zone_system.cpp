@@ -98,6 +98,7 @@ void ZoneSystem::deleteEnemiesinZone(EntityManager& em, uint16_t z)
     {
         std::unordered_set<std::size_t> enemies = li.enemiesID;
         for (auto& enemy : enemies)
-            em.destroyEntity(enemy);
+            if (em.getEntityByID(enemy)->hasTag<EnemyTag>())
+                em.destroyEntity(enemy);
     }
 }
