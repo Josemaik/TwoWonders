@@ -27,6 +27,12 @@ void CollisionSystem::update(EntityManager& em)
     checkCollision(em, octree, checkedPairs, neighborsMap);
 
     // checkBorderCollision(em, ECPair);
+
+    if (!dead_entities.empty())
+    {
+        em.destroyEntities(dead_entities);
+        dead_entities.clear();
+    }
 }
 
 // Función recursiva qué revisa las colisiones de las entidades del octree actual con otras entidades
@@ -81,7 +87,7 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
                     }
                     else if (bbox1.min.y() < -10.f)
                     {
-                        em.destroyEntity(e->getID());
+                        dead_entities.insert(e->getID());
                     }
                 }
             }

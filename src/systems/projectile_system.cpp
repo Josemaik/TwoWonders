@@ -4,7 +4,16 @@ void ProjectileSystem::update(EntityManager& em, float deltaTime) {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, ProjectileComponent& pro)
     {
         if (pro.checkRange(deltaTime)) {
-            em.destroyEntity(e.getID());
+            if (e.hasComponent<LifeComponent>())
+                em.getComponent<LifeComponent>(e).markedForDeletion = true;
+            else
+                dead_entities.insert(e.getID());
         }
     });
+
+    if (!dead_entities.empty())
+    {
+        em.destroyEntities(dead_entities);
+        dead_entities.clear();
+    }
 }

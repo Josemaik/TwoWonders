@@ -61,6 +61,8 @@ private:
     void resolveEnemyDirection(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, float overlap, bool isZAxis);
     template <auto getPos, auto setPos>
     bool resolveCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap);
+
+    std::set<std::size_t, std::greater<std::size_t>> dead_entities{};
     // void checkBorderCollision(EntityManager& em, Octree& boxes);
 };
 

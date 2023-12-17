@@ -12,10 +12,18 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
                 createObject(em, em.getComponent<PhysicsComponent>(ent).position);
             }
 
-            // Eliminamos la entidad
-            em.destroyEntity(ent.getID());
+            lif.markedForDeletion = true;
         }
+
+        if (lif.markedForDeletion)
+            dead_entities.insert(ent.getID());
     });
+
+    if (!dead_entities.empty())
+    {
+        em.destroyEntities(dead_entities);
+        dead_entities.clear();
+    }
 }
 
 // Se podra crear objetos: vida, bomba, moneda o nada

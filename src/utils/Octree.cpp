@@ -43,7 +43,7 @@ void Octree::subdivide()
             if (octant->bounds_.intersects(entity.second->boundingBox))
             {
                 octant->insert(*entity.first, *entity.second);
-                break; // Quitar este break para arreglar lo de las zonas pero revienta el rendimiento
+                break; // Leer el comentario grande de getNeighbors
             }
         }
     }
@@ -55,12 +55,15 @@ void Octree::subdivide()
 }
 
 // Función para obtener los vecinos con los que una entidad interacciona fuera de su octante
-std::unordered_set<Octree*> Octree::getNeighbors(Entity const& entity, ColliderComponent const& collider)
+std::unordered_set<Octree*>& Octree::getNeighbors(Entity const& entity, ColliderComponent const& collider)
 {
-    std::unordered_set<Octree*> neighbors{};
+    neighbors.clear();
     neighbors.insert(this);
 
-    // Check the parent node and its ancestors
+    // Comentar esta parte de la función y luego comentar el break de subdivide, ambos funcionan.
+    // Tal y como lo tenemos el rendimiento es más estable.
+    //
+    // Revisa los hijos del nodo padre y los vecinos del padre y etc etc
     if (parent_ != nullptr)
         getParentsRecursive(parent_, entity, collider, neighbors);
 
