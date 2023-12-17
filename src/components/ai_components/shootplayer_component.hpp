@@ -2,7 +2,7 @@
 #include <array>
 #include <cstdint>
 #include <utils/vec3D.hpp>
-struct ShootPlayerComponent
+struct ShootPlayerComponent : AIComponent
 {
     float detect_radius{ 15.f };
     bool playerdetected{ false };

@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <utils/vec3D.hpp>
 #include <random>
-struct DiagonalComponent
+struct DiagonalComponent : AIComponent
 {
     static constexpr vec3f up_left =    vec3f{ -0.25f, 0.0f, -0.25f };
     static constexpr vec3f up_right =   vec3f{ 0.25f, 0.0f, -0.25f };

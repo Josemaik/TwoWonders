@@ -19,6 +19,9 @@
 
 #include "map.hpp"
 
+#include "../utils/bt/behaviourtree.hpp"
+#include "../utils/bt/actionarrive.hpp"
+
 constexpr uint16_t SCREEN_WIDTH{ 800 };
 constexpr uint16_t SCREEN_HEIGHT{ 600 };
 

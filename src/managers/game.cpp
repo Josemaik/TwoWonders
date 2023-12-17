@@ -87,15 +87,17 @@ void createEntities(EntityManager& em)
     // Shop
     createShop(em);
 
-    // Enemies
-    // createEnemiesZelda(em);
-
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
 }
-
+void createTestBt() {
+        BehaviourTree_t tree;
+        tree.createNode <BTActionArrive_t> ( vec3f{100.0f, 50.0f,20.0f} );
+        tree.run();
+}
 void game()
 {
+    createTestBt();
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};
     Ia_man iam{};
