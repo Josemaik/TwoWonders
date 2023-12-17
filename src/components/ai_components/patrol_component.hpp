@@ -2,7 +2,7 @@
 #include <array>
 #include <cstdint>
 #include <utils/vec3D.hpp>
-struct PatrolComponent
+struct PatrolComponent : AIComponent
 {
     //patrol enemy
     static constexpr uint8_t max_patrol{ 10 };

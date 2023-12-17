@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <utils/vec3D.hpp>
 #include <random>
-struct RandomShootComponent
+struct RandomShootComponent : AIComponent
 {
     static constexpr vec3f left = vec3f{ -0.25f, 0.0f, 0.0f };
     static constexpr vec3f right = vec3f{ 0.25f, 0.0f, 0.0f };
