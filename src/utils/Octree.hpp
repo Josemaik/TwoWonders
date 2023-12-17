@@ -39,7 +39,8 @@ struct Octree {
     };
 
     void insert(Entity& entity, ColliderComponent& collider);
-    void subdivide();
+    void subdivide(Entity& entity, ColliderComponent& collider);
+    void clear();
     std::size_t countEntities() const;
     void remove(std::pair<Entity*, ColliderComponent*> const& entity);
     std::unordered_set<Octree*>& getNeighbors(Entity const& entity, ColliderComponent const& collider);

@@ -41,11 +41,14 @@ struct CollisionSystem
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent, ColliderComponent>;
     using SYSTAGs = MP::TypeList<>;
     using pairsType = std::unordered_set<std::pair<std::size_t, std::size_t>, pair_hash, pair_equal>;
-    using octreeMap = std::unordered_map<std::size_t, std::unordered_set<Octree*>>;
+    // using octreeMap = std::unordered_map<std::size_t, std::unordered_set<Octree*>>;
+
+    CollisionSystem()
+        : octree(0, BBox(vec3f{ 0, 0, 0 }, vec3f{ 300, 50, 300 })) {}
 
     void update(EntityManager& em);
 private:
-    void checkCollision(EntityManager& em, Octree& boxes, pairsType& checkedPairs, octreeMap& neighborsMap);
+    void checkCollision(EntityManager& em, Octree& boxes, pairsType& checkedPairs);
     void enemyCollision(EntityManager& em, Entity& damagedEntity);
     void staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3f& minOverlap);
     void nonStaticCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
@@ -62,7 +65,9 @@ private:
     template <auto getPos, auto setPos>
     bool resolveCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap);
 
+    Octree octree;
     std::set<std::size_t, std::greater<std::size_t>> dead_entities{};
+    pairsType checkedPairs{};
     // void checkBorderCollision(EntityManager& em, Octree& boxes);
 };
 

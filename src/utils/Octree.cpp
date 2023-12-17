@@ -10,20 +10,20 @@ void Octree::insert(Entity& entity, ColliderComponent& collider)
     else if (depth_ < MAX_DEPTH)
     {
         if (!divided_)
-            subdivide();
-
-        for (auto& octant : octants_)
-        {
-            if (octant->bounds_.intersects(collider.boundingBox))
+            subdivide(entity, collider);
+        else
+            for (auto& octant : octants_)
             {
-                octant->insert(entity, collider);
+                if (octant->bounds_.intersects(collider.boundingBox))
+                {
+                    octant->insert(entity, collider);
+                }
             }
-        }
     }
 }
 
 // Cuando el octree excede su capacidad de entidades, se divide en 8 octantes
-void Octree::subdivide()
+void Octree::subdivide(Entity& entity, ColliderComponent& collider)
 {
     vec3f size = bounds_.size() / 2.0f;
     vec3f center = bounds_.center();
@@ -33,18 +33,19 @@ void Octree::subdivide()
         vec3f octantCenter = center + offsets[i] * size;
         BBox octantBounds(octantCenter, size);
         octants_[i] = std::make_unique<Octree>(depth_ + 1, octantBounds, this);
-    }
 
-    // Pasamos las entidades del nodo padre a los hijos
-    for (auto& entity : octEntities_)
-    {
-        for (auto& octant : octants_)
+        for (auto& entity : octEntities_)
         {
-            if (octant->bounds_.intersects(entity.second->boundingBox))
+            if (octants_[i]->bounds_.intersects(entity.second->boundingBox))
             {
-                octant->insert(*entity.first, *entity.second);
-                break; // Leer el comentario grande de getNeighbors
+                octants_[i]->insert(*entity.first, *entity.second);
+                // break; // Leer el comentario grande de getNeighbors
             }
+        }
+
+        if (octants_[i]->bounds_.intersects(collider.boundingBox))
+        {
+            octants_[i]->insert(entity, collider);
         }
     }
 
@@ -54,6 +55,26 @@ void Octree::subdivide()
     divided_ = true;
 }
 
+void Octree::clear()
+{
+    octEntities_.clear();
+
+    if (divided_)
+    {
+        for (auto& octant : octants_)
+        {
+            if (octant != nullptr || !octant->octEntities_.empty() || octant->divided_)
+                octant->clear();
+        }
+    }
+
+    divided_ = false;
+}
+
+
+// Funciones en desuso
+//
+//
 // Función para obtener los vecinos con los que una entidad interacciona fuera de su octante
 std::unordered_set<Octree*>& Octree::getNeighbors(Entity const& entity, ColliderComponent const& collider)
 {
@@ -64,13 +85,13 @@ std::unordered_set<Octree*>& Octree::getNeighbors(Entity const& entity, Collider
     // Tal y como lo tenemos el rendimiento es más estable.
     //
     // Revisa los hijos del nodo padre y los vecinos del padre y etc etc
-    if (parent_ != nullptr)
-        getParentsRecursive(parent_, entity, collider, neighbors);
+    // if (parent_ != nullptr)
+    //     getParentsRecursive(parent_, entity, collider, neighbors);
 
     return neighbors;
 }
 
-// Función para buscar los hijos de un nodo específico recursivamente
+// // Función para buscar los hijos de un nodo específico recursivamente
 void Octree::getChildrenRecursive(Octree* node, Entity const& entity, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors)
 {
     for (const auto& octant : node->octants_)
@@ -85,7 +106,7 @@ void Octree::getChildrenRecursive(Octree* node, Entity const& entity, ColliderCo
     }
 }
 
-// Función para buscar los padres del nodo padre recursivamente
+// // Función para buscar los padres del nodo padre recursivamente
 void Octree::getParentsRecursive(Octree* node, Entity const& entity, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors)
 {
     if (node->parent_ != nullptr)

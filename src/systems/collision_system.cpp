@@ -3,8 +3,8 @@
 
 void CollisionSystem::update(EntityManager& em)
 {
-    // Octree que contendrá las entidades y sus colliders boxes pa calcular sus colisiones luego
-    Octree octree(0, BBox(vec3f{ 0, 0, 0 }, vec3f{ 300, 50, 300 }));
+    // Liberar el octree
+    octree.clear();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren, ColliderComponent& col)
     {
@@ -20,11 +20,10 @@ void CollisionSystem::update(EntityManager& em)
     });
 
     // Vector para saber qué colisiones se han calculado ya
-    pairsType checkedPairs;
-    octreeMap neighborsMap{};
+    checkedPairs.clear();
 
     // Comprobar colisiones
-    checkCollision(em, octree, checkedPairs, neighborsMap);
+    checkCollision(em, octree, checkedPairs);
 
     // checkBorderCollision(em, ECPair);
 
@@ -36,7 +35,7 @@ void CollisionSystem::update(EntityManager& em)
 }
 
 // Función recursiva qué revisa las colisiones de las entidades del octree actual con otras entidades
-void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsType& checkedPairs, octreeMap& neighborsMap)
+void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsType& checkedPairs)
 {
     // Si el octree está dividido, revisar sus hijos
     if (octree.isDivided())
@@ -45,50 +44,36 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
         {
             // Si el octante tiene entidades o está dividido, revisar sus colisiones
             if (octant.get()->getNumEntities() > 0 || octant.get()->isDivided())
-                checkCollision(em, *octant, checkedPairs, neighborsMap);
+                checkCollision(em, *octant, checkedPairs);
         }
         return;
     }
 
     for (auto const& [e, c] : octree.getOctEntities())
     {
-        BBox& bbox1 = c->boundingBox;
 
-        // Revisamos las entidades de los octantes vecinos
-        std::unordered_set<Octree*> neighbors{};
-
-        if (neighborsMap.find(e->getID()) == neighborsMap.end())
+        for (auto const& [nEnt, nCol] : octree.getOctEntities())
         {
-            neighbors = octree.getNeighbors(*e, *c);
-            neighborsMap.insert({ e->getID(), neighbors });
-        }
-        else
-            neighbors = neighborsMap[e->getID()];
-
-        for (auto& neighbor : neighbors)
-        {
-            for (auto const& [nEnt, nCol] : neighbor->getOctEntities())
+            // Si la colisión entre estas dos entidades no se ha comprobado ya, se hace ahora
+            if (checkedPairs.find({ e->getID(), nEnt->getID() }) == checkedPairs.end() && e != nEnt)
             {
-                // Si la colisión entre estas dos entidades no se ha comprobado ya, se hace ahora
-                if (checkedPairs.find({ e->getID(), nEnt->getID() }) == checkedPairs.end() && e != nEnt)
+                BBox& bbox1 = c->boundingBox;
+                BBox& bbox2 = nCol->boundingBox;
+
+                if (bbox1.intersects(bbox2))
                 {
-                    BBox& bbox2 = nCol->boundingBox;
+                    // Calculamos el mínimo solape entre las dos entidades
+                    vec3f minOverlap = BBox::minOverlap(bbox1, bbox2);
 
-                    if (bbox1.intersects(bbox2))
-                    {
-                        // Calculamos el mínimo solape entre las dos entidades
-                        vec3f minOverlap = BBox::minOverlap(bbox1, bbox2);
+                    // Manejamos la colisión
+                    handleCollision(em, *e, *nEnt, minOverlap, c->behaviorType, nCol->behaviorType);
 
-                        // Manejamos la colisión
-                        handleCollision(em, *e, *nEnt, minOverlap, c->behaviorType, nCol->behaviorType);
-
-                        // Marcamos la colisión entre ambas entidades como comprobada
-                        checkedPairs.insert({ e->getID(), nEnt->getID() });
-                    }
-                    else if (bbox1.min.y() < -10.f)
-                    {
-                        dead_entities.insert(e->getID());
-                    }
+                    // Marcamos la colisión entre ambas entidades como comprobada
+                    checkedPairs.insert({ e->getID(), nEnt->getID() });
+                }
+                else if (bbox1.min.y() < -10.f)
+                {
+                    dead_entities.insert(e->getID());
                 }
             }
         }
