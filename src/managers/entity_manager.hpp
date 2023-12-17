@@ -9,6 +9,8 @@
 #include <vector>
 #include <algorithm>
 #include <typeinfo>
+#include <set>
+#include <functional>
 #include "../utils/slotmap.hpp"
 #include "../utils/meta_program.hpp"
 
@@ -190,41 +192,6 @@ namespace ETMG {
             return entities_[alive_ - 1];
         }
 
-        // Función para destruir una entidad
-        void destroyEntity(size_t index)
-        {
-            assert(index < alive_);
-            assert(alive_ > 0);
-            auto& e = entities_[index];
-
-            // Eliminamos los componentes de la entidad
-            tuple_replace<CMPList> cmps{};
-            MP::for_each_in_tuple(cmps, [&](auto cmpType)
-            {
-                using CMPType = decltype(cmpType);
-                if (e.template hasComponent<CMPType>())
-                {
-                    // std::cout << "Destroying component " << typeid(CMPType).name() << std::endl;
-                    auto key = e.template getComponentKey<CMPType>();
-                    this->template getCMPStorage<CMPType>().erase(key);
-                }
-            });
-
-            // Actualizamos los ids de los enemigos en el singleton
-            updateLevelEnemies(index, e);
-
-            // Reseteamos la entidad
-            e.reset();
-
-            // Eliminamos la entidad
-            e = entities_[alive_ - 1];
-            entities_[alive_ - 1].reset();
-            e.setID(index);
-            nextID--;
-
-            alive_ -= 1;
-        }
-
         // Plantilla para sacar una lista de componentes de la tupla que los guarda
         template <typename CMP>
         [[nodiscard]] constexpr auto& getCMPStorage() noexcept
@@ -293,7 +260,53 @@ namespace ETMG {
 
         void destroyAll() { while (alive_ > 0) destroyEntity(0); }
 
+        void destroyEntities(std::set<std::size_t, std::greater<std::size_t>> const& set)
+        {
+            // Destroy the entities
+            for (auto const& id : set)
+            {
+                destroyEntity(id);
+            }
+        }
+
+        // Función para destruir una entidad
+
     private:
+        void destroyEntity(size_t index)
+        {
+            assert(index < alive_);
+            assert(alive_ > 0);
+            auto& e = entities_[index];
+
+            // Eliminamos los componentes de la entidad
+            tuple_replace<CMPList> cmps{};
+            MP::for_each_in_tuple(cmps, [&](auto cmpType)
+            {
+                using CMPType = decltype(cmpType);
+                if (e.template hasComponent<CMPType>())
+                {
+                    // std::cout << "Destroying component " << typeid(CMPType).name() << std::endl;
+                    auto key = e.template getComponentKey<CMPType>();
+                    this->template getCMPStorage<CMPType>().erase(key);
+                }
+            });
+
+            // Actualizamos los ids de los enemigos en el singleton
+            updateLevelEnemies(index, e);
+
+            // Reseteamos la entidad
+            e.reset();
+
+            // Eliminamos la entidad
+            e = entities_[alive_ - 1];
+            entities_[alive_ - 1].reset();
+            e.setID(index);
+            nextID--;
+
+            alive_ -= 1;
+        }
+
+
         // Plantilla para recorrer todas las entidades que tengan los componentes y tags especificados
         template <typename... CMPs, typename... TAGs>
         void forEachImpl(auto&& func, MP::TypeList<CMPs...>, MP::TypeList<TAGs...>)

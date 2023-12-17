@@ -39,13 +39,16 @@ struct Octree {
     };
 
     void insert(Entity& entity, ColliderComponent& collider);
-    void subdivide();
+    void subdivide(Entity& entity, ColliderComponent& collider);
+    void clear();
     std::size_t countEntities() const;
     void remove(std::pair<Entity*, ColliderComponent*> const& entity);
-    std::unordered_set<Octree*> getNeighbors(Entity const& entity, ColliderComponent const& collider);
+    std::unordered_set<Octree*>& getNeighbors(Entity const& entity, ColliderComponent const& collider);
     void getChildrenRecursive(Octree* node, Entity const& entity, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors);
     void getParentsRecursive(Octree* node, Entity const& entity, ColliderComponent const& collider, std::unordered_set<Octree*>& neighbors);
     bool query(Entity const& entity, ColliderComponent const& collider);
+    void updateNeighbors(Entity& entity, ColliderComponent& collider);
+
     // Función que nos devuelve las entidades en el octree
     template<typename T = std::pair<Entity*, ColliderComponent*>>
     auto getOctEntities() -> std::conditional_t<std::is_const_v<T>, const OctSet&, OctSet&> {
@@ -95,4 +98,5 @@ private:
     bool divided_ = false;
     Octree* parent_;
     std::size_t max_ent_{ MAX_ENTITIES };
+    std::unordered_set<Octree*> neighbors;
 };

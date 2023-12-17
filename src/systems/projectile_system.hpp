@@ -10,6 +10,9 @@ struct ProjectileSystem
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em, float deltaTime);
+
+private:
+    std::set<std::size_t, std::greater<std::size_t>> dead_entities{};
 };
 
 #endif // !PROJECTILE_SYSTEM

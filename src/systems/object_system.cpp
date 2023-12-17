@@ -8,7 +8,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             if (obj.type == Object_type::BombExplode)
                 obj.effect();
             else
-                em.destroyEntity(ent.getID());
+                dead_entities.insert(ent.getID());
         }
 
         // Recuperamos la entidad del player
@@ -65,26 +65,32 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             default:
                 break;
             }
-            if(shop_object)
-                em.destroyEntity(ent.getID());
-            else 
+            if (shop_object)
+                dead_entities.insert(ent.getID());
+            else
                 obj.active = false;
         }
     });
+
+    if (!dead_entities.empty())
+    {
+        em.destroyEntities(dead_entities);
+        dead_entities.clear();
+    }
 }
 
 // ent->hasComponent<LifeComponent<()
 
-bool ObjectSystem::buyBomb(EntityManager& em, Entity* ent){
-    if (ent->hasComponent<InformationComponent>()){
+bool ObjectSystem::buyBomb(EntityManager& em, Entity* ent) {
+    if (ent->hasComponent<InformationComponent>()) {
         return em.getComponent<InformationComponent>(*ent).buyBomb();
     }
     return false;
 }
 
-bool ObjectSystem::buyLife(EntityManager& em, Entity* ent){
-    if (ent->hasComponent<InformationComponent>() && ent->hasComponent<LifeComponent>()){
-        if(em.getComponent<InformationComponent>(*ent).decreaseCoins(10)){
+bool ObjectSystem::buyLife(EntityManager& em, Entity* ent) {
+    if (ent->hasComponent<InformationComponent>() && ent->hasComponent<LifeComponent>()) {
+        if (em.getComponent<InformationComponent>(*ent).decreaseCoins(10)) {
             em.getComponent<LifeComponent>(*ent).increaseLife();
             em.getComponent<LifeComponent>(*ent).increaseLife();
             return true;
@@ -93,9 +99,9 @@ bool ObjectSystem::buyLife(EntityManager& em, Entity* ent){
     return false;
 }
 
-bool ObjectSystem::buyExtraLife(EntityManager& em, Entity* ent){
-    if (ent->hasComponent<InformationComponent>() && ent->hasComponent<LifeComponent>()){
-        if(em.getComponent<InformationComponent>(*ent).decreaseCoins(30)){
+bool ObjectSystem::buyExtraLife(EntityManager& em, Entity* ent) {
+    if (ent->hasComponent<InformationComponent>() && ent->hasComponent<LifeComponent>()) {
+        if (em.getComponent<InformationComponent>(*ent).decreaseCoins(30)) {
             em.getComponent<LifeComponent>(*ent).increaseMaxLife();
             em.getComponent<LifeComponent>(*ent).increaseLife();
             em.getComponent<LifeComponent>(*ent).increaseLife();

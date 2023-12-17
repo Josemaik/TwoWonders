@@ -18,6 +18,7 @@ private:
     bool buyBomb(EntityManager& em, Entity* ent);
     bool buyExtraLife(EntityManager& em, Entity* ent);
     bool buyLife(EntityManager& em, Entity* ent);
+    std::set<std::size_t, std::greater<std::size_t>> dead_entities{};
 };
 
 #endif // !OBJECT_SYSTEM
