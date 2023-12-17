@@ -3,6 +3,7 @@
 #define AI_SYSTEM
 #include "../utils/types.hpp"
 #include "../utils/vec3D.hpp"
+#include "../utils/bt/behaviourtree.hpp"
 #include <iostream>
 
 constexpr float SPEED_AI = 0.2f;

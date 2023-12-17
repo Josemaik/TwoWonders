@@ -3,7 +3,8 @@
 #include <cstdint>
 #include <utils/vec3D.hpp>
 #include <random>
-struct RandomShootComponent : AIComponent
+struct BehaviourTree_t;
+struct RandomShootComponent
 {
     static constexpr vec3f left = vec3f{ -0.25f, 0.0f, 0.0f };
     static constexpr vec3f right = vec3f{ 0.25f, 0.0f, 0.0f };
@@ -25,4 +26,5 @@ struct RandomShootComponent : AIComponent
     void dec_countdown_stop(float deltaTime) { elapsed_stop += deltaTime; }; 
     void dec_countdown_shoot(float deltaTime) { elapsed_shoot += deltaTime; };
     float Xmin{},Xmax{},Zmin{},Zmax{};
+    BehaviourTree_t* behaviourTree{nullptr};
 };

@@ -3,7 +3,8 @@
 #include <cstdint>
 #include <utils/vec3D.hpp>
 #include <random>
-struct DiagonalComponent : AIComponent
+struct BehaviourTree_t;
+struct DiagonalComponent
 {
     static constexpr vec3f up_left =    vec3f{ -0.25f, 0.0f, -0.25f };
     static constexpr vec3f up_right =   vec3f{ 0.25f, 0.0f, -0.25f };
@@ -27,4 +28,5 @@ struct DiagonalComponent : AIComponent
     void dec_countdown_stop(float deltaTime) { elapsed_stop += deltaTime; }; 
     void dec_countdown_moving(float deltaTime) { elapsed_moving += deltaTime; };
     float Xmin{},Xmax{},Zmin{},Zmax{};
+    BehaviourTree_t* behaviourTree{nullptr};
 };

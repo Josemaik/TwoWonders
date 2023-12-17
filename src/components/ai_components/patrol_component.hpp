@@ -2,7 +2,8 @@
 #include <array>
 #include <cstdint>
 #include <utils/vec3D.hpp>
-struct PatrolComponent : AIComponent
+struct BehaviourTree_t;
+struct PatrolComponent
 {
     //patrol enemy
     static constexpr uint8_t max_patrol{ 10 };
@@ -12,4 +13,5 @@ struct PatrolComponent : AIComponent
     float arrival_radius{ 1.f };
     bool arrived{ false };
     uint8_t nexttarget{ 1 };
+    BehaviourTree_t* behaviourTree{nullptr};
 };

@@ -2,8 +2,8 @@
 #include <array>
 #include <cstdint>
 #include <utils/vec3D.hpp>
-
-struct DrakeComponent : AIComponent
+struct BehaviourTree_t;
+struct DrakeComponent
 {
     //patrol enemy
     static constexpr uint8_t max_patrol{ 10 };
@@ -15,4 +15,5 @@ struct DrakeComponent : AIComponent
     uint8_t nexttarget{ 1 };
     float countdown_shoot{2.0f}, elapsed_shoot{1.0f};
     void dec_countdown_shoot(float deltaTime) { elapsed_shoot += deltaTime; };
+    BehaviourTree_t* behaviourTree{nullptr};
 };

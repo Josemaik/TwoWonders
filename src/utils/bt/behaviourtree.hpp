@@ -2,7 +2,11 @@
 #include<vector>
 #include <memory>
 #include <cstddef>
+#include <concepts>
 #include "node.hpp"
+
+template <typename T>
+concept BTNodeType = std::derived_from<T,BTNode_t>;
 
 struct BehaviourTree_t{
     //Types
@@ -11,12 +15,14 @@ struct BehaviourTree_t{
     using MemoryStorage_t = std::unique_ptr<std::byte[]>;
     //Constructor
     explicit BehaviourTree_t() {}
+
     void run() noexcept{
         if ( nodes.size() > 0 ){
             nodes.back()->run();
         }
     }
-    template <typename NodeType, typename...ParamTypes>
+
+    template <BTNodeType NodeType, typename...ParamTypes>
     NodeType& createNode(ParamTypes&&... params){
         //Reservar memoria
         ptr_reserved -= sizeof(NodeType);
@@ -31,6 +37,7 @@ struct BehaviourTree_t{
         //Return node
         return *pnode;
     }
+    
 private:
     std::size_t     mem_size    { 1024 };
     MemoryStorage_t mem         { std::make_unique<std::byte[]>(mem_size) };

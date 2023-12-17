@@ -248,6 +248,7 @@ void AISystem::update(EntityManager& em, float dt)
     em.forEach<SYSCMPs_Patrol, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, PatrolComponent& pc)
     {
         (void)e;
+        if(pc.behaviourTree){pc.behaviourTree->run();}
         vec3f distance = FollowPatrol(phy, pc);
         setVelocity(phy, distance);
     });

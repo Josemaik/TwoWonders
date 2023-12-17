@@ -4,6 +4,10 @@
 
 #include "../utils/types.hpp"
 #include <cstdint>
+
+#include "../utils/bt/behaviourtree.hpp"
+#include "../utils/bt/actionarrive.hpp"
+
 struct Ia_man
 {
     // void createMap(EntityManager& em);
