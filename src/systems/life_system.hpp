@@ -15,7 +15,7 @@ struct LifeSystem
 
 private:
     void createObject(EntityManager& em, vec3f pos);
-    std::set<std::size_t, std::greater<std::size_t>> dead_entities{};
+    deathSet dead_entities{};
 };
 
 #endif // !LIFE_SYSTEM

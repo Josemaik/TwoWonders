@@ -73,7 +73,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
 void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, AttackComponent& att, int numShots) {
     float spread = 0.15f; // Ángulo de dispersión entre los disparos
     for (int i = 0; i < numShots; ++i) {
-        float offset = spread * ((i + 0.5f) - numShots / 2.f);
+        float offset = spread * ((static_cast<float>(i) + 0.5f) - static_cast<float>(numShots) / 2.f);
         att.vel = { -0.25, 0.0f, offset };
         createAttackRangedOrMelee(em, ent, att, true);
     }

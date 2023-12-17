@@ -67,6 +67,7 @@ namespace ETMG {
 
         // ALIAS
         //
+        using deathSet = std::set<std::size_t, std::greater<std::size_t>>;
         using TypeProcessFunc = void(*)(Entity&); // Alias para un puntero a función (lambda)
         using tag_info = tag_traits<TAGList>; // Alias para la información de los tags
         using cmp_info = cmp_traits<CMPList>; // Alias para la información de los componentes
@@ -260,7 +261,7 @@ namespace ETMG {
 
         void destroyAll() { while (alive_ > 0) destroyEntity(0); }
 
-        void destroyEntities(std::set<std::size_t, std::greater<std::size_t>> const& set)
+        void destroyEntities(deathSet const& set)
         {
             // Destroy the entities
             for (auto const& id : set)

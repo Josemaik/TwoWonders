@@ -66,7 +66,7 @@ private:
     bool resolveCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap);
 
     Octree octree;
-    std::set<std::size_t, std::greater<std::size_t>> dead_entities{};
+    deathSet dead_entities{};
     pairsType checkedPairs{};
     // void checkBorderCollision(EntityManager& em, Octree& boxes);
 };

@@ -132,8 +132,12 @@ void game()
     using std::chrono::milliseconds;
 
     // Colocar antes de donde se quiere medir el tiempo
+    // auto t1 = high_resolution_clock::now();
 
     // Colocar despues de donde se quiere medir el tiempo
+    // auto t2 = high_resolution_clock::now();
+    // auto duration = duration_cast<milliseconds>(t2 - t1);
+    // std::cout << "el _System se ejecutó en " << duration.count() << " ms.\n";
 
 
     // Inicializa una variabloe donde tener el tiempo entre frames
@@ -145,14 +149,7 @@ void game()
         input_system.update(em);
         ai_sys.update(em, deltaTime);
         physics_system.update(em);
-        auto t1 = high_resolution_clock::now();
-
         collision_system.update(em);
-
-        auto t2 = high_resolution_clock::now();
-        auto duration = duration_cast<milliseconds>(t2 - t1);
-        std::cout << "el _System se ejecutó en " << duration.count() << " ms.\n";
-
         zone_system.update(em, engine, iam);
 
         shield_system.update(em);

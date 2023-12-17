@@ -36,9 +36,10 @@ struct ObjectTag {};
 struct ZoneTag {};
 
 
-using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, PatrolComponent, ShootPlayerComponent, RandomShootComponent,DiagonalComponent,DrakeComponent,AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent,ShieldComponent>;
+using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent, AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent, ShieldComponent>;
 using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayer, GroundTag, WaterTag, ObjectTag, ZoneTag>;
 using SCL = MP::TypeList<LevelInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;
+using deathSet = std::set<std::size_t, std::greater<std::size_t>>;

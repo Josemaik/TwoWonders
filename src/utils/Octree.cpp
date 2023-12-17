@@ -76,7 +76,7 @@ void Octree::clear()
 //
 //
 // Función para obtener los vecinos con los que una entidad interacciona fuera de su octante
-std::unordered_set<Octree*>& Octree::getNeighbors(Entity const& entity, ColliderComponent const& collider)
+std::unordered_set<Octree*>& Octree::getNeighbors(Entity const&, ColliderComponent const&)
 {
     neighbors.clear();
     neighbors.insert(this);
