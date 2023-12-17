@@ -14,7 +14,7 @@ struct CollisionSystem
         template <class T1, class T2>
         std::size_t operator () (const std::pair<T1, T2>& p) const
         {
-            // Order the elements in the pair
+            // Ordenar los elementos de los pares
             auto ordered_p = std::minmax(p.first, p.second);
 
             auto h1 = std::hash<T1>{}(ordered_p.first);
@@ -29,7 +29,7 @@ struct CollisionSystem
         template <class T1, class T2>
         bool operator () (const std::pair<T1, T2>& p1, const std::pair<T1, T2>& p2) const
         {
-            // Order the elements in the pairs
+            // Ordenar los elementos de los pares
             auto ordered_p1 = std::minmax(p1.first, p1.second);
             auto ordered_p2 = std::minmax(p2.first, p2.second);
 

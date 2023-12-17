@@ -13,9 +13,8 @@ struct AttackSystem
 
 private:
     void createAttack(EntityManager& em, Entity& e, AttackComponent& att);
-    void createAttackRanged(EntityManager& em, Entity& e, AttackComponent& att);
-    void createAttackMelee(EntityManager& em, Entity& e, AttackComponent& att);
-    void createAttackTripleShot(EntityManager& em, Entity& e, AttackComponent& att);
+    void createAttackRangedOrMelee(EntityManager& em, Entity& e, AttackComponent& att, bool isRanged);
+    void createAttackMultipleShot(EntityManager& em, Entity& ent, AttackComponent& att, int numShots);
 };
 
 #endif // !ATTACK_SYSTEM

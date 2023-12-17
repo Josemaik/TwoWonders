@@ -49,12 +49,13 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
         return;
     }
 
-    for (auto const& [e, c] : octree.getOctEntities())
+    for (auto it1 = octree.getOctEntities().begin(); it1 != octree.getOctEntities().end(); ++it1)
     {
-
-        for (auto const& [nEnt, nCol] : octree.getOctEntities())
+        for (auto it2 = std::next(it1); it2 != octree.getOctEntities().end(); ++it2)
         {
-            // Si la colisión entre estas dos entidades no se ha comprobado ya, se hace ahora
+            auto [e, c] = *it1;
+            auto [nEnt, nCol] = *it2;
+
             if (checkedPairs.find({ e->getID(), nEnt->getID() }) == checkedPairs.end() && e != nEnt)
             {
                 BBox& bbox1 = c->boundingBox;
