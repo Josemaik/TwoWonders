@@ -6,10 +6,10 @@
 //DEvuelve un tiempo en segundos random
 float getRandomStop() {
     switch (std::rand() % 2) {
-    case 0:  return 10.0f; break;
+    case 0:  return 9.0f; break;
     case 1:  return 6.0f; break;
     case 2:  return 8.0f; break;
-    default: return 6.5f; break;
+    default: return 7.0f; break;
     }
 }
 // //Devuelve una posición random dado un rango

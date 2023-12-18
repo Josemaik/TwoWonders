@@ -8,12 +8,8 @@
 #include "../components/input_component.hpp"
 #include "../components/life_component.hpp"
 //ia
-#include "../components/ai_components/ai_component.hpp"
-// #include "../components/ai_components/patrol_component.hpp"
-// #include "../components/ai_components/shootplayer_component.hpp"
-// #include "../components/ai_components/randomshoot_component.hpp"
-// #include "../components/ai_components/diagonal_component.hpp"
-// #include "../components/ai_components//drake_component.hpp"
+#include "../components/ai_component.hpp"
+
 
 #include "../components/levelinfo.hpp"
 #include "../components/projectile_component.hpp"

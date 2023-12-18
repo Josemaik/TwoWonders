@@ -1,11 +1,7 @@
 #pragma once
 #include <cstdint>
-//IAs
-#include <components/ai_components/diagonal_component.hpp>
-#include <components/ai_components/drake_component.hpp>
-#include <components/ai_components/patrol_component.hpp>
-#include <components/ai_components/randomshoot_component.hpp>
-#include <components/ai_components/shootplayer_component.hpp>
+//IA
+#include <components/ai_component.hpp>
 //physics y entitymanager
 #include <components/physics_component.hpp>
 #include <managers/entity_manager.hpp>
