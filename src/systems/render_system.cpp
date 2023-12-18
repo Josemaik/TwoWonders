@@ -29,7 +29,7 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine){
     engine.drawText("PRESS [ENTER] TO PLAY", 
                     engine.getScreenWidth()/2 - 200, 
                     engine.getScreenHeight() - 50, 30, 
-                    BLUE);
+                    Color({108, 198, 215, 255}));
     engine.endDrawing();
 }
 
