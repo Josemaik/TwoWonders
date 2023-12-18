@@ -167,6 +167,19 @@ struct vec3D
         return os;
     }
 
+    void updateLowest(vec3D const& v) noexcept 
+    {
+        if (x_ <= y_ && x_ <= z_) {
+            x_ += v.x_ < 0 ? -v.x_ : v.x_;
+        }
+        else if (y_ <= x_ && y_ <= z_) {
+            y_ += v.y_ < 0 ? -v.y_ : v.y_;
+        }
+        else {
+            z_ += v.z_ < 0 ? -v.z_ : v.z_;
+        }
+    }
+
 private:
     DataT x_{}, y_{}, z_{};
     mutable std::optional<DataT> length_{};
