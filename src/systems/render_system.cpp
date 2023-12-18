@@ -54,6 +54,17 @@ void RenderSystem::drawEnding(ENGI::GameEngine& engine){
     engine.endDrawing();
 }
 
+void RenderSystem::drawStory(ENGI::GameEngine& engine){
+    engine.beginDrawing();
+    engine.clearBackground(WHITE);
+    engine.drawText("Ana quiere historia", 250, 250, 50, BLACK);
+    engine.drawText("PRESS [ENTER] TO PLAY ", 
+                    engine.getScreenWidth()/2 - 200, 
+                    engine.getScreenHeight() - 50, 30, 
+                    BLACK);
+    engine.endDrawing();
+}
+
 void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
 {
     for (auto const& e : em.getEntities())

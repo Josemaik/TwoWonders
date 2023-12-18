@@ -172,10 +172,18 @@ void game()
         
         // CODIGO DE LA PANTALLA DE TITULO
         case GameScreen::TITLE:
+            // Input del enter para la historia
+            if(input_system.pressEnter())
+                li.currentScreen = GameScreen::STORY;
+            render_system.drawLogoGame(engine);
+            break;
+
+        // CODIGO DE LA PANTALLA DE HISTORIA
+        case GameScreen::STORY:
             // Input del enter para empezar la partida
             if(input_system.pressEnter())
                 li.currentScreen = GameScreen::GAMEPLAY;
-            render_system.drawLogoGame(engine);
+            render_system.drawStory(engine);
             break;
 
         // CODIGO DEL GAMEPLAY
