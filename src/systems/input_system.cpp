@@ -4,7 +4,8 @@ void InputSystem::update(EntityManager& em)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto* playerEn = em.getEntityByID(li.playerID);
-    if (!playerEn->hasTag<PlayerTag>() && IsKeyDown(KEY_ENTER))
+
+    if (!playerEn->hasTag<PlayerTag>() && IsKeyReleased(KEY_ENTER))
         em.destroyAll();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, InputComponent& in)
@@ -62,5 +63,5 @@ void InputSystem::update(EntityManager& em)
 }
 
 bool InputSystem::pressEnter(){
-    return IsKeyDown(KEY_ENTER);
+    return IsKeyReleased(KEY_ENTER);
 }

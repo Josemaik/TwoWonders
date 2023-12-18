@@ -63,6 +63,14 @@ void createShield(EntityManager& em, Entity& ent)
     em.addComponent<ShieldComponent>(e, ShieldComponent{});
 }
 
+void createEnding(EntityManager& em)
+{
+    auto& e{ em.newEntity() };
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = {83.0f, 1.0f, -87.0f}, .scale = {1.0f, 1.0f, 1.0f}, .color = WHITE });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
+}
+
 void createEntities(EntityManager& em)
 {
     // Player
@@ -77,15 +85,15 @@ void createEntities(EntityManager& em)
 
     // Sword
     createSword(em);
-
     // Shield
     createShield(em, e);
-
     // Coin
     createCoin(em);
-
     // Shop
     createShop(em);
+
+    // Ending
+    createEnding(em);
 
     // Enemies
     // createEnemiesZelda(em);
@@ -93,10 +101,6 @@ void createEntities(EntityManager& em)
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
 }
-
-// Enum que representa el estado del juego
-enum struct GameScreen { LOGO, TITLE, GAMEPLAY, /*DEAD,*/ ENDING };
-GameScreen currentScreen = GameScreen::LOGO;
 
 void game()
 {
@@ -141,15 +145,16 @@ void game()
     // auto t2 = high_resolution_clock::now();
     // auto duration = duration_cast<milliseconds>(t2 - t1);
     // std::cout << "el _System se ejecutó en " << duration.count() << " ms.\n";
+    auto& li = em.getSingleton<LevelInfo>();
 
     // Inicializa una variable donde tener el tiempo entre frames
     float deltaTime{}, currentTime{};
-    
+
     while (!engine.windowShouldClose())
     {
         deltaTime = engine.getFrameTime();
 
-        switch (currentScreen)
+        switch (li.currentScreen)
         {
 
         // CODIGO DE LA PANTALLA DE LOGO DE EMPRESA
@@ -157,7 +162,7 @@ void game()
             // Contador para que pasen X segundos
             currentTime += deltaTime;
             if(currentTime > 3.0f){
-                currentScreen = GameScreen::TITLE;
+                li.currentScreen = GameScreen::TITLE;
                 currentTime = 0;
             }
             render_system.drawLogoKaiwa(engine);
@@ -167,12 +172,17 @@ void game()
         case GameScreen::TITLE:
             // Input del enter para empezar la partida
             if(input_system.pressEnter())
-                currentScreen = GameScreen::GAMEPLAY;
+                li.currentScreen = GameScreen::GAMEPLAY;
             render_system.drawLogoGame(engine);
             break;
 
         // CODIGO DEL GAMEPLAY
         case GameScreen::GAMEPLAY:
+            if(em.getEntities().empty()) {
+                createEntities(em);
+                map.createMap(em);
+            }
+
             input_system.update(em);
             ai_sys.update(em, deltaTime);
             physics_system.update(em);
@@ -185,18 +195,19 @@ void game()
             projectile_system.update(em, deltaTime);
             life_system.update(em, deltaTime);
 
-            if (!render_system.update(em, engine)) {
-                createEntities(em);
-                map.createMap(em);
-            }
+            render_system.update(em, engine);
             break;
 
         // case GameScreen::DEAD:
         //     /* code */
         //     break;
 
+        // CODIGO DE LA PANTALLA FINAL
         case GameScreen::ENDING:
-            /* code */
+            if(input_system.pressEnter())
+                li.currentScreen = GameScreen::TITLE;
+            em.destroyAll();
+            render_system.drawEnding(engine);
             break;
 
         default:
