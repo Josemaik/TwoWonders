@@ -35,7 +35,7 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine){
 
 void RenderSystem::drawLogoKaiwa(ENGI::GameEngine& engine){
     engine.beginDrawing();
-    engine.clearBackground(WHITE);
+    engine.clearBackground(Color({136, 219, 152, 255}));
     engine.drawTexture(engine.texture_logo_kaiwa_games,
                        engine.getScreenWidth()/2 - engine.texture_logo_kaiwa_games.width/2,
                        engine.getScreenHeight()/2 - engine.texture_logo_kaiwa_games.height/2,
