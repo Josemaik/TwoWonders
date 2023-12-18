@@ -8,11 +8,16 @@ void CollisionSystem::update(EntityManager& em)
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren, ColliderComponent& col)
     {
-        // Actualizar bounding box
+        // Si la entidad está por debajo del suelo, se destruye
         auto& pos = phy.position;
-        auto& scl = ren.scale;
+        if (pos.y() < -20.f)
+        {
+            dead_entities.insert(e.getID());
+            return;
+        }
 
-        // if (phy.velocity != vec3f::zero())
+        // Actualizar bounding box
+        auto& scl = ren.scale;
         col.updateBox(pos, scl, phy.gravity);
 
         // Insertar en el Octree
@@ -71,10 +76,6 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
 
                     // Marcamos la colisión entre ambas entidades como comprobada
                     checkedPairs.insert({ e->getID(), nEnt->getID() });
-                }
-                else if (bbox1.min.y() < -10.f)
-                {
-                    dead_entities.insert(e->getID());
                 }
             }
         }
