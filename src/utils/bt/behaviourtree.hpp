@@ -16,10 +16,10 @@ struct BehaviourTree_t{
     //Constructor
     explicit BehaviourTree_t() {}
 
-    void run() noexcept{
-        if ( nodes.size() > 0 ){
-            nodes.back()->run();
-        }
+    BTNodeStatus_t run(EntityContext_t& ectx) noexcept{
+        if ( nodes.size() > 0 )
+            return nodes.back()->run(ectx);
+        return BTNodeStatus_t::fail;
     }
 
     template <BTNodeType NodeType, typename...ParamTypes>

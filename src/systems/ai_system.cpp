@@ -245,26 +245,48 @@ vec3f AISystem::DrakeAI(DrakeComponent& drc,PhysicsComponent& p,EntityManager& e
 // Actualizar las IA
 void AISystem::update(EntityManager& em, float dt)
 {
-    em.forEach<SYSCMPs_Patrol, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, PatrolComponent& pc)
+    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, PatrolComponent& pc,ShootPlayerComponent& spc,RandomShootComponent& rsc,DiagonalComponent& dc,
+    DrakeComponent& drc)
     {
         (void)e;
-        if(pc.behaviourTree){pc.behaviourTree->run();}
-        vec3f distance = FollowPatrol(phy, pc);
-        setVelocity(phy, distance);
+        EntityContext_t ectx {em,e,pc,rsc,spc,dc,drc,phy};
+        if(pc.behaviourTree){
+            pc.behaviourTree->run( ectx );
+            return;
+        }
+         if(rsc.behaviourTree){
+            pc.behaviourTree->run( ectx );
+            return;
+        }
+         if(spc.behaviourTree){
+            pc.behaviourTree->run( ectx );
+            return;
+        }
+         if(dc.behaviourTree){
+            pc.behaviourTree->run( ectx );
+            return;
+        }
+         if(drc.behaviourTree){
+            pc.behaviourTree->run( ectx );
+            return;
+        }
+
+        // vec3f distance = FollowPatrol(phy, pc);
+        // setVelocity(phy, distance);
     });
-    em.forEach<SYSCMPs_ShootPlayer, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, ShootPlayerComponent& spc) {
-        ShotandMove(spc, phy, em, ent, dt);
-    });
-    em.forEach<SYSCMPs_RandomShoot, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, RandomShootComponent& rsc) {
-        RandomAI(rsc, phy, em, ent, dt);
-    });
-    em.forEach<SYSCMPs_Diagonal, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, DiagonalComponent& dc) {
-        (void)ent;
-        DiagonalAI(dc, phy, dt);
-    });
-    em.forEach<SYSCMPs_Drake, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, DrakeComponent& drc) {
-        (void)ent;
-        vec3f distance = DrakeAI(drc, phy, em ,ent,dt);
-        setVelocity(phy, distance);
-    });
+    // em.forEach<SYSCMPs_ShootPlayer, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, ShootPlayerComponent& spc) {
+    //     ShotandMove(spc, phy, em, ent, dt);
+    // });
+    // em.forEach<SYSCMPs_RandomShoot, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, RandomShootComponent& rsc) {
+    //     RandomAI(rsc, phy, em, ent, dt);
+    // });
+    // em.forEach<SYSCMPs_Diagonal, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, DiagonalComponent& dc) {
+    //     (void)ent;
+    //     DiagonalAI(dc, phy, dt);
+    // });
+    // em.forEach<SYSCMPs_Drake, SYSTAGs>([&, dt](Entity& ent, PhysicsComponent& phy, DrakeComponent& drc) {
+    //     (void)ent;
+    //     vec3f distance = DrakeAI(drc, phy, em ,ent,dt);
+    //     setVelocity(phy, distance);
+    // });
 }

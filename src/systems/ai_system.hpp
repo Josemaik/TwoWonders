@@ -11,11 +11,11 @@ constexpr float SPEED_AI = 0.2f;
 struct AISystem
 {
     // Se van a buscar las entidad que tengan estos componentes y tags
-    using SYSCMPs_Patrol = MP::TypeList<PhysicsComponent, PatrolComponent>;
-    using SYSCMPs_ShootPlayer = MP::TypeList<PhysicsComponent, ShootPlayerComponent>;
-    using SYSCMPs_RandomShoot = MP::TypeList<PhysicsComponent, RandomShootComponent>;
-    using SYSCMPs_Diagonal = MP::TypeList<PhysicsComponent, DiagonalComponent>;
-    using SYSCMPs_Drake = MP::TypeList<PhysicsComponent, DrakeComponent>;
+    using SYSCMPs = MP::TypeList<PhysicsComponent, PatrolComponent,ShootPlayerComponent,RandomShootComponent,DiagonalComponent,DrakeComponent>;
+    // using SYSCMPs_ShootPlayer = MP::TypeList<PhysicsComponent, ShootPlayerComponent>;
+    // using SYSCMPs_RandomShoot = MP::TypeList<PhysicsComponent, RandomShootComponent>;
+    // using SYSCMPs_Diagonal = MP::TypeList<PhysicsComponent, DiagonalComponent>;
+    // using SYSCMPs_Drake = MP::TypeList<PhysicsComponent, DrakeComponent>;
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em, float dt);
