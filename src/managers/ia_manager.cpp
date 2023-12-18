@@ -139,7 +139,7 @@ void Ia_man::createEnemiesZone5(EntityManager& em) {
          .route={vec3f{}},.num_lifes=2,.Xmin=-43.0f,.Xmax=-46.0f,.Zmin=3.0f,.Zmax=-4.0f,.visible=false
         }
     };
-    tree2.createNode<BTActionShootPlayer>();
+    tree3.createNode<BTActionShootPlayer>();
     createEnemiesofType(em, Vec_ShootPlayerData,tree3);
 }
 BehaviourTree_t tree4;
@@ -164,6 +164,7 @@ void Ia_man::createEnemiesZone11(EntityManager& em) {
            AIComponent::invalid
        },.num_lifes=10,.Xmin=0.0f,.Xmax=0.0f,.Zmin=0.0f,.Zmax=0.0f,.visible=true}
     };
+    tree5.createNode<BTActionDrake>();
     createEnemiesofType(em, Vec_Drake,tree5);
 }
 BehaviourTree_t tree6;
@@ -176,6 +177,7 @@ void Ia_man::createEnemiesZone12(EntityManager& em) {
         {.currentType =TypeEnemies::Bat,.position=getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),.route={},.num_lifes=1,.Xmin=74.0f,.Xmax=92.0f,.Zmin=-77.0f,.Zmax=-65.0f,.visible=true},
         {.currentType =TypeEnemies::Bat,.position=getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),.route={},.num_lifes=1,.Xmin=74.0f,.Xmax=92.0f,.Zmin=-77.0f,.Zmax=-65.0f,.visible=true}
     };
+    tree6.createNode<BTActionBat>();
     createEnemiesofType(em, Vec_Diagonal,tree6);
 }
 // //----------------------------------------------------------------------------------------------------------------

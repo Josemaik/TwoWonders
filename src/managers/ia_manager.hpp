@@ -9,6 +9,8 @@
 #include "../utils/bt/actionpatrol.hpp"
 #include "../utils/bt/actionrandom.hpp"
 #include "../utils/bt/actionshootplayer.hpp"
+#include "../utils/bt/actionbat.hpp"
+#include "../utils/bt/actiondrake.hpp"
 
 struct Ia_man
 {

@@ -57,12 +57,13 @@ struct AIComponent
     float detect_radius{ 15.f };
     bool playerdetected{ false };
     //timers
-    float countdown_change_dir{ 1.5f },countdown_stop{3.5f},countdown_shoot{2.0f},countdown_change_position{3.0f}; //segundos
-    float elapsed_change_position{1.0f},elapsed_stop{1.0f},elapsed_change_dir{1.0f},elapsed_shoot{1.0f};
+    float countdown_change_dir{ 1.5f },countdown_stop{3.5f},countdown_shoot{2.0f},countdown_change_position{3.0f},countdown_moving{2.0f}; //segundos
+    float elapsed_change_position{1.0f},elapsed_stop{1.0f},elapsed_change_dir{1.0f},elapsed_shoot{1.0f},elapsed_moving{1.0f};
     void dec_countdown_change_pos(float deltaTime) { elapsed_change_position += deltaTime; };
     void dec_countdown_change_dir(float deltaTime) { elapsed_change_dir += deltaTime; }; // delta time
     void dec_countdown_stop(float deltaTime) { elapsed_stop += deltaTime; }; 
     void dec_countdown_shoot(float deltaTime) { elapsed_shoot += deltaTime; };
+    void dec_countdown_moving(float deltaTime) { elapsed_moving += deltaTime; };
     //behaviour trees
     BehaviourTree_t* behaviourTree{nullptr};
 };
