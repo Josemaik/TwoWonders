@@ -3,13 +3,43 @@
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
 {
-    initWindow(width_, height_, "ZeldaWonders");
+    ENGI::GameEngine::initWindow(width_, height_, "ZeldaWonders");
 
-    setPositionCamera({ 0.0f, 30.0f, 12.0f });
-    setTargetCamera({ 0.0f, 03.0f, .0f });
-    setUpCamera({ 0.0f, 01.0f, 0.0f });
-    setFovyCamera(30.0f);
-    setProjectionCamera(CAMERA_PERSPECTIVE);
+    ENGI::GameEngine::setPositionCamera({ 0.0f, 30.0f, 12.0f });
+    ENGI::GameEngine::setTargetCamera({ 0.0f, 03.0f, .0f });
+    ENGI::GameEngine::setUpCamera({ 0.0f, 01.0f, 0.0f });
+    ENGI::GameEngine::setFovyCamera(30.0f);
+    ENGI::GameEngine::setProjectionCamera(CAMERA_PERSPECTIVE);
+
+    // Logo Two Wonders
+    Image logo_two_wonders = ENGI::GameEngine::loadImage("assets/logo_two_wonders.png");
+    ENGI::GameEngine::imageResize(&logo_two_wonders, width_ - 20, static_cast<int>(height_/1.76));
+    texture_logo_two_wonders = ENGI::GameEngine::loadTextureFromImage(logo_two_wonders);
+    ENGI::GameEngine::unloadImage(logo_two_wonders);
+
+    // Logo Kaiwa Games
+    Image logo_kaiwa_games = ENGI::GameEngine::loadImage("assets/logo_kaiwa_games.png");
+    ENGI::GameEngine::imageResize(&logo_kaiwa_games, width_, static_cast<int>(height_/2)); // 2.49
+    texture_logo_kaiwa_games = ENGI::GameEngine::loadTextureFromImage(logo_kaiwa_games);
+    ENGI::GameEngine::unloadImage(logo_kaiwa_games);
+}
+
+////// IMAGE AND TEXTURE //////
+
+Image ENGI::GameEngine::loadImage(const char *filename){
+    return LoadImage(filename);
+} 
+
+void ENGI::GameEngine::imageResize(Image* image, int newWidth, int newHeight){
+    ImageResize(image, newWidth, newHeight);
+}
+
+void ENGI::GameEngine::unloadImage(Image image){
+    UnloadImage(image);
+}
+
+Texture2D ENGI::GameEngine::loadTextureFromImage(Image image){
+    return LoadTextureFromImage(image);
 }
 
 ////// TIMIING RELATED FUNCTIONS //////
@@ -66,6 +96,10 @@ void ENGI::GameEngine::drawCubeWires(vec3f pos, float width, float height, float
 
 void ENGI::GameEngine::drawRectangle(int posX, int posY, int width, int height, Color color) {
     DrawRectangle(posX, posY, width, height, color);
+}
+
+void ENGI::GameEngine::drawTexture(Texture2D texture, int posX, int posY, Color tint){
+    DrawTexture(texture, posX, posY, tint);
 }
 
 ////// TEXT //////
