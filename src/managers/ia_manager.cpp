@@ -101,10 +101,10 @@ void Ia_man::createEnemiesZone2(EntityManager& em, uint16_t z) {
         }, .num_lifes = 1,.Xmin= 0.0f,.Xmax=0.0f,.Zmin=0.0f,.Zmax=0.0f,.visible=true}
     };
     //Creamos los nodos del behaviour tree
-    tree.createNode<BTActionArrive_t>( vec3f{100.0f, 50.0f,20.0f} );
+    tree.createNode<BTActionPatrol>( vec3f{100.0f, 50.0f,20.0f} );
     createEnemiesofType(em, Vec_patrolData,z,tree);
 }
-
+BehaviourTree_t tree1;
 void Ia_man::createEnemiesZone3(EntityManager& em, uint16_t z) {
     createdzone3 = true;
     //Crearemos IA random
@@ -115,8 +115,9 @@ void Ia_man::createEnemiesZone3(EntityManager& em, uint16_t z) {
        {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-31.0f,-13.0f,2.0f,4.0f),  .route={},.num_lifes=1,.Xmin=-31.0f,.Xmax=-11.0f,.Zmin=-7.0f,.Zmax=8.0f, .visible=true},
        {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-31.0f,-13.0f,4.0f,6.0f),  .route={},.num_lifes=1,.Xmin=-31.0f,.Xmax=-11.0f,.Zmin=-7.0f,.Zmax=8.0f, .visible=true}
     };
-    createEnemiesofType(em, Vec_RandomShoot_3, z,tree);
+    createEnemiesofType(em, Vec_RandomShoot_3, z,tree1);
 }
+BehaviourTree_t tree2;
 void Ia_man::createEnemiesZone4(EntityManager& em, uint16_t z) {
     createdzone4 = true;
     //Creamos Random enemies
@@ -127,8 +128,9 @@ void Ia_man::createEnemiesZone4(EntityManager& em, uint16_t z) {
         {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),.route={},.num_lifes=1,.Xmin=-32.0f,.Xmax=-11.0f,.Zmin=-24.0f,.Zmax=-9.0f,.visible=true},
         {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),.route={},.num_lifes=1,.Xmin=-32.0f,.Xmax=-11.0f,.Zmin=-24.0f,.Zmax=-9.0f,.visible=true}
     };
-    createEnemiesofType(em, Vec_RandomShoot,z,tree);
+    createEnemiesofType(em, Vec_RandomShoot,z,tree2);
 }
+BehaviourTree_t tree3;
 void Ia_man::createEnemiesZone5(EntityManager& em, uint16_t z) {
     createdzone5 = true;
     std::vector<EnemyData> Vec_ShootPlayerData = {
@@ -136,8 +138,9 @@ void Ia_man::createEnemiesZone5(EntityManager& em, uint16_t z) {
          .route={vec3f{}},.num_lifes=2,.Xmin=-43.0f,.Xmax=-46.0f,.Zmin=3.0f,.Zmax=-4.0f,.visible=false
         }
     };
-    createEnemiesofType(em, Vec_ShootPlayerData,z,tree);
+    createEnemiesofType(em, Vec_ShootPlayerData,z,tree3);
 }
+BehaviourTree_t tree4;
 void Ia_man::createEnemiesZone6(EntityManager& em, uint16_t z) {
     createdzone6 = true;
     std::vector<EnemyData> Vec_ShootPlayerData = {
@@ -145,8 +148,9 @@ void Ia_man::createEnemiesZone6(EntityManager& em, uint16_t z) {
          .route={vec3f{},},.num_lifes=2,.Xmin=-43.0f,.Xmax=-46.0f,.Zmin=-11.0f,.Zmax=-20.0f,.visible=false
         }
     };
-    createEnemiesofType(em, Vec_ShootPlayerData,z,tree);
+    createEnemiesofType(em, Vec_ShootPlayerData,z,tree4);
 }
+BehaviourTree_t tree5;
 void Ia_man::createEnemiesZone11(EntityManager& em, uint16_t z) {
     createdzone11 = true;
     std::vector<EnemyData> Vec_Drake = {
@@ -157,8 +161,9 @@ void Ia_man::createEnemiesZone11(EntityManager& em, uint16_t z) {
            DrakeComponent::invalid
        },.num_lifes=10,.Xmin=0.0f,.Xmax=0.0f,.Zmin=0.0f,.Zmax=0.0f,.visible=true}
     };
-    createEnemiesofType(em, Vec_Drake,z,tree);
+    createEnemiesofType(em, Vec_Drake,z,tree5);
 }
+BehaviourTree_t tree6;
 void Ia_man::createEnemiesZone12(EntityManager& em, uint16_t z) {
     createdzone12 = true;
     std::vector<EnemyData> Vec_Diagonal = {
@@ -168,7 +173,7 @@ void Ia_man::createEnemiesZone12(EntityManager& em, uint16_t z) {
         {.currentType =TypeEnemies::Bat,.position=getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),.route={},.num_lifes=1,.Xmin=74.0f,.Xmax=92.0f,.Zmin=-77.0f,.Zmax=-65.0f,.visible=true},
         {.currentType =TypeEnemies::Bat,.position=getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),.route={},.num_lifes=1,.Xmin=74.0f,.Xmax=92.0f,.Zmin=-77.0f,.Zmax=-65.0f,.visible=true}
     };
-    createEnemiesofType(em, Vec_Diagonal,z,tree);
+    createEnemiesofType(em, Vec_Diagonal,z,tree6);
 }
 // //----------------------------------------------------------------------------------------------------------------
 

@@ -16,10 +16,10 @@ struct EntityContext_t{
     Entity& ent;
     //AI
     PatrolComponent& pc;
-    RandomShootComponent& rsc;
-    ShootPlayerComponent& spc;
-    DiagonalComponent& dc;
-    DrakeComponent& drc;
+    // RandomShootComponent& rsc;
+    // ShootPlayerComponent& spc;
+    // DiagonalComponent& dc;
+    // DrakeComponent& drc;
     //physics
     PhysicsComponent& phy;
 };

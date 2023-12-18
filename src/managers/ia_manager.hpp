@@ -6,7 +6,7 @@
 #include <cstdint>
 
 #include "../utils/bt/behaviourtree.hpp"
-#include "../utils/bt/actionarrive.hpp"
+#include "../utils/bt/actionpatrol.hpp"
 
 struct Ia_man
 {

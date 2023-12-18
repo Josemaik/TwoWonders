@@ -15,7 +15,8 @@ struct BehaviourTree_t{
     using MemoryStorage_t = std::unique_ptr<std::byte[]>;
     //Constructor
     explicit BehaviourTree_t() {}
-
+    
+    BTNodeStatus_t run(EntityContext_t&& ectx) noexcept { return run(ectx); };
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept{
         if ( nodes.size() > 0 )
             return nodes.back()->run(ectx);
