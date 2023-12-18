@@ -12,6 +12,9 @@ struct RenderSystem
 
     bool update(EntityManager& em, GameEngine& engine);
 
+    void drawLogoGame(ENGI::GameEngine& engine);
+    void drawLogoKaiwa(ENGI::GameEngine& engine);
+
     // Funciones privadas para organizar el codigo
 private:
     void beginFrame(ENGI::GameEngine& engine);

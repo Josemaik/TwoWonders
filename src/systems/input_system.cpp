@@ -60,3 +60,7 @@ void InputSystem::update(EntityManager& em)
         }
     });
 }
+
+bool InputSystem::pressEnter(){
+    return IsKeyDown(KEY_ENTER);
+}

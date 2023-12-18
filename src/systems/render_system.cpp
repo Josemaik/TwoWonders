@@ -21,6 +21,30 @@ bool RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
     return notReset;
 }
 
+void RenderSystem::drawLogoGame(ENGI::GameEngine& engine){
+    engine.beginDrawing();
+    engine.clearBackground(WHITE);
+    engine.drawTexture(engine.texture_logo_two_wonders, 
+                       engine.getScreenWidth()/2 - engine.texture_logo_two_wonders.width/2, 
+                       engine.getScreenHeight()/2.5 - engine.texture_logo_two_wonders.height/2, 
+                       WHITE);
+    engine.drawText("PRESS ENTER TO PLAY", 
+                    engine.getScreenWidth()/2 - 200, 
+                    engine.getScreenHeight() - 50, 30, 
+                    BLUE);
+    engine.endDrawing();
+}
+
+void RenderSystem::drawLogoKaiwa(ENGI::GameEngine& engine){
+    engine.beginDrawing();
+    engine.clearBackground(WHITE);
+    engine.drawTexture(engine.texture_logo_kaiwa_games,
+                       engine.getScreenWidth()/2 - engine.texture_logo_kaiwa_games.width/2,
+                       engine.getScreenHeight()/2 - engine.texture_logo_kaiwa_games.height/2,
+                       WHITE);
+    engine.endDrawing();
+}
+
 bool RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
 {
     auto const& entities = em.getEntities();

@@ -94,6 +94,10 @@ void createEntities(EntityManager& em)
     li.playerID = e.getID();
 }
 
+// Enum que representa el estado del juego
+enum struct GameScreen { LOGO, TITLE, GAMEPLAY, /*DEAD,*/ ENDING };
+GameScreen currentScreen = GameScreen::LOGO;
+
 void game()
 {
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
@@ -111,10 +115,9 @@ void game()
     ObjectSystem object_system{};
     ZoneSystem zone_system{};
     ShieldSystem shield_system{};
+    Map map{};
 
     createEntities(em);
-
-    Map map{};
     map.createMap(em);
 
     engine.setTargetFPS(30);
@@ -139,28 +142,65 @@ void game()
     // auto duration = duration_cast<milliseconds>(t2 - t1);
     // std::cout << "el _System se ejecutó en " << duration.count() << " ms.\n";
 
-
-    // Inicializa una variabloe donde tener el tiempo entre frames
-    float deltaTime;
+    // Inicializa una variable donde tener el tiempo entre frames
+    float deltaTime{}, currentTime{};
+    
     while (!engine.windowShouldClose())
     {
         deltaTime = engine.getFrameTime();
 
-        input_system.update(em);
-        ai_sys.update(em, deltaTime);
-        physics_system.update(em);
-        collision_system.update(em);
-        zone_system.update(em, engine, iam);
+        switch (currentScreen)
+        {
 
-        shield_system.update(em);
-        object_system.update(em, deltaTime);
-        attack_system.update(em, deltaTime);
-        projectile_system.update(em, deltaTime);
-        life_system.update(em, deltaTime);
+        // CODIGO DE LA PANTALLA DE LOGO DE EMPRESA
+        case GameScreen::LOGO:
+            // Contador para que pasen X segundos
+            currentTime += deltaTime;
+            if(currentTime > 3.0f){
+                currentScreen = GameScreen::TITLE;
+                currentTime = 0;
+            }
+            render_system.drawLogoKaiwa(engine);
+            break;
+        
+        // CODIGO DE LA PANTALLA DE TITULO
+        case GameScreen::TITLE:
+            // Input del enter para empezar la partida
+            if(input_system.pressEnter())
+                currentScreen = GameScreen::GAMEPLAY;
+            render_system.drawLogoGame(engine);
+            break;
 
-        if (!render_system.update(em, engine)) {
-            createEntities(em);
-            map.createMap(em);
+        // CODIGO DEL GAMEPLAY
+        case GameScreen::GAMEPLAY:
+            input_system.update(em);
+            ai_sys.update(em, deltaTime);
+            physics_system.update(em);
+            collision_system.update(em);
+            zone_system.update(em, engine, iam);
+
+            shield_system.update(em);
+            object_system.update(em, deltaTime);
+            attack_system.update(em, deltaTime);
+            projectile_system.update(em, deltaTime);
+            life_system.update(em, deltaTime);
+
+            if (!render_system.update(em, engine)) {
+                createEntities(em);
+                map.createMap(em);
+            }
+            break;
+
+        // case GameScreen::DEAD:
+        //     /* code */
+        //     break;
+
+        case GameScreen::ENDING:
+            /* code */
+            break;
+
+        default:
+            break;
         }
     }
 
