@@ -92,11 +92,10 @@ void createEntities(EntityManager& em)
     // Shop
     createShop(em);
 
+
     // Ending
     createEnding(em);
 
-    // Enemies
-    // createEnemiesZelda(em);
 
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
