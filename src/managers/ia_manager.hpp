@@ -7,6 +7,7 @@
 
 #include "../utils/bt/behaviourtree.hpp"
 #include "../utils/bt/actionpatrol.hpp"
+#include "../utils/bt/actionrandom.hpp"
 
 struct Ia_man
 {
@@ -18,13 +19,13 @@ private:
         createdzone5{ false }, createdzone6{ false }, createdzone12{ false },
         createdzone11{false};
 
-    void createEnemiesZone2(EntityManager& em, uint16_t z);
-    void createEnemiesZone3(EntityManager& em, uint16_t z);
-    void createEnemiesZone4(EntityManager& em, uint16_t z);
-    void createEnemiesZone5(EntityManager& em, uint16_t z);
-    void createEnemiesZone6(EntityManager& em, uint16_t z);
-    void createEnemiesZone12(EntityManager& em, uint16_t z);
-    void createEnemiesZone11(EntityManager& em, uint16_t z);
+    void createEnemiesZone2(EntityManager& em);
+    void createEnemiesZone3(EntityManager& em);
+    void createEnemiesZone4(EntityManager& em);
+    void createEnemiesZone5(EntityManager& em);
+    void createEnemiesZone6(EntityManager& em);
+    void createEnemiesZone12(EntityManager& em);
+    void createEnemiesZone11(EntityManager& em);
 
     void setCreatedtofalse(uint16_t z);
 };

@@ -3,93 +3,93 @@
 #include <random>
 
 //Funcion para saber si el player ha sido detectado o no
-[[nodiscard]] bool AISystem::isPlayerDetected(EntityManager& EM, PhysicsComponent const& p, ShootPlayerComponent const& spc) const noexcept {
-    auto& li = EM.getSingleton<LevelInfo>();
-    auto* playerEn = EM.getEntityByID(li.playerID);
-    if (not playerEn) return false;
-    auto& plphy = EM.getComponent<PhysicsComponent>(*playerEn);
-    auto const distance = (p.position - plphy.position).lengthSQ();
-    return  distance < (spc.detect_radius * spc.detect_radius);
-}
-// Obtener la distancia del enemigo con respecto al player
-[[nodiscard]] vec3f AISystem::getPlayerDistance(EntityManager& EM, PhysicsComponent const& p, ShootPlayerComponent& spc) const noexcept {
-    auto& li = EM.getSingleton<LevelInfo>();
-    auto* playerEn = EM.getEntityByID(li.playerID);
-    if (not playerEn) { spc.playerdetected = false; return vec3f{}; };
-    auto& plphy = EM.getComponent<PhysicsComponent>(*playerEn);
-    auto const distance = plphy.position - p.position;
-    return  distance;
-}
-// Poner la velocidad al compponente de físicas
-// void AISystem::setVelocity(PhysicsComponent& p, vec3f distance) {
-//     if (distance != vec3f{ 0,0,0 }) {
-//         //Normalizo la distancia y se la asigno a la velocidad
-//         p.velocity = distance.normalize() * SPEED_AI;
+// [[nodiscard]] bool AISystem::isPlayerDetected(EntityManager& EM, PhysicsComponent const& p, ShootPlayerComponent const& spc) const noexcept {
+//     auto& li = EM.getSingleton<LevelInfo>();
+//     auto* playerEn = EM.getEntityByID(li.playerID);
+//     if (not playerEn) return false;
+//     auto& plphy = EM.getComponent<PhysicsComponent>(*playerEn);
+//     auto const distance = (p.position - plphy.position).lengthSQ();
+//     return  distance < (spc.detect_radius * spc.detect_radius);
+// }
+// // Obtener la distancia del enemigo con respecto al player
+// [[nodiscard]] vec3f AISystem::getPlayerDistance(EntityManager& EM, PhysicsComponent const& p, ShootPlayerComponent& spc) const noexcept {
+//     auto& li = EM.getSingleton<LevelInfo>();
+//     auto* playerEn = EM.getEntityByID(li.playerID);
+//     if (not playerEn) { spc.playerdetected = false; return vec3f{}; };
+//     auto& plphy = EM.getComponent<PhysicsComponent>(*playerEn);
+//     auto const distance = plphy.position - p.position;
+//     return  distance;
+// }
+// // Poner la velocidad al compponente de físicas
+// // void AISystem::setVelocity(PhysicsComponent& p, vec3f distance) {
+// //     if (distance != vec3f{ 0,0,0 }) {
+// //         //Normalizo la distancia y se la asigno a la velocidad
+// //         p.velocity = distance.normalize() * SPEED_AI;
+// //     }
+// // }
+// //FUncion para poner la Velocidad dado un rango
+// template <typename CMP>
+// void AISystem::setVelocityinRange(PhysicsComponent& p,CMP& cmp){
+//     if (!cmp.stoped) {
+//         //Range Control
+//         if (!isInDesiredRange(p.position + cmp.oldvel, cmp.Xmin, cmp.Xmax, cmp.Zmin, cmp.Zmax)) {
+//             cmp.oldvel *= -1.0f;
+//         }
+//         p.velocity = cmp.oldvel;
+//     }
+//     else {
+//         p.velocity = {};
 //     }
 // }
-//FUncion para poner la Velocidad dado un rango
-template <typename CMP>
-void AISystem::setVelocityinRange(PhysicsComponent& p,CMP& cmp){
-    if (!cmp.stoped) {
-        //Range Control
-        if (!isInDesiredRange(p.position + cmp.oldvel, cmp.Xmin, cmp.Xmax, cmp.Zmin, cmp.Zmax)) {
-            cmp.oldvel *= -1.0f;
-        }
-        p.velocity = cmp.oldvel;
-    }
-    else {
-        p.velocity = {};
-    }
-}
-//función que devuelve una posición aleatoria dentro de un rango específico
-vec3f AISystem::getRandomPosinRange(float xmin, float xmax, float zmin, float zmax) {
-    //Semilla para generar numeros aleatorios
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    // creo rangos
-    std::uniform_real_distribution<float> rangoX(xmin, xmax);
-    std::uniform_real_distribution<float> rangoZ(zmin, zmax);
-    // obtengo x y z aleatoria
-    float x = rangoX(gen);
-    float z;
-    do {
-        z = rangoZ(gen);
-    } while (z >= -18.0f && z <= -13.0f);
+// //función que devuelve una posición aleatoria dentro de un rango específico
+// vec3f AISystem::getRandomPosinRange(float xmin, float xmax, float zmin, float zmax) {
+//     //Semilla para generar numeros aleatorios
+//     std::random_device rd;
+//     std::mt19937 gen(rd());
+//     // creo rangos
+//     std::uniform_real_distribution<float> rangoX(xmin, xmax);
+//     std::uniform_real_distribution<float> rangoZ(zmin, zmax);
+//     // obtengo x y z aleatoria
+//     float x = rangoX(gen);
+//     float z;
+//     do {
+//         z = rangoZ(gen);
+//     } while (z >= -18.0f && z <= -13.0f);
 
-    //devuelvo vector
-    return vec3f{ x,0.0f,z };
-}
-//Función para comprobar si la dirección está fuera de rango
-bool AISystem::isInDesiredRange(const vec3f& direction, float xmin, float xmax, float zmin, float zmax) {
-    return direction.x() >= xmin && direction.x() <= xmax &&
-        direction.z() >= zmin && direction.z() <= zmax;
-}
-// Devuelve una dirección aleatoria
-vec3f AISystem::getRandomDir() {
-    // Genero direccion aleatoria
-    switch (std::rand() % 4) {
-    case 0:  return { 0.25f, 0.0f, 0.0f }; break;//derecha
-    case 1:  return { -0.25f, 0.0f, 0.0f }; break; //izquieda
-    case 2:  return { 0.0f, 0.0f, 0.25f }; break; //Abajo
-    case 3:  return { 0.0f, 0.0f, -0.25f }; break; //Arriba
-    default: return { -0.25f, 0.0f, 0.0f }; break;
-    }
-}
-// Devuelve una dirección aleatoria incluida diagonales
-vec3f AISystem::getRandomDirwithDiagonals() {
-    // Genero direccion aleatoria
-    switch (std::rand() % 8) {
-    case 0:  return { 0.25f, 0.0f, 0.0f }; break; //derecha
-    case 1:  return { -0.25f, 0.0f, 0.0f }; break; //izquieda
-    case 2:  return { 0.0f, 0.0f, 0.25f }; break; //Abajo
-    case 3:  return { 0.0f, 0.0f, -0.25f }; break; //Arriba
-    case 4:  return { -0.25f, 0.0f, -0.25f}; break; //up-left
-    case 5:  return { 0.25f, 0.0f, 0.25f }; break; //down-right
-    case 6:  return { 0.25f, 0.0f, -0.25f }; break; //up-right
-    case 7:  return { -0.25f, 0.0f, 0.25f }; break; //down-left
-    default: return { -0.25f, 0.0f, 0.0f }; break;
-    }
-}
+//     //devuelvo vector
+//     return vec3f{ x,0.0f,z };
+// }
+// //Función para comprobar si la dirección está fuera de rango
+// bool AISystem::isInDesiredRange(const vec3f& direction, float xmin, float xmax, float zmin, float zmax) {
+//     return direction.x() >= xmin && direction.x() <= xmax &&
+//         direction.z() >= zmin && direction.z() <= zmax;
+// }
+// // Devuelve una dirección aleatoria
+// vec3f AISystem::getRandomDir() {
+//     // Genero direccion aleatoria
+//     switch (std::rand() % 4) {
+//     case 0:  return { 0.25f, 0.0f, 0.0f }; break;//derecha
+//     case 1:  return { -0.25f, 0.0f, 0.0f }; break; //izquieda
+//     case 2:  return { 0.0f, 0.0f, 0.25f }; break; //Abajo
+//     case 3:  return { 0.0f, 0.0f, -0.25f }; break; //Arriba
+//     default: return { -0.25f, 0.0f, 0.0f }; break;
+//     }
+// }
+// // Devuelve una dirección aleatoria incluida diagonales
+// vec3f AISystem::getRandomDirwithDiagonals() {
+//     // Genero direccion aleatoria
+//     switch (std::rand() % 8) {
+//     case 0:  return { 0.25f, 0.0f, 0.0f }; break; //derecha
+//     case 1:  return { -0.25f, 0.0f, 0.0f }; break; //izquieda
+//     case 2:  return { 0.0f, 0.0f, 0.25f }; break; //Abajo
+//     case 3:  return { 0.0f, 0.0f, -0.25f }; break; //Arriba
+//     case 4:  return { -0.25f, 0.0f, -0.25f}; break; //up-left
+//     case 5:  return { 0.25f, 0.0f, 0.25f }; break; //down-right
+//     case 6:  return { 0.25f, 0.0f, -0.25f }; break; //up-right
+//     case 7:  return { -0.25f, 0.0f, 0.25f }; break; //down-left
+//     default: return { -0.25f, 0.0f, 0.0f }; break;
+//     }
+// }
 /////////////////////////////////////////////////////////////////
 /// TIPOS DE IA /////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////----------------------------------------------------------
@@ -245,11 +245,10 @@ vec3f AISystem::getRandomDirwithDiagonals() {
 // Actualizar las IA
 void AISystem::update(EntityManager& em, float dt)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, PatrolComponent& pc)
+    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, AIComponent& ai)
     {
-        (void)e;
-        if(pc.behaviourTree){
-            pc.behaviourTree->run( {em,e,pc,phy} );
+        if(ai.behaviourTree){
+            ai.behaviourTree->run( {em,e,ai,phy,dt} );
             return;
         }
         //  if(rsc.behaviourTree){

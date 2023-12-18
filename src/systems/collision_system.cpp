@@ -231,19 +231,17 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
 
 void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3f& minOverlap)
 {
-    if (entity2.hasComponent<RandomShootComponent>())
-    {
-        // Determine which axis had the minimum overlap
-        if (minOverlap.z() < minOverlap.x())
-            resolveEnemyDirection(em, entity2, staticPhy, otherPhy, minOverlap.z(), true);
-        else if (minOverlap.x() < minOverlap.z())
-            resolveEnemyDirection(em, entity2, staticPhy, otherPhy, minOverlap.x(), false);
-    }
+    
+            // Determine which axis had the minimum overlap
+            if (minOverlap.z() < minOverlap.x())
+                resolveEnemyDirection(em, entity2, staticPhy, otherPhy, minOverlap.z(), true);
+            else if (minOverlap.x() < minOverlap.z())
+                resolveEnemyDirection(em, entity2, staticPhy, otherPhy, minOverlap.x(), false);
 }
 
 void CollisionSystem::resolveEnemyDirection(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, float overlap, bool isZAxis)
 {
-    auto& rands = em.getComponent<RandomShootComponent>(entity2);
+    auto& rands = em.getComponent<AIComponent>(entity2);
     bool dir = isZAxis ? resolveCollision<&vec3f::z, &vec3f::setZ>(otherPhy, staticPhy, overlap)
         : resolveCollision<&vec3f::x, &vec3f::setX>(otherPhy, staticPhy, overlap);
 
