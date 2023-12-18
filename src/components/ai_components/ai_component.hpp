@@ -11,6 +11,7 @@
 struct BehaviourTree_t;
 struct AIComponent
 {
+    float SPEED_AI = 0.2f;
     //data for patrol behaviour
     static constexpr uint8_t max_patrol{ 10 };
      std::array<vec3f, max_patrol> patrol{};
@@ -56,7 +57,7 @@ struct AIComponent
     float detect_radius{ 15.f };
     bool playerdetected{ false };
     //timers
-    float countdown_change_dir{ 1.5f },countdown_stop{3.5f},countdown_shoot{2.0f},countdown_change_position{5.0f}; //segundos
+    float countdown_change_dir{ 1.5f },countdown_stop{3.5f},countdown_shoot{2.0f},countdown_change_position{3.0f}; //segundos
     float elapsed_change_position{1.0f},elapsed_stop{1.0f},elapsed_change_dir{1.0f},elapsed_shoot{1.0f};
     void dec_countdown_change_pos(float deltaTime) { elapsed_change_position += deltaTime; };
     void dec_countdown_change_dir(float deltaTime) { elapsed_change_dir += deltaTime; }; // delta time

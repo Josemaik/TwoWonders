@@ -2,7 +2,6 @@
 #include "node.hpp"
 #include <utils/types.hpp>
 
-constexpr float SPEED_AI = 0.2f;
 
 struct BTActionPatrol : BTNode_t{
     // BTActionPatrol() = default;
@@ -31,7 +30,7 @@ struct BTActionPatrol : BTNode_t{
             ectx.ai.arrived = true;
         }
         //Normalizo la distancia y se la asigno a la velocidad
-        ectx.phy.velocity = distance.normalize() * SPEED_AI;
+        ectx.phy.velocity = distance.normalize() * ectx.ai.SPEED_AI;
         return BTNodeStatus_t::success;
     }
 };

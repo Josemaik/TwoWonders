@@ -60,8 +60,8 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, Behaviour
         {
         case TypeEnemies::Patrol: em.addComponent<AIComponent>(enemy, AIComponent{ .patrol = data.route ,.behaviourTree=&tree});
             break;
-        case TypeEnemies::PlayerShoot:em.addComponent<AIComponent>(enemy, AIComponent{.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.behaviourTree=&tree});
-            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.0f });
+        case TypeEnemies::PlayerShoot:em.addComponent<AIComponent>(enemy, AIComponent{.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_shoot=4.0f,.behaviourTree=&tree});
+            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 4.5f });
             break;
         case TypeEnemies::RanndomShoot:
             em.addComponent<AIComponent>(enemy, AIComponent{.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_stop = getRandomStop(),.behaviourTree=&tree});
@@ -128,6 +128,7 @@ void Ia_man::createEnemiesZone4(EntityManager& em) {
         {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),.route={},.num_lifes=1,.Xmin=-32.0f,.Xmax=-11.0f,.Zmin=-24.0f,.Zmax=-9.0f,.visible=true},
         {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),.route={},.num_lifes=1,.Xmin=-32.0f,.Xmax=-11.0f,.Zmin=-24.0f,.Zmax=-9.0f,.visible=true}
     };
+    tree2.createNode<BTActionRandomShoot>();
     createEnemiesofType(em, Vec_RandomShoot,tree2);
 }
 BehaviourTree_t tree3;
@@ -138,6 +139,7 @@ void Ia_man::createEnemiesZone5(EntityManager& em) {
          .route={vec3f{}},.num_lifes=2,.Xmin=-43.0f,.Xmax=-46.0f,.Zmin=3.0f,.Zmax=-4.0f,.visible=false
         }
     };
+    tree2.createNode<BTActionShootPlayer>();
     createEnemiesofType(em, Vec_ShootPlayerData,tree3);
 }
 BehaviourTree_t tree4;
@@ -148,6 +150,7 @@ void Ia_man::createEnemiesZone6(EntityManager& em) {
          .route={vec3f{},},.num_lifes=2,.Xmin=-43.0f,.Xmax=-46.0f,.Zmin=-11.0f,.Zmax=-20.0f,.visible=false
         }
     };
+    tree4.createNode<BTActionShootPlayer>();
     createEnemiesofType(em, Vec_ShootPlayerData,tree4);
 }
 BehaviourTree_t tree5;

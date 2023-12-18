@@ -8,6 +8,7 @@
 #include "../utils/bt/behaviourtree.hpp"
 #include "../utils/bt/actionpatrol.hpp"
 #include "../utils/bt/actionrandom.hpp"
+#include "../utils/bt/actionshootplayer.hpp"
 
 struct Ia_man
 {
