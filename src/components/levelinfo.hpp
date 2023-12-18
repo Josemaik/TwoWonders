@@ -4,6 +4,9 @@
 #include <unordered_set>
 #include "utils/types.hpp"
 
+// Enum que representa el estado del juego
+enum struct GameScreen { LOGO, TITLE, STORY, GAMEPLAY, /*DEAD,*/ ENDING };
+
 //Memoria global de nivel
 struct LevelInfo
 {
@@ -12,4 +15,6 @@ struct LevelInfo
   std::unordered_set<std::size_t> enemiesID;
 
   uint16_t num_zone{};
+
+  GameScreen currentScreen = GameScreen::LOGO;
 };

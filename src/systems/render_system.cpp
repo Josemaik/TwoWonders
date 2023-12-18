@@ -2,7 +2,7 @@
 
 #include <iomanip>
 
-bool RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
+void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
 {
 
     // Actualizamos la posicion de render del componente de fisicas
@@ -14,19 +14,59 @@ bool RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
     beginFrame(engine);
 
     // Dibuja todas las entidades con componente de render
-    bool notReset = drawEntities(em, engine);
+    drawEntities(em, engine);
 
     endFrame(engine, em);
-
-    return notReset;
 }
 
-bool RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
-{
-    auto const& entities = em.getEntities();
-    if (entities.empty())
-        return false;
+void RenderSystem::drawLogoGame(ENGI::GameEngine& engine){
+    engine.beginDrawing();
+    engine.clearBackground(WHITE);
+    engine.drawTexture(engine.texture_logo_two_wonders, 
+                       engine.getScreenWidth()/2 - engine.texture_logo_two_wonders.width/2, 
+                       static_cast<int>(engine.getScreenHeight()/2.5 - engine.texture_logo_two_wonders.height/2), 
+                       WHITE);
+    engine.drawText("PRESS [ENTER] TO PLAY", 
+                    engine.getScreenWidth()/2 - 200, 
+                    engine.getScreenHeight() - 50, 30, 
+                    Color({108, 198, 215, 255}));
+    engine.endDrawing();
+}
 
+void RenderSystem::drawLogoKaiwa(ENGI::GameEngine& engine){
+    engine.beginDrawing();
+    engine.clearBackground(Color({136, 219, 152, 255}));
+    engine.drawTexture(engine.texture_logo_kaiwa_games,
+                       engine.getScreenWidth()/2 - engine.texture_logo_kaiwa_games.width/2,
+                       engine.getScreenHeight()/2 - engine.texture_logo_kaiwa_games.height/2,
+                       WHITE);
+    engine.endDrawing();
+}
+
+void RenderSystem::drawEnding(ENGI::GameEngine& engine){
+    engine.beginDrawing();
+    engine.clearBackground(WHITE);
+    engine.drawText("Has ganado", 250, 250, 50, BLACK);
+    engine.drawText("PRESS [ENTER] TO RETURN TITLE", 
+                    engine.getScreenWidth()/2 - 280, 
+                    engine.getScreenHeight() - 50, 30, 
+                    BLACK);
+    engine.endDrawing();
+}
+
+void RenderSystem::drawStory(ENGI::GameEngine& engine){
+    engine.beginDrawing();
+    engine.clearBackground(WHITE);
+    engine.drawText("Ana quiere historia", 250, 250, 50, BLACK);
+    engine.drawText("PRESS [ENTER] TO PLAY ", 
+                    engine.getScreenWidth()/2 - 200, 
+                    engine.getScreenHeight() - 50, 30, 
+                    BLACK);
+    engine.endDrawing();
+}
+
+void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
+{
     for (auto const& e : em.getEntities())
     {
         if (e.hasComponent<RenderComponent>())
@@ -52,8 +92,6 @@ bool RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
             }
         }
     }
-
-    return true;
 }
 
 // Empieza el dibujado y se limpia la pantalla

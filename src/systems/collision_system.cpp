@@ -8,11 +8,16 @@ void CollisionSystem::update(EntityManager& em)
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren, ColliderComponent& col)
     {
-        // Actualizar bounding box
+        // Si la entidad está por debajo del suelo, se destruye
         auto& pos = phy.position;
-        auto& scl = ren.scale;
+        if (pos.y() < -20.f)
+        {
+            dead_entities.insert(e.getID());
+            return;
+        }
 
-        // if (phy.velocity != vec3f::zero())
+        // Actualizar bounding box
+        auto& scl = ren.scale;
         col.updateBox(pos, scl, phy.gravity);
 
         // Insertar en el Octree
@@ -72,10 +77,6 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
                     // Marcamos la colisión entre ambas entidades como comprobada
                     checkedPairs.insert({ e->getID(), nEnt->getID() });
                 }
-                else if (bbox1.min.y() < -10.f)
-                {
-                    dead_entities.insert(e->getID());
-                }
             }
         }
     }
@@ -119,14 +120,13 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         if ((behaviorType2 & BehaviorType::SHIELD || behaviorType1 & BehaviorType::SHIELD)
             && (isAtkEnemy1 || isAtkEnemy2))
         {
-            if (isAtkEnemy2)
-            {
-                std::swap(staticEnt, otherEnt);
-                std::swap(staticPhy, otherPhy);
-                std::swap(behaviorType1, behaviorType2);
-            }
+            auto* staticEntPtr = &staticEnt;
+            auto* otherEntPtr = &otherEnt;
 
-            em.getComponent<LifeComponent>(staticEnt).decreaseLife();
+            if (isAtkEnemy2)
+                std::swap(staticEntPtr, otherEntPtr);
+
+            dead_entities.insert(staticEntPtr->getID());
             return;
         }
 
@@ -134,11 +134,20 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         return;
     }
 
-    // Colisiones de enemigos con el jugador
     if (behaviorType1 & BehaviorType::PLAYER || behaviorType2 & BehaviorType::PLAYER)
     {
+        // Colision con la meta
+        if (behaviorType1 & BehaviorType::ENDING || behaviorType2 & BehaviorType::ENDING){
+            auto& li = em.getSingleton<LevelInfo>();
+            li.currentScreen = GameScreen::ENDING;
+            //dead_entities.insert(li.playerID);
+            return;
+        }
+
+        // Colisiones de enemigos con el jugador
         if (!(behaviorType1 & BehaviorType::SHIELD || behaviorType2 & BehaviorType::SHIELD))
             handlePlayerCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, minOverlap, behaviorType1, behaviorType2);
+
         return;
     }
 
@@ -207,7 +216,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
         if (!staticEntPtr->hasTag<WaterTag>())
-            em.getComponent<LifeComponent>(*otherEntPtr).decreaseLife();
+            dead_entities.insert(otherEntPtr->getID());
         return;
     }
 
@@ -316,7 +325,7 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
         // Si la bala es del jugador y ha colisionado con un enemigo, o si la bala es de un enemigo y ha colisionado con el jugador, se baja la vida
         if ((isPlayer2 && (atkEn1 || atkEn2)) || (isEnemy2 && (atkPl1 || atkPl2)))
         {
-            em.getComponent<LifeComponent>(*ent1Ptr).decreaseLife();
+            dead_entities.insert(ent1Ptr->getID());
             em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife();
         }
     }

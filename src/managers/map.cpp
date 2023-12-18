@@ -198,7 +198,7 @@ void Map::createGroundWaterOverworld(EntityManager& em) {
         // OverWorld
         { { 0.f, -1.5f, 0.f }, { 85.0f, 2.f, 100.f }, BEIGE },
         { { -52.5f, -1.5f, 0.f }, { 10.0f, 2.f, 100.f }, BEIGE },
-        { { -45.f, -1.5f, -16.f }, { 5.0f, 2.f, 2.0f }, ORANGE },
+        { { -45.f, -1.5f, -16.f }, { 5.0f, 2.f, 2.0f }, BROWN },
         // Cuevas
         { { 71.f, -1.5f, 80.f }, { 69.0f, 2.f, 19.0f }, BROWN },
         // Mazmorra
@@ -263,8 +263,8 @@ void Map::createZonesOverworld(EntityManager& em) {
         { { 93.f, 0.f, 88.5f }, { 3.f, 1.f, 2.f }, 19 }, // OverWorld
         // MAZMORRA //
         { { 61.f, 0.0f, -71.f }, { 19.0f, 1.f, 13.0f }, 10 },
-        { { 61.f, 0.0f, -87.f }, { 19.0f, 1.f, 13.0f }, 11 }, 
-        { { 83.f, 0.0f, -71.f }, { 19.0f, 1.f, 13.0f }, 12 }, 
+        { { 61.f, 0.0f, -87.f }, { 19.0f, 1.f, 13.0f }, 11 },
+        { { 83.f, 0.0f, -71.f }, { 19.0f, 1.f, 13.0f }, 12 },
         { { 83.f, 0.0f, -87.f }, { 19.0f, 1.f, 13.0f }, 13 },
         // TP //
         { { -51.5f, 0.f, -3.5f }, { 0.5f, 1.f, 2.0f }, 20 }, // Mazmorra

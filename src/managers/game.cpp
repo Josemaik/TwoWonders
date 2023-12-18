@@ -63,6 +63,14 @@ void createShield(EntityManager& em, Entity& ent)
     em.addComponent<ShieldComponent>(e, ShieldComponent{});
 }
 
+void createEnding(EntityManager& em)
+{
+    auto& e{ em.newEntity() };
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = {83.0f, 1.0f, -87.0f}, .scale = {1.0f, 1.0f, 1.0f}, .color = WHITE });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
+}
+
 void createEntities(EntityManager& em)
 {
     // Player
@@ -77,15 +85,17 @@ void createEntities(EntityManager& em)
 
     // Sword
     createSword(em);
-
     // Shield
     createShield(em, e);
-
     // Coin
     createCoin(em);
-
     // Shop
     createShop(em);
+
+
+    // Ending
+    createEnding(em);
+
 
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
@@ -108,10 +118,9 @@ void game()
     ObjectSystem object_system{};
     ZoneSystem zone_system{};
     ShieldSystem shield_system{};
+    Map map{};
 
     createEntities(em);
-
-    Map map{};
     map.createMap(em);
 
     engine.setTargetFPS(30);
@@ -122,42 +131,96 @@ void game()
     // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
     // mv.printMemory();
 
-    // Cosas pa contar milisegundos
-    using std::chrono::high_resolution_clock;
-    using std::chrono::duration_cast;
-    using std::chrono::duration;
-    using std::chrono::milliseconds;
-
-    // Colocar antes de donde se quiere medir el tiempo
+    // Codigo para medir el tiempo de ejecucion
+    //
+    // - Descomentar estas líneas y dejarlas ahí
+    // using std::chrono::high_resolution_clock;
+    // using std::chrono::duration_cast;
+    // using std::chrono::duration;
+    // using std::chrono::milliseconds;
+    //
+    // - Colocar antes de donde se quiere medir el tiempo
     // auto t1 = high_resolution_clock::now();
-
-    // Colocar despues de donde se quiere medir el tiempo
+    //
+    // - Colocar despues de donde se quiere medir el tiempo
     // auto t2 = high_resolution_clock::now();
     // auto duration = duration_cast<milliseconds>(t2 - t1);
     // std::cout << "el _System se ejecutó en " << duration.count() << " ms.\n";
+    auto& li = em.getSingleton<LevelInfo>();
 
+    // Inicializa una variable donde tener el tiempo entre frames
+    float deltaTime{}, currentTime{};
 
-    // Inicializa una variabloe donde tener el tiempo entre frames
-    float deltaTime;
     while (!engine.windowShouldClose())
     {
         deltaTime = engine.getFrameTime();
 
-        input_system.update(em);
-        ai_sys.update(em, deltaTime);
-        physics_system.update(em);
-        collision_system.update(em);
-        zone_system.update(em, engine, iam);
+        switch (li.currentScreen)
+        {
 
-        shield_system.update(em);
-        object_system.update(em, deltaTime);
-        attack_system.update(em, deltaTime);
-        projectile_system.update(em, deltaTime);
-        life_system.update(em, deltaTime);
+        // CODIGO DE LA PANTALLA DE LOGO DE EMPRESA
+        case GameScreen::LOGO:
+            // Contador para que pasen X segundos
+            currentTime += deltaTime;
+            if(currentTime > 3.0f){
+                li.currentScreen = GameScreen::TITLE;
+                currentTime = 0;
+            }
+            render_system.drawLogoKaiwa(engine);
+            break;
+        
+        // CODIGO DE LA PANTALLA DE TITULO
+        case GameScreen::TITLE:
+            // Input del enter para la historia
+            if(input_system.pressEnter())
+                li.currentScreen = GameScreen::STORY;
+            render_system.drawLogoGame(engine);
+            break;
 
-        if (!render_system.update(em, engine)) {
-            createEntities(em);
-            map.createMap(em);
+        // CODIGO DE LA PANTALLA DE HISTORIA
+        case GameScreen::STORY:
+            // Input del enter para empezar la partida
+            if(input_system.pressEnter())
+                li.currentScreen = GameScreen::GAMEPLAY;
+            render_system.drawStory(engine);
+            break;
+
+        // CODIGO DEL GAMEPLAY
+        case GameScreen::GAMEPLAY:
+            if(em.getEntities().empty()) {
+                createEntities(em);
+                map.createMap(em);
+            }
+
+            input_system.update(em);
+            ai_sys.update(em, deltaTime);
+            physics_system.update(em);
+            collision_system.update(em);
+            zone_system.update(em, engine, iam);
+
+            shield_system.update(em);
+            object_system.update(em, deltaTime);
+            attack_system.update(em, deltaTime);
+            projectile_system.update(em, deltaTime);
+            life_system.update(em, deltaTime);
+
+            render_system.update(em, engine);
+            break;
+
+        // case GameScreen::DEAD:
+        //     /* code */
+        //     break;
+
+        // CODIGO DE LA PANTALLA FINAL
+        case GameScreen::ENDING:
+            if(input_system.pressEnter())
+                li.currentScreen = GameScreen::TITLE;
+            em.destroyAll();
+            render_system.drawEnding(engine);
+            break;
+
+        default:
+            break;
         }
     }
 
