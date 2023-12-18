@@ -120,14 +120,13 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         if ((behaviorType2 & BehaviorType::SHIELD || behaviorType1 & BehaviorType::SHIELD)
             && (isAtkEnemy1 || isAtkEnemy2))
         {
-            if (isAtkEnemy2)
-            {
-                std::swap(staticEnt, otherEnt);
-                std::swap(staticPhy, otherPhy);
-                std::swap(behaviorType1, behaviorType2);
-            }
+            auto* staticEntPtr = &staticEnt;
+            auto* otherEntPtr = &otherEnt;
 
-            em.getComponent<LifeComponent>(staticEnt).decreaseLife();
+            if (isAtkEnemy2)
+                std::swap(staticEntPtr, otherEntPtr);
+
+            dead_entities.insert(staticEntPtr->getID());
             return;
         }
 
@@ -208,7 +207,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
         if (!staticEntPtr->hasTag<WaterTag>())
-            em.getComponent<LifeComponent>(*otherEntPtr).decreaseLife();
+            dead_entities.insert(otherEntPtr->getID());
         return;
     }
 
@@ -319,7 +318,7 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
         // Si la bala es del jugador y ha colisionado con un enemigo, o si la bala es de un enemigo y ha colisionado con el jugador, se baja la vida
         if ((isPlayer2 && (atkEn1 || atkEn2)) || (isEnemy2 && (atkPl1 || atkPl2)))
         {
-            em.getComponent<LifeComponent>(*ent1Ptr).decreaseLife();
+            dead_entities.insert(ent1Ptr->getID());
             em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife();
         }
     }
