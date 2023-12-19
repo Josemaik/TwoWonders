@@ -3,14 +3,11 @@
 #include <cstdint>
 #include <vector>
 #include <random>
-// #include "components/ai_components/diagonal_component.hpp"
-// #include "components/ai_components/drake_component.hpp"
-// #include "components/ai_components/patrol_component.hpp"
-// #include "components/ai_components/shootplayer_component.hpp"
-// #include "components/ai_components/randomshoot_component.hpp"
+
 struct BehaviourTree_t;
 struct AIComponent
 {
+    //default velocity
     float SPEED_AI = 0.2f;
     //data for patrol behaviour
     static constexpr uint8_t max_patrol{ 10 };
