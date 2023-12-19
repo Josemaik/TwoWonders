@@ -26,8 +26,7 @@ struct BTActionBat : BTNode_t{
     }
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         vec3f direction{};
-        //check change direction
-        if (!ectx.ai.stoped) {
+        //check change direction when not shooting
             if (ectx.ai.elapsed_change_dir >= ectx.ai.countdown_change_dir) {
                 //set random dir
                 direction = getRandomDirwithDiagonals();
@@ -35,39 +34,61 @@ struct BTActionBat : BTNode_t{
                 ectx.ai.elapsed_change_dir = 0;
             }
             ectx.ai.dec_countdown_change_dir(ectx.deltatime);
-        }
         //check if ai have to stops
-        if (!ectx.ai.moving) {
             if (ectx.ai.elapsed_stop >= ectx.ai.countdown_stop) {
-                ectx.ai.stoped = true;
-                ectx.ai.moving = true;
                 ectx.ai.elapsed_stop = 0;
-                ectx.ai.elapsed_change_dir = 0;
+                ectx.phy.velocity = {};
             }
             ectx.ai.dec_countdown_stop(ectx.deltatime);
-        }
-        //time to return moving
-        if (ectx.ai.moving) {
-            if (ectx.ai.elapsed_moving >= ectx.ai.countdown_moving) {
-                //Shoot
-                ectx.ai.moving = false;
-                ectx.ai.stoped = false;
-                ectx.ai.elapsed_moving = 0;
-            }
-            ectx.ai.dec_countdown_moving(ectx.deltatime);
-        }
-        //Set velocity
-        // setVelocityinRange(p,ectx.ai);
-        if (!ectx.ai.stoped) {
-            //Range Control
+
             if (!isInDesiredRange(ectx.phy.position + ectx.ai.oldvel, ectx.ai.Xmin, ectx.ai.Xmax, ectx.ai.Zmin, ectx.ai.Zmax)) {
                 ectx.ai.oldvel *= -1.0f;
             }
             ectx.phy.velocity = ectx.ai.oldvel;
-        }
-        else {
-            ectx.phy.velocity = {};
-        }
-        return BTNodeStatus_t::success;
+            return BTNodeStatus_t::success;
+        // vec3f direction{};
+        // //check change direction
+        // if (!ectx.ai.stoped) {
+        //     if (ectx.ai.elapsed_change_dir >= ectx.ai.countdown_change_dir) {
+        //         //set random dir
+        //         direction = getRandomDirwithDiagonals();
+        //         ectx.ai.oldvel = direction;
+        //         ectx.ai.elapsed_change_dir = 0;
+        //     }
+        //     ectx.ai.dec_countdown_change_dir(ectx.deltatime);
+        // }
+        // //check if ai have to stops
+        // if (!ectx.ai.moving) {
+        //     if (ectx.ai.elapsed_stop >= ectx.ai.countdown_stop) {
+        //         ectx.ai.stoped = true;
+        //         ectx.ai.moving = true;
+        //         ectx.ai.elapsed_stop = 0;
+        //         ectx.ai.elapsed_change_dir = 0;
+        //     }
+        //     ectx.ai.dec_countdown_stop(ectx.deltatime);
+        // }
+        // //time to return moving
+        // if (ectx.ai.moving) {
+        //     if (ectx.ai.elapsed_moving >= ectx.ai.countdown_moving) {
+        //         //Shoot
+        //         ectx.ai.moving = false;
+        //         ectx.ai.stoped = false;
+        //         ectx.ai.elapsed_moving = 0;
+        //     }
+        //     ectx.ai.dec_countdown_moving(ectx.deltatime);
+        // }
+        // //Set velocity
+        // // setVelocityinRange(p,ectx.ai);
+        // if (!ectx.ai.stoped) {
+        //     //Range Control
+        //     if (!isInDesiredRange(ectx.phy.position + ectx.ai.oldvel, ectx.ai.Xmin, ectx.ai.Xmax, ectx.ai.Zmin, ectx.ai.Zmax)) {
+        //         ectx.ai.oldvel *= -1.0f;
+        //     }
+        //     ectx.phy.velocity = ectx.ai.oldvel;
+        // }
+        // else {
+        //     ectx.phy.velocity = {};
+        // }
+        // return BTNodeStatus_t::success;
     }
 };

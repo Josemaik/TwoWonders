@@ -17,7 +17,7 @@
 #include "../utils/bt/actionshoot.hpp"
 //decision
 #include "../utils/bt/decisionalternative.hpp"
-
+#include "../utils/bt/decisiondetectplayer.hpp"
 struct Ia_man
 {
     // void createMap(EntityManager& em);

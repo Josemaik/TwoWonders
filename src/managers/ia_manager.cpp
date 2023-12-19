@@ -59,7 +59,7 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, Behaviour
 
         switch (data.currentType)
         {
-        case TypeEnemies::Patrol: em.addComponent<AIComponent>(enemy, AIComponent{ .patrol = data.route ,.behaviourTree=&tree});
+        case TypeEnemies::Patrol: em.addComponent<AIComponent>(enemy, AIComponent{.patrol = data.route ,.behaviourTree=&tree});
             break;
         case TypeEnemies::PlayerShoot:em.addComponent<AIComponent>(enemy, AIComponent{.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_shoot=4.0f,.behaviourTree=&tree});
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 4.5f });
@@ -70,7 +70,7 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, Behaviour
             break;
         case TypeEnemies::Bat:  em.addComponent<AIComponent>(enemy, AIComponent{.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_stop = getRandomStop(),.behaviourTree=&tree});
             break;
-        case TypeEnemies::Drake: em.addComponent<AIComponent>(enemy, AIComponent{ .patrol = data.route,.countdown_shoot=1.0f,.behaviourTree=&tree });
+        case TypeEnemies::Drake: em.addComponent<AIComponent>(enemy, AIComponent{ .patrol = data.route,.countdown_shoot=2.5f,.behaviourTree=&tree });
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
             r.scale = { 1.5f,2.0f,1.5f };
             break;
@@ -114,7 +114,10 @@ void Ia_man::createEnemiesZone3(EntityManager& em) {
        {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-31.0f,-13.0f,2.0f,4.0f),  .route={},.num_lifes=1,.Xmin=-31.0f,.Xmax=-11.0f,.Zmin=-7.0f,.Zmax=8.0f, .visible=true,.color=ORANGE},
        {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-31.0f,-13.0f,4.0f,6.0f),  .route={},.num_lifes=1,.Xmin=-31.0f,.Xmax=-11.0f,.Zmin=-7.0f,.Zmax=8.0f, .visible=true,.color=ORANGE}
     };
-    tree.createNode<BTActionRandomShoot>();
+    tree.createNode<BTNodeSequence_t>(
+         &tree.createNode<BTActionRandomShoot>(),
+         &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoot)
+    );
     createEnemiesofType(em, Vec_RandomShoot_3,tree);
 }
 void Ia_man::createEnemiesZone4(EntityManager& em) {
@@ -127,7 +130,10 @@ void Ia_man::createEnemiesZone4(EntityManager& em) {
         {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),.route={},.num_lifes=1,.Xmin=-32.0f,.Xmax=-11.0f,.Zmin=-24.0f,.Zmax=-9.0f,.visible=true,.color=ORANGE},
         {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),.route={},.num_lifes=1,.Xmin=-32.0f,.Xmax=-11.0f,.Zmin=-24.0f,.Zmax=-9.0f,.visible=true,.color=ORANGE}
     };
-    tree.createNode<BTActionRandomShoot>();
+    tree.createNode<BTNodeSequence_t>(
+         &tree.createNode<BTActionRandomShoot>(),
+         &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoot)
+    );
     createEnemiesofType(em, Vec_RandomShoot,tree);
 }
 void Ia_man::createEnemiesZone5(EntityManager& em) {
@@ -137,7 +143,11 @@ void Ia_man::createEnemiesZone5(EntityManager& em) {
          .route={vec3f{}},.num_lifes=2,.Xmin=-43.0f,.Xmax=-46.0f,.Zmin=3.0f,.Zmax=-4.0f,.visible=false,.color = ORANGE
         }
     };
-    tree.createNode<BTActionShootPlayer>();
+    tree.createNode<BTNodeSequence_t>(
+        &tree.createNode<BTActionShootPlayer>(),
+        &tree.createNode<BTDecisionPlayerDetected>(),
+        &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoot)
+    );
     createEnemiesofType(em, Vec_ShootPlayerData,tree);
 }
 void Ia_man::createEnemiesZone6(EntityManager& em) {
@@ -148,7 +158,11 @@ void Ia_man::createEnemiesZone6(EntityManager& em) {
         }
     };
     // tree4.createNode<BTActionShootPlayer>();
-    tree.createNode<BTActionShootPlayer>();
+   tree.createNode<BTNodeSequence_t>(
+        &tree.createNode<BTActionShootPlayer>(),
+        &tree.createNode<BTDecisionPlayerDetected>(),
+        &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoot)
+    );
     createEnemiesofType(em, Vec_ShootPlayerData,tree);
 }
 void Ia_man::createEnemiesZone11(EntityManager& em) {
@@ -176,7 +190,7 @@ void Ia_man::createEnemiesZone11(EntityManager& em) {
     // );
     tree.createNode<BTNodeSequence_t>(
         &tree.createNode<BTActionPatrol>(),
-        &tree.createNode<BTActionShoot>()
+        &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot)
     );
     createEnemiesofType(em, Vec_Drake,tree);
 }
