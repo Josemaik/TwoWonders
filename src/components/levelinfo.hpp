@@ -15,6 +15,8 @@ struct LevelInfo
   std::unordered_set<std::size_t> enemiesID;
 
   uint16_t num_zone{};
+  bool generateKey{ false };
+  bool alreadyGenerated{ false };
 
-  GameScreen currentScreen = GameScreen::LOGO;
+  GameScreen currentScreen = GameScreen::GAMEPLAY;
 };

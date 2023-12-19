@@ -343,6 +343,11 @@ namespace ETMG {
             auto it = li.enemiesID.find(e.getID());
             if (it != li.enemiesID.end()) {
                 li.enemiesID.erase(it);
+
+                if (li.enemiesID.size() <= 0 && li.num_zone == 12)
+                {
+                    li.generateKey = true;
+                }
             }
 
             it = li.enemiesID.find(entities_[alive_ - 1].getID());

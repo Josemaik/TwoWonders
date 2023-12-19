@@ -8,10 +8,10 @@ void createSword(EntityManager& em)
 
     em.addTag<ObjectTag>(e);
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 49.0f, 0.f, 78.0f }, .scale = { .6f, 0.3f, 0.1f }, .color = LIGHTGRAY });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 49.0f, 0.f, 78.0f }, .scale = { 1.f, 0.3f, 0.3f }, .color = LIGHTGRAY });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Key, .inmortal = true });
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword, .inmortal = true });
 }
 
 void createKey(EntityManager& em)
@@ -20,7 +20,7 @@ void createKey(EntityManager& em)
 
     em.addTag<ObjectTag>(e);
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 83.f, 0.f, -71.0f }, .scale = { 1.0f, 0.3f, 0.3f }, .color = GOLD });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 83.f, 0.f, -71.0f }, .scale = { 1.f, 0.3f, 0.3f }, .color = GOLD });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Key, .inmortal = true });
@@ -88,7 +88,7 @@ void createEntities(EntityManager& em)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, -0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
@@ -103,13 +103,9 @@ void createEntities(EntityManager& em)
     createCoin(em);
     // Shop
     createShop(em);
-    // Key
-    createKey(em);
-
 
     // Ending
     createEnding(em);
-
 
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
@@ -153,8 +149,11 @@ void game()
     // using std::chrono::milliseconds;
     //
     // - Colocar antes de donde se quiere medir el tiempo
-    //
+    // auto t1 = high_resolution_clock::now();
     // - Colocar despues de donde se quiere medir el tiempo
+    // auto t2 = high_resolution_clock::now();
+    // duration<float, std::milli> ms_double = t2 - t1;
+    // std::cout << "el _System se ejecutó en " << duration.count() << " ms.\n";
 
     auto& li = em.getSingleton<LevelInfo>();
 
@@ -197,6 +196,14 @@ void game()
 
             // CODIGO DEL GAMEPLAY
         case GameScreen::GAMEPLAY:
+        {
+
+            if (li.generateKey && !li.alreadyGenerated)
+            {
+                createKey(em);
+                li.generateKey = false;
+                li.alreadyGenerated = true;
+            }
             if (em.getEntities().empty()) {
                 createEntities(em);
                 map.createMap(em);
@@ -207,7 +214,6 @@ void game()
             physics_system.update(em);
             collision_system.update(em);
             zone_system.update(em, engine, iam);
-
             shield_system.update(em);
             object_system.update(em, deltaTime);
             attack_system.update(em, deltaTime);
@@ -216,12 +222,13 @@ void game()
 
             render_system.update(em, engine);
             break;
+        }
 
-            // case GameScreen::DEAD:
-            //     /* code */
-            //     break;
+        // case GameScreen::DEAD:
+        //     /* code */
+        //     break;
 
-            // CODIGO DE LA PANTALLA FINAL
+        // CODIGO DE LA PANTALLA FINAL
         case GameScreen::ENDING:
             if (input_system.pressEnter())
                 li.currentScreen = GameScreen::TITLE;
