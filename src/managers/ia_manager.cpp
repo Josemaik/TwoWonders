@@ -70,7 +70,7 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, Behaviour
             break;
         case TypeEnemies::Bat:  em.addComponent<AIComponent>(enemy, AIComponent{.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_stop = getRandomStop(),.behaviourTree=&tree});
             break;
-        case TypeEnemies::Drake: em.addComponent<AIComponent>(enemy, AIComponent{ .patrol = data.route,.behaviourTree=&tree });
+        case TypeEnemies::Drake: em.addComponent<AIComponent>(enemy, AIComponent{ .patrol = data.route,.countdown_shoot=1.0f,.behaviourTree=&tree });
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
             r.scale = { 1.5f,2.0f,1.5f };
             break;
@@ -174,7 +174,7 @@ void Ia_man::createEnemiesZone11(EntityManager& em) {
     //         &tree.createNode<BTActionDrake>()
     //     ) 
     // );
-    tree.createNode<BTNodeSelector_t>(
+    tree.createNode<BTNodeSequence_t>(
         &tree.createNode<BTActionPatrol>(),
         &tree.createNode<BTActionShoot>()
     );
