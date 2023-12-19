@@ -12,7 +12,7 @@ OBJ  	   := obj
 RELEASE    := release
 ASSETS     := assets
 LIBS_DIR   := libs
-LIBS_COPY  := /usr/lib/libraylib.so.450 /usr/lib/libstdc++.so.6 /usr/lib/libm.so.6 /usr/lib/libgcc_s.so /usr/lib/libc.so.6
+LIBS_COPY  := /usr/lib/libraylib.so.450 /usr/lib/libstdc++.so.6 /usr/lib/libc.so.6 /usr/lib/libm.so.6
 
 ALLCPP     := $(shell find $(SRC) -type f -iname *.cpp)
 ALLCPPOBJ  := $(patsubst %.cpp,%.o,$(ALLCPP))
@@ -23,7 +23,7 @@ DATE       := $(shell date +'%d-%m-%y')
 ZIP_NAME   := $(APP)_$(RELEASE)_$(DATE).zip
 
 $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
-	$(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) -Wl,-rpath=$(LIBS_DIR) -L$(LIBS_DIR)
+	$(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) -Wl,-rpath=. -L$(LIBS_DIR)
 
 # ifdef release
 # 	SANITIZE :=
@@ -43,7 +43,7 @@ $(RELEASE) : $(APP) $(ASSETS)
 	cp $(APP) $(RELEASE)/
 	cp -r $(ASSETS) $(RELEASE)/
 	$(MKDIR) $(RELEASE)/$(LIBS_DIR)
-	cp $(LIBS_COPY) $(RELEASE)/$(LIBS_DIR)
+	cp $(LIBS_COPY) $(RELEASE)
 	zip -r $(ZIP_NAME) $(RELEASE)/
 	make clean
 
