@@ -8,10 +8,22 @@ void createSword(EntityManager& em)
 
     em.addTag<ObjectTag>(e);
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 49.0f, 0.f, 78.0f }, .scale = { 1.0f, 0.3f, 0.3f }, .color = LIGHTGRAY });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 49.0f, 0.f, 78.0f }, .scale = { .6f, 0.3f, 0.1f }, .color = LIGHTGRAY });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword, .inmortal = true });
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Key, .inmortal = true });
+}
+
+void createKey(EntityManager& em)
+{
+    auto& e{ em.newEntity() };
+
+    em.addTag<ObjectTag>(e);
+
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 83.f, 0.f, -71.0f }, .scale = { 1.0f, 0.3f, 0.3f }, .color = GOLD });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Key, .inmortal = true });
 }
 
 void createCoin(EntityManager& em)
@@ -76,7 +88,7 @@ void createEntities(EntityManager& em)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, -0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
@@ -91,6 +103,8 @@ void createEntities(EntityManager& em)
     createCoin(em);
     // Shop
     createShop(em);
+    // Key
+    createKey(em);
 
 
     // Ending
@@ -124,7 +138,6 @@ void game()
     map.createMap(em);
 
     engine.setTargetFPS(30);
-
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     srand((unsigned int)time(NULL));
 
@@ -140,12 +153,9 @@ void game()
     // using std::chrono::milliseconds;
     //
     // - Colocar antes de donde se quiere medir el tiempo
-    // auto t1 = high_resolution_clock::now();
     //
     // - Colocar despues de donde se quiere medir el tiempo
-    // auto t2 = high_resolution_clock::now();
-    // auto duration = duration_cast<milliseconds>(t2 - t1);
-    // std::cout << "el _System se ejecutó en " << duration.count() << " ms.\n";
+
     auto& li = em.getSingleton<LevelInfo>();
 
     // Inicializa una variable donde tener el tiempo entre frames
@@ -158,36 +168,36 @@ void game()
         switch (li.currentScreen)
         {
 
-        // CODIGO DE LA PANTALLA DE LOGO DE EMPRESA
+            // CODIGO DE LA PANTALLA DE LOGO DE EMPRESA
         case GameScreen::LOGO:
             // Contador para que pasen X segundos
             currentTime += deltaTime;
-            if(currentTime > 4.0f){
+            if (currentTime > 4.0f) {
                 li.currentScreen = GameScreen::TITLE;
                 currentTime = 0;
             }
             render_system.drawLogoKaiwa(engine);
             break;
-        
-        // CODIGO DE LA PANTALLA DE TITULO
+
+            // CODIGO DE LA PANTALLA DE TITULO
         case GameScreen::TITLE:
             // Input del enter para la historia
-            if(input_system.pressEnter())
+            if (input_system.pressEnter())
                 li.currentScreen = GameScreen::STORY;
             render_system.drawLogoGame(engine);
             break;
 
-        // CODIGO DE LA PANTALLA DE HISTORIA
+            // CODIGO DE LA PANTALLA DE HISTORIA
         case GameScreen::STORY:
             // Input del enter para empezar la partida
-            if(input_system.pressEnter())
+            if (input_system.pressEnter())
                 li.currentScreen = GameScreen::GAMEPLAY;
             render_system.drawStory(engine);
             break;
 
-        // CODIGO DEL GAMEPLAY
+            // CODIGO DEL GAMEPLAY
         case GameScreen::GAMEPLAY:
-            if(em.getEntities().empty()) {
+            if (em.getEntities().empty()) {
                 createEntities(em);
                 map.createMap(em);
             }
@@ -207,13 +217,13 @@ void game()
             render_system.update(em, engine);
             break;
 
-        // case GameScreen::DEAD:
-        //     /* code */
-        //     break;
+            // case GameScreen::DEAD:
+            //     /* code */
+            //     break;
 
-        // CODIGO DE LA PANTALLA FINAL
+            // CODIGO DE LA PANTALLA FINAL
         case GameScreen::ENDING:
-            if(input_system.pressEnter())
+            if (input_system.pressEnter())
                 li.currentScreen = GameScreen::TITLE;
             em.destroyAll();
             render_system.drawEnding(engine);
