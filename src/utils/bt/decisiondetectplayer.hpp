@@ -23,7 +23,6 @@ struct BTDecisionPlayerDetected : BTNode_t{
         auto const distance = (ectx.phy.position - plphy.position).lengthSQ();
         //Compruebo si esta dentro del radio de detección
         if( distance < (ectx.ai.detect_radius * ectx.ai.detect_radius)){
-            ectx.ai.oldvel = (getPlayerDistance(ectx.em, ectx.phy, ectx.ai)).normalized() * ectx.ai.SPEED_AI;
             return BTNodeStatus_t::success;
         }
         return BTNodeStatus_t::fail;

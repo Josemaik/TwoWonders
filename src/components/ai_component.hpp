@@ -48,11 +48,11 @@ struct AIComponent
          }
     }
     //Flags
-    bool stoped{false}, shoot{false},moving{false};
+    bool stoped{false}, shoot{false},moving{false},detectplayer{false},ghost{false};
     //before velocity
     vec3f oldvel{0.25f,0.0f,0.0f};
     //Rangos
-    float Xmin{},Xmax{},Zmin{},Zmax{};
+    float Xmin{},Xmax{},Zmin{},Zmax{},visible{true};
     //data for detect player
     float detect_radius{ 15.f };
     bool playerdetected{ false };
