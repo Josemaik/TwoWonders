@@ -7,6 +7,9 @@
 struct BehaviourTree_t;
 struct AIComponent
 {
+    //shoots
+    enum class TypeShoot: uint8_t{OneShoot,TripleShoot};
+    TypeShoot currentshoot{};
     //default velocity
     float SPEED_AI = 0.2f;
     //data for patrol behaviour
