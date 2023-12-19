@@ -162,7 +162,7 @@ void game()
         case GameScreen::LOGO:
             // Contador para que pasen X segundos
             currentTime += deltaTime;
-            if(currentTime > 3.0f){
+            if(currentTime > 4.0f){
                 li.currentScreen = GameScreen::TITLE;
                 currentTime = 0;
             }
