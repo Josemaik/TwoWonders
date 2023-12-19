@@ -10,7 +10,7 @@ OBJ  	   := obj
 RELEASE    := release
 ASSETS     := assets
 #LIBS_DIR   := libs
-#LIBS_COPY  := /usr/lib/libraylib.so.450 /usr/lib/libasan.so.8 /usr/lib/libstdc++.so.6 /usr/lib/libm.so.6 /usr/lib/libubsan.so.1 /usr/lib/libgcc_s.so.1 /usr/lib/libc.so.6 /usr/lib64/ld-linux-x86-64.so.2
+#LIBS_COPY  := /usr/lib/libstdc++.so.6 /usr/lib/libc.so.6 /usr/lib/libm.so.6
 
 ALLCPP     := $(shell find $(SRC) -type f -iname *.cpp)
 ALLCPPOBJ  := $(patsubst %.cpp,%.o,$(ALLCPP))
