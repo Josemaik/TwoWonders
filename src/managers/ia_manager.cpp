@@ -61,11 +61,11 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, Behaviour
         {
         case TypeEnemies::Patrol: em.addComponent<AIComponent>(enemy, AIComponent{.patrol = data.route ,.behaviourTree=&tree});
             break;
-        case TypeEnemies::PlayerShoot:em.addComponent<AIComponent>(enemy, AIComponent{.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_shoot=4.0f,.behaviourTree=&tree});
+        case TypeEnemies::PlayerShoot:em.addComponent<AIComponent>(enemy, AIComponent{.stoped=true,.detectplayer=true,.ghost=true,.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_shoot=4.0f,.behaviourTree=&tree});
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 4.5f });
             break;
         case TypeEnemies::RanndomShoot:
-            em.addComponent<AIComponent>(enemy, AIComponent{.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_stop = getRandomStop(),.behaviourTree=&tree});
+            em.addComponent<AIComponent>(enemy, AIComponent{.stoped=true,.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_stop = getRandomStop(),.behaviourTree=&tree});
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
             break;
         case TypeEnemies::Bat:  em.addComponent<AIComponent>(enemy, AIComponent{.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_stop = getRandomStop(),.behaviourTree=&tree});

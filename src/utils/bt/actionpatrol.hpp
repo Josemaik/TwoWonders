@@ -31,6 +31,7 @@ struct BTActionPatrol : BTNode_t{
         }
         //Normalizo la distancia y se la asigno a la velocidad
         ectx.phy.velocity = distance.normalize() * ectx.ai.SPEED_AI;
+
         return BTNodeStatus_t::success;
     }
 };

@@ -12,15 +12,6 @@ struct BTActionShootPlayer : BTNode_t{
         auto const distance = (p.position - plphy.position).lengthSQ();
         return  distance < (ai.detect_radius * ai.detect_radius);
     }
-    // Obtener la distancia del enemigo con respecto al player
-    [[nodiscard]] vec3f getPlayerDistance(EntityManager& EM, PhysicsComponent const& p, AIComponent& ai) const noexcept {
-        auto& li = EM.getSingleton<LevelInfo>();
-        auto* playerEn = EM.getEntityByID(li.playerID);
-        if (not playerEn) { ai.playerdetected = false; return vec3f{}; };
-        auto& plphy = EM.getComponent<PhysicsComponent>(*playerEn);
-        auto const distance = plphy.position - p.position;
-        return  distance;
-    }
     vec3f getRandomPosinRange(float xmin, float xmax, float zmin, float zmax) {
         //Semilla para generar numeros aleatorios
         std::random_device rd;
