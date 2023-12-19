@@ -18,5 +18,5 @@ struct LevelInfo
   bool generateKey{ false };
   bool alreadyGenerated{ false };
 
-  GameScreen currentScreen = GameScreen::GAMEPLAY;
+  GameScreen currentScreen = GameScreen::LOGO;
 };
