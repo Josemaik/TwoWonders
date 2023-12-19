@@ -19,49 +19,49 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine)
     endFrame(engine, em);
 }
 
-void RenderSystem::drawLogoGame(ENGI::GameEngine& engine){
+void RenderSystem::drawLogoGame(ENGI::GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
-    engine.drawTexture(engine.texture_logo_two_wonders, 
-                       engine.getScreenWidth()/2 - engine.texture_logo_two_wonders.width/2, 
-                       static_cast<int>(engine.getScreenHeight()/2.5 - engine.texture_logo_two_wonders.height/2), 
-                       WHITE);
-    engine.drawText("PRESS [ENTER] TO PLAY", 
-                    engine.getScreenWidth()/2 - 200, 
-                    engine.getScreenHeight() - 50, 30, 
-                    Color({108, 198, 215, 255}));
+    engine.drawTexture(engine.texture_logo_two_wonders,
+        engine.getScreenWidth() / 2 - engine.texture_logo_two_wonders.width / 2,
+        static_cast<int>(engine.getScreenHeight() / 2.5 - engine.texture_logo_two_wonders.height / 2),
+        WHITE);
+    engine.drawText("PRESS [ENTER] TO PLAY",
+        engine.getScreenWidth() / 2 - 200,
+        engine.getScreenHeight() - 50, 30,
+        Color({ 108, 198, 215, 255 }));
     engine.endDrawing();
 }
 
-void RenderSystem::drawLogoKaiwa(ENGI::GameEngine& engine){
+void RenderSystem::drawLogoKaiwa(ENGI::GameEngine& engine) {
     engine.beginDrawing();
-    engine.clearBackground(Color({136, 219, 152, 255}));
+    engine.clearBackground(Color({ 136, 219, 152, 255 }));
     engine.drawTexture(engine.texture_logo_kaiwa_games,
-                       engine.getScreenWidth()/2 - engine.texture_logo_kaiwa_games.width/2,
-                       engine.getScreenHeight()/2 - engine.texture_logo_kaiwa_games.height/2,
-                       WHITE);
+        engine.getScreenWidth() / 2 - engine.texture_logo_kaiwa_games.width / 2,
+        engine.getScreenHeight() / 2 - engine.texture_logo_kaiwa_games.height / 2,
+        WHITE);
     engine.endDrawing();
 }
 
-void RenderSystem::drawEnding(ENGI::GameEngine& engine){
+void RenderSystem::drawEnding(ENGI::GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
     engine.drawText("Has ganado", 250, 250, 50, BLACK);
-    engine.drawText("PRESS [ENTER] TO RETURN TITLE", 
-                    engine.getScreenWidth()/2 - 280, 
-                    engine.getScreenHeight() - 50, 30, 
-                    BLACK);
+    engine.drawText("PRESS [ENTER] TO RETURN TITLE",
+        engine.getScreenWidth() / 2 - 280,
+        engine.getScreenHeight() - 50, 30,
+        BLACK);
     engine.endDrawing();
 }
 
-void RenderSystem::drawStory(ENGI::GameEngine& engine){
+void RenderSystem::drawStory(ENGI::GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
     engine.drawText("Ana quiere historia", 250, 250, 50, BLACK);
-    engine.drawText("PRESS [ENTER] TO PLAY ", 
-                    engine.getScreenWidth()/2 - 200, 
-                    engine.getScreenHeight() - 50, 30, 
-                    BLACK);
+    engine.drawText("PRESS [ENTER] TO PLAY ",
+        engine.getScreenWidth() / 2 - 200,
+        engine.getScreenHeight() - 50, 30,
+        BLACK);
     engine.endDrawing();
 }
 

@@ -182,6 +182,12 @@ void Map::createWallsOverworld(EntityManager& em) {
         auto& wp = em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = { wr.position }, .velocity = { .0f, .0f, .0f } });
         em.addComponent<ColliderComponent>(wall, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
     }
+
+    auto& door{ em.newEntity() };
+    door.addTag<DoorTag>();
+    auto& wr = em.addComponent<RenderComponent>(door, RenderComponent{ .position = { 61.f, 0.f, -78.f }, .scale = { 2.f, 4.f, 1.f }, .color = BROWN });
+    auto& wp = em.addComponent<PhysicsComponent>(door, PhysicsComponent{ .position = { wr.position }, .velocity = { .0f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(door, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
 }
 
 // Se encarga de crear el suelo del OverWorld

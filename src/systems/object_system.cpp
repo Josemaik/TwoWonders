@@ -62,6 +62,11 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 explodeBomb(em, ent);
                 break;
 
+            case Object_type::Key:
+                if (playerEnt->hasComponent<InformationComponent>())
+                    em.getComponent<InformationComponent>(*playerEnt).addKey();
+                break;
+
             default:
                 break;
             }

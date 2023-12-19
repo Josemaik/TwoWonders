@@ -1,8 +1,15 @@
 #include "collision_system.hpp"
 #include <raylib.h>
+#include <chrono>
 
 void CollisionSystem::update(EntityManager& em)
 {
+    // using std::chrono::high_resolution_clock;
+    // using std::chrono::duration_cast;
+    // using std::chrono::duration;
+    // using std::chrono::milliseconds;
+    // auto t1 = high_resolution_clock::now();
+
     // Liberar el octree
     octree.clear();
 
@@ -37,6 +44,10 @@ void CollisionSystem::update(EntityManager& em)
         em.destroyEntities(dead_entities);
         dead_entities.clear();
     }
+
+    // auto t2 = high_resolution_clock::now();
+    // auto duration = duration_cast<milliseconds>(t2 - t1);
+    // std::cout << "el _System se ejecutó en " << duration.count() << " ms.\n";
 }
 
 // Función recursiva qué revisa las colisiones de las entidades del octree actual con otras entidades
@@ -137,10 +148,10 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     if (behaviorType1 & BehaviorType::PLAYER || behaviorType2 & BehaviorType::PLAYER)
     {
         // Colision con la meta
-        if (behaviorType1 & BehaviorType::ENDING || behaviorType2 & BehaviorType::ENDING){
+        if (behaviorType1 & BehaviorType::ENDING || behaviorType2 & BehaviorType::ENDING)
+        {
             auto& li = em.getSingleton<LevelInfo>();
             li.currentScreen = GameScreen::ENDING;
-            //dead_entities.insert(li.playerID);
             return;
         }
 
@@ -234,18 +245,29 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
+    if (staticEntPtr->hasTag<DoorTag>() && behaviorType2 & BehaviorType::PLAYER)
+    {
+        auto& ic = em.getComponent<InformationComponent>(*otherEntPtr);
+        if (ic.hasKey)
+        {
+            dead_entities.insert(staticEntPtr->getID());
+            ic.hasKey = false;
+            return;
+        }
+    }
+
     // Colisiones con paredes
     staticCollision(*otherPhy, *staticPhy, minOverlap);
 }
 
 void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3f& minOverlap)
 {
-    
-            // Determine which axis had the minimum overlap
-            if (minOverlap.z() < minOverlap.x())
-                resolveEnemyDirection(em, entity2, staticPhy, otherPhy, minOverlap.z(), true);
-            else if (minOverlap.x() < minOverlap.z())
-                resolveEnemyDirection(em, entity2, staticPhy, otherPhy, minOverlap.x(), false);
+
+    // Determine which axis had the minimum overlap
+    if (minOverlap.z() < minOverlap.x())
+        resolveEnemyDirection(em, entity2, staticPhy, otherPhy, minOverlap.z(), true);
+    else if (minOverlap.x() < minOverlap.z())
+        resolveEnemyDirection(em, entity2, staticPhy, otherPhy, minOverlap.x(), false);
 }
 
 void CollisionSystem::resolveEnemyDirection(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, float overlap, bool isZAxis)
