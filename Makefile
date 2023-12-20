@@ -1,5 +1,5 @@
 APP		   := ZeldaWonders
-CC         := ccache g++
+CC         :=  ccache g++
 CCFLAGS    := -std=c++23 -Wall -Wpedantic -Wextra -Wconversion -Isrc/ -Ilibs/
 LIBS       := -lraylib
 SANITIZE   := -fsanitize=address,undefined
@@ -12,7 +12,7 @@ OBJ  	   := obj
 RELEASE    := release
 ASSETS     := assets
 LIBS_DIR   := libs
-LIBS_COPY  := /usr/lib/libraylib.so.450 /usr/lib/libstdc++.so.6 /usr/lib/libc.so.6 /usr/lib/libm.so.6
+# LIBS_COPY  := /usr/lib/libraylib.so.450 /usr/lib/libstdc++.so.6 /usr/lib/libc.so.6 /usr/lib/libm.so.6
 
 ALLCPP     := $(shell find $(SRC) -type f -iname *.cpp)
 ALLCPPOBJ  := $(patsubst %.cpp,%.o,$(ALLCPP))
@@ -23,7 +23,7 @@ DATE       := $(shell date +'%d-%m-%y')
 ZIP_NAME   := $(APP)_$(RELEASE)_$(DATE).zip
 
 $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
-	$(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) -Wl,-rpath=. -L$(LIBS_DIR) $(SANITIZE)
+	$(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE)
 
 # ifdef release
 # 	SANITIZE :=
