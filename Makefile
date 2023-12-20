@@ -23,7 +23,7 @@ DATE       := $(shell date +'%d-%m-%y')
 ZIP_NAME   := $(APP)_$(RELEASE)_$(DATE).zip
 
 $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
-	$(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) -Wl,-rpath=. -L$(LIBS_DIR)
+	$(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) -Wl,-rpath=. -L$(LIBS_DIR) $(SANITIZE)
 
 # ifdef release
 # 	SANITIZE :=
@@ -36,7 +36,7 @@ $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
 # LD_LIBRARY_PATH=libs ./ZeldaWonders
 
 %.o : %.cpp
-	$(CC) -o $(patsubst $(SRC)%,$(OBJ)%,$@) -c $^ $(CCFLAGS) -O3 -DNDEBUG
+	$(CC) -o $(patsubst $(SRC)%,$(OBJ)%,$@) -c $^ $(CCFLAGS) -g $(SANITIZE)
 
 $(RELEASE) : $(APP) $(ASSETS)
 	$(MKDIR) $(RELEASE)
