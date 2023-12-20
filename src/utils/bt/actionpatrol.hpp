@@ -1,6 +1,7 @@
 #pragma once
 #include "node.hpp"
 #include <utils/types.hpp>
+#include <iostream>
 
 
 struct BTActionPatrol : BTNode_t{
@@ -29,8 +30,21 @@ struct BTActionPatrol : BTNode_t{
             ectx.ai.current++;
             ectx.ai.arrived = true;
         }
+
         //Normalizo la distancia y se la asigno a la velocidad
         ectx.phy.velocity = distance.normalize() * ectx.ai.SPEED_AI;
+
+
+        if(ectx.ent.hasComponent<AttackComponent>()){
+             if (ectx.ai.elapsed_stop >= ectx.ai.countdown_stop) {
+                std::cout << "HOLA";
+                ectx.phy.velocity = {};
+                ectx.ai.elapsed_stop = 0;
+                return BTNodeStatus_t::success;
+             }  
+             ectx.ai.dec_countdown_stop(ectx.deltatime);
+             return BTNodeStatus_t::running;
+        }
 
         return BTNodeStatus_t::success;
     }
