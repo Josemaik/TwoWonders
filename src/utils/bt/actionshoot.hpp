@@ -28,12 +28,15 @@ struct BTActionShoot : BTNode_t{
             ectx.ai.elapsed_shoot = 0;
             switch (shoot)
             {
-            case AIComponent::TypeShoot::OneShoot : {
+            case AIComponent::TypeShoot::OneShootonDir : {
                 // shoot one time
-                if(ectx.ai.detectplayer==true){
-                    ectx.ai.oldvel = (getPlayerDistance(ectx.em, ectx.phy, ectx.ai)).normalized() * ectx.ai.SPEED_AI;
-                }
                 att.vel = ectx.ai.oldvel;
+                att.attack(AttackType::Ranged);
+                return BTNodeStatus_t::success;
+            }
+                break;
+            case  AIComponent::TypeShoot::OneShoottoPlayer : {
+                att.vel = (getPlayerDistance(ectx.em, ectx.phy, ectx.ai)).normalized() * ectx.ai.SPEED_AI;
                 att.attack(AttackType::Ranged);
                 return BTNodeStatus_t::success;
             }
