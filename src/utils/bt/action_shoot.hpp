@@ -42,6 +42,7 @@ struct BTActionShoot : BTNode_t{
                 break;
             case AIComponent::TypeShoot::TripleShoot: {
                 //shoot three time
+                att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai.SPEED_AI;
                 att.attack(AttackType::TripleShot);
                 return BTNodeStatus_t::success;
             }
