@@ -72,7 +72,7 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, Behaviour
             break;
         case TypeEnemies::Drake: em.addComponent<AIComponent>(enemy, AIComponent{ .patrol = data.route,.countdown_stop=2.5f,.countdown_shoot=0.0f,.behaviourTree=&tree });
             em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
-            r.scale = { 1.5f,2.0f,1.5f };
+            r.scale = { 2.0f,2.5f,2.5f };
             break;
         default:
             break;
@@ -136,6 +136,7 @@ void Ia_man::createEnemiesZone4(EntityManager& em) {
     );
     createEnemiesofType(em, Vec_RandomShoot,tree);
 }
+//Creamos murcielgaos
 void Ia_man::createEnemiesZone5(EntityManager& em) {
     createdzone5 = true;
     std::vector<EnemyData> Vec_ShootPlayerData = {
@@ -150,6 +151,7 @@ void Ia_man::createEnemiesZone5(EntityManager& em) {
     );
     createEnemiesofType(em, Vec_ShootPlayerData,tree);
 }
+//creamos enemigos edel río
 void Ia_man::createEnemiesZone6(EntityManager& em) {
     createdzone6 = true;
     std::vector<EnemyData> Vec_ShootPlayerData = {
@@ -175,19 +177,6 @@ void Ia_man::createEnemiesZone11(EntityManager& em) {
            AIComponent::invalid
        },.num_lifes=10,.Xmin=0.0f,.Xmax=0.0f,.Zmin=0.0f,.Zmax=0.0f,.visible=true,.color=RED}
     };
-    // auto* a1 = &tree.createNode<BTActionDrake>();
-    // auto* a2 = &tree.createNode<BTActionBat>();
-    // tree.createNode<BTNodeSequence_t>(a1,a2);
-    // tree.createNode<BTNodeSelector_t>(
-    //     &tree.createNode<BTNodeSequence_t>(
-    //          &tree.createNode<BTDecisionAlternative>(true),
-    //          &tree.createNode<BTActionBat>()
-    //     )
-    //     ,&tree.createNode<BTNodeSequence_t>(
-    //         &tree.createNode<BTActionPatrol>(),
-    //         &tree.createNode<BTActionDrake>()
-    //     ) 
-    // );
     tree.createNode<BTNodeSequence_t>(
         &tree.createNode<BTActionPatrol>(),
         &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot)

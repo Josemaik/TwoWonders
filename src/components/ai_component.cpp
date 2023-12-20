@@ -1,5 +1,6 @@
 #include "ai_component.hpp"
 
+//Es llamada por el collision y te devuelve una direccion random menos en la que has colisionado
 vec3f AIComponent::getRandomDirection(vec3f dir1,vec3f dir2,vec3f dir3){
         switch (std::rand() % 3) {
             case 0:  return dir3; break;//derecha
@@ -8,6 +9,7 @@ vec3f AIComponent::getRandomDirection(vec3f dir1,vec3f dir2,vec3f dir3){
             default: return dir2; break;
          }
 }
+//Igual pero incluye las diagonales
 vec3f AIComponent::getRandomDirectionWithDiagonals(vec3f dir1,vec3f dir2,vec3f dir3,vec3f dir4,vec3f dir5){
         switch (std::rand() % 5) {
             case 0:  return dir3; break;
@@ -18,7 +20,7 @@ vec3f AIComponent::getRandomDirectionWithDiagonals(vec3f dir1,vec3f dir2,vec3f d
             default: return dir2; break;
          }
 }
-  // // Devuelve una dirección aleatoria
+//Devuelve una dirección aleatoria
 vec3f AIComponent::getRandomDir() {
         // Genero direccion aleatoria
         switch (std::rand() % 4) {
@@ -29,6 +31,7 @@ vec3f AIComponent::getRandomDir() {
         default: return right; break;
         }
 }
+//Devuelve una dirección aleatoria incluido diagonales
 vec3f AIComponent::getRandomDirwithDiagonals() {
         // Genero direccion aleatoria
         switch (std::rand() % 8) {
@@ -43,10 +46,12 @@ vec3f AIComponent::getRandomDirwithDiagonals() {
         default: return left; break;
         }
 }
+//Comprueba si estan en el rango establecido
 bool AIComponent::isInDesiredRange(const vec3f& direction, float xmin, float xmax, float zmin, float zmax) {
         return direction.x() >= xmin && direction.x() <= xmax &&
         direction.z() >= zmin && direction.z() <= zmax;
 }
+//Devuelve una posicion dentro del rango establecido
 vec3f AIComponent::getRandomPosinRange(float xmin, float xmax, float zmin, float zmax) {
         //Semilla para generar numeros aleatorios
         std::random_device rd;
