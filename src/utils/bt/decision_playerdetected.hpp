@@ -6,14 +6,7 @@
 struct BTDecisionPlayerDetected : BTNode_t{
 
     BTDecisionPlayerDetected()  {}
-    [[nodiscard]] vec3f getPlayerDistance(EntityManager& EM, PhysicsComponent const& p, AIComponent& ai) const noexcept {
-        auto& li = EM.getSingleton<LevelInfo>();
-        auto* playerEn = EM.getEntityByID(li.playerID);
-        if (not playerEn) { ai.playerdetected = false; return vec3f{}; };
-        auto& plphy = EM.getComponent<PhysicsComponent>(*playerEn);
-        auto const distance = plphy.position - p.position;
-        return  distance;
-    }
+
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         auto& li = ectx.em.getSingleton<LevelInfo>();
         auto* playerEn = ectx.em.getEntityByID(li.playerID);

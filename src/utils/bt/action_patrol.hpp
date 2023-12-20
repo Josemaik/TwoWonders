@@ -37,7 +37,6 @@ struct BTActionPatrol : BTNode_t{
 
         if(ectx.ent.hasComponent<AttackComponent>()){
              if (ectx.ai.elapsed_stop >= ectx.ai.countdown_stop) {
-                std::cout << "HOLA";
                 ectx.phy.velocity = {};
                 ectx.ai.elapsed_stop = 0;
                 return BTNodeStatus_t::success;

@@ -10,14 +10,13 @@
 #include "../utils/bt/nodesequence.hpp"
 #include "../utils/bt/nodeselector.hpp"
 //actions
-#include "../utils/bt/actionpatrol.hpp"
-#include "../utils/bt/actionrandom.hpp"
-#include "../utils/bt/actionshootplayer.hpp"
-#include "../utils/bt/actionbat.hpp"
-#include "../utils/bt/actionshoot.hpp"
+#include "../utils/bt/action_patrol.hpp"
+#include "../utils/bt/action_randommovement.hpp"
+#include "../utils/bt/action_changeposition.hpp"
+#include "../utils/bt/action_diagonalmovement.hpp"
+#include "../utils/bt/action_shoot.hpp"
 //decision
-#include "../utils/bt/decisionalternative.hpp"
-#include "../utils/bt/decisiondetectplayer.hpp"
+#include "../utils/bt/decision_playerdetected.hpp"
 struct Ia_man
 {
     // void createMap(EntityManager& em);

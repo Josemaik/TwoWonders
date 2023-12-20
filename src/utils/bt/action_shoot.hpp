@@ -7,16 +7,15 @@ struct BTActionShoot : BTNode_t{
     using type_value = AIComponent::TypeShoot;
     BTActionShoot(type_value t) : shoot{t} {}
     //   BTDecisionAlternative( a = false) : alternative{a}  {}
-     // Obtener la distancia del enemigo con respecto al player
-    [[nodiscard]] vec3f getPlayerDistance(EntityManager& EM, PhysicsComponent const& p, AIComponent& ai) const noexcept {
-        auto& li = EM.getSingleton<LevelInfo>();
-        auto* playerEn = EM.getEntityByID(li.playerID);
-        if (not playerEn) { ai.playerdetected = false; return vec3f{}; };
-        auto& plphy = EM.getComponent<PhysicsComponent>(*playerEn);
-        auto const distance = plphy.position - p.position;
-        return  distance;
+    // Obtener la distancia del enemigo con respecto al player
+    [[nodiscard]]vec3f getPlayerDistance(EntityContext_t& ectx) const noexcept {
+            auto& li = ectx.em.getSingleton<LevelInfo>();
+            auto* playerEn = ectx.em.getEntityByID(li.playerID);
+            if (not playerEn) { ectx.ai.playerdetected = false; return vec3f{}; };
+            auto& plphy = ectx.em.getComponent<PhysicsComponent>(*playerEn);
+            auto const distance = plphy.position - ectx.phy.position;
+            return  distance;
     }
-
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         auto& att = ectx.em.getComponent<AttackComponent>(ectx.ent);
         if (ectx.ai.elapsed_shoot >= ectx.ai.countdown_shoot) {
@@ -36,7 +35,7 @@ struct BTActionShoot : BTNode_t{
             }
                 break;
             case  AIComponent::TypeShoot::OneShoottoPlayer : {
-                att.vel = (getPlayerDistance(ectx.em, ectx.phy, ectx.ai)).normalized() * ectx.ai.SPEED_AI;
+                att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai.SPEED_AI;
                 att.attack(AttackType::Ranged);
                 return BTNodeStatus_t::success;
             }
