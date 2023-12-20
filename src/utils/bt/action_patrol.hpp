@@ -1,13 +1,14 @@
 #pragma once
 #include "node.hpp"
 #include <utils/types.hpp>
+#include <iostream>
 
 
-struct BTActionDrake : BTNode_t{
-    // BTActionPatrol() = default;
+struct BTActionPatrol : BTNode_t{
+    BTActionPatrol() {}
 
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
-         //Do patrol
+        //Do patrol
         //si la pos actual es >= que el maximo patron vuelvo al principio
         if (ectx.ai.current >= ectx.ai.max_patrol) {
             ectx.ai.current = 0;
@@ -29,16 +30,21 @@ struct BTActionDrake : BTNode_t{
             ectx.ai.current++;
             ectx.ai.arrived = true;
         }
+
         //Normalizo la distancia y se la asigno a la velocidad
         ectx.phy.velocity = distance.normalize() * ectx.ai.SPEED_AI;
-        
-         if (ectx.ai.elapsed_shoot >= ectx.ai.countdown_shoot) {
-            ectx.ai.elapsed_shoot = 0;
-            //shoot one time
-            auto& att = ectx.em.getComponent<AttackComponent>(ectx.ent);
-            att.attack(AttackType::TripleShot);
-         }
-        ectx.ai.dec_countdown_shoot(ectx.deltatime);
+
+
+        if(ectx.ent.hasComponent<AttackComponent>()){
+             if (ectx.ai.elapsed_stop >= ectx.ai.countdown_stop) {
+                ectx.phy.velocity = {};
+                ectx.ai.elapsed_stop = 0;
+                return BTNodeStatus_t::success;
+             }  
+             ectx.ai.dec_countdown_stop(ectx.deltatime);
+             return BTNodeStatus_t::running;
+        }
+
         return BTNodeStatus_t::success;
     }
 };
