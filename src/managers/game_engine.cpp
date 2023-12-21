@@ -1,5 +1,4 @@
 #include "game_engine.hpp"
-#include "utils/gametimer.hpp"
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
 {
