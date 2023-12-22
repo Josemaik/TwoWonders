@@ -14,7 +14,12 @@ struct ZoneSystem
     void update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam,Eventmanager& evm);
 
 private:
-    void deleteEnemiesinZone(EntityManager& em, uint16_t zone);
+    void updateZoneEnemies(EntityManager& em);
+    void deleteZoneEnemies(EntityManager& em);
+    void createKey(EntityManager& em);
+
+    bool keyCreated{ false };
+    deathSet dead_entities{};
 };
 
 #endif // !ZONE_SYSTEM

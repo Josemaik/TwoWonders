@@ -1,10 +1,16 @@
 APP		   := ZeldaWonders
-CC         :=   g++
-CCFLAGS    := -std=c++23 -Wall -Wpedantic -Wextra -Wconversion -Isrc/ -Ilibs/
+
+CCACHE 	   := ccache
+CC         := g++-12
+CCFLAGS    := -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
+
 LIBS       := -lraylib
 SANITIZE   := -fsanitize=address,undefined
 
+# agregar g++ | clang++
+
 # libs/libraylib.a
+# LD_LIBRARY_PATH=libs ./ZeldaWonders
 
 MKDIR      := mkdir -p
 SRC  	   := src
@@ -12,7 +18,7 @@ OBJ  	   := obj
 RELEASE    := release
 ASSETS     := assets
 LIBS_DIR   := libs
-# LIBS_COPY  := /usr/lib/libraylib.so.450 /usr/lib/libstdc++.so.6 /usr/lib/libc.so.6 /usr/lib/libm.so.6
+LIBS_COPY  := /usr/lib/libraylib.so.420
 
 ALLCPP     := $(shell find $(SRC) -type f -iname *.cpp)
 ALLCPPOBJ  := $(patsubst %.cpp,%.o,$(ALLCPP))
@@ -22,30 +28,34 @@ OBJSUBDIRS := $(patsubst $(SRC)%,$(OBJ)%,$(SUBDIRS))
 DATE       := $(shell date +'%d-%m-%y')
 ZIP_NAME   := $(APP)_$(RELEASE)_$(DATE).zip
 
+# Variables si es make release
+ifeq ($(filter release,$(MAKECMDGOALS)),release)
+    SANITIZE :=
+    CCFLAGS  += -O3 -DNDEBUG
+else
+    CCFLAGS  += -g
+endif
+
+# _glfwPlatformLoadModule
+
+# Regla principal (enlazado de los .o)
 $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
-	$(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE)
+	$(CCACHE) $(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE) -Wl,-rpath=libs
 
-# ifdef release
-# 	SANITIZE :=
-# 	CCFLAGS  += -O3
-#   -DNDEBUG (al compilador)
-# else
-# 	CCFLAGS  += -g
-# endif
-
-# LD_LIBRARY_PATH=libs ./ZeldaWonders
-
+# Regla que compila los .cpp
 %.o : %.cpp
-	$(CC) -o $(patsubst $(SRC)%,$(OBJ)%,$@) -c $^ $(CCFLAGS) -g $(SANITIZE)
+	$(CCACHE) $(CC) -o $(patsubst $(SRC)%,$(OBJ)%,$@) -c $^ $(CCFLAGS) $(SANITIZE)
 
+# Regla que crea una release
 $(RELEASE) : $(APP) $(ASSETS)
 	$(MKDIR) $(RELEASE)
 	cp $(APP) $(RELEASE)/
 	cp -r $(ASSETS) $(RELEASE)/
 	$(MKDIR) $(RELEASE)/$(LIBS_DIR)
-	cp $(LIBS_COPY) $(RELEASE)
+	cp $(LIBS_COPY) $(RELEASE)/$(LIBS_DIR)
 	zip -r $(ZIP_NAME) $(RELEASE)/
-	make clean
+
+# Reglas auxiliares que crean carpetas
 
 $(OBJSUBDIRS) :
 	$(MKDIR) $(OBJSUBDIRS)
@@ -53,6 +63,8 @@ $(OBJSUBDIRS) :
 $(ASSETS): 
 	$(MKDIR) $(ASSETS)
 	
+# Otras reglas
+
 .PHONY : dir clean game
 
 game: $(APP)
@@ -66,4 +78,4 @@ dir:
 	$(info $(ALLCPPOBJ))
 
 clean:
-	rm -r ./$(OBJ)/ ./$(APP) ./$(RELEASE)/
+	rm -r ./$(OBJ)/ ./$(APP) ./$(RELEASE)/ ./$(ZIP_NAME)

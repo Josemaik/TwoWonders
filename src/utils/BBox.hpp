@@ -32,4 +32,18 @@ struct BBox
     constexpr vec3f size() const { return max - min; }
     constexpr vec3f center() const { return (min + max) / 2.f; }
     bool intersects(const BBox& other) const { return !(max < other.min || min > other.max); }
+
+    // Función para comprobar si un rayo intersecta con la caja delimitadora
+    bool intersectsRay(vec3f& rayOrigin, vec3f& rayDirection) const {
+        vec3f t1 = (min - rayOrigin) / rayDirection;
+        vec3f t2 = (max - rayOrigin) / rayDirection;
+
+        vec3f tmin = vec3f::min(t1, t2);
+        vec3f tmax = vec3f::max(t1, t2);
+
+        float tNear = tmin.max();
+        float tFar = tmax.min();
+
+        return tNear <= tFar && tFar >= 0;
+    }
 };

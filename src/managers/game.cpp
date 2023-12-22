@@ -1,8 +1,7 @@
 #include "game.hpp"
-#include "game_engine.hpp"
 //#include "../utils/memory_viewer.hpp"
 
-void createSword(EntityManager& em)
+void Game::createSword(EntityManager& em)
 {
     auto& e{ em.newEntity() };
 
@@ -14,19 +13,7 @@ void createSword(EntityManager& em)
     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword, .inmortal = true });
 }
 
-void createKey(EntityManager& em)
-{
-    auto& e{ em.newEntity() };
-
-    em.addTag<ObjectTag>(e);
-
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 83.f, 0.f, -71.0f }, .scale = { 1.f, 0.3f, 0.3f }, .color = GOLD });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
-    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Key, .inmortal = true });
-}
-
-void createCoin(EntityManager& em)
+void Game::createCoin(EntityManager& em)
 {
     auto& e{ em.newEntity() };
 
@@ -38,7 +25,7 @@ void createCoin(EntityManager& em)
     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Coin30, .inmortal = true });
 }
 
-void createShop(EntityManager& em)
+void Game::createShop(EntityManager& em)
 {
 
     // Bomba
@@ -66,7 +53,7 @@ void createShop(EntityManager& em)
     em.addComponent<ObjectComponent>(e3, ObjectComponent{ .type = Object_type::ShopItem_ExtraLife, .inmortal = true });
 }
 
-void createShield(EntityManager& em, Entity& ent)
+void Game::createShield(EntityManager& em, Entity& ent)
 {
     auto& e{ em.newEntity() };
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .color = DARKBROWN });
@@ -75,13 +62,14 @@ void createShield(EntityManager& em, Entity& ent)
     em.addComponent<ShieldComponent>(e, ShieldComponent{});
 }
 
-void createEnding(EntityManager& em)
+void Game::createEnding(EntityManager& em)
 {
     auto& e{ em.newEntity() };
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = {83.0f, 1.0f, -87.0f}, .scale = {1.0f, 1.0f, 1.0f}, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
 }
+
 
 void createEntities(EntityManager& em,Eventmanager& evm)
 {
@@ -113,8 +101,9 @@ void createEntities(EntityManager& em,Eventmanager& evm)
     li.playerID = e.getID();
 }
 
-void game()
+void Game::run()
 {
+
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};
     Eventmanager evm{};
@@ -135,9 +124,10 @@ void game()
     Map map{};
 
     createEntities(em,evm);
-    map.createMap(em);
 
+    map.createMap(em);
     engine.setTargetFPS(30);
+
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     srand((unsigned int)time(NULL));
 
@@ -154,9 +144,10 @@ void game()
     //
     // - Colocar antes de donde se quiere medir el tiempo
     // auto t1 = high_resolution_clock::now();
+    // 
     // - Colocar despues de donde se quiere medir el tiempo
     // auto t2 = high_resolution_clock::now();
-    // duration<float, std::milli> ms_double = t2 - t1;
+    // duration<float, std::milli> duration = t2 - t1;
     // std::cout << "el _System se ejecutó en " << duration.count() << " ms.\n";
 
     auto& li = em.getSingleton<LevelInfo>();
@@ -173,6 +164,7 @@ void game()
 
             // CODIGO DE LA PANTALLA DE LOGO DE EMPRESA
         case GameScreen::LOGO:
+        {
             // Contador para que pasen X segundos
             currentTime += deltaTime;
             if (currentTime > 4.0f) {
@@ -181,28 +173,32 @@ void game()
             }
             render_system.drawLogoKaiwa(engine);
             break;
+        }
 
-            // CODIGO DE LA PANTALLA DE TITULO
+        // CODIGO DE LA PANTALLA DE TITULO
         case GameScreen::TITLE:
+        {
             // Input del enter para la historia
             if (input_system.pressEnter())
                 li.currentScreen = GameScreen::STORY;
             render_system.drawLogoGame(engine);
             break;
+        }
 
-            // CODIGO DE LA PANTALLA DE HISTORIA
+        // CODIGO DE LA PANTALLA DE HISTORIA
         case GameScreen::STORY:
+        {
             // Input del enter para empezar la partida
             if (input_system.pressEnter())
                 li.currentScreen = GameScreen::GAMEPLAY;
             render_system.drawStory(engine);
             break;
+        }
 
-            // CODIGO DEL GAMEPLAY
+        // CODIGO DEL GAMEPLAY
         case GameScreen::GAMEPLAY:
         {
-
-            if (li.generateKey && !li.alreadyGenerated)
+            if (em.getEntities().empty())
             {
                 createKey(em);
                 li.generateKey = false;
@@ -225,6 +221,10 @@ void game()
             life_system.update(em, deltaTime);
             event_system.update(evm,em);
             render_system.update(em, engine);
+            if (!input_system.debugMode)
+                normalExecution(em, deltaTime);
+            else
+                debugExecution(em);
             break;
         }
 
@@ -234,11 +234,13 @@ void game()
 
         // CODIGO DE LA PANTALLA FINAL
         case GameScreen::ENDING:
+        {
             if (input_system.pressEnter())
                 li.currentScreen = GameScreen::TITLE;
             em.destroyAll();
             render_system.drawEnding(engine);
             break;
+        }
 
         default:
             break;
@@ -246,5 +248,22 @@ void game()
     }
 
     engine.closeWindow();
+}
 
+void Game::normalExecution(EntityManager& em, float deltaTime)
+{
+    ai_system.update(em, deltaTime);
+    physics_system.update(em);
+    collision_system.update(em);
+    zone_system.update(em, engine, iam);
+    shield_system.update(em);
+    object_system.update(em, deltaTime);
+    attack_system.update(em, deltaTime);
+    projectile_system.update(em, deltaTime);
+    life_system.update(em, deltaTime);
+    render_system.update(em, engine, false);
+}
+void Game::debugExecution(EntityManager& em)
+{
+    render_system.update(em, engine, true);
 }

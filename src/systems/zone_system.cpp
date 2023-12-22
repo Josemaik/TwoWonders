@@ -2,6 +2,7 @@
 
 void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam,Eventmanager& evm) {
 
+    updateZoneEnemies(em);
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ZoneComponent& zon)
     {
@@ -16,7 +17,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
                 //lanzar evento
                 evm.scheduleEvent(Event{EVENT_CODE_CHANGE_ZONE});
                 //borro enemigos si cambio de zona
-                deleteEnemiesinZone(em, li.num_zone);
+                deleteZoneEnemies(em);
                 iam.createEnemiesZone(em, zon.zone);
                 // Es una zona
                 li.num_zone = zon.zone;
@@ -92,16 +93,52 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
             zon.changeZone = false;
         }
     });
+
+    if (!dead_entities.empty())
+    {
+        em.destroyEntities(dead_entities);
+        dead_entities.clear();
+    }
 }
 
-void ZoneSystem::deleteEnemiesinZone(EntityManager& em, uint16_t z)
+void ZoneSystem::deleteZoneEnemies(EntityManager& em)
 {
+    auto const& li = em.getSingleton<LevelInfo>();
+
+    for (auto& enemy : li.enemiesID)
+        dead_entities.insert(enemy);
+}
+
+void ZoneSystem::updateZoneEnemies(EntityManager& em)
+{
+    using noCMPs = MP::TypeList<>;
+    using enemyTag = MP::TypeList<EnemyTag>;
+
     auto& li = em.getSingleton<LevelInfo>();
-    if (z == li.num_zone)
+
+    std::unordered_set<std::size_t> enemies;
+    em.forEach<noCMPs, enemyTag>([&](Entity& ent)
     {
-        std::unordered_set<std::size_t> enemies = li.enemiesID;
-        for (auto& enemy : enemies)
-            if (em.getEntityByID(enemy)->hasTag<EnemyTag>())
-                em.getComponent<LifeComponent>(*em.getEntityByID(enemy)).markedForDeletion = true;
-    }
+        enemies.insert(ent.getID());
+    });
+
+    if (enemies != li.enemiesID)
+        li.enemiesID = std::move(enemies);
+
+    if (li.num_zone == 12 && li.enemiesID.empty() && !keyCreated)
+        createKey(em);
+}
+
+void ZoneSystem::createKey(EntityManager& em)
+{
+    auto& e{ em.newEntity() };
+
+    em.addTag<ObjectTag>(e);
+
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 83.f, 0.f, -71.0f }, .scale = { 1.f, 0.3f, 0.3f }, .color = GOLD });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Key, .inmortal = true });
+
+    keyCreated = true;
 }

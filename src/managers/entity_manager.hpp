@@ -14,34 +14,9 @@
 #include "../utils/slotmap.hpp"
 #include "../utils/meta_program.hpp"
 
-template <typename TLIST>
-struct cmp_tag_traits {
-    static_assert(TLIST::size() <= 64, "Component tag list is too large");
-    // Metafunción para saber el mejor tipo de dato para guardar la máscara (su tamaño)
-    using mask_type = MP::smallest_type<TLIST>;
-
-    // Función en tiempo de compilación para saber el tamaño de la lista
-    consteval static uint8_t size() noexcept { return TLIST::size(); }
-
-    // Plantilla que nos dice la posición de un tipo (componente o tag) en la lista
-    template <typename CMPTAG>
-    consteval static uint8_t id() noexcept
-    {
-        static_assert(TLIST::template contains<CMPTAG>(), "Component or Tag not found");
-        return TLIST::template pos<CMPTAG>();
-    }
-
-    // Plantilla que nos dice la máscara de un tipo (componente o tag) de la lista
-    template <typename... Ts>
-    consteval static mask_type mask() noexcept
-    {
-        return (0 | ... | (1 << id<Ts>()));
-    }
-};
-
 // Plantilla para obtener la información de los tags
 template <typename TAGS>
-struct tag_traits : cmp_tag_traits<TAGS> {};
+struct tag_traits : MP::cmp_tag_traits<TAGS> {};
 
 // Plantilla para obtener la información de los componentes
 template <typename CMPS>
@@ -91,32 +66,33 @@ namespace ETMG {
         // Clase Entity
         struct Entity
         {
+            friend struct EntityManager<CMPList, SNGCMPLIST, TAGList, SlotCapacity>;
             // Sacamos TypeList para asociar cada componente con su key
             using keytype_list = MP::forall_insert_template_t<to_keytype, CMPList>;
             // Tupla de los tipos de las keys de los componentes
             using key_storage_type = tuple_replace<keytype_list>;
 
-            Entity() { id = nextID++; }
-
-            // Plantilla para añadir un componente a la entidad
-            template <typename CMP>
-            void addComponent(to_keytype<CMP> key)
-            {
-                // Actualiza la máscara de componentes para indicar que esta entidad ahora tiene un componente del tipo CMP
-                cmp_mask |= cmp_info::template mask<CMP>();
-
-                // Almacena la clave para el componente del tipo CMP
-                std::get< to_keytype<CMP> >(cmp_keys_) = key;
-            }
+            Entity() { id_ = nextID++; }
 
             // Plantilla para saber si la entidad tiene un componente del tipo CMP
             template <typename CMP>
             bool hasComponent() const noexcept
             {
                 // Devuelve true si la máscara de componentes tiene el bit correspondiente al componente CMP
-                return cmp_mask & cmp_info::template mask<CMP>();
+                return cmp_mask_ & cmp_info::template mask<CMP>();
             }
 
+            // Plantilla para saber si la entidad tiene un tag del tipo TAG
+            template <typename TAG>
+            bool hasTag() const noexcept
+            {
+                // Devuelve true si la máscara de tags tiene el bit correspondiente al tag TAG
+                return tag_mask_ & tag_info::template mask<TAG>();
+            }
+
+            std::size_t  getID() const noexcept { return id_; }
+
+        private:
             // Plantilla para obtener la clave de un componente del tipo CMP
             template <typename CMP>
             to_keytype<CMP> getComponentKey() const
@@ -125,47 +101,51 @@ namespace ETMG {
                 return std::get< to_keytype<CMP> >(cmp_keys_);
             }
 
+            // Resetea la entidad
+            void reset() noexcept
+            {
+                cmp_mask_ = 0;
+                tag_mask_ = 0;
+                cmp_keys_ = {};
+            }
+
+            // Asigna un nuevo ID a la entidad
+            void setID(std::size_t const id) noexcept { this->id_ = id; }
+
+            // Plantilla para añadir un componente a la entidad
+            template <typename CMP>
+            void addComponent(to_keytype<CMP> key)
+            {
+                // Actualiza la máscara de componentes para indicar que esta entidad ahora tiene un componente del tipo CMP
+                cmp_mask_ |= cmp_info::template mask<CMP>();
+
+                // Almacena la clave para el componente del tipo CMP
+                std::get< to_keytype<CMP> >(cmp_keys_) = key;
+            }
+
             // Plantilla para añadir un tag a la entidad
             template <typename TAG>
             void addTag()
             {
                 // Se actualiza la máscara de tags para indicar que esta entidad ahora tiene un tag del tipo TAG
-                tag_mask |= tag_info::template mask<TAG>();
+                tag_mask_ |= tag_info::template mask<TAG>();
             }
 
-            // Plantilla para saber si la entidad tiene un tag del tipo TAG
-            template <typename TAG>
-            bool hasTag() const noexcept
-            {
-                // Devuelve true si la máscara de tags tiene el bit correspondiente al tag TAG
-                return tag_mask & tag_info::template mask<TAG>();
-            }
-
-            std::size_t  getID() const noexcept { return id; }
-
-            void setID(std::size_t const id) noexcept { this->id = id; }
-
-            void reset() noexcept
-            {
-                cmp_mask = 0;
-                tag_mask = 0;
-                cmp_keys_ = {};
-            }
-
-        private:
-            std::size_t id{}; // ID de la entidad
-            typename cmp_info::mask_type cmp_mask{}; // Máscara de componentes
-            typename cmp_info::mask_type tag_mask{}; // Máscara de tags
+            std::size_t id_{}; // ID de la entidad
+            typename cmp_info::mask_type cmp_mask_{}; // Máscara de componentes
+            typename cmp_info::mask_type tag_mask_{}; // Máscara de tags
             key_storage_type cmp_keys_{}; // Tupla de las claves de los componentes
         };
 
         // FUNCIONES
         //
-
+        //
         // Plantilla para añadir un tag a una entidad del EntityManager
         template <typename TAG>
         void addTag(Entity& e)
         {
+            if (e.template hasTag<TAG>()) return;
+
             e.template addTag<TAG>();
         }
 
@@ -193,14 +173,6 @@ namespace ETMG {
             return entities_[alive_ - 1];
         }
 
-        // Plantilla para sacar una lista de componentes de la tupla que los guarda
-        template <typename CMP>
-        [[nodiscard]] constexpr auto& getCMPStorage() noexcept
-        {
-            constexpr auto id{ cmp_info::template id < CMP>() };
-            return std::get< id >(CMPTuple_);
-        }
-
         // Plantilla para recibir un componente específico de una entidad
         template <typename CMP, typename EntityT>
         auto& getComponent(EntityT& e)
@@ -210,28 +182,12 @@ namespace ETMG {
             return storage[key];
         }
 
-        // Plantilla para recorrer todas las entidades libres en una función pasada por lambda
-        template <typename T>
-        void forAll(T&& func)
-        {
-            for (Entity& e : getEntities())
-            {
-                func(e);
-            }
-        }
-
         // Plantilla para recorrer todas las entidades que tengan los componentes y tags especificados
         template <typename CMPs, typename TAGs>
-        void forEach(auto&& func)
-        {
-            forEachImpl(func, CMPs{}, TAGs{});
-        }
+        void forEach(auto&& func) { forEachImpl(func, CMPs{}, TAGs{}); }
 
         // Función que nos devuelve el número de entidades libres sin asignar en el EntityManager
-        std::size_t freeEntities() const noexcept
-        {
-            return MAX_ENTITIES - alive_;
-        }
+        std::size_t freeEntities() const noexcept { return MAX_ENTITIES - alive_; }
 
         // Función que nos devuelve las entidades vivas
         template<typename T = Entity>
@@ -239,28 +195,32 @@ namespace ETMG {
         {
             return std::span{ entities_.begin(), entities_.begin() + alive_ };
         }
-        //Función que nos devuelve una tupla de componentes singleton
-        template<typename CMP>
-        [[nodiscard]] constexpr auto& getSingleton() noexcept {
-            return std::get<CMP>(singletonComponentTuple_);
+
+        // Función que nos devuelve una tupla de componentes singleton
+        template<typename SCMP, typename T = SCMP>
+        [[nodiscard]] constexpr auto& getSingleton() noexcept
+        {
+            using ReturnType = std::conditional_t<std::is_const_v<T>, const SCMP, SCMP>;
+            return std::get<ReturnType>(singletonCMPTuple_);
         }
-        template<typename CMP>
-        [[nodiscard]] constexpr auto const& getSingleton() const noexcept {
-            return std::get<CMP>(singletonComponentTuple_);
-        }
-        //Obtener entidad por su ID
-        Entity* getEntityByID(std::size_t const id) noexcept {
+
+
+        // Obtener entidad por su ID
+        Entity* getEntityByID(std::size_t const id) noexcept
+        {
             auto it = std::ranges::find_if(
                 entities_
                 , [=](Entity const& e) { return e.getID() == id; }
             );
             if (it != entities_.end())
-                return &(*it); //devuelvo la direccion de memoria a la que apunta el iterador
+                return &(*it); // Devuelve la direccion de memoria a la que apunta el iterador
             return nullptr;
         }
 
+        // Despeja todas las entidades
         void destroyAll() { while (alive_ > 0) destroyEntity(0); }
 
+        // Despeja un conjunto de entidades
         void destroyEntities(deathSet const& set)
         {
             // Destroy the entities
@@ -270,9 +230,27 @@ namespace ETMG {
             }
         }
 
-        // Función para destruir una entidad
+        // Plantilla para destruir un componente de una entidad
+        template<typename CMP>
+        void destroyComponent(Entity& e)
+        {
+            if (e.template hasComponent<CMP>())
+            {
+                auto key = e.template getComponentKey<CMP>();
+                this->template getCMPStorage<CMP>().erase(key);
+            }
+        }
 
     private:
+        // Plantilla para sacar una lista de componentes de la tupla que los guarda
+        template <typename CMP>
+        [[nodiscard]] constexpr auto& getCMPStorage() noexcept
+        {
+            constexpr auto id{ cmp_info::template id < CMP>() };
+            return std::get< id >(CMPTuple_);
+        }
+
+        // Función para destruir una entidad
         void destroyEntity(size_t index)
         {
             assert(index < alive_);
@@ -280,20 +258,7 @@ namespace ETMG {
             auto& e = entities_[index];
 
             // Eliminamos los componentes de la entidad
-            tuple_replace<CMPList> cmps{};
-            MP::for_each_in_tuple(cmps, [&](auto cmpType)
-            {
-                using CMPType = decltype(cmpType);
-                if (e.template hasComponent<CMPType>())
-                {
-                    // std::cout << "Destroying component " << typeid(CMPType).name() << std::endl;
-                    auto key = e.template getComponentKey<CMPType>();
-                    this->template getCMPStorage<CMPType>().erase(key);
-                }
-            });
-
-            // Actualizamos los ids de los enemigos en el singleton
-            updateLevelEnemies(index, e);
+            destroyCMPs(e);
 
             // Reseteamos la entidad
             e.reset();
@@ -302,11 +267,9 @@ namespace ETMG {
             e = entities_[alive_ - 1];
             entities_[alive_ - 1].reset();
             e.setID(index);
-            nextID--;
 
             alive_ -= 1;
         }
-
 
         // Plantilla para recorrer todas las entidades que tengan los componentes y tags especificados
         template <typename... CMPs, typename... TAGs>
@@ -335,34 +298,23 @@ namespace ETMG {
             return storage[key];
         }
 
-        void updateLevelEnemies(std::size_t& index, Entity& e)
+        // Destruye todos los componentes de una entidad
+        void destroyCMPs(Entity& e)
         {
-            auto& li = getSingleton<LevelInfo>();
-            if (li.enemiesID.empty()) return;
-
-            auto it = li.enemiesID.find(e.getID());
-            if (it != li.enemiesID.end()) {
-                li.enemiesID.erase(it);
-
-                if (li.enemiesID.size() <= 0 && li.num_zone == 12)
-                {
-                    li.generateKey = true;
-                }
-            }
-
-            it = li.enemiesID.find(entities_[alive_ - 1].getID());
-            if (it != li.enemiesID.end()) {
-                li.enemiesID.erase(it);
-                li.enemiesID.insert(index);
-            }
+            tuple_replace<CMPList> cmps{};
+            MP::for_each_in_tuple(cmps, [&](auto cmpType)
+            {
+                using CMPType = decltype(cmpType);
+                destroyComponent<CMPType>(e);
+            });
         }
 
         std::size_t alive_{};
         std::array<Entity, MAX_ENTITIES> entities_{};
 
         storage_type CMPTuple_{};
-        singlestorage_t singletonComponentTuple_{};
+        singlestorage_t singletonCMPTuple_{};
     };
-#endif // !ENTITY_MANAGER
 
+#endif // !ENTITY_MANAGER
 } // namespace ETMG
