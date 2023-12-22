@@ -1,6 +1,6 @@
 APP		   := ZeldaWonders
 CCACHE 	   := ccache
-CC         := g++
+CC         := g++-12
 CCFLAGS    := -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
 LIBS       := -lraylib
 SANITIZE   := -fsanitize=address,undefined
@@ -16,7 +16,7 @@ OBJ  	   := obj
 RELEASE    := release
 ASSETS     := assets
 LIBS_DIR   := libs
-LIBS_COPY  := /usr/lib/libraylib.so.450
+LIBS_COPY  := /usr/lib/libraylib.so.420
 
 ALLCPP     := $(shell find $(SRC) -type f -iname *.cpp)
 ALLCPPOBJ  := $(patsubst %.cpp,%.o,$(ALLCPP))
