@@ -127,4 +127,31 @@ namespace MP
         f(std::get<I>(t));
         for_each_in_tuple<I + 1, Tp...>(t, f);
     }
+
+    template <typename TLIST>
+    struct cmp_tag_traits
+    {
+        static_assert(TLIST::size() <= 64, "Component tag list is too large");
+        // Metafunción para saber el mejor tipo de dato para guardar la máscara (su tamaño)
+        using mask_type = smallest_type<TLIST>;
+
+        // Función en tiempo de compilación para saber el tamaño de la lista
+        consteval static uint8_t size() noexcept { return TLIST::size(); }
+
+        // Plantilla que nos dice la posición de un tipo (componente o tag) en la lista
+        template <typename CMPTAG>
+        consteval static uint8_t id() noexcept
+        {
+            static_assert(TLIST::template contains<CMPTAG>(), "Component or Tag not found");
+            return TLIST::template pos<CMPTAG>();
+        }
+
+        // Plantilla que nos dice la máscara de un tipo (componente o tag) de la lista
+        template <typename... Ts>
+        consteval static mask_type mask() noexcept
+        {
+            return (0 | ... | (1 << id<Ts>()));
+        }
+    };
+
 } // namespace MP
