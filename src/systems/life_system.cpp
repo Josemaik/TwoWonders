@@ -30,8 +30,8 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
 void LifeSystem::createObject(EntityManager& em, vec3f pos) {
     int random_value = std::rand();
     if (random_value % 4 > 0) {
-        Object_type tipo_nuevo_objeto;
-        Color color_nuevo_objeto;
+        Object_type tipo_nuevo_objeto{};
+        Color color_nuevo_objeto{};
         if (random_value % 4 == 1)
         {
             tipo_nuevo_objeto = Object_type::Bomb;
@@ -46,6 +46,10 @@ void LifeSystem::createObject(EntityManager& em, vec3f pos) {
         {
             tipo_nuevo_objeto = Object_type::Life;
             color_nuevo_objeto = RED;
+        }
+        else
+        {
+            tipo_nuevo_objeto = Object_type::None;
         }
 
         // Se crea el nuevo objeto

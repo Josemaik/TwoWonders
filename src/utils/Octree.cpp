@@ -28,7 +28,7 @@ void Octree::subdivide(Entity& entity, ColliderComponent& collider)
     vec3f size = bounds_.size() / 2.0f;
     vec3f center = bounds_.center();
 
-    for (int i = 0; i < 8; ++i)
+    for (std::size_t i = 0; i < 8; ++i)
     {
         vec3f octantCenter = center + offsets[i] * size;
         BBox octantBounds(octantCenter, size);

@@ -113,10 +113,10 @@ void Game::run()
     // Codigo para medir el tiempo de ejecucion
     //
     // - Descomentar estas líneas y dejarlas ahí
-    using std::chrono::high_resolution_clock;
-    using std::chrono::duration_cast;
-    using std::chrono::duration;
-    using std::chrono::milliseconds;
+    // using std::chrono::high_resolution_clock;
+    // using std::chrono::duration_cast;
+    // using std::chrono::duration;
+    // using std::chrono::milliseconds;
     //
     // - Colocar antes de donde se quiere medir el tiempo
     // auto t1 = high_resolution_clock::now();
@@ -184,7 +184,7 @@ void Game::run()
             if (!input_system.debugMode)
                 normalExecution(em, deltaTime);
             else
-                debugExecution(em, deltaTime);
+                debugExecution(em);
             break;
         }
 
@@ -223,7 +223,7 @@ void Game::normalExecution(EntityManager& em, float deltaTime)
     life_system.update(em, deltaTime);
     render_system.update(em, engine, false);
 }
-void Game::debugExecution(EntityManager& em, float deltaTime)
+void Game::debugExecution(EntityManager& em)
 {
     render_system.update(em, engine, true);
 }

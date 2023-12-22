@@ -79,13 +79,13 @@ void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, Atta
 
     for (int i = 1; i <= numShots; ++i) {
         float offset = spread * (static_cast<float>(i) - 0.5f - static_cast<float>(numShots) / 2.f);
-        
+
         // Restaura la velocidad original
         att.vel = vel;
 
         // Aplica el offset en la dirección z
-        att.vel = {att.vel.x(), att.vel.y(), att.vel.z() + offset};
-        
+        att.vel = { att.vel.x(), att.vel.y(), att.vel.z() + offset };
+
         // Crea el disparo
         createAttackRangedOrMelee(em, ent, att, true);
     }
