@@ -104,24 +104,24 @@ void createEntities(EntityManager& em,Eventmanager& evm)
 void Game::run()
 {
 
-    GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
-    EntityManager em{};
-    Eventmanager evm{};
-    Ia_man iam{};
-    PhysicsSystem physics_system{};
-    RenderSystem render_system{};
-    InputSystem input_system{};
-    CollisionSystem collision_system{};
-    LifeSystem life_system{};
-    AISystem   ai_sys{};
-    // GameTimer gtime{};
-    AttackSystem attack_system{};
-    ProjectileSystem projectile_system{};
-    ObjectSystem object_system{};
-    ZoneSystem zone_system{};
-    ShieldSystem shield_system{};
-    EventSystem event_system{};
-    Map map{};
+    // GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
+    // EntityManager em{};
+    // Eventmanager evm{};
+    // Ia_man iam{};
+    // PhysicsSystem physics_system{};
+    // RenderSystem render_system{};
+    // InputSystem input_system{};
+    // CollisionSystem collision_system{};
+    // LifeSystem life_system{};
+    // AISystem   ai_sys{};
+    // // GameTimer gtime{};
+    // AttackSystem attack_system{};
+    // ProjectileSystem projectile_system{};
+    // ObjectSystem object_system{};
+    // ZoneSystem zone_system{};
+    // ShieldSystem shield_system{};
+    // EventSystem event_system{};
+    // Map map{};
 
     createEntities(em,evm);
 

@@ -46,6 +46,7 @@ private:
 void createEntities(EntityManager& em,Eventmanager& evm);
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};
+    Eventmanager evm{};
     Ia_man iam{};
     PhysicsSystem physics_system{};
     RenderSystem render_system{};
@@ -59,6 +60,7 @@ void createEntities(EntityManager& em,Eventmanager& evm);
     ObjectSystem object_system{};
     ZoneSystem zone_system{};
     ShieldSystem shield_system{};
+    EventSystem event_system{};
     Map map{};
 };
 
