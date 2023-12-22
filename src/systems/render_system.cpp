@@ -56,7 +56,9 @@ void RenderSystem::drawEnding(ENGI::GameEngine& engine) {
 void RenderSystem::drawStory(ENGI::GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
-    engine.drawText("Ana quiere historia", 250, 250, 50, BLACK);
+    engine.drawText("Busca la espada en la cueva", 45, 200, 40, BLACK);
+    engine.drawText("Extermina al dragón de la mazmorra", 45, 250, 40, BLACK);
+    engine.drawText("(Ana quería historia)", 45, 300, 40, BLACK);
     engine.drawText("PRESS [ENTER] TO PLAY ",
         engine.getScreenWidth() / 2 - 200,
         engine.getScreenHeight() - 50, 30,
