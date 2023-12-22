@@ -15,20 +15,46 @@
 #include "../systems/object_system.hpp"
 #include "../systems/zone_system.hpp"
 #include "../systems/shield_system.hpp"
-
+#include "game_engine.hpp"
 #include "map.hpp"
 
-constexpr uint16_t SCREEN_WIDTH{ 800 };
-constexpr uint16_t SCREEN_HEIGHT{ 600 };
+struct Game
+{
+    static constexpr uint16_t SCREEN_WIDTH{ 800 };
+    static constexpr uint16_t SCREEN_HEIGHT{ 600 };
 
-void createEntities(EntityManager& em);
-// void createWalls(EntityManager& em);
-// void createEnemies(EntityManager& em);
-// void createGroundWater(EntityManager& em);
-void game();
+    Game() = default;
+    ~Game() = default;
 
-// void createWallsZelda(EntityManager& em);
-// void createGroundWaterZelda(EntityManager& em);
-// void createEnemiesZelda(EntityManager& em);
-// void createEnemiesofType(EntityManager& em,std::vector<EnemyData>vec,uint16_t type);
+    void run();
+
+private:
+    void createEntities(EntityManager& em);
+
+    void createSword(EntityManager& em);
+    void createShield(EntityManager& em, Entity& ent);
+    void createCoin(EntityManager& em);
+    void createShop(EntityManager& em);
+    void createEnding(EntityManager& em);
+    void normalExecution(EntityManager& em, float deltaTime);
+    void debugExecution(EntityManager& em);
+
+    GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
+    EntityManager em{};
+    Ia_man iam{};
+    PhysicsSystem physics_system{};
+    RenderSystem render_system{};
+    InputSystem input_system{};
+    CollisionSystem collision_system{};
+    LifeSystem life_system{};
+    AISystem   ai_system{};
+    // GameTimer gtime{};
+    AttackSystem attack_system{};
+    ProjectileSystem projectile_system{};
+    ObjectSystem object_system{};
+    ZoneSystem zone_system{};
+    ShieldSystem shield_system{};
+    Map map{};
+};
+
 #endif // !GAME

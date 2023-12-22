@@ -5,6 +5,13 @@ void InputSystem::update(EntityManager& em)
     auto& li = em.getSingleton<LevelInfo>();
     auto* playerEn = em.getEntityByID(li.playerID);
 
+    // DEBUG
+    if (IsKeyReleased(KEY_F1))
+        debugMode = !debugMode;
+
+    if (debugMode)
+        return;
+
     if (!playerEn->hasTag<PlayerTag>() && IsKeyReleased(KEY_ENTER))
         em.destroyAll();
 
@@ -62,6 +69,6 @@ void InputSystem::update(EntityManager& em)
     });
 }
 
-bool InputSystem::pressEnter(){
+bool InputSystem::pressEnter() {
     return IsKeyReleased(KEY_ENTER);
 }

@@ -20,10 +20,10 @@ namespace ENGI {
 
         // Timing Related Functions
         void setTargetFPS(int fps);
-        float getFrameTime();  
+        float getFrameTime();
 
         // Image and Texture
-        Image loadImage(const char *filename );
+        Image loadImage(const char* filename);
         void imageResize(Image* image, int newWidth, int newHeight);
         void unloadImage(Image image);
         Texture2D loadTextureFromImage(Image image);
@@ -60,6 +60,7 @@ namespace ENGI {
         // Aux 
         float getWorldToScreenX(vec3f pos);
         float getWorldToScreenY(vec3f pos);
+        RayCast getMouseRay();
 
     private:
         u16 const width_{}, height_{};
