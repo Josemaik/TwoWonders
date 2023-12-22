@@ -1,6 +1,6 @@
 #include "zone_system.hpp"
 
-void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam) {
+void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam,Eventmanager& evm) {
 
     updateZoneEnemies(em);
 
@@ -10,9 +10,12 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
             // Comprobar en que zona estamos
             auto& li = em.getSingleton<LevelInfo>();
             if (li.num_zone != zon.zone) {
+                // crear una funcion que devuelva un Evento
                 //Crear enemigos de la zona nueva
                 // if(!iam.checkEnemiesCreaeted(zon.zone)){
                 // }
+                //lanzar evento
+                evm.scheduleEvent(Event{EVENT_CODE_CHANGE_ZONE});
                 //borro enemigos si cambio de zona
                 deleteZoneEnemies(em);
                 iam.createEnemiesZone(em, zon.zone);

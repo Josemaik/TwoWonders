@@ -15,7 +15,10 @@
 #include "../systems/object_system.hpp"
 #include "../systems/zone_system.hpp"
 #include "../systems/shield_system.hpp"
+
+#include "../systems/event_system.hpp"
 #include "game_engine.hpp"
+
 #include "map.hpp"
 
 struct Game
@@ -39,6 +42,8 @@ private:
     void normalExecution(EntityManager& em, float deltaTime);
     void debugExecution(EntityManager& em);
 
+
+void createEntities(EntityManager& em,Eventmanager& evm);
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};
     Ia_man iam{};
@@ -56,5 +61,6 @@ private:
     ShieldSystem shield_system{};
     Map map{};
 };
+
 
 #endif // !GAME

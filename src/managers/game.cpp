@@ -70,7 +70,8 @@ void Game::createEnding(EntityManager& em)
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
 }
 
-void Game::createEntities(EntityManager& em)
+
+void createEntities(EntityManager& em,Eventmanager& evm)
 {
     // Player
     auto& e{ em.newEntity() };
@@ -81,6 +82,8 @@ void Game::createEntities(EntityManager& em)
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<InformationComponent>(e, InformationComponent{});
+    em.addComponent<EventComponent>(e);
+    evm.registerListener(e,EVENT_CODE_CHANGE_ZONE);
 
     // Sword
     createSword(em);
@@ -100,7 +103,28 @@ void Game::createEntities(EntityManager& em)
 
 void Game::run()
 {
-    createEntities(em);
+
+    GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
+    EntityManager em{};
+    Eventmanager evm{};
+    Ia_man iam{};
+    PhysicsSystem physics_system{};
+    RenderSystem render_system{};
+    InputSystem input_system{};
+    CollisionSystem collision_system{};
+    LifeSystem life_system{};
+    AISystem   ai_sys{};
+    // GameTimer gtime{};
+    AttackSystem attack_system{};
+    ProjectileSystem projectile_system{};
+    ObjectSystem object_system{};
+    ZoneSystem zone_system{};
+    ShieldSystem shield_system{};
+    EventSystem event_system{};
+    Map map{};
+
+    createEntities(em,evm);
+
     map.createMap(em);
     engine.setTargetFPS(30);
 
@@ -176,11 +200,27 @@ void Game::run()
         {
             if (em.getEntities().empty())
             {
-                createEntities(em);
+                createKey(em);
+                li.generateKey = false;
+                li.alreadyGenerated = true;
+            }
+            if (em.getEntities().empty()) {
+                createEntities(em,evm);
                 map.createMap(em);
             }
 
             input_system.update(em);
+            ai_sys.update(em, deltaTime);
+            physics_system.update(em);
+            collision_system.update(em);
+            zone_system.update(em, engine, iam,evm);
+            shield_system.update(em);
+            object_system.update(em, deltaTime);
+            attack_system.update(em, deltaTime);
+            projectile_system.update(em, deltaTime);
+            life_system.update(em, deltaTime);
+            event_system.update(evm,em);
+            render_system.update(em, engine);
             if (!input_system.debugMode)
                 normalExecution(em, deltaTime);
             else
