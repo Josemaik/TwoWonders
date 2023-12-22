@@ -27,7 +27,13 @@ struct Eventmanager
 public:
     // Verifica nuevos eventos y los agrega a la cola
     void checkForEvents() {
-        
+         // Detectar eventos de entrada del usuario
+        //Event userInputEvent = detectUserInput();
+
+        // Programar el evento detectado en la cola de eventos
+        // if (userInputEvent.code != 0) {
+        //     scheduleEvent(userInputEvent);
+        // }
     }
 
     // Programa un evento para ser despachado tan pronto como sea posible

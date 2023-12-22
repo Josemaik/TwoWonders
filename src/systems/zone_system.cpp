@@ -9,6 +9,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
             // Comprobar en que zona estamos
             auto& li = em.getSingleton<LevelInfo>();
             if (li.num_zone != zon.zone) {
+                // crear una funcion que devuelva un Evento
                 //Crear enemigos de la zona nueva
                 // if(!iam.checkEnemiesCreaeted(zon.zone)){
                 // }
