@@ -1,16 +1,54 @@
 #include "game_engine.hpp"
-#include "utils/gametimer.hpp"
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
 {
-    GameEngine::initWindow(width_, height_, "ZeldaWonders");
-    GameEngine::setTargetFPS(30);
+    ENGI::GameEngine::initWindow(width_, height_, "ZeldaWonders");
 
-    GameEngine::setPositionCamera({ 0.0f, 25.0f, 25.0f });
-    GameEngine::setTargetCamera({ 0.0f, 03.0f, .0f });
-    GameEngine::setUpCamera({ 0.0f, 01.0f, 0.0f });
-    GameEngine::setFovyCamera(30.0f);
-    GameEngine::setProjectionCamera(CAMERA_PERSPECTIVE);
+    ENGI::GameEngine::setPositionCamera({ 0.0f, 30.0f, 12.0f });
+    ENGI::GameEngine::setTargetCamera({ 0.0f, 03.0f, .0f });
+    ENGI::GameEngine::setUpCamera({ 0.0f, 01.0f, 0.0f });
+    ENGI::GameEngine::setFovyCamera(30.0f);
+    ENGI::GameEngine::setProjectionCamera(CAMERA_PERSPECTIVE);
+
+    // Logo Two Wonders
+    Image logo_two_wonders = ENGI::GameEngine::loadImage("assets/logo_two_wonders.png");
+    ENGI::GameEngine::imageResize(&logo_two_wonders, width_ - 20, static_cast<int>(height_ / 1.76));
+    texture_logo_two_wonders = ENGI::GameEngine::loadTextureFromImage(logo_two_wonders);
+    ENGI::GameEngine::unloadImage(logo_two_wonders);
+
+    // Logo Kaiwa Games
+    Image logo_kaiwa_games = ENGI::GameEngine::loadImage("assets/logo_kaiwa_games.png");
+    ENGI::GameEngine::imageResize(&logo_kaiwa_games, width_, static_cast<int>(height_ / 2)); // 2.49
+    texture_logo_kaiwa_games = ENGI::GameEngine::loadTextureFromImage(logo_kaiwa_games);
+    ENGI::GameEngine::unloadImage(logo_kaiwa_games);
+}
+
+////// IMAGE AND TEXTURE //////
+
+Image ENGI::GameEngine::loadImage(const char* filename) {
+    return LoadImage(filename);
+}
+
+void ENGI::GameEngine::imageResize(Image* image, int newWidth, int newHeight) {
+    ImageResize(image, newWidth, newHeight);
+}
+
+void ENGI::GameEngine::unloadImage(Image image) {
+    UnloadImage(image);
+}
+
+Texture2D ENGI::GameEngine::loadTextureFromImage(Image image) {
+    return LoadTextureFromImage(image);
+}
+
+////// TIMIING RELATED FUNCTIONS //////
+
+void ENGI::GameEngine::setTargetFPS(int fps) {
+    SetTargetFPS(fps);
+}
+
+float ENGI::GameEngine::getFrameTime() {
+    return GetFrameTime();
 }
 
 ////// DRAWING //////
@@ -55,13 +93,17 @@ void ENGI::GameEngine::drawCubeWires(vec3f pos, float width, float height, float
     DrawCubeWires(pos.toRaylib(), width, height, lenght, color);
 }
 
-void ENGI::GameEngine::drawRectangle(int posX, int posY, int width, int height, Color color){
+void ENGI::GameEngine::drawRectangle(int posX, int posY, int width, int height, Color color) {
     DrawRectangle(posX, posY, width, height, color);
+}
+
+void ENGI::GameEngine::drawTexture(Texture2D texture, int posX, int posY, Color tint) {
+    DrawTexture(texture, posX, posY, tint);
 }
 
 ////// TEXT //////
 
-void ENGI::GameEngine::drawText(const char *text, int posX, int posY, int fontSize, Color color){
+void ENGI::GameEngine::drawText(const char* text, int posX, int posY, int fontSize, Color color) {
     DrawText(text, posX, posY, fontSize, color);
 }
 
@@ -75,11 +117,6 @@ void ENGI::GameEngine::initWindow(int width, int height, const char* title)
 void ENGI::GameEngine::closeWindow()
 {
     CloseWindow();
-}
-
-void ENGI::GameEngine::setTargetFPS(int fps)
-{
-    SetTargetFPS(fps);
 }
 
 bool ENGI::GameEngine::windowShouldClose()
@@ -134,4 +171,10 @@ float ENGI::GameEngine::getWorldToScreenX(vec3f pos)
 float ENGI::GameEngine::getWorldToScreenY(vec3f pos)
 {
     return GetWorldToScreen(pos.toRaylib(), camera).y;
+}
+
+RayCast ENGI::GameEngine::getMouseRay()
+{
+    Ray r = GetMouseRay(GetMousePosition(), camera);
+    return RayCast{ .origin = vec3f(r.position.x, r.position.y, r.position.z), .direction = vec3f(r.direction.x, r.direction.y, r.direction.z) };
 }

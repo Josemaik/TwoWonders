@@ -9,7 +9,10 @@ struct ProjectileSystem
     using SYSCMPs = MP::TypeList<ProjectileComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em);
+    void update(EntityManager& em, float deltaTime);
+
+private:
+    deathSet dead_entities{};
 };
 
 #endif // !PROJECTILE_SYSTEM

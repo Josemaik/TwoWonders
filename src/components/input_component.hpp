@@ -9,6 +9,7 @@ struct InputComponent
     int left{ KEY_A };
     int right{ KEY_D };
     int space{ KEY_SPACE };
+    int enter{ KEY_ENTER };
 
     int last_key{};
 };

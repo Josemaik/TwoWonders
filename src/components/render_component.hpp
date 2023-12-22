@@ -11,4 +11,5 @@ struct RenderComponent
     vec3f position{};
     vec3f scale{};
     Color color{};
+    bool visible{true};
 };

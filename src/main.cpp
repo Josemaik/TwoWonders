@@ -4,7 +4,8 @@ int main()
 {
     try
     {
-        game();
+        Game game{};
+        game.run();
     }
     catch (const std::exception& e)
     {

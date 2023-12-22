@@ -30,6 +30,11 @@ struct vec3D
         return { x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_ };
     }
 
+    constexpr vec3D crossProduct(vec3D const& rhs) const
+    {
+        return { y_ * rhs.z_ - z_ * rhs.y_, z_ * rhs.x_ - x_ * rhs.z_, x_ * rhs.y_ - y_ * rhs.x_ };
+    }
+
     constexpr vec3D operator*(DataT const s) const
     {
         return { x_ * s, y_ * s, z_ * s };
@@ -48,6 +53,11 @@ struct vec3D
     constexpr vec3D operator/(DataT const s) const
     {
         return *this * (1 / s);
+    }
+
+    constexpr vec3D operator/(vec3D const& rhs) const
+    {
+        return { x_ / rhs.x_, y_ / rhs.y_, z_ / rhs.z_ };
     }
 
     constexpr vec3D& operator+=(vec3D const& nhs) {
@@ -121,6 +131,14 @@ struct vec3D
         return { std::max(a.x_, b.x_), std::max(a.y_, b.y_), std::max(a.z_, b.z_) };
     }
 
+    float max() const {
+        return std::max({ x_, y_, z_ });
+    }
+
+    float min() const {
+        return std::min({ x_, y_, z_ });
+    }
+
     static constexpr vec3D abs(const vec3D& a)
     {
         return { std::abs(a.x_), std::abs(a.y_), std::abs(a.z_) };
@@ -161,6 +179,25 @@ struct vec3D
         return Vector3{ x_, y_, z_ };
     }
 
+    friend std::ostream& operator<<(std::ostream& os, vec3D const& v)
+    {
+        os << '(' << v.x_ << ", " << v.y_ << ", " << v.z_ << ')';
+        return os;
+    }
+
+    void updateLowest(vec3D const& v) noexcept
+    {
+        if (x_ <= y_ && x_ <= z_) {
+            x_ += v.x_ < 0 ? -v.x_ : v.x_;
+        }
+        else if (y_ <= x_ && y_ <= z_) {
+            y_ += v.y_ < 0 ? -v.y_ : v.y_;
+        }
+        else {
+            z_ += v.z_ < 0 ? -v.z_ : v.z_;
+        }
+    }
+
 private:
     DataT x_{}, y_{}, z_{};
     mutable std::optional<DataT> length_{};
@@ -168,3 +205,9 @@ private:
 
 using vec3f = vec3D<float>;
 using vec3d = vec3D<double>;
+
+struct RayCast
+{
+    vec3f origin;
+    vec3f direction;
+};

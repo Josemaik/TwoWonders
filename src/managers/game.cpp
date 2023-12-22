@@ -1,248 +1,232 @@
 #include "game.hpp"
-#include "game_engine.hpp"
 //#include "../utils/memory_viewer.hpp"
 
-void createWalls(EntityManager& em)
+void Game::createSword(EntityManager& em)
 {
-    std::vector<std::pair<vec3f, vec3f>> wallData = {
-        { { 38.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 7.0f } },  // |
-        { { 21.5f, 0.0f, 6.0f }, { 1.0f, 1.0f, 7.0f } },  // |
-        { { 38.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 7.0f } }, // |
-        { { 21.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 7.0f } }, // | - Paredes
-        { { 24.5f, 0.0f, -9.5f }, { 7.0f, 1.0f, 1.0f } }, // | - Exteriores
-        { { 24.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },  // |
-        { { 35.5f, 0.0f, -9.5f }, { 7.0f, 1.0, 1.0f } },  // |
-        { { 35.5f, 0.0f, 9.5f }, { 7.0f, 1.0f, 1.0f } },  // |
+    auto& e{ em.newEntity() };
 
-        { { 5.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },     // |
-        { { 5.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },    // |
-        { { -5.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },    // |
-        { { -5.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },   // | - Cuadrados
-        { { 5.f, 0.0f, 0.f }, { 3.0f, 1.0f, 3.0f } },     // | - Interiores
-        { { -5.f, 0.0f, 0.f }, { 3.0f, 1.0f, 3.0f } },    // |
-        { { 0.f, 0.0f, -5.f }, { 3.0f, 1.0f, 3.0f } },    // |
-        { { 0.f, 0.0f, 5.f }, { 3.0f, 1.0f, 3.0f } },     // |
-    };
+    em.addTag<ObjectTag>(e);
 
-    for (const auto& [pos, scl] : wallData)
-    {
-        auto& wall{ em.newEntity() };
-        auto& wr = em.addComponent<RenderComponent>(wall, RenderComponent{ .position = pos, .scale = scl, .color = GRAY });
-        auto& wp = em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = { wr.position }, .velocity = { .0f, .0f, .0f } });
-        em.addComponent<ColliderComponent>(wall, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
-    }
-}
-struct EnemyData {
-    AIComponent::AI_type aiType;
-    vec3f position;
-    std::array<vec3f, 10> route;
-    float detect_radius;
-    int num_lifes;
-};
-void createEnemies(EntityManager& em)
-{
-    std::vector<EnemyData> enemyData = {
-       {  AIComponent::AI_type::PatrolEnemy,
-         {0.0f, 0.0f, -8.0f},
-         {
-             vec3f{0.f, 0.f, -8.0f},
-             { -8.5f, 0.f, -8.0f },
-             { -8.5f, 0.f, 8.0f },
-             { 0.f, 0.f, 8.0f },
-             { -8.5f, 0.f, 8.0f },
-             { -8.5f, 0.f, -8.0f },
-             AIComponent::invalid
-         },5.0f,1},
-       {  AIComponent::AI_type::PatrolEnemy,
-         {0.0f, 0.0f, 8.0f},
-         {
-             vec3f{0.f, 0.f, 8.0f},
-             { 8.5f, 0.f, 8.0f },
-             { 8.5f, 0.f, -8.0f },
-             { 0.f, 0.f, -8.0f },
-             { 8.5f, 0.f, -8.0f },
-             { 8.5f, 0.f, 8.0f },
-             AIComponent::invalid
-         },5.0f,1},
-         {  AIComponent::AI_type::PatrolFollowEnemy,
-         {-2.0f, 0.0f, 10.0f},
-         {
-             vec3f{0.0f, 0.f, 13.0f},
-             { 2.0f, 0.f, 10.0f },
-             { -2.0f, 0.0f, 10.0f },
-             AIComponent::invalid
-         },5.0f,1},
-         {  AIComponent::AI_type::PatrolFollowEnemy,
-         {-2.0f, 0.f, -13.0f},
-         {
-             vec3f{-1.0f, 0.f, -9.0f},
-             { 2.0f, 0.f, -12.0f },
-             {-2.0f, 0.f, -13.0f },
-             AIComponent::invalid
-         },5.0f,1},
-         { AIComponent::AI_type::ShoterEnemy,
-         {25.0f, 0.0f, -7.0f},
-         {
-             vec3f{25.0f, 0.0f, -2.0f},
-             {37.0f, 0.0f, -2.0f},
-              {37.0f, 0.0f, -7.0f},
-              {25.0f, 0.0f, -7.0f},
-             AIComponent::invalid
-         },5.0f,1},
-         { AIComponent::AI_type::ShoterEnemy,
-         {31.0f, 0.0f, 1.0f},
-         {
-             vec3f{31.0f, 0.0f, 6.0f},
-             {24.0f, 0.0f, 6.0f},
-              {24.0f, 0.0f, 1.0f},
-              {31.0f, 0.0f, 1.0f},
-             AIComponent::invalid
-         },5.0f,1},
-         { AIComponent::AI_type::ShoterEnemy,
-         {35.0f, 0.0f, 0.0f},
-         {
-             vec3f{33.0f, 0.0f, 3.0f},
-             {35.0f, 0.0f, 7.0f},
-              {37.0f, 0.0f, 4.0f},
-              {35.0f, 0.0f, 0.0f},
-             AIComponent::invalid
-         },5.0f,1},
-         { AIComponent::AI_type::ShoterEnemy2,
-         {15.0f, 0.0f, -4.0f},
-         {
-             vec3f{13.0f, 0.0f, -8.0f},
-             {15.0f, 0.0f, -4.0f},
-             AIComponent::invalid
-         },10.0f,2},
-          { AIComponent::AI_type::ShoterEnemy2,
-         {16.0f, 0.0f, 4.0f},
-         {
-             vec3f{13.0f, 0.0f, 10.0f},
-             {16.0f, 0.0f, 4.0f},
-             AIComponent::invalid
-         },10.0f,2}
-    };
-
-    for (const auto& enemyDataItem : enemyData)
-    {
-        auto& enemy{ em.newEntity() };
-        em.addTag<EnemyTag>(enemy);
-        auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = enemyDataItem.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = ORANGE });
-        auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = {} });
-        em.addComponent<AIComponent>(enemy, AIComponent{ .current_type = enemyDataItem.aiType,
-        .patrol = enemyDataItem.route,
-        .detect_radius = enemyDataItem.detect_radius
-            });
-        em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = enemyDataItem.num_lifes });
-        em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
-        if (enemyDataItem.aiType == AIComponent::AI_type::ShoterEnemy2) {
-            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 3.5f });
-        }
-    }
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 49.0f, 0.f, 78.0f }, .scale = { 1.f, 0.3f, 0.3f }, .color = LIGHTGRAY });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword, .inmortal = true });
 }
 
-void createGroundWater(EntityManager& em)
+void Game::createCoin(EntityManager& em)
 {
-    struct EntityData
-    {
-        vec3f position;
-        vec3f scale;
-        Color color;
-    };
+    auto& e{ em.newEntity() };
 
-    EntityData entitiesG[] = {
-        { { 0.0f, -1.5f, 0.0f }, { 25.0f, 2.f, 30.0f }, GREEN },
-        { { 15.f, -1.5f, 0.f }, { 5.0f, 2.f, 5.f }, GREEN },
-        { { 30.0f, -1.5f, 0.0f }, { 25.0f, 2.f, 30.0f }, GREEN },
-    };
+    em.addTag<ObjectTag>(e);
 
-    for (const auto& data : entitiesG)
-    {
-        auto& entity = em.newEntity();
-        em.addTag<GroundTag>(entity);
-        auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
-        auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
-    }
-
-    EntityData entitiesW[] = {
-    { { 15.f, -1.5f, -8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
-    { { 15.f, -1.5f, 8.75f }, { 5.0f, 2.f, 12.5f }, SKYBLUE },
-    { { 15.f, -1.5f, 17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
-    { { 15.f, -1.5f, -17.5f }, { 55.0f, 2.f, 5.f }, SKYBLUE },
-    { { -15.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE },
-    { { 45.f, -1.5f, 0.f }, { 5.0f, 2.f, 40.f }, SKYBLUE }
-    };
-
-    for (const auto& data : entitiesW)
-    {
-        auto& entity = em.newEntity();
-        em.addTag<WaterTag>(entity);
-        auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
-        auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
-    }
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 71.0f, 0.f, 78.0f }, .scale = { 0.5f, 0.5f, 0.5f }, .color = YELLOW });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Coin30, .inmortal = true });
 }
 
-void createEntities(EntityManager& em)
+void Game::createShop(EntityManager& em)
+{
+
+    // Bomba
+    auto& e{ em.newEntity() };
+    em.addTag<ObjectTag>(e);
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 93.0f, 0.f, 78.0f }, .scale = { 0.5f, 0.5f, 0.5f }, .color = GRAY });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::ShopItem_Bomb, .inmortal = true });
+
+    // Vida
+    auto& e2{ em.newEntity() };
+    em.addTag<ObjectTag>(e2);
+    auto& r2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = { 88.0f, 0.f, 78.0f }, .scale = { 0.5f, 0.5f, 0.5f }, .color = RED });
+    auto& p2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = { r2.position }, .velocity = { .0f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(e2, ColliderComponent{ p2.position, r2.scale, BehaviorType::STATIC });
+    em.addComponent<ObjectComponent>(e2, ObjectComponent{ .type = Object_type::ShopItem_Life, .inmortal = true });
+
+    // Vida extra
+    auto& e3{ em.newEntity() };
+    em.addTag<ObjectTag>(e3);
+    auto& r3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = { 98.0f, 0.f, 78.0f }, .scale = { 0.5f, 0.5f, 0.5f }, .color = MAROON });
+    auto& p3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = { r3.position }, .velocity = { .0f, .0f, .0f } });
+    em.addComponent<ColliderComponent>(e3, ColliderComponent{ p3.position, r3.scale, BehaviorType::STATIC });
+    em.addComponent<ObjectComponent>(e3, ObjectComponent{ .type = Object_type::ShopItem_ExtraLife, .inmortal = true });
+}
+
+void Game::createShield(EntityManager& em, Entity& ent)
+{
+    auto& e{ em.newEntity() };
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .color = DARKBROWN });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
+    em.addComponent<ShieldComponent>(e, ShieldComponent{});
+}
+
+void Game::createEnding(EntityManager& em)
+{
+    auto& e{ em.newEntity() };
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = {83.0f, 1.0f, -87.0f}, .scale = {1.0f, 1.0f, 1.0f}, .color = WHITE });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
+}
+
+
+void Game::createEntities(EntityManager& em, Eventmanager& evm)
 {
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 28.0f, 0.f, 10.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 3 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e, AttackComponent{});
+    em.addComponent<InformationComponent>(e, InformationComponent{});
+    em.addComponent<EventComponent>(e);
+    evm.registerListener(e, EVENT_CODE_CHANGE_ZONE);
 
-    // Ground and water
-    createGroundWater(em);
+    // Sword
+    createSword(em);
+    // Shield
+    createShield(em, e);
+    // Coin
+    createCoin(em);
+    // Shop
+    createShop(em);
 
-    // Walls
-    createWalls(em);
-
-    // Enemy
-    createEnemies(em);
+    // Ending
+    createEnding(em);
 
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
 }
 
-void game()
+void Game::run()
 {
-    GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
-    EntityManager em{};
-    PhysicsSystem physics_system{};
-    RenderSystem render_system{};
-    InputSystem input_system{};
-    CollisionSystem collision_system{};
-    LifeSystem life_system{};
-    AISystem   ai_sys{};
-    GameTimer gtime{};
-    AttackSystem attack_system{};
-    ProjectileSystem projectile_system{};
+    createEntities(em, evm);
 
-    createEntities(em);
+    map.createMap(em);
+    engine.setTargetFPS(30);
+
+    // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
+    srand((unsigned int)time(NULL));
 
     // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
-    // MemoryViewer mv2{ em.getCMPStorage<RenderComponent>() };
-    // mv2.printMemory();
     // mv.printMemory();
-      // Inicializa el reloj para medir el tiempo entre frames
+
+    // Codigo para medir el tiempo de ejecucion
+    //
+    // - Descomentar estas líneas y dejarlas ahí
+    // using std::chrono::high_resolution_clock;
+    // using std::chrono::duration_cast;
+    // using std::chrono::duration;
+    // using std::chrono::milliseconds;
+    //
+    // - Colocar antes de donde se quiere medir el tiempo
+    // auto t1 = high_resolution_clock::now();
+    // 
+    // - Colocar despues de donde se quiere medir el tiempo
+    // auto t2 = high_resolution_clock::now();
+    // duration<float, std::milli> duration = t2 - t1;
+    // std::cout << "el _System se ejecutó en " << duration.count() << " ms.\n";
+
+    auto& li = em.getSingleton<LevelInfo>();
+
+    // Inicializa una variable donde tener el tiempo entre frames
+    float deltaTime{}, currentTime{};
+
     while (!engine.windowShouldClose())
     {
-        input_system.update(em);
-        ai_sys.update(em);
-        physics_system.update(em);
-        collision_system.update(em);
-        attack_system.update(em);
-        projectile_system.update(em);
-        life_system.update(em);
+        deltaTime = engine.getFrameTime();
 
-        render_system.update(em, engine);
+        switch (li.currentScreen)
+        {
+
+            // CODIGO DE LA PANTALLA DE LOGO DE EMPRESA
+        case GameScreen::LOGO:
+        {
+            // Contador para que pasen X segundos
+            currentTime += deltaTime;
+            if (currentTime > 4.0f) {
+                li.currentScreen = GameScreen::TITLE;
+                currentTime = 0;
+            }
+            render_system.drawLogoKaiwa(engine);
+            break;
+        }
+
+        // CODIGO DE LA PANTALLA DE TITULO
+        case GameScreen::TITLE:
+        {
+            // Input del enter para la historia
+            if (input_system.pressEnter())
+                li.currentScreen = GameScreen::STORY;
+            render_system.drawLogoGame(engine);
+            break;
+        }
+
+        // CODIGO DE LA PANTALLA DE HISTORIA
+        case GameScreen::STORY:
+        {
+            // Input del enter para empezar la partida
+            if (input_system.pressEnter())
+                li.currentScreen = GameScreen::GAMEPLAY;
+            render_system.drawStory(engine);
+            break;
+        }
+
+        // CODIGO DEL GAMEPLAY
+        case GameScreen::GAMEPLAY:
+        {
+            if (em.getEntities().empty()) {
+                createEntities(em, evm);
+                map.createMap(em);
+            }
+
+            input_system.update(em);
+            if (!input_system.debugMode)
+                normalExecution(em, deltaTime);
+            else
+                debugExecution(em);
+            break;
+        }
+
+        // case GameScreen::DEAD:
+        //     /* code */
+        //     break;
+
+        // CODIGO DE LA PANTALLA FINAL
+        case GameScreen::ENDING:
+        {
+            if (input_system.pressEnter())
+                li.currentScreen = GameScreen::TITLE;
+            em.destroyAll();
+            render_system.drawEnding(engine);
+            break;
+        }
+
+        default:
+            break;
+        }
     }
 
     engine.closeWindow();
+}
 
+void Game::normalExecution(EntityManager& em, float deltaTime)
+{
+    ai_system.update(em, deltaTime);
+    physics_system.update(em);
+    collision_system.update(em);
+    zone_system.update(em, engine, iam, evm);
+    shield_system.update(em);
+    object_system.update(em, deltaTime);
+    attack_system.update(em, deltaTime);
+    projectile_system.update(em, deltaTime);
+    life_system.update(em, deltaTime);
+    render_system.update(em, engine, false);
+}
+void Game::debugExecution(EntityManager& em)
+{
+    render_system.update(em, engine, true);
 }

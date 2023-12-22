@@ -132,14 +132,7 @@ private:
     index_type size_{};
     index_type freelist_{};
     gen_type generation_{};
-    const char c[8] = "#BEEF#";
     content_type<key_type> indexes_{};
-    const char d[8] = "#FININD";
-
     content_type<data_type> data_{};
-    const char e[8] = "#FINATA";
-
     content_type<index_type> erase_{};
-    const char f[8] = "#FINERA";
-
 };
