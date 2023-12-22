@@ -4,12 +4,6 @@
 
 void CollisionSystem::update(EntityManager& em)
 {
-    // using std::chrono::high_resolution_clock;
-    // using std::chrono::duration_cast;
-    // using std::chrono::duration;
-    // using std::chrono::milliseconds;
-    // auto t1 = high_resolution_clock::now();
-
     // Liberar el octree
     octree.clear();
 
@@ -44,10 +38,6 @@ void CollisionSystem::update(EntityManager& em)
         em.destroyEntities(dead_entities);
         dead_entities.clear();
     }
-
-    // auto t2 = high_resolution_clock::now();
-    // auto duration = duration_cast<milliseconds>(t2 - t1);
-    // std::cout << "el _System se ejecutó en " << duration.count() << " ms.\n";
 }
 
 // Función recursiva qué revisa las colisiones de las entidades del octree actual con otras entidades

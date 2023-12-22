@@ -93,7 +93,7 @@ void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, Atta
 
 void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged) {
     auto& e{ em.newEntity() };
-    em.addTag<HitPlayer>(e);
+    em.addTag<HitPlayerTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3f{0, 0, 0} : att.vel * 2), .scale = { isRanged ? 0.5f : 1.0f, isRanged ? 0.5f : 1.0f, isRanged ? 0.5f : 1.0f }, .color = BLACK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = isRanged ? att.vel : vec3f{0, 0, 0}, .gravity = 0 });
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });

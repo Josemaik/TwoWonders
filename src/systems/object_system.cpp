@@ -126,7 +126,7 @@ void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorTyp
         auto& ren = em.getComponent<RenderComponent>(ent);
         // Crear una entidad que quite vida
         auto& e{ em.newEntity() };
-        em.addTag<HitPlayer>(e);
+        em.addTag<HitPlayerTag>(e);
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = ren.position, .scale = { 3.0f, 1.0f, 3.0f }, .color = BLACK });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
         em.addComponent<LifeComponent>(e, LifeComponent{ .life = 5, .countdown = 0.0f });

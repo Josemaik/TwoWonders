@@ -15,7 +15,6 @@
 #include "../systems/object_system.hpp"
 #include "../systems/zone_system.hpp"
 #include "../systems/shield_system.hpp"
-
 #include "../systems/event_system.hpp"
 #include "game_engine.hpp"
 
@@ -32,8 +31,8 @@ struct Game
     void run();
 
 private:
-    void createEntities(EntityManager& em);
 
+    void createEntities(EntityManager& em, Eventmanager& evm);
     void createSword(EntityManager& em);
     void createShield(EntityManager& em, Entity& ent);
     void createCoin(EntityManager& em);
@@ -42,8 +41,6 @@ private:
     void normalExecution(EntityManager& em, float deltaTime);
     void debugExecution(EntityManager& em);
 
-
-void createEntities(EntityManager& em,Eventmanager& evm);
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};
     Eventmanager evm{};
