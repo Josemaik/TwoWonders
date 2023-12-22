@@ -95,7 +95,7 @@ void createEntities(EntityManager& em,Eventmanager& evm)
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<InformationComponent>(e, InformationComponent{});
     em.addComponent<EventComponent>(e);
-    evm.registerListener(e,EVENT_CODE_PLAYER_HIT);
+    evm.registerListener(e,EVENT_CODE_CHANGE_ZONE);
 
     // Sword
     createSword(em);
@@ -209,7 +209,7 @@ void game()
                 li.alreadyGenerated = true;
             }
             if (em.getEntities().empty()) {
-                createEntities(em);
+                createEntities(em,evm);
                 map.createMap(em);
             }
 
@@ -217,7 +217,7 @@ void game()
             ai_sys.update(em, deltaTime);
             physics_system.update(em);
             collision_system.update(em);
-            zone_system.update(em, engine, iam);
+            zone_system.update(em, engine, iam,evm);
             shield_system.update(em);
             object_system.update(em, deltaTime);
             attack_system.update(em, deltaTime);

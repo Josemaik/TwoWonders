@@ -14,7 +14,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
                 // if(!iam.checkEnemiesCreaeted(zon.zone)){
                 // }
                 //lanzar evento
-                evm.scheduleEvent(Event{EVENT_CODE_PLAYER_HIT});
+                evm.scheduleEvent(Event{EVENT_CODE_CHANGE_ZONE});
                 //borro enemigos si cambio de zona
                 deleteEnemiesinZone(em, li.num_zone);
                 iam.createEnemiesZone(em, zon.zone);

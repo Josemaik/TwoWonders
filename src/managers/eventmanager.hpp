@@ -8,7 +8,8 @@
 
 
 //Eventos
-static const uint16_t EVENT_CODE_PLAYER_HIT = 1;
+static const uint16_t EVENT_CODE_CHANGE_ZONE = 1; 
+
 
 struct Event {
     uint16_t code; // Código identificador del evento
@@ -16,6 +17,7 @@ struct Event {
 
 // Clase ListenerRegistration para almacenar datos sobre un listener registrado
 struct ListenerRegistration {
+
     uint16_t interestCode;
     const Entity& listener;
 
@@ -26,17 +28,6 @@ struct ListenerRegistration {
 struct Eventmanager
 {
 public:
-    // Verifica nuevos eventos y los agrega a la cola
-    // void checkForEvents() {
-    //      // Detectar eventos de entrada del usuario
-    //     //Event userInputEvent = detectUserInput();
-
-    //     // Programar el evento detectado en la cola de eventos
-    //     // if (userInputEvent.code != 0) {
-    //     //     scheduleEvent(userInputEvent);
-    //     // }
-    // }
-
     // Programa un evento para ser despachado tan pronto como sea posible
     void scheduleEvent(const Event& event) {
         events.push_back(event);
@@ -58,26 +49,13 @@ public:
 
             // Notifica a cada listener interesado en el evento
             for (const auto& lr : listeners) {
-                // for (auto& entity : em.getEntities()) {
-                //     auto& eventComponent = em.getComponent<EventComponent>(entity);
                     if(lr.interestCode == event.code){
                         EventComponent& eventComponent = em.getComponent<EventComponent>(lr.listener);
-                        eventComponent.notify(event);
+                        eventComponent.notify(event.code);
                     }
-                    // if (std::find(eventComponent.eventCodes.begin(), eventComponent.eventCodes.end(), event.code) != eventComponent.eventCodes.end()) {
-                    //     // La entidad está registrada para manejar este evento
-                    //     lr.listener.notify(event);
-                    // }
-            //     }
             }
         }
     }
-
-    // Ejecuta el gestor de eventos
-    // void run() {
-    //     checkForEvents();
-    //     dispatchEvents();
-    // }
 private:
     // Lista de registros de listeners
     std::vector<ListenerRegistration> listeners;

@@ -4,6 +4,7 @@
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
 #include "../managers/ia_manager.hpp"
+#include "../managers/eventmanager.hpp"
 
 struct ZoneSystem
 {

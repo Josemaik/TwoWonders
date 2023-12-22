@@ -2,7 +2,7 @@
 #ifndef EVENT_SYSTEM
 #define EVENT_SYSTEM
 
-#include <managers/eventmanager.hpp>
+
 #include "../utils/types.hpp"
 
 struct EventSystem
