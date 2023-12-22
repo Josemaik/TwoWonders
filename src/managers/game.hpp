@@ -16,6 +16,7 @@
 #include "../systems/object_system.hpp"
 #include "../systems/zone_system.hpp"
 #include "../systems/shield_system.hpp"
+#include "../systems/event_system.hpp"
 
 #include "map.hpp"
 

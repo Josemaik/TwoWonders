@@ -83,7 +83,7 @@ void createEnding(EntityManager& em)
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
 }
 
-void createEntities(EntityManager& em)
+void createEntities(EntityManager& em,Eventmanager& evm)
 {
     // Player
     auto& e{ em.newEntity() };
@@ -94,6 +94,8 @@ void createEntities(EntityManager& em)
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<InformationComponent>(e, InformationComponent{});
+    em.addComponent<EventComponent>(e);
+    evm.registerListener(e,EVENT_CODE_PLAYER_HIT);
 
     // Sword
     createSword(em);
@@ -115,6 +117,7 @@ void game()
 {
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};
+    Eventmanager evm{};
     Ia_man iam{};
     PhysicsSystem physics_system{};
     RenderSystem render_system{};
@@ -128,9 +131,10 @@ void game()
     ObjectSystem object_system{};
     ZoneSystem zone_system{};
     ShieldSystem shield_system{};
+    EventSystem event_system{};
     Map map{};
 
-    createEntities(em);
+    createEntities(em,evm);
     map.createMap(em);
 
     engine.setTargetFPS(30);
@@ -219,7 +223,7 @@ void game()
             attack_system.update(em, deltaTime);
             projectile_system.update(em, deltaTime);
             life_system.update(em, deltaTime);
-
+            event_system.update(evm,em);
             render_system.update(em, engine);
             break;
         }
