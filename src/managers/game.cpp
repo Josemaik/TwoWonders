@@ -181,17 +181,10 @@ void Game::run()
             }
 
             input_system.update(em);
-            ai_system.update(em, deltaTime);
-            physics_system.update(em);
-            collision_system.update(em);
-            zone_system.update(em, engine, iam);
-            shield_system.update(em);
-            object_system.update(em, deltaTime);
-            attack_system.update(em, deltaTime);
-            projectile_system.update(em, deltaTime);
-            life_system.update(em, deltaTime);
-
-            render_system.update(em, engine);
+            if (!input_system.debugMode)
+                normalExecution(em, deltaTime);
+            else
+                debugExecution(em, deltaTime);
             break;
         }
 
@@ -215,5 +208,22 @@ void Game::run()
     }
 
     engine.closeWindow();
+}
 
+void Game::normalExecution(EntityManager& em, float deltaTime)
+{
+    ai_system.update(em, deltaTime);
+    physics_system.update(em);
+    collision_system.update(em);
+    zone_system.update(em, engine, iam);
+    shield_system.update(em);
+    object_system.update(em, deltaTime);
+    attack_system.update(em, deltaTime);
+    projectile_system.update(em, deltaTime);
+    life_system.update(em, deltaTime);
+    render_system.update(em, engine, false);
+}
+void Game::debugExecution(EntityManager& em, float deltaTime)
+{
+    render_system.update(em, engine, true);
 }
