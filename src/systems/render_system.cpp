@@ -130,7 +130,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         if (e.hasTag<PlayerTag>())
         {
             // Dibujar background HUD
-            engine.drawRectangle(0, 0, 550, 60, WHITE);
+            engine.drawRectangle(0, 0, 580, 60, WHITE);
 
             // Dibujar vidas restantes del player en el HUD
             if (e.hasComponent<LifeComponent>())
@@ -146,6 +146,9 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 auto const& info{ em.getComponent<InformationComponent>(e) };
                 std::string info_text = "Bombas: " + std::to_string(info.bombs) + " (max " + std::to_string(info.max_bombs) + ") - Monedas: " + std::to_string(info.coins);
                 engine.drawText(info_text.c_str(), 200, 10, 20, BLACK);
+
+                std::string debug_txt = "F1 to DEBUG";
+                engine.drawText(debug_txt.c_str(), 420, 35, 20, BLACK);
             }
 
             // Dibujar el countdown restante del ataque del player en el HUD
@@ -154,7 +157,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 auto const& a{ em.getComponent<AttackComponent>(e) };
                 std::string countdown_ataque;
                 if (a.elapsed > a.countdown)
-                    countdown_ataque = "Ataque listo";
+                    countdown_ataque = "Ataque listo (SPACE) - Bomba lista (B)";
                 else
                     countdown_ataque = "Ataque listo en: " + std::to_string(-1 * (a.elapsed - 1.0f)) + " segundos";
 
@@ -210,11 +213,12 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             RayCast ray = engine.getMouseRay();
 
             auto& col = em.getComponent<ColliderComponent>(e);
+            auto& ren = em.getComponent<RenderComponent>(e);
             // Comprobar si el rayo intersecta con el collider
             if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE))
             {
                 // Dibujar el HUD de debug
-                engine.drawRectangle(0, 50, 150, 240, WHITE);
+                engine.drawRectangle(0, 60, 150, 240, WHITE);
                 engine.drawText("Posición", 10, 70, 20, BLACK);
                 std::string posX = "X: " + std::to_string(static_cast<int>(phy.position.x()));
                 engine.drawText(posX.c_str(), 10, 95, 20, BLACK);
@@ -230,6 +234,10 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 engine.drawText(velY.c_str(), 10, 225, 20, BLACK);
                 std::string velZ = "Z: " + std::to_string(phy.velocity.z());
                 engine.drawText(velZ.c_str(), 10, 250, 20, BLACK);
+
+                engine.beginMode3D();
+                engine.drawCubeWires(ren.position, ren.scale.x(), ren.scale.y(), ren.scale.z(), RED);
+                engine.endMode3D();
             }
         }
 
