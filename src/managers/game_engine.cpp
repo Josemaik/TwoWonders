@@ -13,32 +13,32 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Logo Two Wonders
     Image logo_two_wonders = ENGI::GameEngine::loadImage("assets/logo_two_wonders.png");
-    ENGI::GameEngine::imageResize(&logo_two_wonders, width_ - 20, static_cast<int>(height_/1.76));
+    ENGI::GameEngine::imageResize(&logo_two_wonders, width_ - 20, static_cast<int>(height_ / 1.76));
     texture_logo_two_wonders = ENGI::GameEngine::loadTextureFromImage(logo_two_wonders);
     ENGI::GameEngine::unloadImage(logo_two_wonders);
 
     // Logo Kaiwa Games
     Image logo_kaiwa_games = ENGI::GameEngine::loadImage("assets/logo_kaiwa_games.png");
-    ENGI::GameEngine::imageResize(&logo_kaiwa_games, width_, static_cast<int>(height_/2)); // 2.49
+    ENGI::GameEngine::imageResize(&logo_kaiwa_games, width_, static_cast<int>(height_ / 2)); // 2.49
     texture_logo_kaiwa_games = ENGI::GameEngine::loadTextureFromImage(logo_kaiwa_games);
     ENGI::GameEngine::unloadImage(logo_kaiwa_games);
 }
 
 ////// IMAGE AND TEXTURE //////
 
-Image ENGI::GameEngine::loadImage(const char *filename){
+Image ENGI::GameEngine::loadImage(const char* filename) {
     return LoadImage(filename);
-} 
+}
 
-void ENGI::GameEngine::imageResize(Image* image, int newWidth, int newHeight){
+void ENGI::GameEngine::imageResize(Image* image, int newWidth, int newHeight) {
     ImageResize(image, newWidth, newHeight);
 }
 
-void ENGI::GameEngine::unloadImage(Image image){
+void ENGI::GameEngine::unloadImage(Image image) {
     UnloadImage(image);
 }
 
-Texture2D ENGI::GameEngine::loadTextureFromImage(Image image){
+Texture2D ENGI::GameEngine::loadTextureFromImage(Image image) {
     return LoadTextureFromImage(image);
 }
 
@@ -98,7 +98,7 @@ void ENGI::GameEngine::drawRectangle(int posX, int posY, int width, int height, 
     DrawRectangle(posX, posY, width, height, color);
 }
 
-void ENGI::GameEngine::drawTexture(Texture2D texture, int posX, int posY, Color tint){
+void ENGI::GameEngine::drawTexture(Texture2D texture, int posX, int posY, Color tint) {
     DrawTexture(texture, posX, posY, tint);
 }
 
@@ -172,4 +172,10 @@ float ENGI::GameEngine::getWorldToScreenX(vec3f pos)
 float ENGI::GameEngine::getWorldToScreenY(vec3f pos)
 {
     return GetWorldToScreen(pos.toRaylib(), camera).y;
+}
+
+RayCast ENGI::GameEngine::getMouseRay()
+{
+    Ray r = GetMouseRay(GetMousePosition(), camera);
+    return RayCast{ .origin = vec3f(r.position.x, r.position.y, r.position.z), .direction = vec3f(r.direction.x, r.direction.y, r.direction.z) };
 }
