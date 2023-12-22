@@ -1,5 +1,6 @@
 APP		   := ZeldaWonders
-CC         := ccache g++
+CCACHE 	   := ccache
+CC         := g++
 CCFLAGS    := -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
 LIBS       := -lraylib
 SANITIZE   := -fsanitize=address,undefined
@@ -15,7 +16,7 @@ OBJ  	   := obj
 RELEASE    := release
 ASSETS     := assets
 LIBS_DIR   := libs
-LIBS_COPY  := /usr/lib/libraylib.so.450 /usr/lib/libstdc++.so.6 /usr/lib/libc.so.6 /usr/lib/libm.so.6 /usr/lib/libgcc_s.so.1
+LIBS_COPY  := /usr/lib/libraylib.so.450
 
 ALLCPP     := $(shell find $(SRC) -type f -iname *.cpp)
 ALLCPPOBJ  := $(patsubst %.cpp,%.o,$(ALLCPP))
@@ -33,13 +34,15 @@ else
     CCFLAGS  += -g
 endif
 
+# _glfwPlatformLoadModule
+
 # Regla principal (enlazado de los .o)
 $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
-	$(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE) -Wl,-rpath=$(LIBS_DIR) 
+	$(CCACHE) $(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE) -Wl,-rpath=libs
 
 # Regla que compila los .cpp
 %.o : %.cpp
-	$(CC) -o $(patsubst $(SRC)%,$(OBJ)%,$@) -c $^ $(CCFLAGS) $(SANITIZE)
+	$(CCACHE) $(CC) -o $(patsubst $(SRC)%,$(OBJ)%,$@) -c $^ $(CCFLAGS) $(SANITIZE)
 
 # Regla que crea una release
 $(RELEASE) : $(APP) $(ASSETS)
