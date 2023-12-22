@@ -56,7 +56,8 @@ void RenderSystem::drawEnding(ENGI::GameEngine& engine) {
 void RenderSystem::drawStory(ENGI::GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
-    engine.drawText("Ana quiere historia", 250, 250, 50, BLACK);
+    engine.drawText("   Entregable V2   ", 150, 250, 50, BLACK);
+    engine.drawText("Mecanicas de Accion", 150, 300, 50, BLACK);
     engine.drawText("PRESS [ENTER] TO PLAY ",
         engine.getScreenWidth() / 2 - 200,
         engine.getScreenHeight() - 50, 30,
