@@ -184,7 +184,7 @@ void Map::createWallsOverworld(EntityManager& em) {
     }
 
     auto& door{ em.newEntity() };
-    door.addTag<DoorTag>();
+    em.addTag<DoorTag>(door);
     auto& wr = em.addComponent<RenderComponent>(door, RenderComponent{ .position = { 61.f, 0.f, -78.f }, .scale = { 2.f, 4.f, 1.f }, .color = BROWN });
     auto& wp = em.addComponent<PhysicsComponent>(door, PhysicsComponent{ .position = { wr.position }, .velocity = { .0f, .0f, .0f } });
     em.addComponent<ColliderComponent>(door, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
