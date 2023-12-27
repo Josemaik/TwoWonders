@@ -12,7 +12,7 @@ void AttackSystem::update(EntityManager& em, float deltaTime) {
 }
 
 void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att) {
-    att.vel += vec3f{ 0, 0, -0.5f } *(att.vel == vec3f{ 0, 0, 0 });
+    att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
 
     // Se pone la direccion en la que este mirando el player
     if (ent.hasTag<PlayerTag>() && ent.hasComponent<InputComponent>()) {
@@ -72,7 +72,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
 
 void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, AttackComponent& att, int numShots) {
     float spread = 0.15f; // Ángulo de dispersión entre los disparos
-    vec3f vel = att.vel;
+    vec3d vel = att.vel;
 
     // Disparo hacia el jugador
     createAttackRangedOrMelee(em, ent, att, true);
@@ -94,10 +94,10 @@ void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, Atta
 void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged) {
     auto& e{ em.newEntity() };
     em.addTag<HitPlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3f{0, 0, 0} : att.vel * 2), .scale = { isRanged ? 0.5f : 1.0f, isRanged ? 0.5f : 1.0f, isRanged ? 0.5f : 1.0f }, .color = BLACK });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = isRanged ? att.vel : vec3f{0, 0, 0}, .gravity = 0 });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3d{0, 0, 0} : att.vel * 2), .scale = { isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 1.0 }, .color = BLACK });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = isRanged ? att.vel : vec3d{0, 0, 0}, .gravity = 0 });
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = isRanged ? 3.0f : 0.2f });
+    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = static_cast<float>(isRanged ? 3.0 : 0.2 )});
     if (ent.hasTag<PlayerTag>())
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
     else

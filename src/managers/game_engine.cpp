@@ -83,12 +83,12 @@ void ENGI::GameEngine::endMode3D()
     EndMode3D();
 }
 
-void ENGI::GameEngine::drawCube(vec3f pos, float width, float height, float lenght, Color color)
+void ENGI::GameEngine::drawCube(vec3d pos, float width, float height, float lenght, Color color)
 {
     DrawCube(pos.toRaylib(), width, height, lenght, color);
 }
 
-void ENGI::GameEngine::drawCubeWires(vec3f pos, float width, float height, float lenght, Color color)
+void ENGI::GameEngine::drawCubeWires(vec3d pos, float width, float height, float lenght, Color color)
 {
     DrawCubeWires(pos.toRaylib(), width, height, lenght, color);
 }
@@ -136,17 +136,17 @@ int ENGI::GameEngine::getScreenHeight()
 
 ////// CAMERA //////
 
-void ENGI::GameEngine::setPositionCamera(vec3f pos)
+void ENGI::GameEngine::setPositionCamera(vec3d pos)
 {
     camera.position = pos.toRaylib();
 }
 
-void ENGI::GameEngine::setTargetCamera(vec3f tar)
+void ENGI::GameEngine::setTargetCamera(vec3d tar)
 {
     camera.target = tar.toRaylib();
 }
 
-void ENGI::GameEngine::setUpCamera(vec3f up)
+void ENGI::GameEngine::setUpCamera(vec3d up)
 {
     camera.up = up.toRaylib();
 }
@@ -163,12 +163,12 @@ void ENGI::GameEngine::setProjectionCamera(int proj)
 
 ////// AUX //////
 
-float ENGI::GameEngine::getWorldToScreenX(vec3f pos)
+float ENGI::GameEngine::getWorldToScreenX(vec3d pos)
 {
     return GetWorldToScreen(pos.toRaylib(), camera).x;
 }
 
-float ENGI::GameEngine::getWorldToScreenY(vec3f pos)
+float ENGI::GameEngine::getWorldToScreenY(vec3d pos)
 {
     return GetWorldToScreen(pos.toRaylib(), camera).y;
 }
@@ -176,5 +176,5 @@ float ENGI::GameEngine::getWorldToScreenY(vec3f pos)
 RayCast ENGI::GameEngine::getMouseRay()
 {
     Ray r = GetMouseRay(GetMousePosition(), camera);
-    return RayCast{ .origin = vec3f(r.position.x, r.position.y, r.position.z), .direction = vec3f(r.direction.x, r.direction.y, r.direction.z) };
+    return RayCast{ .origin = vec3d(r.position.x, r.position.y, r.position.z), .direction = vec3d(r.direction.x, r.direction.y, r.direction.z) };
 }

@@ -4,12 +4,12 @@
 
 struct RenderComponent
 {
-    void setAll(vec3f p, vec3f s, Color c);
-    void setPosition(vec3f p);
-    void setScale(vec3f s);
+    void setAll(vec3d p, vec3d s, Color c);
+    void setPosition(vec3d p);
+    void setScale(vec3d s);
     void setColor(Color c);
-    vec3f position{};
-    vec3f scale{};
+    vec3d position{};
+    vec3d scale{};
     Color color{};
     bool visible{true};
 };

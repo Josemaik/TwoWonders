@@ -44,26 +44,26 @@ struct CollisionSystem
     // using octreeMap = std::unordered_map<std::size_t, std::unordered_set<Octree*>>;
 
     CollisionSystem()
-        : octree(0, BBox(vec3f{ 0, 0, 0 }, vec3f{ 300, 50, 300 })) {}
+        : octree(0, BBox(vec3d{ 0.0, 0.0, 0.0 }, vec3d{ 300.0, 50.0, 300.0 })) {}
 
     void update(EntityManager& em);
 private:
     void checkCollision(EntityManager& em, Octree& boxes, pairsType& checkedPairs);
     void enemyCollision(EntityManager& em, Entity& damagedEntity);
-    void staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3f& minOverlap);
-    void nonStaticCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
-    void groundCollision(PhysicsComponent& playerPhysics, vec3f& playerEsc, vec3f& minOverlap);
-    void floorCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
-    void handleCollision(EntityManager& em, Entity& entity1, Entity& entity2, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
-    void handleStaticCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
+    void staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3d& minOverlap);
+    void nonStaticCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3d& minOverlap);
+    void groundCollision(PhysicsComponent& playerPhysics, vec3d& playerEsc, vec3d& minOverlap);
+    void floorCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3d& minOverlap);
+    void handleCollision(EntityManager& em, Entity& entity1, Entity& entity2, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
+    void handleStaticCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
     void handleZoneCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, BehaviorType behaviorType1, BehaviorType behaviorType2);
-    void handlePlayerCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
+    void handlePlayerCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
     void handleAtkCollision(EntityManager& em, bool& atkPl1, bool& atkPl2, bool& atkEn1, bool& atkEn2, Entity& entity1, Entity& entity2);
-    void enemiesWallCollision(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3f& minOverlap);
-    void classicCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap);
-    void resolveEnemyDirection(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, float overlap, bool isZAxis);
+    void enemiesWallCollision(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3d& minOverlap);
+    void classicCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3d& minOverlap);
+    void resolveEnemyDirection(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, double overlap, bool isZAxis);
     template <auto getPos, auto setPos>
-    bool resolveCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap);
+    bool resolveCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, double overlap);
 
     Octree octree;
     deathSet dead_entities{};
