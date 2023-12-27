@@ -10,7 +10,7 @@ struct BTActionChangePosition : BTNode_t{
                 auto& rend = ectx.em.getComponent<RenderComponent>(ectx.ent);
                 rend.visible = true;
                 //Set random position
-                vec3f randomPos = ectx.ai.getRandomPosinRange(ectx.ai.Xmin, ectx.ai.Xmax, ectx.ai.Zmin, ectx.ai.Zmax);
+                vec3d randomPos = ectx.ai.getRandomPosinRange(ectx.ai.Xmin, ectx.ai.Xmax, ectx.ai.Zmin, ectx.ai.Zmax);
                 ectx.phy.position.setX(randomPos.x());
                 ectx.phy.position.setZ(randomPos.z());
                 //Attack

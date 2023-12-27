@@ -4,39 +4,39 @@
 //////////////////////////////////////////////////////---------------------------------
 
 //DEvuelve un tiempo en segundos random
-float getRandomStop() {
+double getRandomStop() {
     switch (std::rand() % 2) {
-    case 0:  return 12.0f; break;
-    case 1:  return 6.0f; break;
-    case 2:  return 16.0f; break;
-    default: return 0.0f; break;
+    case 0:  return 12.0; break;
+    case 1:  return 6.0; break;
+    case 2:  return 16.0; break;
+    default: return 0.0; break;
     }
 }
 // //Devuelve una posición random dado un rango
-vec3f getRandomPosinRange(float xmin, float xmax, float zmin, float zmax) {
-    //Semilla para generar numeros aleatorios
+vec3d getRandomPosinRange(double xmin, double xmax, double zmin, double zmax) {
+    // Semilla para generar números aleatorios
     std::random_device rd;
     std::mt19937 gen(rd());
-    // creo rangos
-    std::uniform_real_distribution<float> rangoX(xmin, xmax);
-    std::uniform_real_distribution<float> rangoZ(zmin, zmax);
-    // obtengo x y z aleatoria
-    float x = rangoX(gen);
-    float z = rangoZ(gen);
-    //devuelvo vector
-    return vec3f{ x,0.0f,z };
+    // Creo rangos
+    std::uniform_real_distribution<double> rangoX(xmin, xmax);
+    std::uniform_real_distribution<double> rangoZ(zmin, zmax);
+    // Obtengo x y z aleatoria
+    double x = rangoX(gen);
+    double z = rangoZ(gen);
+    // Devuelvo vector
+    return vec3d{ x, 0.0, z };
 }
 //-----------------------------------------------------------------------------------
 /////////////////////////////////////////////////////7
 ///Clase con los Datos necesarios para los enemigos
 ///////////////////////////////////////////////////////----------------------------
-enum class TypeEnemies : uint8_t {Patrol,RanndomShoot,PlayerShoot,Bat,Drake};
+enum class TypeEnemies : uint8_t { Patrol, RanndomShoot, PlayerShoot, Bat, Drake };
 struct EnemyData {
     TypeEnemies currentType;
-    vec3f position;
-    std::array<vec3f, 10> route;
+    vec3d position;
+    std::array<vec3d, 10> route;
     int num_lifes;
-    float Xmin{}, Xmax{}, Zmin{}, Zmax{};
+    double Xmin{}, Xmax{}, Zmin{}, Zmax{};
     bool visible{};
     Color color{};
 };
@@ -53,7 +53,7 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, Behaviour
         auto& enemy{ em.newEntity() };
         em.addTag<EnemyTag>(enemy);
         auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = data.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = data.color ,.visible = data.visible });
-        auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = { .2f, .0f, .0f } });
+        auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = { .2, .0, .0 } });
         em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = data.num_lifes });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
 
@@ -61,18 +61,18 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, Behaviour
         {
         case TypeEnemies::Patrol: em.addComponent<AIComponent>(enemy, AIComponent{.patrol = data.route ,.behaviourTree=&tree});
             break;
-        case TypeEnemies::PlayerShoot:em.addComponent<AIComponent>(enemy, AIComponent{.detectplayer=true,.ghost=true,.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_shoot=4.0f,.behaviourTree=&tree});
-            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 4.5f });
+        case TypeEnemies::PlayerShoot:em.addComponent<AIComponent>(enemy, AIComponent{.detectplayer=true,.ghost=true,.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_shoot=4.0,.behaviourTree=&tree});
+            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 4.5 });
             break;
         case TypeEnemies::RanndomShoot:
-            em.addComponent<AIComponent>(enemy, AIComponent{.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_stop = getRandomStop(),.countdown_shoot=3.0f,.behaviourTree=&tree});
-            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 1.5f });
+            em.addComponent<AIComponent>(enemy, AIComponent{.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_stop = getRandomStop(),.countdown_shoot=3.0,.behaviourTree=&tree});
+            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 1.5 });
             break;
         case TypeEnemies::Bat:  em.addComponent<AIComponent>(enemy, AIComponent{.Xmin = data.Xmin,.Xmax = data.Xmax,.Zmin = data.Zmin,.Zmax = data.Zmax,.countdown_stop = getRandomStop(),.behaviourTree=&tree});
             break;
-        case TypeEnemies::Drake: em.addComponent<AIComponent>(enemy, AIComponent{ .patrol = data.route,.countdown_stop=2.5f,.countdown_shoot=0.0f,.behaviourTree=&tree });
-            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0f });
-            r.scale = { 2.0f,2.5f,2.5f };
+        case TypeEnemies::Drake: em.addComponent<AIComponent>(enemy, AIComponent{ .patrol = data.route,.countdown_stop=2.5,.countdown_shoot=0.0,.behaviourTree=&tree });
+            em.addComponent<AttackComponent>(enemy, AttackComponent{ .countdown = 0.0 });
+            r.scale = { 2.0,2.5,2.5 };
             break;
         default:
             break;
@@ -91,14 +91,14 @@ void Ia_man::createEnemiesZone2(EntityManager& em) {
     createdzone2 = true;
     //Creamos Patrol Enemies
     std::vector<EnemyData> Vec_patrolData = {
-       { .currentType =TypeEnemies::Patrol,.position ={-9.0f, 0.f, -14.0f}, 
+       { .currentType =TypeEnemies::Patrol,.position ={-9.0, 0., -14.0}, 
         .route = {
-            vec3f{-9.0f, 0.f, -14.0f},
-            { -9.0f, 0.f, -10.0f },
-            { 9.0f, 0.f, -10.0f },
-            { 9.0f, 0.f, -14.0f },
+            vec3d{-9.0, 0., -14.0},
+            { -9.0, 0., -10.0 },
+            { 9.0, 0., -10.0 },
+            { 9.0, 0., -14.0 },
             AIComponent::invalid
-        }, .num_lifes = 1,.Xmin= 0.0f,.Xmax=0.0f,.Zmin=0.0f,.Zmax=0.0f,.visible=true,.color=ORANGE}
+        }, .num_lifes = 1,.Xmin= 0.0,.Xmax=0.0,.Zmin=0.0,.Zmax=0.0,.visible=true,.color=ORANGE}
     };
     //Creamos los nodos del behaviour tree
     tree.createNode<BTActionPatrol>();
@@ -108,11 +108,11 @@ void Ia_man::createEnemiesZone3(EntityManager& em) {
     createdzone3 = true;
     //Crearemos IA random
     std::vector<EnemyData> Vec_RandomShoot_3 = {
-       {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-31.0f,-13.0f,-6.0f,-3.0f),.route={},.num_lifes=1,.Xmin=-31.0f,.Xmax=-11.0f,.Zmin=-7.0f,.Zmax=8.0f, .visible=true,.color=ORANGE},
-       {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-31.0f,-13.0f,-3.0f,-1.0f),.route={},.num_lifes=1,.Xmin=-31.0f,.Xmax=-11.0f,.Zmin=-7.0f,.Zmax=8.0f, .visible=true,.color=ORANGE},
-       {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-31.0f,-13.0f,-1.0f,2.0f), .route={},.num_lifes=1,.Xmin=-31.0f,.Xmax=-11.0f,.Zmin=-7.0f,.Zmax=8.0f, .visible=true,.color=ORANGE},
-       {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-31.0f,-13.0f,2.0f,4.0f),  .route={},.num_lifes=1,.Xmin=-31.0f,.Xmax=-11.0f,.Zmin=-7.0f,.Zmax=8.0f, .visible=true,.color=ORANGE},
-       {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-31.0f,-13.0f,4.0f,6.0f),  .route={},.num_lifes=1,.Xmin=-31.0f,.Xmax=-11.0f,.Zmin=-7.0f,.Zmax=8.0f, .visible=true,.color=ORANGE}
+       {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-31.0,-13.0,-6.0,-3.0),.route={},.num_lifes=1,.Xmin=-31.0,.Xmax=-11.0,.Zmin=-7.0,.Zmax=8.0, .visible=true,.color=ORANGE},
+       {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-31.0,-13.0,-3.0,-1.0),.route={},.num_lifes=1,.Xmin=-31.0,.Xmax=-11.0,.Zmin=-7.0,.Zmax=8.0, .visible=true,.color=ORANGE},
+       {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-31.0,-13.0,-1.0,2.0), .route={},.num_lifes=1,.Xmin=-31.0,.Xmax=-11.0,.Zmin=-7.0,.Zmax=8.0, .visible=true,.color=ORANGE},
+       {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-31.0,-13.0,2.0,4.0),  .route={},.num_lifes=1,.Xmin=-31.0,.Xmax=-11.0,.Zmin=-7.0,.Zmax=8.0, .visible=true,.color=ORANGE},
+       {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-31.0,-13.0,4.0,6.0),  .route={},.num_lifes=1,.Xmin=-31.0,.Xmax=-11.0,.Zmin=-7.0,.Zmax=8.0, .visible=true,.color=ORANGE}
     };
     tree.createNode<BTNodeSequence_t>(
          &tree.createNode<BTActionRandomMovement>(),
@@ -124,11 +124,11 @@ void Ia_man::createEnemiesZone4(EntityManager& em) {
     createdzone4 = true;
     //Creamos Random enemies
     std::vector<EnemyData> Vec_RandomShoot = {
-        {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),.route={},.num_lifes=1,.Xmin=-32.0f,.Xmax=-11.0f,.Zmin=-24.0f,.Zmax=-9.0f,.visible=true,.color=ORANGE},
-        {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),.route={},.num_lifes=1,.Xmin=-32.0f,.Xmax=-11.0f,.Zmin=-24.0f,.Zmax=-9.0f,.visible=true,.color=ORANGE},
-        {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),.route={},.num_lifes=1,.Xmin=-32.0f,.Xmax=-11.0f,.Zmin=-24.0f,.Zmax=-9.0f,.visible=true,.color=ORANGE},
-        {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),.route={},.num_lifes=1,.Xmin=-32.0f,.Xmax=-11.0f,.Zmin=-24.0f,.Zmax=-9.0f,.visible=true,.color=ORANGE},
-        {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0f,-13.0f,-22.0f,-10.0f),.route={},.num_lifes=1,.Xmin=-32.0f,.Xmax=-11.0f,.Zmin=-24.0f,.Zmax=-9.0f,.visible=true,.color=ORANGE}
+        {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0,-13.0,-22.0,-10.0),.route={},.num_lifes=1,.Xmin=-32.0,.Xmax=-11.0,.Zmin=-24.0,.Zmax=-9.0,.visible=true,.color=ORANGE},
+        {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0,-13.0,-22.0,-10.0),.route={},.num_lifes=1,.Xmin=-32.0,.Xmax=-11.0,.Zmin=-24.0,.Zmax=-9.0,.visible=true,.color=ORANGE},
+        {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0,-13.0,-22.0,-10.0),.route={},.num_lifes=1,.Xmin=-32.0,.Xmax=-11.0,.Zmin=-24.0,.Zmax=-9.0,.visible=true,.color=ORANGE},
+        {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0,-13.0,-22.0,-10.0),.route={},.num_lifes=1,.Xmin=-32.0,.Xmax=-11.0,.Zmin=-24.0,.Zmax=-9.0,.visible=true,.color=ORANGE},
+        {.currentType =TypeEnemies::RanndomShoot,.position=getRandomPosinRange(-32.0,-13.0,-22.0,-10.0),.route={},.num_lifes=1,.Xmin=-32.0,.Xmax=-11.0,.Zmin=-24.0,.Zmax=-9.0,.visible=true,.color=ORANGE}
     };
     tree.createNode<BTNodeSequence_t>(
          &tree.createNode<BTActionRandomMovement>(),
@@ -140,8 +140,8 @@ void Ia_man::createEnemiesZone4(EntityManager& em) {
 void Ia_man::createEnemiesZone5(EntityManager& em) {
     createdzone5 = true;
     std::vector<EnemyData> Vec_ShootPlayerData = {
-        { .currentType =TypeEnemies::PlayerShoot,.position={-45.0f, 0.0f, 4.0f},
-         .route={vec3f{}},.num_lifes=2,.Xmin=-43.0f,.Xmax=-46.0f,.Zmin=3.0f,.Zmax=-4.0f,.visible=false,.color = ORANGE
+        { .currentType =TypeEnemies::PlayerShoot,.position={-45.0, 0.0, 4.0},
+         .route={vec3d{}},.num_lifes=2,.Xmin=-43.0,.Xmax=-46.0,.Zmin=3.0,.Zmax=-4.0,.visible=false,.color = ORANGE
         }
     };
     tree.createNode<BTNodeSequence_t>(
@@ -155,8 +155,8 @@ void Ia_man::createEnemiesZone5(EntityManager& em) {
 void Ia_man::createEnemiesZone6(EntityManager& em) {
     createdzone6 = true;
     std::vector<EnemyData> Vec_ShootPlayerData = {
-        {.currentType =TypeEnemies::PlayerShoot,.position= {-46.0f, 0.0f, -20.0f},
-         .route={vec3f{},},.num_lifes=2,.Xmin=-43.0f,.Xmax=-46.0f,.Zmin=-11.0f,.Zmax=-20.0f,.visible=false,.color=ORANGE
+        {.currentType =TypeEnemies::PlayerShoot,.position= {-46.0, 0.0, -20.0},
+         .route={vec3d{},},.num_lifes=2,.Xmin=-43.0,.Xmax=-46.0,.Zmin=-11.0,.Zmax=-20.0,.visible=false,.color=ORANGE
         }
     };
     // tree4.createNode<BTActionShootPlayer>();
@@ -170,12 +170,12 @@ void Ia_man::createEnemiesZone6(EntityManager& em) {
 void Ia_man::createEnemiesZone11(EntityManager& em) {
     createdzone11 = true;
     std::vector<EnemyData> Vec_Drake = {
-      {.currentType =TypeEnemies::Drake, .position={73.0f, 0.f, -87.0f},
+      {.currentType =TypeEnemies::Drake, .position={73.0, 0., -87.0},
        .route={
-           vec3f{73.0f, 0.f, -87.0f},
-           { 69.0f, 0.f, -87.0f },
+           vec3d{73.0, 0., -87.0},
+           { 69.0, 0., -87.0 },
            AIComponent::invalid
-       },.num_lifes=10,.Xmin=0.0f,.Xmax=0.0f,.Zmin=0.0f,.Zmax=0.0f,.visible=true,.color=RED}
+       },.num_lifes=10,.Xmin=0.0,.Xmax=0.0,.Zmin=0.0,.Zmax=0.0,.visible=true,.color=RED}
     };
     tree.createNode<BTNodeSequence_t>(
         &tree.createNode<BTActionPatrol>(),
@@ -186,11 +186,11 @@ void Ia_man::createEnemiesZone11(EntityManager& em) {
 void Ia_man::createEnemiesZone12(EntityManager& em) {
     createdzone12 = true;
     std::vector<EnemyData> Vec_Diagonal = {
-        {.currentType =TypeEnemies::Bat,.position=getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),.route={},.num_lifes=1,.Xmin=74.0f,.Xmax=92.0f,.Zmin=-77.0f,.Zmax=-65.0f,.visible=true,.color=PURPLE},
-        {.currentType =TypeEnemies::Bat,.position=getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),.route={},.num_lifes=1,.Xmin=74.0f,.Xmax=92.0f,.Zmin=-77.0f,.Zmax=-65.0f,.visible=true,.color=PURPLE},
-        {.currentType =TypeEnemies::Bat,.position=getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),.route={},.num_lifes=1,.Xmin=74.0f,.Xmax=92.0f,.Zmin=-77.0f,.Zmax=-65.0f,.visible=true,.color=PURPLE},
-        {.currentType =TypeEnemies::Bat,.position=getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),.route={},.num_lifes=1,.Xmin=74.0f,.Xmax=92.0f,.Zmin=-77.0f,.Zmax=-65.0f,.visible=true,.color=PURPLE},
-        {.currentType =TypeEnemies::Bat,.position=getRandomPosinRange(74.0f,92.0f,-77.0f,-65.0f),.route={},.num_lifes=1,.Xmin=74.0f,.Xmax=92.0f,.Zmin=-77.0f,.Zmax=-65.0f,.visible=true,.color=PURPLE}
+        {.currentType =TypeEnemies::Bat,.position=getRandomPosinRange(74.0,92.0,-77.0,-65.0),.route={},.num_lifes=1,.Xmin=74.0,.Xmax=92.0,.Zmin=-77.0,.Zmax=-65.0,.visible=true,.color=PURPLE},
+        {.currentType =TypeEnemies::Bat,.position=getRandomPosinRange(74.0,92.0,-77.0,-65.0),.route={},.num_lifes=1,.Xmin=74.0,.Xmax=92.0,.Zmin=-77.0,.Zmax=-65.0,.visible=true,.color=PURPLE},
+        {.currentType =TypeEnemies::Bat,.position=getRandomPosinRange(74.0,92.0,-77.0,-65.0),.route={},.num_lifes=1,.Xmin=74.0,.Xmax=92.0,.Zmin=-77.0,.Zmax=-65.0,.visible=true,.color=PURPLE},
+        {.currentType =TypeEnemies::Bat,.position=getRandomPosinRange(74.0,92.0,-77.0,-65.0),.route={},.num_lifes=1,.Xmin=74.0,.Xmax=92.0,.Zmin=-77.0,.Zmax=-65.0,.visible=true,.color=PURPLE},
+        {.currentType =TypeEnemies::Bat,.position=getRandomPosinRange(74.0,92.0,-77.0,-65.0),.route={},.num_lifes=1,.Xmin=74.0,.Xmax=92.0,.Zmin=-77.0,.Zmax=-65.0,.visible=true,.color=PURPLE}
     };
     tree.createNode<BTActionDiagonalMovement>();
     createEnemiesofType(em, Vec_Diagonal,tree);

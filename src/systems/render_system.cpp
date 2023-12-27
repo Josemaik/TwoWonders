@@ -89,8 +89,8 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                         colorEntidad = YELLOW;
                 }
                 if (!e.hasTag<ZoneTag>())
-                    engine.drawCube(r.position, r.scale.x(), r.scale.y(), r.scale.z(), colorEntidad);
-                engine.drawCubeWires(r.position, r.scale.x(), r.scale.y(), r.scale.z(), BLACK);
+                    engine.drawCube(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), colorEntidad);
+                engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
             }
         }
     }
@@ -238,7 +238,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 engine.drawText(velZ.c_str(), 10, 250, 20, BLACK);
 
                 engine.beginMode3D();
-                engine.drawCubeWires(ren.position, ren.scale.x(), ren.scale.y(), ren.scale.z(), RED);
+                engine.drawCubeWires(ren.position,  static_cast<float>(ren.scale.x()),  static_cast<float>(ren.scale.y()),  static_cast<float>(ren.scale.z()), RED);
                 engine.endMode3D();
             }
         }

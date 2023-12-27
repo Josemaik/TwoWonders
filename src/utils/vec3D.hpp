@@ -131,11 +131,11 @@ struct vec3D
         return { std::max(a.x_, b.x_), std::max(a.y_, b.y_), std::max(a.z_, b.z_) };
     }
 
-    float max() const {
+    double max() const {
         return std::max({ x_, y_, z_ });
     }
 
-    float min() const {
+    double min() const {
         return std::min({ x_, y_, z_ });
     }
 
@@ -176,7 +176,7 @@ struct vec3D
 
     constexpr Vector3 toRaylib() const noexcept
     {
-        return Vector3{ x_, y_, z_ };
+        return Vector3{ static_cast<float>(x_),  static_cast<float>(y_),  static_cast<float>(z_) };
     }
 
     friend std::ostream& operator<<(std::ostream& os, vec3D const& v)
@@ -208,6 +208,6 @@ using vec3d = vec3D<double>;
 
 struct RayCast
 {
-    vec3f origin;
-    vec3f direction;
+    vec3d origin;
+    vec3d direction;
 };

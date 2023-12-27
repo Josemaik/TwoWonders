@@ -1,7 +1,7 @@
 APP		   := ZeldaWonders
 CCACHE 	   := ccache
-CC         := g++-12
-CCFLAGS    := -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
+CC         := g++
+CCFLAGS    := -std=c++23 -Wall -Wpedantic -Wextra -Wconversion -Isrc/
 LIBS       := -lraylib
 SANITIZE   := -fsanitize=address,undefined
 
@@ -38,11 +38,11 @@ endif
 
 # Regla principal (enlazado de los .o)
 $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
-	$(CCACHE) $(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE) -Wl,-rpath=libs
+	 $(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE) 
 
 # Regla que compila los .cpp
 %.o : %.cpp
-	$(CCACHE) $(CC) -o $(patsubst $(SRC)%,$(OBJ)%,$@) -c $^ $(CCFLAGS) $(SANITIZE)
+	 $(CC) -o $(patsubst $(SRC)%,$(OBJ)%,$@) -c $^ $(CCFLAGS) $(SANITIZE)
 
 # Regla que crea una release
 $(RELEASE) : $(APP) $(ASSETS)

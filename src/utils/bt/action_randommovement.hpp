@@ -6,7 +6,7 @@
 struct BTActionRandomMovement : BTNode_t{
     // BTActionRandomShoot() = default;
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
-        vec3f direction{};
+        vec3d direction{};
         //check change direction when not shooting
             if (ectx.ai.elapsed_change_dir >= ectx.ai.countdown_change_dir) {
                 //set random dir

@@ -8,10 +8,10 @@ struct BTActionShoot : BTNode_t{
     BTActionShoot(type_value t) : shoot{t} {}
     //   BTDecisionAlternative( a = false) : alternative{a}  {}
     // Obtener la distancia del enemigo con respecto al player
-    [[nodiscard]]vec3f getPlayerDistance(EntityContext_t& ectx) const noexcept {
+    [[nodiscard]]vec3d getPlayerDistance(EntityContext_t& ectx) const noexcept {
             auto& li = ectx.em.getSingleton<LevelInfo>();
             auto* playerEn = ectx.em.getEntityByID(li.playerID);
-            if (not playerEn) { ectx.ai.playerdetected = false; return vec3f{}; };
+            if (not playerEn) { ectx.ai.playerdetected = false; return vec3d{}; };
             auto& plphy = ectx.em.getComponent<PhysicsComponent>(*playerEn);
             auto const distance = plphy.position - ectx.phy.position;
             return  distance;

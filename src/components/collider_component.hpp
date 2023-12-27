@@ -17,10 +17,10 @@ enum BehaviorType {
 struct ColliderComponent
 {
     ColliderComponent() = default;
-    ColliderComponent(vec3f pos, vec3f scale, BehaviorType behavior)
+    ColliderComponent(vec3d pos, vec3d scale, BehaviorType behavior)
         : boundingBox{ pos, scale }, behaviorType{ behavior } {};
 
-    void updateBox(vec3f pos, vec3f scale, float gravity);
+    void updateBox(vec3d pos, vec3d scale, double gravity);
     BBox boundingBox{};
     BehaviorType behaviorType;
 };

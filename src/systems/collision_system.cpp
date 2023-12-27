@@ -11,7 +11,7 @@ void CollisionSystem::update(EntityManager& em)
     {
         // Si la entidad está por debajo del suelo, se destruye
         auto& pos = phy.position;
-        if (pos.y() < -20.f)
+        if (pos.y() < -20.)
         {
             dead_entities.insert(e.getID());
             return;
@@ -70,7 +70,7 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
                 if (bbox1.intersects(bbox2))
                 {
                     // Calculamos el mínimo solape entre las dos entidades
-                    vec3f minOverlap = BBox::minOverlap(bbox1, bbox2);
+                    vec3d minOverlap = BBox::minOverlap(bbox1, bbox2);
 
                     // Manejamos la colisión
                     handleCollision(em, *e, *nEnt, minOverlap, c->behaviorType, nCol->behaviorType);
@@ -83,7 +83,7 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
     }
 }
 
-void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
+void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
 {
     // Sacamos las físicas para pasarlas por parámetro swaps
     auto& staticPhy = em.getComponent<PhysicsComponent>(staticEnt);
@@ -156,7 +156,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     nonStaticCollision(staticPhy, otherPhy, minOverlap);
 }
 
-void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, vec3f& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
+void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
 {
     // Sacamos punteros de las físicas y de las entidades para poder hacer swaps
     auto* staticPhy = &statPhy;
@@ -250,7 +250,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     staticCollision(*otherPhy, *staticPhy, minOverlap);
 }
 
-void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3f& minOverlap)
+void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3d& minOverlap)
 {
 
     // Determine which axis had the minimum overlap
@@ -260,13 +260,13 @@ void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& entity2, P
         resolveEnemyDirection(em, entity2, staticPhy, otherPhy, minOverlap.x(), false);
 }
 
-void CollisionSystem::resolveEnemyDirection(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, float overlap, bool isZAxis)
+void CollisionSystem::resolveEnemyDirection(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, double overlap, bool isZAxis)
 {
     auto& rands = em.getComponent<AIComponent>(entity2);
-    bool dir = isZAxis ? resolveCollision<&vec3f::z, &vec3f::setZ>(otherPhy, staticPhy, overlap)
-        : resolveCollision<&vec3f::x, &vec3f::setX>(otherPhy, staticPhy, overlap);
+    bool dir = isZAxis ? resolveCollision<&vec3d::z, &vec3d::setZ>(otherPhy, staticPhy, overlap)
+        : resolveCollision<&vec3d::x, &vec3d::setX>(otherPhy, staticPhy, overlap);
 
-    vec3f randir{};
+    vec3d randir{};
     if (dir)    // Si es true, es derecha o arriba
         randir = rands.getRandomDirection(rands.right, rands.up, rands.left);
     else        // Si es false, es izquierda o abajo
@@ -296,7 +296,7 @@ void CollisionSystem::handleZoneCollision(EntityManager& em, Entity& staticEnt, 
     }
 }
 
-void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, vec3f& minOverlap, BehaviorType, BehaviorType behaviorType2)
+void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, vec3d& minOverlap, BehaviorType, BehaviorType behaviorType2)
 {
     // Sacamos punteros de las físicas y de las entidades para poder hacer swaps
     auto* staticPhy = &statPhy;
@@ -344,10 +344,10 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
 }
 
 // Si chocamos contra el suelo, solo se desplaza en Y
-void CollisionSystem::groundCollision(PhysicsComponent& playerPhysics, vec3f& playerEsc, vec3f& minOverlap)
+void CollisionSystem::groundCollision(PhysicsComponent& playerPhysics, vec3d& playerEsc, vec3d& minOverlap)
 {
     auto& pos1 = playerPhysics.position;
-    minOverlap += vec3f{ playerEsc.x() / 2, 0.f, playerEsc.z() / 2 };
+    minOverlap += vec3d{ playerEsc.x() / 2, 0.f, playerEsc.z() / 2 };
 
     if (!playerPhysics.alreadyGrounded && minOverlap.y() < minOverlap.x() && minOverlap.y() < minOverlap.z())
     {
@@ -357,15 +357,15 @@ void CollisionSystem::groundCollision(PhysicsComponent& playerPhysics, vec3f& pl
 }
 
 // Si el suelo choca contra el suelo, solo se desplaza en X o Z (también se usa para paredes con paredes)
-void CollisionSystem::floorCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap)
+void CollisionSystem::floorCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3d& minOverlap)
 {
     if (minOverlap.x() < minOverlap.y() && minOverlap.x() < minOverlap.z())
     {
-        resolveCollision<&vec3f::x, &vec3f::setX>(phy1, phy2, minOverlap.x());
+        resolveCollision<&vec3d::x, &vec3d::setX>(phy1, phy2, minOverlap.x());
     }
     else if (minOverlap.z() < minOverlap.y())
     {
-        resolveCollision<&vec3f::z, &vec3f::setZ>(phy1, phy2, minOverlap.z());
+        resolveCollision<&vec3d::z, &vec3d::setZ>(phy1, phy2, minOverlap.z());
     }
 }
 
@@ -376,38 +376,38 @@ void CollisionSystem::enemyCollision(EntityManager& em, Entity& damagedEntity)
 }
 
 // Efecto de cuando se choca contra una pared - podría expandirse para más usos en el futuro
-void CollisionSystem::staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3f& minOverlap)
+void CollisionSystem::staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3d& minOverlap)
 {
     classicCollision(playerPhysics, staticPhysics, minOverlap);
 }
 
 // Colisión entre entidades no estáticas, no hay diferencias definidas aún con las colisiones estáticas
-void CollisionSystem::nonStaticCollision(PhysicsComponent& phy2, PhysicsComponent& phy1, vec3f& minOverlap)
+void CollisionSystem::nonStaticCollision(PhysicsComponent& phy2, PhysicsComponent& phy1, vec3d& minOverlap)
 {
     classicCollision(phy1, phy2, minOverlap);
 }
 
 // Colisión que desplaza una entidad en el eje que tenga el mínimo solape con quien haya chocado
-void CollisionSystem::classicCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3f& minOverlap)
+void CollisionSystem::classicCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3d& minOverlap)
 {
     // Si el solape en X es menor que el solape en Y y Z, desplazar en X, la misma lógica para el resto
     if (minOverlap.x() < minOverlap.y() && minOverlap.x() < minOverlap.z())
     {
-        resolveCollision<&vec3f::x, &vec3f::setX>(phy1, phy2, minOverlap.x());
+        resolveCollision<&vec3d::x, &vec3d::setX>(phy1, phy2, minOverlap.x());
     }
     else if (minOverlap.z() < minOverlap.y())
     {
-        resolveCollision<&vec3f::z, &vec3f::setZ>(phy1, phy2, minOverlap.z());
+        resolveCollision<&vec3d::z, &vec3d::setZ>(phy1, phy2, minOverlap.z());
     }
     else
     {
         // minOverlap += vec3f{ 0.f, phy2.gravity, 0.f };
-        resolveCollision<&vec3f::y, &vec3f::setY>(phy1, phy2, minOverlap.y());
+        resolveCollision<&vec3d::y, &vec3d::setY>(phy1, phy2, minOverlap.y());
     }
 }
 
 template <auto getPos, auto setPos>
-bool CollisionSystem::resolveCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, float overlap)
+bool CollisionSystem::resolveCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, double overlap)
 {
     auto& pos1 = phy1.position;
     auto& pos2 = phy2.position;

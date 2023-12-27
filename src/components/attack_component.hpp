@@ -9,7 +9,7 @@ struct AttackComponent
     float range{}; // en segundos
     bool createAttack{ false };
     float countdown{ 1.0f }, elapsed{ 1.0f }; // en segundos
-    vec3f vel{};
+    vec3d vel{};
 
     void attack(AttackType typeAttack) {
         if (elapsed >= countdown) {
