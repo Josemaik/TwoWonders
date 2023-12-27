@@ -214,7 +214,7 @@ void Map::createGroundWaterOverworld(EntityManager& em) {
     {
         auto& entity = em.newEntity();
         em.addTag<GroundTag>(entity);
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = vec3d(data.position), .scale = vec3d(data.scale), .visible = false });
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = vec3d(data.position), .scale = vec3d(data.scale),.color = data.color});
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = vec3d(r.position), .velocity = vec3d::zero(), .gravity = .0 });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     }
