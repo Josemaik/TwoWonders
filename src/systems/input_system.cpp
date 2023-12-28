@@ -1,6 +1,6 @@
 #include "input_system.hpp"
 
-void InputSystem::update(EntityManager& em,float dt)
+void InputSystem::update(EntityManager& em)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto* playerEn = em.getEntityByID(li.playerID);
@@ -15,7 +15,7 @@ void InputSystem::update(EntityManager& em,float dt)
     if (!playerEn->hasTag<PlayerTag>() && IsKeyReleased(KEY_ENTER))
         em.destroyAll();
 
-    em.forEach<SYSCMPs, SYSTAGs>([&,dt](Entity& e, PhysicsComponent& phy, InputComponent& in)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, InputComponent& in)
     {
         // Resetear la velocidad
         phy.velocity = {};

@@ -17,6 +17,10 @@
 #include "../systems/shield_system.hpp"
 #include "../systems/event_system.hpp"
 #include "game_engine.hpp"
+#include "../utils/bt/action_gotarget.hpp"
+#include "../utils/bt/behaviourtree.hpp"
+#include "../utils/bt/nodesequence.hpp"
+#include "../utils/bt/nodeselector.hpp"
 
 #include "map.hpp"
 
@@ -31,7 +35,7 @@ struct Game
     void run();
 
 private:
-
+    void createCube(EntityManager& em);
     void createEntities(EntityManager& em, Eventmanager& evm);
     void createSword(EntityManager& em);
     void createShield(EntityManager& em, Entity& ent);
