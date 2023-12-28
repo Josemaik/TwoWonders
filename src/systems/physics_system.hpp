@@ -9,7 +9,7 @@ struct PhysicsSystem
     using SYSCMPs = MP::TypeList<PhysicsComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em);
+    void update(EntityManager& em,float deltaTime);
 };
 
 #endif // !PHYSICS_SYSTEM

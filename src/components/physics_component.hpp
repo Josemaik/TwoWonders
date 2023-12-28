@@ -10,6 +10,12 @@ struct PhysicsComponent
 
     vec3d position{};
     vec3d velocity{};
+    
     double gravity{ KGravity };
     bool alreadyGrounded{ false };
+
+    //IA
+    double v_linear  { 0.0 };
+    double v_angular { 0.0 };
+    double orientation { 0.0 }; //ángulo del vector con respecto al eje de origen
 };

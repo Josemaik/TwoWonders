@@ -7,8 +7,8 @@ void Game::createSword(EntityManager& em)
 
     em.addTag<ObjectTag>(e);
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 49.0f, 0.f, 78.0f }, .scale = { 1.f, 0.3f, 0.3f }, .color = LIGHTGRAY });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 49.0, 0., 78.0 }, .scale = { 1., 0.3, 0.3 }, .color = LIGHTGRAY });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0, .0, .0 } });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword, .inmortal = true });
 }
@@ -216,7 +216,7 @@ void Game::run()
 void Game::normalExecution(EntityManager& em, float deltaTime)
 {
     ai_system.update(em, deltaTime);
-    physics_system.update(em);
+    physics_system.update(em,deltaTime);
     collision_system.update(em);
     zone_system.update(em, engine, iam, evm);
     shield_system.update(em);

@@ -1,6 +1,6 @@
 #include "input_system.hpp"
 
-void InputSystem::update(EntityManager& em)
+void InputSystem::update(EntityManager& em,float dt)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto* playerEn = em.getEntityByID(li.playerID);
@@ -15,26 +15,32 @@ void InputSystem::update(EntityManager& em)
     if (!playerEn->hasTag<PlayerTag>() && IsKeyReleased(KEY_ENTER))
         em.destroyAll();
 
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, InputComponent& in)
+    em.forEach<SYSCMPs, SYSTAGs>([&,dt](Entity& e, PhysicsComponent& phy, InputComponent& in)
     {
         // Resetear la velocidad
         phy.velocity = {};
+        phy.v_linear = phy.v_angular = 0;
         auto& vel = phy.velocity;
         // Actualizar la velocidad
         if (IsKeyDown(in.right)) {
-            vel.setX(vel.x() + INP_SPEED);
+            // vel.setX(vel.x() + INP_SPEED);
+            phy.v_angular = 2*PI;
             in.last_key = in.right;
         }
         if (IsKeyDown(in.left)) {
-            vel.setX(vel.x() - INP_SPEED);
+            // vel.setX(vel.x() - INP_SPEED);
+             phy.v_angular = -2*PI;
             in.last_key = in.left;
         }
         if (IsKeyDown(in.up)) {
-            vel.setZ(vel.z() - INP_SPEED);
+            // vel.setZ(1);
+            phy.v_linear = 100;
             in.last_key = in.up;
+
         }
         if (IsKeyDown(in.down)) {
-            vel.setZ(vel.z() + INP_SPEED);
+            // vel.setZ(-1);
+            phy.v_linear = -100;
             in.last_key = in.down;
         }
 
