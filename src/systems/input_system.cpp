@@ -34,13 +34,13 @@ void InputSystem::update(EntityManager& em)
         }
         if (IsKeyDown(in.up)) {
             // vel.setZ(1);
-            phy.v_linear = 100;
+            phy.v_linear = 5;
             in.last_key = in.up;
 
         }
         if (IsKeyDown(in.down)) {
             // vel.setZ(-1);
-            phy.v_linear = -100;
+            phy.v_linear = -5;
             in.last_key = in.down;
         }
 

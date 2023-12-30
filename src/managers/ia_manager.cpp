@@ -201,19 +201,19 @@ void Ia_man::createEnemiesZone12(EntityManager& em) {
 void Ia_man::createEnemiesZone(EntityManager& em,uint16_t zone) {
     switch (zone)
     {
-    case 2: this->createEnemiesZone2(em);
+    case 2: //this->createEnemiesZone2(em);
         break;
-    case 3: this->createEnemiesZone3(em);
+    case 3: //this->createEnemiesZone3(em);
         break;
-    case 4:this->createEnemiesZone4(em);
+    case 4://this->createEnemiesZone4(em);
         break;
-    case 5: this->createEnemiesZone5(em);
+    case 5: //this->createEnemiesZone5(em);
         break;
-    case 6: this->createEnemiesZone6(em);
+    case 6: //this->createEnemiesZone6(em);
         break;
-    case 11: this->createEnemiesZone11(em);
+    case 11: //this->createEnemiesZone11(em);
         break;
-    case 12: this->createEnemiesZone12(em);
+    case 12: //this->createEnemiesZone12(em);
         break;
     default:
         break;

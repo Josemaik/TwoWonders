@@ -102,11 +102,12 @@ BehaviourTree_t tree1;
 void Game::createCube(EntityManager& em)
 {
         auto& wall{ em.newEntity() };
+        // em.addTag<EnemyTag>(wall);
         auto& wr = em.addComponent<RenderComponent>(wall, RenderComponent{ .position = vec3d{6.5,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
-        auto& wp = em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = vec3d(wr.position), .velocity = { .0, .0, .0 }, .gravity = .0 });
+        auto& wp = em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = vec3d(wr.position)});
         em.addComponent<ColliderComponent>(wall, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
         tree1.createNode<BTAction_goTarget>();
-        em.addComponent<AIComponent>(wall,AIComponent{.behaviourTree=&tree1});
+        em.addComponent<AIComponent>(wall,AIComponent{.tx=0.0,.tz=0.0,.tactive=true,.behaviourTree=&tree1});
 }
 
 void Game::run()

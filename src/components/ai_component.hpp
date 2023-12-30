@@ -48,7 +48,7 @@ struct AIComponent
     double detect_radius{ 15.0 };
     bool playerdetected{ false };
     // data for cinematic test
-    double tx { 0 }, ty { 0 };
+    double tx { 0 }, tz { 0 };
     bool tactive { false };
     // Timers
     double countdown_change_dir{ 1.5 }, countdown_stop{ 3.5 }, countdown_shoot{ 2.0 }, countdown_change_position{ 3.0 }; // seconds

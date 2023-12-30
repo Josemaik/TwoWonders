@@ -4,7 +4,7 @@
 
 void PhysicsSystem::update(EntityManager& em,float dt)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([dt](Entity& e, PhysicsComponent& phy)
+    em.forEach<SYSCMPs, SYSTAGs>([dt,&em](Entity& e, PhysicsComponent& phy)
     {
         auto& pos = phy.position;
         auto& vel = phy.velocity;
@@ -22,24 +22,27 @@ void PhysicsSystem::update(EntityManager& em,float dt)
             vel.normalize();
             vel *= phy.MAX_SPEED;
         }
-        if(e.hasTag<PlayerTag>()){
+        // if(e.hasTag<PlayerTag>()){
             phy.orientation += dt * vel_a;
             if(phy.orientation > 2*PI) phy.orientation -= 2*PI;
             if(phy.orientation < 0   ) phy.orientation += 2*PI;
 
-            vel.setX(dt * vel_l * std::cos(phy.orientation) );
-            vel.setZ(dt * vel_l * std::sin(phy.orientation) );
+            vel.setX(vel_l * std::cos(phy.orientation) );
+            vel.setZ(vel_l * std::sin(phy.orientation) );
 
             pos.setX(pos.x() + (vel.x() * dt) );
             pos.setY(pos.y() + vel.y());
             pos.setZ(pos.z() + (vel.z() * dt) );
-        }else{
-            pos.setX(pos.x() + vel.x());
-            pos.setY(pos.y() + vel.y());
-            pos.setZ(pos.z() + vel.z());
-        }
-        
-
+        // }
+        // }else{
+        //     pos.setX(pos.x() + vel.x());
+        //     pos.setY(pos.y() + vel.y());
+        //     pos.setZ(pos.z() + vel.z());
+        // }
+        // if(e.hasTag<EnemyTag>()){
+        //     auto& en = em.getComponent<PhysicsComponent>(e);
+        //     std::cout << en.position.x() << en.position.z();
+        // }
         if (phy.alreadyGrounded)
             phy.alreadyGrounded = false;
     });

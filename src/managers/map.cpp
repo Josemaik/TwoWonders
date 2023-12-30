@@ -21,13 +21,13 @@ void Map::createWallsOverworld(EntityManager& em) {
 
         // ZONA 1
 
-        { { -5.5, 0.0, -8.0 }, { 8.0, 1.0, 3.0 }, LIME },    // |
-        { { 5.5, 0.0, -8.0 }, { 8.0, 1.0, 3.0 }, LIME },     // | Pared Horizontal Arriba
+        // { { -5.5, 0.0, -8.0 }, { 8.0, 1.0, 3.0 }, LIME },    // |
+        // { { 5.5, 0.0, -8.0 }, { 8.0, 1.0, 3.0 }, LIME },     // | Pared Horizontal Arriba
 
-        { { -11.0, 0.0, -5.5 }, { 3.0, 1.0, 8.0 }, LIME },   // | 
-        { { -11.0, 0.0, 5.5 }, { 3.0, 1.0, 8.0}, LIME },    // | Pared Vertical Izquierda
-        { { 0.0, 0.0, 8.0 }, { 19.0, 1.0, 3.0 }, LIME },     // | Pared Horizontal Abajo
-        { { 11.0, 0.0, 0.0 }, { 3.0, 1.0, 19.0 }, LIME },    // | Pared Vertical Derecha
+        // { { -11.0, 0.0, -5.5 }, { 3.0, 1.0, 8.0 }, LIME },   // | 
+        // { { -11.0, 0.0, 5.5 }, { 3.0, 1.0, 8.0}, LIME },    // | Pared Vertical Izquierda
+        // { { 0.0, 0.0, 8.0 }, { 19.0, 1.0, 3.0 }, LIME },     // | Pared Horizontal Abajo
+        // { { 11.0, 0.0, 0.0 }, { 3.0, 1.0, 19.0 }, LIME },    // | Pared Vertical Derecha
 
         // ZONA 2
 
