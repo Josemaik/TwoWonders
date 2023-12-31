@@ -28,8 +28,8 @@ struct BTAction_goTarget : BTNode_t{
         auto torien { std::atan2(vtz,vtx) };
         if( torien < 0 ) torien += 2*PI;
         auto vang { torien - ectx.phy.orientation };
-        if ( vang > PI ) vang = 
-        else if ( vang < -PI )  
+        // if ( vang > PI ) vang = 
+        // else if ( vang < -PI )  
         ectx.phy.v_angular = std::clamp(vang, -ectx.phy.kMaxVAng,ectx.phy.kMaxVAng);
         return BTNodeStatus_t::running;
     }
