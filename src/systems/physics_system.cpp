@@ -16,12 +16,10 @@ void PhysicsSystem::update(EntityManager& em,float dt)
         vel.setY(vel.y() - phy.gravity);
         //vel.setY(std::clamp(vel.x(), phy.KMinVy, phy.KMaxVy));
 
-        //Revisar que la velocidad no exceda la velocidad máxima
-        if (std::abs(vel.x()) > phy.MAX_SPEED || std::abs(vel.y()) > phy.MAX_SPEED || std::abs(vel.z()) > phy.MAX_SPEED)
-        {
-            vel.normalize();
-            vel *= phy.MAX_SPEED;
-        }
+        //Normalizar la velocidad
+        vel.normalize();
+
+        // }
         // if(e.hasTag<PlayerTag>()){
             phy.orientation += dt * vel_a;
             if(phy.orientation > 2*PI) phy.orientation -= 2*PI;
@@ -32,8 +30,6 @@ void PhysicsSystem::update(EntityManager& em,float dt)
             // e = e0 + v0t + (1/2)at² t = 1 / 30
             // e = vt
             // a = at
-
-
             // e = v*t
             pos.setX(pos.x() + (vel.x() * dt) );
             pos.setY(pos.y() + vel.y());
@@ -43,6 +39,10 @@ void PhysicsSystem::update(EntityManager& em,float dt)
             phy.v_angular += phy.a_angular * dt;
             phy.v_linear =  std::clamp(phy.v_linear,  -phy.kMaxVLin, phy.kMaxVLin);
             phy.v_angular = std::clamp(phy.v_angular, -phy.kMaxAAng, phy.kMaxAAng);
+            // drag 
+            auto drag { dt * std::abs(phy.v_linear) * phy.kDrag };
+            if ( phy.v_linear > 0 ) phy.v_linear -= drag;
+            else                    phy.v_linear += drag;
         // }
         // }else{
         //     pos.setX(pos.x() + vel.x());

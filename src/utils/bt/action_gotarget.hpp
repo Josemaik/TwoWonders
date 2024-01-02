@@ -15,7 +15,7 @@ struct BTAction_goTarget : BTNode_t{
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         if( !ectx.ai.tactive ) return BTNodeStatus_t::fail;
 
-        ectx.phy.v_angular = ectx.phy.v_linear = 0;
+        ectx.phy.v_angular = ectx.phy.a_linear = 0;
         
         auto vtx { ectx.ai.tx - ectx.phy.position.x() };
         auto vtz { ectx.ai.tz - ectx.phy.position.z() };
@@ -26,7 +26,8 @@ struct BTAction_goTarget : BTNode_t{
             return BTNodeStatus_t::success;
         }
         
-        ectx.phy.v_linear = std::clamp( tdist / ectx.ai.time2arrive, -ectx.phy.kMaxVLin, ectx.phy.kMaxVLin );
+        auto tvelocity    = std::clamp( tdist / ectx.ai.time2arrive, -ectx.phy.kMaxVLin, ectx.phy.kMaxVLin );
+        ectx.phy.a_linear = std::clamp( tvelocity - ectx.phy.v_linear , -ectx.phy.kMaxAlin, ectx.phy.kMaxAlin ) ;
         
         //velocidad angular 
         auto torien { std::atan2(vtz,vtx) };
