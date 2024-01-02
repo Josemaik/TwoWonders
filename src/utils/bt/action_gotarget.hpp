@@ -16,21 +16,25 @@ struct BTAction_goTarget : BTNode_t{
         if( !ectx.ai.tactive ) return BTNodeStatus_t::fail;
 
         ectx.phy.v_angular = ectx.phy.v_linear = 0;
-        std::cout << "posx: " << ectx.phy.position.x() << ", posy: " << ectx.phy.position.z() << std::endl;
+        
         auto vtx { ectx.ai.tx - ectx.phy.position.x() };
         auto vtz { ectx.ai.tz - ectx.phy.position.z() };
+        auto tdist { std::sqrt(vtx*vtx + vtz*vtz) };
+        if(tdist < ectx.ai.arrival_radius){
+            ectx.ai.tactive = false;
+            std::printf("[%d] He llegado! \n",static_cast<int>(ectx.ent.getID()));
+            return BTNodeStatus_t::success;
+        }
         
-        auto vtlin { std::sqrt(vtx*vtx + vtz*vtz) };
-        std::cout << vtlin << "\n";
-        ectx.phy.v_linear = std::clamp( vtlin, -ectx.phy.kMaxVLin, ectx.phy.kMaxVLin );
+        ectx.phy.v_linear = std::clamp( tdist / ectx.ai.time2arrive, -ectx.phy.kMaxVLin, ectx.phy.kMaxVLin );
         
         //velocidad angular 
         auto torien { std::atan2(vtz,vtx) };
         if( torien < 0 ) torien += 2*PI;
         auto vang { torien - ectx.phy.orientation };
-        // if ( vang > PI ) vang = 
-        // else if ( vang < -PI )  
-        ectx.phy.v_angular = std::clamp(vang, -ectx.phy.kMaxVAng,ectx.phy.kMaxVAng);
+        if      ( vang >  PI ) vang -= 2*PI;
+        else if ( vang < -PI ) vang += 2*PI;
+        ectx.phy.v_angular = std::clamp(vang/ectx.ai.time2arrive, -ectx.phy.kMaxVAng,ectx.phy.kMaxVAng);
         return BTNodeStatus_t::running;
     }
 };

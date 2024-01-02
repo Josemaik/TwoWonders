@@ -18,7 +18,13 @@ struct PhysicsComponent
     double v_linear  { 0.0 };
     double v_angular { 0.0 };
     double orientation { 0.0 }; //ángulo del vector con respecto al eje de origen
-    static constexpr double kMaxVLin { 3 };
+
+    double a_linear  { 0.0 };
+    double a_angular { 0.0 };
+ 
+    static constexpr double kMaxVLin { 5.0 };
+    static constexpr double kMaxAlin { kMaxVLin/0.5 };
     static constexpr double kMaxVAng { 3*PI };
+    static constexpr double kMaxAAng { kMaxVAng/5.0};
     static constexpr double kEpsilon { 0.1 };
 };

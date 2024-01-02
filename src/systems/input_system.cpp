@@ -19,28 +19,28 @@ void InputSystem::update(EntityManager& em)
     {
         // Resetear la velocidad
         phy.velocity = {};
-        phy.v_linear = phy.v_angular = 0;
+        phy.a_linear = phy.v_angular = 0;
         auto& vel = phy.velocity;
         // Actualizar la velocidad
         if (IsKeyDown(in.right)) {
             // vel.setX(vel.x() + INP_SPEED);
-            phy.v_angular = 2*PI;
+            phy.v_angular = phy.kMaxVAng;
             in.last_key = in.right;
         }
         if (IsKeyDown(in.left)) {
             // vel.setX(vel.x() - INP_SPEED);
-             phy.v_angular = -2*PI;
+             phy.v_angular = -phy.kMaxVAng;
             in.last_key = in.left;
         }
         if (IsKeyDown(in.up)) {
             // vel.setZ(1);
-            phy.v_linear = 5;
+            phy.a_linear = phy.kMaxAlin;
             in.last_key = in.up;
 
         }
         if (IsKeyDown(in.down)) {
             // vel.setZ(-1);
-            phy.v_linear = -5;
+            phy.a_linear = -phy.kMaxAlin;
             in.last_key = in.down;
         }
 

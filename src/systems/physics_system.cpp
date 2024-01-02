@@ -4,7 +4,7 @@
 
 void PhysicsSystem::update(EntityManager& em,float dt)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([dt,&em](Entity& e, PhysicsComponent& phy)
+    em.forEach<SYSCMPs, SYSTAGs>([dt,&em](Entity& , PhysicsComponent& phy)
     {
         auto& pos = phy.position;
         auto& vel = phy.velocity;
@@ -26,13 +26,23 @@ void PhysicsSystem::update(EntityManager& em,float dt)
             phy.orientation += dt * vel_a;
             if(phy.orientation > 2*PI) phy.orientation -= 2*PI;
             if(phy.orientation < 0   ) phy.orientation += 2*PI;
-
+            
             vel.setX(vel_l * std::cos(phy.orientation) );
             vel.setZ(vel_l * std::sin(phy.orientation) );
+            // e = e0 + v0t + (1/2)at² t = 1 / 30
+            // e = vt
+            // a = at
 
+
+            // e = v*t
             pos.setX(pos.x() + (vel.x() * dt) );
             pos.setY(pos.y() + vel.y());
             pos.setZ(pos.z() + (vel.z() * dt) );
+            // v = at
+            phy.v_linear += phy.a_linear * dt;
+            phy.v_angular += phy.a_angular * dt;
+            phy.v_linear =  std::clamp(phy.v_linear,  -phy.kMaxVLin, phy.kMaxVLin);
+            phy.v_angular = std::clamp(phy.v_angular, -phy.kMaxAAng, phy.kMaxAAng);
         // }
         // }else{
         //     pos.setX(pos.x() + vel.x());

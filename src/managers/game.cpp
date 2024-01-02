@@ -75,7 +75,7 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, -5.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
@@ -98,16 +98,24 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
 }
+//IA FOR TEST STEERING BEHAVIOUR
 BehaviourTree_t tree1;
 void Game::createCube(EntityManager& em)
 {
-        auto& wall{ em.newEntity() };
+        auto& e1{ em.newEntity() };
+        auto& e2{ em.newEntity() };
         // em.addTag<EnemyTag>(wall);
-        auto& wr = em.addComponent<RenderComponent>(wall, RenderComponent{ .position = vec3d{6.5,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
-        auto& wp = em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = vec3d(wr.position)});
-        em.addComponent<ColliderComponent>(wall, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
+        auto& wr1 = em.addComponent<RenderComponent>(e1, RenderComponent{ .position = vec3d{6.5,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
+        auto& wp1 = em.addComponent<PhysicsComponent>(e1, PhysicsComponent{ .position = vec3d(wr1.position)});
+        em.addComponent<ColliderComponent>(e1, ColliderComponent{ wp1.position, wr1.scale, BehaviorType::ENEMY });
         tree1.createNode<BTAction_goTarget>();
-        em.addComponent<AIComponent>(wall,AIComponent{.tx=0.0,.tz=0.0,.tactive=true,.behaviourTree=&tree1});
+        em.addComponent<AIComponent>(e1,AIComponent{.arrival_radius=0.2,.tx=0.0,.tz=0.0,.time2arrive=0.15,.tactive=true,.behaviourTree=&tree1});
+
+        auto& wr2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = vec3d{-6.5,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
+        auto& wp2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = vec3d(wr2.position)});
+        em.addComponent<ColliderComponent>(e2, ColliderComponent{ wp2.position, wr2.scale, BehaviorType::ENEMY });
+        tree1.createNode<BTAction_goTarget>();
+        em.addComponent<AIComponent>(e2,AIComponent{.arrival_radius=0.5,.tx=0.0,.tz=0.0,.time2arrive=2.0,.tactive=true,.behaviourTree=&tree1});
 }
 
 void Game::run()
