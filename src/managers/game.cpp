@@ -98,41 +98,12 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
 }
-//IA FOR TEST STEERING BEHAVIOUR
-BehaviourTree_t tree1;
-void Game::createCube(EntityManager& em)
-{
-        auto& e1{ em.newEntity() };
-        //em.addTag<EnemyTag>(e1);
-        auto& e2{ em.newEntity() };
-        //em.addTag<EnemyTag>(e2);
-        // em.addTag<EnemyTag>(wall);
-        auto& wr1 = em.addComponent<RenderComponent>(e1, RenderComponent{ .position = vec3d{6.5,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
-        auto& wp1 = em.addComponent<PhysicsComponent>(e1, PhysicsComponent{ .position = vec3d(wr1.position),.gravity=2.0});
-        em.addComponent<ColliderComponent>(e1, ColliderComponent{ wp1.position, wr1.scale, BehaviorType::ENEMY });
-        tree1.createNode<BTAction_goTarget>();
-        em.addComponent<AIComponent>(e1,AIComponent{.arrival_radius=0.01,.tx=0.0,.tz=0.0,.time2arrive=0.15,.tactive=true,.behaviourTree=&tree1});
 
-        auto& wr2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = vec3d{-6.5,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
-        auto& wp2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = vec3d(wr2.position)});
-        em.addComponent<ColliderComponent>(e2, ColliderComponent{ wp2.position, wr2.scale, BehaviorType::ENEMY });
-        tree1.createNode<BTAction_goTarget>();
-        em.addComponent<AIComponent>(e2,AIComponent{.arrival_radius=0.1,.tx=0.0,.tz=0.0,.time2arrive=1.0,.tactive=true,.behaviourTree=&tree1});
-}
 
 void Game::run()
 {
     createEntities(em, evm);
-    createCube(em);
-    //enemie test
-    // auto& enemy{ em.newEntity() };
-    // em.addTag<EnemyTag>(enemy);
-    // auto& re = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = {0.0,0.0,2.0}, .scale = { 1.0, 1.0, 1.0 }, .color = ORANGE ,.visible = true });
-    // auto& pe = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { re.position }, .velocity = { .0, .0, .0 } });
-    // em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = 1 });
-    // em.addComponent<ColliderComponent>(enemy, ColliderComponent{ pe.position, re.scale, BehaviorType::ENEMY });
-    // tree1.createNode<BTAction_goTarget>();
-    // em.addComponent<AIComponent>(enemy, AIComponent{.behaviourTree=&tree1});
+    iam.createEnemies(em);
 
     map.createMap(em);
     engine.setTargetFPS(30);

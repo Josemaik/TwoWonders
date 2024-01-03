@@ -8,7 +8,7 @@
 #include <algorithm>
 
 
-struct BTAction_goTarget : BTNode_t{
+struct BTAction_Arrive : BTNode_t{
     // BTActionPatrol() = default;
     
     
@@ -16,7 +16,7 @@ struct BTAction_goTarget : BTNode_t{
         if( !ectx.ai.tactive ) return BTNodeStatus_t::fail;
 
         ectx.phy.v_angular = ectx.phy.a_linear = 0;
-        
+        // Linear distance to target
         auto vtx { ectx.ai.tx - ectx.phy.position.x() };
         auto vtz { ectx.ai.tz - ectx.phy.position.z() };
         auto tdist { std::sqrt(vtx*vtx + vtz*vtz) };

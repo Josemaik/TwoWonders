@@ -15,6 +15,9 @@
 #include "../utils/bt/action_changeposition.hpp"
 #include "../utils/bt/action_diagonalmovement.hpp"
 #include "../utils/bt/action_shoot.hpp"
+#include "../utils/bt/action_arrive.hpp"
+#include "../utils/bt/action_seek.hpp"
+#include "../utils/bt/action_flee.hpp"
 //decision
 #include "../utils/bt/decision_playerdetected.hpp"
 struct Ia_man
@@ -22,6 +25,7 @@ struct Ia_man
     // void createMap(EntityManager& em);
     void createEnemiesZone(EntityManager& em, uint16_t zone);
     bool checkEnemiesCreaeted(uint16_t zone);
+    void createEnemies(EntityManager& em);
 private:
     bool createdzone2{ false }, createdzone3{ false }, createdzone4{ false },
         createdzone5{ false }, createdzone6{ false }, createdzone12{ false },

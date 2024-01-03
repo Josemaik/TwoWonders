@@ -7,12 +7,12 @@
 // Forwarding
 struct BehaviourTree_t;
 
-enum class SB {
-      Arrive
-    , Seek
-    , Flee
-    , Avoid
-}
+// enum class SB {
+//       Arrive
+//     , Seek
+//     , Flee
+//     , Avoid
+// }
 struct AIComponent
 {
     // Type of shoots
@@ -57,7 +57,7 @@ struct AIComponent
     double tx { 0 }, tz { 0 };
     double time2arrive { 0.5 };
     bool tactive { false };
-    SB behaviour {SB::Arrive};
+    // SB behaviour {SB::Arrive};
     // Timers
     double countdown_change_dir{ 1.5 }, countdown_stop{ 3.5 }, countdown_shoot{ 2.0 }, countdown_change_position{ 3.0 }; // seconds
     double elapsed_change_position{ 1.0 }, elapsed_stop{ 1.0 }, elapsed_change_dir{ 1.0 }, elapsed_shoot{ 1.0 };
