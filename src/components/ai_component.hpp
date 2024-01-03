@@ -54,9 +54,15 @@ struct AIComponent
     double detect_radius{ 15.0 };
     bool playerdetected{ false };
     // data for cinematic test
+    // posicion objetivo
     double tx { 0 }, tz { 0 };
+    //tiempor para llegar al objetivo
     double time2arrive { 0.5 };
+    //activar o no comportamiento
     bool tactive { false };
+    //perception time ( couldown )
+    float perceptionTime { 0.1f }; // Frequency inverse 
+    float accumulated_dt { 0.0f };
     // SB behaviour {SB::Arrive};
     // Timers
     double countdown_change_dir{ 1.5 }, countdown_stop{ 3.5 }, countdown_shoot{ 2.0 }, countdown_change_position{ 3.0 }; // seconds

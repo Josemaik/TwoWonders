@@ -3,6 +3,7 @@
 void InputSystem::update(EntityManager& em)
 {
     auto& li = em.getSingleton<LevelInfo>();
+    auto& bb = em.getSingleton<BlackBoard_t>();
     auto* playerEn = em.getEntityByID(li.playerID);
 
     // DEBUG
@@ -43,6 +44,9 @@ void InputSystem::update(EntityManager& em)
             phy.a_linear = -phy.kMaxAlin;
             in.last_key = in.down;
         }
+        // if(IsKeyDown(in.seek) && !bb.tactive){     
+            bb = { phy.position.x() , phy.position.z(), true };
+        // }
 
         // Codigo para el ataque
         if (IsKeyDown(in.space) && e.hasComponent<AttackComponent>())

@@ -10,7 +10,7 @@
 #include "../components/event_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
-
+#include "../components/blackboard.hpp"
 
 #include "../components/levelinfo.hpp"
 #include "../components/projectile_component.hpp"
@@ -37,7 +37,7 @@ struct DoorTag {};
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList<PhysicsComponent, RenderComponent, EventComponent, InputComponent, LifeComponent, ColliderComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent, ShieldComponent>;
 using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, ObjectTag, ZoneTag, DoorTag>;
-using SCL = MP::TypeList<LevelInfo>;
+using SCL = MP::TypeList<LevelInfo,BlackBoard_t>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;

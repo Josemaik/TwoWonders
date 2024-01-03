@@ -10,6 +10,7 @@ struct InputComponent
     int right{ KEY_D };
     int space{ KEY_SPACE };
     int enter{ KEY_ENTER };
+    int seek { KEY_G };
 
     int last_key{};
 };

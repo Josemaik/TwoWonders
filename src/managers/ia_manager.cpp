@@ -227,7 +227,7 @@ BehaviourTree_t tree3;
 void Ia_man::createEnemies(EntityManager& em){
         auto& e1{ em.newEntity() };
         //em.addTag<EnemyTag>(e1);
-        auto& e2{ em.newEntity() };
+       // auto& e2{ em.newEntity() };
         //em.addTag<EnemyTag>(e2);
         auto& e3{ em.newEntity() };
         // em.addTag<EnemyTag>(wall);
@@ -235,17 +235,17 @@ void Ia_man::createEnemies(EntityManager& em){
         auto& wp1 = em.addComponent<PhysicsComponent>(e1, PhysicsComponent{ .position = vec3d(wr1.position),.gravity=2.0});
         em.addComponent<ColliderComponent>(e1, ColliderComponent{ wp1.position, wr1.scale, BehaviorType::ENEMY });
         tree1.createNode<BTAction_Seek>();
-        em.addComponent<AIComponent>(e1,AIComponent{.arrival_radius=1.0,.tx=0.0,.tz=0.0,.time2arrive=0.02,.tactive=true,.behaviourTree=&tree1});
+        em.addComponent<AIComponent>(e1,AIComponent{.arrival_radius=1.0,.tx=0.0,.tz=0.0,.time2arrive=0.02,.tactive=true,.perceptionTime=1.2f,.behaviourTree=&tree1});
 
-        auto& wr2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = vec3d{-6.5,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
-        auto& wp2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = vec3d(wr2.position)});
-        em.addComponent<ColliderComponent>(e2, ColliderComponent{ wp2.position, wr2.scale, BehaviorType::ENEMY });
-        tree2.createNode<BTAction_Arrive>();
-        em.addComponent<AIComponent>(e2,AIComponent{.arrival_radius=1.0,.tx=0.0,.tz=0.0,.time2arrive=2.0,.tactive=true,.behaviourTree=&tree2});
+        // auto& wr2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = vec3d{-6.5,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
+        // auto& wp2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = vec3d(wr2.position)});
+        // em.addComponent<ColliderComponent>(e2, ColliderComponent{ wp2.position, wr2.scale, BehaviorType::ENEMY });
+        // tree2.createNode<BTAction_Arrive>();
+        // em.addComponent<AIComponent>(e2,AIComponent{.arrival_radius=1.0,.tx=0.0,.tz=0.0,.time2arrive=2.0,.tactive=true,.behaviourTree=&tree2});
 
-        auto& wr3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = vec3d{0.0,0.0,2.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
+        auto& wr3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = vec3d{0.0,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
         auto& wp3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = vec3d(wr3.position)});
         em.addComponent<ColliderComponent>(e3, ColliderComponent{ wp3.position, wr3.scale, BehaviorType::ENEMY });
-        tree3.createNode<BTAction_Flee>();
-        em.addComponent<AIComponent>(e3,AIComponent{.arrival_radius=10.0,.tx=0.0,.tz=0.0,.time2arrive=1.0,.tactive=true,.behaviourTree=&tree3});
+        tree3.createNode<BTAction_Seek>();
+        em.addComponent<AIComponent>(e3,AIComponent{.arrival_radius=10.0,.tx=0.0,.tz=0.0,.time2arrive=1.0,.tactive=true,.perceptionTime=0.1f,.behaviourTree=&tree3});
 }
