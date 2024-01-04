@@ -3,7 +3,7 @@
 #include <random>
 
 
-void perception(Entity& e,BlackBoard_t& bb, AIComponent& ai,float dt){
+void perception(BlackBoard_t& bb, AIComponent& ai,float dt){
         // Accumulate delta time still perception time
         ai.accumulated_dt += dt;
         if( ai.accumulated_dt <= ai.perceptionTime ) return;
@@ -25,7 +25,7 @@ void AISystem::update(EntityManager& em, float dt)
     em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, AIComponent& ai)
     {
         //percibir el entorno
-        perception(e,bb,ai,dt);
+        perception(bb,ai,dt);
         if(ai.behaviourTree){
             ai.behaviourTree->run( {em,e,ai,phy,dt} );
             return;

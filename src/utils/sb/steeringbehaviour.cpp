@@ -4,24 +4,32 @@
 #include <numbers>
 #include <algorithm>
 
-struct Steer_t {
-      double linear { 0.0 };
-      double angular {0.0 };
-};
+double calculatePointDistance(vec3d const& target, vec3d const& origin){
+        auto dx { target.x() - origin.x() };
+        auto dz { target.z() - origin.z() };
+        return std::sqrt(dx*dx + dz*dz);
+}
 
 void adjustAnglePiMinusPi(double& angle){
       while      ( angle >  PI ) angle -= 2*PI;
       while      ( angle < -PI ) angle += 2*PI;
 }
 
+Steer_t velocity_match(PhysicsComponent const& phy,double const target_v, double const time2arrive) {
+        Steer_t steering;
+        auto acceleration { (target_v - phy.v_linear) / time2arrive };
+        steering.linear = std::clamp(acceleration , -phy.kMaxAlin, phy.kMaxAlin ) ;
+        return steering;
+}
+
 Steer_t align(PhysicsComponent const& phy, double const target_orientation, const double time2arrive){
-      Steer_t steering;
-      // Adjust angular distance
-      auto angular_distance { target_orientation - phy.orientation };
-      adjustAnglePiMinusPi(angular_distance);
-      //Adjusted angular velocity
-      steering.angular = std::clamp(angular_distance/time2arrive, -phy.kMaxVAng,phy.kMaxVAng);
-      return steering;
+        Steer_t steering;
+        // Adjust angular distance
+        auto angular_distance { target_orientation - phy.orientation };
+        adjustAnglePiMinusPi(angular_distance);
+        //Adjusted angular velocity
+        steering.angular = std::clamp(angular_distance/time2arrive, -phy.kMaxVAng,phy.kMaxVAng);
+        return steering;
 }
 
 Steer_t face(PhysicsComponent const& phy, vec3d target, const double time2arrive){
@@ -35,58 +43,37 @@ Steer_t face(PhysicsComponent const& phy, vec3d target, const double time2arrive
         return align(phy,target_orientation,time2arrive);
 }
 
-bool STBH::Arrive(AIComponent& ai,PhysicsComponent& phy,Entity& ent){
-        phy.v_angular = phy.a_linear = 0;
-        // Linear distance to target
-        auto vtx { ai.tx - phy.position.x() };
-        auto vtz { ai.tz - phy.position.z() };
-        auto tdist { std::sqrt(vtx*vtx + vtz*vtz) };
-        if(tdist < ai.arrival_radius){
-            ai.tactive = false;
-            std::printf("[%d] He llegado! \n",static_cast<int>(ent.getID()));
-            return true;
-        }
+Steer_t STBH::Arrive(PhysicsComponent const& phy,vec3d const& target,double const time2arrive, double const arrivalRadious){
+        //check if i'm on target
+        auto tdist { calculatePointDistance(target, {phy.position.x(),0.0,phy.position.z()}) };
+        if(tdist < arrivalRadious)
+            return {};
+        // face target
+        auto ang_steer { face(phy,target,time2arrive) };
+
+        // accelerate to arrive to the point
         //Target linear velocity
-        auto tvelocity    = std::clamp( tdist / ai.time2arrive, -phy.kMaxVLin, phy.kMaxVLin );
-        phy.a_linear = std::clamp( tvelocity - phy.v_linear , -phy.kMaxAlin, phy.kMaxAlin ) ;
-        
-        //Target orientation
-        auto torien { std::atan2(vtz,vtx) };
-        if( torien < 0 ) torien += 2*PI;
+        auto tvelocity    = std::clamp( tdist / time2arrive, -phy.kMaxVLin, phy.kMaxVLin );
+        auto lin_steer { velocity_match(phy,tvelocity,time2arrive) };
 
-        // target angular velocity
-        auto angular_st { align(phy,torien,ai.time2arrive) };
-        phy.v_angular = angular_st.angular;
-        return false;
+        return { lin_steer.linear,ang_steer.angular };
 }
-void STBH::Seek(AIComponent& ai,PhysicsComponent& phy){
-        phy.v_angular = phy.a_linear = 0;
+Steer_t STBH::Seek(PhysicsComponent const& phy,vec3d const& target, double const time2arrive){
+        Steer_t steering;
         //Face the target
-        auto asteer { face(phy,{ai.tx,0.0,ai.tz},ai.time2arrive) };
-        phy.v_angular = std::clamp(asteer.angular,-phy.kMaxVAng,phy.kMaxVAng);
+        auto asteer { face(phy,target,time2arrive) };
+        steering.angular = std::clamp(asteer.angular,-phy.kMaxVAng,phy.kMaxVAng);
         
         // Calculate target linear acceleration based on angular distance
         auto angular_velocity_size { std::fabs(phy.v_angular) };
         auto acceleration { phy.kMaxVLin / (1 + angular_velocity_size) };
-        phy.a_linear = std::clamp( acceleration/ai.time2arrive , -phy.kMaxAlin, phy.kMaxAlin ) ;
+        steering.linear = std::clamp( acceleration/time2arrive , -phy.kMaxAlin, phy.kMaxAlin ) ;
+
+        return steering;
 }
-void STBH::Flee(AIComponent& ai,PhysicsComponent& phy){
-       phy.v_angular = phy.a_linear = 0;
-
-        // Linear distance to target
-        auto vtx {- ai.tx + phy.position.x() };
-        auto vtz {- ai.tz + phy.position.z() };
-        
-        // target orientation 
-        auto target_orientation { std::atan2(vtz,vtx) };
-        if( target_orientation < 0 ) target_orientation += 2*PI;
-
-        // target angular velocity
-        auto asteer { align(phy,target_orientation,ai.time2arrive) };
-        phy.v_angular = asteer.angular;
-
-        // Calculate target linear acceleration based on angular distance
-        auto angular_velocity_size { std::fabs(phy.v_angular) };
-        auto acceleration { phy.kMaxVLin / (1 + angular_velocity_size) };
-        phy.a_linear = std::clamp( acceleration/ai.time2arrive , -phy.kMaxAlin, phy.kMaxAlin ) ;
+Steer_t STBH::Flee(PhysicsComponent const& phy,vec3d const& enemy, double const time2flee){
+        //Calcular pnto opuesto
+        vec3d target { 2*phy.position.x() - enemy.x(),0.0,2*phy.position.z() - enemy.z() };
+        //Seek al punto opuesto
+        return Seek(phy,target,time2flee);
 }
