@@ -63,6 +63,8 @@ struct AIComponent
     //perception time ( couldown )
     float perceptionTime { 0.1f }; // Frequency inverse 
     float accumulated_dt { 0.0f };
+    //Target Entity
+    std::size_t teid{};
     // SB behaviour {SB::Arrive};
     // Timers
     double countdown_change_dir{ 1.5 }, countdown_stop{ 3.5 }, countdown_shoot{ 2.0 }, countdown_change_position{ 3.0 }; // seconds

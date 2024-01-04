@@ -45,7 +45,7 @@ void InputSystem::update(EntityManager& em)
             in.last_key = in.down;
         }
         // if(IsKeyDown(in.seek) && !bb.tactive){     
-            bb = { phy.position.x() , phy.position.z(), true };
+            bb = { phy.position.x() , phy.position.z(), true, e.getID() };
         // }
 
         // Codigo para el ataque

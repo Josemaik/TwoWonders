@@ -77,3 +77,17 @@ Steer_t STBH::Flee(PhysicsComponent const& phy,vec3d const& enemy, double const 
         //Seek al punto opuesto
         return Seek(phy,target,time2flee);
 }
+
+Steer_t STBH::Pursue(PhysicsComponent const& phyTarget,PhysicsComponent const& phyPursuer, double const time2arrive){
+        //Calculate distance
+        vec3d target  {  phyTarget.position.x(), 0.0 ,   phyTarget.position.z() };
+        vec3d pursuer { phyPursuer.position.x(), 0.0 ,   phyPursuer.position.z()  };
+        auto distance { calculatePointDistance(target,pursuer) };
+        auto minimaltime { distance / phyPursuer.kMaxVLin };
+        vec3d predicted_target {
+                phyTarget.position.x() + phyTarget.velocity.x() * minimaltime,
+                0.0                                                          ,
+                phyTarget.position.z() + phyTarget.velocity.z() * minimaltime
+        };
+        return Seek(phyPursuer, predicted_target, time2arrive);
+}
