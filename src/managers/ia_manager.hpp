@@ -18,6 +18,7 @@
 #include "../utils/bt/action_arrive.hpp"
 #include "../utils/bt/action_seek.hpp"
 #include "../utils/bt/action_flee.hpp"
+#include "../utils/bt/action_pursue.hpp"
 //decision
 #include "../utils/bt/decision_playerdetected.hpp"
 struct Ia_man

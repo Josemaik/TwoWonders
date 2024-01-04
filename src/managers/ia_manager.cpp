@@ -234,7 +234,7 @@ void Ia_man::createEnemies(EntityManager& em){
         auto& wr1 = em.addComponent<RenderComponent>(e1, RenderComponent{ .position = vec3d{6.5,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
         auto& wp1 = em.addComponent<PhysicsComponent>(e1, PhysicsComponent{ .position = vec3d(wr1.position),.gravity=2.0});
         em.addComponent<ColliderComponent>(e1, ColliderComponent{ wp1.position, wr1.scale, BehaviorType::ENEMY });
-        tree1.createNode<BTAction_Seek>();
+        tree1.createNode<BTAction_Pursue>();
         em.addComponent<AIComponent>(e1,AIComponent{.arrival_radius=1.0,.tx=0.0,.tz=0.0,.time2arrive=0.02,.tactive=true,.perceptionTime=1.2f,.behaviourTree=&tree1});
 
         // auto& wr2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = vec3d{-6.5,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
