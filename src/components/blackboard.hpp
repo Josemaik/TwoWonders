@@ -1,10 +1,13 @@
 #pragma once
 
 #include <cstdint>
+#include <utils/path.hpp>
 
 struct BlackBoard_t {
     double tx { 0.0 } , tz { 0.0 };
     bool tactive { false };
     //Target Entity
     std::size_t teid{};
+    //Path
+    Path_t<4> path { vec3d{5.0, 0.0, 5.0} , {5.0,0.0,-5.0} , {-5.0,0.0,-5.0}, {-5.0,0.0,5.0} };
 };

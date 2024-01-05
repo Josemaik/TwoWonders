@@ -101,7 +101,7 @@ void Ia_man::createEnemiesZone2(EntityManager& em) {
         }, .num_lifes = 1,.Xmin= 0.0,.Xmax=0.0,.Zmin=0.0,.Zmax=0.0,.visible=true,.color=ORANGE}
     };
     //Creamos los nodos del behaviour tree
-    tree.createNode<BTActionPatrol>();
+    tree.createNode<BTAction_Patrol>();
     createEnemiesofType(em, Vec_patrolData,tree);
 }
 void Ia_man::createEnemiesZone3(EntityManager& em) {
@@ -178,7 +178,7 @@ void Ia_man::createEnemiesZone11(EntityManager& em) {
        },.num_lifes=10,.Xmin=0.0,.Xmax=0.0,.Zmin=0.0,.Zmax=0.0,.visible=true,.color=RED}
     };
     tree.createNode<BTNodeSequence_t>(
-        &tree.createNode<BTActionPatrol>(),
+        &tree.createNode<BTAction_Patrol>(),
         &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot)
     );
     createEnemiesofType(em, Vec_Drake,tree);
@@ -243,9 +243,9 @@ void Ia_man::createEnemies(EntityManager& em){
         // tree2.createNode<BTAction_Arrive>();
         // em.addComponent<AIComponent>(e2,AIComponent{.arrival_radius=1.0,.tx=0.0,.tz=0.0,.time2arrive=2.0,.tactive=true,.behaviourTree=&tree2});
 
-        auto& wr3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = vec3d{0.0,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
+        auto& wr3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = vec3d{-5.0,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
         auto& wp3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = vec3d(wr3.position)});
         em.addComponent<ColliderComponent>(e3, ColliderComponent{ wp3.position, wr3.scale, BehaviorType::ENEMY });
-        tree3.createNode<BTAction_Seek>();
-        em.addComponent<AIComponent>(e3,AIComponent{.arrival_radius=10.0,.tx=0.0,.tz=0.0,.time2arrive=1.0,.tactive=true,.perceptionTime=0.1f,.behaviourTree=&tree3});
+        tree3.createNode<BTAction_Patrol>();
+        em.addComponent<AIComponent>(e3,AIComponent{.arrival_radius=0.1,.tx=0.0,.tz=0.0,.time2arrive=0.02,.tactive=true,.perceptionTime=0.1f,.behaviourTree=&tree3});
 }

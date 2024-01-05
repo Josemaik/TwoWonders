@@ -44,9 +44,13 @@ void InputSystem::update(EntityManager& em)
             phy.a_linear = -phy.kMaxAlin;
             in.last_key = in.down;
         }
-        // if(IsKeyDown(in.seek) && !bb.tactive){     
-            bb = { phy.position.x() , phy.position.z(), true, e.getID() };
-        // }
+        if(IsKeyDown(in.seek) && !bb.tactive){
+           // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
+            bb.tx = phy.position.x();
+            bb.tz = phy.position.z();
+            bb.tactive = true;
+            bb.teid = e.getID();
+        }
 
         // Codigo para el ataque
         if (IsKeyDown(in.space) && e.hasComponent<AttackComponent>())
@@ -58,7 +62,7 @@ void InputSystem::update(EntityManager& em)
 
         // Codigo para curarse // DEBUG
         // if(IsKeyDown(KEY_Z) && e.hasComponent<LifeComponent>())
-        //     em.getComponent<LifeComponent>(e).increaseLife();  
+        //     em.getComponent<LifeComponent>(e).increaseLife();
 
         // Código pa correr
         //

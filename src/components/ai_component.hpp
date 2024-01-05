@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <array>
 #include <random>
-#include "utils/vec3D.hpp"
+#include <utils/path.hpp>
 
 // Forwarding
 struct BehaviourTree_t;
@@ -61,10 +61,12 @@ struct AIComponent
     //activar o no comportamiento
     bool tactive { false };
     //perception time ( couldown )
-    float perceptionTime { 0.1f }; // Frequency inverse 
+    float perceptionTime { 0.1f }; // Frequency inverse
     float accumulated_dt { 0.0f };
     //Target Entity
     std::size_t teid{};
+    //PATH
+    Path_t<4>::iterator pathIt {};
     // SB behaviour {SB::Arrive};
     // Timers
     double countdown_change_dir{ 1.5 }, countdown_stop{ 3.5 }, countdown_shoot{ 2.0 }, countdown_change_position{ 3.0 }; // seconds
