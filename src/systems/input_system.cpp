@@ -3,6 +3,7 @@
 void InputSystem::update(EntityManager& em)
 {
     auto& li = em.getSingleton<LevelInfo>();
+    auto& bb = em.getSingleton<BlackBoard_t>();
     auto* playerEn = em.getEntityByID(li.playerID);
 
     // DEBUG
@@ -19,23 +20,65 @@ void InputSystem::update(EntityManager& em)
     {
         // Resetear la velocidad
         phy.velocity = {};
+        phy.a_linear = phy.v_angular = 0;
         auto& vel = phy.velocity;
         // Actualizar la velocidad
         if (IsKeyDown(in.right)) {
-            vel.setX(vel.x() + INP_SPEED);
+            // vel.setX(vel.x() + INP_SPEED);
+            phy.v_angular = phy.kMaxVAng;
             in.last_key = in.right;
         }
         if (IsKeyDown(in.left)) {
-            vel.setX(vel.x() - INP_SPEED);
+            // vel.setX(vel.x() - INP_SPEED);
+             phy.v_angular = -phy.kMaxVAng;
             in.last_key = in.left;
         }
         if (IsKeyDown(in.up)) {
-            vel.setZ(vel.z() - INP_SPEED);
+            // vel.setZ(1);
+            phy.a_linear = phy.kMaxAlin;
             in.last_key = in.up;
+
         }
         if (IsKeyDown(in.down)) {
-            vel.setZ(vel.z() + INP_SPEED);
+            // vel.setZ(-1);
+            phy.a_linear = -phy.kMaxAlin;
             in.last_key = in.down;
+        }
+        if(IsKeyDown(in.seek) && !bb.tactive){
+           // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
+            bb.behaviour = SB::Seek;
+        }
+        if(IsKeyDown(in.arrive) && !bb.tactive){
+           // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
+            bb.behaviour = SB::Arrive;
+        }
+        if(IsKeyDown(in.Flee) && !bb.tactive){
+           // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
+            bb.behaviour = SB::Flee;
+        }
+        if(IsKeyDown(in.Pursue) && !bb.tactive){
+           // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
+            bb.behaviour = SB::Pursue;
+        }
+        if(IsKeyDown(in.Avoid) && !bb.tactive){
+           // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
+            bb.behaviour = SB::Avoid;
+        }
+        if(IsKeyDown(in.pathfollow) && !bb.tactive){
+           // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
+            bb.behaviour = SB::followPath;
+            bb.tactive = true;
+        }
+        if(bb.behaviour != SB::followPath && bb.behaviour != SB::Arrive){
+            bb.tx = phy.position.x();
+            bb.tz = phy.position.z();
+            bb.tactive = true;
+            bb.teid = e.getID();
+        }
+        if(bb.behaviour == SB::Arrive){
+            bb.tx = 0.0;
+            bb.tz = 0.0;
+            bb.tactive = true;
         }
 
         // Codigo para el ataque
@@ -48,7 +91,7 @@ void InputSystem::update(EntityManager& em)
 
         // Codigo para curarse // DEBUG
         // if(IsKeyDown(KEY_Z) && e.hasComponent<LifeComponent>())
-        //     em.getComponent<LifeComponent>(e).increaseLife();  
+        //     em.getComponent<LifeComponent>(e).increaseLife();
 
         // Código pa correr
         //

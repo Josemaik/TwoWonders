@@ -10,6 +10,12 @@ struct InputComponent
     int right{ KEY_D };
     int space{ KEY_SPACE };
     int enter{ KEY_ENTER };
+    int arrive { KEY_R };
+    int seek   { KEY_K };
+    int Flee   { KEY_F };
+    int Pursue { KEY_P };
+    int Avoid  { KEY_V };
+    int pathfollow  { KEY_T };
 
     int last_key{};
 };

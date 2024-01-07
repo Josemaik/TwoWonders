@@ -7,8 +7,8 @@ void Game::createSword(EntityManager& em)
 
     em.addTag<ObjectTag>(e);
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 49.0f, 0.f, 78.0f }, .scale = { 1.f, 0.3f, 0.3f }, .color = LIGHTGRAY });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 49.0, 0., 78.0 }, .scale = { 1., 0.3, 0.3 }, .color = LIGHTGRAY });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0, .0, .0 } });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword, .inmortal = true });
 }
@@ -70,13 +70,12 @@ void Game::createEnding(EntityManager& em)
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
 }
 
-
 void Game::createEntities(EntityManager& em, Eventmanager& evm)
 {
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, -5.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
@@ -84,7 +83,6 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     em.addComponent<InformationComponent>(e, InformationComponent{});
     em.addComponent<EventComponent>(e);
     evm.registerListener(e, EVENT_CODE_CHANGE_ZONE);
-
     // Sword
     createSword(em);
     // Shield
@@ -101,9 +99,11 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     li.playerID = e.getID();
 }
 
+
 void Game::run()
 {
     createEntities(em, evm);
+    iam.createEnemies(em);
 
     map.createMap(em);
     engine.setTargetFPS(30);
@@ -216,7 +216,7 @@ void Game::run()
 void Game::normalExecution(EntityManager& em, float deltaTime)
 {
     ai_system.update(em, deltaTime);
-    physics_system.update(em);
+    physics_system.update(em,deltaTime);
     collision_system.update(em);
     zone_system.update(em, engine, iam, evm);
     shield_system.update(em);

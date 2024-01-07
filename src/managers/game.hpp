@@ -17,6 +17,8 @@
 #include "../systems/shield_system.hpp"
 #include "../systems/event_system.hpp"
 #include "game_engine.hpp"
+#include "ia_manager.hpp"
+
 
 #include "map.hpp"
 
@@ -31,7 +33,6 @@ struct Game
     void run();
 
 private:
-
     void createEntities(EntityManager& em, Eventmanager& evm);
     void createSword(EntityManager& em);
     void createShield(EntityManager& em, Entity& ent);
