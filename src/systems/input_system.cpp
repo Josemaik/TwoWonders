@@ -46,10 +46,39 @@ void InputSystem::update(EntityManager& em)
         }
         if(IsKeyDown(in.seek) && !bb.tactive){
            // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
+            bb.behaviour = SB::Seek;
+        }
+        if(IsKeyDown(in.arrive) && !bb.tactive){
+           // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
+            bb.behaviour = SB::Arrive;
+        }
+        if(IsKeyDown(in.Flee) && !bb.tactive){
+           // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
+            bb.behaviour = SB::Flee;
+        }
+        if(IsKeyDown(in.Pursue) && !bb.tactive){
+           // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
+            bb.behaviour = SB::Pursue;
+        }
+        if(IsKeyDown(in.Avoid) && !bb.tactive){
+           // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
+            bb.behaviour = SB::Avoid;
+        }
+        if(IsKeyDown(in.pathfollow) && !bb.tactive){
+           // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
+            bb.behaviour = SB::followPath;
+            bb.tactive = true;
+        }
+        if(bb.behaviour != SB::followPath && bb.behaviour != SB::Arrive){
             bb.tx = phy.position.x();
             bb.tz = phy.position.z();
             bb.tactive = true;
             bb.teid = e.getID();
+        }
+        if(bb.behaviour == SB::Arrive){
+            bb.tx = 0.0;
+            bb.tz = 0.0;
+            bb.tactive = true;
         }
 
         // Codigo para el ataque

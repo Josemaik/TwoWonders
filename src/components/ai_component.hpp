@@ -7,12 +7,14 @@
 // Forwarding
 struct BehaviourTree_t;
 
-// enum class SB {
-//       Arrive
-//     , Seek
-//     , Flee
-//     , Avoid
-// }
+enum class SB : uint8_t {
+    Arrive,
+    Seek,
+    Flee,
+    Pursue,
+    Avoid,
+    followPath
+};
 struct AIComponent
 {
     // Type of shoots
@@ -53,7 +55,8 @@ struct AIComponent
     // Data for detect player
     double detect_radius{ 15.0 };
     bool playerdetected{ false };
-    // data for cinematic test
+    // data for steering behaviour
+    SB behaviour { SB::Arrive };
     // posicion objetivo
     double tx { 0 }, tz { 0 };
     //tiempor para llegar al objetivo

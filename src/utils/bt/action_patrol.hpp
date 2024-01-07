@@ -14,7 +14,6 @@ struct BTAction_Patrol : BTNode_t{
         //Do patrol
         Steer_t steering = STBH::Arrive(ectx.phy,*ectx.ai.pathIt,ectx.ai.time2arrive,ectx.ai.arrival_radius);
         if ( steering == Steer_t{} ){
-            std::cout << "he entrado";
             ++ectx.ai.pathIt;
         }
         ectx.phy.a_linear = steering.linear;

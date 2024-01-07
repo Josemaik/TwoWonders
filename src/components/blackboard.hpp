@@ -2,9 +2,11 @@
 
 #include <cstdint>
 #include <utils/path.hpp>
+#include "ai_component.hpp"
 
 struct BlackBoard_t {
     double tx { 0.0 } , tz { 0.0 };
+    SB behaviour { SB::Arrive };
     bool tactive { false };
     //Target Entity
     std::size_t teid{};
