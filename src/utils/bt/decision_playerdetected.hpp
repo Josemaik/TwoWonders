@@ -18,9 +18,9 @@ struct BTDecisionPlayerDetected : BTNode_t{
         if( distance < (ectx.ai.detect_radius * ectx.ai.detect_radius)){
             std::cout << "PLayer detectado \n";
             ectx.ai.path_initialized = false;
-            return BTNodeStatus_t::fail;
+            return BTNodeStatus_t::success;
         }
-        return BTNodeStatus_t::success;
+        return BTNodeStatus_t::fail;
     }
 
 // private:

@@ -237,12 +237,13 @@ void Ia_man::createEnemies(EntityManager& em){
         em.addComponent<ColliderComponent>(e1, ColliderComponent{ wp1.position, wr1.scale, BehaviorType::ENEMY });
         tree1.createNode<BTNodeSelector_t>(
             &tree1.createNode<BTNodeSequence_t>(
-                &tree1.createNode<BTAction_Patrol>(),
-                &tree1.createNode<BTDecisionPlayerDetected>()
+                &tree1.createNode<BTDecisionPlayerDetected>(),
+                &tree1.createNode<BTAction_Seek>(),
+                &tree1.createNode<BTDecisionReadyforAttack>(),
+                &tree1.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer)
             ),
             &tree1.createNode<BTNodeSequence_t>(
-                &tree1.createNode<BTAction_Seek>(),
-                &tree1.createNode<BTDecisionReadyforAttack>()
+                &tree1.createNode<BTAction_Patrol>()
             )
         );
         // auto *a1 = &tree1.createNode<BTAction_Patrol>();
@@ -254,7 +255,8 @@ void Ia_man::createEnemies(EntityManager& em){
         // tree1.createNode<BTNodeSelector_t>(a12,a34);
 
             // tree1.createNode<BTAction_Arrive>();
-        em.addComponent<AIComponent>(e1,AIComponent{.arrival_radius=0.5,.detect_radius = 8.0,.tx=0.0,.tz=0.0,.time2arrive=0.2,.tactive=true,.perceptionTime=0.0f,.behaviourTree=&tree1});
+        em.addComponent<AIComponent>(e1,AIComponent{.arrival_radius=0.5,.detect_radius = 4.0,.tx=0.0,.tz=0.0,.time2arrive=0.2,.tactive=true,.perceptionTime=0.0f,.behaviourTree=&tree1});
+        em.addComponent<AttackComponent>(e1, AttackComponent{});
         }
         // auto& wr2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = vec3d{-6.5,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
         // auto& wp2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = vec3d(wr2.position)});

@@ -20,11 +20,10 @@ struct BTDecisionReadyforAttack : BTNode_t{
         //Compruebo si esta dentro del radio de detección
         if( distance < (ectx.ai.attack_radius * ectx.ai.attack_radius)){
             std::cout << "Atacar player \n";
-            ectx.phy.v_linear = 0;
-            return BTNodeStatus_t::running;
-        } else{
-             return BTNodeStatus_t::success;
+            // ectx.phy.v_linear = 0;
+            return BTNodeStatus_t::success;
         }
+        return BTNodeStatus_t::fail;
 
     }
 

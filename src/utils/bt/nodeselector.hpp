@@ -23,7 +23,7 @@ struct BTNodeSelector_t : BTNode_t{
         auto status = (*currentNodeIt)->run(ectx);
         switch (status)
         {
-            case BTNodeStatus_t::success:    {  return BTNodeStatus_t::success;    }
+            case BTNodeStatus_t::success:    { resetSequence(); return BTNodeStatus_t::success;    }
                 break;
             case BTNodeStatus_t::running: { return BTNodeStatus_t::running; }
                 break;

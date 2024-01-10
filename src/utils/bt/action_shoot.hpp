@@ -18,13 +18,13 @@ struct BTActionShoot : BTNode_t{
     }
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         auto& att = ectx.em.getComponent<AttackComponent>(ectx.ent);
-        if (ectx.ai.elapsed_shoot >= ectx.ai.countdown_shoot) {
-            if(ectx.ai.ghost){
-                //rend a no visibles
-                 auto& rend1 = ectx.em.getComponent<RenderComponent>(ectx.ent);
-                 rend1.visible = false;
-            }
-            ectx.ai.elapsed_shoot = 0;
+        // if (ectx.ai.elapsed_shoot >= ectx.ai.countdown_shoot) {
+            // if(ectx.ai.ghost){
+            //     //rend a no visibles
+            //      auto& rend1 = ectx.em.getComponent<RenderComponent>(ectx.ent);
+            //      rend1.visible = false;
+            // }
+            // ectx.ai.elapsed_shoot = 0;
             switch (shoot)
             {
             case AIComponent::TypeShoot::OneShootonDir : {
@@ -50,9 +50,9 @@ struct BTActionShoot : BTNode_t{
             default:
                 break;
             }
-        }
+        // }
         ectx.ai.dec_countdown_shoot(ectx.deltatime);
-        return BTNodeStatus_t::running; 
+        return BTNodeStatus_t::fail;
     }
 private:
    type_value shoot;
