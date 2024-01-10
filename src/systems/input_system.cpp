@@ -24,24 +24,24 @@ void InputSystem::update(EntityManager& em)
         auto& vel = phy.velocity;
         // Actualizar la velocidad
         if (IsKeyDown(in.right)) {
-            // vel.setX(vel.x() + INP_SPEED);
-            phy.v_angular = phy.kMaxVAng;
+            vel.setX(vel.x() + INP_SPEED);
+            //phy.v_angular = phy.kMaxVAng;
             in.last_key = in.right;
         }
         if (IsKeyDown(in.left)) {
-            // vel.setX(vel.x() - INP_SPEED);
-             phy.v_angular = -phy.kMaxVAng;
+            vel.setX(vel.x() - INP_SPEED);
+            // phy.v_angular = -phy.kMaxVAng;
             in.last_key = in.left;
         }
         if (IsKeyDown(in.up)) {
-            // vel.setZ(1);
-            phy.a_linear = phy.kMaxAlin;
+            vel.setZ(vel.z() - INP_SPEED);
+            // phy.a_linear = phy.kMaxAlin;
             in.last_key = in.up;
 
         }
         if (IsKeyDown(in.down)) {
-            // vel.setZ(-1);
-            phy.a_linear = -phy.kMaxAlin;
+            vel.setZ(vel.z() + INP_SPEED);
+            // phy.a_linear = -phy.kMaxAlin;
             in.last_key = in.down;
         }
         if(IsKeyDown(in.seek) && !bb.tactive){
