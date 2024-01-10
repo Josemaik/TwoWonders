@@ -22,6 +22,7 @@
 #include "../utils/bt/action_avoid.hpp"
 //decision
 #include "../utils/bt/decision_playerdetected.hpp"
+#include "../utils/bt/decision_readyforattack.hpp"
 struct Ia_man
 {
     // void createMap(EntityManager& em);

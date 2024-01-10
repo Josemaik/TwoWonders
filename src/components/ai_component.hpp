@@ -7,14 +7,14 @@
 // Forwarding
 struct BehaviourTree_t;
 
-enum class SB : uint8_t {
-    Arrive,
-    Seek,
-    Flee,
-    Pursue,
-    Avoid,
-    followPath
-};
+// enum class SB : uint8_t {
+//     Arrive,
+//     Seek,
+//     Flee,
+//     Pursue,
+//     Avoid,
+//     followPath
+// };
 struct AIComponent
 {
     // Type of shoots
@@ -54,9 +54,10 @@ struct AIComponent
     vec3d getRandomPosinRange(double xmin, double xmax, double zmin, double zmax);
     // Data for detect player
     double detect_radius{ 15.0 };
+    double attack_radius { 4.0 };
     bool playerdetected{ false };
     // data for steering behaviour
-    SB behaviour { SB::Arrive };
+    // SB behaviour { SB::Arrive };
     // posicion objetivo
     double tx { 0 }, tz { 0 };
     //tiempor para llegar al objetivo
@@ -69,7 +70,9 @@ struct AIComponent
     //Target Entity
     std::size_t teid{};
     //PATH
-    Path_t<4>::iterator pathIt {};
+    Path_t<4> path { vec3d{2.0, 0.0, -2.0} , {-1.0,0.0,-2.0} , {-1.0,0.0,2.0}, {2.0,0.0,2.0} };
+    Path_t<4>::iterator pathIt { };
+    bool path_initialized { false };
     // SB behaviour {SB::Arrive};
     // Timers
     double countdown_change_dir{ 1.5 }, countdown_stop{ 3.5 }, countdown_shoot{ 2.0 }, countdown_change_position{ 3.0 }; // seconds

@@ -15,9 +15,9 @@ void perception(BlackBoard_t& bb, AIComponent& ai,float dt){
             ai.tz = bb.tz;
             ai.tactive = true;
             ai.teid = bb.teid;
-            ai.behaviour = bb.behaviour;
+            // ai.behaviour = bb.behaviour;
             bb.tactive = false;
-            ai.pathIt = bb.path.begin();
+            // ai.pathIt = bb.path.begin();
             // auto id {static_cast<int>(e.getID()) };
             // std::printf("[%d] VOY! (%.1f,%.1f)\n",id,ai.tx,ai.tz);
         }
@@ -31,30 +31,30 @@ void AISystem::update(EntityManager& em, float dt)
         //percibir el entorno
         perception(bb,ai,dt);
         if(ai.behaviourTree){
-            ai.behaviourTree->clearNodes();
-            switch(ai.behaviour){
-                case SB::Arrive :ai.behaviourTree->createNode<BTAction_Arrive>();
-                std::cout << "arrive\n";
-                break;
-                case SB::Seek :ai.behaviourTree->createNode<BTAction_Seek>();
-                std::cout << "seek\n";
-                break;
-                case SB::Flee :ai.behaviourTree->createNode<BTAction_Flee>();
-                std::cout << "flee\n";
-                break;
-                case SB::Pursue :ai.behaviourTree->createNode<BTAction_Pursue>();
-                std::cout << "pursue\n";
-                break;
-                case SB::Avoid :ai.behaviourTree->createNode<BTAction_Avoid>();
-                std::cout << "avoid\n";
-                break;
-                case SB::followPath :ai.behaviourTree->createNode<BTAction_Patrol>();
-                std::cout << "followpath \n";
-                break;
-                default: ai.behaviourTree->createNode<BTAction_Arrive>();
-                std::cout << "defecto \n";
-                break;
-            }
+            // ai.behaviourTree->clearNodes();
+            // switch(ai.behaviour){
+            //     case SB::Arrive :ai.behaviourTree->createNode<BTAction_Arrive>();
+            //     std::cout << "arrive\n";
+            //     break;
+            //     case SB::Seek :ai.behaviourTree->createNode<BTAction_Seek>();
+            //     std::cout << "seek\n";
+            //     break;
+            //     case SB::Flee :ai.behaviourTree->createNode<BTAction_Flee>();
+            //     std::cout << "flee\n";
+            //     break;
+            //     case SB::Pursue :ai.behaviourTree->createNode<BTAction_Pursue>();
+            //     std::cout << "pursue\n";
+            //     break;
+            //     case SB::Avoid :ai.behaviourTree->createNode<BTAction_Avoid>();
+            //     std::cout << "avoid\n";
+            //     break;
+            //     case SB::followPath :ai.behaviourTree->createNode<BTAction_Patrol>();
+            //     std::cout << "followpath \n";
+            //     break;
+            //     default: ai.behaviourTree->createNode<BTAction_Arrive>();
+            //     std::cout << "defecto \n";
+            //     break;
+            // }
             ai.behaviourTree->run( {em,e,ai,phy,dt} );
             return;
         }
