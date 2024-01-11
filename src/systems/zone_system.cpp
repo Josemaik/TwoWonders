@@ -40,8 +40,8 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
                         // SWORD //
 
                     case 14: // TP a la cueva de la espada
-                        p.position.setX(49.0);
-                        p.position.setZ(85.0);
+                        // p.position.setX(49.0);
+                        // p.position.setZ(85.0);
                         break;
 
                     case 15: // TP desde la cueva de la espada

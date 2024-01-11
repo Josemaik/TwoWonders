@@ -16,11 +16,13 @@ struct BTDecisionPlayerDetected : BTNode_t{
         auto const distance = (ectx.phy.position - plphy.position).lengthSQ();
         //Compruebo si esta dentro del radio de detección
         if( distance < (ectx.ai.detect_radius * ectx.ai.detect_radius)){
+            std::cout << "PLayer detectado \n";
+            ectx.ai.path_initialized = false;
             return BTNodeStatus_t::success;
         }
         return BTNodeStatus_t::fail;
     }
-    
+
 // private:
 //     bool alternative { false };
 };
