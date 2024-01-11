@@ -231,31 +231,37 @@ void Ia_man::createEnemies(EntityManager& em){
         //em.addTag<EnemyTag>(e2);
         {
         auto& e1{ em.newEntity() };
-        // em.addTag<EnemyTag>(wall);
+        // em.addTag<EnemyTag>(e1);
         auto& wr1 = em.addComponent<RenderComponent>(e1, RenderComponent{ .position = vec3d{6.5,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
         auto& wp1 = em.addComponent<PhysicsComponent>(e1, PhysicsComponent{ .position = vec3d(wr1.position),.gravity=2.0});
         em.addComponent<ColliderComponent>(e1, ColliderComponent{ wp1.position, wr1.scale, BehaviorType::ENEMY });
-        tree1.createNode<BTNodeSelector_t>(
-            &tree1.createNode<BTNodeSequence_t>(
-                &tree1.createNode<BTDecisionPlayerDetected>(),
-                &tree1.createNode<BTAction_Seek>(),
-                &tree1.createNode<BTDecisionReadyforAttack>(),
-                &tree1.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer)
-            ),
-            &tree1.createNode<BTNodeSequence_t>(
-                &tree1.createNode<BTAction_Patrol>()
-            )
-        );
-        // auto *a1 = &tree1.createNode<BTAction_Patrol>();
-        // auto *a2 = &tree1.createNode<BTDecisionPlayerDetected>();
-        // auto *a12 = &tree1.createNode<BTNodeSequence_t> (a1 , a2);
-        // auto *a3 = &tree1.createNode<BTAction_Seek>();
-        // auto *a4 = &tree1.createNode<BTDecisionReadyforAttack>();
-        // auto *a34 = &tree1.createNode<BTNodeSequence_t> (a3 , a4);
-        // tree1.createNode<BTNodeSelector_t>(a12,a34);
+        // tree1.createNode<BTNodeSelector_t>(
+        //     &tree1.createNode<BTNodeSequence_t>(
+        //         &tree1.createNode<BTDecisionPlayerDetected>(),
+        //         &tree1.createNode<BTAction_Seek>(),
+        //         &tree1.createNode<BTDecisionReadyforAttack>(),
+        //         &tree1.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer)
+        //     ),
+        //     &tree1.createNode<BTNodeSequence_t>(
+        //         &tree1.createNode<BTAction_Patrol>()
+        //     )
+        // );
+        // &tree1.createNode<BTAction_Seek>();
+
+        auto *d_1 = &tree1.createNode<BTDecisionPlayerDetected>();
+        auto *a_s = &tree1.createNode<BTAction_Seek>();
+        auto *d_a = &tree1.createNode<BTDecisionReadyforAttack>();
+        // auto *d_2 = &tree1.createNode<BTDecisionPlayerDetected>();
+        auto *a_a = &tree1.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer);
+        auto *sequence1 = &tree1.createNode<BTNodeSequence_t> (d_1 , a_s, d_a, a_a);
+
+        auto *patrol = &tree1.createNode<BTAction_Patrol>();
+        auto *sequence2 = &tree1.createNode<BTNodeSequence_t> (patrol);
+
+        tree1.createNode<BTNodeSelector_t>(sequence1,sequence2);
 
             // tree1.createNode<BTAction_Arrive>();
-        em.addComponent<AIComponent>(e1,AIComponent{.arrival_radius=0.5,.detect_radius = 4.0,.tx=0.0,.tz=0.0,.time2arrive=0.2,.tactive=true,.perceptionTime=0.0f,.behaviourTree=&tree1});
+        em.addComponent<AIComponent>(e1,AIComponent{.arrival_radius=0.1,.detect_radius = 6.0,.tx=0.0,.tz=0.0,.time2arrive=1.0,.tactive=true,.perceptionTime=0.2f,.behaviourTree=&tree1});
         em.addComponent<AttackComponent>(e1, AttackComponent{});
         }
         // auto& wr2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = vec3d{-6.5,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });

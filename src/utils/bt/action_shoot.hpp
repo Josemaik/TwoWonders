@@ -25,34 +25,38 @@ struct BTActionShoot : BTNode_t{
             //      rend1.visible = false;
             // }
             // ectx.ai.elapsed_shoot = 0;
-            switch (shoot)
-            {
-            case AIComponent::TypeShoot::OneShootonDir : {
-                // shoot one time
-                att.vel = ectx.ai.oldvel;
-                att.attack(AttackType::Ranged);
-                return BTNodeStatus_t::success;
+            if(ectx.ai.ready_attack){
+                ectx.ai.ready_attack = false;
+                    switch (shoot)
+                {
+                case AIComponent::TypeShoot::OneShootonDir : {
+                    // shoot one time
+                    att.vel = ectx.ai.oldvel;
+                    att.attack(AttackType::Ranged);
+                    return BTNodeStatus_t::success;
+                }
+                    break;
+                case  AIComponent::TypeShoot::OneShoottoPlayer : {
+                    att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai.SPEED_AI;
+                    att.attack(AttackType::Ranged);
+                    return BTNodeStatus_t::success;
+                }
+                    break;
+                case AIComponent::TypeShoot::TripleShoot: {
+                    //shoot three time
+                    att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai.SPEED_AI;
+                    att.attack(AttackType::TripleShot);
+                    return BTNodeStatus_t::success;
+                }
+                    break;
+                default:
+                    break;
+                }
             }
-                break;
-            case  AIComponent::TypeShoot::OneShoottoPlayer : {
-                att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai.SPEED_AI;
-                att.attack(AttackType::Ranged);
-                return BTNodeStatus_t::success;
-            }
-                break;
-            case AIComponent::TypeShoot::TripleShoot: {
-                //shoot three time
-                att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai.SPEED_AI;
-                att.attack(AttackType::TripleShot);
-                return BTNodeStatus_t::success;
-            }
-                break;
-            default:
-                break;
-            }
+
         // }
-        ectx.ai.dec_countdown_shoot(ectx.deltatime);
-        return BTNodeStatus_t::fail;
+        // ectx.ai.dec_countdown_shoot(ectx.deltatime);
+        return BTNodeStatus_t::success;
     }
 private:
    type_value shoot;

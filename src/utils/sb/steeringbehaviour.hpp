@@ -2,9 +2,10 @@
 #include <utils/types.hpp>
 
 struct Steer_t {
-      double linear { 0.0 };
-      double angular {0.0 };
-      constexpr bool operator==(Steer_t const&) const noexcept = default;
+      double v_x { 0.0 };
+      double v_z {0.0 };
+      bool arrived {false};
+    //   constexpr bool operator==(Steer_t const&) const noexcept = default;
 };
 
 namespace STBH{

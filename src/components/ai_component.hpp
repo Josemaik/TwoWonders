@@ -54,8 +54,10 @@ struct AIComponent
     vec3d getRandomPosinRange(double xmin, double xmax, double zmin, double zmax);
     // Data for detect player
     double detect_radius{ 15.0 };
-    double attack_radius { 4.0 };
+    double attack_radius { 6.0 };
     bool playerdetected{ false };
+    //Ataque
+    bool ready_attack {false};
     // data for steering behaviour
     // SB behaviour { SB::Arrive };
     // posicion objetivo

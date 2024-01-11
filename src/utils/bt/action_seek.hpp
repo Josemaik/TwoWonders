@@ -17,8 +17,7 @@ struct BTAction_Seek : BTNode_t{
         }
          std::cout << "TOY SEEK \n";
         Steer_t steering = STBH::Seek(ectx.phy,{ectx.ai.tx,0.0,ectx.ai.tz},ectx.ai.time2arrive);
-        ectx.phy.a_linear = steering.linear;
-        ectx.phy.v_angular = steering.angular;
+        ectx.phy.velocity = vec3d{steering.v_x,0.0,steering.v_z};
         return BTNodeStatus_t::success;
     }
 };
