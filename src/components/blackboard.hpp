@@ -11,5 +11,5 @@ struct BlackBoard_t {
     //Target Entity
     std::size_t teid{};
     //Path
-    Path_t<4> path { vec3d{2.0, 0.0, -2.0} , {-1.0,0.0,-2.0} , {-1.0,0.0,2.0}, {2.0,0.0,2.0} };
+    Path_t<4> path { vec3d{8.0, 0.0, 4.0} , {3.0,0.0,4.0} , {3.0,0.0,5.0}, {8.0,0.0,5.0} };
 };

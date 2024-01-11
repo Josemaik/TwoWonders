@@ -72,12 +72,12 @@ struct AIComponent
     //Target Entity
     std::size_t teid{};
     //PATH
-    Path_t<4> path { vec3d{2.0, 0.0, -2.0} , {-1.0,0.0,-2.0} , {-1.0,0.0,2.0}, {2.0,0.0,2.0} };
+    Path_t<4> path { vec3d{8.0, 0.0, 4.0} , {3.0,0.0,4.0} , {3.0,0.0,5.0}, {8.0,0.0,5.0}  };
     Path_t<4>::iterator pathIt { };
     bool path_initialized { false };
     // SB behaviour {SB::Arrive};
     // Timers
-    double countdown_change_dir{ 1.5 }, countdown_stop{ 3.5 }, countdown_shoot{ 2.0 }, countdown_change_position{ 3.0 }; // seconds
+    double countdown_change_dir{ 1.5 }, countdown_stop{ 0.35 }, countdown_shoot{ 0.5 }, countdown_change_position{ 3.0 }; // seconds
     double elapsed_change_position{ 1.0 }, elapsed_stop{ 1.0 }, elapsed_change_dir{ 1.0 }, elapsed_shoot{ 1.0 };
     void dec_countdown_change_pos(double deltaTime) { elapsed_change_position += deltaTime; };
     void dec_countdown_change_dir(double deltaTime) { elapsed_change_dir += deltaTime; }; // delta time

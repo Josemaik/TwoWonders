@@ -18,14 +18,32 @@ struct BTDecisionReadyforAttack : BTNode_t{
         // Si hay player
         auto& plphy = ectx.em.getComponent<PhysicsComponent>(*playerEn);
         auto const distance = (ectx.phy.position - plphy.position).lengthSQ();
-        //Compruebo si esta dentro del radio de detección
-        if( distance < (ectx.ai.attack_radius * ectx.ai.attack_radius)){
+        //Compruebo si esta dentro del radio de ataque y se acabo el culldown
+        if(distance < (ectx.ai.attack_radius * ectx.ai.attack_radius) &&
+        ectx.ai.elapsed_shoot >= ectx.ai.countdown_shoot){
             std::cout << "Atacar player \n";
-            ectx.ai.ready_attack = true;
-            // ectx.phy.v_linear = 0;
+            // paro al enemigo
+            ectx.phy.velocity = vec3d{};
+            if(ectx.ai.elapsed_stop >= ectx.ai.countdown_stop){
+                ectx.ai.elapsed_shoot = 0;
+                ectx.ai.elapsed_stop = 0;
+                ectx.ai.ready_attack = true;
+                // ectx.phy.v_linear = 0;
+                return BTNodeStatus_t::success;
+            }
+            ectx.ai.dec_countdown_stop(ectx.deltatime);
+            //reinicio culldown
+             return BTNodeStatus_t::running;
+            // activo ataque
+        }else{
+             ectx.ai.dec_countdown_shoot(ectx.deltatime);
             return BTNodeStatus_t::success;
         }
-        return BTNodeStatus_t::success;
+
+        //decremento tiempo culldown
+
+        //go to next node
+
 
     }
 
