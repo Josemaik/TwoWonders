@@ -16,7 +16,7 @@ struct BTAction_Seek : BTNode_t{
              return BTNodeStatus_t::fail;
         }
          std::cout << "TOY SEEK \n";
-        Steer_t steering = STBH::Seek(ectx.phy,{ectx.ai.tx,0.0,ectx.ai.tz},ectx.ai.time2arrive);
+        Steer_t steering = STBH::Seek(ectx.phy,{ectx.ai.tx,0.0,ectx.ai.tz});
         ectx.phy.velocity = vec3d{steering.v_x,0.0,steering.v_z};
         return BTNodeStatus_t::success;
     }

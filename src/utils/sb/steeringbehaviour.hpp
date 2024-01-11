@@ -9,9 +9,9 @@ struct Steer_t {
 };
 
 namespace STBH{
-    Steer_t Arrive(PhysicsComponent const& phy,vec3d const& target,double const time2arrive,double const arrivalRadious);
-    Steer_t Seek(PhysicsComponent const& phy,vec3d const& target, double const time2arrive);
-    Steer_t Flee(PhysicsComponent const& phy,vec3d const& enemy, double const time2flee);
-    Steer_t Pursue(PhysicsComponent const& phyTarget,PhysicsComponent const& phyPursuer, double const time2arrive);
-    Steer_t Avoid(PhysicsComponent const& phyTarget,PhysicsComponent const& phyPursuer, double const time2arrive);
+    Steer_t Arrive(PhysicsComponent const& phy,vec3d const& target,double const arrivalRadious);
+    Steer_t Seek(PhysicsComponent const& phy,vec3d const& target);
+    Steer_t Flee(PhysicsComponent const& phy,vec3d const& enemy);
+    Steer_t Pursue(PhysicsComponent const& phyTarget,PhysicsComponent const& phyPursuer);
+    Steer_t Avoid(PhysicsComponent const& phyTarget,PhysicsComponent const& phyPursuer);
 } //STBH

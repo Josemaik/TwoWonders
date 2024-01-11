@@ -43,7 +43,7 @@ double calculatePointDistance(vec3d const& target, vec3d const& origin){
 //         return align(phy,target_orientation,time2arrive);
 // }
 
-Steer_t STBH::Arrive(PhysicsComponent const& phy,vec3d const& target,double const time2arrive, double const arrivalRadious){
+Steer_t STBH::Arrive(PhysicsComponent const& phy,vec3d const& target, double const arrivalRadious){
         Steer_t steering;
         //check if i'm on target
         steering.arrived = false;
@@ -62,7 +62,7 @@ Steer_t STBH::Arrive(PhysicsComponent const& phy,vec3d const& target,double cons
 
         return steering;
 }
-Steer_t STBH::Seek(PhysicsComponent const& phy,vec3d const& target, double const time2arrive){
+Steer_t STBH::Seek(PhysicsComponent const& phy,vec3d const& target){
         Steer_t steering;
 
 
@@ -82,38 +82,38 @@ Steer_t STBH::Seek(PhysicsComponent const& phy,vec3d const& target, double const
         // steering.v_z = std::clamp(distance.z(), -phy.MAX_SPEED, phy.MAX_SPEED);
         return steering;
 }
-Steer_t STBH::Flee(PhysicsComponent const& phy,vec3d const& enemy, double const time2flee){
+Steer_t STBH::Flee(PhysicsComponent const& phy,vec3d const& enemy){
         //Calcular pnto opuesto
-        // vec3d target { 2*phy.position.x() - enemy.x(),0.0,2*phy.position.z() - enemy.z() };
+        vec3d target { 2*phy.position.x() - enemy.x(),0.0,2*phy.position.z() - enemy.z() };
         // //Seek al punto opuesto
-        // return Seek(phy,target,time2flee);
+        return Seek(phy,target);
 }
 
-Steer_t STBH::Pursue(PhysicsComponent const& phyTarget,PhysicsComponent const& phyPursuer, double const time2arrive){
+Steer_t STBH::Pursue(PhysicsComponent const& phyTarget,PhysicsComponent const& phyPursuer){
         //Calculate distance
-        // vec3d target  {  phyTarget.position.x(), 0.0 ,   phyTarget.position.z() };
-        // vec3d avoider { phyPursuer.position.x(), 0.0 ,   phyPursuer.position.z()  };
-        // auto distance { calculatePointDistance(target,avoider) };
-        // auto minimaltime { distance / phyPursuer.kMaxVLin };
-        // vec3d predicted_target {
-        //         phyTarget.position.x() + phyTarget.velocity.x() * minimaltime,
-        //         0.0                                                          ,
-        //         phyTarget.position.z() + phyTarget.velocity.z() * minimaltime
-        // };
-        // return Seek(phyPursuer, predicted_target, time2arrive);
+        vec3d target  {  phyTarget.position.x(), 0.0 ,   phyTarget.position.z() };
+        vec3d avoider { phyPursuer.position.x(), 0.0 ,   phyPursuer.position.z()  };
+        auto distance { calculatePointDistance(target,avoider) };
+        auto minimaltime { distance / phyPursuer.kMaxVLin };
+        vec3d predicted_target {
+                phyTarget.position.x() + phyTarget.velocity.x() * minimaltime,
+                0.0                                                          ,
+                phyTarget.position.z() + phyTarget.velocity.z() * minimaltime
+        };
+        return Seek(phyPursuer, predicted_target);
 }
-Steer_t STBH::Avoid(PhysicsComponent const& phyTarget,PhysicsComponent const& phyAvoider, double const time2arrive){
+Steer_t STBH::Avoid(PhysicsComponent const& phyTarget,PhysicsComponent const& phyAvoider){
         //Calculate distance
-        // vec3d target  {  phyTarget.position.x(), 0.0 ,   phyTarget.position.z() };
-        // vec3d pursuer { phyAvoider.position.x(), 0.0 ,   phyAvoider.position.z()  };
-        // auto distance { calculatePointDistance(target,pursuer) };
-        // auto minimaltime { distance / phyAvoider.kMaxVLin };
-        // vec3d predicted_avoider {
-        //         phyTarget.position.x() + phyTarget.velocity.x() * minimaltime,
-        //         0.0                                                          ,
-        //         phyTarget.position.z() + phyTarget.velocity.z() * minimaltime
-        // };
-        // // Invert the direction to avoid the predicted avoider position
-        // vec3d avoidDirection = target - predicted_avoider;
-        // return Seek(phyTarget, target + avoidDirection, time2arrive);
+        vec3d target  {  phyTarget.position.x(), 0.0 ,   phyTarget.position.z() };
+        vec3d pursuer { phyAvoider.position.x(), 0.0 ,   phyAvoider.position.z()  };
+        auto distance { calculatePointDistance(target,pursuer) };
+        auto minimaltime { distance / phyAvoider.kMaxVLin };
+        vec3d predicted_avoider {
+                phyTarget.position.x() + phyTarget.velocity.x() * minimaltime,
+                0.0                                                          ,
+                phyTarget.position.z() + phyTarget.velocity.z() * minimaltime
+        };
+        // Invert the direction to avoid the predicted avoider position
+        vec3d avoidDirection = target - predicted_avoider;
+        return Seek(phyTarget, target + avoidDirection);
 }

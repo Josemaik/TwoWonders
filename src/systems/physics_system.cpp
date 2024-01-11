@@ -4,12 +4,12 @@
 
 void PhysicsSystem::update(EntityManager& em,float dt)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([dt,&em](Entity& e, PhysicsComponent& phy)
+    em.forEach<SYSCMPs, SYSTAGs>([dt,&em](Entity& , PhysicsComponent& phy)
     {
         auto& pos = phy.position;
         auto& vel = phy.velocity;
-        auto& vel_l = phy.v_linear;
-        auto& vel_a = phy.v_angular;
+        // auto& vel_l = phy.v_linear;
+        // auto& vel_a = phy.v_angular;
 
         // Aplicar gravedad y hacer Clamp
         //if (!phy.unCheckGravity)

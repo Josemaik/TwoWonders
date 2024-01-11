@@ -17,7 +17,7 @@ struct BTAction_Patrol : BTNode_t{
         }
          std::cout << "Patrol \n";
         //Do patrol
-        Steer_t steering = STBH::Arrive(ectx.phy,*ectx.ai.pathIt,ectx.ai.time2arrive,ectx.ai.arrival_radius);
+        Steer_t steering = STBH::Arrive(ectx.phy,*ectx.ai.pathIt,ectx.ai.arrival_radius);
         if(steering.arrived){
             ++ectx.ai.pathIt;
         }
