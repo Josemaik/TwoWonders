@@ -40,8 +40,9 @@ struct BTDecisionReadyforAttack : BTNode_t{
                 ectx.ai.dec_countdown_shoot(ectx.deltatime);
                 return BTNodeStatus_t::success;
             }
+        }else{
+             return BTNodeStatus_t::fail;
         }
-        return BTNodeStatus_t::success;
         //decremento tiempo culldown
 
         //go to next node
