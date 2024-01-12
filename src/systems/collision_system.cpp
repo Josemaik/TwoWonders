@@ -348,13 +348,31 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
         // Si la bala es del jugador y ha colisionado con un enemigo, o si la bala es de un enemigo y ha colisionado con el jugador, se baja la vida
         if ((isPlayer2 && (atkEn1 || atkEn2)) || (isEnemy2 && (atkPl1 || atkPl2)))
         {
+            // Comprobar si tiene tipo la bala
+            ElementalType typeBala{ ElementalType::Neutral }, typeEnemyPlayer{ ElementalType::Neutral };
+            if(ent1Ptr->hasComponent<TypeComponent>())
+                typeBala = em.getComponent<TypeComponent>(*ent1Ptr).type;
+            if(ent2Ptr->hasComponent<TypeComponent>())
+                typeEnemyPlayer = em.getComponent<TypeComponent>(*ent2Ptr).type;
+
+            // Destruir bala
             dead_entities.insert(ent1Ptr->getID());
+
+            // Comprobar el tipo de la bala y el enemigo/player
+            if((typeBala == ElementalType::Fuego && typeEnemyPlayer == ElementalType::Hielo) ||
+               (typeBala == ElementalType::Hielo && typeEnemyPlayer == ElementalType::Agua ) ||
+               (typeBala == ElementalType::Agua  && typeEnemyPlayer == ElementalType::Fuego))
+            {
+               em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(3);
+            }
+            else if(typeBala == ElementalType::Neutral)
+                em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(2);
+            else
+                em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(1);
 
             auto& r = em.getComponent<RenderComponent>(*ent1Ptr);
             if (r.meshLoaded)
                 em.getComponent<RenderComponent>(*ent1Ptr).destroyMesh();
-
-            em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife();
         }
     }
 }
@@ -388,7 +406,7 @@ void CollisionSystem::floorCollision(PhysicsComponent& phy1, PhysicsComponent& p
 // Efecto de cuando se choca con un enemigo
 void CollisionSystem::enemyCollision(EntityManager& em, Entity& damagedEntity)
 {
-    em.getComponent<LifeComponent>(damagedEntity).decreaseLife();
+    em.getComponent<LifeComponent>(damagedEntity).decreaseLife(1);
 }
 
 // Efecto de cuando se choca contra una pared - podría expandirse para más usos en el futuro

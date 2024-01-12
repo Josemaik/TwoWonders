@@ -92,16 +92,24 @@ void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, Atta
     }
 }
 
-void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack) {
-    std::cout << "CREO LA BALA";
-    auto const& phy = em.getComponent<PhysicsComponent>(ent);
+void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged,double const scale_to_respawn_attack) {
+    //std::cout << "CREO LA BALA";
 
+    // Comprobar el tipo del ataque
+    ElementalType tipoElemental;
+    if (ent.hasComponent<TypeComponent>())
+        tipoElemental = em.getComponent<TypeComponent>(ent).type;
+    else    
+        tipoElemental = ElementalType::Neutral;
+
+    // Crear la entidad ataque
     auto& e{ em.newEntity() };
     em.addTag<HitPlayerTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3d{0, 0, 0} : att.vel * scale_to_respawn_attack), .scale = { isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 1.0 }, .color = BLACK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = isRanged ? att.vel : vec3d{0, 0, 0}, .gravity = 0, .orientation = phy.orientation });
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = static_cast<float>(isRanged ? 3.0 : 0.2) });
+    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = static_cast<float>(isRanged ? 3.0 : 0.2 )});
+    em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
     if (ent.hasTag<PlayerTag>())
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
     else

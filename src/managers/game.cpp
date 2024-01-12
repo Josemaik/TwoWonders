@@ -81,6 +81,7 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<InformationComponent>(e, InformationComponent{});
+    em.addComponent<TypeComponent>(e, TypeComponent{});
     em.addComponent<EventComponent>(e);
     evm.registerListener(e, EVENT_CODE_CHANGE_ZONE);
     // Sword

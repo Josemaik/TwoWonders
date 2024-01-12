@@ -84,6 +84,34 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 // Comprobar si tiene el componente vida
 
                 Color colorEntidad = r.color;
+
+                // Comprobar el tipo y si es enemigo cambiarle el color
+                if (!e.hasTag<PlayerTag>() && e.hasComponent<TypeComponent>()){
+                    auto& t{ em.getComponent<TypeComponent>(e) };
+
+                    switch (t.type)
+                    {
+                    case ElementalType::Neutral:
+                        colorEntidad = GRAY;
+                        break;
+                    
+                    case ElementalType::Agua:
+                        colorEntidad = BLUE;
+                        break;
+
+                    case ElementalType::Fuego:
+                        colorEntidad = RED;
+                        break;
+
+                    case ElementalType::Hielo:
+                        colorEntidad = SKYBLUE;
+                        break;
+                                        
+                    default:
+                        break;
+                    }
+                }
+
                 if (e.hasComponent<LifeComponent>()) {
                     auto& l{ em.getComponent<LifeComponent>(e) };
                     if (l.elapsed < l.countdown)
@@ -144,6 +172,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         {
             // Dibujar background HUD
             engine.drawRectangle(0, 0, 580, 60, WHITE);
+            engine.drawRectangle(0, 55, 100, 30, WHITE);
 
             // Dibujar vidas restantes del player en el HUD
             if (e.hasComponent<LifeComponent>())
@@ -175,6 +204,21 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                     countdown_ataque = "Ataque listo en: " + std::to_string(-1 * (a.elapsed - 1.0f)) + " segundos";
 
                 engine.drawText(countdown_ataque.c_str(), 10, 35, 20, BLACK);
+            }
+
+            // Dibujar el tipo de ataque que tiene equipado
+            if (e.hasComponent<TypeComponent>())
+            {
+                auto const& t{ em.getComponent<TypeComponent>(e) };
+
+                if (t.type == ElementalType::Neutral)
+                    engine.drawText("Neutral", 10, 60, 20, BLACK);
+                else if (t.type == ElementalType::Agua)
+                    engine.drawText("Agua", 10, 60, 20, BLUE);
+                else if (t.type == ElementalType::Fuego)
+                    engine.drawText("Fuego", 10, 60, 20, RED);
+                else
+                    engine.drawText("Hielo", 10, 60, 20, SKYBLUE);
             }
 
         }
@@ -217,6 +261,37 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
                 20,
                 BLACK);
+
+            if (e.hasComponent<TypeComponent>())
+            {
+                auto const& t{ em.getComponent<TypeComponent>(e) };
+
+                std::string tipo = "Hielo";
+                Color color = SKYBLUE;
+
+                if (t.type == ElementalType::Neutral)
+                {
+                    tipo = "Neutral";
+                    color = BLACK;
+                }
+                else if (t.type == ElementalType::Agua)
+                {
+                    tipo = "Agua";
+                    color = BLUE;
+                }
+                else if (t.type == ElementalType::Fuego)
+                {
+                    tipo = "Fuego";
+                    color = RED;
+                }
+                
+                engine.drawText(tipo.c_str(), 
+                    static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+                    static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 70),
+                    20, 
+                    color);
+            }
+
         }
 
         if (debug && e.hasComponent<ColliderComponent>())

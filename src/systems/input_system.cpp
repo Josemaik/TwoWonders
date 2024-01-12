@@ -101,6 +101,10 @@ void InputSystem::update(EntityManager& em)
         if (IsKeyDown(KEY_B) && e.hasComponent<AttackComponent>())
             em.getComponent<AttackComponent>(e).attack(AttackType::Bomb);
 
+        // Codigo para cambiar de tipo de ataque
+        if (IsKeyReleased(KEY_Q) && e.hasComponent<TypeComponent>())
+            em.getComponent<TypeComponent>(e).changeType();
+
         // Codigo para curarse // DEBUG
         // if(IsKeyDown(KEY_Z) && e.hasComponent<LifeComponent>())
         //     em.getComponent<LifeComponent>(e).increaseLife();

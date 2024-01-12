@@ -233,6 +233,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         auto& wp1 = em.addComponent<PhysicsComponent>(e1, PhysicsComponent{ .position = vec3d(wr1.position),.gravity = 2.0, .max_speed = 0.5 });
         em.addComponent<ColliderComponent>(e1, ColliderComponent{ wp1.position, wr1.scale, BehaviorType::ENEMY });
         em.addComponent<LifeComponent>(e1, LifeComponent{ .life = 10 });
+        em.addComponent<TypeComponent>(e1, TypeComponent{ .type = ElementalType::Fuego });
 
         auto* d_a_1 = &tree1.createNode<BTDecisionReadyforAttack>();
         auto* a_a_1 = &tree1.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee); // fail si disparo succes si no disparo
@@ -258,6 +259,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         auto& wp2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = vec3d(wr2.position),.gravity = 2.0 });
         em.addComponent<ColliderComponent>(e2, ColliderComponent{ wp2.position, wr2.scale, BehaviorType::ENEMY });
         em.addComponent<LifeComponent>(e2, LifeComponent{ .life = 10 });
+        em.addComponent<TypeComponent>(e2, TypeComponent{ .type = ElementalType::Hielo });
 
         auto* d_a_2 = &tree2.createNode<BTDecisionReadyforAttack>();
         auto* a_a_2 = &tree2.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer); // fail si disparo succes si no disparo
