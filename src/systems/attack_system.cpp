@@ -40,11 +40,11 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     switch (att.type)
     {
     case AttackType::Ranged:
-        createAttackRangedOrMelee(em, ent, att, true);
+        createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack);
         break;
 
     case AttackType::Melee:
-        createAttackRangedOrMelee(em, ent, att, false);
+        createAttackRangedOrMelee(em, ent, att, false, att.scale_to_respawn_attack);
         break;
 
     case AttackType::Bomb:
@@ -75,7 +75,7 @@ void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, Atta
     vec3d vel = att.vel;
 
     // Disparo hacia el jugador
-    createAttackRangedOrMelee(em, ent, att, true);
+    createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack);
 
     for (int i = 1; i <= numShots; ++i) {
         float offset = spread * (static_cast<float>(i) - 0.5f - static_cast<float>(numShots) / 2.f);
@@ -87,15 +87,15 @@ void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, Atta
         att.vel = { att.vel.x(), att.vel.y(), att.vel.z() + offset };
 
         // Crea el disparo
-        createAttackRangedOrMelee(em, ent, att, true);
+        createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack);
     }
 }
 
-void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged) {
+void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged,double const scale_to_respawn_attack) {
     std::cout << "CREO LA BALA";
     auto& e{ em.newEntity() };
     em.addTag<HitPlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3d{0, 0, 0} : att.vel * 2), .scale = { isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 1.0 }, .color = BLACK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3d{0, 0, 0} : att.vel * scale_to_respawn_attack), .scale = { isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 1.0 }, .color = BLACK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = isRanged ? att.vel : vec3d{0, 0, 0}, .gravity = 0 });
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
     em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = static_cast<float>(isRanged ? 3.0 : 0.2 )});
