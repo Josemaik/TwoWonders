@@ -222,6 +222,37 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
                 20,
                 BLACK);
+
+            if (e.hasComponent<TypeComponent>())
+            {
+                auto const& t{ em.getComponent<TypeComponent>(e) };
+
+                std::string tipo = "Hielo";
+                Color color = SKYBLUE;
+
+                if (t.type == ElementalType::Neutral)
+                {
+                    tipo = "Neutral";
+                    color = BLACK;
+                }
+                else if (t.type == ElementalType::Agua)
+                {
+                    tipo = "Agua";
+                    color = BLUE;
+                }
+                else if (t.type == ElementalType::Fuego)
+                {
+                    tipo = "Fuego";
+                    color = RED;
+                }
+                
+                engine.drawText(tipo.c_str(), 
+                    static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+                    static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 70),
+                    20, 
+                    color);
+            }
+
         }
 
         if (debug && e.hasComponent<PhysicsComponent>())
