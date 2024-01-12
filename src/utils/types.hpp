@@ -34,10 +34,11 @@ struct WaterTag {};
 struct ObjectTag {};
 struct ZoneTag {};
 struct DoorTag {};
+struct RampTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList<PhysicsComponent, RenderComponent, EventComponent, InputComponent, LifeComponent, ColliderComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent, ShieldComponent, TypeComponent>;
-using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, ObjectTag, ZoneTag, DoorTag>;
+using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, ObjectTag, ZoneTag, DoorTag, RampTag>;
 using SCL = MP::TypeList<LevelInfo,BlackBoard_t>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;

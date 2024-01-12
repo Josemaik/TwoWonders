@@ -1,5 +1,11 @@
 #include "render_component.hpp"
 
+void RenderComponent::destroyMesh()
+{
+    UnloadModel(model);
+    meshLoaded = false;
+}
+
 void RenderComponent::setAll(vec3d p, vec3d s, Color c)
 {
     position.setX(p.x());
@@ -30,4 +36,9 @@ void RenderComponent::setScale(vec3d s)
 void RenderComponent::setColor(Color c)
 {
     color = c;
+}
+
+void RenderComponent::setOrientation(double o)
+{
+    orientation = o;
 }

@@ -4,11 +4,11 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 {
     ENGI::GameEngine::initWindow(width_, height_, "ZeldaWonders");
 
-    ENGI::GameEngine::setPositionCamera({ 0.0f, 30.0f, 12.0f });
+    ENGI::GameEngine::setPositionCamera({ 10.0f, 15.0f, 10.0f });
     ENGI::GameEngine::setTargetCamera({ 0.0f, 03.0f, .0f });
     ENGI::GameEngine::setUpCamera({ 0.0f, 01.0f, 0.0f });
-    ENGI::GameEngine::setFovyCamera(30.0f);
-    ENGI::GameEngine::setProjectionCamera(CAMERA_PERSPECTIVE);
+    ENGI::GameEngine::setFovyCamera(20.0f);
+    ENGI::GameEngine::setProjectionCamera(CAMERA_ORTHOGRAPHIC);
 
     // Logo Two Wonders
     Image logo_two_wonders = ENGI::GameEngine::loadImage("assets/logo_two_wonders.png");
@@ -93,6 +93,16 @@ void ENGI::GameEngine::drawCubeWires(vec3d pos, float width, float height, float
     DrawCubeWires(pos.toRaylib(), width, height, lenght, color);
 }
 
+void ENGI::GameEngine::drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint)
+{
+    DrawModelEx(model, position.toRaylib(), rotationAxis.toRaylib(), rotationAngle, scale.toRaylib(), tint);
+}
+
+void ENGI::GameEngine::drawModelWires(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint)
+{
+    DrawModelWiresEx(model, position.toRaylib(), rotationAxis.toRaylib(), rotationAngle, scale.toRaylib(), tint);
+}
+
 void ENGI::GameEngine::drawRectangle(int posX, int posY, int width, int height, Color color) {
     DrawRectangle(posX, posY, width, height, color);
 }
@@ -162,6 +172,21 @@ void ENGI::GameEngine::setProjectionCamera(int proj)
 }
 
 ////// AUX //////
+
+Mesh ENGI::GameEngine::genMeshCube(float width, float height, float lenght)
+{
+    return GenMeshCube(width, height, lenght);
+}
+
+Model ENGI::GameEngine::loadModelFromMesh(Mesh m)
+{
+    return LoadModelFromMesh(m);
+}
+
+void ENGI::GameEngine::unloadModel(Model m)
+{
+    UnloadModel(m);
+}
 
 float ENGI::GameEngine::getWorldToScreenX(vec3d pos)
 {

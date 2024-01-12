@@ -22,28 +22,40 @@ void InputSystem::update(EntityManager& em)
         phy.velocity = {};
         phy.a_linear = phy.v_angular = 0;
         auto& vel = phy.velocity;
+
         // Actualizar la velocidad
+        int keysPressed = 0;
         if (IsKeyDown(in.right)) {
             vel.setX(vel.x() + INP_SPEED);
-            //phy.v_angular = phy.kMaxVAng;
+            vel.setZ(vel.z() - INP_SPEED);
             in.last_key = in.right;
+            keysPressed++;
         }
         if (IsKeyDown(in.left)) {
             vel.setX(vel.x() - INP_SPEED);
-            // phy.v_angular = -phy.kMaxVAng;
+            vel.setZ(vel.z() + INP_SPEED);
             in.last_key = in.left;
+            keysPressed++;
         }
         if (IsKeyDown(in.up)) {
+            vel.setX(vel.x() - INP_SPEED);
             vel.setZ(vel.z() - INP_SPEED);
-            // phy.a_linear = phy.kMaxAlin;
             in.last_key = in.up;
-
+            keysPressed++;
         }
         if (IsKeyDown(in.down)) {
+            vel.setX(vel.x() + INP_SPEED);
             vel.setZ(vel.z() + INP_SPEED);
-            // phy.a_linear = -phy.kMaxAlin;
             in.last_key = in.down;
+            keysPressed++;
         }
+
+        if (keysPressed == 2)
+        {
+            vel.normalize();
+            vel *= INP_SPEED;
+        }
+
         // if(IsKeyDown(in.seek) && !bb.tactive){
         //    // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
         //     bb.behaviour = SB::Seek;
@@ -70,10 +82,10 @@ void InputSystem::update(EntityManager& em)
         //     bb.tactive = true;
         // }
         // if(bb.behaviour != SB::followPath && bb.behaviour != SB::Arrive){
-            bb.tx = phy.position.x();
-            bb.tz = phy.position.z();
-            bb.tactive = true;
-            bb.teid = e.getID();
+        bb.tx = phy.position.x();
+        bb.tz = phy.position.z();
+        bb.tactive = true;
+        bb.teid = e.getID();
         // }
         // if(bb.behaviour == SB::Arrive){
         //     bb.tx = 0.0;

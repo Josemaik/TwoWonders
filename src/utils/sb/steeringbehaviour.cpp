@@ -4,10 +4,10 @@
 #include <numbers>
 #include <algorithm>
 
-double calculatePointDistance(vec3d const& target, vec3d const& origin){
-        auto dx { target.x() - origin.x() };
-        auto dz { target.z() - origin.z() };
-        return std::sqrt(dx*dx + dz*dz);
+double calculatePointDistance(vec3d const& target, vec3d const& origin) {
+        auto dx{ target.x() - origin.x() };
+        auto dz{ target.z() - origin.z() };
+        return std::sqrt(dx * dx + dz * dz);
 }
 
 // void adjustAnglePiMinusPi(double& angle){
@@ -43,13 +43,13 @@ double calculatePointDistance(vec3d const& target, vec3d const& origin){
 //         return align(phy,target_orientation,time2arrive);
 // }
 
-Steer_t STBH::Arrive(PhysicsComponent const& phy,vec3d const& target, double const arrivalRadious){
+Steer_t STBH::Arrive(PhysicsComponent const& phy, vec3d const& target, double const arrivalRadious) {
         Steer_t steering;
         //check if i'm on target
         steering.arrived = false;
-        auto tdist { calculatePointDistance(target, {phy.position.x(),0.0,phy.position.z()}) };
-        if(tdist < arrivalRadious)
-            steering.arrived = true;
+        auto tdist{ calculatePointDistance(target, {phy.position.x(),0.0,phy.position.z()}) };
+        if (tdist < arrivalRadious)
+                steering.arrived = true;
         // face target
         // auto ang_steer { face(phy,target,time2arrive) };
 
@@ -57,12 +57,12 @@ Steer_t STBH::Arrive(PhysicsComponent const& phy,vec3d const& target, double con
         //Target linear velocity
         // auto tvelocity    = std::clamp( tdist / time2arrive, -phy.kMaxVLin, phy.kMaxVLin );
         // auto lin_steer { velocity_match(phy,tvelocity,time2arrive) };
-        steering.v_x = std::clamp((target.x() - phy.position.x()), -phy.MAX_SPEED, phy.MAX_SPEED);
-        steering.v_z = std::clamp((target.z() - phy.position.z()), -phy.MAX_SPEED, phy.MAX_SPEED);
+        steering.v_x = std::clamp((target.x() - phy.position.x()), -phy.max_speed, phy.max_speed);
+        steering.v_z = std::clamp((target.z() - phy.position.z()), -phy.max_speed, phy.max_speed);
 
         return steering;
 }
-Steer_t STBH::Seek(PhysicsComponent const& phy,vec3d const& target){
+Steer_t STBH::Seek(PhysicsComponent const& phy, vec3d const& target) {
         Steer_t steering;
 
 
@@ -75,40 +75,40 @@ Steer_t STBH::Seek(PhysicsComponent const& phy,vec3d const& target){
         // Calculate target linear acceleration based on angular distance
         // auto angular_velocity_size { std::fabs(phy.v_angular) };
         // auto acceleration { phy.kMaxVLin / (1 + angular_velocity_size) };
-        steering.v_x = std::clamp((target.x() - phy.position.x()), -phy.MAX_SPEED, phy.MAX_SPEED);
-        steering.v_z = std::clamp((target.z() - phy.position.z()), -phy.MAX_SPEED, phy.MAX_SPEED);
+        steering.v_x = std::clamp((target.x() - phy.position.x()), -phy.max_speed, phy.max_speed);
+        steering.v_z = std::clamp((target.z() - phy.position.z()), -phy.max_speed, phy.max_speed);
         // std::cout << "X=" << steering.v_x << " " << "Z=" << steering.v_z << "\n";
-        // steering.v_x = std::clamp(distance.x(), -phy.MAX_SPEED, phy.MAX_SPEED);
-        // steering.v_z = std::clamp(distance.z(), -phy.MAX_SPEED, phy.MAX_SPEED);
+        // steering.v_x = std::clamp(distance.x(), -phy.max_speed, phy.max_speed);
+        // steering.v_z = std::clamp(distance.z(), -phy.max_speed, phy.max_speed);
         return steering;
 }
-Steer_t STBH::Flee(PhysicsComponent const& phy,vec3d const& enemy){
+Steer_t STBH::Flee(PhysicsComponent const& phy, vec3d const& enemy) {
         //Calcular pnto opuesto
-        vec3d target { 2*phy.position.x() - enemy.x(),0.0,2*phy.position.z() - enemy.z() };
+        vec3d target{ 2 * phy.position.x() - enemy.x(),0.0,2 * phy.position.z() - enemy.z() };
         // //Seek al punto opuesto
-        return Seek(phy,target);
+        return Seek(phy, target);
 }
 
-Steer_t STBH::Pursue(PhysicsComponent const& phyTarget,PhysicsComponent const& phyPursuer){
+Steer_t STBH::Pursue(PhysicsComponent const& phyTarget, PhysicsComponent const& phyPursuer) {
         //Calculate distance
-        vec3d target  {  phyTarget.position.x(), 0.0 ,   phyTarget.position.z() };
-        vec3d avoider { phyPursuer.position.x(), 0.0 ,   phyPursuer.position.z()  };
-        auto distance { calculatePointDistance(target,avoider) };
-        auto minimaltime { distance / phyPursuer.MAX_SPEED };
-        vec3d predicted_target {
+        vec3d target{ phyTarget.position.x(), 0.0 ,   phyTarget.position.z() };
+        vec3d avoider{ phyPursuer.position.x(), 0.0 ,   phyPursuer.position.z() };
+        auto distance{ calculatePointDistance(target,avoider) };
+        auto minimaltime{ distance / phyPursuer.max_speed };
+        vec3d predicted_target{
                 phyTarget.position.x() + phyTarget.velocity.x() * minimaltime,
                 0.0                                                          ,
                 phyTarget.position.z() + phyTarget.velocity.z() * minimaltime
         };
         return Seek(phyPursuer, predicted_target);
 }
-Steer_t STBH::Avoid(PhysicsComponent const& phyTarget,PhysicsComponent const& phyAvoider){
+Steer_t STBH::Avoid(PhysicsComponent const& phyTarget, PhysicsComponent const& phyAvoider) {
         //Calculate distance
-        vec3d target  {  phyTarget.position.x(), 0.0 ,   phyTarget.position.z() };
-        vec3d pursuer { phyAvoider.position.x(), 0.0 ,   phyAvoider.position.z()  };
-        auto distance { calculatePointDistance(target,pursuer) };
-        auto minimaltime { distance / phyAvoider.kMaxVLin };
-        vec3d predicted_avoider {
+        vec3d target{ phyTarget.position.x(), 0.0 ,   phyTarget.position.z() };
+        vec3d pursuer{ phyAvoider.position.x(), 0.0 ,   phyAvoider.position.z() };
+        auto distance{ calculatePointDistance(target,pursuer) };
+        auto minimaltime{ distance / phyAvoider.kMaxVLin };
+        vec3d predicted_avoider{
                 phyTarget.position.x() + phyTarget.velocity.x() * minimaltime,
                 0.0                                                          ,
                 phyTarget.position.z() + phyTarget.velocity.z() * minimaltime

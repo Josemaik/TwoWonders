@@ -2,9 +2,9 @@
 #include <printf.h>
 #include <math.h>
 
-void PhysicsSystem::update(EntityManager& em,float dt)
+void PhysicsSystem::update(EntityManager& em, float dt)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([dt,&em](Entity& , PhysicsComponent& phy)
+    em.forEach<SYSCMPs, SYSTAGs>([dt, &em](Entity&, PhysicsComponent& phy)
     {
         auto& pos = phy.position;
         auto& vel = phy.velocity;
@@ -16,20 +16,24 @@ void PhysicsSystem::update(EntityManager& em,float dt)
         vel.setY(vel.y() - phy.gravity);
 
         // if(e.hasTag<PlayerTag>() || e.hasTag<HitPlayerTag>()){
-            if (std::abs(vel.x()) > phy.MAX_SPEED || std::abs(vel.y()) > phy.MAX_SPEED || std::abs(vel.z()) > phy.MAX_SPEED)
-            {
-                vel.normalize();
-                vel *= phy.MAX_SPEED;
-            }
+        if (std::abs(vel.x()) > phy.max_speed || std::abs(vel.y()) > phy.max_speed || std::abs(vel.z()) > phy.max_speed)
+        {
+            vel.normalize();
+            vel *= phy.max_speed;
+        }
         // }else{
         //         //Normalizar la velocidad
         //         vel.normalize();
         // }
         // Player únicamente tiene velocidad linear
         // if(e.hasTag<PlayerTag>() || e.hasTag<HitPlayerTag>()){
-            pos.setX(pos.x() + vel.x());
-            pos.setY(pos.y() + vel.y());
-            pos.setZ(pos.z() + vel.z());
+
+        pos.setX((pos.x() + vel.x()));
+        pos.setY((pos.y() + vel.y()));
+        pos.setZ((pos.z() + vel.z()));
+
+        if (vel.x() != 0 || vel.z() != 0)
+            phy.orientation = std::atan2(vel.x(), vel.z());
         // }else{ //Enemigo tiene aceleracion lineal y velocidad angular
         //     phy.orientation += dt * vel_a;
         //     if(phy.orientation > 2*PI) phy.orientation -= 2*PI;

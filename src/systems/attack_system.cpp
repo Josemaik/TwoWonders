@@ -16,15 +16,16 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
 
     // Se pone la direccion en la que este mirando el player
     if (ent.hasTag<PlayerTag>() && ent.hasComponent<InputComponent>()) {
-        auto& i = em.getComponent<InputComponent>(ent);
-        if (i.last_key == i.down)
-            att.vel = { 0 , 0 , 0.5f };
-        else if (i.last_key == i.up)
-            att.vel = { 0 , 0 , -0.5f };
-        else if (i.last_key == i.right)
-            att.vel = { 0.5f , 0 , 0 };
-        else if (i.last_key == i.left)
-            att.vel = { -0.5f , 0 , 0 };
+        auto& phy = em.getComponent<PhysicsComponent>(ent);
+
+        static const double ATTACK_SPEED = 0.5f;
+
+        // Calculamos la velocidad basada en la orientación del jugador
+        double velX = sin(phy.orientation) * ATTACK_SPEED;
+        double velZ = cos(phy.orientation) * ATTACK_SPEED;
+
+        // Asignamos la velocidad al ataque
+        att.vel = { velX , 0 , velZ };
     }
 
     // Comprobar si la vida de la entidad es la maxima y elegir que tipo de ataque usa
@@ -105,7 +106,7 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
     auto& e{ em.newEntity() };
     em.addTag<HitPlayerTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3d{0, 0, 0} : att.vel * scale_to_respawn_attack), .scale = { isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 1.0 }, .color = BLACK });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = isRanged ? att.vel : vec3d{0, 0, 0}, .gravity = 0 });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = isRanged ? att.vel : vec3d{0, 0, 0}, .gravity = 0, .orientation = phy.orientation });
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
     em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = static_cast<float>(isRanged ? 3.0 : 0.2 )});
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });

@@ -15,22 +15,24 @@ struct PhysicsComponent
     bool alreadyGrounded{ false };
 
     //Velocidad lineal
-    double v_linear  { 0.0 };
+    double v_linear{ 0.0 };
     //Velocidad angular
-    double v_angular { 0.0 };
-    double orientation { 0.0 }; //ángulo del vector con respecto al eje de origen
+    double v_angular{ 0.0 };
+    double orientation{ 0.0 }; //ángulo del vector con respecto al eje de origen
     //aceleracion lineal
-    double a_linear  { 0.0 };
+    double a_linear{ 0.0 };
     //aceleracion angular
-    double a_angular { 0.0 };
+    double a_angular{ 0.0 };
+    // velocidad máxima
+    double max_speed{ MAX_SPEED };
     //max valor que puede tomar las velocidades y aceleraciones
-    static constexpr double kMaxVLin { 5.0 };
-    static constexpr double kMaxAlin { kMaxVLin/0.5 };
-    static constexpr double kMaxVAng { 3*PI };
-    static constexpr double kMaxAAng { kMaxVAng/5.0};
+    static constexpr double kMaxVLin{ 5.0 };
+    static constexpr double kMaxAlin{ kMaxVLin / 0.5 };
+    static constexpr double kMaxVAng{ 3 * PI };
+    static constexpr double kMaxAAng{ kMaxVAng / 5.0 };
     //controla la llegada , se ha sustituido por arrivalradius en la ia
-    static constexpr double kEpsilon { 0.1 };
+    static constexpr double kEpsilon{ 0.1 };
     //rozamiento
-    static constexpr double kDrag { 1.20 };
+    static constexpr double kDrag{ 1.20 };
 
 };

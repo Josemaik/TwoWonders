@@ -1,10 +1,10 @@
 #include "zone_system.hpp"
 
-void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam,Eventmanager& evm) {
+void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Eventmanager& evm) {
 
     updateZoneEnemies(em);
 
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ZoneComponent& zon)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, ZoneComponent& zon)
     {
         if (zon.changeZone) {
             // Comprobar en que zona estamos
@@ -15,7 +15,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
                 // if(!iam.checkEnemiesCreaeted(zon.zone)){
                 // }
                 //lanzar evento
-                evm.scheduleEvent(Event{EVENT_CODE_CHANGE_ZONE});
+                evm.scheduleEvent(Event{ EVENT_CODE_CHANGE_ZONE });
                 //borro enemigos si cambio de zona
                 deleteZoneEnemies(em);
                 iam.createEnemiesZone(em, zon.zone);
@@ -23,11 +23,11 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
                 li.num_zone = zon.zone;
                 if (zon.zone <= 13)
                 {
-                    if (ent.hasComponent<RenderComponent>()) {
-                        auto& r = em.getComponent<RenderComponent>(ent);
-                        engine.setPositionCamera({ r.position.x(), 30.0, r.position.z() + 12.0 });
-                        engine.setTargetCamera({ r.position.x(), r.position.y() + 3.0, r.position.z() });
-                    }
+                    // if (ent.hasComponent<RenderComponent>()) {
+                    //     auto& r = em.getComponent<RenderComponent>(ent);
+                    //     engine.setPositionCamera({ r.position.x(), 30.0, r.position.z() + 12.0 });
+                    //     engine.setTargetCamera({ r.position.x(), r.position.y() + 3.0, r.position.z() });
+                    // }
                 }
                 // Es un TP
                 else
@@ -106,7 +106,10 @@ void ZoneSystem::deleteZoneEnemies(EntityManager& em)
     auto const& li = em.getSingleton<LevelInfo>();
 
     for (auto& enemy : li.enemiesID)
+    {
         dead_entities.insert(enemy);
+        em.getComponent<RenderComponent>(*em.getEntityByID(enemy)).destroyMesh();
+    }
 }
 
 void ZoneSystem::updateZoneEnemies(EntityManager& em)

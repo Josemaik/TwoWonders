@@ -14,12 +14,13 @@ void CollisionSystem::update(EntityManager& em)
         if (pos.y() < -20.)
         {
             dead_entities.insert(e.getID());
+            em.getComponent<RenderComponent>(e).destroyMesh();
             return;
         }
 
         // Actualizar bounding box
         auto& scl = ren.scale;
-        col.updateBox(pos, scl, phy.gravity);
+        col.updateBox(pos, scl, phy.gravity, phy.orientation);
 
         // Insertar en el Octree
         octree.insert(e, col);
@@ -127,6 +128,11 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
             if (isAtkEnemy2)
                 std::swap(staticEntPtr, otherEntPtr);
 
+
+            auto& r = em.getComponent<RenderComponent>(*staticEntPtr);
+            if (r.meshLoaded)
+                r.destroyMesh();
+
             dead_entities.insert(staticEntPtr->getID());
             return;
         }
@@ -146,8 +152,8 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         }
 
         // // Colisiones de enemigos con el jugador
-        // if (!(behaviorType1 & BehaviorType::SHIELD || behaviorType2 & BehaviorType::SHIELD))
-        //     handlePlayerCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, minOverlap, behaviorType1, behaviorType2);
+        if (!(behaviorType1 & BehaviorType::SHIELD || behaviorType2 & BehaviorType::SHIELD))
+            handlePlayerCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, minOverlap, behaviorType1, behaviorType2);
 
         return;
     }
@@ -217,7 +223,10 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
         if (!staticEntPtr->hasTag<WaterTag>())
+        {
             dead_entities.insert(otherEntPtr->getID());
+            em.getComponent<RenderComponent>(*otherEntPtr).destroyMesh();
+        }
         return;
     }
 
@@ -241,6 +250,8 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         if (ic.hasKey)
         {
             dead_entities.insert(staticEntPtr->getID());
+            em.getComponent<RenderComponent>(*staticEntPtr).destroyMesh();
+
             ic.hasKey = false;
             return;
         }
@@ -359,6 +370,9 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
             else
                 em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(1);
 
+            auto& r = em.getComponent<RenderComponent>(*ent1Ptr);
+            if (r.meshLoaded)
+                em.getComponent<RenderComponent>(*ent1Ptr).destroyMesh();
         }
     }
 }
