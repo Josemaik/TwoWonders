@@ -95,13 +95,13 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
     //std::cout << "CREO LA BALA";
 
     // Comprobar el tipo del ataque
-    // Comprobar el tipo del ataque
     ElementalType tipoElemental;
     if (ent.hasComponent<TypeComponent>())
         tipoElemental = em.getComponent<TypeComponent>(ent).type;
     else    
         tipoElemental = ElementalType::Neutral;
 
+    // Crear la entidad ataque
     auto& e{ em.newEntity() };
     em.addTag<HitPlayerTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3d{0, 0, 0} : att.vel * scale_to_respawn_attack), .scale = { isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 1.0 }, .color = BLACK });
