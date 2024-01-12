@@ -16,6 +16,7 @@ struct RenderSystem
     void drawLogoKaiwa(ENGI::GameEngine& engine);
     void drawEnding(ENGI::GameEngine& engine);
     void drawStory(ENGI::GameEngine& engine);
+    void unloadModels(EntityManager& em, ENGI::GameEngine& engine);
 
     // Funciones privadas para organizar el codigo
 private:

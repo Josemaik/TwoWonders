@@ -56,7 +56,7 @@ void Game::createShop(EntityManager& em)
 void Game::createShield(EntityManager& em, Entity& ent)
 {
     auto& e{ em.newEntity() };
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .color = DARKBROWN });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = DARKBROWN });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
     em.addComponent<ShieldComponent>(e, ShieldComponent{});
@@ -91,6 +91,8 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     createCoin(em);
     // Shop
     createShop(em);
+    // Enemies
+    iam.createEnemies(em);
 
     // Ending
     createEnding(em);
@@ -103,9 +105,8 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
 void Game::run()
 {
     createEntities(em, evm);
-    iam.createEnemies(em);
-
     map.createMap(em);
+
     engine.setTargetFPS(30);
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
@@ -210,13 +211,14 @@ void Game::run()
         }
     }
 
+    render_system.unloadModels(em, engine);
     engine.closeWindow();
 }
 
 void Game::normalExecution(EntityManager& em, float deltaTime)
 {
     ai_system.update(em, deltaTime);
-    physics_system.update(em,deltaTime);
+    physics_system.update(em, deltaTime);
     collision_system.update(em);
     zone_system.update(em, engine, iam, evm);
     shield_system.update(em);

@@ -11,7 +11,7 @@ enum BehaviorType {
     ATK_ENEMY = 0x10,
     ZONE = 0x20,
     SHIELD = 0x40,
-    ENDING = 0x80 ,
+    ENDING = 0x80,
 };
 
 struct ColliderComponent
@@ -20,7 +20,9 @@ struct ColliderComponent
     ColliderComponent(vec3d pos, vec3d scale, BehaviorType behavior)
         : boundingBox{ pos, scale }, behaviorType{ behavior } {};
 
-    void updateBox(vec3d pos, vec3d scale, double gravity);
+    void updateBox(vec3d pos, vec3d scale, double gravity, double orientation);
+    void rotatePointY(vec3d& point, double cosAngle, double sinAngle);
+
     BBox boundingBox{};
     BehaviorType behaviorType;
 };

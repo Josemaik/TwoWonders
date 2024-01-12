@@ -37,6 +37,8 @@ namespace ENGI {
         void endMode3D();
         void drawCube(vec3d pos, float width, float height, float lenght, Color color);
         void drawCubeWires(vec3d pos, float width, float height, float lenght, Color color);
+        void drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
+        void drawModelWires(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
         void drawRectangle(int posX, int posY, int width, int height, Color color);
         void drawTexture(Texture2D texture, int posX, int posY, Color tint);
 
@@ -57,7 +59,10 @@ namespace ENGI {
         void setFovyCamera(float fovy);
         void setProjectionCamera(int proj);
 
-        // Aux 
+        // Aux
+        Mesh genMeshCube(float width, float height, float lenght);
+        Model loadModelFromMesh(Mesh m);
+        void unloadModel(Model m);
         float getWorldToScreenX(vec3d pos);
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();

@@ -14,12 +14,13 @@ void CollisionSystem::update(EntityManager& em)
         if (pos.y() < -20.)
         {
             dead_entities.insert(e.getID());
+            em.getComponent<RenderComponent>(e).destroyMesh();
             return;
         }
 
         // Actualizar bounding box
         auto& scl = ren.scale;
-        col.updateBox(pos, scl, phy.gravity);
+        col.updateBox(pos, scl, phy.gravity, phy.orientation);
 
         // Insertar en el Octree
         octree.insert(e, col);
@@ -128,6 +129,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
                 std::swap(staticEntPtr, otherEntPtr);
 
             dead_entities.insert(staticEntPtr->getID());
+            em.getComponent<RenderComponent>(*staticEntPtr).destroyMesh();
             return;
         }
 
@@ -217,7 +219,10 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
         if (!staticEntPtr->hasTag<WaterTag>())
+        {
             dead_entities.insert(otherEntPtr->getID());
+            em.getComponent<RenderComponent>(*otherEntPtr).destroyMesh();
+        }
         return;
     }
 
@@ -241,6 +246,8 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         if (ic.hasKey)
         {
             dead_entities.insert(staticEntPtr->getID());
+            em.getComponent<RenderComponent>(*staticEntPtr).destroyMesh();
+
             ic.hasKey = false;
             return;
         }
@@ -338,6 +345,7 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
         if ((isPlayer2 && (atkEn1 || atkEn2)) || (isEnemy2 && (atkPl1 || atkPl2)))
         {
             dead_entities.insert(ent1Ptr->getID());
+            em.getComponent<RenderComponent>(*ent1Ptr).destroyMesh();
             em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife();
         }
     }
