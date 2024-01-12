@@ -4,8 +4,6 @@
 
 struct RenderComponent
 {
-    // Da problemas con el addresssanitizer cuando se cierra la aplicación xd
-    // ~RenderComponent();
     void setAll(vec3d p, vec3d s, Color c);
     void setPosition(vec3d p);
     void setScale(vec3d s);

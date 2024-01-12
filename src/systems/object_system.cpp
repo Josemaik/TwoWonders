@@ -8,10 +8,8 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             if (obj.type == Object_type::BombExplode)
                 obj.effect();
             else
-            {
                 dead_entities.insert(ent.getID());
-                em.getComponent<RenderComponent>(ent).destroyMesh();
-            }
+
         }
 
         // Recuperamos la entidad del player
@@ -74,10 +72,8 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 break;
             }
             if (shop_object)
-            {
                 dead_entities.insert(ent.getID());
-                em.getComponent<RenderComponent>(ent).destroyMesh();
-            }
+
             else
                 obj.active = false;
         }

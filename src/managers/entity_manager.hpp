@@ -232,10 +232,11 @@ namespace ETMG {
 
         // Plantilla para destruir un componente de una entidad
         template<typename CMP>
-        void destroyComponent(Entity& e)
-        {
-            if (e.template hasComponent<CMP>())
-            {
+        void destroyComponent(Entity& e) {
+            if (e.template hasComponent<CMP>()) {
+                if constexpr (std::is_same_v<CMP, RenderComponent>) {
+                    getComponent<RenderComponent>(e).destroyMesh();
+                }
                 auto key = e.template getComponentKey<CMP>();
                 this->template getCMPStorage<CMP>().erase(key);
             }

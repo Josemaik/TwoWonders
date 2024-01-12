@@ -14,7 +14,6 @@ void CollisionSystem::update(EntityManager& em)
         if (pos.y() < -20.)
         {
             dead_entities.insert(e.getID());
-            em.getComponent<RenderComponent>(e).destroyMesh();
             return;
         }
 
@@ -128,11 +127,6 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
             if (isAtkEnemy2)
                 std::swap(staticEntPtr, otherEntPtr);
 
-
-            auto& r = em.getComponent<RenderComponent>(*staticEntPtr);
-            if (r.meshLoaded)
-                r.destroyMesh();
-
             dead_entities.insert(staticEntPtr->getID());
             return;
         }
@@ -223,10 +217,8 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
         if (!staticEntPtr->hasTag<WaterTag>())
-        {
             dead_entities.insert(otherEntPtr->getID());
-            em.getComponent<RenderComponent>(*otherEntPtr).destroyMesh();
-        }
+
         return;
     }
 
@@ -250,7 +242,6 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         if (ic.hasKey)
         {
             dead_entities.insert(staticEntPtr->getID());
-            em.getComponent<RenderComponent>(*staticEntPtr).destroyMesh();
 
             ic.hasKey = false;
             return;
@@ -350,29 +341,25 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
         {
             // Comprobar si tiene tipo la bala
             ElementalType typeBala{ ElementalType::Neutral }, typeEnemyPlayer{ ElementalType::Neutral };
-            if(ent1Ptr->hasComponent<TypeComponent>())
+            if (ent1Ptr->hasComponent<TypeComponent>())
                 typeBala = em.getComponent<TypeComponent>(*ent1Ptr).type;
-            if(ent2Ptr->hasComponent<TypeComponent>())
+            if (ent2Ptr->hasComponent<TypeComponent>())
                 typeEnemyPlayer = em.getComponent<TypeComponent>(*ent2Ptr).type;
 
             // Destruir bala
             dead_entities.insert(ent1Ptr->getID());
 
             // Comprobar el tipo de la bala y el enemigo/player
-            if((typeBala == ElementalType::Fuego && typeEnemyPlayer == ElementalType::Hielo) ||
-               (typeBala == ElementalType::Hielo && typeEnemyPlayer == ElementalType::Agua ) ||
-               (typeBala == ElementalType::Agua  && typeEnemyPlayer == ElementalType::Fuego))
+            if ((typeBala == ElementalType::Fuego && typeEnemyPlayer == ElementalType::Hielo) ||
+                (typeBala == ElementalType::Hielo && typeEnemyPlayer == ElementalType::Agua) ||
+                (typeBala == ElementalType::Agua && typeEnemyPlayer == ElementalType::Fuego))
             {
-               em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(3);
+                em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(3);
             }
-            else if(typeBala == ElementalType::Neutral)
+            else if (typeBala == ElementalType::Neutral)
                 em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(2);
             else
                 em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(1);
-
-            auto& r = em.getComponent<RenderComponent>(*ent1Ptr);
-            if (r.meshLoaded)
-                em.getComponent<RenderComponent>(*ent1Ptr).destroyMesh();
         }
     }
 }

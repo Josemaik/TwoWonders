@@ -202,7 +202,9 @@ void Game::run()
         {
             if (input_system.pressEnter())
                 li.currentScreen = GameScreen::TITLE;
+
             em.destroyAll();
+            render_system.unloadModels(em, engine);
             render_system.drawEnding(engine);
             break;
         }
