@@ -24,6 +24,9 @@ private:
     void drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debug);
     void drawEntities(EntityManager& em, ENGI::GameEngine& engine);
     void drawDeath(ENGI::GameEngine& engine);
+
+    Model model{};
+    bool cargado{ false };
 };
 
 #endif // !RENDER_SYSTEM

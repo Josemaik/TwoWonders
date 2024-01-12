@@ -19,7 +19,7 @@ void CollisionSystem::update(EntityManager& em)
 
         // Actualizar bounding box
         auto& scl = ren.scale;
-        col.updateBox(pos, scl, phy.gravity);
+        col.updateBox(pos, scl, phy.gravity, phy.orientation);
 
         // Insertar en el Octree
         octree.insert(e, col);

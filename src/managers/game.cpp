@@ -56,7 +56,7 @@ void Game::createShop(EntityManager& em)
 void Game::createShield(EntityManager& em, Entity& ent)
 {
     auto& e{ em.newEntity() };
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .color = DARKBROWN });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = DARKBROWN });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
     em.addComponent<ShieldComponent>(e, ShieldComponent{});
@@ -216,7 +216,7 @@ void Game::run()
 void Game::normalExecution(EntityManager& em, float deltaTime)
 {
     ai_system.update(em, deltaTime);
-    physics_system.update(em,deltaTime);
+    physics_system.update(em, deltaTime);
     collision_system.update(em);
     zone_system.update(em, engine, iam, evm);
     shield_system.update(em);

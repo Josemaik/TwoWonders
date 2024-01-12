@@ -31,3 +31,8 @@ void RenderComponent::setColor(Color c)
 {
     color = c;
 }
+
+void RenderComponent::setOrientation(double o)
+{
+    orientation = o;
+}

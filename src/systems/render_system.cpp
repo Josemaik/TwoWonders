@@ -8,6 +8,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debu
     em.forEach<SYSCMPs, SYSTAGs>([](Entity&, PhysicsComponent& phy, RenderComponent& ren)
     {
         ren.setPosition(phy.position);
+        ren.setOrientation(phy.orientation);
     });
 
     beginFrame(engine);
@@ -72,14 +73,14 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
     {
         if (e.hasComponent<RenderComponent>())
         {
-            auto const& r{ em.getComponent<RenderComponent>(e) };
+            auto& r{ em.getComponent<RenderComponent>(e) };
             if (r.visible) {
                 // Revisamos si es el jugador para mover la cámara
-                //if (e.hasTag<PlayerTag>())
-                //{
-                //    engine.setPositionCamera({ r.position.x(), 25.0f, r.position.z() + 25.0f });
-                //    engine.setTargetCamera(r.position);
-                //}
+                if (e.hasTag<PlayerTag>())
+                {
+                    engine.setPositionCamera({ r.position.x() + 10.f, 15.f, r.position.z() + 10.f });
+                    engine.setTargetCamera(r.position);
+                }
                 // Comprobar si tiene el componente vida
 
                 Color colorEntidad = r.color;
@@ -89,8 +90,18 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                         colorEntidad = YELLOW;
                 }
                 if (!e.hasTag<ZoneTag>())
-                    engine.drawCube(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), colorEntidad);
-                engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
+                {
+                    // Solo generamos la malla si no existe
+                    if (!r.meshLoaded)
+                    {
+                        r.model = engine.loadModelFromMesh(engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z())));
+                        r.meshLoaded = true;
+                    }
+
+                    float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
+                    engine.drawModel(r.model, { static_cast<float>(r.position.x()), static_cast<float>(r.position.y()), static_cast<float>(r.position.z()) }, { 0.0f, 1.0f, 0.0f }, orientationInDegrees, { 1.0f, 1.0f, 1.0f }, colorEntidad);
+                    engine.drawModelWires(r.model, { static_cast<float>(r.position.x()), static_cast<float>(r.position.y()), static_cast<float>(r.position.z()) }, { 0.0f, 1.0f, 0.0f }, orientationInDegrees, { 1.0f, 1.0f, 1.0f }, BLACK);
+                }
             }
         }
     }
@@ -238,7 +249,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 engine.drawText(velZ.c_str(), 10, 250, 20, BLACK);
 
                 engine.beginMode3D();
-                engine.drawCubeWires(ren.position,  static_cast<float>(ren.scale.x()),  static_cast<float>(ren.scale.y()),  static_cast<float>(ren.scale.z()), RED);
+                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
                 engine.endMode3D();
             }
         }
