@@ -16,7 +16,10 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
         }
 
         if (lif.markedForDeletion)
+        {
             dead_entities.insert(ent.getID());
+            em.getComponent<RenderComponent>(ent).destroyMesh();
+        }
     });
 
     if (!dead_entities.empty())

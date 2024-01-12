@@ -7,7 +7,10 @@ void ProjectileSystem::update(EntityManager& em, float deltaTime) {
             if (e.hasComponent<LifeComponent>())
                 em.getComponent<LifeComponent>(e).markedForDeletion = true;
             else
+            {
                 dead_entities.insert(e.getID());
+                em.getComponent<RenderComponent>(e).destroyMesh();
+            }
         }
     });
 

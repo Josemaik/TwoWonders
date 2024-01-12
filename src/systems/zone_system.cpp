@@ -106,7 +106,10 @@ void ZoneSystem::deleteZoneEnemies(EntityManager& em)
     auto const& li = em.getSingleton<LevelInfo>();
 
     for (auto& enemy : li.enemiesID)
+    {
         dead_entities.insert(enemy);
+        em.getComponent<RenderComponent>(*em.getEntityByID(enemy)).destroyMesh();
+    }
 }
 
 void ZoneSystem::updateZoneEnemies(EntityManager& em)

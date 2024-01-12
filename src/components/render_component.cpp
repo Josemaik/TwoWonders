@@ -1,5 +1,10 @@
 #include "render_component.hpp"
 
+void RenderComponent::destroyMesh()
+{
+    UnloadModel(model);
+}
+
 void RenderComponent::setAll(vec3d p, vec3d s, Color c)
 {
     position.setX(p.x());
