@@ -230,7 +230,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         //Enemigo Golem
         auto& e1{ em.newEntity() };
         auto& wr1 = em.addComponent<RenderComponent>(e1, RenderComponent{ .position = vec3d{-6.5,0.0,-.0}, .scale = vec3d{2.0,2.0,2.0}, .color = BLUE });
-        auto& wp1 = em.addComponent<PhysicsComponent>(e1, PhysicsComponent{ .position = vec3d(wr1.position),.gravity = 2.0, .max_speed = 0.5 });
+        auto& wp1 = em.addComponent<PhysicsComponent>(e1, PhysicsComponent{ .position = vec3d(wr1.position),.gravity = 2.0, .max_speed = 0.55 });
         em.addComponent<ColliderComponent>(e1, ColliderComponent{ wp1.position, wr1.scale, BehaviorType::ENEMY });
         em.addComponent<LifeComponent>(e1, LifeComponent{ .life = 10 });
         em.addComponent<TypeComponent>(e1, TypeComponent{ .type = ElementalType::Fuego });
