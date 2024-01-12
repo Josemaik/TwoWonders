@@ -133,6 +133,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         {
             // Dibujar background HUD
             engine.drawRectangle(0, 0, 580, 60, WHITE);
+            engine.drawRectangle(0, 55, 100, 30, WHITE);
 
             // Dibujar vidas restantes del player en el HUD
             if (e.hasComponent<LifeComponent>())
@@ -164,6 +165,21 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                     countdown_ataque = "Ataque listo en: " + std::to_string(-1 * (a.elapsed - 1.0f)) + " segundos";
 
                 engine.drawText(countdown_ataque.c_str(), 10, 35, 20, BLACK);
+            }
+
+            // Dibujar el tipo de ataque que tiene equipado
+            if (e.hasComponent<TypeComponent>())
+            {
+                auto const& t{ em.getComponent<TypeComponent>(e) };
+
+                if (t.type == ElementalType::Neutral)
+                    engine.drawText("Neutral", 10, 60, 20, BLACK);
+                else if (t.type == ElementalType::Agua)
+                    engine.drawText("Agua", 10, 60, 20, BLUE);
+                else if (t.type == ElementalType::Fuego)
+                    engine.drawText("Fuego", 10, 60, 20, RED);
+                else
+                    engine.drawText("Hielo", 10, 60, 20, SKYBLUE);
             }
 
         }
