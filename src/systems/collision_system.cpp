@@ -128,8 +128,12 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
             if (isAtkEnemy2)
                 std::swap(staticEntPtr, otherEntPtr);
 
+
+            auto& r = em.getComponent<RenderComponent>(*staticEntPtr);
+            if (r.meshLoaded)
+                r.destroyMesh();
+
             dead_entities.insert(staticEntPtr->getID());
-            em.getComponent<RenderComponent>(*staticEntPtr).destroyMesh();
             return;
         }
 
@@ -148,8 +152,8 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         }
 
         // // Colisiones de enemigos con el jugador
-        // if (!(behaviorType1 & BehaviorType::SHIELD || behaviorType2 & BehaviorType::SHIELD))
-        //     handlePlayerCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, minOverlap, behaviorType1, behaviorType2);
+        if (!(behaviorType1 & BehaviorType::SHIELD || behaviorType2 & BehaviorType::SHIELD))
+            handlePlayerCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, minOverlap, behaviorType1, behaviorType2);
 
         return;
     }
@@ -345,7 +349,11 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
         if ((isPlayer2 && (atkEn1 || atkEn2)) || (isEnemy2 && (atkPl1 || atkPl2)))
         {
             dead_entities.insert(ent1Ptr->getID());
-            em.getComponent<RenderComponent>(*ent1Ptr).destroyMesh();
+
+            auto& r = em.getComponent<RenderComponent>(*ent1Ptr);
+            if (r.meshLoaded)
+                em.getComponent<RenderComponent>(*ent1Ptr).destroyMesh();
+
             em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife();
         }
     }

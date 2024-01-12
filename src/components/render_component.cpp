@@ -3,6 +3,7 @@
 void RenderComponent::destroyMesh()
 {
     UnloadModel(model);
+    meshLoaded = false;
 }
 
 void RenderComponent::setAll(vec3d p, vec3d s, Color c)

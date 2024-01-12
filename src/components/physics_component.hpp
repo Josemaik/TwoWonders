@@ -23,6 +23,8 @@ struct PhysicsComponent
     double a_linear{ 0.0 };
     //aceleracion angular
     double a_angular{ 0.0 };
+    // velocidad máxima
+    double max_speed{ MAX_SPEED };
     //max valor que puede tomar las velocidades y aceleraciones
     static constexpr double kMaxVLin{ 5.0 };
     static constexpr double kMaxAlin{ kMaxVLin / 0.5 };
