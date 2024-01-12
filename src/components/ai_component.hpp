@@ -18,7 +18,7 @@ struct BehaviourTree_t;
 struct AIComponent
 {
     // Type of shoots
-    enum class TypeShoot : uint8_t { OneShootonDir, OneShoottoPlayer, TripleShoot };
+    enum class TypeShoot : uint8_t { OneShootonDir, OneShoottoPlayer, TripleShoot, Melee};
     // TypeShoot currentshoot{};
     // Default velocity
     double SPEED_AI = 0.2;
@@ -55,6 +55,7 @@ struct AIComponent
     // Data for detect player
     double detect_radius{ 15.0 };
     double attack_radius { 6.0 };
+    bool on_attack_radius { false };
     bool playerdetected{ false };
     //Ataque
     bool ready_attack {false};
@@ -77,7 +78,7 @@ struct AIComponent
     bool path_initialized { false };
     // SB behaviour {SB::Arrive};
     // Timers
-    double countdown_change_dir{ 1.5 }, countdown_stop{ 0.35 }, countdown_shoot{ 0.5 }, countdown_change_position{ 3.0 }; // seconds
+    double countdown_change_dir{ 1.5 }, countdown_stop{ 0.8 }, countdown_shoot{ 0.5 }, countdown_change_position{ 3.0 }; // seconds
     double elapsed_change_position{ 1.0 }, elapsed_stop{ 1.0 }, elapsed_change_dir{ 1.0 }, elapsed_shoot{ 1.0 };
     void dec_countdown_change_pos(double deltaTime) { elapsed_change_position += deltaTime; };
     void dec_countdown_change_dir(double deltaTime) { elapsed_change_dir += deltaTime; }; // delta time

@@ -26,6 +26,7 @@ struct BTActionShoot : BTNode_t{
             // }
             // ectx.ai.elapsed_shoot = 0;
             if(ectx.ai.ready_attack){
+                 std::cout << "HE DISPARADO \n";
                 ectx.ai.ready_attack = false;
                     switch (shoot)
                 {
@@ -48,15 +49,28 @@ struct BTActionShoot : BTNode_t{
                     att.attack(AttackType::TripleShot);
                     return BTNodeStatus_t::success;
                 }
+                case AIComponent::TypeShoot::Melee: {
+                    //shoot three time
+                    att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai.SPEED_AI;
+                    att.attack(AttackType::Melee);
+                    return BTNodeStatus_t::success;
+                }
                     break;
                 default:
                     break;
                 }
             }
-
+          std::cout << "NO HE DISPARADO \n";
         // }
-        // ectx.ai.dec_countdown_shoot(ectx.deltatime);
-        return BTNodeStatus_t::success;
+        // Si no puedo atacar por culldown pero sigo en radio de ataque
+        // if(ectx.ai.on_attack_radius){
+        //     ectx.ai.on_attack_radius = false;
+            return BTNodeStatus_t::success;
+        // }else{
+        //     return BTNodeStatus_t::fail;
+        // }
+
+
     }
 private:
    type_value shoot;

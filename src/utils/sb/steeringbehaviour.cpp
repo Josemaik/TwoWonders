@@ -94,7 +94,7 @@ Steer_t STBH::Pursue(PhysicsComponent const& phyTarget,PhysicsComponent const& p
         vec3d target  {  phyTarget.position.x(), 0.0 ,   phyTarget.position.z() };
         vec3d avoider { phyPursuer.position.x(), 0.0 ,   phyPursuer.position.z()  };
         auto distance { calculatePointDistance(target,avoider) };
-        auto minimaltime { distance / phyPursuer.kMaxVLin };
+        auto minimaltime { distance / phyPursuer.MAX_SPEED };
         vec3d predicted_target {
                 phyTarget.position.x() + phyTarget.velocity.x() * minimaltime,
                 0.0                                                          ,
