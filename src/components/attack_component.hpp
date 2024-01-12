@@ -7,6 +7,7 @@ struct AttackComponent
     AttackType type{ AttackType::Ranged };
     u_int16_t damage{};
     float range{}; // en segundos
+    double scale_to_respawn_attack{2.0};
     bool createAttack{ false };
     float countdown{ 1.0f }, elapsed{ 1.0f }; // en segundos
     vec3d vel{};
