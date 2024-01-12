@@ -23,6 +23,8 @@
 //decision
 #include "../utils/bt/decision_playerdetected.hpp"
 #include "../utils/bt/decision_readyforattack.hpp"
+#include "../utils/bt/decision_on_attack_radius.hpp"
+
 struct Ia_man
 {
     // void createMap(EntityManager& em);
