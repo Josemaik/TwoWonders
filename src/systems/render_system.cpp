@@ -83,6 +83,34 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 // Comprobar si tiene el componente vida
 
                 Color colorEntidad = r.color;
+
+                // Comprobar el tipo y si es enemigo cambiarle el color
+                if (!e.hasTag<PlayerTag>() && e.hasComponent<TypeComponent>()){
+                    auto& t{ em.getComponent<TypeComponent>(e) };
+
+                    switch (t.type)
+                    {
+                    case ElementalType::Neutral:
+                        colorEntidad = GRAY;
+                        break;
+                    
+                    case ElementalType::Agua:
+                        colorEntidad = BLUE;
+                        break;
+
+                    case ElementalType::Fuego:
+                        colorEntidad = RED;
+                        break;
+
+                    case ElementalType::Hielo:
+                        colorEntidad = SKYBLUE;
+                        break;
+                                        
+                    default:
+                        break;
+                    }
+                }
+
                 if (e.hasComponent<LifeComponent>()) {
                     auto& l{ em.getComponent<LifeComponent>(e) };
                     if (l.elapsed < l.countdown)
