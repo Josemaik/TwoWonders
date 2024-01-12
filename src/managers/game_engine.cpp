@@ -183,6 +183,11 @@ Model ENGI::GameEngine::loadModelFromMesh(Mesh m)
     return LoadModelFromMesh(m);
 }
 
+void ENGI::GameEngine::unloadModel(Model m)
+{
+    UnloadModel(m);
+}
+
 float ENGI::GameEngine::getWorldToScreenX(vec3d pos)
 {
     return GetWorldToScreen(pos.toRaylib(), camera).x;

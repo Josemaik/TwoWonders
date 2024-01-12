@@ -232,6 +232,19 @@ void Map::createGroundWaterOverworld(EntityManager& em) {
         auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0, .0, .0 }, .gravity = .0 });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
     }
+
+    // EntityData entitiesRamp[] = {
+    //     { { 1.0, -0.5, -5.0 }, { 2.0, 2.0, 2.0 }, WHITE },
+    // };
+
+    // for (const auto& data : entitiesRamp)
+    // {
+    //     auto& entity = em.newEntity();
+    //     em.addTag<RampTag>(entity);
+    //     auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
+    //     auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0, .0, .0 }, .gravity = .0 });
+    //     em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
+    // }
 }
 
 // Se encarga de crear las zonas

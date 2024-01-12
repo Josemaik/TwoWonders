@@ -219,6 +219,21 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 BLACK);
         }
 
+        if (debug && e.hasComponent<ColliderComponent>())
+        {
+            auto& col{ em.getComponent<ColliderComponent>(e) };
+
+            // Calcular la posición y el tamaño de la bounding box
+            vec3d boxPosition = (col.boundingBox.min + col.boundingBox.max) / 2;
+            vec3d boxSize = col.boundingBox.max - col.boundingBox.min;
+
+            // Dibujar la bounding box
+            engine.beginMode3D();
+            engine.drawCubeWires(boxPosition, boxSize.x(), boxSize.y(), boxSize.z(), BLUE);
+            engine.endMode3D();
+
+        }
+
         if (debug && e.hasComponent<PhysicsComponent>())
         {
             auto& phy = em.getComponent<PhysicsComponent>(e);
@@ -272,4 +287,19 @@ void RenderSystem::drawDeath(ENGI::GameEngine& engine)
     engine.drawRectangle(0, 0, engine.getScreenWidth(), engine.getScreenHeight(), Fade(BLACK, 0.5f));
     engine.drawText("HAS MUERTO", 250, 250, 40, RED);
     engine.drawText("[ENTER] para volver a jugar", 165, 300, 30, RED);
+}
+
+void RenderSystem::unloadModels(EntityManager& em, ENGI::GameEngine& engine)
+{
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, PhysicsComponent&, RenderComponent& ren)
+    {
+        if (ent.hasComponent<RenderComponent>())
+        {
+            if (ren.meshLoaded)
+            {
+                engine.unloadModel(ren.model);
+                ren.meshLoaded = false;
+            }
+        }
+    });
 }

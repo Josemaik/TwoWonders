@@ -91,6 +91,8 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     createCoin(em);
     // Shop
     createShop(em);
+    // Enemies
+    iam.createEnemies(em);
 
     // Ending
     createEnding(em);
@@ -103,9 +105,8 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
 void Game::run()
 {
     createEntities(em, evm);
-    iam.createEnemies(em);
-
     map.createMap(em);
+
     engine.setTargetFPS(30);
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
@@ -210,6 +211,7 @@ void Game::run()
         }
     }
 
+    render_system.unloadModels(em, engine);
     engine.closeWindow();
 }
 

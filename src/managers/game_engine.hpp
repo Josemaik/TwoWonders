@@ -62,6 +62,7 @@ namespace ENGI {
         // Aux
         Mesh genMeshCube(float width, float height, float lenght);
         Model loadModelFromMesh(Mesh m);
+        void unloadModel(Model m);
         float getWorldToScreenX(vec3d pos);
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();

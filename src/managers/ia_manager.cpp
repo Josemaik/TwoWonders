@@ -232,6 +232,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         auto& wr1 = em.addComponent<RenderComponent>(e1, RenderComponent{ .position = vec3d{6.5,0.0,5.0}, .scale = vec3d{1.0,2.0,1.0}, .color = BLUE });
         auto& wp1 = em.addComponent<PhysicsComponent>(e1, PhysicsComponent{ .position = vec3d(wr1.position),.gravity = 2.0 });
         em.addComponent<ColliderComponent>(e1, ColliderComponent{ wp1.position, wr1.scale, BehaviorType::ENEMY });
+        em.addComponent<LifeComponent>(e1, LifeComponent{ .life = 10 });
 
         auto* d_1 = &tree1.createNode<BTDecisionPlayerDetected>();
         auto* a_s = &tree1.createNode<BTAction_Seek>();
@@ -245,11 +246,14 @@ void Ia_man::createEnemies(EntityManager& em) {
         tree1.createNode<BTNodeSelector_t>(sequence1, sequence2);
         em.addComponent<AIComponent>(e1, AIComponent{ .arrival_radius = 0.1,.detect_radius = 7.0,.tx = 0.0,.tz = 0.0,.time2arrive = 1.0,.tactive = true,.perceptionTime = 0.2f,.behaviourTree = &tree1 });
         em.addComponent<AttackComponent>(e1, AttackComponent{});
+
         //Enemigo 2
         auto& e2{ em.newEntity() };
         auto& wr2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = vec3d{1.0,0.0,5.0}, .scale = vec3d{1.0,2.0,1.0}, .color = BLUE });
         auto& wp2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = vec3d(wr2.position),.gravity = 2.0 });
         em.addComponent<ColliderComponent>(e2, ColliderComponent{ wp2.position, wr2.scale, BehaviorType::ENEMY });
+        em.addComponent<LifeComponent>(e2, LifeComponent{ .life = 10 });
+
         auto* d_1_2 = &tree2.createNode<BTDecisionPlayerDetected>();
         auto* a_s_2 = &tree2.createNode<BTAction_Seek>();
         auto* d_a_2 = &tree2.createNode<BTDecisionReadyforAttack>();

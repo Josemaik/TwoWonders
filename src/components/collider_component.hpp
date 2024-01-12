@@ -21,7 +21,7 @@ struct ColliderComponent
         : boundingBox{ pos, scale }, behaviorType{ behavior } {};
 
     void updateBox(vec3d pos, vec3d scale, double gravity, double orientation);
-    vec3d rotateY(vec3d point, vec3d center, double angle);
+    void rotatePointY(vec3d& point, double cosAngle, double sinAngle);
 
     BBox boundingBox{};
     BehaviorType behaviorType;
