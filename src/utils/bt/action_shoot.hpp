@@ -26,7 +26,7 @@ struct BTActionShoot : BTNode_t{
             // }
             // ectx.ai.elapsed_shoot = 0;
             if(ectx.ai.ready_attack){
-                 std::cout << "HE DISPARADO \n";
+                 //std::cout << "HE DISPARADO \n";
                 ectx.ai.ready_attack = false;
                     switch (shoot)
                 {

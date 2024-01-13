@@ -20,6 +20,7 @@
 #include "../utils/bt/action_flee.hpp"
 #include "../utils/bt/action_pursue.hpp"
 #include "../utils/bt/action_avoid.hpp"
+#include "../utils/bt/action_jumptoplayer.hpp"
 //decision
 #include "../utils/bt/decision_playerdetected.hpp"
 #include "../utils/bt/decision_readyforattack.hpp"
