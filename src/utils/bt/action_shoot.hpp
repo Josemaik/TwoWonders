@@ -60,7 +60,7 @@ struct BTActionShoot : BTNode_t{
                     break;
                 }
             }
-          std::cout << "NO HE DISPARADO \n";
+          //std::cout << "NO HE DISPARADO \n";
         // }
         // Si no puedo atacar por culldown pero sigo en radio de ataque
         // if(ectx.ai.on_attack_radius){

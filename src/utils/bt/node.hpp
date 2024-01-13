@@ -16,8 +16,9 @@ struct EntityContext_t {
     // ShootPlayerComponent& spc;
     // DiagonalComponent& dc;
     // DrakeComponent& drc;
-    //physics
+    //Components
     PhysicsComponent& phy;
+    LifeComponent& lifec;
     float deltatime;
 };
 enum class BTNodeStatus_t : uint8_t {
