@@ -26,7 +26,7 @@ void perception(BlackBoard_t& bb, AIComponent& ai, float dt) {
 void AISystem::update(EntityManager& em, float dt)
 {
     auto& bb = em.getSingleton<BlackBoard_t>();
-    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, AIComponent& ai)
+    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, AIComponent& ai,LifeComponent& lc)
     {
         //percibir el entorno
         perception(bb, ai, dt);
@@ -55,7 +55,7 @@ void AISystem::update(EntityManager& em, float dt)
             //     std::cout << "defecto \n";
             //     break;
             // }
-            ai.behaviourTree->run({ em,e,ai,phy,dt });
+            ai.behaviourTree->run({ em,e,ai,phy,lc,dt});
             return;
         }
     });

@@ -18,7 +18,7 @@ void LifeComponent::decreaseLife(int minusLife){
 
 void LifeComponent::increaseLife() {
     if (life < maxLife)
-        life += 1;
+        life += 2;
 }
 
 void LifeComponent::increaseMaxLife(){

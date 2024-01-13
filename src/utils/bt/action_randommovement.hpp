@@ -14,14 +14,14 @@ struct BTActionRandomMovement : BTNode_t{
                 ectx.ai.oldvel = direction;
                 ectx.ai.elapsed_change_dir = 0;
             }
-            ectx.ai.dec_countdown_change_dir(ectx.deltatime);
+            ectx.ai.plusdeltatime(ectx.deltatime,ectx.ai.elapsed_change_dir);
         //check if ai have to stops
             if (ectx.ai.elapsed_stop >= ectx.ai.countdown_stop) {
                 ectx.ai.elapsed_stop = 0;
                 ectx.phy.velocity = {};
                 return BTNodeStatus_t::success;
             }
-            ectx.ai.dec_countdown_stop(ectx.deltatime);
+            ectx.ai.plusdeltatime(ectx.deltatime,ectx.ai.elapsed_stop);
 
             if (!ectx.ai.isInDesiredRange(ectx.phy.position + ectx.ai.oldvel, ectx.ai.Xmin, ectx.ai.Xmax, ectx.ai.Zmin, ectx.ai.Zmax)) {
                 ectx.ai.oldvel *= -1.0f;

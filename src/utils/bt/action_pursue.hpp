@@ -10,7 +10,7 @@ struct BTAction_Pursue : BTNode_t{
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         if( !ectx.ai.tactive ) return BTNodeStatus_t::fail;
         //get target entity by id
-          std::cout << "TOY PURSUE \n";
+       //   std::cout << "TOY PURSUE \n";
         auto const& e_opt { ectx.em.getEntityByID(ectx.ai.teid) };
         if ( !e_opt ) { ectx.ai.tactive = false; return BTNodeStatus_t::running; };
         auto const& phyTarget = ectx.em.getComponent<PhysicsComponent>(*e_opt);
