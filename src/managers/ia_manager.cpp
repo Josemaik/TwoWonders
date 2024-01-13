@@ -281,6 +281,7 @@ void Ia_man::createEnemies(EntityManager& em) {
 
         //Enemigo Slime
         auto& e3{ em.newEntity() };
+        em.addTag<SlimeTag>(e3);
         auto& wr3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = vec3d{1.0,0.0,5.0}, .scale = vec3d{1.0,2.0,1.0}, .color = BLUE });
         auto& wp3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = vec3d(wr3.position),.gravity = 2.0 });
         em.addComponent<ColliderComponent>(e3, ColliderComponent{ wp3.position, wr3.scale, BehaviorType::ENEMY });

@@ -11,6 +11,10 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
             if (ent.hasTag<EnemyTag>()) {
                 createObject(em, em.getComponent<PhysicsComponent>(ent).position);
             }
+            if (ent.hasTag<SlimeTag>()){
+                std::cout << "ALLA HUAKBAR";
+                em.getComponent<AttackComponent>(ent).attack(AttackType::Bomb);
+            }
 
             lif.markedForDeletion = true;
         }
