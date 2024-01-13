@@ -22,10 +22,10 @@ struct BTDecisionReadyforAttack : BTNode_t{
         if(distance < (ectx.ai.attack_radius * ectx.ai.attack_radius)){
             ectx.ai.on_attack_radius = true;
             if(ectx.ai.elapsed_shoot >= ectx.ai.countdown_shoot){
-                std::cout << "Atacar player \n";
                 // paro al enemigo
                 ectx.phy.velocity = vec3d{};
                 if(ectx.ai.elapsed_stop >= ectx.ai.countdown_stop){
+                    std::cout << "ATACAR\n";
                     ectx.ai.elapsed_shoot = 0;
                     ectx.ai.elapsed_stop = 0;
                     ectx.ai.ready_attack = true;
