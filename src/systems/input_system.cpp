@@ -25,30 +25,47 @@ void InputSystem::update(EntityManager& em)
 
         // Actualizar la velocidad
         int keysPressed = 0;
-        if (IsKeyDown(in.right)) {
-            vel.setX(vel.x() + INP_SPEED);
-            vel.setZ(vel.z() - INP_SPEED);
-            in.last_key = in.right;
-            keysPressed++;
+        if(phy.blockXZ){
+          // std::cout << "BLOQUEADOS \n";
+            if (IsKeyDown(in.up)) {
+                //std::cout << "SUBIRRR";
+                vel.setY(vel.y() + INP_SPEED);
+                in.last_key = in.up;
+                keysPressed++;
+            }
+            if (IsKeyDown(in.down)) {
+                vel.setY(vel.y() - INP_SPEED);
+                in.last_key = in.down;
+                keysPressed++;
+            }
+        }else{
+           // std::cout << "NO BLOQUEADOS \n";
+             if (IsKeyDown(in.right)) {
+                vel.setX(vel.x() + INP_SPEED);
+                vel.setZ(vel.z() - INP_SPEED);
+                in.last_key = in.right;
+                keysPressed++;
+            }
+            if (IsKeyDown(in.left)) {
+                vel.setX(vel.x() - INP_SPEED);
+                vel.setZ(vel.z() + INP_SPEED);
+                in.last_key = in.left;
+                keysPressed++;
+            }
+            if (IsKeyDown(in.up)) {
+                vel.setX(vel.x() - INP_SPEED);
+                vel.setZ(vel.z() - INP_SPEED);
+                in.last_key = in.up;
+                keysPressed++;
+            }
+            if (IsKeyDown(in.down)) {
+                vel.setX(vel.x() + INP_SPEED);
+                vel.setZ(vel.z() + INP_SPEED);
+                in.last_key = in.down;
+                keysPressed++;
+            }
         }
-        if (IsKeyDown(in.left)) {
-            vel.setX(vel.x() - INP_SPEED);
-            vel.setZ(vel.z() + INP_SPEED);
-            in.last_key = in.left;
-            keysPressed++;
-        }
-        if (IsKeyDown(in.up)) {
-            vel.setX(vel.x() - INP_SPEED);
-            vel.setZ(vel.z() - INP_SPEED);
-            in.last_key = in.up;
-            keysPressed++;
-        }
-        if (IsKeyDown(in.down)) {
-            vel.setX(vel.x() + INP_SPEED);
-            vel.setZ(vel.z() + INP_SPEED);
-            in.last_key = in.down;
-            keysPressed++;
-        }
+
 
         if (keysPressed == 2)
         {

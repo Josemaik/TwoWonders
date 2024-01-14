@@ -280,37 +280,37 @@ void Ia_man::createEnemies(EntityManager& em) {
         // em.addComponent<AttackComponent>(e2, AttackComponent{});
 
         //Enemigo Slime
-        auto& e3{ em.newEntity() };
-        em.addTag<SlimeTag>(e3);
-        auto& wr3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = vec3d{1.0,0.0,5.0}, .scale = vec3d{1.0,2.0,1.0}, .color = BLUE });
-        auto& wp3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = vec3d(wr3.position),.gravity = 2.0 });
-        em.addComponent<ColliderComponent>(e3, ColliderComponent{ wp3.position, wr3.scale, BehaviorType::ENEMY });
-        em.addComponent<LifeComponent>(e3, LifeComponent{ .life = 10 });
-        em.addComponent<TypeComponent>(e3, TypeComponent{ .type = ElementalType::Hielo });
+        // auto& e3{ em.newEntity() };
+        // em.addTag<SlimeTag>(e3);
+        // auto& wr3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = vec3d{1.0,0.0,5.0}, .scale = vec3d{1.0,2.0,1.0}, .color = BLUE });
+        // auto& wp3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = vec3d(wr3.position),.gravity = 2.0 });
+        // em.addComponent<ColliderComponent>(e3, ColliderComponent{ wp3.position, wr3.scale, BehaviorType::ENEMY });
+        // em.addComponent<LifeComponent>(e3, LifeComponent{ .life = 10 });
+        // em.addComponent<TypeComponent>(e3, TypeComponent{ .type = ElementalType::Hielo });
 
-        auto* d_cl_3 = &tree3.createNode<BTDecisionCheckLifes>();
-        auto* a_f_3 =  &tree3.createNode<BTAction_Flee>();
-        auto* a_h_3 = &tree3.createNode<BTAction_Healing>();
-        auto* sequence3_1 = &tree3.createNode<BTNodeSequence_t>(d_cl_3,a_f_3,a_h_3);
+        // auto* d_cl_3 = &tree3.createNode<BTDecisionCheckLifes>();
+        // auto* a_f_3 =  &tree3.createNode<BTAction_Flee>();
+        // auto* a_h_3 = &tree3.createNode<BTAction_Healing>();
+        // auto* sequence3_1 = &tree3.createNode<BTNodeSequence_t>(d_cl_3,a_f_3,a_h_3);
 
-        auto* d_a_3 = &tree3.createNode<BTDecisionReadyforAttack>();
-        auto* a_j_3 = &tree3.createNode<BTAction_JumptoPlayer>();
-        auto* a_a_3 = &tree3.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee); // fail si disparo succes si no disparo
-        auto* d_r_3 = &tree3.createNode<BTDecisionOnAttackRadius>();
-        auto* sequence3_2 = &tree3.createNode<BTNodeSequence_t>(d_a_3, a_j_3 ,a_a_3, d_r_3);
+        // auto* d_a_3 = &tree3.createNode<BTDecisionReadyforAttack>();
+        // auto* a_j_3 = &tree3.createNode<BTAction_JumptoPlayer>();
+        // auto* a_a_3 = &tree3.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee); // fail si disparo succes si no disparo
+        // auto* d_r_3 = &tree3.createNode<BTDecisionOnAttackRadius>();
+        // auto* sequence3_2 = &tree3.createNode<BTNodeSequence_t>(d_a_3, a_j_3 ,a_a_3, d_r_3);
 
-        auto* d_1_3 = &tree3.createNode<BTDecisionPlayerDetected>();
-        auto* a_s_3 = &tree3.createNode<BTAction_Seek>();
-        auto* sequence3_3 = &tree3.createNode<BTNodeSequence_t>(d_1_3, a_s_3);
+        // auto* d_1_3 = &tree3.createNode<BTDecisionPlayerDetected>();
+        // auto* a_s_3 = &tree3.createNode<BTAction_Seek>();
+        // auto* sequence3_3 = &tree3.createNode<BTNodeSequence_t>(d_1_3, a_s_3);
 
 
-        auto* patrol_3 = &tree3.createNode<BTAction_Patrol>();
-        auto* sequence3_4 = &tree3.createNode<BTNodeSequence_t>(patrol_3);
+        // auto* patrol_3 = &tree3.createNode<BTAction_Patrol>();
+        // auto* sequence3_4 = &tree3.createNode<BTNodeSequence_t>(patrol_3);
 
-        tree3.createNode<BTNodeSelector_t>(sequence3_1, sequence3_2, sequence3_3, sequence3_4);
+        // tree3.createNode<BTNodeSelector_t>(sequence3_1, sequence3_2, sequence3_3, sequence3_4);
 
-        em.addComponent<AIComponent>(e3, AIComponent{ .arrival_radius = 0.1,.detect_radius = 11.0,.attack_radius = 6,.tx = 0.0,.tz = 0.0,.time2arrive = 1.0,.tactive = true,.perceptionTime = 0.5f,.countdown_stop=2.0,.countdown_shoot= 0.0,.behaviourTree = &tree3 });
-        em.addComponent<AttackComponent>(e3, AttackComponent{});
+        // em.addComponent<AIComponent>(e3, AIComponent{ .arrival_radius = 0.1,.detect_radius = 11.0,.attack_radius = 6,.tx = 0.0,.tz = 0.0,.time2arrive = 1.0,.tactive = true,.perceptionTime = 0.5f,.countdown_stop=2.0,.countdown_shoot= 0.0,.behaviourTree = &tree3 });
+        // em.addComponent<AttackComponent>(e3, AttackComponent{});
 
     }
     // {

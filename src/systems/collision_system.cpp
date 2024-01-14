@@ -94,6 +94,12 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     {
         handleStaticCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, minOverlap, behaviorType1, behaviorType2);
         return;
+    }else{
+        if(otherEnt.hasTag<PlayerTag>() && staticEnt.hasTag<StairTag>()){
+            std::cout << "NO COLISIONO CON ESCALERA \n";
+            em.getComponent<PhysicsComponent>(otherEnt).blockXZ = false;
+            em.getComponent<PhysicsComponent>(otherEnt).gravity = 1.0;
+        }
     }
 
     // Segundo tipo de colisión más común, colisiones con zonas
@@ -212,6 +218,14 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         em.getComponent<ObjectComponent>(*staticEntPtr).effect();
         return;
     }
+    // Si el objeto estático es una escalera
+    if(staticEntPtr->hasTag<StairTag>() && otherEntPtr->hasTag<PlayerTag>()){
+       std::cout << "COLISION CON ESCALERA \n";
+        em.getComponent<PhysicsComponent>(*otherEntPtr).blockXZ = true;
+        em.getComponent<PhysicsComponent>(*otherEntPtr).gravity = 0.0;
+        return;
+    }
+
 
     // Si cualquiera de los impactos es con una bala, se baja la vida del otro
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
@@ -247,7 +261,6 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
             return;
         }
     }
-
     // Colisiones con paredes
     staticCollision(*otherPhy, *staticPhy, minOverlap);
 }
