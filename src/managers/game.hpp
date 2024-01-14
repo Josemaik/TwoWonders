@@ -16,6 +16,7 @@
 #include "../systems/zone_system.hpp"
 #include "../systems/shield_system.hpp"
 #include "../systems/event_system.hpp"
+#include "../systems/sound_system.hpp"
 #include "game_engine.hpp"
 #include "ia_manager.hpp"
 
@@ -60,6 +61,7 @@ private:
     ShieldSystem shield_system{};
     EventSystem event_system{};
     Map map{};
+    SoundSystem sound_system{};
 };
 
 

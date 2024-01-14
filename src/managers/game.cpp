@@ -99,6 +99,8 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     li.playerID = e.getID();
 }
 
+//inicializar bancos
+
 
 void Game::run()
 {
@@ -209,6 +211,8 @@ void Game::run()
             break;
         }
     }
+
+    //descargar bancos
 
     engine.closeWindow();
 }
