@@ -112,6 +112,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     // Colisiones de enemigos con enemigos - creo que son más o menos comunes
     if (behaviorType1 & BehaviorType::ENEMY && behaviorType2 & BehaviorType::ENEMY)
     {
+        nonStaticCollision(staticPhy, otherPhy, minOverlap);
         return;
     }
 
