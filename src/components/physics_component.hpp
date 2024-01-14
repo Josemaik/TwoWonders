@@ -14,6 +14,8 @@ struct PhysicsComponent
     double gravity{ KGravity };
     bool alreadyGrounded{ false };
 
+    //Flag para indicar que estas subiendo escaleras( solo eje y activado)
+    bool blockXZ { false };
     //Velocidad lineal
     double v_linear{ 0.0 };
     //Velocidad angular

@@ -126,7 +126,7 @@ void Game::run()
     //
     // - Colocar antes de donde se quiere medir el tiempo
     // auto t1 = high_resolution_clock::now();
-    // 
+    //
     // - Colocar despues de donde se quiere medir el tiempo
     // auto t2 = high_resolution_clock::now();
     // duration<float, std::milli> duration = t2 - t1;

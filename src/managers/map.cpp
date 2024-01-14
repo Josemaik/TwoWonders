@@ -3,7 +3,7 @@
 void Map::createMap(EntityManager& em) {
     createGroundWaterOverworld(em);
     createWallsOverworld(em);
-
+    createStairs(em);
     createZonesOverworld(em);
 }
 
@@ -25,7 +25,7 @@ void Map::createWallsOverworld(EntityManager& em) {
         { { 5.5, 0.0, -8.0 }, { 8.0, 1.0, 3.0 }, LIME },     // | Pared Horizontal Arriba
 
         { { -11.0, 0.0, -5.5 }, { 3.0, 1.0, 8.0 }, LIME },   // |
-        { { -11.0, 0.0, 5.5 }, { 3.0, 1.0, 8.0}, LIME },    // | Pared Vertical Izquierda
+        { { -11.0, 0.0, 5.5 }, { 3.0, 7.0, 8.0}, LIME },    // | Pared Vertical Izquierda
         { { 0.0, 0.0, 8.0 }, { 19.0, 1.0, 3.0 }, LIME },     // | Pared Horizontal Abajo
         { { 11.0, 0.0, 0.0 }, { 3.0, 1.0, 19.0 }, LIME },    // | Pared Vertical Derecha
 
@@ -245,6 +245,27 @@ void Map::createGroundWaterOverworld(EntityManager& em) {
     //     auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0, .0, .0 }, .gravity = .0 });
     //     em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
     // }
+
+}
+//Creamos escaleras
+void Map::createStairs(EntityManager& em){
+     struct EntityData
+    {
+        vec3d position;
+        vec3d scale;
+        Color color;
+    };
+    EntityData entitiesS[] = {
+        { {-9.5, 0.0, 4.5}, {0.5, 7.3, 1.0}, BROWN}
+    };
+    for (const auto& data : entitiesS)
+    {
+        auto& entity = em.newEntity();
+        em.addTag<StairTag>(entity);
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0 });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+    }
 }
 
 // Se encarga de crear las zonas
