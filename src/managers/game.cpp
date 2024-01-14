@@ -101,7 +101,7 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
 
 //inicializar bancos
 void Game::createSound(EntityManager& em){
-    sound_system.initBanks("../assets/banks/Master.bank","../assets/banks/Master.strings.bank","../assets/banks/UI.bank");
+    sound_system.initBanks("assets/banks/Master.bank","assets/banks/Master.strings.bank","assets/banks/UI.bank");
 }
 
 void Game::run()
@@ -216,7 +216,7 @@ void Game::run()
         }
     }
 
-    //descargar bancos
+    //liberar bancos
     sound_system.liberar();
 
     engine.closeWindow();
@@ -233,6 +233,7 @@ void Game::normalExecution(EntityManager& em, float deltaTime)
     attack_system.update(em, deltaTime);
     projectile_system.update(em, deltaTime);
     life_system.update(em, deltaTime);
+    sound_system.update();
     render_system.update(em, engine, false);
 }
 void Game::debugExecution(EntityManager& em)

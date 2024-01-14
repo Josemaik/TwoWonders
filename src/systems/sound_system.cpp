@@ -28,10 +28,18 @@ void SoundSystem::initBanks(const std::string& master_bank_location, const std::
     ERRCHECK(soundSystem->loadBankFile(master_bank_location.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &master_bank));
     ERRCHECK(soundSystem->loadBankFile(master_string_location.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &strings_bank));
     //SOUND_INFO("Successfully loaded FMOD banks");
+
+    ERRCHECK(master_bank->getLoadingState(&loadingState));
+
+    std::cout<< loadingState << std::endl; //dona 3 = FMOD_STUDIO_LOADING_STATE_LOADING (loading in progress)  
+}
+
+void SoundSystem::update (){
+    ERRCHECK(soundSystem->update() );
 }
 
 void SoundSystem::liberar(){
-    ERRCHECK(eventDescription->releaseAllInstances());
+    //ERRCHECK(eventDescription->releaseAllInstances());
     ERRCHECK(master_bank->unload());
     ERRCHECK(strings_bank->unload());
     ERRCHECK(soundSystem->unloadAll());
