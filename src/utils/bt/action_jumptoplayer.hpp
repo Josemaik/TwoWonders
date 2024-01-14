@@ -16,7 +16,7 @@ struct BTAction_JumptoPlayer : BTNode_t{
                 ectx.ai.target_obtained = true;
             }
             //std::cout << "TOY JUMPING \n";
-            ectx.phy.max_speed = 0.7;
+            ectx.phy.max_speed = 0.6;
             Steer_t steering = STBH::Arrive(ectx.phy,{ectx.ai.txp,0.0,ectx.ai.tzp},ectx.ai.arrival_radius);
             if(steering.arrived) {
                 ectx.phy.max_speed = 0.5;
