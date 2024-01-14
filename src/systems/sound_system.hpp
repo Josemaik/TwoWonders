@@ -9,11 +9,16 @@
 
 struct SoundSystem {
 
+    SoundSystem();
+
     void initBanks(std::string const& master_bank_location, std::string const& master_string_location, std::string const& ui_bank_location);
+    void liberar();
 
     private:
+        FMOD::System* coreSystem;
         FMOD::Studio::System * soundSystem;
         FMOD::Studio::Bank* master_bank;
         FMOD::Studio::Bank* strings_bank;
+        FMOD::Studio::EventDescription* eventDescription;
 
 };

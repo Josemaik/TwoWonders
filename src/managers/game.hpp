@@ -42,6 +42,7 @@ private:
     void createEnding(EntityManager& em);
     void normalExecution(EntityManager& em, float deltaTime);
     void debugExecution(EntityManager& em);
+    void createSound(EntityManager& em);
 
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};

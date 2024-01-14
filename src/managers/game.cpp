@@ -100,7 +100,9 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
 }
 
 //inicializar bancos
-
+void Game::createSound(EntityManager& em){
+    sound_system.initBanks("../assets/banks/Master.bank","../assets/banks/Master.strings.bank","../assets/banks/UI.bank");
+}
 
 void Game::run()
 {
@@ -136,6 +138,8 @@ void Game::run()
 
     // Inicializa una variable donde tener el tiempo entre frames
     float deltaTime{}, currentTime{};
+
+    createSound(em);
 
     while (!engine.windowShouldClose())
     {
@@ -213,6 +217,7 @@ void Game::run()
     }
 
     //descargar bancos
+    sound_system.liberar();
 
     engine.closeWindow();
 }
