@@ -34,19 +34,20 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
     Rectangle btn2Rec = { 300, 520, 200, 50 };
 
     auto& li = em.getSingleton<LevelInfo>();
+
     if (GuiButton(btn1Rec, "JUGAR")) {
         li.currentScreen = GameScreen::STORY;
         ss.seleccion_menu();
         ss.music_stop();
     }
 
-
     if (CheckCollisionPointRec(GetMousePosition(), btn1Rec) || CheckCollisionPointRec(GetMousePosition(), btn2Rec)) {
         if (ss.pushed == false)
             ss.sonido_mov();
         ss.pushed = true;
     }
-    else ss.pushed = false;
+    else 
+      ss.pushed = false;
 
     if (GuiButton(btn2Rec, "CONFIGURACION")) {
         li.currentScreen = GameScreen::OPTIONS;
@@ -67,20 +68,22 @@ void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, Soun
     // Ahora asignamos el nuevo valor al puntero volumen
     volumen = nuevoValor;
 
-
     // Boton de volver al inicio
     Rectangle btn1Rec = { 300, 520, 200, 50 };
     auto& li = em.getSingleton<LevelInfo>();
+
     if (GuiButton(btn1Rec, "VOLVER")) {
         li.currentScreen = GameScreen::TITLE;
         ss.seleccion_menu();
     }
+  
     if (CheckCollisionPointRec(GetMousePosition(), btn1Rec)) {
         if (ss.pushed == false)
             ss.sonido_mov();
         ss.pushed = true;
     }
-    else ss.pushed = false;
+    else 
+      ss.pushed = false;
 
     engine.endDrawing();
 }
