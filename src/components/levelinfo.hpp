@@ -16,6 +16,6 @@ struct LevelInfo
 
   uint16_t num_zone{};
 
-  GameScreen currentScreen = GameScreen::TITLE;
+  GameScreen currentScreen = GameScreen::LOGO;
 };
 
