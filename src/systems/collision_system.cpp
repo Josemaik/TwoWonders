@@ -220,12 +220,12 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
     // Si el objeto estático es una escalera
-    if(staticEntPtr->hasTag<StairTag>() && otherEntPtr->hasTag<PlayerTag>()){
-       std::cout << "COLISION CON ESCALERA \n";
-        em.getComponent<PhysicsComponent>(*otherEntPtr).blockXZ = true;
-        em.getComponent<PhysicsComponent>(*otherEntPtr).gravity = 0.0;
-        return;
-    }
+    // if(staticEntPtr->hasTag<StairTag>() && otherEntPtr->hasTag<PlayerTag>()){
+    //    std::cout << "COLISION CON ESCALERA \n";
+    //     em.getComponent<PhysicsComponent>(*otherEntPtr).blockXZ = true;
+    //     em.getComponent<PhysicsComponent>(*otherEntPtr).gravity = 0.0;
+    //     return;
+    // }
 
 
     // Si cualquiera de los impactos es con una bala, se baja la vida del otro

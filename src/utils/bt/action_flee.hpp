@@ -14,10 +14,10 @@ struct BTAction_Flee : BTNode_t{
         if( !ectx.ai.tactive ) return BTNodeStatus_t::fail;
         if(ectx.ai.elapsed_fleeing >= ectx.ai.countdown_fleeing){
             ectx.ai.elapsed_fleeing = 0;
-            std::cout << "YA NO TAMO FLEEING \n";
+            // std::cout << "YA NO TAMO FLEEING \n";
             return BTNodeStatus_t::success;
         }else{
-            std::cout << "TAMO FLEEING \n";
+            // std::cout << "TAMO FLEEING \n";
             Steer_t steering = STBH::Flee(ectx.phy,{ectx.ai.tx,0.0,ectx.ai.tz});
             ectx.phy.velocity = vec3d{steering.v_x,0.0,steering.v_z};
             ectx.ai.plusdeltatime(ectx.deltatime,ectx.ai.elapsed_fleeing);
