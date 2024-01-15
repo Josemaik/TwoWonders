@@ -86,7 +86,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 Color colorEntidad = r.color;
 
                 // Comprobar el tipo y si es enemigo cambiarle el color
-                if (!e.hasTag<PlayerTag>() && e.hasComponent<TypeComponent>()){
+                if (!e.hasTag<PlayerTag>() && e.hasComponent<TypeComponent>()) {
                     auto& t{ em.getComponent<TypeComponent>(e) };
 
                     switch (t.type)
@@ -94,7 +94,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     case ElementalType::Neutral:
                         colorEntidad = GRAY;
                         break;
-                    
+
                     case ElementalType::Agua:
                         colorEntidad = BLUE;
                         break;
@@ -106,7 +106,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     case ElementalType::Hielo:
                         colorEntidad = SKYBLUE;
                         break;
-                                        
+
                     default:
                         break;
                     }
@@ -251,7 +251,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         }
 
 
-        if (debug && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
+        if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
             auto const& l{ em.getComponent<LifeComponent>(e) };
@@ -284,11 +284,11 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                     tipo = "Fuego";
                     color = RED;
                 }
-                
-                engine.drawText(tipo.c_str(), 
+
+                engine.drawText(tipo.c_str(),
                     static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
                     static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 70),
-                    20, 
+                    20,
                     color);
             }
 

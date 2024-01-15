@@ -234,9 +234,9 @@ namespace ETMG {
         template<typename CMP>
         void destroyComponent(Entity& e) {
             if (e.template hasComponent<CMP>()) {
-                if constexpr (std::is_same_v<CMP, RenderComponent>) {
+                if constexpr (std::is_same_v<CMP, RenderComponent>)
                     getComponent<RenderComponent>(e).destroyMesh();
-                }
+
                 auto key = e.template getComponentKey<CMP>();
                 this->template getCMPStorage<CMP>().erase(key);
             }
