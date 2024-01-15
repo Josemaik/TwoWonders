@@ -35,7 +35,7 @@ endif
 
 # Regla principal (enlazado de los .o)
 $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
-	$(CCACHE) $(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE) -Wl,-rpath=libs
+	$(CCACHE) $(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE) -Wl,-rpath=libs -Wl,-rpath,./fmodlibs
 
 # Regla que compila los .cpp
 %.o : %.cpp
