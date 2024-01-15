@@ -46,8 +46,8 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
             ss.sonido_mov();
         ss.pushed = true;
     }
-    else 
-      ss.pushed = false;
+    else
+        ss.pushed = false;
 
     if (GuiButton(btn2Rec, "CONFIGURACION")) {
         li.currentScreen = GameScreen::OPTIONS;
@@ -63,7 +63,7 @@ void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, Soun
     // Slider del volumen
     Rectangle volumenSlider = { 100, 100, 200, 20 };
     float volumen = 50; // supongo que esto inicializa volumen
-    float nuevoValor = GuiSliderBar(volumenSlider, "Volumen", NULL, &volumen, 0, 100);
+    float nuevoValor = static_cast<float>(GuiSliderBar(volumenSlider, "Volumen", NULL, &volumen, 0, 100));
 
     // Ahora asignamos el nuevo valor al puntero volumen
     volumen = nuevoValor;
@@ -76,14 +76,14 @@ void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, Soun
         li.currentScreen = GameScreen::TITLE;
         ss.seleccion_menu();
     }
-  
+
     if (CheckCollisionPointRec(GetMousePosition(), btn1Rec)) {
         if (ss.pushed == false)
             ss.sonido_mov();
         ss.pushed = true;
     }
-    else 
-      ss.pushed = false;
+    else
+        ss.pushed = false;
 
     engine.endDrawing();
 }

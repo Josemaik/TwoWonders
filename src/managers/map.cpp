@@ -17,7 +17,7 @@ void Map::createWallsOverworld(EntityManager& em) {
         { { -5.5, 0.0, -8.0 }, { 8.0, 1.0, 3.0 }, LIME },    // |
         { { 5.5, 0.0, -8.0 }, { 8.0, 1.0, 3.0 }, LIME },     // | Pared Horizontal Arriba
 
-        { { -11.0, 0.0, -5.5 }, { 3.0, 1.5, 8.0 }, LIME },   // |
+        { { -11.0, 0.0, -5.45 }, { 3.0, 1.5, 8.0 }, LIME },   // |
         { { -11.0, 0.0, 5.5 }, { 3.0, 1.0, 8.0}, LIME },    // | Pared Vertical Izquierda
         { { 0.0, 0.0, 8.0 }, { 19.0, 1.0, 3.0 }, LIME },     // | Pared Horizontal Abajo
         { { 11.0, 0.0, 0.0 }, { 3.0, 1.0, 19.0 }, LIME },    // | Pared Vertical Derecha
@@ -67,7 +67,7 @@ void Map::createWallsOverworld(EntityManager& em) {
         // ZONA 5
 
         { { -37.0, 0.0, 8.0 }, { 11.0, 1.0, 3.0 }, LIME },   // |
-        { { -50.0, 0.0, 8.0 }, { 5.0, 1.0, 3.0 }, LIME },    // | Pared Horizontal Abajo
+        { { -50.0, 0.0, 8.0 }, { 5.0, 2.0, 3.0 }, LIME },    // | Pared Horizontal Abajo
         { { -51.5, 0.0, -7.99 }, { 2.0, 2.0, 3.0 }, LIME },  // |
         { { -37.0, 0.0, -8.0 }, { 11.0, 2.0, 3.0 }, LIME },  // | Pared Horizontal Arriba
 
@@ -80,7 +80,7 @@ void Map::createWallsOverworld(EntityManager& em) {
         { { -34.5, 0.0, 0.0 }, { 1.0, 1.0, 1.0 }, LIME },    // |
         { { -34.5, 0.0, 4.0 }, { 1.0, 1.0, 1.0 }, LIME },    // |
         { { -50.0, 0.0, 0.0 }, { 1.0, 1.0, 1.0 }, LIME },    // |
-        { { -54.0, 0.0, 0.0 }, { 3.0, 1.0, 19.0 }, LIME },   // | Pared Vertical Izquierda
+        { { -54.0, 0.0, 0.0 }, { 3.0, 2.0, 19.0 }, LIME },   // | Pared Vertical Izquierda
 
         // ZONA 6
 

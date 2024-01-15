@@ -1,7 +1,7 @@
 #include "sound_system.hpp"
 
 //Para que funcione el ERRCHECK
-void ERRCHECK_FMOD(FMOD_RESULT result, const char* file, int line)
+void ERRCHECK_FMOD(FMOD_RESULT result, const char*, int)
 {
     if (result != FMOD_OK)
     {
@@ -37,37 +37,37 @@ void SoundSystem::initBanks(const std::string& master_bank_location, const std::
 }
 
 //crear instancies d'events
-void SoundSystem::createEventInstance(){
-    ERRCHECK(soundSystem->getEvent("event:/Menús/main_select", &eventDescription) );
+void SoundSystem::createEventInstance() {
+    ERRCHECK(soundSystem->getEvent("event:/Menús/main_select", &eventDescription));
     //ERRCHECK(soundSystem->getEvent("event:/Música/Menu/menu_music", &eventDescription_Musica) );
-    
+
     ERRCHECK(eventDescription->createInstance(&eventInstance));
-   // ERRCHECK(eventDescription_Musica->createInstance(&eventInstance_Musica));
-    //açó fa que sone el evento que haja assignat a eventInstance
+    // ERRCHECK(eventDescription_Musica->createInstance(&eventInstance_Musica));
+     //açó fa que sone el evento que haja assignat a eventInstance
     eventInstance->start(); //sona!!!
-   // eventInstance_Musica->start();
-    //FMOD_Studio_EventInstance_Start(&eventInstance);
+    // eventInstance_Musica->start();
+     //FMOD_Studio_EventInstance_Start(&eventInstance);
 }
 
-void SoundSystem::playMusicMenu(){
-    ERRCHECK(soundSystem->getEvent("event:/Música/Menu/menu_music", &eventDescription_Musica) );
+void SoundSystem::playMusicMenu() {
+    ERRCHECK(soundSystem->getEvent("event:/Música/Menu/menu_music", &eventDescription_Musica));
     ERRCHECK(eventDescription_Musica->createInstance(&eventInstance_Musica));
     eventInstance_Musica->start();
     update();
 }
-void SoundSystem::seleccion_menu(){
-    ERRCHECK(soundSystem->getEvent("event:/Menús/main_select", &eventDescription) );
+void SoundSystem::seleccion_menu() {
+    ERRCHECK(soundSystem->getEvent("event:/Menús/main_select", &eventDescription));
     ERRCHECK(eventDescription->createInstance(&eventInstance));
     eventInstance->start();
     update();
 }
-void SoundSystem::sonido_config(){
-    ERRCHECK(soundSystem->getEvent("event:/Menús/sound_config", &eventDescription) );
+void SoundSystem::sonido_config() {
+    ERRCHECK(soundSystem->getEvent("event:/Menús/sound_config", &eventDescription));
     ERRCHECK(eventDescription->createInstance(&eventInstance));
     eventInstance->start();
 }
-void SoundSystem::sonido_mov(){
-    ERRCHECK(soundSystem->getEvent("event:/Menús/main_mov", &eventDescription) );
+void SoundSystem::sonido_mov() {
+    ERRCHECK(soundSystem->getEvent("event:/Menús/main_mov", &eventDescription));
     ERRCHECK(eventDescription->createInstance(&eventInstance));
     eventInstance->start();
     update();
@@ -75,7 +75,7 @@ void SoundSystem::sonido_mov(){
 
 //play event
 void SoundSystem::play() {
-    FMOD_RESULT FMOD_Studio_EventInstance_Start();
+    [[maybe_unused]] FMOD_RESULT FMOD_Studio_EventInstance_Start;
     //FMOD_RESULT Studio::EventInstance::start();
 }
 
