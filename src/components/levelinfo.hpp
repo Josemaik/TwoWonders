@@ -5,7 +5,7 @@
 #include "utils/types.hpp"
 
 // Enum que representa el estado del juego
-enum struct GameScreen { LOGO, TITLE, STORY, GAMEPLAY, /*DEAD,*/ ENDING };
+enum struct GameScreen { LOGO, TITLE, STORY, GAMEPLAY, /*DEAD,*/ OPTIONS, ENDING };
 
 //Memoria global de nivel
 struct LevelInfo
@@ -16,6 +16,6 @@ struct LevelInfo
 
   uint16_t num_zone{};
 
-  GameScreen currentScreen = GameScreen::LOGO;
+  GameScreen currentScreen = GameScreen::TITLE;
 };
 

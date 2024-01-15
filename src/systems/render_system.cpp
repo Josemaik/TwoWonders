@@ -19,28 +19,44 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debu
     endFrame(engine, em, debug);
 }
 
-void RenderSystem::drawLogoGame(ENGI::GameEngine& engine,EntityManager& em) {
-     auto& li = em.getSingleton<LevelInfo>();
+void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
+    // Logo del videojuego
     engine.drawTexture(engine.texture_logo_two_wonders,
         engine.getScreenWidth() / 2 - engine.texture_logo_two_wonders.width / 2,
         static_cast<int>(engine.getScreenHeight() / 2.5 - engine.texture_logo_two_wonders.height / 2),
         WHITE);
-    Rectangle btn1Rec = { 300, 250, 200, 50 };
-    Rectangle btn2Rec = { 300, 350, 200, 50 };
-    if (GuiButton(btn1Rec, "PLAY"))
-    {
-                    // Acción cuando se hace clic en el Botón 1
-                    li.currentScreen = GameScreen::STORY;
-    }
 
-    if (GuiButton(btn2Rec, "CONFIGURACIÓN"))
-    {
-                    // // Acción cuando se hace clic en el Botón 2
-                    //  render_system.unloadModels(em, engine);
-                    //  engine.closeWindow();
-    }
+    // Funcionalidad de botones
+    Rectangle btn1Rec = { 300, 450, 200, 50 };
+    Rectangle btn2Rec = { 300, 520, 200, 50 };
+
+    auto& li = em.getSingleton<LevelInfo>();
+    if (GuiButton(btn1Rec, "JUGAR"))
+        li.currentScreen = GameScreen::STORY;
+
+    if (GuiButton(btn2Rec, "CONFIGURACION"))
+        li.currentScreen = GameScreen::OPTIONS;
+    
+    engine.endDrawing();
+}
+
+void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em){
+    engine.beginDrawing();
+    engine.clearBackground(WHITE);
+
+    // Slider del volumen
+    float volumen = 50.0f; // falta implementar con el sonido
+    Rectangle volumenSlider = { 100, 100, 200, 20 };
+    volumen = static_cast<float>(GuiSliderBar(volumenSlider, "Volumen", NULL, &volumen, 0, 100));
+
+    // Boton de volver al inicio
+    Rectangle btn1Rec = { 300, 520, 200, 50 };
+    auto& li = em.getSingleton<LevelInfo>();
+    if (GuiButton(btn1Rec, "VOLVER"))
+        li.currentScreen = GameScreen::TITLE;
+
     engine.endDrawing();
 }
 
