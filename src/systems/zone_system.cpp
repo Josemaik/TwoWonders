@@ -112,19 +112,19 @@ void ZoneSystem::deleteZoneEnemies(EntityManager& em)
 
 void ZoneSystem::updateZoneEnemies(EntityManager& em)
 {
-    using noCMPs = MP::TypeList<>;
-    using enemyTag = MP::TypeList<EnemyTag>;
+    // using noCMPs = MP::TypeList<>;
+    // using enemyTag = MP::TypeList<EnemyTag>;
 
     auto& li = em.getSingleton<LevelInfo>();
 
-    std::unordered_set<std::size_t> enemies;
-    em.forEach<noCMPs, enemyTag>([&](Entity& ent)
-    {
-        enemies.insert(ent.getID());
-    });
+    // std::unordered_set<std::size_t> enemies;
+    // em.forEach<noCMPs, enemyTag>([&](Entity& ent)
+    // {
+    //     enemies.insert(ent.getID());
+    // });
 
-    if (enemies != li.enemiesID)
-        li.enemiesID = std::move(enemies);
+    // if (enemies != li.enemiesID)
+    //     li.enemiesID = std::move(enemies);
 
     if (li.num_zone == 12 && li.enemiesID.empty() && !keyCreated)
         createKey(em);

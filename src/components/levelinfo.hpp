@@ -18,3 +18,4 @@ struct LevelInfo
 
   GameScreen currentScreen = GameScreen::LOGO;
 };
+

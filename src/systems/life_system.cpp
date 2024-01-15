@@ -8,10 +8,10 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
         if (lif.life == 0)
         {
             // Si es enemigo creamos un objeto
-            if (ent.hasTag<EnemyTag>()) {
+            if (ent.hasTag<EnemyTag>())
                 createObject(em, em.getComponent<PhysicsComponent>(ent).position);
-            }
-            if (ent.hasTag<SlimeTag>()){
+
+            if (ent.hasTag<SlimeTag>()) {
                 em.getComponent<AttackComponent>(ent).attack(AttackType::Bomb);
             }
 
