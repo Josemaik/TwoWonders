@@ -2,7 +2,7 @@
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
 {
-    ENGI::GameEngine::initWindow(width_, height_, "ZeldaWonders");
+    ENGI::GameEngine::initWindow(width_, height_, "Two Wonders");
 
     ENGI::GameEngine::setPositionCamera({ 10.0f, 15.0f, 10.0f });
     ENGI::GameEngine::setTargetCamera({ 0.0f, 03.0f, .0f });
@@ -81,6 +81,11 @@ void ENGI::GameEngine::beginMode3D()
 void ENGI::GameEngine::endMode3D()
 {
     EndMode3D();
+}
+
+void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color)
+{
+    DrawLine3D(startPos.toRaylib(), endPos.toRaylib(), color);
 }
 
 void ENGI::GameEngine::drawCube(vec3d pos, float width, float height, float lenght, Color color)

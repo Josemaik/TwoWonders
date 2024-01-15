@@ -42,3 +42,10 @@ void RenderComponent::setOrientation(double o)
 {
     orientation = o;
 }
+
+void RenderComponent::setRotationVec(vec3d r)
+{
+    rotationVec.setX(r.x());
+    rotationVec.setY(r.y());
+    rotationVec.setZ(r.z());
+}

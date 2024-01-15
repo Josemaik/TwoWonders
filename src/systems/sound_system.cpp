@@ -1,9 +1,9 @@
 #include "sound_system.hpp"
 
 //Para que funcione el ERRCHECK
-void ERRCHECK_FMOD (FMOD_RESULT result, const char * file, int line)
+void ERRCHECK_FMOD(FMOD_RESULT result, const char* file, int line)
 {
-    if(result != FMOD_OK)
+    if (result != FMOD_OK)
     {
         std::cerr << FMOD_ErrorString(result) << std::endl;
         exit(-1);
@@ -13,7 +13,7 @@ void ERRCHECK_FMOD (FMOD_RESULT result, const char * file, int line)
 #define ERRCHECK(_result) ERRCHECK_FMOD(_result, __FILE__, __LINE__)
 
 //Constructor
-SoundSystem::SoundSystem(){
+SoundSystem::SoundSystem() {
     //Inalización FMOD
     ERRCHECK(FMOD::Studio::System::create(&soundSystem));
     ERRCHECK(soundSystem->getCoreSystem(&coreSystem));
@@ -33,7 +33,7 @@ void SoundSystem::initBanks(const std::string& master_bank_location, const std::
     //ERRCHECK(strings_bank->getLoadingState(&loadingState));
     ERRCHECK(ui_bank->getLoadingState(&loadingState));
 
-    std::cout<< loadingState << std::endl; //dona 3 = FMOD_STUDIO_LOADING_STATE_LOADING (loading in progress)  
+    std::cout << loadingState << std::endl; //dona 3 = FMOD_STUDIO_LOADING_STATE_LOADING (loading in progress)  
 }
 
 //crear instancies d'events
@@ -74,16 +74,16 @@ void SoundSystem::sonido_mov(){
 }
 
 //play event
-void SoundSystem::play(){
+void SoundSystem::play() {
     FMOD_RESULT FMOD_Studio_EventInstance_Start();
     //FMOD_RESULT Studio::EventInstance::start();
 }
 
-void SoundSystem::update (){
+void SoundSystem::update() {
     ERRCHECK(soundSystem->update());
 }
 
-void SoundSystem::liberar(){
+void SoundSystem::liberar() {
     //ERRCHECK(eventDescription->releaseAllInstances());
     ERRCHECK(master_bank->unload());
     ERRCHECK(strings_bank->unload());
@@ -91,8 +91,8 @@ void SoundSystem::liberar(){
     ERRCHECK(music_bank->unload());
     ERRCHECK(soundSystem->unloadAll());
 }
-void SoundSystem::music_stop(){
 
+void SoundSystem::music_stop() {
     eventInstance_Musica->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);
 }
 

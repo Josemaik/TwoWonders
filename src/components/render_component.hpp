@@ -9,6 +9,7 @@ struct RenderComponent
     void setScale(vec3d s);
     void setColor(Color c);
     void setOrientation(double o);
+    void setRotationVec(vec3d r);
     void destroyMesh();
 
     vec3d position{};
@@ -16,6 +17,7 @@ struct RenderComponent
     double orientation{ 0.0 };
     Color color{};
     bool visible{ true };
+    vec3d rotationVec{ 0.0, 0.1, 0.0 };
 
     Model model{};
     bool meshLoaded{ false };

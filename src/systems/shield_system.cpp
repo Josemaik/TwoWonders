@@ -20,12 +20,13 @@ void ShieldSystem::update(EntityManager& em) {
                 {
                     auto& phy_pl = em.getComponent<PhysicsComponent>(*playerEn);
                     auto& p = em.getComponent<PhysicsComponent>(ent);
+                    auto& r = em.getComponent<RenderComponent>(ent);
 
                     // Reposicionamos el escudo segun el player
                     p.position = phy_pl.position;
                     p.orientation = phy_pl.orientation;
 
-                    static const double SHIELD_DISTANCE = 0.75f;
+                    static const double SHIELD_DISTANCE = 0.75;
 
                     // Calculamos el desplazamiento basado en la orientación del jugador
                     double offsetX = sin(p.orientation) * SHIELD_DISTANCE;
@@ -33,6 +34,10 @@ void ShieldSystem::update(EntityManager& em) {
 
                     // Aplicamos el desplazamiento al escudo
                     p.position += { offsetX, 0.0f, offsetZ };
+                    if (offsetX == 0.75 || offsetX == -0.75)
+                        r.scale = { 0.5f, 1.0f, 1.0f };
+                    else
+                        r.scale = { 1.0f, 1.0f, 0.5f };
                 }
             }
         }
