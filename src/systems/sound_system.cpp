@@ -12,6 +12,7 @@ void ERRCHECK_FMOD (FMOD_RESULT result, const char * file, int line)
 
 #define ERRCHECK(_result) ERRCHECK_FMOD(_result, __FILE__, __LINE__)
 
+//Constructor
 SoundSystem::SoundSystem(){
     //Inalización FMOD
     ERRCHECK(FMOD::Studio::System::create(&soundSystem));
@@ -24,18 +25,35 @@ SoundSystem::SoundSystem(){
 //inicialitza el Master, string i UI bank (els primers que s'han de carregar en memoria)
 void SoundSystem::initBanks(const std::string& master_bank_location, const std::string& master_string_location, std::string const& ui_bank_location)
 {
-    //SOUND_TRACE("Initializing FMOD engine in our game...");
     ERRCHECK(soundSystem->loadBankFile(master_bank_location.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &master_bank));
     ERRCHECK(soundSystem->loadBankFile(master_string_location.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &strings_bank));
-    //SOUND_INFO("Successfully loaded FMOD banks");
-
-    ERRCHECK(master_bank->getLoadingState(&loadingState));
+    ERRCHECK(soundSystem->loadBankFile(ui_bank_location.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &ui_bank));
+    
+    //ERRCHECK(master_bank->getLoadingState(&loadingState));
+    //ERRCHECK(strings_bank->getLoadingState(&loadingState));
+    ERRCHECK(ui_bank->getLoadingState(&loadingState));
 
     std::cout<< loadingState << std::endl; //dona 3 = FMOD_STUDIO_LOADING_STATE_LOADING (loading in progress)  
 }
 
+//crear instancies d'events
+void SoundSystem::createEventInstance(){
+    ERRCHECK(soundSystem->getEvent("event:/Menús/salir", &eventDescription) );
+    ERRCHECK(eventDescription->createInstance(&eventInstance));
+
+    //açó fa que sone el evento que haja assignat a eventInstance
+    eventInstance->start(); //sona!!!
+    //FMOD_Studio_EventInstance_Start(&eventInstance);
+}
+
+//play event
+void SoundSystem::play(){
+    FMOD_RESULT FMOD_Studio_EventInstance_Start();
+    //FMOD_RESULT Studio::EventInstance::start();
+}
+
 void SoundSystem::update (){
-    ERRCHECK(soundSystem->update() );
+    ERRCHECK(soundSystem->update());
 }
 
 void SoundSystem::liberar(){
