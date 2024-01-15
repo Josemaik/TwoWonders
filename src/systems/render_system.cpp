@@ -1,6 +1,6 @@
 #include "render_system.hpp"
 #include <iomanip>
-
+#include "../libs/raygui.h"
 void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debug)
 {
 
@@ -19,17 +19,28 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debu
     endFrame(engine, em, debug);
 }
 
-void RenderSystem::drawLogoGame(ENGI::GameEngine& engine) {
+void RenderSystem::drawLogoGame(ENGI::GameEngine& engine,EntityManager& em) {
+     auto& li = em.getSingleton<LevelInfo>();
     engine.beginDrawing();
     engine.clearBackground(WHITE);
     engine.drawTexture(engine.texture_logo_two_wonders,
         engine.getScreenWidth() / 2 - engine.texture_logo_two_wonders.width / 2,
         static_cast<int>(engine.getScreenHeight() / 2.5 - engine.texture_logo_two_wonders.height / 2),
         WHITE);
-    engine.drawText("PRESS [ENTER] TO PLAY",
-        engine.getScreenWidth() / 2 - 200,
-        engine.getScreenHeight() - 50, 30,
-        Color({ 108, 198, 215, 255 }));
+    Rectangle btn1Rec = { 300, 250, 200, 50 };
+    Rectangle btn2Rec = { 300, 350, 200, 50 };
+    if (GuiButton(btn1Rec, "PLAY"))
+    {
+                    // Acción cuando se hace clic en el Botón 1
+                    li.currentScreen = GameScreen::STORY;
+    }
+
+    if (GuiButton(btn2Rec, "CONFIGURACIÓN"))
+    {
+                    // // Acción cuando se hace clic en el Botón 2
+                    //  render_system.unloadModels(em, engine);
+                    //  engine.closeWindow();
+    }
     engine.endDrawing();
 }
 

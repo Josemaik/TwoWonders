@@ -160,10 +160,10 @@ void Game::run()
         // CODIGO DE LA PANTALLA DE TITULO
         case GameScreen::TITLE:
         {
-            // Input del enter para la historia
-            if (input_system.pressEnter())
-                li.currentScreen = GameScreen::STORY;
-            render_system.drawLogoGame(engine);
+            // // Input del enter para la historia
+            // if (input_system.pressEnter())
+            //     li.currentScreen = GameScreen::STORY;
+            render_system.drawLogoGame(engine,em);
             break;
         }
 
