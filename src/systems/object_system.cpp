@@ -9,6 +9,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 obj.effect();
             else
                 dead_entities.insert(ent.getID());
+
         }
 
         // Recuperamos la entidad del player
@@ -72,6 +73,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             }
             if (shop_object)
                 dead_entities.insert(ent.getID());
+
             else
                 obj.active = false;
         }

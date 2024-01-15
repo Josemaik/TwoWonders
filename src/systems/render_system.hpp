@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 #ifndef RENDER_SYSTEM
 #define RENDER_SYSTEM
 #include "../utils/types.hpp"
@@ -12,10 +12,12 @@ struct RenderSystem
 
     void update(EntityManager& em, GameEngine& engine, bool debug);
 
-    void drawLogoGame(ENGI::GameEngine& engine);
+    void drawLogoGame(ENGI::GameEngine& engine, EntityManager& em);
     void drawLogoKaiwa(ENGI::GameEngine& engine);
+    void drawOptions(ENGI::GameEngine& engine, EntityManager& em);
     void drawEnding(ENGI::GameEngine& engine);
     void drawStory(ENGI::GameEngine& engine);
+    void unloadModels(EntityManager& em, ENGI::GameEngine& engine);
 
     // Funciones privadas para organizar el codigo
 private:

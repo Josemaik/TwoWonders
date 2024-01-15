@@ -1,6 +1,6 @@
 #include "render_system.hpp"
 #include <iomanip>
-
+#include "../libs/raygui.h"
 void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debug)
 {
 
@@ -8,6 +8,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debu
     em.forEach<SYSCMPs, SYSTAGs>([](Entity&, PhysicsComponent& phy, RenderComponent& ren)
     {
         ren.setPosition(phy.position);
+        ren.setOrientation(phy.orientation);
     });
 
     beginFrame(engine);
@@ -18,17 +19,44 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debu
     endFrame(engine, em, debug);
 }
 
-void RenderSystem::drawLogoGame(ENGI::GameEngine& engine) {
+void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
+    // Logo del videojuego
     engine.drawTexture(engine.texture_logo_two_wonders,
         engine.getScreenWidth() / 2 - engine.texture_logo_two_wonders.width / 2,
         static_cast<int>(engine.getScreenHeight() / 2.5 - engine.texture_logo_two_wonders.height / 2),
         WHITE);
-    engine.drawText("PRESS [ENTER] TO PLAY",
-        engine.getScreenWidth() / 2 - 200,
-        engine.getScreenHeight() - 50, 30,
-        Color({ 108, 198, 215, 255 }));
+
+    // Funcionalidad de botones
+    Rectangle btn1Rec = { 300, 450, 200, 50 };
+    Rectangle btn2Rec = { 300, 520, 200, 50 };
+
+    auto& li = em.getSingleton<LevelInfo>();
+    if (GuiButton(btn1Rec, "JUGAR"))
+        li.currentScreen = GameScreen::STORY;
+
+    if (GuiButton(btn2Rec, "CONFIGURACION"))
+        li.currentScreen = GameScreen::OPTIONS;
+    
+    engine.endDrawing();
+}
+
+void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em){
+    engine.beginDrawing();
+    engine.clearBackground(WHITE);
+
+    // Slider del volumen
+    float volumen = 50.0f; // falta implementar con el sonido
+    Rectangle volumenSlider = { 100, 100, 200, 20 };
+    volumen = static_cast<float>(GuiSliderBar(volumenSlider, "Volumen", NULL, &volumen, 0, 100));
+
+    // Boton de volver al inicio
+    Rectangle btn1Rec = { 300, 520, 200, 50 };
+    auto& li = em.getSingleton<LevelInfo>();
+    if (GuiButton(btn1Rec, "VOLVER"))
+        li.currentScreen = GameScreen::TITLE;
+
     engine.endDrawing();
 }
 
@@ -72,25 +100,63 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
     {
         if (e.hasComponent<RenderComponent>())
         {
-            auto const& r{ em.getComponent<RenderComponent>(e) };
+            auto& r{ em.getComponent<RenderComponent>(e) };
             if (r.visible) {
                 // Revisamos si es el jugador para mover la cámara
-                //if (e.hasTag<PlayerTag>())
-                //{
-                //    engine.setPositionCamera({ r.position.x(), 25.0f, r.position.z() + 25.0f });
-                //    engine.setTargetCamera(r.position);
-                //}
+                if (e.hasTag<PlayerTag>())
+                {
+                    engine.setPositionCamera({ r.position.x() + 10.f, 15.f, r.position.z() + 10.f });
+                    engine.setTargetCamera(r.position);
+                }
                 // Comprobar si tiene el componente vida
 
                 Color colorEntidad = r.color;
+
+                // Comprobar el tipo y si es enemigo cambiarle el color
+                if (!e.hasTag<PlayerTag>() && e.hasComponent<TypeComponent>()) {
+                    auto& t{ em.getComponent<TypeComponent>(e) };
+
+                    switch (t.type)
+                    {
+                    case ElementalType::Neutral:
+                        colorEntidad = GRAY;
+                        break;
+
+                    case ElementalType::Agua:
+                        colorEntidad = BLUE;
+                        break;
+
+                    case ElementalType::Fuego:
+                        colorEntidad = RED;
+                        break;
+
+                    case ElementalType::Hielo:
+                        colorEntidad = SKYBLUE;
+                        break;
+
+                    default:
+                        break;
+                    }
+                }
+
                 if (e.hasComponent<LifeComponent>()) {
                     auto& l{ em.getComponent<LifeComponent>(e) };
                     if (l.elapsed < l.countdown)
                         colorEntidad = YELLOW;
                 }
                 if (!e.hasTag<ZoneTag>())
-                    engine.drawCube(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), colorEntidad);
-                engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
+                {
+                    // Solo generamos la malla si no existe
+                    if (!r.meshLoaded)
+                    {
+                        r.model = engine.loadModelFromMesh(engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z())));
+                        r.meshLoaded = true;
+                    }
+
+                    float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
+                    engine.drawModel(r.model, { static_cast<float>(r.position.x()), static_cast<float>(r.position.y()), static_cast<float>(r.position.z()) }, { 0.0f, 1.0f, 0.0f }, orientationInDegrees, { 1.0f, 1.0f, 1.0f }, colorEntidad);
+                    engine.drawModelWires(r.model, { static_cast<float>(r.position.x()), static_cast<float>(r.position.y()), static_cast<float>(r.position.z()) }, { 0.0f, 1.0f, 0.0f }, orientationInDegrees, { 1.0f, 1.0f, 1.0f }, BLACK);
+                }
             }
         }
     }
@@ -133,6 +199,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         {
             // Dibujar background HUD
             engine.drawRectangle(0, 0, 580, 60, WHITE);
+            engine.drawRectangle(0, 55, 100, 30, WHITE);
 
             // Dibujar vidas restantes del player en el HUD
             if (e.hasComponent<LifeComponent>())
@@ -166,6 +233,21 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 engine.drawText(countdown_ataque.c_str(), 10, 35, 20, BLACK);
             }
 
+            // Dibujar el tipo de ataque que tiene equipado
+            if (e.hasComponent<TypeComponent>())
+            {
+                auto const& t{ em.getComponent<TypeComponent>(e) };
+
+                if (t.type == ElementalType::Neutral)
+                    engine.drawText("Neutral", 10, 60, 20, BLACK);
+                else if (t.type == ElementalType::Agua)
+                    engine.drawText("Agua", 10, 60, 20, BLUE);
+                else if (t.type == ElementalType::Fuego)
+                    engine.drawText("Fuego", 10, 60, 20, RED);
+                else
+                    engine.drawText("Hielo", 10, 60, 20, SKYBLUE);
+            }
+
         }
 
         // Dibujar el precio d elos objetos de la tienda
@@ -196,7 +278,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         }
 
 
-        if (debug && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
+        if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
             auto const& l{ em.getComponent<LifeComponent>(e) };
@@ -206,6 +288,65 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
                 20,
                 BLACK);
+        }
+
+
+        if (debug && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
+        {
+            auto const& r{ em.getComponent<RenderComponent>(e) };
+            auto const& l{ em.getComponent<LifeComponent>(e) };
+
+            //engine.drawText(std::to_string(l.life).c_str(),
+            //    static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+            //    static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+            //    20,
+            //    BLACK);
+
+            if (e.hasComponent<TypeComponent>())
+            {
+                auto const& t{ em.getComponent<TypeComponent>(e) };
+
+                std::string tipo = "Hielo";
+                Color color = SKYBLUE;
+
+                if (t.type == ElementalType::Neutral)
+                {
+                    tipo = "Neutral";
+                    color = BLACK;
+                }
+                else if (t.type == ElementalType::Agua)
+                {
+                    tipo = "Agua";
+                    color = BLUE;
+                }
+                else if (t.type == ElementalType::Fuego)
+                {
+                    tipo = "Fuego";
+                    color = RED;
+                }
+
+                engine.drawText(tipo.c_str(),
+                    static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+                    static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 70),
+                    20,
+                    color);
+            }
+
+        }
+
+        if (debug && e.hasComponent<ColliderComponent>())
+        {
+            auto& col{ em.getComponent<ColliderComponent>(e) };
+
+            // Calcular la posición y el tamaño de la bounding box
+            vec3d boxPosition = (col.boundingBox.min + col.boundingBox.max) / 2;
+            vec3d boxSize = col.boundingBox.max - col.boundingBox.min;
+
+            // Dibujar la bounding box
+            engine.beginMode3D();
+            engine.drawCubeWires(boxPosition, boxSize.x(), boxSize.y(), boxSize.z(), BLUE);
+            engine.endMode3D();
+
         }
 
         if (debug && e.hasComponent<PhysicsComponent>())
@@ -238,7 +379,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 engine.drawText(velZ.c_str(), 10, 250, 20, BLACK);
 
                 engine.beginMode3D();
-                engine.drawCubeWires(ren.position,  static_cast<float>(ren.scale.x()),  static_cast<float>(ren.scale.y()),  static_cast<float>(ren.scale.z()), RED);
+                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
                 engine.endMode3D();
             }
         }
@@ -261,4 +402,19 @@ void RenderSystem::drawDeath(ENGI::GameEngine& engine)
     engine.drawRectangle(0, 0, engine.getScreenWidth(), engine.getScreenHeight(), Fade(BLACK, 0.5f));
     engine.drawText("HAS MUERTO", 250, 250, 40, RED);
     engine.drawText("[ENTER] para volver a jugar", 165, 300, 30, RED);
+}
+
+void RenderSystem::unloadModels(EntityManager& em, ENGI::GameEngine& engine)
+{
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, PhysicsComponent&, RenderComponent& ren)
+    {
+        if (ent.hasComponent<RenderComponent>())
+        {
+            if (ren.meshLoaded)
+            {
+                engine.unloadModel(ren.model);
+                ren.meshLoaded = false;
+            }
+        }
+    });
 }

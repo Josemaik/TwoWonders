@@ -7,18 +7,18 @@
 // Forwarding
 struct BehaviourTree_t;
 
-enum class SB : uint8_t {
-    Arrive,
-    Seek,
-    Flee,
-    Pursue,
-    Avoid,
-    followPath
-};
+// enum class SB : uint8_t {
+//     Arrive,
+//     Seek,
+//     Flee,
+//     Pursue,
+//     Avoid,
+//     followPath
+// };
 struct AIComponent
 {
     // Type of shoots
-    enum class TypeShoot : uint8_t { OneShootonDir, OneShoottoPlayer, TripleShoot };
+    enum class TypeShoot : uint8_t { OneShootonDir, OneShoottoPlayer, TripleShoot, Melee};
     // TypeShoot currentshoot{};
     // Default velocity
     double SPEED_AI = 0.2;
@@ -54,9 +54,13 @@ struct AIComponent
     vec3d getRandomPosinRange(double xmin, double xmax, double zmin, double zmax);
     // Data for detect player
     double detect_radius{ 15.0 };
+    double attack_radius { 6.0 };
+    bool on_attack_radius { false };
     bool playerdetected{ false };
+    //Ataque
+    bool ready_attack {false};
     // data for steering behaviour
-    SB behaviour { SB::Arrive };
+    // SB behaviour { SB::Arrive };
     // posicion objetivo
     double tx { 0 }, tz { 0 };
     //tiempor para llegar al objetivo
@@ -69,15 +73,18 @@ struct AIComponent
     //Target Entity
     std::size_t teid{};
     //PATH
-    Path_t<4>::iterator pathIt {};
+    Path_t<4> path { };
+    Path_t<4>::iterator pathIt { };
+    bool path_initialized { false };
     // SB behaviour {SB::Arrive};
+    double txp{},tzp{};
+    bool target_obtained { false };
     // Timers
-    double countdown_change_dir{ 1.5 }, countdown_stop{ 3.5 }, countdown_shoot{ 2.0 }, countdown_change_position{ 3.0 }; // seconds
-    double elapsed_change_position{ 1.0 }, elapsed_stop{ 1.0 }, elapsed_change_dir{ 1.0 }, elapsed_shoot{ 1.0 };
-    void dec_countdown_change_pos(double deltaTime) { elapsed_change_position += deltaTime; };
-    void dec_countdown_change_dir(double deltaTime) { elapsed_change_dir += deltaTime; }; // delta time
-    void dec_countdown_stop(double deltaTime) { elapsed_stop += deltaTime; };
-    void dec_countdown_shoot(double deltaTime) { elapsed_shoot += deltaTime; };
+    double countdown_change_dir{ 1.5 }, countdown_stop{ 0.8 }, countdown_shoot{ 0.5 }, countdown_change_position{ 3.0 }
+    ,countdown_fleeing{3.0}, countdown_perception{0.5}; // seconds
+    double elapsed_change_position{ 1.0 }, elapsed_stop{ 1.0 }, elapsed_change_dir{ 1.0 }, elapsed_shoot{ 1.0 },
+    elapsed_fleeing{1.0}, elapsed_perception{1.0};
+    void plusdeltatime(double deltaTime, double& elapsed) { elapsed += deltaTime; };
     // Behaviour trees
     BehaviourTree_t* behaviourTree{ nullptr };
 };

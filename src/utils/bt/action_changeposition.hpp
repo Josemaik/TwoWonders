@@ -18,7 +18,7 @@ struct BTActionChangePosition : BTNode_t{
                 ectx.ai.elapsed_change_position = 0;
                 return BTNodeStatus_t::success;
             }
-            ectx.ai.dec_countdown_change_pos(ectx.deltatime);
+            ectx.ai.plusdeltatime(ectx.deltatime, ectx.ai.elapsed_change_position);
             return BTNodeStatus_t::running;
     }
 };

@@ -56,7 +56,7 @@ void Game::createShop(EntityManager& em)
 void Game::createShield(EntityManager& em, Entity& ent)
 {
     auto& e{ em.newEntity() };
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .color = DARKBROWN });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = DARKBROWN });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
     em.addComponent<ShieldComponent>(e, ShieldComponent{});
@@ -75,12 +75,13 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.f, -5.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -8.0f, 0.f, -3.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<InformationComponent>(e, InformationComponent{});
+    em.addComponent<TypeComponent>(e, TypeComponent{});
     em.addComponent<EventComponent>(e);
     evm.registerListener(e, EVENT_CODE_CHANGE_ZONE);
     // Sword
@@ -91,6 +92,8 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     createCoin(em);
     // Shop
     createShop(em);
+    // Enemies
+    iam.createEnemies(em);
 
     // Ending
     createEnding(em);
@@ -109,9 +112,8 @@ void Game::createSound(EntityManager& em){
 void Game::run()
 {
     createEntities(em, evm);
-    iam.createEnemies(em);
-
     map.createMap(em);
+
     engine.setTargetFPS(30);
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
@@ -130,7 +132,7 @@ void Game::run()
     //
     // - Colocar antes de donde se quiere medir el tiempo
     // auto t1 = high_resolution_clock::now();
-    // 
+    //
     // - Colocar despues de donde se quiere medir el tiempo
     // auto t2 = high_resolution_clock::now();
     // duration<float, std::milli> duration = t2 - t1;
@@ -166,10 +168,14 @@ void Game::run()
         // CODIGO DE LA PANTALLA DE TITULO
         case GameScreen::TITLE:
         {
-            // Input del enter para la historia
-            if (input_system.pressEnter())
-                li.currentScreen = GameScreen::STORY;
-            render_system.drawLogoGame(engine);
+            render_system.drawLogoGame(engine,em);
+            break;
+        }
+
+        // CODIGO DE LA PANTALLA DE OPCIONES
+        case GameScreen::OPTIONS:
+        {
+            render_system.drawOptions(engine,em);
             break;
         }
 
@@ -208,7 +214,9 @@ void Game::run()
         {
             if (input_system.pressEnter())
                 li.currentScreen = GameScreen::TITLE;
+
             em.destroyAll();
+            render_system.unloadModels(em, engine);
             render_system.drawEnding(engine);
             break;
         }
@@ -218,8 +226,12 @@ void Game::run()
         }
     }
 
+
     //liberar bancos
     sound_system.liberar();
+
+
+    render_system.unloadModels(em, engine);
 
     engine.closeWindow();
 }
@@ -227,7 +239,7 @@ void Game::run()
 void Game::normalExecution(EntityManager& em, float deltaTime)
 {
     ai_system.update(em, deltaTime);
-    physics_system.update(em,deltaTime);
+    physics_system.update(em, deltaTime);
     collision_system.update(em);
     zone_system.update(em, engine, iam, evm);
     shield_system.update(em);

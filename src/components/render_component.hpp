@@ -8,8 +8,15 @@ struct RenderComponent
     void setPosition(vec3d p);
     void setScale(vec3d s);
     void setColor(Color c);
+    void setOrientation(double o);
+    void destroyMesh();
+
     vec3d position{};
     vec3d scale{};
+    double orientation{ 0.0 };
     Color color{};
-    bool visible{true};
+    bool visible{ true };
+
+    Model model{};
+    bool meshLoaded{ false };
 };

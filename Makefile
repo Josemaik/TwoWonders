@@ -2,7 +2,9 @@ APP		   := ZeldaWonders
 CCACHE 	   := ccache
 CC         := g++-12
 CCFLAGS    := -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
-LIBS       := -lraylib -L./fmodlibs -lfmod -lfmodstudio
+
+LIBS       := -lraylib -L./fmodlibs -lfmod -lfmodstudio src/libs/raygui.so
+
 SANITIZE   := -fsanitize=address,undefined
 
 # agregar g++ | clang++
@@ -16,7 +18,7 @@ OBJ  	   := obj
 RELEASE    := release
 ASSETS     := assets
 LIBS_DIR   := libs
-LIBS_COPY  := /usr/lib/libraylib.so.420
+LIBS_COPY  := /usr/lib/libraylib.so.420 src/libs/raygui.so
 
 ALLCPP     := $(shell find $(SRC) -type f -iname *.cpp)
 ALLCPPOBJ  := $(patsubst %.cpp,%.o,$(ALLCPP))
@@ -58,9 +60,9 @@ $(RELEASE) : $(APP) $(ASSETS)
 $(OBJSUBDIRS) :
 	$(MKDIR) $(OBJSUBDIRS)
 
-$(ASSETS): 
+$(ASSETS):
 	$(MKDIR) $(ASSETS)
-	
+
 # Otras reglas
 
 .PHONY : dir clean game

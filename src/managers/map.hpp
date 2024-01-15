@@ -11,7 +11,7 @@ struct Map
 private:
     void createWallsOverworld(EntityManager& em);
     void createGroundWaterOverworld(EntityManager& em);
-
+    void createStairs(EntityManager& em);
     void createZonesOverworld(EntityManager& em);
 };
 

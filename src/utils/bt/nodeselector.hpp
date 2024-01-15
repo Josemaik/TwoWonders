@@ -26,7 +26,7 @@ struct BTNodeSelector_t : BTNode_t{
             case BTNodeStatus_t::success:    { resetSequence(); return BTNodeStatus_t::success;    }
                 break;
             case BTNodeStatus_t::running: { return BTNodeStatus_t::running; }
-                break;  
+                break;
             case BTNodeStatus_t::fail: {
                 ++currentNodeIt;
                 if ( currentNodeIt == nodes.end() ) { resetSequence(); return BTNodeStatus_t::fail; }
@@ -37,7 +37,7 @@ struct BTNodeSelector_t : BTNode_t{
         }
         return BTNodeStatus_t::running;
     }
-    
+
 private:
     container_type nodes {};
     iterator currentNodeIt { nodes.begin() };

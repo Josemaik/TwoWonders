@@ -3,7 +3,7 @@
 void Map::createMap(EntityManager& em) {
     createGroundWaterOverworld(em);
     createWallsOverworld(em);
-
+    createStairs(em);
     createZonesOverworld(em);
 }
 
@@ -21,13 +21,13 @@ void Map::createWallsOverworld(EntityManager& em) {
 
         // ZONA 1
 
-        // { { -5.5, 0.0, -8.0 }, { 8.0, 1.0, 3.0 }, LIME },    // |
-        // { { 5.5, 0.0, -8.0 }, { 8.0, 1.0, 3.0 }, LIME },     // | Pared Horizontal Arriba
+        { { -5.5, 0.0, -8.0 }, { 8.0, 1.0, 3.0 }, LIME },    // |
+        { { 5.5, 0.0, -8.0 }, { 8.0, 1.0, 3.0 }, LIME },     // | Pared Horizontal Arriba
 
-        // { { -11.0, 0.0, -5.5 }, { 3.0, 1.0, 8.0 }, LIME },   // |
-        // { { -11.0, 0.0, 5.5 }, { 3.0, 1.0, 8.0}, LIME },    // | Pared Vertical Izquierda
-        // { { 0.0, 0.0, 8.0 }, { 19.0, 1.0, 3.0 }, LIME },     // | Pared Horizontal Abajo
-        // { { 11.0, 0.0, 0.0 }, { 3.0, 1.0, 19.0 }, LIME },    // | Pared Vertical Derecha
+        { { -11.0, 0.0, -5.5 }, { 3.0, 1.0, 8.0 }, LIME },   // |
+        { { -11.0, 0.0, 5.5 }, { 3.0, 7.0, 8.0}, LIME },    // | Pared Vertical Izquierda
+        { { 0.0, 0.0, 8.0 }, { 19.0, 1.0, 3.0 }, LIME },     // | Pared Horizontal Abajo
+        { { 11.0, 0.0, 0.0 }, { 3.0, 1.0, 19.0 }, LIME },    // | Pared Vertical Derecha
 
         // ZONA 2
 
@@ -37,16 +37,16 @@ void Map::createWallsOverworld(EntityManager& em) {
         { { 11.0, 0.0, -17.5 }, { 3.0, 1.0, 16.0 }, LIME },  // | Pared Vertical Derecha
         { { 0.0, 0.0, -24.0 }, { 19.0, 1.0, 3.0 }, LIME },   // | Pared Horizontal Arriba
 
-        { { 7.0, 0.0, -20.0 }, { 1.0, 1.0, 1.0 }, LIME },    // |
-        { { 7.0, 0.0, -16.0 }, { 1.0, 1.0, 1.0 }, LIME },    // | Paredes Chiquitas Derecha
-        { { 7.0, 0.0, -12.0 }, { 1.0, 1.0, 1.0 }, LIME },    // |
+        // { { 7.0, 0.0, -20.0 }, { 1.0, 1.0, 1.0 }, LIME },    // |
+        // { { 7.0, 0.0, -16.0 }, { 1.0, 1.0, 1.0 }, LIME },    // | Paredes Chiquitas Derecha
+        // { { 7.0, 0.0, -12.0 }, { 1.0, 1.0, 1.0 }, LIME },    // |
 
-        { { -7.0, 0.0, -20.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
-        { { -7.0, 0.0, -16.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
-        { { -7.0, 0.0, -12.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
-        { { -4.0, 0.0, -20.0 }, { 1.0, 1.0, 1.0 }, LIME },   // | Paredes Chiquitas Izquierda
-        { { -4.0, 0.0, -16.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
-        { { -4.0, 0.0, -12.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
+        // { { -7.0, 0.0, -20.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
+        // { { -7.0, 0.0, -16.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
+        // { { -7.0, 0.0, -12.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
+        // { { -4.0, 0.0, -20.0 }, { 1.0, 1.0, 1.0 }, LIME },   // | Paredes Chiquitas Izquierda
+        // { { -4.0, 0.0, -16.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
+        // { { -4.0, 0.0, -12.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
 
         // ZONA 3
 
@@ -104,9 +104,9 @@ void Map::createWallsOverworld(EntityManager& em) {
 
         // CUEVAS EN EL OVERWORLD
 
-        // { { -3.5, 0.0, -6.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
-        // { { -5.0, 0.0, -6.0 }, { 2.0, 1.0, 1.0 }, BLACK },  // | Cueva Espada
-        // { { -6.5, 0.0, -6.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
+        { { -3.5, 0.0, -6.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
+        { { -5.0, 0.0, -6.0 }, { 2.0, 1.0, 1.0 }, BLACK },  // | Cueva Espada
+        { { -6.5, 0.0, -6.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
 
         { { 1.5, 0.0, -22.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
         { { 3.0, 0.0, -22.0 }, { 2.0, 1.0, 1.0 }, BLACK },  // | Cueva Monedas
@@ -214,7 +214,7 @@ void Map::createGroundWaterOverworld(EntityManager& em) {
     {
         auto& entity = em.newEntity();
         em.addTag<GroundTag>(entity);
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = vec3d(data.position), .scale = vec3d(data.scale),.color = data.color});
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = vec3d(data.position), .scale = vec3d(data.scale),.color = data.color });
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = vec3d(r.position), .velocity = vec3d::zero(), .gravity = .0 });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     }
@@ -231,6 +231,40 @@ void Map::createGroundWaterOverworld(EntityManager& em) {
         auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
         auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0, .0, .0 }, .gravity = .0 });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
+    }
+
+    // EntityData entitiesRamp[] = {
+    //     { { 1.0, -0.5, -5.0 }, { 2.0, 2.0, 2.0 }, WHITE },
+    // };
+
+    // for (const auto& data : entitiesRamp)
+    // {
+    //     auto& entity = em.newEntity();
+    //     em.addTag<RampTag>(entity);
+    //     auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
+    //     auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0, .0, .0 }, .gravity = .0 });
+    //     em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
+    // }
+
+}
+//Creamos escaleras
+void Map::createStairs(EntityManager& em){
+     struct EntityData
+    {
+        vec3d position;
+        vec3d scale;
+        Color color;
+    };
+    EntityData entitiesS[] = {
+        { {-9.5, 0.0, 4.5}, {0.5, 7.3, 1.0}, BROWN}
+    };
+    for (const auto& data : entitiesS)
+    {
+        auto& entity = em.newEntity();
+        em.addTag<StairTag>(entity);
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0 });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     }
 }
 
