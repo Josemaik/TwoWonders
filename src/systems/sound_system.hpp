@@ -11,7 +11,7 @@ struct SoundSystem {
 
     SoundSystem();
 
-    void initBanks(std::string const& master_bank_location, std::string const& master_string_location, std::string const& ui_bank_location);
+    void initBanks(std::string const& master_bank_location, std::string const& master_string_location, std::string const& ui_bank_location, std::string const& music_bank_location );
     void createEventInstance();
     void play();
 
@@ -24,9 +24,14 @@ struct SoundSystem {
         FMOD::Studio::Bank* master_bank;
         FMOD::Studio::Bank* strings_bank;
         FMOD::Studio::Bank* ui_bank;
+        FMOD::Studio::Bank* music_bank;
         FMOD_STUDIO_LOADING_STATE loadingState{};
         FMOD::Studio::EventDescription* eventDescription;
+        FMOD::Studio::EventDescription* eventDescription_Ambiente;
+        FMOD::Studio::EventDescription* eventDescription_Musica;
         FMOD::Studio::EventInstance* eventInstance;
+        FMOD::Studio::EventInstance* eventInstance_Ambiente;
+        FMOD::Studio::EventInstance* eventInstance_Musica;
         FMOD_RESULT res;
 
 };

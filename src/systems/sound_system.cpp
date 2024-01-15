@@ -23,12 +23,12 @@ SoundSystem::SoundSystem(){
 }
 
 //inicialitza el Master, string i UI bank (els primers que s'han de carregar en memoria)
-void SoundSystem::initBanks(const std::string& master_bank_location, const std::string& master_string_location, std::string const& ui_bank_location)
+void SoundSystem::initBanks(const std::string& master_bank_location, const std::string& master_string_location, std::string const& ui_bank_location, std::string const& music_bank_location)
 {
     ERRCHECK(soundSystem->loadBankFile(master_bank_location.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &master_bank));
     ERRCHECK(soundSystem->loadBankFile(master_string_location.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &strings_bank));
     ERRCHECK(soundSystem->loadBankFile(ui_bank_location.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &ui_bank));
-    
+    ERRCHECK(soundSystem->loadBankFile(music_bank_location.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &music_bank));
     //ERRCHECK(master_bank->getLoadingState(&loadingState));
     //ERRCHECK(strings_bank->getLoadingState(&loadingState));
     ERRCHECK(ui_bank->getLoadingState(&loadingState));
@@ -38,11 +38,14 @@ void SoundSystem::initBanks(const std::string& master_bank_location, const std::
 
 //crear instancies d'events
 void SoundSystem::createEventInstance(){
-    ERRCHECK(soundSystem->getEvent("event:/Menús/salir", &eventDescription) );
+    ERRCHECK(soundSystem->getEvent("event:/Menús/main_select", &eventDescription) );
+    ERRCHECK(soundSystem->getEvent("event:/Música/Menu/menu_music", &eventDescription_Musica) );
+    
     ERRCHECK(eventDescription->createInstance(&eventInstance));
-
+    ERRCHECK(eventDescription_Musica->createInstance(&eventInstance_Musica));
     //açó fa que sone el evento que haja assignat a eventInstance
     eventInstance->start(); //sona!!!
+    eventInstance_Musica->start();
     //FMOD_Studio_EventInstance_Start(&eventInstance);
 }
 
