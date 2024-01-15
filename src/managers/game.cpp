@@ -75,15 +75,17 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -8.0f, 0.f, -3.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
+
     em.addComponent<InformationComponent>(e, InformationComponent{});
     em.addComponent<TypeComponent>(e, TypeComponent{});
     em.addComponent<EventComponent>(e);
     evm.registerListener(e, EVENT_CODE_CHANGE_ZONE);
+
     // Sword
     createSword(em);
     // Shield
@@ -103,8 +105,8 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
 }
 
 //inicializar bancos
-void Game::createSound(EntityManager& em){
-    sound_system.initBanks("assets/banks/Master.bank","assets/banks/Master.strings.bank","assets/banks/UI.bank", "assets/banks/Music.bank");
+void Game::createSound(EntityManager& em) {
+    sound_system.initBanks("assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Music.bank");
     //sound_system.createEventInstance();
     //sound_system.play();
 }
@@ -168,18 +170,18 @@ void Game::run()
         // CODIGO DE LA PANTALLA DE TITULO
         case GameScreen::TITLE:
         {
-            if(sound_system.music_started == false){
+            if (sound_system.music_started == false) {
                 sound_system.playMusicMenu();
                 sound_system.music_started = true;
             }
-            render_system.drawLogoGame(engine,em,sound_system);
+            render_system.drawLogoGame(engine, em, sound_system);
             break;
         }
 
         // CODIGO DE LA PANTALLA DE OPCIONES
         case GameScreen::OPTIONS:
         {
-            render_system.drawOptions(engine,em,sound_system);
+            render_system.drawOptions(engine, em, sound_system);
             break;
         }
 
@@ -200,6 +202,9 @@ void Game::run()
                 createEntities(em, evm);
                 map.createMap(em);
             }
+
+            // em.getComponent<PhysicsComponent>(*em.getEntityByID(0)).orientation += 0.01f;
+            // std::cout << em.getComponent<PhysicsComponent>(*em.getEntityByID(0)).orientation * (180.f / M_PI) << std::endl;
 
             input_system.update(em);
             if (!input_system.debugMode)

@@ -35,6 +35,7 @@ namespace ENGI {
         void endDrawing();
         void beginMode3D();
         void endMode3D();
+        void drawLine3D(vec3d startPos, vec3d endPos, Color color);
         void drawCube(vec3d pos, float width, float height, float lenght, Color color);
         void drawCubeWires(vec3d pos, float width, float height, float lenght, Color color);
         void drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);

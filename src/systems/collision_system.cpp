@@ -6,7 +6,7 @@ void CollisionSystem::update(EntityManager& em)
 {
     // Liberar el octree
     octree.clear();
-
+    std::vector<Entity*> EntsForRamps{};
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren, ColliderComponent& col)
     {
         // Si la entidad está por debajo del suelo, se destruye
@@ -23,6 +23,12 @@ void CollisionSystem::update(EntityManager& em)
 
         // Insertar en el Octree
         octree.insert(e, col);
+
+        // Revisamos que no sean entidades estáticas
+        if (!(col.behaviorType & BehaviorType::STATIC) && !(col.behaviorType & BehaviorType::ZONE))
+            EntsForRamps.push_back(&e);
+        else if (e.hasTag<ObjectTag>())
+            EntsForRamps.push_back(&e);
     });
 
     // Vector para saber qué colisiones se han calculado ya
@@ -30,6 +36,9 @@ void CollisionSystem::update(EntityManager& em)
 
     // Comprobar colisiones
     checkCollision(em, octree, checkedPairs);
+
+    // Comprobar colisiones con rampas
+    checkRampCollision(em, EntsForRamps);
 
     // checkBorderCollision(em, ECPair);
 
@@ -83,6 +92,38 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
     }
 }
 
+void CollisionSystem::checkRampCollision(EntityManager& em, std::vector<Entity*>& Ents)
+{
+    for (auto e : Ents)
+    {
+        auto& col = em.getComponent<ColliderComponent>(*e);
+
+        auto& bbox = col.boundingBox;
+        auto pos = bbox.center();
+
+        for (const auto& ramp : ramps)
+        {
+            if (pos.x() >= ramp.xMin && pos.x() <= ramp.xMax && pos.z() >= ramp.zMin && pos.z() <= ramp.zMax)
+            {
+                auto& ren = em.getComponent<RenderComponent>(*e);
+                auto& phy = em.getComponent<PhysicsComponent>(*e);
+
+                double baseHeight = ren.scale.y() / 2 - 0.5;
+                double newHeight = 0.0;
+
+                // Deltas para calcular la altura
+                if (ramp.xOffset == 0.0)
+                    newHeight = baseHeight + ramp.slope * (pos.z() + ramp.zOffset);
+                else
+                    newHeight = baseHeight + ramp.slope * (pos.x() + ramp.xOffset);
+
+                phy.position.setY(newHeight);
+                break;
+            }
+        }
+    }
+}
+
 void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
 {
     // Sacamos las físicas para pasarlas por parámetro swaps
@@ -94,12 +135,6 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     {
         handleStaticCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, minOverlap, behaviorType1, behaviorType2);
         return;
-    }else{
-        if(otherEnt.hasTag<PlayerTag>() && staticEnt.hasTag<StairTag>()){
-            std::cout << "NO COLISIONO CON ESCALERA \n";
-            em.getComponent<PhysicsComponent>(otherEnt).blockXZ = false;
-            em.getComponent<PhysicsComponent>(otherEnt).gravity = 1.0;
-        }
     }
 
     // Segundo tipo de colisión más común, colisiones con zonas
@@ -203,13 +238,6 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (staticEntPtr->hasTag<GroundTag>())
     {
         groundCollision(*otherPhy, em.getComponent<RenderComponent>(*otherEntPtr).scale, minOverlap);
-        return;
-    }
-
-    // Si el suelo choca entre sí o las paredes chocan entre ellas
-    if (behaviorType1 & BehaviorType::STATIC && behaviorType2 & BehaviorType::STATIC)
-    {
-        floorCollision(*staticPhy, *otherPhy, minOverlap);
         return;
     }
 

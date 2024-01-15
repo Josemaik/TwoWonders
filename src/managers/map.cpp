@@ -3,19 +3,12 @@
 void Map::createMap(EntityManager& em) {
     createGroundWaterOverworld(em);
     createWallsOverworld(em);
-    createStairs(em);
     createZonesOverworld(em);
+    createRamps(em);
 }
 
 // Se encarga de crear las paredes del OverWorld
 void Map::createWallsOverworld(EntityManager& em) {
-
-    struct WallData
-    {
-        vec3d position;
-        vec3d scale;
-        Color color;
-    };
 
     WallData wallData[] = {
 
@@ -24,18 +17,18 @@ void Map::createWallsOverworld(EntityManager& em) {
         { { -5.5, 0.0, -8.0 }, { 8.0, 1.0, 3.0 }, LIME },    // |
         { { 5.5, 0.0, -8.0 }, { 8.0, 1.0, 3.0 }, LIME },     // | Pared Horizontal Arriba
 
-        { { -11.0, 0.0, -5.5 }, { 3.0, 1.0, 8.0 }, LIME },   // |
-        { { -11.0, 0.0, 5.5 }, { 3.0, 7.0, 8.0}, LIME },    // | Pared Vertical Izquierda
+        { { -11.0, 0.0, -5.5 }, { 3.0, 1.5, 8.0 }, LIME },   // |
+        { { -11.0, 0.0, 5.5 }, { 3.0, 1.0, 8.0}, LIME },    // | Pared Vertical Izquierda
         { { 0.0, 0.0, 8.0 }, { 19.0, 1.0, 3.0 }, LIME },     // | Pared Horizontal Abajo
         { { 11.0, 0.0, 0.0 }, { 3.0, 1.0, 19.0 }, LIME },    // | Pared Vertical Derecha
 
         // ZONA 2
 
-        { { -11.0, 0.0, -12.0 }, { 3.0, 1.0, 5.0 }, LIME },  // |
-        { { -11.0, 0.0, -21.5 }, { 3.0, 1.0, 8.0 }, LIME },  // | Pared Vertical Izquierda
+        { { -10.9, 0.0, -12.0 }, { 3.0, 2.0, 5.0 }, LIME },  // |
+        { { -10.95, 0.0, -21.6 }, { 3.0, 2.0, 8.0 }, LIME },  // | Pared Vertical Izquierda
 
-        { { 11.0, 0.0, -17.5 }, { 3.0, 1.0, 16.0 }, LIME },  // | Pared Vertical Derecha
-        { { 0.0, 0.0, -24.0 }, { 19.0, 1.0, 3.0 }, LIME },   // | Pared Horizontal Arriba
+        { { 11.1, 0.0, -17.5 }, { 3.0, 1.0, 16.0 }, LIME },  // | Pared Vertical Derecha
+        { { 0.01, 0.0, -24.0 }, { 19.0, 1.0, 3.0 }, LIME },   // | Pared Horizontal Arriba
 
         // { { 7.0, 0.0, -20.0 }, { 1.0, 1.0, 1.0 }, LIME },    // |
         // { { 7.0, 0.0, -16.0 }, { 1.0, 1.0, 1.0 }, LIME },    // | Paredes Chiquitas Derecha
@@ -51,7 +44,7 @@ void Map::createWallsOverworld(EntityManager& em) {
         // ZONA 3
 
         { { -22.0, 0.0, 8.0 }, { 19.0, 1.0, 3.0 }, LIME },   // | Pared Horizontal Abajo
-        { { -23.5, 0.0, -8.0 }, { 16.0, 1.0, 3.0 }, LIME },  // | Pared Horizontal Arriba
+        { { -23.5, 0.0, -7.99 }, { 16.0, 2.0, 3.0 }, LIME },  // | Pared Horizontal Arriba
 
         { { -22.0, 0.0, -4.0 }, { 1.0, 1.0, 1.0 }, LIME },  // |
         { { -22.0, 0.0, 0.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
@@ -63,20 +56,20 @@ void Map::createWallsOverworld(EntityManager& em) {
 
         // ZONA 4
 
-        { { -22.0, 0.0, -24.0 }, { 19.0, 1.0, 3.0 }, LIME },  // | Pared Horizontal Arriba
+        { { -22.0, 0.0, -24.1 }, { 19.0, 2.0, 3.0 }, LIME },  // | Pared Horizontal Arriba
 
-        { { -20.0, 0.0, -18.0 }, { 3.0, 1.0, 1.0 }, DARKBROWN },   // |
-        { { -20.0, 0.0, -14.0 }, { 3.0, 1.0, 1.0 }, DARKBROWN },   // |
-        { { -25.0, 0.0, -20.0 }, { 4.0, 1.0, 1.0 }, DARKBROWN },   // | Paredes Chiquitas
-        { { -25.0, 0.0, -16.0 }, { 4.0, 1.0, 1.0 }, DARKBROWN },   // |
-        { { -25.0, 0.0, -12.0 }, { 4.0, 1.0, 1.0 }, DARKBROWN },   // |
+        { { -20.0, 1.0, -18.0 }, { 3.0, 1.0, 1.0 }, DARKBROWN },   // |
+        { { -20.0, 1.0, -14.0 }, { 3.0, 1.0, 1.0 }, DARKBROWN },   // |
+        { { -25.0, 1.0, -20.0 }, { 4.0, 1.0, 1.0 }, DARKBROWN },   // | Paredes Chiquitas
+        { { -25.0, 1.0, -16.0 }, { 4.0, 1.0, 1.0 }, DARKBROWN },   // |
+        { { -25.0, 1.0, -12.0 }, { 4.0, 1.0, 1.0 }, DARKBROWN },   // |
 
         // ZONA 5
 
         { { -37.0, 0.0, 8.0 }, { 11.0, 1.0, 3.0 }, LIME },   // |
         { { -50.0, 0.0, 8.0 }, { 5.0, 1.0, 3.0 }, LIME },    // | Pared Horizontal Abajo
-        { { -51.5, 0.0, -8.0 }, { 2.0, 1.0, 3.0 }, LIME },   // |
-        { { -37.0, 0.0, -8.0 }, { 11.0, 1.0, 3.0 }, LIME },  // | Pared Horizontal Arriba
+        { { -51.5, 0.0, -7.99 }, { 2.0, 2.0, 3.0 }, LIME },  // |
+        { { -37.0, 0.0, -8.0 }, { 11.0, 2.0, 3.0 }, LIME },  // | Pared Horizontal Arriba
 
         { { -40.5, 0.0, -4.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
         { { -40.5, 0.0, 0.0 }, { 1.0, 1.0, 1.0 }, LIME },    // |
@@ -91,16 +84,16 @@ void Map::createWallsOverworld(EntityManager& em) {
 
         // ZONA 6
 
-        { { -37.0, 0.0, -24.0 }, { 11.0, 1.0, 3.0 }, LIME },   // |
-        { { -50.0, 0.0, -24.0 }, { 5.0, 1.0, 3.0 }, LIME },    // | Pared Horizontal Arriba
+        { { -37.0, 0.0, -24.1 }, { 11.0, 2.0, 3.0 }, LIME },   // |
+        { { -50.0, 0.0, -24.1 }, { 5.0, 2.0, 3.0 }, LIME },    // | Pared Horizontal Arriba
 
-        { { -54.0, 0.0, -17.5 }, { 3.0, 1.0, 16.0 }, LIME },   // | Pared Vertical Izquierda
+        { { -54.0, 0.0, -17.5 }, { 3.0, 2.0, 16.0 }, LIME },   // | Pared Vertical Izquierda
 
-        { { -40.5, 0.0, -20.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
-        { { -40.5, 0.0, -16.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
-        { { -40.5, 0.0, -12.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // | Paredes Chiquitas
-        { { -37.5, 0.0, -18.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
-        { { -37.5, 0.0, -14.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
+        { { -40.5, 1.0, -20.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
+        { { -40.5, 1.0, -16.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
+        { { -40.5, 1.0, -12.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // | Paredes Chiquitas
+        { { -37.5, 1.0, -18.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
+        { { -37.5, 1.0, -14.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
 
         // CUEVAS EN EL OVERWORLD
 
@@ -112,9 +105,9 @@ void Map::createWallsOverworld(EntityManager& em) {
         { { 3.0, 0.0, -22.0 }, { 2.0, 1.0, 1.0 }, BLACK },  // | Cueva Monedas
         { { 4.5, 0.0, -22.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
 
-        { { -15.5, 0.0, -22.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
-        { { -17.0, 0.0, -22.0 }, { 2.0, 1.0, 1.0 }, BLACK },  // | Cueva Tienda
-        { { -18.5, 0.0, -22.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
+        { { -15.5, 1.0, -22.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
+        { { -17.0, 1.0, -22.0 }, { 2.0, 1.0, 1.0 }, BLACK },  // | Cueva Tienda
+        { { -18.5, 1.0, -22.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
 
         { { -52.0, 0.0, -2.0 }, { 1.0, 1.0, 1.0 }, DARKBLUE },  // |
         { { -52.0, 0.0, -3.5 }, { 1.0, 1.0, 2.0 }, BLACK },     // | Cueva Mazmorra
@@ -190,20 +183,16 @@ void Map::createWallsOverworld(EntityManager& em) {
 }
 
 // Se encarga de crear el suelo del OverWorld
-void Map::createGroundWaterOverworld(EntityManager& em) {
-
-    struct EntityData
-    {
-        vec3d position;
-        vec3d scale;
-        Color color;
-    };
-
+void Map::createGroundWaterOverworld(EntityManager& em)
+{
     EntityData entitiesG[] = {
         // OverWorld
         { { 0., -1.5, 0. }, { 85.0, 2., 100. }, BEIGE },
-        { { -52.5, -1.5, 0. }, { 10.0, 2., 100. }, BEIGE },
-        { { -45., -1.5, -16. }, { 5.0, 2., 2.0 }, BROWN },
+        { { -72.5, -1.5, 0. }, { 50.0, 2., 100. }, BEIGE },
+        { { -27.5, 0.0, -16.0 }, { 30.0, 1.0, 13.0 }, BEIGE },
+        { { -50., 0.0, -16.0 }, { 4.95, 1.0, 13.0 }, BEIGE },
+
+        { { -45., 0.0, -16. }, { 5.0, 1.0, 2.0 }, BROWN },
         // Cuevas
         { { 71., -1.5, 80. }, { 69.0, 2., 19.0 }, BROWN },
         // Mazmorra
@@ -220,8 +209,9 @@ void Map::createGroundWaterOverworld(EntityManager& em) {
     }
 
     EntityData entitiesW[] = {
-    { { -45., -1.5, -0.0 }, { 5.0, 2., 30. }, SKYBLUE },
-    { { -45., -1.5, -32.0 }, { 5.0, 2., 30. }, SKYBLUE },
+    { { -45., -1.5, 13.0 }, { 5.0, 2.0, 45.0 }, SKYBLUE },
+    { { -45., 0.0, -10.75 }, { 5.0, 1.0, 8.5 }, SKYBLUE },
+    { { -45., 0.0, -32.0 }, { 5.0, 1.0, 30.0 }, SKYBLUE },
     };
 
     for (const auto& data : entitiesW)
@@ -247,38 +237,30 @@ void Map::createGroundWaterOverworld(EntityManager& em) {
     // }
 
 }
-//Creamos escaleras
-void Map::createStairs(EntityManager& em){
-     struct EntityData
-    {
-        vec3d position;
-        vec3d scale;
-        Color color;
+
+void Map::createRamps(EntityManager& em)
+{
+    float ori = DEGTORAD * 72.f;
+
+    RampData entitiesR[] = {
+        { { -11.4, -1.4, -16.0 }, { 3.0, 3.2, 3.0 }, BEIGE, ori, { 0.0, 0.0, 1.0 } },
+        { { -49., -1.4, -8.4 }, { 3.0, 3.2, 3.0 }, BEIGE, -ori, { 1.0, 0.0, 0.0 } },
+        { { -14., -1.4, -8.4 }, { 3.0, 3.2, 3.0 }, BEIGE, -ori, { 1.0, 0.0, 0.0 } },
     };
-    EntityData entitiesS[] = {
-        { {-9.5, 0.0, 4.5}, {0.5, 7.3, 1.0}, BROWN}
-    };
-    for (const auto& data : entitiesS)
+
+    for (const auto& data : entitiesR)
     {
         auto& entity = em.newEntity();
-        em.addTag<StairTag>(entity);
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0 });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+        em.addTag<RampTag>(entity);
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color, .rotationVec = data.rotationVec });
+        em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = { .0, .0, .0 }, .gravity = .0, .orientation = data.orientation, .rotationVec = data.rotationVec });
     }
 }
 
 // Se encarga de crear las zonas
 void Map::createZonesOverworld(EntityManager& em) {
 
-    struct EntityData
-    {
-        vec3d position;
-        vec3d scale;
-        uint16_t zone;
-    };
-
-    EntityData entitiesG[] = {
+    ZoneData entitiesZ[] = {
         // OVERWORLD //
         // Zonas //
         { { 0., 0., 0. }, {19.f, 1.f, 13.f }, 1 },
@@ -290,7 +272,7 @@ void Map::createZonesOverworld(EntityManager& em) {
         // TP //
         { { -5., 0., -5.5 }, { 2.f, 1.f, 0.5f }, 14 },   // Espada
         { {  3., 0., -21.5 }, { 2.f, 1.f, 0.5f }, 16 },  // Monedas
-        { { -17., 0., -21.5 }, { 2.f, 1.f, 0.5f }, 18 }, // Tienda
+        { { -17., 1., -21.5 }, { 2.f, 2.f, 0.5f }, 18 }, // Tienda
         // CUEVAS //
         // Zonas //
         { { 49., 0., 80. }, { 19.f, 1.f, 13.f }, 7 },
@@ -310,7 +292,7 @@ void Map::createZonesOverworld(EntityManager& em) {
         { { 61.0, 0., -62.5 }, { 3.0f, 1.f, 2.0f }, 21 }, // OverWorld
     };
 
-    for (const auto& data : entitiesG)
+    for (const auto& data : entitiesZ)
     {
         auto& entity = em.newEntity();
         em.addTag<ZoneTag>(entity);

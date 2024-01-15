@@ -34,27 +34,28 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
     Rectangle btn2Rec = { 300, 520, 200, 50 };
 
     auto& li = em.getSingleton<LevelInfo>();
-    if (GuiButton(btn1Rec, "JUGAR")){
+    if (GuiButton(btn1Rec, "JUGAR")) {
         li.currentScreen = GameScreen::STORY;
         ss.seleccion_menu();
         ss.music_stop();
     }
 
 
-    if( CheckCollisionPointRec(GetMousePosition(),btn1Rec) || CheckCollisionPointRec(GetMousePosition(),btn2Rec )){
-        if(ss.pushed == false)
+    if (CheckCollisionPointRec(GetMousePosition(), btn1Rec) || CheckCollisionPointRec(GetMousePosition(), btn2Rec)) {
+        if (ss.pushed == false)
             ss.sonido_mov();
         ss.pushed = true;
-    }else ss.pushed = false;  
+    }
+    else ss.pushed = false;
 
-    if (GuiButton(btn2Rec, "CONFIGURACION")){
+    if (GuiButton(btn2Rec, "CONFIGURACION")) {
         li.currentScreen = GameScreen::OPTIONS;
         ss.seleccion_menu();
-    }    
+    }
     engine.endDrawing();
 }
 
-void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss){
+void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
 
@@ -63,22 +64,23 @@ void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, Soun
     float volumen = 50; // supongo que esto inicializa volumen
     float nuevoValor = GuiSliderBar(volumenSlider, "Volumen", NULL, &volumen, 0, 100);
 
-// Ahora asignamos el nuevo valor al puntero volumen
-volumen = nuevoValor;
+    // Ahora asignamos el nuevo valor al puntero volumen
+    volumen = nuevoValor;
 
 
     // Boton de volver al inicio
     Rectangle btn1Rec = { 300, 520, 200, 50 };
     auto& li = em.getSingleton<LevelInfo>();
-    if (GuiButton(btn1Rec, "VOLVER")){
+    if (GuiButton(btn1Rec, "VOLVER")) {
         li.currentScreen = GameScreen::TITLE;
         ss.seleccion_menu();
     }
-    if( CheckCollisionPointRec(GetMousePosition(),btn1Rec)){
-        if(ss.pushed == false)
+    if (CheckCollisionPointRec(GetMousePosition(), btn1Rec)) {
+        if (ss.pushed == false)
             ss.sonido_mov();
         ss.pushed = true;
-    }else ss.pushed = false;  
+    }
+    else ss.pushed = false;
 
     engine.endDrawing();
 }
@@ -128,7 +130,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 // Revisamos si es el jugador para mover la cámara
                 if (e.hasTag<PlayerTag>())
                 {
-                    engine.setPositionCamera({ r.position.x() + 10.f, 15.f, r.position.z() + 10.f });
+                    engine.setPositionCamera({ r.position.x() + 10.f, r.position.y() + 15.f, r.position.z() + 10.f });
                     engine.setTargetCamera(r.position);
                 }
                 // Comprobar si tiene el componente vida
@@ -177,8 +179,14 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     }
 
                     float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
-                    engine.drawModel(r.model, { static_cast<float>(r.position.x()), static_cast<float>(r.position.y()), static_cast<float>(r.position.z()) }, { 0.0f, 1.0f, 0.0f }, orientationInDegrees, { 1.0f, 1.0f, 1.0f }, colorEntidad);
-                    engine.drawModelWires(r.model, { static_cast<float>(r.position.x()), static_cast<float>(r.position.y()), static_cast<float>(r.position.z()) }, { 0.0f, 1.0f, 0.0f }, orientationInDegrees, { 1.0f, 1.0f, 1.0f }, BLACK);
+                    engine.drawModel(r.model, { static_cast<float>(r.position.x()), static_cast<float>(r.position.y()), static_cast<float>(r.position.z()) }, r.rotationVec, orientationInDegrees, { 1.0f, 1.0f, 1.0f }, colorEntidad);
+
+                    if (fmod(orientationInDegrees, 90.0f) == 0.0f)
+                    {
+                        engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
+                    }
+                    else
+                        engine.drawModelWires(r.model, { static_cast<float>(r.position.x()), static_cast<float>(r.position.y()), static_cast<float>(r.position.z()) }, r.rotationVec, orientationInDegrees, { 1.0f, 1.0f, 1.0f }, BLACK);
                 }
             }
         }
@@ -367,16 +375,16 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             // Dibujar la bounding box
             engine.beginMode3D();
-            engine.drawCubeWires(boxPosition, 
-                                 static_cast<float>(boxSize.x()), 
-                                 static_cast<float>(boxSize.y()), 
-                                 static_cast<float>(boxSize.z()), 
-                                 BLUE);
+            engine.drawCubeWires(boxPosition,
+                static_cast<float>(boxSize.x()),
+                static_cast<float>(boxSize.y()),
+                static_cast<float>(boxSize.z()),
+                BLUE);
             engine.endMode3D();
 
         }
 
-        if (debug && e.hasComponent<PhysicsComponent>())
+        if (debug && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
         {
             auto& phy = em.getComponent<PhysicsComponent>(e);
 

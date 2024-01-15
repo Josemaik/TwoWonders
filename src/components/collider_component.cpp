@@ -1,13 +1,13 @@
 #include "collider_component.hpp"
 
-void ColliderComponent::updateBox(vec3d pos, vec3d scale, double gravity, double orientation)
+void ColliderComponent::updateBox(vec3d pos, vec3d scale, double gravity, double)
 {
     vec3d min = pos - (scale / 2);
     vec3d max = pos + (scale / 2);
 
     // Para tomar en cuenta la gravedad, se aumenta la altura de la bounding box
     if (gravity > 0.)
-        max.setY(max.y() + 0.6);
+        max.setY(max.y() + 0.5);
 
     // Define los vértices de la bounding box
     // vec3d vertices[8] = {

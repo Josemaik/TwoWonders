@@ -37,6 +37,11 @@ struct CollisionSystem
         }
     };
 
+    struct Ramp
+    {
+        double xMin, xMax, zMin, zMax, slope, xOffset, zOffset;
+    };
+
     // Se van a buscar las entidad que tengan estos componentes y tags
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent, ColliderComponent>;
     using SYSTAGs = MP::TypeList<>;
@@ -49,6 +54,7 @@ struct CollisionSystem
     void update(EntityManager& em);
 private:
     void checkCollision(EntityManager& em, Octree& boxes, pairsType& checkedPairs);
+    void checkRampCollision(EntityManager& em, std::vector<Entity*>& entities);
     void enemyCollision(EntityManager& em, Entity& damagedEntity);
     void staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3d& minOverlap);
     void nonStaticCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3d& minOverlap);
@@ -68,6 +74,12 @@ private:
     Octree octree;
     deathSet dead_entities{};
     pairsType checkedPairs{};
+    std::vector<Ramp> ramps = {
+        { -13.0, -9.0, -17.5, -14.0, -0.25, 8.9, 0.0 },
+        { -51.0, -48.0, -10.0, -6.0, -0.25, 0.0, 6.0 },
+        { -15.5, -12.0, -10.0, -6.0, -0.25, 0.0, 6.0 }
+    };
+
     // void checkBorderCollision(EntityManager& em, Octree& boxes);
 };
 
