@@ -105,7 +105,7 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
 //inicializar bancos
 void Game::createSound(EntityManager& em){
     sound_system.initBanks("assets/banks/Master.bank","assets/banks/Master.strings.bank","assets/banks/UI.bank", "assets/banks/Music.bank");
-    sound_system.createEventInstance();
+    //sound_system.createEventInstance();
     //sound_system.play();
 }
 
@@ -168,14 +168,18 @@ void Game::run()
         // CODIGO DE LA PANTALLA DE TITULO
         case GameScreen::TITLE:
         {
-            render_system.drawLogoGame(engine,em);
+            if(sound_system.music_started == false){
+                sound_system.playMusicMenu();
+                sound_system.music_started = true;
+            }
+            render_system.drawLogoGame(engine,em,sound_system);
             break;
         }
 
         // CODIGO DE LA PANTALLA DE OPCIONES
         case GameScreen::OPTIONS:
         {
-            render_system.drawOptions(engine,em);
+            render_system.drawOptions(engine,em,sound_system);
             break;
         }
 

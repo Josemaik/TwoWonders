@@ -20,7 +20,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debu
     endFrame(engine, em, debug);
 }
 
-void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em) {
+void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
     // Logo del videojuego
@@ -34,29 +34,51 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em) {
     Rectangle btn2Rec = { 300, 520, 200, 50 };
 
     auto& li = em.getSingleton<LevelInfo>();
-    if (GuiButton(btn1Rec, "JUGAR"))
+    if (GuiButton(btn1Rec, "JUGAR")){
         li.currentScreen = GameScreen::STORY;
+        ss.seleccion_menu();
+        ss.music_stop();
+    }
 
-    if (GuiButton(btn2Rec, "CONFIGURACION"))
+
+    if( CheckCollisionPointRec(GetMousePosition(),btn1Rec) || CheckCollisionPointRec(GetMousePosition(),btn2Rec )){
+        if(ss.pushed == false)
+            ss.sonido_mov();
+        ss.pushed = true;
+    }else ss.pushed = false;  
+
+    if (GuiButton(btn2Rec, "CONFIGURACION")){
         li.currentScreen = GameScreen::OPTIONS;
-    
+        ss.seleccion_menu();
+    }    
     engine.endDrawing();
 }
 
-void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em){
+void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss){
     engine.beginDrawing();
     engine.clearBackground(WHITE);
 
     // Slider del volumen
-    float volumen = 50.0f; // falta implementar con el sonido
     Rectangle volumenSlider = { 100, 100, 200, 20 };
-    volumen = static_cast<float>(GuiSliderBar(volumenSlider, "Volumen", NULL, &volumen, 0, 100));
+    float volumen = 50; // supongo que esto inicializa volumen
+    float nuevoValor = GuiSliderBar(volumenSlider, "Volumen", NULL, &volumen, 0, 100);
+
+// Ahora asignamos el nuevo valor al puntero volumen
+volumen = nuevoValor;
+
 
     // Boton de volver al inicio
     Rectangle btn1Rec = { 300, 520, 200, 50 };
     auto& li = em.getSingleton<LevelInfo>();
-    if (GuiButton(btn1Rec, "VOLVER"))
+    if (GuiButton(btn1Rec, "VOLVER")){
         li.currentScreen = GameScreen::TITLE;
+        ss.seleccion_menu();
+    }
+    if( CheckCollisionPointRec(GetMousePosition(),btn1Rec)){
+        if(ss.pushed == false)
+            ss.sonido_mov();
+        ss.pushed = true;
+    }else ss.pushed = false;  
 
     engine.endDrawing();
 }
