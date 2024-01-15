@@ -39,14 +39,38 @@ void SoundSystem::initBanks(const std::string& master_bank_location, const std::
 //crear instancies d'events
 void SoundSystem::createEventInstance(){
     ERRCHECK(soundSystem->getEvent("event:/Menús/main_select", &eventDescription) );
-    ERRCHECK(soundSystem->getEvent("event:/Música/Menu/menu_music", &eventDescription_Musica) );
+    //ERRCHECK(soundSystem->getEvent("event:/Música/Menu/menu_music", &eventDescription_Musica) );
     
     ERRCHECK(eventDescription->createInstance(&eventInstance));
-    ERRCHECK(eventDescription_Musica->createInstance(&eventInstance_Musica));
+   // ERRCHECK(eventDescription_Musica->createInstance(&eventInstance_Musica));
     //açó fa que sone el evento que haja assignat a eventInstance
     eventInstance->start(); //sona!!!
-    eventInstance_Musica->start();
+   // eventInstance_Musica->start();
     //FMOD_Studio_EventInstance_Start(&eventInstance);
+}
+
+void SoundSystem::playMusicMenu(){
+    ERRCHECK(soundSystem->getEvent("event:/Música/Menu/menu_music", &eventDescription_Musica) );
+    ERRCHECK(eventDescription_Musica->createInstance(&eventInstance_Musica));
+    eventInstance_Musica->start();
+    update();
+}
+void SoundSystem::seleccion_menu(){
+    ERRCHECK(soundSystem->getEvent("event:/Menús/main_select", &eventDescription) );
+    ERRCHECK(eventDescription->createInstance(&eventInstance));
+    eventInstance->start();
+    update();
+}
+void SoundSystem::sonido_config(){
+    ERRCHECK(soundSystem->getEvent("event:/Menús/sound_config", &eventDescription) );
+    ERRCHECK(eventDescription->createInstance(&eventInstance));
+    eventInstance->start();
+}
+void SoundSystem::sonido_mov(){
+    ERRCHECK(soundSystem->getEvent("event:/Menús/main_mov", &eventDescription) );
+    ERRCHECK(eventDescription->createInstance(&eventInstance));
+    eventInstance->start();
+    update();
 }
 
 //play event
@@ -63,5 +87,20 @@ void SoundSystem::liberar(){
     //ERRCHECK(eventDescription->releaseAllInstances());
     ERRCHECK(master_bank->unload());
     ERRCHECK(strings_bank->unload());
+    ERRCHECK(ui_bank->unload());
+    ERRCHECK(music_bank->unload());
     ERRCHECK(soundSystem->unloadAll());
 }
+void SoundSystem::music_stop(){
+
+    eventInstance_Musica->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);
+}
+
+/*float SoundSystem::getVolume(){
+    eventInstance_Musica->getVolume(volume, finalvolume);
+    float volumen = volume;
+    return volumen;
+}
+void SoundSystem::setVolume(float volumen){
+    eventInstance_Musica->setVolume(volumen);
+}*/

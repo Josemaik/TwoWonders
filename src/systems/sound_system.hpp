@@ -13,10 +13,19 @@ struct SoundSystem {
 
     void initBanks(std::string const& master_bank_location, std::string const& master_string_location, std::string const& ui_bank_location, std::string const& music_bank_location );
     void createEventInstance();
+    void playMusicMenu();
+    void seleccion_menu();
+    void sonido_config();
+    void sonido_mov();
     void play();
+    void music_stop();
 
     void update();
     void liberar();
+    //float getVolume();
+    //void setVolume(float volumen);
+    bool pushed{false};
+    bool music_started{false};
 
     private:
         FMOD::System* coreSystem;
@@ -33,5 +42,9 @@ struct SoundSystem {
         FMOD::Studio::EventInstance* eventInstance_Ambiente;
         FMOD::Studio::EventInstance* eventInstance_Musica;
         FMOD_RESULT res;
+        float* volume;
+        float* finalvolume;
+    
+       
 
 };
