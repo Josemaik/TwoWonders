@@ -261,6 +261,19 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
                 20,
                 BLACK);
+        }
+
+
+        if (debug && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
+        {
+            auto const& r{ em.getComponent<RenderComponent>(e) };
+            auto const& l{ em.getComponent<LifeComponent>(e) };
+
+            //engine.drawText(std::to_string(l.life).c_str(),
+            //    static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+            //    static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+            //    20,
+            //    BLACK);
 
             if (e.hasComponent<TypeComponent>())
             {
