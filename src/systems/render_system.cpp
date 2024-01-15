@@ -295,7 +295,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         if (debug && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
-            auto const& l{ em.getComponent<LifeComponent>(e) };
+            //auto const& l{ em.getComponent<LifeComponent>(e) };
 
             //engine.drawText(std::to_string(l.life).c_str(),
             //    static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
@@ -345,7 +345,11 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             // Dibujar la bounding box
             engine.beginMode3D();
-            engine.drawCubeWires(boxPosition, boxSize.x(), boxSize.y(), boxSize.z(), BLUE);
+            engine.drawCubeWires(boxPosition, 
+                                 static_cast<float>(boxSize.x()), 
+                                 static_cast<float>(boxSize.y()), 
+                                 static_cast<float>(boxSize.z()), 
+                                 BLUE);
             engine.endMode3D();
 
         }
