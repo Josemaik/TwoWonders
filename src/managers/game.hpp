@@ -16,6 +16,7 @@
 #include "../systems/zone_system.hpp"
 #include "../systems/shield_system.hpp"
 #include "../systems/event_system.hpp"
+#include "../systems/sound_system.hpp"
 #include "game_engine.hpp"
 #include "ia_manager.hpp"
 
@@ -41,6 +42,7 @@ private:
     void createEnding(EntityManager& em);
     void normalExecution(EntityManager& em, float deltaTime);
     void debugExecution(EntityManager& em);
+    void createSound(EntityManager& em);
 
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};
@@ -60,6 +62,7 @@ private:
     ShieldSystem shield_system{};
     EventSystem event_system{};
     Map map{};
+    SoundSystem sound_system{};
 };
 
 

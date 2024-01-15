@@ -102,6 +102,12 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     li.playerID = e.getID();
 }
 
+//inicializar bancos
+void Game::createSound(EntityManager& em){
+    sound_system.initBanks("assets/banks/Master.bank","assets/banks/Master.strings.bank","assets/banks/UI.bank", "assets/banks/Music.bank");
+    sound_system.createEventInstance();
+    //sound_system.play();
+}
 
 void Game::run()
 {
@@ -136,6 +142,8 @@ void Game::run()
 
     // Inicializa una variable donde tener el tiempo entre frames
     float deltaTime{}, currentTime{};
+
+    createSound(em);
 
     while (!engine.windowShouldClose())
     {
@@ -218,7 +226,13 @@ void Game::run()
         }
     }
 
+
+    //liberar bancos
+    sound_system.liberar();
+
+
     render_system.unloadModels(em, engine);
+
     engine.closeWindow();
 }
 
@@ -233,6 +247,7 @@ void Game::normalExecution(EntityManager& em, float deltaTime)
     attack_system.update(em, deltaTime);
     projectile_system.update(em, deltaTime);
     life_system.update(em, deltaTime);
+    sound_system.update();
     render_system.update(em, engine, false);
 }
 void Game::debugExecution(EntityManager& em)

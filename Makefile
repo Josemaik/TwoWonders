@@ -2,7 +2,9 @@ APP		   := ZeldaWonders
 CCACHE 	   := ccache
 CC         := g++-12
 CCFLAGS    := -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
-LIBS       := -lraylib src/libs/raygui.so
+
+LIBS       := -lraylib -L./fmodlibs -lfmod -lfmodstudio src/libs/raygui.so
+
 SANITIZE   := -fsanitize=address,undefined
 
 # agregar g++ | clang++
@@ -38,7 +40,7 @@ endif
 
 # Regla principal (enlazado de los .o)
 $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
-	$(CCACHE) $(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE) -Wl,-rpath=libs
+	$(CCACHE) $(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE) -Wl,-rpath,./fmodlibs
 
 # Regla que compila los .cpp
 %.o : %.cpp
