@@ -100,6 +100,12 @@ void ENGI::GameEngine::drawCubeWires(vec3d pos, float width, float height, float
 
 void ENGI::GameEngine::drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint)
 {
+    // Matriz de transformación (incluyendo escalado)
+    // Matrix transform = MatrixScale(scale.x, scale.y, scale.z);
+
+    // // Dibuja el modelo con la matriz de transformación
+    // DrawModelEx(model, (Vector3) { 0.0f, 0.0f, 0.0f }, 0.0f, transform, WHITE);
+
     DrawModelEx(model, position.toRaylib(), rotationAxis.toRaylib(), rotationAngle, scale.toRaylib(), tint);
 }
 
@@ -186,6 +192,11 @@ Mesh ENGI::GameEngine::genMeshCube(float width, float height, float lenght)
 Model ENGI::GameEngine::loadModelFromMesh(Mesh m)
 {
     return LoadModelFromMesh(m);
+}
+
+void ENGI::GameEngine::unloadMesh(Mesh m)
+{
+    UnloadMesh(m);
 }
 
 void ENGI::GameEngine::unloadModel(Model m)

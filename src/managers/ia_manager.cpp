@@ -286,8 +286,8 @@ void Ia_man::createEnemies(EntityManager& em) {
 
         // //Enemigo Slime
         auto& e3{ em.newEntity() };
-        //em.addTag<SlimeTag>(e3);
-        //em.addTag<EnemyTag>(e3);
+        em.addTag<SlimeTag>(e3);
+        em.addTag<EnemyTag>(e3);
         auto& wr3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = vec3d{1.0,0.0,5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
         auto& wp3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = vec3d(wr3.position),.gravity = 2.0 });
         em.addComponent<ColliderComponent>(e3, ColliderComponent{ wp3.position, wr3.scale, BehaviorType::ENEMY });
@@ -320,8 +320,8 @@ void Ia_man::createEnemies(EntityManager& em) {
         em.addComponent<AttackComponent>(e3, AttackComponent{});
         //Slime 2
         auto& e4{ em.newEntity() };
-        //em.addTag<SlimeTag>(e4);
-        //em.addTag<EnemyTag>(e4);
+        em.addTag<SlimeTag>(e4);
+        em.addTag<EnemyTag>(e4);
         auto& wr4 = em.addComponent<RenderComponent>(e4, RenderComponent{ .position = vec3d{2.0,0.0,-5.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
         auto& wp4 = em.addComponent<PhysicsComponent>(e4, PhysicsComponent{ .position = vec3d(wr4.position),.gravity = 2.0 });
         em.addComponent<ColliderComponent>(e4, ColliderComponent{ wp4.position, wr4.scale, BehaviorType::ENEMY });

@@ -16,7 +16,7 @@ void InputSystem::update(EntityManager& em)
     if (!playerEn->hasTag<PlayerTag>() && IsKeyReleased(KEY_ENTER))
         em.destroyAll();
 
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, InputComponent& in)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, InputComponent& in, RenderComponent& ren)
     {
         // Resetear la velocidad
         phy.velocity = {};
@@ -40,30 +40,71 @@ void InputSystem::update(EntityManager& em)
         //     }
         // }else{
            // std::cout << "NO BLOQUEADOS \n";
-             if (IsKeyDown(in.right)) {
+        if (IsKeyDown(in.right)) {
+
+            if (!ren.cameraChange)
+            {
                 vel.setX(vel.x() + INP_SPEED);
                 vel.setZ(vel.z() - INP_SPEED);
-                in.last_key = in.right;
-                keysPressed++;
             }
-            if (IsKeyDown(in.left)) {
-                vel.setX(vel.x() - INP_SPEED);
-                vel.setZ(vel.z() + INP_SPEED);
-                in.last_key = in.left;
-                keysPressed++;
-            }
-            if (IsKeyDown(in.up)) {
-                vel.setX(vel.x() - INP_SPEED);
-                vel.setZ(vel.z() - INP_SPEED);
-                in.last_key = in.up;
-                keysPressed++;
-            }
-            if (IsKeyDown(in.down)) {
+            else
+            {
                 vel.setX(vel.x() + INP_SPEED);
                 vel.setZ(vel.z() + INP_SPEED);
-                in.last_key = in.down;
-                keysPressed++;
             }
+
+            in.last_key = in.right;
+            keysPressed++;
+        }
+        if (IsKeyDown(in.left)) {
+
+            if (!ren.cameraChange)
+            {
+                vel.setX(vel.x() - INP_SPEED);
+                vel.setZ(vel.z() + INP_SPEED);
+
+            }
+            else
+            {
+                vel.setX(vel.x() - INP_SPEED);
+                vel.setZ(vel.z() - INP_SPEED);
+            }
+
+            in.last_key = in.left;
+            keysPressed++;
+        }
+        if (IsKeyDown(in.up)) {
+
+            if (!ren.cameraChange)
+            {
+                vel.setX(vel.x() - INP_SPEED);
+                vel.setZ(vel.z() - INP_SPEED);
+            }
+            else
+            {
+                vel.setX(vel.x() + INP_SPEED);
+                vel.setZ(vel.z() - INP_SPEED);
+            }
+
+            in.last_key = in.up;
+            keysPressed++;
+        }
+        if (IsKeyDown(in.down)) {
+
+            if (!ren.cameraChange)
+            {
+                vel.setX(vel.x() + INP_SPEED);
+                vel.setZ(vel.z() + INP_SPEED);
+            }
+            else
+            {
+                vel.setX(vel.x() - INP_SPEED);
+                vel.setZ(vel.z() + INP_SPEED);
+            }
+
+            in.last_key = in.down;
+            keysPressed++;
+        }
         // }
 
 
@@ -123,8 +164,8 @@ void InputSystem::update(EntityManager& em)
             em.getComponent<TypeComponent>(e).changeType();
 
         // Codigo para curarse // DEBUG
-        // if(IsKeyDown(KEY_Z) && e.hasComponent<LifeComponent>())
-        //     em.getComponent<LifeComponent>(e).increaseLife();
+        if (IsKeyDown(KEY_Z) && e.hasComponent<LifeComponent>())
+            em.getComponent<LifeComponent>(e).increaseLife();
 
         // Código pa correr
         //

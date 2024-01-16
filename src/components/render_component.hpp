@@ -20,5 +20,7 @@ struct RenderComponent
     vec3d rotationVec{ 0.0, 0.1, 0.0 };
 
     Model model{};
+    Mesh mesh{};
     bool meshLoaded{ false };
+    bool cameraChange{ false };
 };

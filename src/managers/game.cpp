@@ -75,7 +75,7 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = PINK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
@@ -227,6 +227,7 @@ void Game::run()
             em.destroyAll();
             render_system.unloadModels(em, engine);
             render_system.drawEnding(engine);
+            zone_system.reset();
             break;
         }
 
@@ -238,8 +239,6 @@ void Game::run()
 
     //liberar bancos
     sound_system.liberar();
-
-
     render_system.unloadModels(em, engine);
 
     engine.closeWindow();

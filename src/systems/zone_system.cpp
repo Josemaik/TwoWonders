@@ -34,6 +34,8 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                 {
                     auto* playerEn = em.getEntityByID(li.playerID);
                     auto& p = em.getComponent<PhysicsComponent>(*playerEn);
+                    auto& r = em.getComponent<RenderComponent>(*playerEn);
+
                     switch (zon.zone)
                     {
 
@@ -76,11 +78,15 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         // MAZMORRA //
 
                     case 20: // TP a la cueva de la mazmorra
+                        r.cameraChange = true;
+
                         p.position.setX(61.0);
                         p.position.setZ(-65.0);
                         break;
 
                     case 21: // TP desde la cueva de la mazmorra
+                        r.cameraChange = false;
+
                         p.position.setX(-50.0);
                         p.position.setZ(-3.5);
                         break;
@@ -142,4 +148,10 @@ void ZoneSystem::createKey(EntityManager& em)
     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Key, .inmortal = true });
 
     keyCreated = true;
+}
+
+void ZoneSystem::reset()
+{
+    keyCreated = false;
+    dead_entities.clear();
 }
