@@ -101,7 +101,7 @@ void RenderSystem::drawLogoKaiwa(ENGI::GameEngine& engine) {
 void RenderSystem::drawEnding(ENGI::GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
-    engine.drawText("Has ganado", 250, 250, 50, BLACK);
+    engine.drawText("FIN DEL NIVEL 1", 250, 250, 50, BLACK);
     engine.drawText("PRESS [ENTER] TO RETURN TITLE",
         engine.getScreenWidth() / 2 - 280,
         engine.getScreenHeight() - 50, 30,
