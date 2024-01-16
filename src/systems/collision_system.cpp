@@ -303,10 +303,9 @@ void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& entity2, P
         resolveEnemyDirection(em, entity2, staticPhy, otherPhy, minOverlap.x(), false);
 }
 
-void CollisionSystem::resolveEnemyDirection(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, double overlap, bool isZAxis)
+void CollisionSystem::resolveEnemyDirection(EntityManager&, Entity&, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, double overlap, bool isZAxis)
 {
-    auto& rands = em.getComponent<AIComponent>(entity2);
-    bool dir = isZAxis ? resolveCollision<&vec3d::z, &vec3d::setZ>(otherPhy, staticPhy, overlap)
+    [[maybe_unused]] bool dir = isZAxis ? resolveCollision<&vec3d::z, &vec3d::setZ>(otherPhy, staticPhy, overlap)
         : resolveCollision<&vec3d::x, &vec3d::setX>(otherPhy, staticPhy, overlap);
 
     // vec3d randir{};

@@ -107,7 +107,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     }
 }
 
-void ZoneSystem::deleteZoneEnemies(EntityManager& em)
+void ZoneSystem::deleteZoneEnemies(EntityManager&)
 {
     // auto const& li = em.getSingleton<LevelInfo>();
 

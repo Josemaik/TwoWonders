@@ -44,7 +44,7 @@ struct EnemyData {
 // Función que crea enemigos dado un tipo ,vector de datos y zona //
 void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, BehaviourTree_t& tree) {
     // Obtenemos la clase con información del nivel
-    auto& li = em.getSingleton<LevelInfo>();
+    // auto& li = em.getSingleton<LevelInfo>();
     // Vacíamos enemigos de la zona anterior del vector
     // li.enemiesID.clear();
     //Creamos enemigos
@@ -243,7 +243,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         auto* patrol_7 = &tree7.createNode<BTAction_Patrol>();
         auto* ready_7 = &tree7.createNode<BTDecisionReadyforAttack>();
         auto* atack_7 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot);
-        auto* sequence7_3 = &tree7.createNode<BTNodeSequence_t>(patrol_7, ready_7, atack_7);
+        [[maybe_unused]] auto* sequence7_3 = &tree7.createNode<BTNodeSequence_t>(patrol_7, ready_7, atack_7);
 
 
         em.addComponent<AIComponent>(e7, AIComponent{ .arrival_radius = 0.7,.detect_radius = 15.0,.attack_radius = 10.0,.ready_attack = false,.tx = 0.0,.tz = 0.0,.time2arrive = 7.0,.tactive = true,.perceptionTime = 0.2f,
