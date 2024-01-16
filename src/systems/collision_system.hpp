@@ -75,9 +75,11 @@ private:
     deathSet dead_entities{};
     pairsType checkedPairs{};
     std::vector<Ramp> ramps = {
-        { -13.0, -9.0, -17.5, -14.0, -0.25, 8.9, 0.0 },
-        { -51.0, -48.0, -10.0, -6.0, -0.25, 0.0, 6.0 },
-        { -15.5, -12.0, -10.0, -6.0, -0.25, 0.0, 6.0 }
+        // Si la eleveación es de 1.0. el slope será 0.25
+        // Si la elevación es de 2.0, el slope será 0.365
+        { -13.0, -9.0, -17.5, -14.0, -0.365, 8.9, 0.0 },
+        { -51.0, -48.0, -10.0, -6.0, -0.365, 0.0, 6.0 },
+        { -15.5, -12.0, -10.0, -6.0, -0.365, 0.0, 6.0 }
     };
 
     // void checkBorderCollision(EntityManager& em, Octree& boxes);

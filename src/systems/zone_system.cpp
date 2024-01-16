@@ -67,11 +67,13 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
 
                     case 18: // TP a la cueva de la tienda
                         p.position.setX(93.0);
+                        p.position.setY(0.0);
                         p.position.setZ(85.0);
                         break;
 
                     case 19: // TP desde la cueva de la tienda
                         p.position.setX(-17.0);
+                        p.position.setY(2.0);
                         p.position.setZ(-20.0);
                         break;
 

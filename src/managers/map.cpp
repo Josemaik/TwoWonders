@@ -24,7 +24,7 @@ void Map::createWallsOverworld(EntityManager& em) {
 
         // ZONA 2
 
-        { { -10.9, 0.0, -12.0 }, { 3.0, 2.0, 5.0 }, LIME },  // |
+        { { -10.95, 0.0, -12.0 }, { 3.0, 2.0, 5.0 }, LIME },  // |
         { { -10.95, 0.0, -21.6 }, { 3.0, 2.0, 8.0 }, LIME },  // | Pared Vertical Izquierda
 
         { { 11.1, 0.0, -17.5 }, { 3.0, 1.0, 16.0 }, LIME },  // | Pared Vertical Derecha
@@ -189,10 +189,10 @@ void Map::createGroundWaterOverworld(EntityManager& em)
         // OverWorld
         { { 0., -1.5, 0. }, { 85.0, 2., 100. }, BEIGE },
         { { -72.5, -1.5, 0. }, { 50.0, 2., 100. }, BEIGE },
-        { { -27.5, 0.0, -16.0 }, { 30.0, 1.0, 13.0 }, BEIGE },
-        { { -50., 0.0, -16.0 }, { 4.95, 1.0, 13.0 }, BEIGE },
+        { { -27.5, 0.0, -16.0 }, { 30.0, 2.0, 13.0 }, BEIGE },
+        { { -50., 0.0, -16.0 }, { 4.95, 2.0, 13.0 }, BEIGE },
 
-        { { -45., 0.0, -16. }, { 5.0, 1.0, 2.0 }, BROWN },
+        { { -45., 0.0, -16. }, { 5.0, 2.0, 2.0 }, BROWN },
         // Cuevas
         { { 71., -1.5, 80. }, { 69.0, 2., 19.0 }, BROWN },
         // Mazmorra
@@ -210,8 +210,8 @@ void Map::createGroundWaterOverworld(EntityManager& em)
 
     EntityData entitiesW[] = {
     { { -45., -1.5, 13.0 }, { 5.0, 2.0, 45.0 }, SKYBLUE },
-    { { -45., 0.0, -10.75 }, { 5.0, 1.0, 8.5 }, SKYBLUE },
-    { { -45., 0.0, -32.0 }, { 5.0, 1.0, 30.0 }, SKYBLUE },
+    { { -45., 0.0, -10.75 }, { 5.0, 2.0, 8.5 }, SKYBLUE },
+    { { -45., 0.0, -32.0 }, { 5.0, 2.0, 30.0 }, SKYBLUE },
     };
 
     for (const auto& data : entitiesW)
@@ -240,12 +240,12 @@ void Map::createGroundWaterOverworld(EntityManager& em)
 
 void Map::createRamps(EntityManager& em)
 {
-    float ori = DEGTORAD * 72.f;
+    float ori = DEGTORAD * 65.f;
 
     RampData entitiesR[] = {
-        { { -11.4, -1.4, -16.0 }, { 3.0, 3.2, 3.0 }, BEIGE, ori, { 0.0, 0.0, 1.0 } },
-        { { -49., -1.4, -8.4 }, { 3.0, 3.2, 3.0 }, BEIGE, -ori, { 1.0, 0.0, 0.0 } },
-        { { -14., -1.4, -8.4 }, { 3.0, 3.2, 3.0 }, BEIGE, -ori, { 1.0, 0.0, 0.0 } },
+        { { -11.6, -1.12, -16.0 }, { 3.0, 3.4, 3.0 }, BEIGE, ori, { 0.0, 0.0, 1.0 } },
+        { { -49., -1.12, -8.6 }, { 3.0, 3.4, 3.0 }, BEIGE, -ori, { 1.0, 0.0, 0.0 } },
+        { { -14., -1.12, -8.6 }, { 3.0, 3.4, 3.0 }, BEIGE, -ori, { 1.0, 0.0, 0.0 } },
     };
 
     for (const auto& data : entitiesR)
