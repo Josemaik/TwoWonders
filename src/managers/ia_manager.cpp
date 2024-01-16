@@ -237,7 +237,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         auto& wr7 = em.addComponent<RenderComponent>(e7, RenderComponent{ .position = vec3d{73.0, 0., -87.0}, .scale = vec3d{ 2.0, 2.0, 2.0 }, .color = BLUE });
         auto& wp7 = em.addComponent<PhysicsComponent>(e7, PhysicsComponent{ .position = vec3d(wr7.position),.gravity = 2.0, .max_speed = 0.55 });
         em.addComponent<ColliderComponent>(e7, ColliderComponent{ wp7.position, wr7.scale, BehaviorType::ENEMY });
-        em.addComponent<LifeComponent>(e7, LifeComponent{ .life = 70 });
+        em.addComponent<LifeComponent>(e7, LifeComponent{ .life = 15 });
         em.addComponent<TypeComponent>(e7, TypeComponent{ .type = ElementalType::Fuego });
 
         auto* patrol_7 = &tree7.createNode<BTAction_Patrol>();
@@ -284,7 +284,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         auto& wr2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = vec3d{-2.0,0.0,-21.0}, .scale = vec3d{1.0,2.0,1.0}, .color = BLUE });
         auto& wp2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = vec3d(wr2.position),.gravity = 2.0 });
         em.addComponent<ColliderComponent>(e2, ColliderComponent{ wp2.position, wr2.scale, BehaviorType::ENEMY });
-        em.addComponent<LifeComponent>(e2, LifeComponent{ .life = 10 });
+        em.addComponent<LifeComponent>(e2, LifeComponent{ .life = 6 });
         em.addComponent<TypeComponent>(e2, TypeComponent{ .type = ElementalType::Hielo });
 
         auto* d_a_2 = &tree2.createNode<BTDecisionReadyforAttack>();
@@ -311,7 +311,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         auto& wr5 = em.addComponent<RenderComponent>(e5, RenderComponent{ .position = vec3d{-31.0,0.0,-4.0}, .scale = vec3d{1.0,2.0,1.0}, .color = BLUE });
         auto& wp5 = em.addComponent<PhysicsComponent>(e5, PhysicsComponent{ .position = vec3d(wr5.position),.gravity = 2.0 });
         em.addComponent<ColliderComponent>(e5, ColliderComponent{ wp5.position, wr5.scale, BehaviorType::ENEMY });
-        em.addComponent<LifeComponent>(e5, LifeComponent{ .life = 10 });
+        em.addComponent<LifeComponent>(e5, LifeComponent{ .life = 6 });
         em.addComponent<TypeComponent>(e5, TypeComponent{ .type = ElementalType::Fuego });
 
         auto* d_a_5 = &tree5.createNode<BTDecisionReadyforAttack>();
@@ -339,7 +339,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         auto& wr6 = em.addComponent<RenderComponent>(e6, RenderComponent{ .position = vec3d{-31.0,0.0,-8.0}, .scale = vec3d{1.0,2.0,1.0}, .color = BLUE });
         auto& wp6 = em.addComponent<PhysicsComponent>(e6, PhysicsComponent{ .position = vec3d(wr6.position),.gravity = 2.0 });
         em.addComponent<ColliderComponent>(e6, ColliderComponent{ wp6.position, wr6.scale, BehaviorType::ENEMY });
-        em.addComponent<LifeComponent>(e6, LifeComponent{ .life = 10 });
+        em.addComponent<LifeComponent>(e6, LifeComponent{ .life = 6 });
         em.addComponent<TypeComponent>(e6, TypeComponent{ .type = ElementalType::Agua });
 
         auto* d_a_6 = &tree6.createNode<BTDecisionReadyforAttack>();
