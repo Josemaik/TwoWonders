@@ -183,18 +183,30 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     // Solo generamos la malla si no existe
                     if (!r.meshLoaded)
                     {
-                        if (!e.hasTag<PlayerTag>())
-                        {
-                            r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
-                            r.model = engine.loadModelFromMesh(r.mesh);
-                        }
-                        else
+                        if (e.hasTag<PlayerTag>())
                         {
                             r.model = LoadModel("assets/models/main_character.obj");
                             Texture2D t0 = LoadTexture("assets/models/textures/main_character_uv_V2.png");
                             Texture2D t = LoadTexture("assets/models/textures/main_character_texture_V2.png");
                             r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                             r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+                        }
+                        else if (e.hasTag<SlimeTag>())
+                        {
+                            r.model = LoadModel("assets/models/Slime.obj");
+                        }
+                        else if (e.hasTag<SnowmanTag>())
+                        {
+                            r.model = LoadModel("assets/models/snowman.obj");
+                            Texture2D t0 = LoadTexture("assets/models/textures/snowman_uv.png");
+                            Texture2D t = LoadTexture("assets/models/textures/snowman_texture.png");
+                            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                            r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+                        }
+                        else
+                        {
+                            r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
+                            r.model = engine.loadModelFromMesh(r.mesh);
                         }
                         r.meshLoaded = true;
                     }
@@ -204,18 +216,27 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                         scl = { 0.33, 0.33, 0.33 };
                         pos.setY(pos.y() - .5);
                     }
+                    else if (e.hasTag<SlimeTag>())
+                    {
+                        scl = { 0.33, 0.33, 0.33 };
+                        pos.setY(pos.y() - .6);
+                    }
+                    else if (e.hasTag<SnowmanTag>())
+                    {
+                        scl = { 0.33, 0.33, 0.33 };
+                        pos.setY(pos.y() - 1.1);
+                    }
 
                     float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
                     engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
 
-                    if (!e.hasTag<PlayerTag>())
+                    if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>())
                     {
                         if (fmod(orientationInDegrees, 90.0f) == 0.0f)
                             engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
                         else
                             engine.drawModelWires(r.model, pos, r.rotationVec, orientationInDegrees, scl, BLACK);
                     }
-
                 }
             }
         }
