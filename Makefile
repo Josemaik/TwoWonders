@@ -1,4 +1,4 @@
-APP		   := ZeldaWonders
+APP		   := TwoWonders
 CCACHE 	   := ccache
 CC         := g++-12
 CCFLAGS    := -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
