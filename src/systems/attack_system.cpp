@@ -49,18 +49,29 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         break;
 
     case AttackType::Bomb:
-        if (ent.hasComponent<InformationComponent>())
+    {
+        auto& li = em.getSingleton<LevelInfo>();
+        if (li.playerID == ent.getID())
         {
-            auto& inf = em.getComponent<InformationComponent>(ent);
-            if (inf.bombs > 0) {
-                auto& e{ em.newEntity() };
-                em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
-                em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::BombExplode, .life_time = 2.0f });
-                inf.decreaseBomb();
+            if (ent.hasComponent<InformationComponent>())
+            {
+                auto& inf = em.getComponent<InformationComponent>(ent);
+                if (inf.bombs > 0) {
+                    auto& e{ em.newEntity() };
+                    em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
+                    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::BombExplode, .life_time = 2.0f });
+                    inf.decreaseBomb();
+                }
             }
         }
+        else
+        {
+            auto& e{ em.newEntity() };
+            em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
+            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::BombExplode, .life_time = 2.0f });
+        }
         break;
-
+    }
     case AttackType::AttackPlayer:
         break;
     case AttackType::TripleShot: createAttackMultipleShot(em, ent, att, 3);
@@ -92,7 +103,7 @@ void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, Atta
     }
 }
 
-void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged,double const scale_to_respawn_attack) {
+void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack) {
     //std::cout << "CREO LA BALA";
     auto const& phy = em.getComponent<PhysicsComponent>(ent);
 
@@ -109,7 +120,7 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3d{0, 0, 0} : att.vel * scale_to_respawn_attack), .scale = { isRanged ? 0.5 : 2.0, isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 2.0 }, .color = BLACK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = isRanged ? att.vel : vec3d{0, 0, 0}, .gravity = 0, .orientation = phy.orientation });
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = static_cast<float>(isRanged ? 3.0 : 0.2 )});
+    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = static_cast<float>(isRanged ? 3.0 : 0.2) });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
     if (ent.hasTag<PlayerTag>())
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });

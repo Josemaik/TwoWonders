@@ -8,17 +8,23 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
         if (lif.life == 0)
         {
             // Si es enemigo creamos un objeto
-            if (ent.hasTag<EnemyTag>())
+            if (ent.hasTag<EnemyTag>() && !lif.decreaseNextFrame)
                 createObject(em, em.getComponent<PhysicsComponent>(ent).position);
 
-            if (ent.hasTag<SlimeTag>()) {
+            if (ent.hasTag<SlimeTag>())
+            {
+                if (!lif.decreaseNextFrame)
+                    lif.decreaseNextFrame = true;
+                else
+                    lif.decreaseNextFrame = false;
+
                 em.getComponent<AttackComponent>(ent).attack(AttackType::Bomb);
             }
 
             lif.markedForDeletion = true;
         }
 
-        if (lif.markedForDeletion)
+        if (lif.markedForDeletion && !lif.decreaseNextFrame)
             dead_entities.insert(ent.getID());
 
     });

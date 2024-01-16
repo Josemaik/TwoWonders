@@ -69,7 +69,7 @@ void Map::createWallsOverworld(EntityManager& em) {
         { { -37.0, 0.0, 8.0 }, { 11.0, 1.0, 3.0 }, LIME },   // |
         { { -50.0, 0.0, 8.0 }, { 5.0, 2.0, 3.0 }, LIME },    // | Pared Horizontal Abajo
         { { -51.5, 0.0, -7.99 }, { 2.0, 2.0, 3.0 }, LIME },  // |
-        { { -37.0, 0.0, -8.0 }, { 11.0, 2.0, 3.0 }, LIME },  // | Pared Horizontal Arriba
+        { { -37.0, 0.0, -7.99 }, { 11.0, 2.0, 3.0 }, LIME },  // | Pared Horizontal Arriba
 
         { { -40.5, 0.0, -4.0 }, { 1.0, 1.0, 1.0 }, LIME },   // |
         { { -40.5, 0.0, 0.0 }, { 1.0, 1.0, 1.0 }, LIME },    // |
@@ -89,11 +89,11 @@ void Map::createWallsOverworld(EntityManager& em) {
 
         { { -54.0, 0.0, -17.5 }, { 3.0, 2.0, 16.0 }, LIME },   // | Pared Vertical Izquierda
 
-        { { -40.5, 1.0, -20.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
-        { { -40.5, 1.0, -16.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
-        { { -40.5, 1.0, -12.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // | Paredes Chiquitas
-        { { -37.5, 1.0, -18.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
-        { { -37.5, 1.0, -14.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
+        // { { -40.5, 1.0, -20.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
+        // { { -40.5, 1.0, -16.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
+        // { { -40.5, 1.0, -12.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // | Paredes Chiquitas
+        // { { -37.5, 1.0, -18.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
+        // { { -37.5, 1.0, -14.0 }, { 1.0, 1.0, 1.0 }, DARKBROWN },   // |
 
         // CUEVAS EN EL OVERWORLD
 

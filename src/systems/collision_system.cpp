@@ -296,7 +296,6 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
 
 void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3d& minOverlap)
 {
-
     // Determine which axis had the minimum overlap
     if (minOverlap.z() < minOverlap.x())
         resolveEnemyDirection(em, entity2, staticPhy, otherPhy, minOverlap.z(), true);
@@ -310,13 +309,13 @@ void CollisionSystem::resolveEnemyDirection(EntityManager& em, Entity& entity2, 
     bool dir = isZAxis ? resolveCollision<&vec3d::z, &vec3d::setZ>(otherPhy, staticPhy, overlap)
         : resolveCollision<&vec3d::x, &vec3d::setX>(otherPhy, staticPhy, overlap);
 
-    vec3d randir{};
-    if (dir)    // Si es true, es derecha o arriba
-        randir = rands.getRandomDirection(rands.right, rands.up, rands.left);
-    else        // Si es false, es izquierda o abajo
-        randir = rands.getRandomDirection(rands.right, rands.left, rands.down);
+    // vec3d randir{};
+    // if (dir)    // Si es true, es derecha o arriba
+    //     randir = rands.getRandomDirection(rands.right, rands.up, rands.left);
+    // else        // Si es false, es izquierda o abajo
+    //     randir = rands.getRandomDirection(rands.right, rands.left, rands.down);
 
-    otherPhy.velocity = randir;
+    // otherPhy.velocity = randir;
 }
 
 void CollisionSystem::handleZoneCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, BehaviorType behaviorType1, BehaviorType behaviorType2)

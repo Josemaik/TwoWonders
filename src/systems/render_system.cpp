@@ -133,7 +133,11 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 // Revisamos si es el jugador para mover la cámara
                 if (e.hasTag<PlayerTag>())
                 {
-                    engine.setPositionCamera({ r.position.x() + 10.f, r.position.y() + 15.f, r.position.z() + 10.f });
+                    if (!r.cameraChange)
+                        engine.setPositionCamera({ r.position.x() + 8.f, r.position.y() + 10.f, r.position.z() + 8.f });
+                    else
+                        engine.setPositionCamera({ r.position.x() - 8.f, r.position.y() + 10.f, r.position.z() + 8.f });
+
                     engine.setTargetCamera(r.position);
                 }
                 // Comprobar si tiene el componente vida
@@ -170,26 +174,48 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 if (e.hasComponent<LifeComponent>()) {
                     auto& l{ em.getComponent<LifeComponent>(e) };
                     if (l.elapsed < l.countdown)
-                        colorEntidad = YELLOW;
+                        colorEntidad = MAROON;
                 }
                 if (!e.hasTag<ZoneTag>())
                 {
+                    vec3d scl = { 1.0, 1.0, 1.0 };
+                    vec3d pos = { r.position.x(), r.position.y(), r.position.z() };
                     // Solo generamos la malla si no existe
                     if (!r.meshLoaded)
                     {
-                        r.model = engine.loadModelFromMesh(engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z())));
+                        if (!e.hasTag<PlayerTag>())
+                        {
+                            r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
+                            r.model = engine.loadModelFromMesh(r.mesh);
+                        }
+                        else
+                        {
+                            r.model = LoadModel("assets/models/main_character.obj");
+                            Texture2D t0 = LoadTexture("assets/models/textures/main_character_uv_V2.png");
+                            Texture2D t = LoadTexture("assets/models/textures/main_character_texture_V2.png");
+                            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                            r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+                        }
                         r.meshLoaded = true;
                     }
 
-                    float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
-                    engine.drawModel(r.model, { static_cast<float>(r.position.x()), static_cast<float>(r.position.y()), static_cast<float>(r.position.z()) }, r.rotationVec, orientationInDegrees, { 1.0f, 1.0f, 1.0f }, colorEntidad);
-
-                    if (fmod(orientationInDegrees, 90.0f) == 0.0f)
+                    if (e.hasTag<PlayerTag>())
                     {
-                        engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
+                        scl = { 0.33, 0.33, 0.33 };
+                        pos.setY(pos.y() - .5);
                     }
-                    else
-                        engine.drawModelWires(r.model, { static_cast<float>(r.position.x()), static_cast<float>(r.position.y()), static_cast<float>(r.position.z()) }, r.rotationVec, orientationInDegrees, { 1.0f, 1.0f, 1.0f }, BLACK);
+
+                    float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
+                    engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
+
+                    if (!e.hasTag<PlayerTag>())
+                    {
+                        if (fmod(orientationInDegrees, 90.0f) == 0.0f)
+                            engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
+                        else
+                            engine.drawModelWires(r.model, pos, r.rotationVec, orientationInDegrees, scl, BLACK);
+                    }
+
                 }
             }
         }
@@ -444,15 +470,10 @@ void RenderSystem::drawDeath(ENGI::GameEngine& engine)
 
 void RenderSystem::unloadModels(EntityManager& em, ENGI::GameEngine& engine)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, PhysicsComponent&, RenderComponent& ren)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, PhysicsComponent&, RenderComponent& ren)
     {
-        if (ent.hasComponent<RenderComponent>())
-        {
-            if (ren.meshLoaded)
-            {
-                engine.unloadModel(ren.model);
-                ren.meshLoaded = false;
-            }
-        }
+        // engine.unloadMesh(ren.mesh);
+        engine.unloadModel(ren.model);
+        ren.meshLoaded = false;
     });
 }

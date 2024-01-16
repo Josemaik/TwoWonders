@@ -13,4 +13,5 @@ struct LifeComponent
     void increaseMaxLife();
     void decreaseCountdown(float deltaTime) { elapsed += deltaTime; };
     bool vidaMax() { return (life == maxLife); };
+    bool decreaseNextFrame{ false };
 };
