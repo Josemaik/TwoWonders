@@ -230,12 +230,9 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
                     engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
 
-                    if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>())
+                    if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<EnemyTag>() && !e.hasTag<RampTag>() && !e.hasComponent<ShieldComponent>())
                     {
-                        if (fmod(orientationInDegrees, 90.0f) == 0.0f)
-                            engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
-                        else
-                            engine.drawModelWires(r.model, pos, r.rotationVec, orientationInDegrees, scl, BLACK);
+                        engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
                     }
                 }
             }
