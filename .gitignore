@@ -2,5 +2,6 @@ obj
 .vscode
 .vscode/*
 ZeldaWonders
+TwoWonders
 *.zip
 release

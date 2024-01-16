@@ -109,30 +109,40 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
 
 void ZoneSystem::deleteZoneEnemies(EntityManager& em)
 {
-    auto const& li = em.getSingleton<LevelInfo>();
+    // auto const& li = em.getSingleton<LevelInfo>();
 
-    for (auto& enemy : li.enemiesID)
-        dead_entities.insert(enemy);
+    // for (auto& enemy : li.enemiesID)
+    //     dead_entities.insert(enemy);
 
 }
 
 void ZoneSystem::updateZoneEnemies(EntityManager& em)
 {
-    // using noCMPs = MP::TypeList<>;
-    // using enemyTag = MP::TypeList<EnemyTag>;
+    using noCMPs = MP::TypeList<>;
+    using enemyTag = MP::TypeList<EnemyTag>;
 
     auto& li = em.getSingleton<LevelInfo>();
 
-    // std::unordered_set<std::size_t> enemies;
-    // em.forEach<noCMPs, enemyTag>([&](Entity& ent)
-    // {
-    //     enemies.insert(ent.getID());
-    // });
+    std::unordered_set<std::size_t> enemies;
+    em.forEach<noCMPs, enemyTag>([&](Entity& ent)
+    {
+        enemies.insert(ent.getID());
+    });
 
-    // if (enemies != li.enemiesID)
-    //     li.enemiesID = std::move(enemies);
+    if (enemies != li.enemiesID)
+        li.enemiesID = std::move(enemies);
 
-    if (li.num_zone == 12 && li.enemiesID.empty() && !keyCreated)
+    bool slimesDead{ true };
+
+    for (auto enemy : li.enemiesID)
+    {
+        auto ent = em.getEntityByID(enemy);
+
+        if (ent->hasTag<SlimeTag>())
+            slimesDead = false;
+    }
+
+    if ((li.num_zone == 12 || li.num_zone == 11) && slimesDead && !keyCreated)
         createKey(em);
 }
 

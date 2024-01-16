@@ -46,7 +46,7 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, Behaviour
     // Obtenemos la clase con información del nivel
     auto& li = em.getSingleton<LevelInfo>();
     // Vacíamos enemigos de la zona anterior del vector
-    li.enemiesID.clear();
+    // li.enemiesID.clear();
     //Creamos enemigos
     for (const auto& data : vec)
     {
@@ -78,7 +78,7 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, Behaviour
             break;
         }
         //Insertamos enemigos en el vector
-        li.enemiesID.insert(enemy.getID());
+        // li.enemiesID.insert(enemy.getID());
     }
 }
 /////////////////////////////////////////////////////////////
@@ -242,12 +242,12 @@ void Ia_man::createEnemies(EntityManager& em) {
 
         auto* patrol_7 = &tree7.createNode<BTAction_Patrol>();
         auto* ready_7 = &tree7.createNode<BTDecisionReadyforAttack>();
-        auto* atack_7 =  &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot);
-        auto* sequence7_3 = &tree7.createNode<BTNodeSequence_t>(patrol_7, ready_7,atack_7);
+        auto* atack_7 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot);
+        auto* sequence7_3 = &tree7.createNode<BTNodeSequence_t>(patrol_7, ready_7, atack_7);
 
 
-        em.addComponent<AIComponent>(e7, AIComponent{ .arrival_radius = 0.7,.detect_radius = 15.0,.attack_radius = 10.0,.ready_attack=false,.tx = 0.0,.tz = 0.0,.time2arrive = 7.0,.tactive = true,.perceptionTime = 0.2f,
-        .path = { vec3d{73.0, 0., -87.0},{ 69.0, 0., -87.0 }, {73.0, 0., -87.0},{ 69.0, 0., -87.0 } },.countdown_stop=0.0,.countdown_perception = 0.5,.behaviourTree = &tree7 });
+        em.addComponent<AIComponent>(e7, AIComponent{ .arrival_radius = 0.7,.detect_radius = 15.0,.attack_radius = 10.0,.ready_attack = false,.tx = 0.0,.tz = 0.0,.time2arrive = 7.0,.tactive = true,.perceptionTime = 0.2f,
+        .path = { vec3d{73.0, 0., -87.0},{ 69.0, 0., -87.0 }, {73.0, 0., -87.0},{ 69.0, 0., -87.0 } },.countdown_stop = 0.0,.countdown_perception = 0.5,.behaviourTree = &tree7 });
         em.addComponent<AttackComponent>(e7, AttackComponent{ .scale_to_respawn_attack = 7.0 });
 
         //Enemigo Golem
@@ -306,7 +306,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         .path = {vec3d{-7.0,0.0,-20.0},{-3.0,0.0,-20.0},{-7.0,0.0,-20.0},{-3.0,0.0,-20.0}},.countdown_perception = 2.0,.behaviourTree = &tree2 });
         em.addComponent<AttackComponent>(e2, AttackComponent{});
         //Enemigo muñeco 2
-         auto& e5{ em.newEntity() };
+        auto& e5{ em.newEntity() };
         em.addTag<EnemyTag>(e5);
         auto& wr5 = em.addComponent<RenderComponent>(e5, RenderComponent{ .position = vec3d{-31.0,0.0,-4.0}, .scale = vec3d{1.0,2.0,1.0}, .color = BLUE });
         auto& wp5 = em.addComponent<PhysicsComponent>(e5, PhysicsComponent{ .position = vec3d(wr5.position),.gravity = 2.0 });
@@ -334,7 +334,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         em.addComponent<AttackComponent>(e5, AttackComponent{});
 
         //Enemigo muñeco 3
-         auto& e6{ em.newEntity() };
+        auto& e6{ em.newEntity() };
         em.addTag<EnemyTag>(e6);
         auto& wr6 = em.addComponent<RenderComponent>(e6, RenderComponent{ .position = vec3d{-31.0,0.0,-8.0}, .scale = vec3d{1.0,2.0,1.0}, .color = BLUE });
         auto& wp6 = em.addComponent<PhysicsComponent>(e6, PhysicsComponent{ .position = vec3d(wr6.position),.gravity = 2.0 });

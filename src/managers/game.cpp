@@ -198,13 +198,12 @@ void Game::run()
         // CODIGO DEL GAMEPLAY
         case GameScreen::GAMEPLAY:
         {
-            if (em.getEntities().empty()) {
+            if (em.getEntities().empty())
+            {
                 createEntities(em, evm);
                 map.createMap(em);
+                zone_system.reset();
             }
-
-            // em.getComponent<PhysicsComponent>(*em.getEntityByID(0)).orientation += 0.01f;
-            // std::cout << em.getComponent<PhysicsComponent>(*em.getEntityByID(0)).orientation * (180.f / M_PI) << std::endl;
 
             input_system.update(em);
             if (!input_system.debugMode)
