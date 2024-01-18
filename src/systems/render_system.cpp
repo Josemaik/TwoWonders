@@ -56,10 +56,6 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
     engine.endDrawing();
 }
 
-void RenderSystem::drawEditorInGameIA(EntityManager& em){
-
-}
-
 void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
@@ -266,12 +262,51 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool de
 
     drawHUD(em, engine, debugphy,debugAI);
     if(debugAI){
-        drawEditorInGameIA(em);
+        drawEditorInGameIA(engine,em);
     }
 
     engine.endDrawing();
 }
 
+void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em){
+    engine.beginDrawing();
+
+    // Dibujar un rectángulo que simula una ventana
+    Rectangle windowRect = { 0, 100, 300, 400 };
+    DrawRectangleLinesEx(windowRect, 2, DARKGRAY);
+    DrawRectangleRec(windowRect, RAYWHITE);
+
+    // Dibujar el texto "debugger IA" en el centro de la ventana
+    Vector2 textSize = MeasureTextEx(GetFontDefault(), "Debugger IA", 20, 1);
+    Vector2 textPosition = { windowRect.x + 20,
+                             windowRect.y + 10};
+
+    DrawTextEx(GetFontDefault(), "Debugger IA", textPosition, 20, 1, DARKBLUE);
+
+    // Dibujar una línea recta debajo del texto
+    float lineY = textPosition.y + textSize.y + 5;  // Ajusta la posición de la línea según tus necesidades
+    DrawLine(static_cast<int>(windowRect.x), static_cast<int>(lineY), static_cast<int>(windowRect.x) + static_cast<int>(windowRect.width),
+    static_cast<int>(lineY), DARKGRAY);
+    // Dibujar el texto "INFO" debajo de la línea
+    Vector2 textSizeInfo = MeasureTextEx(GetFontDefault(), "INFO", 20, 1);
+    Vector2 textPositionInfo = { windowRect.x+5, lineY + 10 };
+
+    DrawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, DARKGRAY);
+
+    // Dibujar el texto "Parámetros" más abajo
+    Vector2 textSizeParameters = MeasureTextEx(GetFontDefault(), "Parámetros", 20, 1);
+    Vector2 textPositionParameters = { windowRect.x+5, textPositionInfo.y + 100 };
+
+    DrawTextEx(GetFontDefault(), "Parámetros", textPositionParameters, 20, 1, DARKGRAY);
+     // Botón
+    Rectangle buttonRect = { windowRect.x + 20, textPositionParameters.y+20, 120, 40 };  // Ajusta las coordenadas y dimensiones según tus necesidades
+
+    if (GuiButton(buttonRect, "Mi Botón")) {
+        // Acción al hacer clic en el botón
+        // Puedes agregar tu lógica aquí
+    }
+    engine.endDrawing();
+}
 // Se dibuja el HUD
 void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy,bool debugAI)
 {

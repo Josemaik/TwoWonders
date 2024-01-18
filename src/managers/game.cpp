@@ -207,12 +207,13 @@ void Game::run()
 
             input_system.update(em);
             // seleccionar modo de debug ( physics o AI)
-            if (input_system.debugModePhysics)
+            if (input_system.debugModePhysics){
                 debugExecution(em,true,false);
-            else if(input_system.debugModeAI)
+            }else if(input_system.debugModeAI){
                 debugExecution(em,false,true);
-            else
+            }else{
                 normalExecution(em, deltaTime);
+            }
             break;
 
         }

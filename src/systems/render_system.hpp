@@ -19,7 +19,7 @@ struct RenderSystem
     void drawEnding(ENGI::GameEngine& engine);
     void drawStory(ENGI::GameEngine& engine);
     void unloadModels(EntityManager& em, ENGI::GameEngine& engine);
-    void drawEditorInGameIA(EntityManager& em);
+    void drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em);
 
     // Funciones privadas para organizar el codigo
 private:
