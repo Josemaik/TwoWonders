@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "../../libs/raygui.h"
 
-void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debug)
+void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debugphy,bool debugAI)
 {
 
     // Actualizamos la posicion de render del componente de fisicas
@@ -17,7 +17,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debu
     // Dibuja todas las entidades con componente de render
     drawEntities(em, engine);
 
-    endFrame(engine, em, debug);
+    endFrame(engine, em, debugphy,debugAI);
 }
 
 void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
@@ -54,6 +54,10 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
         ss.seleccion_menu();
     }
     engine.endDrawing();
+}
+
+void RenderSystem::drawEditorInGameIA(EntityManager& em){
+
 }
 
 void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
@@ -256,17 +260,20 @@ void RenderSystem::beginFrame(ENGI::GameEngine& engine)
 }
 
 // Se termina el dibujado
-void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debug)
+void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debugphy,bool debugAI)
 {
     engine.endMode3D();
 
-    drawHUD(em, engine, debug);
+    drawHUD(em, engine, debugphy,debugAI);
+    if(debugAI){
+        drawEditorInGameIA(em);
+    }
 
     engine.endDrawing();
 }
 
 // Se dibuja el HUD
-void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debug)
+void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy,bool debugAI)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto* playerEn = em.getEntityByID(li.playerID);
@@ -373,7 +380,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         }
 
 
-        if (debug && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
+        if (debugphy && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
             //auto const& l{ em.getComponent<LifeComponent>(e) };
@@ -416,7 +423,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
         }
 
-        if (debug && e.hasComponent<ColliderComponent>())
+        if (debugphy && e.hasComponent<ColliderComponent>())
         {
             auto& col{ em.getComponent<ColliderComponent>(e) };
 
@@ -435,7 +442,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
         }
 
-        if (debug && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
+        if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
         {
             auto& phy = em.getComponent<PhysicsComponent>(e);
 

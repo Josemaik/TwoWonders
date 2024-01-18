@@ -206,11 +206,15 @@ void Game::run()
             }
 
             input_system.update(em);
-            if (!input_system.debugMode)
-                normalExecution(em, deltaTime);
+            // seleccionar modo de debug ( physics o AI)
+            if (input_system.debugModePhysics)
+                debugExecution(em,true,false);
+            else if(input_system.debugModeAI)
+                debugExecution(em,false,true);
             else
-                debugExecution(em);
+                normalExecution(em, deltaTime);
             break;
+
         }
 
         // case GameScreen::DEAD:
@@ -255,9 +259,9 @@ void Game::normalExecution(EntityManager& em, float deltaTime)
     projectile_system.update(em, deltaTime);
     life_system.update(em, deltaTime);
     sound_system.update();
-    render_system.update(em, engine, false);
+    render_system.update(em, engine, false,false);
 }
-void Game::debugExecution(EntityManager& em)
+void Game::debugExecution(EntityManager& em,bool debugphy,bool debugai)
 {
-    render_system.update(em, engine, true);
+    render_system.update(em, engine, debugphy,debugai);
 }

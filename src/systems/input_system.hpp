@@ -15,7 +15,8 @@ struct InputSystem
 
     bool pressEnter();
 
-    bool debugMode{ false };
+    bool debugModePhysics{ false };
+    bool debugModeAI{ false };
 };
 
 #endif // !INPUT_MANAGER
