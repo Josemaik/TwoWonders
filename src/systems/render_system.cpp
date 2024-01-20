@@ -288,19 +288,25 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em
     DrawLine(static_cast<int>(windowRect.x), static_cast<int>(lineY), static_cast<int>(windowRect.x) + static_cast<int>(windowRect.width),
     static_cast<int>(lineY), DARKGRAY);
     // Dibujar el texto "INFO" debajo de la línea
-    Vector2 textSizeInfo = MeasureTextEx(GetFontDefault(), "INFO", 20, 1);
     Vector2 textPositionInfo = { windowRect.x+5, lineY + 10 };
-
+    Vector2 textPositionParameters = { windowRect.x+5, 290 };
     DrawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
+    DrawTextEx(GetFontDefault(), "PARÁMETROS", textPositionParameters, 20, 1, RED);
+
+    auto& debugsnglt = em.getSingleton<Debug_t>();
     // AQUI PONDRIA
      for (auto const& e : em.getEntities()){
+        if(e.getID() == 9){
+             auto& aic = em.getComponent<AIComponent>(e);
+             std::cout << aic.detect_radius << "\n";
+        }
         if(e.hasComponent<AIComponent>()){
             RayCast ray = engine.getMouseRay();
+            auto& aic { em.getComponent<AIComponent>(e) };
             auto& col = em.getComponent<ColliderComponent>(e);
             auto& ren = em.getComponent<RenderComponent>(e);
             // Comprobar si el rayo intersecta con el collider
             if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)){
-                auto const& aic { em.getComponent<AIComponent>(e) };
                 DrawText("Node active:",textPositionInfo.x,textPositionInfo.y+20,20,BLACK);
                 DrawTextEx(GetFontDefault(),aic.bh,Vector2{textPositionInfo.x + 130,textPositionInfo.y+20},20,1,DARKGRAY);
                 DrawText("TEID:",5,190,20,BLACK);
@@ -313,11 +319,34 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em
                 DrawTextEx(GetFontDefault(),std::to_string(aic.elapsed_shoot).c_str(),Vector2{120,250},20,1,DARKGRAY);
                 DrawText("Player Detected?:",5,270,20,BLACK);
                 DrawTextEx(GetFontDefault(),(aic.playerdetected == 0) ? "No" : "Sí",Vector2{200,270},20,1,DARKGRAY);
+                // So ademas de pasar el ratón por encima , clicko activo o desactivo la edición de parámetros
+                if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) isSelected = !isSelected;
+                if (isSelected)  debugsnglt.IA_id = e.getID();
+
+
+                //if ai is not selected , wires are drawn in red color
+                //if ai is selected, wires are drawn in purple color
                 engine.beginMode3D();
                 engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
                 engine.endMode3D();
             }
+            if(isSelected){
+                engine.beginMode3D();
+                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
+                engine.endMode3D();
+            }
         }
+     }
+     if(isSelected){
+        auto& ren = em.getComponent<RenderComponent>(*em.getEntityByID(debugsnglt.IA_id));
+        auto& aic = em.getComponent<AIComponent>(*em.getEntityByID(debugsnglt.IA_id));
+        // std::cout << aic.detect_radius << "\n";
+        DrawText("EID:",5,310,20,BLACK);
+        DrawText(std::to_string(debugsnglt.IA_id).c_str(),55,310,20,DARKGRAY);
+        int detectRadiusInt = static_cast<float>(aic.detect_radius);
+        int new_detect_radius = GuiValueBox((Rectangle){ 85, 330, 120, 30 }, "Detect Radius:", &detectRadiusInt , 0.0, 100.0, true);
+        //aic.detect_radius = GuiSlider((Rectangle){ 85, 330, 120, 30 }, "Detect Radius:", NULL, &detectRadiusInt, 0.0, 100.0);
+        aic.detect_radius = static_cast<double>(detectRadiusInt);
      }
     // EL BEHAVIOUR
     // teid
@@ -326,10 +355,16 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em
 
     // Dibujar el texto "Parámetros" más abajo
     // Vector2 textSizeParameters = MeasureTextEx(GetFontDefault(), "Parámetros", 20, 1);
-    Vector2 textPositionParameters = { windowRect.x+5, 290 };
 
-    DrawTextEx(GetFontDefault(), "Parámetros", textPositionParameters, 20, 1, DARKGRAY);
+
+
     //AQUI PONDRIA
+    // DrawText("Max_speed:",5,310,20,BLACK);
+     // Mostrar el cuadro de texto para la velocidad
+    //GuiLabel((Rectangle){ 100, 310, 150, 20 }, "Velocidad:");
+    // sprintf(velocidadStr, "%.2f", velocidad);  // Convertir el valor de velocidad a una cadena
+    //  = GuiTextBox((Rectangle){ 120, 310, 120, 30 }, "Velocidad", 20, true);
+    // int value = GuiValueBox((Rectangle){ 120, 310, 120, 30 }, )
     // max speed
     // detect radius
     // attack radius
@@ -343,12 +378,12 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em
     // tipo de disparo
 
      // Botón
-    Rectangle buttonRect = { windowRect.x + 20, textPositionParameters.y+20, 120, 40 };  // Ajusta las coordenadas y dimensiones según tus necesidades
+    // Rectangle buttonRect = { windowRect.x + 20, textPositionParameters.y+20, 120, 40 };  // Ajusta las coordenadas y dimensiones según tus necesidades
 
-    if (GuiButton(buttonRect, "Mi Botón")) {
-        // Acción al hacer clic en el botón
-        // Puedes agregar tu lógica aquí
-    }
+    // if (GuiButton(buttonRect, "Mi Botón")) {
+    //     // Acción al hacer clic en el botón
+    //     // Puedes agregar tu lógica aquí
+    // }
     engine.endDrawing();
 }
 // Se dibuja el HUD
@@ -445,18 +480,18 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
 
+        //Vidas HUD
+        // if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
+        // {
+        //     auto const& r{ em.getComponent<RenderComponent>(e) };
+        //     auto const& l{ em.getComponent<LifeComponent>(e) };
 
-        if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
-        {
-            auto const& r{ em.getComponent<RenderComponent>(e) };
-            auto const& l{ em.getComponent<LifeComponent>(e) };
-
-            engine.drawText(std::to_string(l.life).c_str(),
-                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
-                20,
-                BLACK);
-        }
+        //     engine.drawText(std::to_string(l.life).c_str(),
+        //         static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+        //         static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+        //         20,
+        //         BLACK);
+        // }
 
 
         if (debugphy && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
@@ -559,12 +594,12 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         // Dibujar el ID de las entidades // DEBUG
         // if (debug)
         // {
-        //     auto const& r{ em.getComponent<RenderComponent>(e) };
-        //     engine.drawText(std::to_string(e.getID()).c_str(),
-        //         static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-        //         static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
-        //         20,
-        //         BLACK);
+            auto const& r{ em.getComponent<RenderComponent>(e) };
+            engine.drawText(std::to_string(e.getID()).c_str(),
+                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+                20,
+                BLACK);
         // }
     }
 }

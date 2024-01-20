@@ -28,6 +28,8 @@ private:
     void drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy,bool debugAI);
     void drawEntities(EntityManager& em, ENGI::GameEngine& engine);
     void drawDeath(ENGI::GameEngine& engine);
+    bool edit_parameters{false};
+    bool isSelected{false};
 };
 
 #endif // !RENDER_SYSTEM
