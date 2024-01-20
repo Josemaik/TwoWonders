@@ -9,6 +9,7 @@
 struct BTAction_JumptoPlayer : BTNode_t{
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         if( !ectx.ai.tactive ) return BTNodeStatus_t::fail;
+        ectx.ai.bh = "Jumping";
          if(ectx.ai.ready_attack == true){
             if(!ectx.ai.target_obtained){
                 ectx.ai.txp = ectx.ai.tx;

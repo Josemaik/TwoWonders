@@ -86,5 +86,6 @@ struct AIComponent
     elapsed_fleeing{1.0}, elapsed_perception{1.0};
     void plusdeltatime(double deltaTime, double& elapsed) { elapsed += deltaTime; };
     // Behaviour trees
+    const char* bh {};
     BehaviourTree_t* behaviourTree{ nullptr };
 };

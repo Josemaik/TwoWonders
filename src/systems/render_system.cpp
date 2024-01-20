@@ -272,7 +272,7 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em
     engine.beginDrawing();
 
     // Dibujar un rectángulo que simula una ventana
-    Rectangle windowRect = { 0, 100, 300, 400 };
+    Rectangle windowRect = { 0, 100, 340, 400 };
     DrawRectangleLinesEx(windowRect, 2, DARKGRAY);
     DrawRectangleRec(windowRect, RAYWHITE);
 
@@ -291,13 +291,57 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em
     Vector2 textSizeInfo = MeasureTextEx(GetFontDefault(), "INFO", 20, 1);
     Vector2 textPositionInfo = { windowRect.x+5, lineY + 10 };
 
-    DrawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, DARKGRAY);
+    DrawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
+    // AQUI PONDRIA
+     for (auto const& e : em.getEntities()){
+        if(e.hasComponent<AIComponent>()){
+            RayCast ray = engine.getMouseRay();
+            auto& col = em.getComponent<ColliderComponent>(e);
+            auto& ren = em.getComponent<RenderComponent>(e);
+            // Comprobar si el rayo intersecta con el collider
+            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)){
+                auto const& aic { em.getComponent<AIComponent>(e) };
+                DrawText("Node active:",textPositionInfo.x,textPositionInfo.y+20,20,BLACK);
+                DrawTextEx(GetFontDefault(),aic.bh,Vector2{textPositionInfo.x + 130,textPositionInfo.y+20},20,1,DARKGRAY);
+                DrawText("TEID:",5,190,20,BLACK);
+                DrawTextEx(GetFontDefault(),std::to_string(aic.teid).c_str(),Vector2{70,190},20,1,DARKGRAY);
+                DrawText("TX:",5,210,20,BLACK);
+                DrawTextEx(GetFontDefault(),std::to_string(aic.tx).c_str(),Vector2{70,210},20,1,DARKGRAY);
+                DrawText("TZ:",5,230,20,BLACK);
+                DrawTextEx(GetFontDefault(),std::to_string(aic.tz).c_str(),Vector2{70,230},20,1,DARKGRAY);
+                DrawText("Culldown:",5,250,20,BLACK);
+                DrawTextEx(GetFontDefault(),std::to_string(aic.elapsed_shoot).c_str(),Vector2{120,250},20,1,DARKGRAY);
+                DrawText("Player Detected?:",5,270,20,BLACK);
+                DrawTextEx(GetFontDefault(),(aic.playerdetected == 0) ? "No" : "Sí",Vector2{200,270},20,1,DARKGRAY);
+                engine.beginMode3D();
+                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
+                engine.endMode3D();
+            }
+        }
+     }
+    // EL BEHAVIOUR
+    // teid
+    // tx y tz
+    //countdown
 
     // Dibujar el texto "Parámetros" más abajo
-    Vector2 textSizeParameters = MeasureTextEx(GetFontDefault(), "Parámetros", 20, 1);
-    Vector2 textPositionParameters = { windowRect.x+5, textPositionInfo.y + 100 };
+    // Vector2 textSizeParameters = MeasureTextEx(GetFontDefault(), "Parámetros", 20, 1);
+    Vector2 textPositionParameters = { windowRect.x+5, 290 };
 
     DrawTextEx(GetFontDefault(), "Parámetros", textPositionParameters, 20, 1, DARKGRAY);
+    //AQUI PONDRIA
+    // max speed
+    // detect radius
+    // attack radius
+    // arrival radius
+    // time2arrive?
+    // countdown_perception
+    // countdown_shoot
+    // countdown_stop
+    // countdown_fleeing
+    // path
+    // tipo de disparo
+
      // Botón
     Rectangle buttonRect = { windowRect.x + 20, textPositionParameters.y+20, 120, 40 };  // Ajusta las coordenadas y dimensiones según tus necesidades
 

@@ -11,6 +11,7 @@ struct BTAction_Patrol : BTNode_t{
 
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         if( !ectx.ai.tactive ) return BTNodeStatus_t::fail;
+        ectx.ai.bh = "patrolling";
         if (!ectx.ai.path_initialized){
             ectx.ai.pathIt = ectx.ai.path.begin();
             ectx.ai.path_initialized = true;
