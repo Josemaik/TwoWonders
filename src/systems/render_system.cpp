@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "../../libs/raygui.h"
 
-void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debugphy,bool debugAI,float dt)
+void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debugphy,bool debugAI)
 {
 
     // Actualizamos la posicion de render del componente de fisicas
@@ -17,7 +17,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debu
     // Dibuja todas las entidades con componente de render
     drawEntities(em, engine);
 
-    endFrame(engine, em, debugphy,debugAI,dt);
+    endFrame(engine, em, debugphy,debugAI);
 }
 
 void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
@@ -256,28 +256,30 @@ void RenderSystem::beginFrame(ENGI::GameEngine& engine)
 }
 
 // Se termina el dibujado
-void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debugphy,bool debugAI,float dt)
+void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debugphy,bool debugAI)
 {
     engine.endMode3D();
 
-    drawHUD(em, engine, debugphy,debugAI);
+    drawHUD(em, engine, debugphy);
     if(debugAI){
-        drawEditorInGameIA(engine,em,dt);
+        drawEditorInGameIA(engine,em);
     }
 
     engine.endDrawing();
 }
-
-double SelectValue(double value,int posx,int posy,const char *text,float min_value,float max_value){
+//Dibuja Slider en función de los parámetros
+double SelectValue(double value,float posx,float posy,float height,float width,const char *text,float min_value,float max_value){
         // pasamos a float el valor
         float floatvalue = static_cast<float>(value);
         // dibujamos el slider para modificar su valor
-        int new_detect_radius = GuiSliderBar((Rectangle){ posx, posy, 120, 30 }, text, NULL, &floatvalue,min_value, max_value);
-        DrawText(std::to_string(floatvalue).c_str(),220,posy+5,20,BLUE);
+        int new_detect_radius = GuiSliderBar(Rectangle(posx, posy, height, width), text, NULL, &floatvalue,min_value, max_value);
+        new_detect_radius = new_detect_radius + 1;
+        DrawText(std::to_string(floatvalue).c_str(),220,static_cast<int>(posy+5.0f),20,BLUE);
         // seteamos el nuevo valor
         return static_cast<double>(floatvalue);
 }
-void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em,float dt){
+//Editor In-Game
+void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em){
     engine.beginDrawing();
 
     // Dibujar un rectángulo que simula una ventana
@@ -305,10 +307,6 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em
     auto& debugsnglt = em.getSingleton<Debug_t>();
     // AQUI PONDRIA
      for (auto const& e : em.getEntities()){
-        if(e.getID() == 9){
-             auto& aic = em.getComponent<AIComponent>(e);
-             std::cout << aic.detect_radius << "\n";
-        }
         if(e.hasComponent<AIComponent>()){
             RayCast ray = engine.getMouseRay();
             auto& aic { em.getComponent<AIComponent>(e) };
@@ -316,7 +314,7 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em
             auto& ren = em.getComponent<RenderComponent>(e);
             // Comprobar si el rayo intersecta con el collider
             if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)){
-                DrawText("Node active:",textPositionInfo.x,textPositionInfo.y+20,20,BLACK);
+                DrawText("Node active:",static_cast<int>(textPositionInfo.x),static_cast<int>(textPositionInfo.y+20),20,BLACK);
                 DrawTextEx(GetFontDefault(),aic.bh,Vector2{textPositionInfo.x + 130,textPositionInfo.y+20},20,1,DARKGRAY);
                 DrawText("TEID:",5,190,20,BLACK);
                 DrawTextEx(GetFontDefault(),std::to_string(aic.teid).c_str(),Vector2{70,190},20,1,DARKGRAY);
@@ -328,50 +326,50 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em
                 DrawTextEx(GetFontDefault(),std::to_string(aic.elapsed_shoot).c_str(),Vector2{120,250},20,1,DARKGRAY);
                 DrawText("Player Detected?:",5,270,20,BLACK);
                 DrawTextEx(GetFontDefault(),(aic.playerdetected == 0) ? "No" : "Sí",Vector2{200,270},20,1,DARKGRAY);
-                // So ademas de pasar el ratón por encima , clicko activo o desactivo la edición de parámetros
-                if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) isSelected = !isSelected;
-                // Si se seleccionada, guardamos el ID en el singleton
-                if (isSelected)  debugsnglt.IA_id = e.getID();
+                // So ademas de pasar el ratón por encima , clicko activo la edición de parámetros de esa entidad
+                if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                    isSelected = !isSelected;
+                    debugsnglt.IA_id = e.getID();
+                }
                 // si es seleccionada => wires morados
                 // no es seleccionada => wires rojos
                 engine.beginMode3D();
                 engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
                 engine.endMode3D();
             }
-            if(isSelected){
+            if(isSelected && e.getID() == debugsnglt.IA_id){
                 engine.beginMode3D();
                 engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
                 engine.endMode3D();
+                // si se seleccionada una entidad se muestra el Editor de parámetros
+                if(isSelected){
+                    auto& aic = em.getComponent<AIComponent>(*em.getEntityByID(debugsnglt.IA_id));
+                    auto& phy = em.getComponent<PhysicsComponent>(*em.getEntityByID(debugsnglt.IA_id));
+                    // ID DE LA ENTIDAD SELECCIONADA
+                    DrawText("EID:",5,310,20,BLACK);
+                    DrawText(std::to_string(debugsnglt.IA_id).c_str(),55,310,20,DARKGRAY);
+                    //Detect Radius
+                    aic.detect_radius = SelectValue(aic.detect_radius,85.0,330.0,120.0,30.0,"Detect Radius",0.0,100.0);
+                    // Attack Radius
+                    aic.attack_radius = SelectValue(aic.attack_radius,85.0,370.0,120.0,30.0,"Attack Radius",0.0,100.0);
+                    // Arrival Radius
+                    aic.arrival_radius = SelectValue(aic.arrival_radius,85.0,410.0,120.0,30.0,"Arrival Radius",0.0,100.0);
+                    // Max Speed
+                    phy.max_speed = SelectValue(phy.max_speed,85.0,450.0,120.0,30.0,"Max_Speed",0.0,10.0);
+                    //COuntdown Perception
+                    aic.countdown_perception = SelectValue(aic.countdown_perception,85.0,490.0,120.0,30.0,"Perception",0.0,10.0);
+                    //Countdown Shoot
+                    aic.countdown_shoot = SelectValue(aic.countdown_shoot,85.0,530.0,120.0,30.0,"Culldown Shoot",0.0,8.0);
+                    //Countdown stop
+                    aic.countdown_stop = SelectValue(aic.countdown_stop,85.0,570.0,120.0,30.0,"Culldown Stop",0.0,8.0);
+                }
             }
         }
-     }
-     // si se seleccionada una entidad se muestra el Editor de parámetros
-     if(isSelected){
-        auto& ren = em.getComponent<RenderComponent>(*em.getEntityByID(debugsnglt.IA_id));
-        auto& aic = em.getComponent<AIComponent>(*em.getEntityByID(debugsnglt.IA_id));
-        auto& phy = em.getComponent<PhysicsComponent>(*em.getEntityByID(debugsnglt.IA_id));
-        // ID DE LA ENTIDAD SELECCIONADA
-        DrawText("EID:",5,310,20,BLACK);
-        DrawText(std::to_string(debugsnglt.IA_id).c_str(),55,310,20,DARKGRAY);
-        //Detect Radius
-        aic.detect_radius = SelectValue(aic.detect_radius,85,330,"Detect Radius",0.0,100.0);
-        // Attack Radius
-        aic.attack_radius = SelectValue(aic.attack_radius,85,370,"Attack Radius",0.0,100.0);
-         // Arrival Radius
-        aic.arrival_radius = SelectValue(aic.arrival_radius,85,410,"Arrival Radius",0.0,100.0);
-        // Max Speed
-        phy.max_speed = SelectValue(phy.max_speed,85,450,"Max_Speed",0.0,10.0);
-        //COuntdown Perception
-        aic.countdown_perception = SelectValue(aic.countdown_perception,85,490,"Perception",0.0,10.0);
-        //Countdown Shoot
-        aic.countdown_shoot = SelectValue(aic.countdown_shoot,85,530,"Culldown Shoot",0.0,8.0);
-        //Countdown stop
-        aic.countdown_stop = SelectValue(aic.countdown_stop,85,570,"Culldown Stop",0.0,8.0);
      }
     engine.endDrawing();
 }
 // Se dibuja el HUD
-void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy,bool debugAI)
+void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto* playerEn = em.getEntityByID(li.playerID);

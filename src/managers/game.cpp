@@ -208,9 +208,9 @@ void Game::run()
             input_system.update(em);
             // seleccionar modo de debug ( physics o AI)
             if (input_system.debugModePhysics){
-                debugExecution(em,true,false,deltaTime);
+                debugExecution(em,true,false);
             }else if(input_system.debugModeAI){
-                debugExecution(em,false,true,deltaTime);
+                debugExecution(em,false,true);
             }else{
                 normalExecution(em, deltaTime);
             }
@@ -260,9 +260,9 @@ void Game::normalExecution(EntityManager& em, float deltaTime)
     projectile_system.update(em, deltaTime);
     life_system.update(em, deltaTime);
     sound_system.update();
-    render_system.update(em, engine, false,false,deltaTime);
+    render_system.update(em, engine, false,false);
 }
-void Game::debugExecution(EntityManager& em,bool debugphy,bool debugai,float deltaTime)
+void Game::debugExecution(EntityManager& em,bool debugphy,bool debugai)
 {
-    render_system.update(em, engine, debugphy,debugai,deltaTime);
+    render_system.update(em, engine, debugphy,debugai);
 }
