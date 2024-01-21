@@ -12,6 +12,7 @@ struct BTAction_Flee : BTNode_t{
 
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         if( !ectx.ai.tactive ) return BTNodeStatus_t::fail;
+        ectx.ai.bh = "Fleeing";
         if(ectx.ai.elapsed_fleeing >= ectx.ai.countdown_fleeing){
             ectx.ai.elapsed_fleeing = 0;
             // std::cout << "YA NO TAMO FLEEING \n";

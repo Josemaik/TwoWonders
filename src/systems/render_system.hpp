@@ -11,7 +11,7 @@ struct RenderSystem
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, GameEngine& engine, bool debug);
+    void update(EntityManager& em, GameEngine& engine, bool debugphy, bool debugAI);
 
     void drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawLogoKaiwa(ENGI::GameEngine& engine);
@@ -19,14 +19,17 @@ struct RenderSystem
     void drawEnding(ENGI::GameEngine& engine);
     void drawStory(ENGI::GameEngine& engine);
     void unloadModels(EntityManager& em, ENGI::GameEngine& engine);
+    void drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em);
 
     // Funciones privadas para organizar el codigo
 private:
     void beginFrame(ENGI::GameEngine& engine);
-    void endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debug);
-    void drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debug);
+    void endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debugph,bool debugAI);
+    void drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy);
     void drawEntities(EntityManager& em, ENGI::GameEngine& engine);
     void drawDeath(ENGI::GameEngine& engine);
+    bool edit_parameters{false};
+    bool isSelected{false};
 };
 
 #endif // !RENDER_SYSTEM

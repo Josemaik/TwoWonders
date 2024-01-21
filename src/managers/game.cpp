@@ -75,7 +75,7 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -0.0f, 0.0f, -0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -2.0f, 0.0f, -12.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
@@ -206,11 +206,16 @@ void Game::run()
             }
 
             input_system.update(em);
-            if (!input_system.debugMode)
+            // seleccionar modo de debug ( physics o AI)
+            if (input_system.debugModePhysics){
+                debugExecution(em,true,false);
+            }else if(input_system.debugModeAI){
+                debugExecution(em,false,true);
+            }else{
                 normalExecution(em, deltaTime);
-            else
-                debugExecution(em);
+            }
             break;
+
         }
 
         // case GameScreen::DEAD:
@@ -255,9 +260,9 @@ void Game::normalExecution(EntityManager& em, float deltaTime)
     projectile_system.update(em, deltaTime);
     life_system.update(em, deltaTime);
     sound_system.update();
-    render_system.update(em, engine, false);
+    render_system.update(em, engine, false,false);
 }
-void Game::debugExecution(EntityManager& em)
+void Game::debugExecution(EntityManager& em,bool debugphy,bool debugai)
 {
-    render_system.update(em, engine, true);
+    render_system.update(em, engine, debugphy,debugai);
 }

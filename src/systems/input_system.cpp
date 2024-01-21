@@ -6,11 +6,16 @@ void InputSystem::update(EntityManager& em)
     auto& bb = em.getSingleton<BlackBoard_t>();
     auto* playerEn = em.getEntityByID(li.playerID);
 
-    // DEBUG
+    // DEBUG PHYSICS
     if (IsKeyReleased(KEY_F1))
-        debugMode = !debugMode;
+        debugModePhysics = !debugModePhysics;
 
-    if (debugMode)
+    if (debugModePhysics)
+        return;
+    //DEBUG AI
+    if (IsKeyPressed(KEY_F2))
+        debugModeAI = !debugModeAI;
+    if (debugModeAI)
         return;
 
     if (!playerEn->hasTag<PlayerTag>() && IsKeyReleased(KEY_ENTER))
