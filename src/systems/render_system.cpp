@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "../../libs/raygui.h"
 
-void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debugphy,bool debugAI)
+void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debugphy,bool debugAI,float dt)
 {
 
     // Actualizamos la posicion de render del componente de fisicas
@@ -17,7 +17,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debu
     // Dibuja todas las entidades con componente de render
     drawEntities(em, engine);
 
-    endFrame(engine, em, debugphy,debugAI);
+    endFrame(engine, em, debugphy,debugAI,dt);
 }
 
 void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
@@ -256,23 +256,32 @@ void RenderSystem::beginFrame(ENGI::GameEngine& engine)
 }
 
 // Se termina el dibujado
-void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debugphy,bool debugAI)
+void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debugphy,bool debugAI,float dt)
 {
     engine.endMode3D();
 
     drawHUD(em, engine, debugphy,debugAI);
     if(debugAI){
-        drawEditorInGameIA(engine,em);
+        drawEditorInGameIA(engine,em,dt);
     }
 
     engine.endDrawing();
 }
 
-void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em){
+double SelectValue(double value,int posx,int posy,const char *text,float min_value,float max_value){
+        // pasamos a float el valor
+        float floatvalue = static_cast<float>(value);
+        // dibujamos el slider para modificar su valor
+        int new_detect_radius = GuiSliderBar((Rectangle){ posx, posy, 120, 30 }, text, NULL, &floatvalue,min_value, max_value);
+        DrawText(std::to_string(floatvalue).c_str(),220,posy+5,20,BLUE);
+        // seteamos el nuevo valor
+        return static_cast<double>(floatvalue);
+}
+void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em,float dt){
     engine.beginDrawing();
 
     // Dibujar un rectángulo que simula una ventana
-    Rectangle windowRect = { 0, 100, 340, 400 };
+    Rectangle windowRect = { 0, 100, 340, 550 };
     DrawRectangleLinesEx(windowRect, 2, DARKGRAY);
     DrawRectangleRec(windowRect, RAYWHITE);
 
@@ -321,11 +330,10 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em
                 DrawTextEx(GetFontDefault(),(aic.playerdetected == 0) ? "No" : "Sí",Vector2{200,270},20,1,DARKGRAY);
                 // So ademas de pasar el ratón por encima , clicko activo o desactivo la edición de parámetros
                 if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) isSelected = !isSelected;
+                // Si se seleccionada, guardamos el ID en el singleton
                 if (isSelected)  debugsnglt.IA_id = e.getID();
-
-
-                //if ai is not selected , wires are drawn in red color
-                //if ai is selected, wires are drawn in purple color
+                // si es seleccionada => wires morados
+                // no es seleccionada => wires rojos
                 engine.beginMode3D();
                 engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
                 engine.endMode3D();
@@ -337,53 +345,29 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em
             }
         }
      }
+     // si se seleccionada una entidad se muestra el Editor de parámetros
      if(isSelected){
         auto& ren = em.getComponent<RenderComponent>(*em.getEntityByID(debugsnglt.IA_id));
         auto& aic = em.getComponent<AIComponent>(*em.getEntityByID(debugsnglt.IA_id));
-        // std::cout << aic.detect_radius << "\n";
+        auto& phy = em.getComponent<PhysicsComponent>(*em.getEntityByID(debugsnglt.IA_id));
+        // ID DE LA ENTIDAD SELECCIONADA
         DrawText("EID:",5,310,20,BLACK);
         DrawText(std::to_string(debugsnglt.IA_id).c_str(),55,310,20,DARKGRAY);
-        int detectRadiusInt = static_cast<float>(aic.detect_radius);
-        int new_detect_radius = GuiValueBox((Rectangle){ 85, 330, 120, 30 }, "Detect Radius:", &detectRadiusInt , 0.0, 100.0, true);
-        //aic.detect_radius = GuiSlider((Rectangle){ 85, 330, 120, 30 }, "Detect Radius:", NULL, &detectRadiusInt, 0.0, 100.0);
-        aic.detect_radius = static_cast<double>(detectRadiusInt);
+        //Detect Radius
+        aic.detect_radius = SelectValue(aic.detect_radius,85,330,"Detect Radius",0.0,100.0);
+        // Attack Radius
+        aic.attack_radius = SelectValue(aic.attack_radius,85,370,"Attack Radius",0.0,100.0);
+         // Arrival Radius
+        aic.arrival_radius = SelectValue(aic.arrival_radius,85,410,"Arrival Radius",0.0,100.0);
+        // Max Speed
+        phy.max_speed = SelectValue(phy.max_speed,85,450,"Max_Speed",0.0,10.0);
+        //COuntdown Perception
+        aic.countdown_perception = SelectValue(aic.countdown_perception,85,490,"Perception",0.0,10.0);
+        //Countdown Shoot
+        aic.countdown_shoot = SelectValue(aic.countdown_shoot,85,530,"Culldown Shoot",0.0,8.0);
+        //Countdown stop
+        aic.countdown_stop = SelectValue(aic.countdown_stop,85,570,"Culldown Stop",0.0,8.0);
      }
-    // EL BEHAVIOUR
-    // teid
-    // tx y tz
-    //countdown
-
-    // Dibujar el texto "Parámetros" más abajo
-    // Vector2 textSizeParameters = MeasureTextEx(GetFontDefault(), "Parámetros", 20, 1);
-
-
-
-    //AQUI PONDRIA
-    // DrawText("Max_speed:",5,310,20,BLACK);
-     // Mostrar el cuadro de texto para la velocidad
-    //GuiLabel((Rectangle){ 100, 310, 150, 20 }, "Velocidad:");
-    // sprintf(velocidadStr, "%.2f", velocidad);  // Convertir el valor de velocidad a una cadena
-    //  = GuiTextBox((Rectangle){ 120, 310, 120, 30 }, "Velocidad", 20, true);
-    // int value = GuiValueBox((Rectangle){ 120, 310, 120, 30 }, )
-    // max speed
-    // detect radius
-    // attack radius
-    // arrival radius
-    // time2arrive?
-    // countdown_perception
-    // countdown_shoot
-    // countdown_stop
-    // countdown_fleeing
-    // path
-    // tipo de disparo
-
-     // Botón
-    // Rectangle buttonRect = { windowRect.x + 20, textPositionParameters.y+20, 120, 40 };  // Ajusta las coordenadas y dimensiones según tus necesidades
-
-    // if (GuiButton(buttonRect, "Mi Botón")) {
-    //     // Acción al hacer clic en el botón
-    //     // Puedes agregar tu lógica aquí
-    // }
     engine.endDrawing();
 }
 // Se dibuja el HUD
