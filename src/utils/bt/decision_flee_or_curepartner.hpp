@@ -18,12 +18,12 @@ struct BTDecisionFleeorCurePartner : BTNode_t{
         // Si el número es menor o igual a 25, go to heal mate
         if (randomNum <= 25) {
             std::cout << "Tomar decisión A (25%)" << std::endl;
-            return BTNodeStatus_t::fail;
+            return BTNodeStatus_t::success;
         }
         // Si no, toma la decisión B (75%), go to heal itself
         else {
             std::cout << "Tomar decisión B (75%)" << std::endl;
-            return BTNodeStatus_t::success;
+            return BTNodeStatus_t::fail;
         }
     }
 };

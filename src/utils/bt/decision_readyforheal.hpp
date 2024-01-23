@@ -14,9 +14,11 @@ struct BTDecisionReadyforHeal : BTNode_t{
         auto& bb = ectx.em.getSingleton<BlackBoard_t>();
         // si encuentro un slime que tenga menos de 3 vidas, guardo como objetivo su posición
         for(auto& slime : bb.slimeData)
-            if(slime.second.life < 3){
-                ectx.ai.txp = slime.second.position.x();
-                ectx.ai.tzp = slime.second.position.z();
+            if(slime.first != ectx.ent.getID()){
+                ectx.ai.slimex = slime.second.position.x();
+                ectx.ai.slimez = slime.second.position.z();
+                ectx.ai.slimetarget = slime.first;
+                ectx.ai.arrival_radius = 2.0;
                 return BTNodeStatus_t::success;
             }
         return BTNodeStatus_t::fail;

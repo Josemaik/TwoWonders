@@ -5,7 +5,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
     {
         if (obj.decreaseLifeTime(deltaTime) && (!obj.inmortal))
         {
-            if (obj.type == Object_type::BombExplode)
+            if (obj.type == Object_type::BombExplode || obj.type == Object_type::Heal_Spell)
                 obj.effect();
             else
                 dead_entities.insert(ent.getID());
@@ -62,7 +62,9 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             case Object_type::BombExplode:
                 explodeBomb(em, ent);
                 break;
-
+            case Object_type::Heal_Spell:
+                explodeBomb(em, ent);
+                break;
             case Object_type::Key:
                 if (playerEnt->hasComponent<InformationComponent>())
                     em.getComponent<InformationComponent>(*playerEnt).addKey();

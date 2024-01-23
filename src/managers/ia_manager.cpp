@@ -425,9 +425,19 @@ void Ia_man::createEnemies(EntityManager& em) {
         em.addComponent<TypeComponent>(e4, TypeComponent{ .type = ElementalType::Neutral });
 
         auto* d_cl_4 = &tree4.createNode<BTDecisionCheckLifes>();
+
+        auto* d_foc4 = &tree4.createNode<BTDecisionFleeorCurePartner>();
+        auto* d_rh4  = &tree4.createNode<BTDecisionReadyforHeal>();
+        auto* a_hm4  = &tree4.createNode<BTAction_HealMate>();
+        auto* sequence4_0_0 = &tree4.createNode<BTNodeSequence_t>(d_foc4,d_rh4, a_hm4);
+
         auto* a_f_4 = &tree4.createNode<BTAction_Flee>();
         auto* a_h_4 = &tree4.createNode<BTAction_Healing>();
-        auto* sequence4_1 = &tree4.createNode<BTNodeSequence_t>(d_cl_4, a_f_4, a_h_4);
+        auto* sequence4_0_1 = &tree4.createNode<BTNodeSequence_t>(a_f_4, a_h_4);
+
+        auto* selector4_0 = &tree4.createNode<BTNodeSelector_t>(sequence4_0_0, sequence4_0_1);
+
+        auto* sequence4_0 = &tree4.createNode<BTNodeSequence_t>(d_cl_4, selector4_0);
 
         auto* d_a_4 = &tree4.createNode<BTDecisionReadyforAttack>();
         auto* a_j_4 = &tree4.createNode<BTAction_JumptoPlayer>();
@@ -443,7 +453,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         auto* patrol_4 = &tree4.createNode<BTAction_Patrol>();
         auto* sequence4_4 = &tree4.createNode<BTNodeSequence_t>(patrol_4);
 
-        tree4.createNode<BTNodeSelector_t>(sequence4_1, sequence4_2, sequence4_3, sequence4_4);
+        tree4.createNode<BTNodeSelector_t>(sequence4_0, sequence4_2, sequence4_3, sequence4_4);
 
         em.addComponent<AIComponent>(e4, AIComponent{ .arrival_radius = 0.1,.detect_radius = 8.0,.attack_radius = 6,.tx = 0.0,.tz = 0.0,.time2arrive = 1.0,.tactive = true,.perceptionTime = 0.5f,
         .path = { vec3d{75.0, 0.0, -74.0} , {75.0,0.0,-66.0} , {81.0,0.0,-66.0}, {80.0,0.0,-74.0}},.countdown_stop = 2.0,.countdown_shoot = 0.0,.countdown_perception = 1.0,.behaviourTree = &tree4 });

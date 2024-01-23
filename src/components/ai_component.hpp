@@ -72,6 +72,10 @@ struct AIComponent
     float accumulated_dt { 0.0f };
     //Target Entity
     std::size_t teid{};
+    //heal
+    bool healbeforedie{false};
+    double slimex{},slimez{};
+    std::size_t slimetarget{};
     //PATH
     Path_t<4> path { };
     Path_t<4>::iterator pathIt { };
