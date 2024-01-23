@@ -463,29 +463,29 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         }
 
         //Vidas HUD
-        // if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
-        // {
-        //     auto const& r{ em.getComponent<RenderComponent>(e) };
-        //     auto const& l{ em.getComponent<LifeComponent>(e) };
+        if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
+        {
+            auto const& r{ em.getComponent<RenderComponent>(e) };
+            auto const& l{ em.getComponent<LifeComponent>(e) };
 
-        //     engine.drawText(std::to_string(l.life).c_str(),
-        //         static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-        //         static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
-        //         20,
-        //         BLACK);
-        // }
+            engine.drawText(std::to_string(l.life).c_str(),
+                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+                20,
+                BLACK);
+        }
 
 
         if (debugphy && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
-            //auto const& l{ em.getComponent<LifeComponent>(e) };
+            auto const& l{ em.getComponent<LifeComponent>(e) };
 
-            //engine.drawText(std::to_string(l.life).c_str(),
-            //    static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-            //    static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
-            //    20,
-            //    BLACK);
+            engine.drawText(std::to_string(l.life).c_str(),
+               static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+               static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+               20,
+               BLACK);
 
             if (e.hasComponent<TypeComponent>())
             {
@@ -576,13 +576,13 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         // Dibujar el ID de las entidades // DEBUG
         // if (debug)
         // {
-            auto const& r{ em.getComponent<RenderComponent>(e) };
-            engine.drawText(std::to_string(e.getID()).c_str(),
-                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
-                20,
-                BLACK);
-        // }
+        //     auto const& r{ em.getComponent<RenderComponent>(e) };
+        //     engine.drawText(std::to_string(e.getID()).c_str(),
+        //         static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+        //         static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+        //         20,
+        //         BLACK);
+        // // }
     }
 }
 

@@ -27,6 +27,7 @@
 #include "../utils/bt/decision_readyforattack.hpp"
 #include "../utils/bt/decision_on_attack_radius.hpp"
 #include "../utils/bt/decision_checklifes.hpp"
+#include "../utils/bt/decision_flee_or_curepartner.hpp"
 struct Ia_man
 {
     // void createMap(EntityManager& em);
