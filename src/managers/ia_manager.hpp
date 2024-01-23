@@ -22,12 +22,14 @@
 #include "../utils/bt/action_avoid.hpp"
 #include "../utils/bt/action_jumptoplayer.hpp"
 #include "../utils/bt/action_healing.hpp"
+#include "../utils/bt/action_heal_mate.hpp"
 //decision
 #include "../utils/bt/decision_playerdetected.hpp"
 #include "../utils/bt/decision_readyforattack.hpp"
 #include "../utils/bt/decision_on_attack_radius.hpp"
 #include "../utils/bt/decision_checklifes.hpp"
 #include "../utils/bt/decision_flee_or_curepartner.hpp"
+#include "../utils/bt/decision_readyforheal.hpp"
 struct Ia_man
 {
     // void createMap(EntityManager& em);

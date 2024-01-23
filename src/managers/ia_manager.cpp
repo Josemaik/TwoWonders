@@ -372,7 +372,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         auto& wr3 = em.addComponent<RenderComponent>(e3, RenderComponent{ .position = vec3d{85.0,0.0,-75.0}, .scale = vec3d{1.0,1.0,1.0}, .color = BLUE });
         auto& wp3 = em.addComponent<PhysicsComponent>(e3, PhysicsComponent{ .position = vec3d(wr3.position),.gravity = 2.0 });
         em.addComponent<ColliderComponent>(e3, ColliderComponent{ wp3.position, wr3.scale, BehaviorType::ENEMY });
-        em.addComponent<LifeComponent>(e3, LifeComponent{ .life = 2 });
+        em.addComponent<LifeComponent>(e3, LifeComponent{ .life = 4 });
         em.addComponent<TypeComponent>(e3, TypeComponent{ .type = ElementalType::Fuego });
 
         // checklifes < 3 ( si me queda 1 vida , decido de forma aleatoria si huyo/me curo o curo compañero sacrificandome)
@@ -381,12 +381,19 @@ void Ia_man::createEnemies(EntityManager& em) {
         // ( si falla el curar a otro compañero , huyo y me curo)
         //hacer estructura
         auto* d_cl_3 = &tree3.createNode<BTDecisionCheckLifes>();
-        auto* d_foc  = &tree3.createNode<BTDecisionFleeorCurePartner>();
-        auto* sequence3_0 = &tree3.createNode<BTNodeSequence_t>(d_cl_3, d_foc);
+
+        auto* d_foc3 = &tree3.createNode<BTDecisionFleeorCurePartner>();
+        auto* d_rh3  = &tree3.createNode<BTDecisionReadyforHeal>();
+        auto* a_hm3  = &tree3.createNode<BTAction_HealMate>();
+        auto* sequence3_0_0 = &tree3.createNode<BTNodeSequence_t>(d_foc3,d_rh3, a_hm3);
 
         auto* a_f_3 = &tree3.createNode<BTAction_Flee>();
         auto* a_h_3 = &tree3.createNode<BTAction_Healing>();
-        auto* sequence3_1 = &tree3.createNode<BTNodeSequence_t>(a_f_3, a_h_3);
+        auto* sequence3_0_1 = &tree3.createNode<BTNodeSequence_t>(a_f_3, a_h_3);
+
+        auto* selector3_0 = &tree3.createNode<BTNodeSelector_t>(sequence3_0_0, sequence3_0_1);
+
+        auto* sequence3_0 = &tree3.createNode<BTNodeSequence_t>(d_cl_3, selector3_0);
 
         auto* d_a_3 = &tree3.createNode<BTDecisionReadyforAttack>();
         auto* a_j_3 = &tree3.createNode<BTAction_JumptoPlayer>();
@@ -402,7 +409,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         auto* patrol_3 = &tree3.createNode<BTAction_Patrol>();
         auto* sequence3_4 = &tree3.createNode<BTNodeSequence_t>(patrol_3);
 
-        tree3.createNode<BTNodeSelector_t>(sequence3_0,sequence3_1, sequence3_2, sequence3_3, sequence3_4);
+        tree3.createNode<BTNodeSelector_t>(sequence3_0, sequence3_2, sequence3_3, sequence3_4);
 
         em.addComponent<AIComponent>(e3, AIComponent{ .arrival_radius = 0.1,.detect_radius = 8.0,.attack_radius = 6,.tx = 0.0,.tz = 0.0,.time2arrive = 1.0,.tactive = true,.perceptionTime = 0.1f,
         .path = { vec3d{85.0, 0.0, -75.0} , {90.0,0.0,-75.0} , {90.0,0.0,-66.0}, {85.0,0.0,-66.0}},.countdown_stop = 2.0,.countdown_shoot = 0.0,.countdown_perception = 1.5,.behaviourTree = &tree3 });

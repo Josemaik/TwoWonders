@@ -23,7 +23,6 @@ struct BlackBoard_t {
         slimeData[slime_id] = slimeInfo;
         // std::cout << "life:" <<slimeData[slime_id].life << "posx:" <<slimeData[slime_id].position.x() << "\n";
     }
-    private:
-        std::unordered_map<std::size_t, SlimeInfo> slimeData;
+    std::unordered_map<std::size_t, SlimeInfo> slimeData;
 
 };
