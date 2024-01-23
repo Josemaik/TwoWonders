@@ -379,6 +379,7 @@ void Ia_man::createEnemies(EntityManager& em) {
         // decision de si huyo o me curo ( aleatorio )
         // ( si curar compañero ) miro blackboard (tuplas que tengan posicion y vida) y cmpruebo si tienen < 3 vidas y si esta dentro de radio de cura
         // ( si falla el curar a otro compañero , huyo y me curo)
+        //hacer estructura
         auto* d_cl_3 = &tree3.createNode<BTDecisionCheckLifes>();
         auto* d_foc  = &tree3.createNode<BTDecisionFleeorCurePartner>();
         auto* sequence3_0 = &tree3.createNode<BTNodeSequence_t>(d_cl_3, d_foc);
