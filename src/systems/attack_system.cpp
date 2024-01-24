@@ -72,6 +72,13 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         }
         break;
     }
+    case AttackType::HealSpell:
+    {
+        auto& e{ em.newEntity() };
+        em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = GREEN });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Heal_Spell, .life_time = 2.0f });
+        break;
+    }
     case AttackType::AttackPlayer:
         break;
     case AttackType::TripleShot: createAttackMultipleShot(em, ent, att, 3);

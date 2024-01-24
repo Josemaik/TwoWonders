@@ -9,12 +9,7 @@
 #include "../components/life_component.hpp"
 #include "../components/event_component.hpp"
 #include "../components/type_component.hpp"
-//ia
 #include "../components/ai_component.hpp"
-#include "../components/blackboard.hpp"
-#include "../utils/sngtn/debug_singleton.hpp"
-
-#include "../components/levelinfo.hpp"
 #include "../components/projectile_component.hpp"
 #include "../components/object_component.hpp"
 #include "../components/information_component.hpp"
@@ -22,6 +17,10 @@
 #include "../components/shield_component.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
+//singelton
+#include "../utils/sngtn/blackboard.hpp"
+#include "../utils/sngtn/debug_singleton.hpp"
+#include "../utils/sngtn/levelinfo.hpp"
 
 // Constants
 static constexpr float DEGTORAD = static_cast<float>(M_PI / 180.0);

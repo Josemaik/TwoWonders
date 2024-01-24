@@ -17,8 +17,11 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
                     lif.decreaseNextFrame = true;
                 else
                     lif.decreaseNextFrame = false;
-
-                em.getComponent<AttackComponent>(ent).attack(AttackType::Bomb);
+                if(em.getComponent<AIComponent>(ent).healbeforedie){
+                    em.getComponent<AttackComponent>(ent).attack(AttackType::HealSpell);
+                }else{
+                    em.getComponent<AttackComponent>(ent).attack(AttackType::Bomb);
+                }
             }
 
             lif.markedForDeletion = true;

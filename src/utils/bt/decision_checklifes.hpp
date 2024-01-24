@@ -11,11 +11,6 @@ struct BTDecisionCheckLifes : BTNode_t{
         // std::cout << "CHECK LIFES \n";
          ectx.ai.bh = "checking lifes";
         if(ectx.lifec.life < 3){
-            // if(ectx.lifec.life == 0){
-            //  std::cout << "EXPLOTAR \n";
-            //  auto& att = ectx.em.getComponent<AttackComponent>(ectx.ent);
-            //  att.attack(AttackType::Bomb);
-            // }
             return BTNodeStatus_t::success;
         }
         return BTNodeStatus_t::fail;

@@ -2,7 +2,7 @@
 #include <cmath>
 #include <random>
 
-
+// Cada cuanto se percibe al jugador
 void perception(BlackBoard_t& bb, AIComponent& ai, float dt) {
     // Accumulate delta time still perception time
     // ai.accumulated_dt += dt;
@@ -35,31 +35,11 @@ void AISystem::update(EntityManager& em, float dt)
     {
         //percibir el entorno
         perception(bb, ai, dt);
+        // Actualizar datos de los slimes en blackboard
+        if(e.hasTag<SlimeTag>()){
+            bb.updateSlimeInfo(e.getID(),em.getComponent<PhysicsComponent>(e).position,em.getComponent<LifeComponent>(e).life);
+        }
         if (ai.behaviourTree) {
-            // ai.behaviourTree->clearNodes();
-            // switch(ai.behaviour){
-            //     case SB::Arrive :ai.behaviourTree->createNode<BTAction_Arrive>();
-            //     std::cout << "arrive\n";
-            //     break;
-            //     case SB::Seek :ai.behaviourTree->createNode<BTAction_Seek>();
-            //     std::cout << "seek\n";
-            //     break;
-            //     case SB::Flee :ai.behaviourTree->createNode<BTAction_Flee>();
-            //     std::cout << "flee\n";
-            //     break;
-            //     case SB::Pursue :ai.behaviourTree->createNode<BTAction_Pursue>();
-            //     std::cout << "pursue\n";
-            //     break;
-            //     case SB::Avoid :ai.behaviourTree->createNode<BTAction_Avoid>();
-            //     std::cout << "avoid\n";
-            //     break;
-            //     case SB::followPath :ai.behaviourTree->createNode<BTAction_Patrol>();
-            //     std::cout << "followpath \n";
-            //     break;
-            //     default: ai.behaviourTree->createNode<BTAction_Arrive>();
-            //     std::cout << "defecto \n";
-            //     break;
-            // }
             ai.behaviourTree->run({ em,e,ai,phy,lc,dt});
             return;
         }

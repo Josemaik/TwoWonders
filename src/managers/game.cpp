@@ -6,8 +6,8 @@ void Game::createSword(EntityManager& em)
     auto& e{ em.newEntity() };
 
     em.addTag<ObjectTag>(e);
-
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 49.0, 0., 78.0 }, .scale = { 1., 0.3, 0.3 }, .color = LIGHTGRAY });
+    // 49 78
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 63.0, 0., -71.0 }, .scale = { 1., 0.3, 0.3 }, .color = LIGHTGRAY });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0, .0, .0 } });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Sword, .inmortal = true });
@@ -74,8 +74,8 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
 {
     // Player
     auto& e{ em.newEntity() };
-    em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -2.0f, 0.0f, -12.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
+    em.addTag<PlayerTag>(e);// -2 -12 63 -71
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 63.0f, 0.0f, -71.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
