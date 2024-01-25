@@ -63,7 +63,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 explodeBomb(em, ent);
                 break;
             case Object_type::Heal_Spell:
-                explodeBomb(em, ent);
+                explodeBombHeal(em, ent);
                 break;
             case Object_type::Key:
                 if (playerEnt->hasComponent<InformationComponent>())
@@ -118,6 +118,11 @@ bool ObjectSystem::buyExtraLife(EntityManager& em, Entity* ent) {
         }
     }
     return false;
+}
+
+void ObjectSystem::explodeBombHeal(EntityManager& em, Entity& ent){
+    createExplodeBomb(em, ent, BehaviorType::HEAL);
+    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY);
 }
 
 void ObjectSystem::explodeBomb(EntityManager& em, Entity& ent) {

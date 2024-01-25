@@ -200,6 +200,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
 
 void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
 {
+
     // Sacamos punteros de las físicas y de las entidades para poder hacer swaps
     auto* staticPhy = &statPhy;
     auto* otherPhy = &othrPhy;
@@ -207,6 +208,19 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     auto* staticEntPtr = &staticEnt;
     auto* otherEntPtr = &otherEnt;
 
+    //BOMBA DE CURACION
+    if (behaviorType2 & BehaviorType::HEAL || behaviorType1 & BehaviorType::HEAL)
+    {
+        if(staticEntPtr->hasComponent<LifeComponent>() && staticEntPtr->hasTag<SlimeTag>()){
+            std::cout << "YEEEEEEEEEEEEEE \n";
+            em.getComponent<LifeComponent>(*staticEntPtr).increaseLife();
+        }
+        if(otherEntPtr->hasComponent<LifeComponent>() && otherEntPtr->hasTag<SlimeTag>()){
+            std::cout << "HEIIIIIIIIIIIIIII \n";
+            em.getComponent<LifeComponent>(*otherEntPtr).increaseLife();
+        }
+        return;
+    }
     // Comprobar si es un objeto estático - el objeto estático quedará en staticEnt y el otro en otherEnt
     if (behaviorType2 & BehaviorType::STATIC)
     {
@@ -264,6 +278,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
 
         return;
     }
+
 
     //Si impacta enemigo con pared
     if (behaviorType2 & BehaviorType::ENEMY)

@@ -12,7 +12,7 @@ struct BTAction_HealMate : BTNode_t{
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         if( !ectx.ai.tactive ) return BTNodeStatus_t::fail;
         ectx.ai.bh = "Healing mate";
-        std::cout << "txp: " << ectx.ai.slimex << "tzp:" << ectx.ai.slimez << "\n";
+        //std::cout << "txp: " << ectx.ai.slimex << "tzp:" << ectx.ai.slimez << "\n";
         auto const& phyTarget = ectx.em.getComponent<PhysicsComponent>(*ectx.em.getEntityByID(ectx.ai.slimetarget));
         Steer_t steering = STBH::Pursue(phyTarget ,ectx.phy);
         double tdist = calculatedistance(phyTarget.position,ectx.phy.position);
