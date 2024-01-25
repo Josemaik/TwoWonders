@@ -15,6 +15,8 @@ struct LevelInfo
   std::unordered_set<std::size_t> enemiesID;
 
   uint16_t num_zone{};
+  bool drawzone{false};
+  int segundos{10000};
 
   GameScreen currentScreen = GameScreen::GAMEPLAY;
 };

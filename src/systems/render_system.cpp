@@ -572,6 +572,18 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 engine.endMode3D();
             }
         }
+        // Dibujar zona para mostrar ejemplo de uso del eventmanager
+        auto& linfo = em.getSingleton<LevelInfo>();
+        if(linfo.drawzone == true){
+            engine.drawText("CAMBIANDO DE \n ZONA...", 600, 10, 25, RED);
+            if(linfo.segundos == 0){
+                linfo.drawzone = false;
+                linfo.segundos = 10000;
+            }
+            linfo.segundos--;
+        }else{
+            engine.drawText(("ZONA "+ std::to_string(linfo.num_zone)).c_str(), 600, 10, 50, RED);
+        }
 
         // Dibujar el ID de las entidades // DEBUG
         // if (debug)

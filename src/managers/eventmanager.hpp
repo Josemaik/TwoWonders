@@ -8,7 +8,7 @@
 
 
 //Eventos
-static const uint16_t EVENT_CODE_CHANGE_ZONE = 1; 
+static const uint16_t EVENT_CODE_CHANGE_ZONE = 1;
 
 
 struct Event {
@@ -50,8 +50,9 @@ public:
             // Notifica a cada listener interesado en el evento
             for (const auto& lr : listeners) {
                     if(lr.interestCode == event.code){
-                        EventComponent& eventComponent = em.getComponent<EventComponent>(lr.listener);
-                        eventComponent.notify(event.code);
+                        if(event.code == 1){
+                            em.getSingleton<LevelInfo>().drawzone = true;
+                        }
                     }
             }
         }

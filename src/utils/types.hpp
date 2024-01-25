@@ -7,7 +7,6 @@
 #include "../components/attack_component.hpp"
 #include "../components/input_component.hpp"
 #include "../components/life_component.hpp"
-#include "../components/event_component.hpp"
 #include "../components/type_component.hpp"
 #include "../components/ai_component.hpp"
 #include "../components/projectile_component.hpp"
@@ -42,7 +41,7 @@ struct SlimeTag {};
 struct SnowmanTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
-using CL = MP::TypeList<PhysicsComponent, RenderComponent, EventComponent, InputComponent, LifeComponent, ColliderComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent, ShieldComponent, TypeComponent>;
+using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent, ShieldComponent, TypeComponent>;
 using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag>;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t,Debug_t>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

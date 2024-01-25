@@ -10,4 +10,4 @@ struct EventSystem
     void update(Eventmanager& evm,EntityManager& em){ evm.dispatchEvents(em); };
 };
 
-#endif 
+#endif
