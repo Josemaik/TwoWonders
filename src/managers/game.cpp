@@ -75,7 +75,7 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);// -2 -12 63 -71
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 63.0f, 0.0f, -71.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -2.0f, 0.0f, -12.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
@@ -261,6 +261,7 @@ void Game::normalExecution(EntityManager& em, float deltaTime)
     life_system.update(em, deltaTime);
     sound_system.update();
     render_system.update(em, engine, false,false);
+    event_system.update(evm,em);
 }
 void Game::debugExecution(EntityManager& em,bool debugphy,bool debugai)
 {
