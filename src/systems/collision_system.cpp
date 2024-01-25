@@ -193,7 +193,17 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
 
         return;
     }
-
+    //BOMBA DE CURACION
+    if (behaviorType2 & BehaviorType::HEAL || behaviorType1 & BehaviorType::HEAL)
+    {
+        if(staticEnt.hasComponent<LifeComponent>() && staticEnt.hasTag<SlimeTag>()){
+            em.getComponent<LifeComponent>(staticEnt).increaseLife();
+        }
+        if(otherEnt.hasComponent<LifeComponent>() && otherEnt.hasTag<SlimeTag>()){
+            em.getComponent<LifeComponent>(otherEnt).increaseLife();
+        }
+        return;
+    }
     // Esto ya es cualquier colisión que no sea de player, paredes, zonas o ataques
     nonStaticCollision(staticPhy, otherPhy, minOverlap);
 }
@@ -208,19 +218,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     auto* staticEntPtr = &staticEnt;
     auto* otherEntPtr = &otherEnt;
 
-    //BOMBA DE CURACION
-    if (behaviorType2 & BehaviorType::HEAL || behaviorType1 & BehaviorType::HEAL)
-    {
-        if(staticEntPtr->hasComponent<LifeComponent>() && staticEntPtr->hasTag<SlimeTag>()){
-            std::cout << "YEEEEEEEEEEEEEE \n";
-            em.getComponent<LifeComponent>(*staticEntPtr).increaseLife();
-        }
-        if(otherEntPtr->hasComponent<LifeComponent>() && otherEntPtr->hasTag<SlimeTag>()){
-            std::cout << "HEIIIIIIIIIIIIIII \n";
-            em.getComponent<LifeComponent>(*otherEntPtr).increaseLife();
-        }
-        return;
-    }
+
     // Comprobar si es un objeto estático - el objeto estático quedará en staticEnt y el otro en otherEnt
     if (behaviorType2 & BehaviorType::STATIC)
     {
