@@ -5,10 +5,11 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
     {
         if (obj.decreaseLifeTime(deltaTime) && (!obj.inmortal))
         {
-            if (obj.type == Object_type::BombExplode)
+            if (obj.type == Object_type::BombExplode || obj.type == Object_type::Heal_Spell)
                 obj.effect();
             else
                 dead_entities.insert(ent.getID());
+
         }
 
         // Recuperamos la entidad del player
@@ -61,7 +62,9 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             case Object_type::BombExplode:
                 explodeBomb(em, ent);
                 break;
-
+            case Object_type::Heal_Spell:
+                explodeBombHeal(em, ent);
+                break;
             case Object_type::Key:
                 if (playerEnt->hasComponent<InformationComponent>())
                     em.getComponent<InformationComponent>(*playerEnt).addKey();
@@ -74,6 +77,9 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 dead_entities.insert(ent.getID());
             else
                 obj.active = false;
+
+            if (obj.mapID != 255 && obj.objID != 255)
+                li.notLoadSet.insert(std::make_pair(obj.mapID, obj.objID));
         }
     });
 
@@ -114,6 +120,11 @@ bool ObjectSystem::buyExtraLife(EntityManager& em, Entity* ent) {
         }
     }
     return false;
+}
+
+void ObjectSystem::explodeBombHeal(EntityManager& em, Entity& ent) {
+    createExplodeBomb(em, ent, BehaviorType::HEAL);
+    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY);
 }
 
 void ObjectSystem::explodeBomb(EntityManager& em, Entity& ent) {

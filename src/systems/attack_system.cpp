@@ -12,19 +12,20 @@ void AttackSystem::update(EntityManager& em, float deltaTime) {
 }
 
 void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att) {
-    att.vel += vec3f{ 0, 0, -0.5f } *(att.vel == vec3f{ 0, 0, 0 });
+    att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
 
     // Se pone la direccion en la que este mirando el player
     if (ent.hasTag<PlayerTag>() && ent.hasComponent<InputComponent>()) {
-        auto& i = em.getComponent<InputComponent>(ent);
-        if (i.last_key == i.down)
-            att.vel = { 0 , 0 , 0.5f };
-        else if (i.last_key == i.up)
-            att.vel = { 0 , 0 , -0.5f };
-        else if (i.last_key == i.right)
-            att.vel = { 0.5f , 0 , 0 };
-        else if (i.last_key == i.left)
-            att.vel = { -0.5f , 0 , 0 };
+        auto& phy = em.getComponent<PhysicsComponent>(ent);
+
+        static const double ATTACK_SPEED = 0.5f;
+
+        // Calculamos la velocidad basada en la orientación del jugador
+        double velX = sin(phy.orientation) * ATTACK_SPEED;
+        double velZ = cos(phy.orientation) * ATTACK_SPEED;
+
+        // Asignamos la velocidad al ataque
+        att.vel = { velX , 0 , velZ };
     }
 
     // Comprobar si la vida de la entidad es la maxima y elegir que tipo de ataque usa
@@ -40,26 +41,44 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     switch (att.type)
     {
     case AttackType::Ranged:
-        createAttackRangedOrMelee(em, ent, att, true);
+        createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack);
         break;
 
     case AttackType::Melee:
-        createAttackRangedOrMelee(em, ent, att, false);
+        createAttackRangedOrMelee(em, ent, att, false, att.scale_to_respawn_attack);
         break;
 
     case AttackType::Bomb:
-        if (ent.hasComponent<InformationComponent>())
+    {
+        auto& li = em.getSingleton<LevelInfo>();
+        if (li.playerID == ent.getID())
         {
-            auto& inf = em.getComponent<InformationComponent>(ent);
-            if (inf.bombs > 0) {
-                auto& e{ em.newEntity() };
-                em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
-                em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::BombExplode, .life_time = 2.0f });
-                inf.decreaseBomb();
+            if (ent.hasComponent<InformationComponent>())
+            {
+                auto& inf = em.getComponent<InformationComponent>(ent);
+                if (inf.bombs > 0) {
+                    auto& e{ em.newEntity() };
+                    em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
+                    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::BombExplode, .life_time = 2.0f });
+                    inf.decreaseBomb();
+                }
             }
         }
+        else
+        {
+            auto& e{ em.newEntity() };
+            em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
+            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::BombExplode, .life_time = 2.0f });
+        }
         break;
-
+    }
+    case AttackType::HealSpell:
+    {
+        auto& e{ em.newEntity() };
+        em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = GREEN });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Heal_Spell, .life_time = 2.0f });
+        break;
+    }
     case AttackType::AttackPlayer:
         break;
     case AttackType::TripleShot: createAttackMultipleShot(em, ent, att, 3);
@@ -72,10 +91,10 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
 
 void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, AttackComponent& att, int numShots) {
     float spread = 0.15f; // Ángulo de dispersión entre los disparos
-    vec3f vel = att.vel;
+    vec3d vel = att.vel;
 
     // Disparo hacia el jugador
-    createAttackRangedOrMelee(em, ent, att, true);
+    createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack);
 
     for (int i = 1; i <= numShots; ++i) {
         float offset = spread * (static_cast<float>(i) - 0.5f - static_cast<float>(numShots) / 2.f);
@@ -87,17 +106,29 @@ void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, Atta
         att.vel = { att.vel.x(), att.vel.y(), att.vel.z() + offset };
 
         // Crea el disparo
-        createAttackRangedOrMelee(em, ent, att, true);
+        createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack);
     }
 }
 
-void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged) {
+void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack) {
+    //std::cout << "CREO LA BALA";
+    auto const& phy = em.getComponent<PhysicsComponent>(ent);
+
+    // Comprobar el tipo del ataque
+    ElementalType tipoElemental;
+    if (ent.hasComponent<TypeComponent>())
+        tipoElemental = em.getComponent<TypeComponent>(ent).type;
+    else
+        tipoElemental = ElementalType::Neutral;
+
+    // Crear la entidad ataque
     auto& e{ em.newEntity() };
     em.addTag<HitPlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3f{0, 0, 0} : att.vel * 2), .scale = { isRanged ? 0.5f : 1.0f, isRanged ? 0.5f : 1.0f, isRanged ? 0.5f : 1.0f }, .color = BLACK });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = isRanged ? att.vel : vec3f{0, 0, 0}, .gravity = 0 });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3d{0, 0, 0} : att.vel * scale_to_respawn_attack), .scale = { isRanged ? 0.5 : 2.0, isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 2.0 }, .color = BLACK });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = isRanged ? att.vel : vec3d{0, 0, 0}, .gravity = 0, .orientation = phy.orientation });
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = isRanged ? 3.0f : 0.2f });
+    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = static_cast<float>(isRanged ? 3.0 : 0.2) });
+    em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
     if (ent.hasTag<PlayerTag>())
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
     else

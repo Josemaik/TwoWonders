@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 #ifndef OBJECT_SYSTEM
 #define OBJECT_SYSTEM
 #include "../utils/types.hpp"
@@ -14,6 +14,8 @@ struct ObjectSystem
 private:
     void explodeBomb(EntityManager& em, Entity& ent);
     void createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type);
+    void explodeBombHeal(EntityManager& em, Entity& ent);
+
     // Shop
     bool buyBomb(EntityManager& em, Entity* ent);
     bool buyExtraLife(EntityManager& em, Entity* ent);

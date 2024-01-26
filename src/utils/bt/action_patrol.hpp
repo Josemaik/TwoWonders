@@ -1,50 +1,30 @@
 #pragma once
 #include "node.hpp"
-#include <utils/types.hpp>
-#include <iostream>
+#include <random>
+#include <printf.h>
+#include <cmath>
+#include <numbers>
+#include <algorithm>
+#include <utils/sb/steeringbehaviour.hpp>
 
-
-struct BTActionPatrol : BTNode_t{
-    BTActionPatrol() {}
+struct BTAction_Patrol : BTNode_t{
 
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
+        if( !ectx.ai.tactive ) return BTNodeStatus_t::fail;
+        ectx.ai.bh = "patrolling";
+        if (!ectx.ai.path_initialized){
+            ectx.ai.pathIt = ectx.ai.path.begin();
+            ectx.ai.path_initialized = true;
+        }
+
+       //std::cout << "Patrol \n";
         //Do patrol
-        //si la pos actual es >= que el maximo patron vuelvo al principio
-        if (ectx.ai.current >= ectx.ai.max_patrol) {
-            ectx.ai.current = 0;
+        Steer_t steering = STBH::Arrive(ectx.phy,*ectx.ai.pathIt,ectx.ai.arrival_radius);
+        if(steering.arrived){
+            ++ectx.ai.pathIt;
         }
-
-        // Set del objetivo, next position
-        auto const& target = ectx.ai.patrol[ectx.ai.current];
-        if (target == ectx.ai.invalid) {
-            ectx.ai.current = 0;
-            ectx.ai.nexttarget = 0;
-            // return BTNodeStatus_t::fail;
-        }
-        //    std::cout << p.position.x() << ", " << p.position.y() << ", " << p.position.z() << "\n";
-            //calculo la distancia
-        auto  distance = target - ectx.phy.position;
-        //std::cout << distance.x() << ", " << distance.y() << ", " << distance.z() << "\n";
-        // Si la distancia es < que el radio de llegada paso a la siguiente
-        if (distance.length() < ectx.ai.arrival_radius) {
-            ectx.ai.current++;
-            ectx.ai.arrived = true;
-        }
-
-        //Normalizo la distancia y se la asigno a la velocidad
-        ectx.phy.velocity = distance.normalize() * ectx.ai.SPEED_AI;
-
-
-        if(ectx.ent.hasComponent<AttackComponent>()){
-             if (ectx.ai.elapsed_stop >= ectx.ai.countdown_stop) {
-                ectx.phy.velocity = {};
-                ectx.ai.elapsed_stop = 0;
-                return BTNodeStatus_t::success;
-             }  
-             ectx.ai.dec_countdown_stop(ectx.deltatime);
-             return BTNodeStatus_t::running;
-        }
-
+        // std::cout << *ectx.ai.pathIt;
+        ectx.phy.velocity = vec3d{steering.v_x,0.0,steering.v_z};
         return BTNodeStatus_t::success;
     }
 };

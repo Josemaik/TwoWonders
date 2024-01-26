@@ -4,12 +4,23 @@
 
 struct RenderComponent
 {
-    void setAll(vec3f p, vec3f s, Color c);
-    void setPosition(vec3f p);
-    void setScale(vec3f s);
+    void setAll(vec3d p, vec3d s, Color c);
+    void setPosition(vec3d p);
+    void setScale(vec3d s);
     void setColor(Color c);
-    vec3f position{};
-    vec3f scale{};
+    void setOrientation(double o);
+    void setRotationVec(vec3d r);
+    void destroyMesh();
+
+    vec3d position{};
+    vec3d scale{};
+    double orientation{ 0.0 };
     Color color{};
-    bool visible{true};
+    bool visible{ true };
+    vec3d rotationVec{ 0.0, 0.1, 0.0 };
+
+    Model model{};
+    Mesh mesh{};
+    bool meshLoaded{ false };
+    bool cameraChange{ false };
 };

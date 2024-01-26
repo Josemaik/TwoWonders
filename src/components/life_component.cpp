@@ -7,9 +7,21 @@ void LifeComponent::decreaseLife() {
     }
 }
 
+void LifeComponent::decreaseLife(int minusLife){
+    if ((elapsed >= countdown) && (life > 0)) {
+        life -= minusLife;
+        elapsed = 0;
+        if(life < 0)
+            life = 0;
+    }
+}
+
 void LifeComponent::increaseLife() {
-    if (life < maxLife)
-        life += 1;
+    if (life < maxLife){
+        life += 2;
+        if(life > maxLife)
+            life = maxLife;
+    }
 }
 
 void LifeComponent::increaseMaxLife(){

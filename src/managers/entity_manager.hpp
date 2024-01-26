@@ -186,6 +186,10 @@ namespace ETMG {
         template <typename CMPs, typename TAGs>
         void forEach(auto&& func) { forEachImpl(func, CMPs{}, TAGs{}); }
 
+        // Plantilla para recorrer todas las entidades que tengan algunos de los componentes y tags especificados
+        template <typename CMPs, typename TAGs>
+        void forEachAny(auto&& func) { forEachImplAny(func, CMPs{}, TAGs{}); }
+
         // Función que nos devuelve el número de entidades libres sin asignar en el EntityManager
         std::size_t freeEntities() const noexcept { return MAX_ENTITIES - alive_; }
 
@@ -232,10 +236,11 @@ namespace ETMG {
 
         // Plantilla para destruir un componente de una entidad
         template<typename CMP>
-        void destroyComponent(Entity& e)
-        {
-            if (e.template hasComponent<CMP>())
-            {
+        void destroyComponent(Entity& e) {
+            if (e.template hasComponent<CMP>()) {
+                if constexpr (std::is_same_v<CMP, RenderComponent>)
+                    getComponent<RenderComponent>(e).destroyMesh();
+
                 auto key = e.template getComponentKey<CMP>();
                 this->template getCMPStorage<CMP>().erase(key);
             }
@@ -280,6 +285,21 @@ namespace ETMG {
                 auto hasCMPs = (true && ... && e.template hasComponent<CMPs>());
                 auto hasTAGs = (true && ... && e.template hasTag<TAGs>());
                 if (hasCMPs && hasTAGs)
+                {
+                    func(e, getComponent<CMPs>(e)...);
+                }
+            }
+        }
+
+        // Plantilla para recorrer todas las entidades que tengan algunos de los componentes y tags especificados
+        template <typename... CMPs, typename... TAGs>
+        void forEachImplAny(auto&& func, MP::TypeList<CMPs...>, MP::TypeList<TAGs...>)
+        {
+            for (Entity& e : getEntities())
+            {
+                auto hasAnyCMPs = (false || ... || e.template hasComponent<CMPs>());
+                auto hasAnyTAGs = (false || ... || e.template hasTag<TAGs>());
+                if (hasAnyCMPs || hasAnyTAGs)
                 {
                     func(e, getComponent<CMPs>(e)...);
                 }

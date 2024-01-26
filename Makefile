@@ -1,14 +1,13 @@
-APP		   := ZeldaWonders
+APP		   := TwoWonders
 CCACHE 	   := ccache
 CC         := g++-12
 CCFLAGS    := -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
-LIBS       := -lraylib
+
+LIBS       := -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so
+
 SANITIZE   := -fsanitize=address,undefined
 
 # agregar g++ | clang++
-
-# libs/libraylib.a
-# LD_LIBRARY_PATH=libs ./ZeldaWonders
 
 MKDIR      := mkdir -p
 SRC  	   := src
@@ -16,7 +15,7 @@ OBJ  	   := obj
 RELEASE    := release
 ASSETS     := assets
 LIBS_DIR   := libs
-LIBS_COPY  := /usr/lib/libraylib.so.420
+LIBS_COPY  := /usr/lib/libraylib.so.420 libs/raygui.so fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13
 
 ALLCPP     := $(shell find $(SRC) -type f -iname *.cpp)
 ALLCPPOBJ  := $(patsubst %.cpp,%.o,$(ALLCPP))
@@ -34,11 +33,9 @@ else
     CCFLAGS  += -g
 endif
 
-# _glfwPlatformLoadModule
-
 # Regla principal (enlazado de los .o)
 $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
-	$(CCACHE) $(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE) -Wl,-rpath=libs
+	$(CCACHE) $(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE) -Wl,-rpath=libs -Wl,-rpath,./fmodlibs
 
 # Regla que compila los .cpp
 %.o : %.cpp
@@ -58,9 +55,9 @@ $(RELEASE) : $(APP) $(ASSETS)
 $(OBJSUBDIRS) :
 	$(MKDIR) $(OBJSUBDIRS)
 
-$(ASSETS): 
+$(ASSETS):
 	$(MKDIR) $(ASSETS)
-	
+
 # Otras reglas
 
 .PHONY : dir clean game

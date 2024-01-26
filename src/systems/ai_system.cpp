@@ -2,13 +2,45 @@
 #include <cmath>
 #include <random>
 
+// Cada cuanto se percibe al jugador
+void perception(BlackBoard_t& bb, AIComponent& ai, float dt) {
+    // Accumulate delta time still perception time
+    // ai.accumulated_dt += dt;
+    // if (ai.accumulated_dt <= ai.perceptionTime) return;
+    //Perception time reached
+    // ai.accumulated_dt -= ai.perceptionTime;
+    // Al pulsar la G , la ia con seek va a la posición del player
+    if(ai.elapsed_perception >= ai.countdown_perception){
+        ai.elapsed_perception = 0;
+        if (bb.tactive) {
+            ai.tx = bb.tx;
+            ai.tz = bb.tz;
+            ai.tactive = true;
+            ai.teid = bb.teid;
+            // ai.behaviour = bb.behaviour;
+            bb.tactive = false;
+            // ai.pathIt = bb.path.begin();
+            //  id {static_cast<int>(e.getID()) };
+            // std::printf("[%d] VOY! (%.1f,%.1f)\n",id,ai.tx,ai.tz);
+        }
+    }else{
+        ai.plusdeltatime(dt,ai.elapsed_perception);
+    }
+}
 // Actualizar las IA
 void AISystem::update(EntityManager& em, float dt)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, AIComponent& ai)
+    auto& bb = em.getSingleton<BlackBoard_t>();
+    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, AIComponent& ai,LifeComponent& lc)
     {
-        if(ai.behaviourTree){
-            ai.behaviourTree->run( {em,e,ai,phy,dt} );
+        //percibir el entorno
+        perception(bb, ai, dt);
+        // Actualizar datos de los slimes en blackboard
+        if(e.hasTag<SlimeTag>()){
+            bb.updateSlimeInfo(e.getID(),em.getComponent<PhysicsComponent>(e).position,em.getComponent<LifeComponent>(e).life);
+        }
+        if (ai.behaviourTree) {
+            ai.behaviourTree->run({ em,e,ai,phy,lc,dt});
             return;
         }
     });

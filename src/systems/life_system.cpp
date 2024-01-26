@@ -8,15 +8,28 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
         if (lif.life == 0)
         {
             // Si es enemigo creamos un objeto
-            if (ent.hasTag<EnemyTag>()) {
+            if (ent.hasTag<EnemyTag>() && !lif.decreaseNextFrame)
                 createObject(em, em.getComponent<PhysicsComponent>(ent).position);
+
+            if (ent.hasTag<SlimeTag>())
+            {
+                if (!lif.decreaseNextFrame)
+                    lif.decreaseNextFrame = true;
+                else
+                    lif.decreaseNextFrame = false;
+                if(em.getComponent<AIComponent>(ent).healbeforedie){
+                    em.getComponent<AttackComponent>(ent).attack(AttackType::HealSpell);
+                }else{
+                    em.getComponent<AttackComponent>(ent).attack(AttackType::Bomb);
+                }
             }
 
             lif.markedForDeletion = true;
         }
 
-        if (lif.markedForDeletion)
+        if (lif.markedForDeletion && !lif.decreaseNextFrame)
             dead_entities.insert(ent.getID());
+
     });
 
     if (!dead_entities.empty())
@@ -27,7 +40,7 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
 }
 
 // Se podra crear objetos: vida, bomba, moneda o nada
-void LifeSystem::createObject(EntityManager& em, vec3f pos) {
+void LifeSystem::createObject(EntityManager& em, vec3d pos) {
     int random_value = std::rand();
     if (random_value % 4 > 0) {
         Object_type tipo_nuevo_objeto{};
@@ -55,7 +68,7 @@ void LifeSystem::createObject(EntityManager& em, vec3f pos) {
         // Se crea el nuevo objeto
         auto& e{ em.newEntity() };
         em.addTag<ObjectTag>(e);
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = { 0.5f, 0.5f, 0.5f }, .color = color_nuevo_objeto });
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = { 0.5, 0.5, 0.5 }, .color = color_nuevo_objeto });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = tipo_nuevo_objeto });
