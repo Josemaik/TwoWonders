@@ -13,7 +13,7 @@ void InputSystem::update(EntityManager& em)
     if (debugModePhysics)
         return;
     //DEBUG AI
-    if (IsKeyPressed(KEY_F2))
+    if (IsKeyReleased(KEY_F2))
         debugModeAI = !debugModeAI;
     if (debugModeAI)
         return;
