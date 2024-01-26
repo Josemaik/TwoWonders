@@ -7,36 +7,6 @@
 
 struct Map
 {
-    struct EntityData
-    {
-        vec3d position;
-        vec3d scale;
-        Color color;
-    };
-
-    struct ZoneData
-    {
-        vec3d position{};
-        vec3d scale{};
-        uint16_t zone{};
-    };
-
-    struct WallData
-    {
-        vec3d position{};
-        vec3d scale{};
-        Color color{};
-    };
-
-    struct RampData
-    {
-        vec3d position{};
-        vec3d scale{};
-        Color color{};
-        float orientation{};
-        vec3d rotationVec{};
-    };
-
     void createMap(EntityManager& em, uint8_t mapID, Ia_man& iam);
     void reset(EntityManager& em, uint8_t mapID, Ia_man& iam);
 
@@ -44,10 +14,6 @@ private:
     mapType loadMap(const std::string& path);
     void destroyMap(EntityManager& em);
     void generateMapFromJSON(EntityManager& em, const mapType& map, Ia_man& iam);
-    void createWallsOverworld(EntityManager& em);
-    void createGroundWaterOverworld(EntityManager& em);
-    void createRamps(EntityManager& em);
-    void createZonesOverworld(EntityManager& em);
 };
 
 #endif // !MAP

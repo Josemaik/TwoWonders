@@ -220,14 +220,6 @@ void Ia_man::createEnemiesZone(EntityManager& em, uint16_t zone) {
         break;
     };
 }
-//IA FOR TEST STEERING BEHAVIOUR
-BehaviourTree_t tree1;
-BehaviourTree_t tree2;
-BehaviourTree_t tree3;
-BehaviourTree_t tree4;
-BehaviourTree_t tree5;
-BehaviourTree_t tree6;
-BehaviourTree_t tree7;
 
 void Ia_man::createEnemies(EntityManager& em) {
 
