@@ -8,6 +8,8 @@
 #include "../components/input_component.hpp"
 #include "../components/life_component.hpp"
 #include "../components/type_component.hpp"
+#include "../components/ramp_component.hpp"
+//ia
 #include "../components/ai_component.hpp"
 #include "../components/projectile_component.hpp"
 #include "../components/object_component.hpp"
@@ -20,6 +22,7 @@
 #include "../utils/sngtn/blackboard.hpp"
 #include "../utils/sngtn/debug_singleton.hpp"
 #include "../utils/sngtn/levelinfo.hpp"
+#include <nlohmann/json.hpp>
 
 // Constants
 static constexpr float DEGTORAD = static_cast<float>(M_PI / 180.0);
@@ -33,6 +36,7 @@ struct EnemyTag {};
 struct HitPlayerTag {};
 struct GroundTag {};
 struct WaterTag {};
+struct WallTag {};
 struct ObjectTag {};
 struct ZoneTag {};
 struct DoorTag {};
@@ -41,10 +45,11 @@ struct SlimeTag {};
 struct SnowmanTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
-using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent, ShieldComponent, TypeComponent>;
-using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag>;
-using SCL = MP::TypeList<LevelInfo, BlackBoard_t,Debug_t>;
+using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, RampComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent, ShieldComponent, TypeComponent>;
+using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, WallTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag>;
+using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;
 using deathSet = std::set<std::size_t, std::greater<std::size_t>>;
+using mapType = nlohmann::json;

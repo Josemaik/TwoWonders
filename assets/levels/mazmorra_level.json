@@ -1,0 +1,249 @@
+{
+    "id": 1,
+    "overworld":
+    {
+        "ground": [
+            {
+                "position": [72.0, -1.5, -79.0],
+                "scale": [47.0, 2.0, 35.0],
+                "color": [0, 121, 241, 255]
+            }
+        ],
+        "water": [],
+        "walls": [
+            {
+                "position": [50.0, 0.0, -79.0],
+                "scale": [3.0, 1.0, 35.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [94.0, 0.0, -79.0],
+                "scale": [3.0, 1.0, 35.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [72.0, 0.0, -91.0],
+                "scale": [3.0, 1.0, 5.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [72.0, 0.0, -81.5],
+                "scale": [3.0, 1.0, 8.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [72.0, 0.0, -75.0],
+                "scale": [3.0, 1.0, 5.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [72.0, 0.0, -65.5],
+                "scale": [3.0, 1.0, 8.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [72.0, 0.0, -95.0],
+                "scale": [41.0, 1.0, 3.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [55.5, 0.0, -79.0],
+                "scale": [8.0, 1.0, 3.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [66.5, 0.0, -79.0],
+                "scale": [8.0, 1.0, 3.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [83.0, 0.0, -79.0],
+                "scale": [19.0, 1.0, 3.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [55.5, 0.0, -63.0],
+                "scale": [8.0, 1.0, 3.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [66.5, 0.0, -63.0],
+                "scale": [8.0, 1.0, 3.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [83.0, 0.0, -63.0],
+                "scale": [19.0, 1.0, 3.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [55.0, 0.0, -75.0],
+                "scale": [1.0, 1.0, 1.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [55.0, 0.0, -71.0],
+                "scale": [1.0, 1.0, 1.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [55.0, 0.0, -67.0],
+                "scale": [1.0, 1.0, 1.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [67.0, 0.0, -75.0],
+                "scale": [1.0, 1.0, 1.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [67.0, 0.0, -71.0],
+                "scale": [1.0, 1.0, 1.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [67.0, 0.0, -67.0],
+                "scale": [1.0, 1.0, 1.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [78.0, 0.0, -71.0],
+                "scale": [2.0, 1.0, 3.0],
+                "color": [0, 82, 172, 255]
+            },
+            {
+                "position": [88.0, 0.0, -71.0],
+                "scale": [2.0, 1.0, 3.0],
+                "color": [0, 82, 172, 255]
+            }
+        ],
+        "zones": [
+            {
+                "position": [61.0, 0.0, -71.0],
+                "scale": [19.0, 1.0, 13.0],
+                "zone": 10
+            },
+            {
+                "position": [61.0, 0.0, -87.0],
+                "scale": [19.0, 1.0, 13.0],
+                "zone": 11
+            },
+            {
+                "position": [83.0, 0.0, -71.0],
+                "scale": [19.0, 1.0, 13.0],
+                "zone": 12
+            },
+            {
+                "position": [83.0, 0.0, -87.0],
+                "scale": [19.0, 1.0, 13.0],
+                "zone": 13
+            },
+            {
+                "position": [61.0, 0.0, -62.5],
+                "scale": [3.0, 1.0, 2.0],
+                "zone": 21
+            }
+        ],
+        "ramps": [],
+        "doors": [
+            {
+                "position": [61.0, 0.0, -78.0],
+                "scale": [2.0, 4.0, 1.0],
+                "color": [127, 106, 79, 255]
+            }
+        ]
+    },
+    "underworld":
+    {
+        "objects": [],
+        "enemies": [
+            {
+                "position": [85.0, 0.0, -75.0],
+                "scale": [1.0, 1.0, 1.0],
+                "color": [0, 121, 241, 255],
+                "max_speed": 0.5,
+                "life": 4,
+                "type": 2,
+                "element": 2,
+                "arrival_radius": 0.1,
+                "detect_radius": 8.0,
+                "attack_radius": 6.0,
+                "tx": 0.0,
+                "tz": 0.0,
+                "time2arrive": 1.0,
+                "tactive": true,
+                "perceptionTime": 0.1,
+                "path": [
+                    [85.0, 0.0, -75.0],
+                    [90.0, 0.0, -75.0],
+                    [90.0, 0.0, -66.0],
+                    [85.0, 0.0, -66.0]
+                ],
+                "countdown_stop": 2.0,
+                "countdown_shoot": 0.0,
+                "countdown_perception": 1.5,
+                "scale_to_respawn_attack": 2.0
+            },
+            {
+                "position": [75.0, 0.0, -74.0],
+                "scale": [1.0, 1.0, 1.0],
+                "color": [0, 121, 241, 255],
+                "max_speed": 0.5,
+                "life": 4,
+                "type": 2,
+                "element": 0,
+                "arrival_radius": 0.1,
+                "detect_radius": 8.0,
+                "attack_radius": 6.0,
+                "tx": 0.0,
+                "tz": 0.0,
+                "time2arrive": 1.0,
+                "tactive": true,
+                "perceptionTime": 0.1,
+                "path": [
+                    [75.0, 0.0, -74.0],
+                    [75.0, 0.0, -66.0],
+                    [81.0, 0.0, -66.0],
+                    [80.0, 0.0, -74.0]
+                ],
+                "countdown_stop": 2.0,
+                "countdown_shoot": 0.0,
+                "countdown_perception": 1.0,
+                "scale_to_respawn_attack": 2.0
+            },
+            {
+                "position": [73.0, 0.0, -87.0],
+                "scale": [2.0, 2.0, 2.0],
+                "color": [0, 121, 241, 255],
+                "max_speed": 0.55,
+                "life": 15,
+                "type": 3,
+                "element": 2,
+                "arrival_radius": 0.7,
+                "detect_radius": 15.0,
+                "attack_radius": 10.0,
+                "tx": 0.0,
+                "tz": 0.0,
+                "time2arrive": 7.0,
+                "tactive": true,
+                "perceptionTime": 0.2,
+                "path": [
+                    [73.0, 0.0, -87.0],
+                    [69.0, 0.0, -87.0],
+                    [73.0, 0.0, -87.0],
+                    [69.0, 0.0, -87.0]
+                ],
+                "countdown_stop": 0.0,
+                "countdown_shoot": 0.5,
+                "countdown_perception": 0.5,
+                "scale_to_respawn_attack": 2.0
+            }
+        ],
+        "npcs": [],
+        "player": [
+            {
+                "position": [61.0, 0.0, -65.0]
+            }
+        ]
+    }
+}

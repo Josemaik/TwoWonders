@@ -32,14 +32,18 @@
 #include "../utils/bt/decision_readyforheal.hpp"
 struct Ia_man
 {
+    using jsonType = const nlohmann::json_abi_v3_11_2::json&;
+
     // void createMap(EntityManager& em);
     void createEnemiesZone(EntityManager& em, uint16_t zone);
     bool checkEnemiesCreaeted(uint16_t zone);
     void createEnemies(EntityManager& em);
+    void createEnemy(EntityManager& em, jsonType json);
+    void resetVec();
 private:
     bool createdzone2{ false }, createdzone3{ false }, createdzone4{ false },
         createdzone5{ false }, createdzone6{ false }, createdzone12{ false },
-        createdzone11{false};
+        createdzone11{ false };
 
     void createEnemiesZone2(EntityManager& em);
     void createEnemiesZone3(EntityManager& em);
@@ -50,6 +54,9 @@ private:
     void createEnemiesZone11(EntityManager& em);
 
     void setCreatedtofalse(uint16_t z);
+
+    std::vector<std::unique_ptr<BehaviourTree_t>> vec_t{};
+
 };
 
 #endif // !MAP
