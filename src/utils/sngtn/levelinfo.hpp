@@ -42,7 +42,7 @@ struct LevelInfo
 
   uint16_t num_zone{};
   bool drawzone{ false };
-  int segundos{ 10000 };
+  int segundos{ 1000 };
   uint8_t mapID{ 0 };
 
   GameScreen currentScreen = GameScreen::LOGO;

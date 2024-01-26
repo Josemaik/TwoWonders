@@ -458,34 +458,34 @@ void Ia_man::createEnemies(EntityManager&) {
 void Ia_man::createEnemy(EntityManager& em, jsonType json)
 {
     // Extraemos los datos del json
-    vec3d position = { json["position"][0], json["position"][1], json["position"][2] };
-    vec3d scale = { json["scale"][0], json["scale"][1], json["scale"][2] };
-    Color color = { json["color"][0], json["color"][1], json["color"][2], json["color"][3] };
-    double max_speed = json["max_speed"];
-    int life = json["life"];
-    int type = json["type"];
-    ElementalType element = json["element"];
-    double arrival_radius = json["arrival_radius"];
-    double detect_radius = json["detect_radius"];
-    double attack_radius = json["attack_radius"];
-    double tx = json["tx"];
-    double tz = json["tz"];
-    double time2arrive = json["time2arrive"];
-    bool tactive = json["tactive"];
-    double perceptionTime = json["perceptionTime"];
-    Path_t<4> path = { vec3d{json["path"][0][0], json["path"][0][1], json["path"][0][2]},
-                       vec3d{json["path"][1][0], json["path"][1][1], json["path"][1][2]},
-                       vec3d{json["path"][2][0], json["path"][2][1], json["path"][2][2]},
-                       vec3d{json["path"][3][0], json["path"][3][1], json["path"][3][2]} };
+    vec3d position = { json["position"][0].GetDouble(), json["position"][1].GetDouble(), json["position"][2].GetDouble() };
+    vec3d scale = { json["scale"][0].GetDouble(), json["scale"][1].GetDouble(), json["scale"][2].GetDouble() };
+    Color color = { static_cast<u_char>(json["color"][0].GetUint()), static_cast<u_char>(json["color"][1].GetUint()), static_cast<u_char>(json["color"][2].GetUint()), static_cast<u_char>(json["color"][3].GetUint()) };
+    double max_speed = json["max_speed"].GetDouble();
+    int life = json["life"].GetInt();
+    int type = json["type"].GetInt();
+    ElementalType element = static_cast<ElementalType>(json["element"].GetDouble());
+    double arrival_radius = json["arrival_radius"].GetDouble();
+    double detect_radius = json["detect_radius"].GetDouble();
+    double attack_radius = json["attack_radius"].GetDouble();
+    double tx = json["tx"].GetDouble();
+    double tz = json["tz"].GetDouble();
+    double time2arrive = json["time2arrive"].GetDouble();
+    bool tactive = json["tactive"].GetBool();
+    double perceptionTime = json["perceptionTime"].GetDouble();
+    Path_t<4> path = { vec3d{json["path"][0][0].GetDouble(), json["path"][0][1].GetDouble(), json["path"][0][2].GetDouble()},
+                       vec3d{json["path"][1][0].GetDouble(), json["path"][1][1].GetDouble(), json["path"][1][2].GetDouble()},
+                       vec3d{json["path"][2][0].GetDouble(), json["path"][2][1].GetDouble(), json["path"][2][2].GetDouble()},
+                       vec3d{json["path"][3][0].GetDouble(), json["path"][3][1].GetDouble(), json["path"][3][2].GetDouble()} };
     // int i = 0;
     // for (const auto& point : json["path"]) {
     //     path[i] = vec3d{ point[0], point[1], point[2] };
     //     i++;
     // }
-    double countdown_stop = json["countdown_stop"];
-    double countdown_shoot = json["countdown_shoot"];
-    double countdown_perception = json["countdown_perception"];
-    double scale_to_respawn_attack = json["scale_to_respawn_attack"];
+    double countdown_stop = json["countdown_stop"].GetDouble();
+    double countdown_shoot = json["countdown_shoot"].GetDouble();
+    double countdown_perception = json["countdown_perception"].GetDouble();
+    double scale_to_respawn_attack = json["scale_to_respawn_attack"].GetDouble();
 
     // Creamos el enemigo
     auto& e{ em.newEntity() };
@@ -505,6 +505,8 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     {
     case 0:
     {
+        em.addTag<GolemTag>(e);
+
         auto* d_a_1 = &tree.createNode<BTDecisionReadyforAttack>();
         auto* a_a_1 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee); // fail si disparo succes si no disparo
         auto* d_r_1 = &tree.createNode<BTDecisionOnAttackRadius>();

@@ -381,7 +381,7 @@
                 "position": [-33.0, 2.0, -15.0],
                 "scale": [2.0, 2.0, 2.0],
                 "color": [0, 121, 241, 255],
-                "max_speed": 0.55,
+                "max_speed": 0.33,
                 "life": 10,
                 "type": 0,
                 "element": 2,

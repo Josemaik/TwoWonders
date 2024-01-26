@@ -23,7 +23,7 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);// -2 -12 63 -71
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.0f, -0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -0.0f, 0.0f, 0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
@@ -130,7 +130,7 @@ void Game::run()
                 li.currentScreen = GameScreen::GAMEPLAY;
             render_system.drawStory(engine);
 
-            if (em.freeEntities() == EntityManager::MAX_ENTITIES)
+            if (em.getEntities().empty())
             {
                 createEntities(em, evm);
                 map.reset(em, 0, iam);
@@ -144,10 +144,11 @@ void Game::run()
         {
             if (em.getEntities().empty())
             {
-                createEntities(em, evm);
-                map.reset(em, 0, iam);
+                li.num_zone = 0;
                 zone_system.reset();
                 li.notLoadSet.clear();
+                createEntities(em, evm);
+                map.reset(em, 0, iam);
             }
 
             input_system.update(em);

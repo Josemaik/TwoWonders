@@ -32,7 +32,7 @@
 #include "../utils/bt/decision_readyforheal.hpp"
 struct Ia_man
 {
-    using jsonType = const nlohmann::json_abi_v3_11_2::json&;
+    using jsonType = const rapidjson::Value&;
 
     // void createMap(EntityManager& em);
     void createEnemiesZone(EntityManager& em, uint16_t zone);

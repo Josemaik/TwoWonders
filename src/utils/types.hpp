@@ -22,7 +22,9 @@
 #include "../utils/sngtn/blackboard.hpp"
 #include "../utils/sngtn/debug_singleton.hpp"
 #include "../utils/sngtn/levelinfo.hpp"
-#include <nlohmann/json.hpp>
+// #include <nlohmann/json.hpp>
+#include <rapidjson/document.h>
+#include <rapidjson/istreamwrapper.h>
 
 // Constants
 static constexpr float DEGTORAD = static_cast<float>(M_PI / 180.0);
@@ -43,13 +45,13 @@ struct DoorTag {};
 struct RampTag {};
 struct SlimeTag {};
 struct SnowmanTag {};
-
+struct GolemTag {};
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, RampComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent, ShieldComponent, TypeComponent>;
-using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, WallTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag>;
+using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, WallTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag, GolemTag>;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;
 using deathSet = std::set<std::size_t, std::greater<std::size_t>>;
-using mapType = nlohmann::json;
+using mapType = rapidjson::Document;
