@@ -45,5 +45,5 @@ struct LevelInfo
   int segundos{ 10000 };
   uint8_t mapID{ 0 };
 
-  GameScreen currentScreen = GameScreen::STORY;
+  GameScreen currentScreen = GameScreen::LOGO;
 };

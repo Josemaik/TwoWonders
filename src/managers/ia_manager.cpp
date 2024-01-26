@@ -221,7 +221,7 @@ void Ia_man::createEnemiesZone(EntityManager& em, uint16_t zone) {
     };
 }
 
-void Ia_man::createEnemies(EntityManager& em) {
+void Ia_man::createEnemies(EntityManager&) {
 
     {
         //Enemigo Dragón
