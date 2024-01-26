@@ -1,13 +1,15 @@
 #include "render_system.hpp"
 #include <iomanip>
+#include "../../libs/raygui.h"
 
-void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debug)
+void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debugphy, bool debugAI)
 {
 
     // Actualizamos la posicion de render del componente de fisicas
     em.forEach<SYSCMPs, SYSTAGs>([](Entity&, PhysicsComponent& phy, RenderComponent& ren)
     {
         ren.setPosition(phy.position);
+        ren.setOrientation(phy.orientation);
     });
 
     beginFrame(engine);
@@ -15,20 +17,74 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debu
     // Dibuja todas las entidades con componente de render
     drawEntities(em, engine);
 
-    endFrame(engine, em, debug);
+    endFrame(engine, em, debugphy, debugAI);
 }
 
-void RenderSystem::drawLogoGame(ENGI::GameEngine& engine) {
+void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
+    // Logo del videojuego
     engine.drawTexture(engine.texture_logo_two_wonders,
         engine.getScreenWidth() / 2 - engine.texture_logo_two_wonders.width / 2,
         static_cast<int>(engine.getScreenHeight() / 2.5 - engine.texture_logo_two_wonders.height / 2),
         WHITE);
-    engine.drawText("PRESS [ENTER] TO PLAY",
-        engine.getScreenWidth() / 2 - 200,
-        engine.getScreenHeight() - 50, 30,
-        Color({ 108, 198, 215, 255 }));
+
+    // Funcionalidad de botones
+    Rectangle btn1Rec = { 300, 450, 200, 50 };
+    Rectangle btn2Rec = { 300, 520, 200, 50 };
+
+    auto& li = em.getSingleton<LevelInfo>();
+
+    if (GuiButton(btn1Rec, "JUGAR")) {
+        li.currentScreen = GameScreen::STORY;
+        ss.seleccion_menu();
+        ss.music_stop();
+    }
+
+    if (CheckCollisionPointRec(GetMousePosition(), btn1Rec) || CheckCollisionPointRec(GetMousePosition(), btn2Rec)) {
+        if (ss.pushed == false)
+            ss.sonido_mov();
+        ss.pushed = true;
+    }
+    else
+        ss.pushed = false;
+
+    if (GuiButton(btn2Rec, "CONFIGURACION")) {
+        li.currentScreen = GameScreen::OPTIONS;
+        ss.seleccion_menu();
+    }
+    engine.endDrawing();
+}
+
+void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
+    engine.beginDrawing();
+    engine.clearBackground(WHITE);
+
+    // Slider del volumen
+    Rectangle volumenSlider = { 100, 100, 200, 20 };
+    float volumen = 50; // supongo que esto inicializa volumen
+    float nuevoValor = static_cast<float>(GuiSliderBar(volumenSlider, "Volumen", NULL, &volumen, 0, 100));
+
+    // Ahora asignamos el nuevo valor al puntero volumen
+    volumen = nuevoValor;
+
+    // Boton de volver al inicio
+    Rectangle btn1Rec = { 300, 520, 200, 50 };
+    auto& li = em.getSingleton<LevelInfo>();
+
+    if (GuiButton(btn1Rec, "VOLVER")) {
+        li.currentScreen = GameScreen::TITLE;
+        ss.seleccion_menu();
+    }
+
+    if (CheckCollisionPointRec(GetMousePosition(), btn1Rec)) {
+        if (ss.pushed == false)
+            ss.sonido_mov();
+        ss.pushed = true;
+    }
+    else
+        ss.pushed = false;
+
     engine.endDrawing();
 }
 
@@ -45,7 +101,7 @@ void RenderSystem::drawLogoKaiwa(ENGI::GameEngine& engine) {
 void RenderSystem::drawEnding(ENGI::GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
-    engine.drawText("Has ganado", 250, 250, 50, BLACK);
+    engine.drawText("FIN DEL NIVEL 1", 250, 250, 50, BLACK);
     engine.drawText("PRESS [ENTER] TO RETURN TITLE",
         engine.getScreenWidth() / 2 - 280,
         engine.getScreenHeight() - 50, 30,
@@ -72,25 +128,130 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
     {
         if (e.hasComponent<RenderComponent>())
         {
-            auto const& r{ em.getComponent<RenderComponent>(e) };
+            auto& r{ em.getComponent<RenderComponent>(e) };
             if (r.visible) {
                 // Revisamos si es el jugador para mover la cámara
-                //if (e.hasTag<PlayerTag>())
-                //{
-                //    engine.setPositionCamera({ r.position.x(), 25.0f, r.position.z() + 25.0f });
-                //    engine.setTargetCamera(r.position);
-                //}
+                if (e.hasTag<PlayerTag>())
+                {
+                    if (!r.cameraChange)
+                        engine.setPositionCamera({ r.position.x() + 8.f, r.position.y() + 10.f, r.position.z() + 8.f });
+                    else
+                        engine.setPositionCamera({ r.position.x() - 8.f, r.position.y() + 10.f, r.position.z() + 8.f });
+
+                    engine.setTargetCamera(r.position);
+                }
                 // Comprobar si tiene el componente vida
 
                 Color colorEntidad = r.color;
+
+                // Comprobar el tipo y si es enemigo cambiarle el color
+                if (!e.hasTag<PlayerTag>() && e.hasComponent<TypeComponent>()) {
+                    auto& t{ em.getComponent<TypeComponent>(e) };
+
+                    switch (t.type)
+                    {
+                    case ElementalType::Neutral:
+                        colorEntidad = GRAY;
+                        break;
+
+                    case ElementalType::Agua:
+                        colorEntidad = BLUE;
+                        break;
+
+                    case ElementalType::Fuego:
+                        colorEntidad = RED;
+                        break;
+
+                    case ElementalType::Hielo:
+                        colorEntidad = SKYBLUE;
+                        break;
+
+                    default:
+                        break;
+                    }
+                }
+
                 if (e.hasComponent<LifeComponent>()) {
                     auto& l{ em.getComponent<LifeComponent>(e) };
                     if (l.elapsed < l.countdown)
-                        colorEntidad = YELLOW;
+                        colorEntidad = MAROON;
                 }
                 if (!e.hasTag<ZoneTag>())
-                    engine.drawCube(r.position, r.scale.x(), r.scale.y(), r.scale.z(), colorEntidad);
-                engine.drawCubeWires(r.position, r.scale.x(), r.scale.y(), r.scale.z(), BLACK);
+                {
+                    vec3d scl = { 1.0, 1.0, 1.0 };
+                    vec3d pos = { r.position.x(), r.position.y(), r.position.z() };
+                    // Solo generamos la malla si no existe
+                    if (!r.meshLoaded)
+                    {
+                        if (e.hasTag<PlayerTag>())
+                        {
+                            r.model = LoadModel("assets/models/main_character.obj");
+                            Texture2D t0 = LoadTexture("assets/models/textures/main_character_uv_V2.png");
+                            Texture2D t = LoadTexture("assets/models/textures/main_character_texture_V2.png");
+                            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                            r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+                        }
+                        else if (e.hasTag<SlimeTag>())
+                        {
+                            r.model = LoadModel("assets/models/Slime.obj");
+                        }
+                        else if (e.hasTag<SnowmanTag>())
+                        {
+                            r.model = LoadModel("assets/models/snowman.obj");
+                            Texture2D t0 = LoadTexture("assets/models/textures/snowman_uv.png");
+                            Texture2D t = LoadTexture("assets/models/textures/snowman_texture.png");
+                            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                            r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+                        }
+                        else if (e.hasTag<GolemTag>())
+                        {
+                            r.model = LoadModel("assets/models/Golem.obj");
+                            Texture2D t0 = LoadTexture("assets/models/textures/Golem_uv.png");
+                            Texture2D t = LoadTexture("assets/models/textures/Golem_texture.png");
+                            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                            r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+                        }
+                        else
+                        {
+                            r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
+                            r.model = engine.loadModelFromMesh(r.mesh);
+                        }
+                        r.meshLoaded = true;
+                    }
+
+                    if (e.hasTag<PlayerTag>())
+                    {
+                        scl = { 0.33, 0.33, 0.33 };
+                        pos.setY(pos.y() - .5);
+                    }
+                    else if (e.hasTag<SlimeTag>())
+                    {
+                        scl = { 0.33, 0.33, 0.33 };
+                        pos.setY(pos.y() - .6);
+                    }
+                    else if (e.hasTag<SnowmanTag>())
+                    {
+                        scl = { 0.33, 0.33, 0.33 };
+                        pos.setY(pos.y() - 1.1);
+                    }
+                    else if (e.hasTag<GolemTag>())
+                    {
+                        scl = { 0.33, 0.33, 0.33 };
+                        pos.setY(pos.y() - 1.1);
+                    }
+
+                    float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
+                    engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
+
+                    if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>())
+                    {
+                        int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
+                        if (orientationInDegreesInt % 90 == 0)
+                            engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
+                        else
+                            engine.drawModelWires(r.model, pos, r.rotationVec, orientationInDegrees, scl, BLACK);
+                    }
+                }
             }
         }
     }
@@ -108,17 +269,120 @@ void RenderSystem::beginFrame(ENGI::GameEngine& engine)
 }
 
 // Se termina el dibujado
-void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debug)
+void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debugphy, bool debugAI)
 {
     engine.endMode3D();
 
-    drawHUD(em, engine, debug);
+    drawHUD(em, engine, debugphy);
+    if (debugAI) {
+        drawEditorInGameIA(engine, em);
+    }
 
     engine.endDrawing();
 }
+//Dibuja Slider en función de los parámetros
+double SelectValue(double value, float posx, float posy, float height, float width, const char* text, float min_value, float max_value) {
+    // pasamos a float el valor
+    float floatvalue = static_cast<float>(value);
+    // dibujamos el slider para modificar su valor
+    int new_detect_radius = GuiSliderBar(Rectangle(posx, posy, height, width), text, NULL, &floatvalue, min_value, max_value);
+    new_detect_radius = new_detect_radius + 1;
+    DrawText(std::to_string(floatvalue).c_str(), 220, static_cast<int>(posy + 5.0f), 20, BLUE);
+    // seteamos el nuevo valor
+    return static_cast<double>(floatvalue);
+}
+//Editor In-Game
+void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& em) {
+    engine.beginDrawing();
 
+    // Dibujar un rectángulo que simula una ventana
+    Rectangle windowRect = { 0, 100, 340, 550 };
+    DrawRectangleLinesEx(windowRect, 2, DARKGRAY);
+    DrawRectangleRec(windowRect, RAYWHITE);
+
+    // Dibujar el texto "debugger IA" en el centro de la ventana
+    Vector2 textSize = MeasureTextEx(GetFontDefault(), "Debugger IA", 20, 1);
+    Vector2 textPosition = { windowRect.x + 20,
+                             windowRect.y + 10 };
+
+    DrawTextEx(GetFontDefault(), "Debugger IA", textPosition, 20, 1, DARKBLUE);
+
+    // Dibujar una línea recta debajo del texto
+    float lineY = textPosition.y + textSize.y + 5;  // Ajusta la posición de la línea según tus necesidades
+    DrawLine(static_cast<int>(windowRect.x), static_cast<int>(lineY), static_cast<int>(windowRect.x) + static_cast<int>(windowRect.width),
+        static_cast<int>(lineY), DARKGRAY);
+    // Dibujar el texto "INFO" debajo de la línea
+    Vector2 textPositionInfo = { windowRect.x + 5, lineY + 10 };
+    Vector2 textPositionParameters = { windowRect.x + 5, 290 };
+    DrawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
+    DrawTextEx(GetFontDefault(), "PARÁMETROS", textPositionParameters, 20, 1, RED);
+
+    auto& debugsnglt = em.getSingleton<Debug_t>();
+    // AQUI PONDRIA
+    for (auto const& e : em.getEntities()) {
+        if (e.hasComponent<AIComponent>()) {
+            RayCast ray = engine.getMouseRay();
+            auto& aic{ em.getComponent<AIComponent>(e) };
+            auto& col = em.getComponent<ColliderComponent>(e);
+            auto& ren = em.getComponent<RenderComponent>(e);
+            // Comprobar si el rayo intersecta con el collider
+            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
+                DrawText("Node active:", static_cast<int>(textPositionInfo.x), static_cast<int>(textPositionInfo.y + 20), 20, BLACK);
+                DrawTextEx(GetFontDefault(), aic.bh, Vector2{ textPositionInfo.x + 130,textPositionInfo.y + 20 }, 20, 1, DARKGRAY);
+                DrawText("TEID:", 5, 190, 20, BLACK);
+                DrawTextEx(GetFontDefault(), std::to_string(aic.teid).c_str(), Vector2{ 70,190 }, 20, 1, DARKGRAY);
+                DrawText("TX:", 5, 210, 20, BLACK);
+                DrawTextEx(GetFontDefault(), std::to_string(aic.tx).c_str(), Vector2{ 70,210 }, 20, 1, DARKGRAY);
+                DrawText("TZ:", 5, 230, 20, BLACK);
+                DrawTextEx(GetFontDefault(), std::to_string(aic.tz).c_str(), Vector2{ 70,230 }, 20, 1, DARKGRAY);
+                DrawText("Culldown:", 5, 250, 20, BLACK);
+                DrawTextEx(GetFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), Vector2{ 120,250 }, 20, 1, DARKGRAY);
+                DrawText("Player Detected?:", 5, 270, 20, BLACK);
+                DrawTextEx(GetFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", Vector2{ 200,270 }, 20, 1, DARKGRAY);
+                // So ademas de pasar el ratón por encima , clicko activo la edición de parámetros de esa entidad
+                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                    isSelected = !isSelected;
+                    debugsnglt.IA_id = e.getID();
+                }
+                // si es seleccionada => wires morados
+                // no es seleccionada => wires rojos
+                engine.beginMode3D();
+                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
+                engine.endMode3D();
+            }
+            if (isSelected && e.getID() == debugsnglt.IA_id) {
+                engine.beginMode3D();
+                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
+                engine.endMode3D();
+                // si se seleccionada una entidad se muestra el Editor de parámetros
+                if (isSelected) {
+                    auto& aic = em.getComponent<AIComponent>(*em.getEntityByID(debugsnglt.IA_id));
+                    auto& phy = em.getComponent<PhysicsComponent>(*em.getEntityByID(debugsnglt.IA_id));
+                    // ID DE LA ENTIDAD SELECCIONADA
+                    DrawText("EID:", 5, 310, 20, BLACK);
+                    DrawText(std::to_string(debugsnglt.IA_id).c_str(), 55, 310, 20, DARKGRAY);
+                    //Detect Radius
+                    aic.detect_radius = SelectValue(aic.detect_radius, 85.0, 330.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
+                    // Attack Radius
+                    aic.attack_radius = SelectValue(aic.attack_radius, 85.0, 370.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
+                    // Arrival Radius
+                    aic.arrival_radius = SelectValue(aic.arrival_radius, 85.0, 410.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
+                    // Max Speed
+                    phy.max_speed = SelectValue(phy.max_speed, 85.0, 450.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
+                    //COuntdown Perception
+                    aic.countdown_perception = SelectValue(aic.countdown_perception, 85.0, 490.0, 120.0, 30.0, "Perception", 0.0, 10.0);
+                    //Countdown Shoot
+                    aic.countdown_shoot = SelectValue(aic.countdown_shoot, 85.0, 530.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
+                    //Countdown stop
+                    aic.countdown_stop = SelectValue(aic.countdown_stop, 85.0, 570.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
+                }
+            }
+        }
+    }
+    engine.endDrawing();
+}
 // Se dibuja el HUD
-void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debug)
+void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto* playerEn = em.getEntityByID(li.playerID);
@@ -133,6 +397,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         {
             // Dibujar background HUD
             engine.drawRectangle(0, 0, 580, 60, WHITE);
+            engine.drawRectangle(0, 55, 100, 30, WHITE);
 
             // Dibujar vidas restantes del player en el HUD
             if (e.hasComponent<LifeComponent>())
@@ -166,6 +431,21 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 engine.drawText(countdown_ataque.c_str(), 10, 35, 20, BLACK);
             }
 
+            // Dibujar el tipo de ataque que tiene equipado
+            if (e.hasComponent<TypeComponent>())
+            {
+                auto const& t{ em.getComponent<TypeComponent>(e) };
+
+                if (t.type == ElementalType::Neutral)
+                    engine.drawText("Neutral", 10, 60, 20, BLACK);
+                else if (t.type == ElementalType::Agua)
+                    engine.drawText("Agua", 10, 60, 20, BLUE);
+                else if (t.type == ElementalType::Fuego)
+                    engine.drawText("Fuego", 10, 60, 20, RED);
+                else
+                    engine.drawText("Hielo", 10, 60, 20, SKYBLUE);
+            }
+
         }
 
         // Dibujar el precio d elos objetos de la tienda
@@ -195,8 +475,8 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
 
-
-        if (debug && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
+        //Vidas HUD
+        if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
             auto const& l{ em.getComponent<LifeComponent>(e) };
@@ -208,7 +488,70 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 BLACK);
         }
 
-        if (debug && e.hasComponent<PhysicsComponent>())
+
+        if (debugphy && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
+        {
+            auto const& r{ em.getComponent<RenderComponent>(e) };
+            auto const& l{ em.getComponent<LifeComponent>(e) };
+
+            engine.drawText(std::to_string(l.life).c_str(),
+                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+                20,
+                BLACK);
+
+            if (e.hasComponent<TypeComponent>())
+            {
+                auto const& t{ em.getComponent<TypeComponent>(e) };
+
+                std::string tipo = "Hielo";
+                Color color = SKYBLUE;
+
+                if (t.type == ElementalType::Neutral)
+                {
+                    tipo = "Neutral";
+                    color = BLACK;
+                }
+                else if (t.type == ElementalType::Agua)
+                {
+                    tipo = "Agua";
+                    color = BLUE;
+                }
+                else if (t.type == ElementalType::Fuego)
+                {
+                    tipo = "Fuego";
+                    color = RED;
+                }
+
+                engine.drawText(tipo.c_str(),
+                    static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+                    static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 70),
+                    20,
+                    color);
+            }
+
+        }
+
+        if (debugphy && e.hasComponent<ColliderComponent>())
+        {
+            auto& col{ em.getComponent<ColliderComponent>(e) };
+
+            // Calcular la posición y el tamaño de la bounding box
+            vec3d boxPosition = (col.boundingBox.min + col.boundingBox.max) / 2;
+            vec3d boxSize = col.boundingBox.max - col.boundingBox.min;
+
+            // Dibujar la bounding box
+            engine.beginMode3D();
+            engine.drawCubeWires(boxPosition,
+                static_cast<float>(boxSize.x()),
+                static_cast<float>(boxSize.y()),
+                static_cast<float>(boxSize.z()),
+                BLUE);
+            engine.endMode3D();
+
+        }
+
+        if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
         {
             auto& phy = em.getComponent<PhysicsComponent>(e);
 
@@ -238,9 +581,22 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 engine.drawText(velZ.c_str(), 10, 250, 20, BLACK);
 
                 engine.beginMode3D();
-                engine.drawCubeWires(ren.position, ren.scale.x(), ren.scale.y(), ren.scale.z(), RED);
+                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
                 engine.endMode3D();
             }
+        }
+        // Dibujar zona para mostrar ejemplo de uso del eventmanager
+        auto& linfo = em.getSingleton<LevelInfo>();
+        if (linfo.drawzone == true) {
+            engine.drawText("CAMBIANDO DE \n ZONA...", 600, 10, 25, RED);
+            if (linfo.segundos == 0) {
+                linfo.drawzone = false;
+                linfo.segundos = 1000;
+            }
+            linfo.segundos--;
+        }
+        else {
+            engine.drawText(("ZONA " + std::to_string(linfo.num_zone)).c_str(), 600, 10, 50, RED);
         }
 
         // Dibujar el ID de las entidades // DEBUG
@@ -252,7 +608,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         //         static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
         //         20,
         //         BLACK);
-        // }
+        // // }
     }
 }
 
@@ -261,4 +617,14 @@ void RenderSystem::drawDeath(ENGI::GameEngine& engine)
     engine.drawRectangle(0, 0, engine.getScreenWidth(), engine.getScreenHeight(), Fade(BLACK, 0.5f));
     engine.drawText("HAS MUERTO", 250, 250, 40, RED);
     engine.drawText("[ENTER] para volver a jugar", 165, 300, 30, RED);
+}
+
+void RenderSystem::unloadModels(EntityManager& em, ENGI::GameEngine& engine)
+{
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, PhysicsComponent&, RenderComponent& ren)
+    {
+        // engine.unloadMesh(ren.mesh);
+        engine.unloadModel(ren.model);
+        ren.meshLoaded = false;
+    });
 }

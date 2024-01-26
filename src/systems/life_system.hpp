@@ -14,7 +14,7 @@ struct LifeSystem
     void update(EntityManager& em, float deltaTime);
 
 private:
-    void createObject(EntityManager& em, vec3f pos);
+    void createObject(EntityManager& em, vec3d pos);
     deathSet dead_entities{};
 };
 

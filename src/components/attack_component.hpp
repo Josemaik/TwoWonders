@@ -1,15 +1,16 @@
 #pragma once
 
-enum struct AttackType { Melee, Ranged, Bomb, AttackPlayer, TripleShot};
+enum struct AttackType { Melee, Ranged, Bomb, AttackPlayer, TripleShot, HealSpell};
 
 struct AttackComponent
 {
     AttackType type{ AttackType::Ranged };
     u_int16_t damage{};
     float range{}; // en segundos
+    double scale_to_respawn_attack{2.0};
     bool createAttack{ false };
     float countdown{ 1.0f }, elapsed{ 1.0f }; // en segundos
-    vec3f vel{};
+    vec3d vel{};
 
     void attack(AttackType typeAttack) {
         if (elapsed >= countdown) {

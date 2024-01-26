@@ -1,10 +1,10 @@
 #include "zone_system.hpp"
 
-void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam,Eventmanager& evm) {
+void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Eventmanager& evm, Map& map) {
 
     updateZoneEnemies(em);
 
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ZoneComponent& zon)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, ZoneComponent& zon)
     {
         if (zon.changeZone) {
             // Comprobar en que zona estamos
@@ -15,7 +15,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
                 // if(!iam.checkEnemiesCreaeted(zon.zone)){
                 // }
                 //lanzar evento
-                evm.scheduleEvent(Event{EVENT_CODE_CHANGE_ZONE});
+                evm.scheduleEvent(Event{ EVENT_CODE_CHANGE_ZONE });
                 //borro enemigos si cambio de zona
                 deleteZoneEnemies(em);
                 iam.createEnemiesZone(em, zon.zone);
@@ -23,66 +23,90 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
                 li.num_zone = zon.zone;
                 if (zon.zone <= 13)
                 {
-                    if (ent.hasComponent<RenderComponent>()) {
-                        auto& r = em.getComponent<RenderComponent>(ent);
-                        engine.setPositionCamera({ r.position.x(), 30.0f, r.position.z() + 12.0f });
-                        engine.setTargetCamera({ r.position.x(), r.position.y() + 3.0f, r.position.z() });
-                    }
+                    // if (ent.hasComponent<RenderComponent>()) {
+                    //     auto& r = em.getComponent<RenderComponent>(ent);
+                    //     engine.setPositionCamera({ r.position.x(), 30.0, r.position.z() + 12.0 });
+                    //     engine.setTargetCamera({ r.position.x(), r.position.y() + 3.0, r.position.z() });
+                    // }
                 }
                 // Es un TP
                 else
                 {
                     auto* playerEn = em.getEntityByID(li.playerID);
                     auto& p = em.getComponent<PhysicsComponent>(*playerEn);
+                    auto& r = em.getComponent<RenderComponent>(*playerEn);
+
                     switch (zon.zone)
                     {
 
                         // SWORD //
 
                     case 14: // TP a la cueva de la espada
-                        p.position.setX(49.0f);
-                        p.position.setZ(85.0f);
+                        map.reset(em, 2, iam);
+
+                        p.position.setX(49.0);
+                        p.position.setZ(85.0);
                         break;
 
                     case 15: // TP desde la cueva de la espada
-                        p.position.setX(-5.0f);
-                        p.position.setZ(-4.5f);
+                        map.reset(em, 0, iam);
+
+                        p.position.setX(-5.0);
+                        p.position.setZ(-4.5);
                         break;
 
                         // COINS //
 
                     case 16: // TP a la cueva de las monedas
-                        p.position.setX(71.0f);
-                        p.position.setZ(85.0f);
+                        map.reset(em, 2, iam);
+
+                        p.position.setX(71.0);
+                        p.position.setZ(85.0);
                         break;
 
                     case 17: // TP desde la cueva de las monedas
-                        p.position.setX(3.0f);
-                        p.position.setZ(-20.0f);
+                        map.reset(em, 0, iam);
+
+                        p.position.setX(3.0);
+                        p.position.setZ(-20.0);
                         break;
 
                         // SHOP //
 
                     case 18: // TP a la cueva de la tienda
-                        p.position.setX(93.0f);
-                        p.position.setZ(85.0f);
+                        map.reset(em, 2, iam);
+
+                        p.position.setX(93.0);
+                        p.position.setY(0.0);
+                        p.position.setZ(85.0);
                         break;
 
                     case 19: // TP desde la cueva de la tienda
-                        p.position.setX(-17.0f);
-                        p.position.setZ(-20.0f);
+                        map.reset(em, 0, iam);
+
+                        p.position.setX(-17.0);
+                        p.position.setY(2.0);
+                        p.position.setZ(-20.0);
                         break;
 
                         // MAZMORRA //
 
                     case 20: // TP a la cueva de la mazmorra
-                        p.position.setX(61.0f);
-                        p.position.setZ(-65.0f);
+                        r.cameraChange = true;
+
+                        map.reset(em, 1, iam);
+
+                        p.position.setX(61.0);
+                        p.position.setZ(-65.0);
                         break;
 
                     case 21: // TP desde la cueva de la mazmorra
-                        p.position.setX(-50.0f);
-                        p.position.setZ(-3.5f);
+                        r.cameraChange = false;
+
+                        map.reset(em, 0, iam);
+
+                        p.position.setX(-50.0);
+                        p.position.setZ(-3.5);
                         break;
 
                     default:
@@ -101,12 +125,13 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
     }
 }
 
-void ZoneSystem::deleteZoneEnemies(EntityManager& em)
+void ZoneSystem::deleteZoneEnemies(EntityManager&)
 {
-    auto const& li = em.getSingleton<LevelInfo>();
+    // auto const& li = em.getSingleton<LevelInfo>();
 
-    for (auto& enemy : li.enemiesID)
-        dead_entities.insert(enemy);
+    // for (auto& enemy : li.enemiesID)
+    //     dead_entities.insert(enemy);
+
 }
 
 void ZoneSystem::updateZoneEnemies(EntityManager& em)
@@ -125,7 +150,17 @@ void ZoneSystem::updateZoneEnemies(EntityManager& em)
     if (enemies != li.enemiesID)
         li.enemiesID = std::move(enemies);
 
-    if (li.num_zone == 12 && li.enemiesID.empty() && !keyCreated)
+    bool slimesDead{ true };
+
+    for (auto enemy : li.enemiesID)
+    {
+        auto ent = em.getEntityByID(enemy);
+
+        if (ent->hasTag<SlimeTag>())
+            slimesDead = false;
+    }
+
+    if ((li.num_zone == 12 || li.num_zone == 11) && slimesDead && !keyCreated)
         createKey(em);
 }
 
@@ -135,10 +170,16 @@ void ZoneSystem::createKey(EntityManager& em)
 
     em.addTag<ObjectTag>(e);
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 83.f, 0.f, -71.0f }, .scale = { 1.f, 0.3f, 0.3f }, .color = GOLD });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0f, .0f, .0f } });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 83., 0., -71.0 }, .scale = { 1., 0.3, 0.3 }, .color = GOLD });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0, .0, .0 } });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Key, .inmortal = true });
 
     keyCreated = true;
+}
+
+void ZoneSystem::reset()
+{
+    keyCreated = false;
+    dead_entities.clear();
 }

@@ -25,12 +25,12 @@ void Octree::insert(Entity& entity, ColliderComponent& collider)
 // Cuando el octree excede su capacidad de entidades, se divide en 8 octantes
 void Octree::subdivide(Entity& entity, ColliderComponent& collider)
 {
-    vec3f size = bounds_.size() / 2.0f;
-    vec3f center = bounds_.center();
+    vec3d size = bounds_.size() / 2.0;
+    vec3d center = bounds_.center();
 
     for (std::size_t i = 0; i < 8; ++i)
     {
-        vec3f octantCenter = center + offsets[i] * size;
+        vec3d octantCenter = center + offsets[i] * size;
         BBox octantBounds(octantCenter, size);
         octants_[i] = std::make_unique<Octree>(depth_ + 1, octantBounds, this);
 

@@ -3,46 +3,46 @@
 
 struct BBox
 {
-    vec3f min{};
-    vec3f max{};
+    vec3d min{};
+    vec3d max{};
 
     BBox() = default;
 
     // Constructor de bounding box a partir de un centro un tamaño
-    BBox(const vec3f& center, const vec3f& size)
+    BBox(const vec3d& center, const vec3d& size)
     {
-        min = center - size / 2.f;
-        max = center + size / 2.f;
+        min = center - size / 2.0;
+        max = center + size / 2.0;
     }
 
     // Sacamos el solape entre dos bounding boxes
-    [[nodiscard]] inline static constexpr vec3f minOverlap(const BBox& bbox1, const BBox& bbox2) noexcept
+    [[nodiscard]] inline static constexpr vec3d minOverlap(const BBox& bbox1, const BBox& bbox2) noexcept
     {
-        // vec3f overlapMin = vec3f::max(bbox1.min, bbox2.min);
-        // vec3f overlapMax = vec3f::min(bbox1.max, bbox2.max);
-        // vec3f overlapSize = overlapMax - overlapMin;
+        // vec3d overlapMin = vec3d::max(bbox1.min, bbox2.min);
+        // vec3d overlapMax = vec3d::min(bbox1.max, bbox2.max);
+        // vec3d overlapSize = overlapMax - overlapMin;
         // return overlapSize;
 
-        vec3f overlap1 = (bbox1.max - bbox2.min);
-        vec3f overlap2 = (bbox2.max - bbox1.min);
+        vec3d overlap1 = (bbox1.max - bbox2.min);
+        vec3d overlap2 = (bbox2.max - bbox1.min);
 
-        return vec3f::min(overlap1, overlap2);
+        return vec3d::min(overlap1, overlap2);
     }
 
-    constexpr vec3f size() const { return max - min; }
-    constexpr vec3f center() const { return (min + max) / 2.f; }
+    constexpr vec3d size() const { return max - min; }
+    constexpr vec3d center() const { return (min + max) / 2.0; }
     bool intersects(const BBox& other) const { return !(max < other.min || min > other.max); }
 
     // Función para comprobar si un rayo intersecta con la caja delimitadora
-    bool intersectsRay(vec3f& rayOrigin, vec3f& rayDirection) const {
-        vec3f t1 = (min - rayOrigin) / rayDirection;
-        vec3f t2 = (max - rayOrigin) / rayDirection;
+    bool intersectsRay(vec3d& rayOrigin, vec3d& rayDirection) const {
+        vec3d t1 = (min - rayOrigin) / rayDirection;
+        vec3d t2 = (max - rayOrigin) / rayDirection;
 
-        vec3f tmin = vec3f::min(t1, t2);
-        vec3f tmax = vec3f::max(t1, t2);
+        vec3d tmin = vec3d::min(t1, t2);
+        vec3d tmax = vec3d::max(t1, t2);
 
-        float tNear = tmin.max();
-        float tFar = tmax.min();
+        double tNear = tmin.max();
+        double tFar = tmax.min();
 
         return tNear <= tFar && tFar >= 0;
     }

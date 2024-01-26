@@ -3,6 +3,7 @@
 #include <cmath>
 #include <optional>
 #include <raylib.h>
+#include <array>
 
 template <typename DataT>
 struct vec3D
@@ -30,9 +31,19 @@ struct vec3D
         return { x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_ };
     }
 
+    static constexpr DataT dotProduct(vec3D const& lhs, vec3D const& rhs)
+    {
+        return lhs.dotProduct(rhs);
+    }
+
     constexpr vec3D crossProduct(vec3D const& rhs) const
     {
         return { y_ * rhs.z_ - z_ * rhs.y_, z_ * rhs.x_ - x_ * rhs.z_, x_ * rhs.y_ - y_ * rhs.x_ };
+    }
+
+    static constexpr vec3D crossProduct(vec3D const& lhs, vec3D const& rhs)
+    {
+        return lhs.crossProduct(rhs);
     }
 
     constexpr vec3D operator*(DataT const s) const
@@ -126,16 +137,40 @@ struct vec3D
         return { std::min(a.x_, b.x_), std::min(a.y_, b.y_), std::min(a.z_, b.z_) };
     }
 
+    template<typename T>
+    static constexpr vec3D min(std::array<vec3D<T>, 8> array)
+    {
+        vec3D<T> min = array[0];
+        for (int i = 1; i < 8; i++) {
+            if (array[i].x() < min.x()) min.setX(array[i].x());
+            if (array[i].y() < min.y()) min.setY(array[i].y());
+            if (array[i].z() < min.z()) min.setZ(array[i].z());
+        }
+        return min;
+    }
+
     static constexpr vec3D max(const vec3D& a, const vec3D& b)
     {
         return { std::max(a.x_, b.x_), std::max(a.y_, b.y_), std::max(a.z_, b.z_) };
     }
 
-    float max() const {
+    template<typename T>
+    static vec3D max(std::array<vec3D<T>, 8> array)
+    {
+        vec3D<T> max = array[0];
+        for (int i = 1; i < 8; i++) {
+            if (array[i].x() > max.x()) max.setX(array[i].x());
+            if (array[i].y() > max.y()) max.setY(array[i].y());
+            if (array[i].z() > max.z()) max.setZ(array[i].z());
+        }
+        return max;
+    }
+
+    double max() const {
         return std::max({ x_, y_, z_ });
     }
 
-    float min() const {
+    double min() const {
         return std::min({ x_, y_, z_ });
     }
 
@@ -174,9 +209,21 @@ struct vec3D
         return false;
     }
 
+    DataT operator[](int i) const
+    {
+        if (i == 0)
+            return x_;
+        else if (i == 1)
+            return y_;
+        else if (i == 2)
+            return z_;
+        else
+            return 0;
+    }
+
     constexpr Vector3 toRaylib() const noexcept
     {
-        return Vector3{ x_, y_, z_ };
+        return Vector3{ static_cast<float>(x_),  static_cast<float>(y_),  static_cast<float>(z_) };
     }
 
     friend std::ostream& operator<<(std::ostream& os, vec3D const& v)
@@ -208,6 +255,18 @@ using vec3d = vec3D<double>;
 
 struct RayCast
 {
-    vec3f origin;
-    vec3f direction;
+    vec3d origin;
+    vec3d direction;
 };
+
+template <typename DataT>
+struct vec2D
+{
+    constexpr vec2D() = default;
+    constexpr vec2D(DataT x, DataT y) : x{ x }, y{ y } {}
+
+    DataT x{}, y{};
+};
+
+using vec2f = vec2D<float>;
+using vec2d = vec2D<double>;

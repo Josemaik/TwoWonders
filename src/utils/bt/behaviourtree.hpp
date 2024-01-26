@@ -11,11 +11,11 @@ concept BTNodeType = std::derived_from<T,BTNode_t>;
 struct BehaviourTree_t{
     //Types
     using value_type = std::unique_ptr<BTNode_t,BTNode_t::Deleter>;
-    using NodeStorage_t = std::vector<value_type>; 
+    using NodeStorage_t = std::vector<value_type>;
     using MemoryStorage_t = std::unique_ptr<std::byte[]>;
     //Constructor
     explicit BehaviourTree_t() {}
-    
+
     BTNodeStatus_t run(EntityContext_t&& ectx) noexcept { return run(ectx); };
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept{
         if ( nodes.size() > 0 )
@@ -38,7 +38,13 @@ struct BehaviourTree_t{
         //Return node
         return *pnode;
     }
-    
+
+    //Eliinar nodos
+    // Método para eliminar todos los nodos del árbol
+    void clearNodes() noexcept {
+        nodes.clear();
+        ptr_reserved = mem.get() + mem_size;
+    }
 private:
     std::size_t     mem_size    { 1024 };
     MemoryStorage_t mem         { std::make_unique<std::byte[]>(mem_size) };

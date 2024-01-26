@@ -1,289 +1,234 @@
 #include "map.hpp"
+#include <fstream>
 
-void Map::createMap(EntityManager& em) {
-    createGroundWaterOverworld(em);
-    createWallsOverworld(em);
+void Map::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
 
-    createZonesOverworld(em);
-}
+    mapType map{};
+    auto& li = em.getSingleton<LevelInfo>();
+    iam.resetVec();
 
-// Se encarga de crear las paredes del OverWorld
-void Map::createWallsOverworld(EntityManager& em) {
-
-    struct WallData
+    switch (mapID)
     {
-        vec3f position;
-        vec3f scale;
-        Color color;
-    };
+    case 0:
+        li.mapID = 0;
+        map = loadMap("assets/levels/demo_level.json");
+        break;
 
-    WallData wallData[] = {
+    case 1:
+        li.mapID = 1;
+        map = loadMap("assets/levels/mazmorra_level.json");
+        break;
 
-        // ZONA 1
+    case 2:
+        li.mapID = 2;
+        map = loadMap("assets/levels/caves_level.json");
+        break;
 
-        { { -5.5f, 0.0f, -8.0f }, { 8.0f, 1.0f, 3.0f }, LIME },    // |
-        { { 5.5f, 0.0f, -8.0f }, { 8.0f, 1.0f, 3.0f }, LIME },     // | Pared Horizontal Arriba
-
-        { { -11.0f, 0.0f, -5.5f }, { 3.0f, 1.0f, 8.0f }, LIME },   // | 
-        { { -11.0f, 0.0f, 5.5f }, { 3.0f, 1.0f, 8.0f }, LIME },    // | Pared Vertical Izquierda
-        { { 0.0f, 0.0f, 8.0f }, { 19.0f, 1.0f, 3.0f }, LIME },     // | Pared Horizontal Abajo
-        { { 11.0f, 0.0f, 0.0f }, { 3.0f, 1.0f, 19.0f }, LIME },    // | Pared Vertical Derecha
-
-        // ZONA 2
-
-        { { -11.0f, 0.0f, -12.0f }, { 3.0f, 1.0f, 5.0f }, LIME },  // | 
-        { { -11.0f, 0.0f, -21.5f }, { 3.0f, 1.0f, 8.0f }, LIME },  // | Pared Vertical Izquierda
-
-        { { 11.0f, 0.0f, -17.5f }, { 3.0f, 1.0f, 16.0f }, LIME },  // | Pared Vertical Derecha
-        { { 0.0f, 0.0f, -24.0f }, { 19.0f, 1.0f, 3.0f }, LIME },   // | Pared Horizontal Arriba
-
-        { { 7.0f, 0.0f, -20.0f }, { 1.0f, 1.0f, 1.0f }, LIME },    // | 
-        { { 7.0f, 0.0f, -16.0f }, { 1.0f, 1.0f, 1.0f }, LIME },    // | Paredes Chiquitas Derecha
-        { { 7.0f, 0.0f, -12.0f }, { 1.0f, 1.0f, 1.0f }, LIME },    // | 
-
-        { { -7.0f, 0.0f, -20.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -7.0f, 0.0f, -16.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -7.0f, 0.0f, -12.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -4.0f, 0.0f, -20.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | Paredes Chiquitas Izquierda
-        { { -4.0f, 0.0f, -16.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -4.0f, 0.0f, -12.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-
-        // ZONA 3
-
-        { { -22.0f, 0.0f, 8.0f }, { 19.0f, 1.0f, 3.0f }, LIME },   // | Pared Horizontal Abajo
-        { { -23.5f, 0.0f, -8.0f }, { 16.0f, 1.0f, 3.0f }, LIME },  // | Pared Horizontal Arriba
-
-        { { -22.0f, 0.0f, -4.0f }, { 1.0f, 1.0f, 1.0f }, LIME },  // | 
-        { { -22.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -22.0f, 0.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -19.0f, 0.0f, -2.0f }, { 1.0f, 1.0f, 1.0f }, LIME },  // | Paredes Chiquitas
-        { { -19.0f, 0.0f, 2.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -25.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -28.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-
-        // ZONA 4
-
-        { { -22.0f, 0.0f, -24.0f }, { 19.0f, 1.0f, 3.0f }, LIME },  // | Pared Horizontal Arriba
-
-        { { -20.0f, 0.0f, -18.0f }, { 3.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
-        { { -20.0f, 0.0f, -14.0f }, { 3.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
-        { { -25.0f, 0.0f, -20.0f }, { 4.0f, 1.0f, 1.0f }, DARKBROWN },   // | Paredes Chiquitas
-        { { -25.0f, 0.0f, -16.0f }, { 4.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
-        { { -25.0f, 0.0f, -12.0f }, { 4.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
-
-        // ZONA 5
-
-        { { -37.0f, 0.0f, 8.0f }, { 11.0f, 1.0f, 3.0f }, LIME },   // | 
-        { { -50.0f, 0.0f, 8.0f }, { 5.0f, 1.0f, 3.0f }, LIME },    // | Pared Horizontal Abajo
-        { { -51.5f, 0.0f, -8.0f }, { 2.0f, 1.0f, 3.0f }, LIME },   // | 
-        { { -37.0f, 0.0f, -8.0f }, { 11.0f, 1.0f, 3.0f }, LIME },  // | Pared Horizontal Arriba
-
-        { { -40.5f, 0.0f, -4.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -40.5f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, LIME },    // | 
-        { { -40.5f, 0.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, LIME },    // | 
-        { { -37.5f, 0.0f, -2.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | Paredes Chiquitas
-        { { -37.5f, 0.0f, 2.0f }, { 1.0f, 1.0f, 1.0f }, LIME },    // | 
-        { { -34.5f, 0.0f, -4.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -34.5f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, LIME },    // | 
-        { { -34.5f, 0.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, LIME },    // | 
-        { { -50.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, LIME },    // | 
-
-        { { -54.0f, 0.0f, 0.0f }, { 3.0f, 1.0f, 19.0f }, LIME },   // | Pared Vertical Izquierda
-
-        // ZONA 6
-
-        { { -37.0f, 0.0f, -24.0f }, { 11.0f, 1.0f, 3.0f }, LIME },   // | 
-        { { -50.0f, 0.0f, -24.0f }, { 5.0f, 1.0f, 3.0f }, LIME },    // | Pared Horizontal Arriba
-
-        { { -54.0f, 0.0f, -17.5f }, { 3.0f, 1.0f, 16.0f }, LIME },   // | Pared Vertical Izquierda
-
-        { { -40.5f, 0.0f, -20.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
-        { { -40.5f, 0.0f, -16.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
-        { { -40.5f, 0.0f, -12.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | Paredes Chiquitas
-        { { -37.5f, 0.0f, -18.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
-        { { -37.5f, 0.0f, -14.0f }, { 1.0f, 1.0f, 1.0f }, DARKBROWN },   // | 
-
-        // CUEVAS EN EL OVERWORLD
-
-        { { -3.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -5.0f, 0.0f, -6.0f }, { 2.0f, 1.0f, 1.0f }, BLACK },  // | Cueva Espada
-        { { -6.5f, 0.0f, -6.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // |
-
-        { { 1.5f, 0.0f, -22.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { 3.0f, 0.0f, -22.0f }, { 2.0f, 1.0f, 1.0f }, BLACK },  // | Cueva Monedas
-        { { 4.5f, 0.0f, -22.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // |  
-
-        { { -15.5f, 0.0f, -22.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-        { { -17.0f, 0.0f, -22.0f }, { 2.0f, 1.0f, 1.0f }, BLACK },  // | Cueva Tienda
-        { { -18.5f, 0.0f, -22.0f }, { 1.0f, 1.0f, 1.0f }, LIME },   // | 
-
-        { { -52.0f, 0.0f, -2.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
-        { { -52.0f, 0.0f, -3.5f }, { 1.0f, 1.0f, 2.0f }, BLACK },     // | Cueva Mazmorra
-        { { -52.0f, 0.0f, -5.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // |  
-
-        // CUEVAS
-
-        { { 38.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },  // | Pared Vertical Izquierda
-        { { 60.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },  // | Pared Vertical Central - I
-        { { 82.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN },  // | Pared Vertical Central - D
-        { { 104.0f, 0.0f, 80.0f }, { 3.0f, 1.0f, 19.0f }, DARKBROWN }, // | Pared Vertical Derecha
-
-        { { 49.f, 0.f, 72.f }, { 19.f, 1.f, 3.f }, DARKBROWN }, // |
-        { { 71.f, 0.f, 72.f }, { 19.f, 1.f, 3.f }, DARKBROWN }, // | Paredes Horizontales Arriba
-        { { 93.f, 0.f, 72.f }, { 19.f, 1.f, 3.f }, DARKBROWN }, // |
-
-        { { 43.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | 
-        { { 54.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | 
-        { { 65.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | 
-        { { 76.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | Paredes Horizontales Abajo
-        { { 87.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | 
-        { { 98.5f, 0.f, 88.f }, { 8.f, 1.f, 3.f }, DARKBROWN }, // | 
-
-        // MAZMORRA
-
-        { { 50.0f, 0.0f, -79.0f }, { 3.0f, 1.0f, 35.0f }, DARKBLUE },  // | Pared Vertical Izquierda
-        { { 94.0f, 0.0f, -79.0f }, { 3.0f, 1.0f, 35.0f }, DARKBLUE },  // | Pared Vertical Derecha
-
-        { { 72.0f, 0.0f, -91.0f }, { 3.0f, 1.0f, 5.0f }, DARKBLUE },  // | 
-        { { 72.0f, 0.0f, -81.5f }, { 3.0f, 1.0f, 8.0f }, DARKBLUE },  // | 
-        { { 72.0f, 0.0f, -75.0f }, { 3.0f, 1.0f, 5.0f }, DARKBLUE },  // | Pared Vertical Enmedio
-        { { 72.0f, 0.0f, -65.5f }, { 3.0f, 1.0f, 8.0f }, DARKBLUE },  // | 
-
-        { { 72.0f, 0.0f, -95.0f }, { 41.0f, 1.0f, 3.0f }, DARKBLUE },  // | Pared Horizontal Arriba
-
-        { { 55.5f, 0.0f, -79.0f }, { 8.0f, 1.0f, 3.0f }, DARKBLUE },  // | 
-        { { 66.5f, 0.0f, -79.0f }, { 8.0f, 1.0f, 3.0f }, DARKBLUE },  // | Pared Horizontal Enmedio
-        { { 83.0f, 0.0f, -79.0f }, { 19.0f, 1.0f, 3.0f }, DARKBLUE }, // | 
-
-        { { 55.5f, 0.0f, -63.0f }, { 8.0f, 1.0f, 3.0f }, DARKBLUE },  // | 
-        { { 66.5f, 0.0f, -63.0f }, { 8.0f, 1.0f, 3.0f }, DARKBLUE },  // | Pared Horizontal Abajo
-        { { 83.0f, 0.0f, -63.0f }, { 19.0f, 1.0f, 3.0f }, DARKBLUE }, // | 
-
-        // ZONA 10
-
-        { { 55.0f, 0.0f, -75.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
-        { { 55.0f, 0.0f, -71.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
-        { { 55.0f, 0.0f, -67.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
-        { { 67.0f, 0.0f, -75.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | Paredes Chiquitas
-        { { 67.0f, 0.0f, -71.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
-        { { 67.0f, 0.0f, -67.0f }, { 1.0f, 1.0f, 1.0f }, DARKBLUE },  // | 
-
-        // ZONA 12
-
-        { { 78.0f, 0.0f, -71.0f }, { 2.0f, 1.0f, 3.0f }, DARKBLUE },  // | 
-        { { 88.0f, 0.0f, -71.0f }, { 2.0f, 1.0f, 3.0f }, DARKBLUE },  // | 
-
-    };
-
-    for (const auto& data : wallData)
-    {
-        auto& wall{ em.newEntity() };
-        auto& wr = em.addComponent<RenderComponent>(wall, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
-        auto& wp = em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = { wr.position }, .velocity = { .0f, .0f, .0f } });
-        em.addComponent<ColliderComponent>(wall, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
+    default:
+        break;
     }
 
-    auto& door{ em.newEntity() };
-    em.addTag<DoorTag>(door);
-    auto& wr = em.addComponent<RenderComponent>(door, RenderComponent{ .position = { 61.f, 0.f, -78.f }, .scale = { 2.f, 4.f, 1.f }, .color = BROWN });
-    auto& wp = em.addComponent<PhysicsComponent>(door, PhysicsComponent{ .position = { wr.position }, .velocity = { .0f, .0f, .0f } });
-    em.addComponent<ColliderComponent>(door, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
+    generateMapFromJSON(em, map, iam);
 }
 
-// Se encarga de crear el suelo del OverWorld
-void Map::createGroundWaterOverworld(EntityManager& em) {
+mapType Map::loadMap(const std::string& mapFile)
+{
+    std::ifstream file(mapFile);
+    rapidjson::IStreamWrapper isw(file);
+    rapidjson::Document map;
+    map.ParseStream(isw);
+    return map;
+}
 
-    struct EntityData
-    {
-        vec3f position;
-        vec3f scale;
-        Color color;
-    };
+void Map::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_man& iam)
+{
+    const rapidjson::Value& overworld = map["overworld"];
+    const rapidjson::Value& groundArray = overworld["ground"];
+    const rapidjson::Value& waterArray = overworld["water"];
+    const rapidjson::Value& wallArray = overworld["walls"];
+    const rapidjson::Value& zoneArray = overworld["zones"];
+    const rapidjson::Value& rampArray = overworld["ramps"];
+    const rapidjson::Value& doorArray = overworld["doors"];
+    const rapidjson::Value& underworld = map["underworld"];
+    const rapidjson::Value& objectArray = underworld["objects"];
+    const rapidjson::Value& enemyArray = underworld["enemies"];
 
-    EntityData entitiesG[] = {
-        // OverWorld
-        { { 0.f, -1.5f, 0.f }, { 85.0f, 2.f, 100.f }, BEIGE },
-        { { -52.5f, -1.5f, 0.f }, { 10.0f, 2.f, 100.f }, BEIGE },
-        { { -45.f, -1.5f, -16.f }, { 5.0f, 2.f, 2.0f }, BROWN },
-        // Cuevas
-        { { 71.f, -1.5f, 80.f }, { 69.0f, 2.f, 19.0f }, BROWN },
-        // Mazmorra
-        { { 72.f, -1.5f, -79.f }, { 47.0f, 2.f, 35.0f }, BLUE },
-    };
-
-    for (const auto& data : entitiesG)
+    for (rapidjson::SizeType i = 0; i < groundArray.Size(); i++)
     {
         auto& entity = em.newEntity();
         em.addTag<GroundTag>(entity);
-        auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
-        auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
+
+        // Extraemos los datos del json
+        const rapidjson::Value& ground = groundArray[i];
+        vec3d position{ ground["position"][0].GetDouble(), ground["position"][1].GetDouble(), ground["position"][2].GetDouble() };
+        vec3d scale{ ground["scale"][0].GetDouble(), ground["scale"][1].GetDouble(), ground["scale"][2].GetDouble() };
+        Color color{ static_cast<u_char>(ground["color"][0].GetUint()), static_cast<u_char>(ground["color"][1].GetUint()), static_cast<u_char>(ground["color"][2].GetUint()), static_cast<u_char>(ground["color"][3].GetUint()) };
+
+        // Creamos los componentes
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0 });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     }
 
-    EntityData entitiesW[] = {
-    { { -45.f, -1.5f, -0.0f }, { 5.0f, 2.f, 30.f }, SKYBLUE },
-    { { -45.f, -1.5f, -32.0f }, { 5.0f, 2.f, 30.f }, SKYBLUE },
-    };
-
-    for (const auto& data : entitiesW)
+    for (rapidjson::SizeType i = 0; i < waterArray.Size(); i++)
     {
         auto& entity = em.newEntity();
         em.addTag<WaterTag>(entity);
-        auto& renderComponent = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .color = data.color });
-        auto& physicsComponent = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = renderComponent.position, .velocity = { .0f, .0f, .0f }, .gravity = .0f });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ physicsComponent.position, renderComponent.scale, BehaviorType::STATIC });
+
+        // Extraemos los datos del json
+        const rapidjson::Value& water = waterArray[i];
+        vec3d position{ water["position"][0].GetDouble(), water["position"][1].GetDouble(), water["position"][2].GetDouble() };
+        vec3d scale{ water["scale"][0].GetDouble(), water["scale"][1].GetDouble(), water["scale"][2].GetDouble() };
+        Color color{ static_cast<u_char>(water["color"][0].GetUint()), static_cast<u_char>(water["color"][1].GetUint()), static_cast<u_char>(water["color"][2].GetUint()), static_cast<u_char>(water["color"][3].GetUint()) };
+
+        // Creamos los componentes
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0 });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     }
-}
 
-// Se encarga de crear las zonas
-void Map::createZonesOverworld(EntityManager& em) {
-
-    struct EntityData
+    for (rapidjson::SizeType i = 0; i < wallArray.Size(); i++)
     {
-        vec3f position;
-        vec3f scale;
-        uint16_t zone;
-    };
+        auto& entity = em.newEntity();
+        em.addTag<WallTag>(entity);
+        // Extraemos los datos del json
+        const rapidjson::Value& wall = wallArray[i];
+        vec3d position{ wall["position"][0].GetDouble(), wall["position"][1].GetDouble(), wall["position"][2].GetDouble() };
+        vec3d scale{ wall["scale"][0].GetDouble(), wall["scale"][1].GetDouble(), wall["scale"][2].GetDouble() };
+        Color color{ static_cast<u_char>(wall["color"][0].GetUint()), static_cast<u_char>(wall["color"][1].GetUint()), static_cast<u_char>(wall["color"][2].GetUint()), static_cast<u_char>(wall["color"][3].GetUint()) };
 
-    EntityData entitiesG[] = {
-        // OVERWORLD //
-        // Zonas //
-        { { 0.f, 0.f, 0.f }, {19.f, 1.f, 13.f }, 1 },
-        { { 0.f, 0.f, -16.f }, {19.f, 1.f, 13.f }, 2 },
-        { { -22.f, 0.f, 0.f }, {19.f, 1.f, 13.f }, 3 },
-        { { -22.f, 0.f, -16.f }, {19.f, 1.f, 13.f }, 4 },
-        { { -43.f, 0.f, 0.f }, {19.f, 1.f, 13.f }, 5 },
-        { { -43.f, 0.f, -16.f }, {19.f, 1.f, 13.f }, 6 },
-        // TP //
-        { { -5.f, 0.f, -5.5f }, { 2.f, 1.f, 0.5f }, 14 },   // Espada
-        { {  3.f, 0.f, -21.5f }, { 2.f, 1.f, 0.5f }, 16 },  // Monedas
-        { { -17.f, 0.f, -21.5f }, { 2.f, 1.f, 0.5f }, 18 }, // Tienda
-        // CUEVAS //
-        // Zonas //
-        { { 49.f, 0.f, 80.f }, { 19.f, 1.f, 13.f }, 7 },
-        { { 71.f, 0.f, 80.f }, { 19.f, 1.f, 13.f }, 8 },
-        { { 93.f, 0.f, 80.f }, { 19.f, 1.f, 13.f }, 9 },
-        // TP //
-        { { 49.f, 0.f, 88.5f }, { 3.f, 1.f, 2.f }, 15 }, // OverWorld
-        { { 71.f, 0.f, 88.5f }, { 3.f, 1.f, 2.f }, 17 }, // OverWorld
-        { { 93.f, 0.f, 88.5f }, { 3.f, 1.f, 2.f }, 19 }, // OverWorld
-        // MAZMORRA //
-        { { 61.f, 0.0f, -71.f }, { 19.0f, 1.f, 13.0f }, 10 },
-        { { 61.f, 0.0f, -87.f }, { 19.0f, 1.f, 13.0f }, 11 },
-        { { 83.f, 0.0f, -71.f }, { 19.0f, 1.f, 13.0f }, 12 },
-        { { 83.f, 0.0f, -87.f }, { 19.0f, 1.f, 13.0f }, 13 },
-        // TP //
-        { { -51.5f, 0.f, -3.5f }, { 0.5f, 1.f, 2.0f }, 20 }, // Mazmorra
-        { { 61.0f, 0.f, -62.5f }, { 3.0f, 1.f, 2.0f }, 21 }, // OverWorld
-    };
+        // Creamos los componentes
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0 });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+    }
 
-    for (const auto& data : entitiesG)
+    for (rapidjson::SizeType i = 0; i < zoneArray.Size(); i++)
     {
         auto& entity = em.newEntity();
         em.addTag<ZoneTag>(entity);
-        em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = data.zone });
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = data.position, .scale = data.scale, .visible = false });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3f::zero(), .gravity = .0f });
+
+        // Extraemos los datos del json
+        const rapidjson::Value& zone = zoneArray[i];
+        vec3d position{ zone["position"][0].GetDouble(), zone["position"][1].GetDouble(), zone["position"][2].GetDouble() };
+        vec3d scale{ zone["scale"][0].GetDouble(), zone["scale"][1].GetDouble(), zone["scale"][2].GetDouble() };
+        uint16_t zoneNumber{ static_cast<uint16_t>(zone["zone"].GetUint()) };
+
+        // Creamos los componentes
+        em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = zoneNumber });
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .visible = false });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0 });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::ZONE });
     }
+
+    for (rapidjson::SizeType i = 0; i < rampArray.Size(); i++)
+    {
+        auto& entity = em.newEntity();
+        em.addTag<RampTag>(entity);
+
+        // Extraemos los datos del json
+        const rapidjson::Value& ramp = rampArray[i];
+        vec3d position{ ramp["position"][0].GetDouble(), ramp["position"][1].GetDouble(), ramp["position"][2].GetDouble() };
+        vec3d scale{ ramp["scale"][0].GetDouble(), ramp["scale"][1].GetDouble(), ramp["scale"][2].GetDouble() };
+        Color color{ static_cast<u_char>(ramp["color"][0].GetUint()), static_cast<u_char>(ramp["color"][1].GetUint()), static_cast<u_char>(ramp["color"][2].GetUint()), static_cast<u_char>(ramp["color"][3].GetUint()) };
+        float orientation{ ramp["rotation"].GetFloat() };
+        vec3d rotationVec{ ramp["rotVector"][0].GetDouble(), ramp["rotVector"][1].GetDouble(), ramp["rotVector"][2].GetDouble() };
+        vec2d min{ ramp["min"][0].GetDouble(), ramp["min"][1].GetDouble() };
+        vec2d max{ ramp["max"][0].GetDouble(), ramp["max"][1].GetDouble() };
+        double slope{ ramp["slope"].GetDouble() };
+        vec2d offset{ ramp["offset"][0].GetDouble(), ramp["offset"][1].GetDouble() };
+
+        // Creamos los componentes
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
+        em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = rotationVec });
+        em.addComponent<RampComponent>(entity, RampComponent{ .min = min, .max = max, .slope = slope, .offset = offset });
+    }
+
+    for (rapidjson::SizeType i = 0; i < doorArray.Size(); i++)
+    {
+        auto& entity = em.newEntity();
+        em.addTag<DoorTag>(entity);
+
+        // Extraemos los datos del json
+        const rapidjson::Value& door = doorArray[i];
+        vec3d position{ door["position"][0].GetDouble(), door["position"][1].GetDouble(), door["position"][2].GetDouble() };
+        vec3d scale{ door["scale"][0].GetDouble(), door["scale"][1].GetDouble(), door["scale"][2].GetDouble() };
+        Color color{ static_cast<u_char>(door["color"][0].GetUint()), static_cast<u_char>(door["color"][1].GetUint()), static_cast<u_char>(door["color"][2].GetUint()), static_cast<u_char>(door["color"][3].GetUint()) };
+
+        // Creamos los componentes
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0 });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+    }
+
+    const rapidjson::Value& id = map["id"];
+
+    uint8_t mapId = static_cast<uint8_t>(id.GetUint());
+    for (rapidjson::SizeType i = 0; i < objectArray.Size(); i++)
+    {
+        auto& li = em.getSingleton<LevelInfo>();
+        const rapidjson::Value& obj = objectArray[i];
+        uint8_t objId = static_cast<uint8_t>(obj["id"].GetUint());
+
+        std::pair<uint8_t, uint8_t> pair{ mapId, objId };
+
+        if (li.notLoadSet.find(pair) != li.notLoadSet.end())
+            continue;
+
+        // Extraemos los datos del json
+        vec3d position{ obj["position"][0].GetDouble(), obj["position"][1].GetDouble(), obj["position"][2].GetDouble() };
+        vec3d scale{ obj["scale"][0].GetDouble(), obj["scale"][1].GetDouble(), obj["scale"][2].GetDouble() };
+        Color color{ static_cast<u_char>(obj["color"][0].GetUint()), static_cast<u_char>(obj["color"][1].GetUint()), static_cast<u_char>(obj["color"][2].GetUint()), static_cast<u_char>(obj["color"][3].GetUint()) };
+        Object_type type{ static_cast<Object_type>(obj["type"].GetDouble()) };
+
+        auto& entity = em.newEntity();
+        em.addTag<ObjectTag>(entity);
+
+        // Creamos los componentes
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0 });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+        em.addComponent<ObjectComponent>(entity, ObjectComponent{ .type = type, .inmortal = true, .mapID = mapId, .objID = objId });
+    }
+
+    for (rapidjson::SizeType i = 0; i < enemyArray.Size(); i++)
+    {
+        const rapidjson::Value& enemy = enemyArray[i];
+        iam.createEnemy(em, enemy);
+    }
+
+    // pseudo codigo para scheduling xdddd
+    // for enemy : map[enemies]
+    // {
+
+    //     if(tiempo pasado > x)
+    //     {
+    //         texturas enemigo = map[enemies][slime][texturas][1];
+    //     }
+    //     else
+    //     {
+    //         texturas enemigo = map[enemies][slime][texturas][0];
+    //     }
+    // }
+}
+
+void Map::destroyMap(EntityManager& em)
+{
+    using CMPS = MP::TypeList<>;
+    using TAGS = MP::TypeList<GroundTag, WaterTag, WallTag, ZoneTag, RampTag, DoorTag, ObjectTag, EnemyTag>;
+
+    deathSet set{};
+
+    em.forEachAny<CMPS, TAGS>([&](Entity& entity)
+    {
+        set.insert(entity.getID());
+    });
+
+    em.destroyEntities(set);
+}
+
+void Map::reset(EntityManager& em, uint8_t mapID, Ia_man& iam)
+{
+    destroyMap(em);
+    createMap(em, mapID, iam);
 }

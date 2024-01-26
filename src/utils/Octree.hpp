@@ -7,8 +7,9 @@
 #include "../utils/BBox.hpp"
 #include "../components/collider_component.hpp"
 
-struct Octree {
-
+struct Octree
+{
+    // types for unordered_set of pairs
     struct pair_hash
     {
         template <class T1, class T2>
@@ -78,16 +79,16 @@ struct Octree {
 
     static const std::size_t MAX_ENTITIES = 15;
     static const std::size_t MAX_DEPTH = 10;
-    static constexpr std::array<vec3f, 8> offsets =
+    static constexpr std::array<vec3d, 8> offsets =
     {
-        vec3f(-0.5f, -0.5f, -0.5f),
-        vec3f(0.5f, -0.5f, -0.5f),
-        vec3f(-0.5f, 0.5f, -0.5f),
-        vec3f(0.5f, 0.5f, -0.5f),
-        vec3f(-0.5f, -0.5f, 0.5f),
-        vec3f(0.5f, -0.5f, 0.5f),
-        vec3f(-0.5f, 0.5f, 0.5f),
-        vec3f(0.5f, 0.5f, 0.5f)
+        vec3d(-0.5, -0.5, -0.5),
+        vec3d(0.5, -0.5, -0.5),
+        vec3d(-0.5, 0.5, -0.5),
+        vec3d(0.5, 0.5, -0.5),
+        vec3d(-0.5, -0.5, 0.5),
+        vec3d(0.5, -0.5, 0.5),
+        vec3d(-0.5, 0.5, 0.5),
+        vec3d(0.5, 0.5, 0.5)
     };
 
 private:

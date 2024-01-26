@@ -35,8 +35,11 @@ namespace ENGI {
         void endDrawing();
         void beginMode3D();
         void endMode3D();
-        void drawCube(vec3f pos, float width, float height, float lenght, Color color);
-        void drawCubeWires(vec3f pos, float width, float height, float lenght, Color color);
+        void drawLine3D(vec3d startPos, vec3d endPos, Color color);
+        void drawCube(vec3d pos, float width, float height, float lenght, Color color);
+        void drawCubeWires(vec3d pos, float width, float height, float lenght, Color color);
+        void drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
+        void drawModelWires(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
         void drawRectangle(int posX, int posY, int width, int height, Color color);
         void drawTexture(Texture2D texture, int posX, int posY, Color tint);
 
@@ -51,15 +54,19 @@ namespace ENGI {
         int getScreenHeight();
 
         // Camera
-        void setPositionCamera(vec3f pos);
-        void setTargetCamera(vec3f tar);
-        void setUpCamera(vec3f up);
+        void setPositionCamera(vec3d pos);
+        void setTargetCamera(vec3d tar);
+        void setUpCamera(vec3d up);
         void setFovyCamera(float fovy);
         void setProjectionCamera(int proj);
 
-        // Aux 
-        float getWorldToScreenX(vec3f pos);
-        float getWorldToScreenY(vec3f pos);
+        // Aux
+        Mesh genMeshCube(float width, float height, float lenght);
+        Model loadModelFromMesh(Mesh m);
+        void unloadMesh(Mesh m);
+        void unloadModel(Model m);
+        float getWorldToScreenX(vec3d pos);
+        float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();
 
     private:

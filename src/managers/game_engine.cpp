@@ -2,13 +2,13 @@
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
 {
-    ENGI::GameEngine::initWindow(width_, height_, "ZeldaWonders");
+    ENGI::GameEngine::initWindow(width_, height_, "Two Wonders");
 
-    ENGI::GameEngine::setPositionCamera({ 0.0f, 30.0f, 12.0f });
+    ENGI::GameEngine::setPositionCamera({ 10.0f, 15.0f, 10.0f });
     ENGI::GameEngine::setTargetCamera({ 0.0f, 03.0f, .0f });
     ENGI::GameEngine::setUpCamera({ 0.0f, 01.0f, 0.0f });
-    ENGI::GameEngine::setFovyCamera(30.0f);
-    ENGI::GameEngine::setProjectionCamera(CAMERA_PERSPECTIVE);
+    ENGI::GameEngine::setFovyCamera(20.0f);
+    ENGI::GameEngine::setProjectionCamera(CAMERA_ORTHOGRAPHIC);
 
     // Logo Two Wonders
     Image logo_two_wonders = ENGI::GameEngine::loadImage("assets/logo_two_wonders.png");
@@ -83,14 +83,35 @@ void ENGI::GameEngine::endMode3D()
     EndMode3D();
 }
 
-void ENGI::GameEngine::drawCube(vec3f pos, float width, float height, float lenght, Color color)
+void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color)
+{
+    DrawLine3D(startPos.toRaylib(), endPos.toRaylib(), color);
+}
+
+void ENGI::GameEngine::drawCube(vec3d pos, float width, float height, float lenght, Color color)
 {
     DrawCube(pos.toRaylib(), width, height, lenght, color);
 }
 
-void ENGI::GameEngine::drawCubeWires(vec3f pos, float width, float height, float lenght, Color color)
+void ENGI::GameEngine::drawCubeWires(vec3d pos, float width, float height, float lenght, Color color)
 {
     DrawCubeWires(pos.toRaylib(), width, height, lenght, color);
+}
+
+void ENGI::GameEngine::drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint)
+{
+    // Matriz de transformación (incluyendo escalado)
+    // Matrix transform = MatrixScale(scale.x, scale.y, scale.z);
+
+    // // Dibuja el modelo con la matriz de transformación
+    // DrawModelEx(model, (Vector3) { 0.0f, 0.0f, 0.0f }, 0.0f, transform, WHITE);
+
+    DrawModelEx(model, position.toRaylib(), rotationAxis.toRaylib(), rotationAngle, scale.toRaylib(), tint);
+}
+
+void ENGI::GameEngine::drawModelWires(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint)
+{
+    DrawModelWiresEx(model, position.toRaylib(), rotationAxis.toRaylib(), rotationAngle, scale.toRaylib(), tint);
 }
 
 void ENGI::GameEngine::drawRectangle(int posX, int posY, int width, int height, Color color) {
@@ -136,17 +157,17 @@ int ENGI::GameEngine::getScreenHeight()
 
 ////// CAMERA //////
 
-void ENGI::GameEngine::setPositionCamera(vec3f pos)
+void ENGI::GameEngine::setPositionCamera(vec3d pos)
 {
     camera.position = pos.toRaylib();
 }
 
-void ENGI::GameEngine::setTargetCamera(vec3f tar)
+void ENGI::GameEngine::setTargetCamera(vec3d tar)
 {
     camera.target = tar.toRaylib();
 }
 
-void ENGI::GameEngine::setUpCamera(vec3f up)
+void ENGI::GameEngine::setUpCamera(vec3d up)
 {
     camera.up = up.toRaylib();
 }
@@ -163,12 +184,32 @@ void ENGI::GameEngine::setProjectionCamera(int proj)
 
 ////// AUX //////
 
-float ENGI::GameEngine::getWorldToScreenX(vec3f pos)
+Mesh ENGI::GameEngine::genMeshCube(float width, float height, float lenght)
+{
+    return GenMeshCube(width, height, lenght);
+}
+
+Model ENGI::GameEngine::loadModelFromMesh(Mesh m)
+{
+    return LoadModelFromMesh(m);
+}
+
+void ENGI::GameEngine::unloadMesh(Mesh m)
+{
+    UnloadMesh(m);
+}
+
+void ENGI::GameEngine::unloadModel(Model m)
+{
+    UnloadModel(m);
+}
+
+float ENGI::GameEngine::getWorldToScreenX(vec3d pos)
 {
     return GetWorldToScreen(pos.toRaylib(), camera).x;
 }
 
-float ENGI::GameEngine::getWorldToScreenY(vec3f pos)
+float ENGI::GameEngine::getWorldToScreenY(vec3d pos)
 {
     return GetWorldToScreen(pos.toRaylib(), camera).y;
 }
@@ -176,5 +217,5 @@ float ENGI::GameEngine::getWorldToScreenY(vec3f pos)
 RayCast ENGI::GameEngine::getMouseRay()
 {
     Ray r = GetMouseRay(GetMousePosition(), camera);
-    return RayCast{ .origin = vec3f(r.position.x, r.position.y, r.position.z), .direction = vec3f(r.direction.x, r.direction.y, r.direction.z) };
+    return RayCast{ .origin = vec3d(r.position.x, r.position.y, r.position.z), .direction = vec3d(r.direction.x, r.direction.y, r.direction.z) };
 }
