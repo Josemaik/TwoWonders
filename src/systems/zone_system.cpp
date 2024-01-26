@@ -1,6 +1,6 @@
 #include "zone_system.hpp"
 
-void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Eventmanager& evm) {
+void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Eventmanager& evm, Map& map) {
 
     updateZoneEnemies(em);
 
@@ -42,11 +42,15 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         // SWORD //
 
                     case 14: // TP a la cueva de la espada
+                        map.reset(em, 2, iam);
+
                         p.position.setX(49.0);
                         p.position.setZ(85.0);
                         break;
 
                     case 15: // TP desde la cueva de la espada
+                        map.reset(em, 0, iam);
+
                         p.position.setX(-5.0);
                         p.position.setZ(-4.5);
                         break;
@@ -54,11 +58,15 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         // COINS //
 
                     case 16: // TP a la cueva de las monedas
+                        map.reset(em, 2, iam);
+
                         p.position.setX(71.0);
                         p.position.setZ(85.0);
                         break;
 
                     case 17: // TP desde la cueva de las monedas
+                        map.reset(em, 0, iam);
+
                         p.position.setX(3.0);
                         p.position.setZ(-20.0);
                         break;
@@ -66,12 +74,16 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         // SHOP //
 
                     case 18: // TP a la cueva de la tienda
+                        map.reset(em, 2, iam);
+
                         p.position.setX(93.0);
                         p.position.setY(0.0);
                         p.position.setZ(85.0);
                         break;
 
                     case 19: // TP desde la cueva de la tienda
+                        map.reset(em, 0, iam);
+
                         p.position.setX(-17.0);
                         p.position.setY(2.0);
                         p.position.setZ(-20.0);
@@ -82,12 +94,16 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                     case 20: // TP a la cueva de la mazmorra
                         r.cameraChange = true;
 
+                        map.reset(em, 1, iam);
+
                         p.position.setX(61.0);
                         p.position.setZ(-65.0);
                         break;
 
                     case 21: // TP desde la cueva de la mazmorra
                         r.cameraChange = false;
+
+                        map.reset(em, 0, iam);
 
                         p.position.setX(-50.0);
                         p.position.setZ(-3.5);

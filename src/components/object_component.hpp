@@ -1,6 +1,6 @@
 #pragma once
 
-enum struct Object_type { None, Life, Sword, Bomb, Coin, BombExplode, Coin30, ShopItem_Bomb, ShopItem_ExtraLife, ShopItem_Life, Key , Heal_Spell};
+enum struct Object_type { None, Life, Sword, Bomb, Coin, BombExplode, Coin30, ShopItem_Bomb, ShopItem_ExtraLife, ShopItem_Life, Key, Heal_Spell };
 
 struct ObjectComponent
 {
@@ -14,6 +14,9 @@ struct ObjectComponent
         elapsed += deltaTime;
         return elapsed >= life_time ? true : false;
     }
+
+    uint8_t mapID{ 255 };
+    uint8_t objID{ 255 };
 
     void effect() { active = true; }
 };

@@ -75,9 +75,11 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             }
             if (shop_object)
                 dead_entities.insert(ent.getID());
-
             else
                 obj.active = false;
+
+            if (obj.mapID != 255 && obj.objID != 255)
+                li.notLoadSet.insert(std::make_pair(obj.mapID, obj.objID));
         }
     });
 
@@ -120,7 +122,7 @@ bool ObjectSystem::buyExtraLife(EntityManager& em, Entity* ent) {
     return false;
 }
 
-void ObjectSystem::explodeBombHeal(EntityManager& em, Entity& ent){
+void ObjectSystem::explodeBombHeal(EntityManager& em, Entity& ent) {
     createExplodeBomb(em, ent, BehaviorType::HEAL);
     createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY);
 }

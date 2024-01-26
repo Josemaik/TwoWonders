@@ -7,8 +7,9 @@
 #include "../utils/BBox.hpp"
 #include "../components/collider_component.hpp"
 
-struct Octree {
-
+struct Octree
+{
+    // types for unordered_set of pairs
     struct pair_hash
     {
         template <class T1, class T2>

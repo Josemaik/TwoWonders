@@ -258,3 +258,15 @@ struct RayCast
     vec3d origin;
     vec3d direction;
 };
+
+template <typename DataT>
+struct vec2D
+{
+    constexpr vec2D() = default;
+    constexpr vec2D(DataT x, DataT y) : x{ x }, y{ y } {}
+
+    DataT x{}, y{};
+};
+
+using vec2f = vec2D<float>;
+using vec2d = vec2D<double>;

@@ -101,9 +101,26 @@ void CollisionSystem::checkRampCollision(EntityManager& em, std::vector<Entity*>
         auto& bbox = col.boundingBox;
         auto pos = bbox.center();
 
-        for (const auto& ramp : ramps)
+
+        if (ramps.size() == 0)
         {
-            if (pos.x() >= ramp.xMin && pos.x() <= ramp.xMax && pos.z() >= ramp.zMin && pos.z() <= ramp.zMax)
+            using SYSCMPs = MP::TypeList<RampComponent>;
+            using SYSTAGs = MP::TypeList<>;
+            em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, RampComponent& ramp)
+            {
+                ramps.push_back(&ramp);
+            });
+        }
+
+        for (const auto rampP : ramps)
+        {
+            auto& ramp = *rampP;
+
+            auto& min = ramp.min;
+            auto& max = ramp.max;
+            auto& offset = ramp.offset;
+
+            if (pos.x() >= ramp.min.x && pos.x() <= max.x && pos.z() >= min.y && pos.z() <= max.y)
             {
                 auto& ren = em.getComponent<RenderComponent>(*e);
                 auto& phy = em.getComponent<PhysicsComponent>(*e);
@@ -112,15 +129,16 @@ void CollisionSystem::checkRampCollision(EntityManager& em, std::vector<Entity*>
                 double newHeight = 0.0;
 
                 // Deltas para calcular la altura
-                if (ramp.xOffset == 0.0)
-                    newHeight = baseHeight + ramp.slope * (pos.z() + ramp.zOffset);
+                if (offset.x == 0.0)
+                    newHeight = baseHeight + ramp.slope * (pos.z() + offset.y);
                 else
-                    newHeight = baseHeight + ramp.slope * (pos.x() + ramp.xOffset);
+                    newHeight = baseHeight + ramp.slope * (pos.x() + offset.x);
 
                 phy.position.setY(newHeight);
                 break;
             }
         }
+
     }
 }
 
@@ -156,7 +174,6 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     bool isAtkPlayer2 = behaviorType2 & BehaviorType::ATK_PLAYER;
     bool isAtkEnemy1 = behaviorType1 & BehaviorType::ATK_ENEMY;
     bool isAtkEnemy2 = behaviorType2 & BehaviorType::ATK_ENEMY;
-
 
     if (isAtkPlayer1 || isAtkPlayer2 || isAtkEnemy1 || isAtkEnemy2)
     {
@@ -196,10 +213,10 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     //BOMBA DE CURACION
     if (behaviorType2 & BehaviorType::HEAL || behaviorType1 & BehaviorType::HEAL)
     {
-        if(staticEnt.hasComponent<LifeComponent>() && staticEnt.hasTag<SlimeTag>()){
+        if (staticEnt.hasComponent<LifeComponent>() && staticEnt.hasTag<SlimeTag>()) {
             em.getComponent<LifeComponent>(staticEnt).increaseLife();
         }
-        if(otherEnt.hasComponent<LifeComponent>() && otherEnt.hasTag<SlimeTag>()){
+        if (otherEnt.hasComponent<LifeComponent>() && otherEnt.hasTag<SlimeTag>()) {
             em.getComponent<LifeComponent>(otherEnt).increaseLife();
         }
         return;
@@ -217,7 +234,6 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
 
     auto* staticEntPtr = &staticEnt;
     auto* otherEntPtr = &otherEnt;
-
 
     // Comprobar si es un objeto estático - el objeto estático quedará en staticEnt y el otro en otherEnt
     if (behaviorType2 & BehaviorType::STATIC)
