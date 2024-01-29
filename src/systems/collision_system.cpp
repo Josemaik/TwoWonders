@@ -155,7 +155,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         return;
     }
 
-    // Segundo tipo de colisión más común, colisiones con zonas
+    //Segundo tipo de colisión más común, colisiones con zonas
     if ((behaviorType1 & BehaviorType::ZONE || behaviorType2 & BehaviorType::ZONE))
     {
         handleZoneCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, behaviorType1, behaviorType2);
@@ -166,6 +166,16 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     if (behaviorType1 & BehaviorType::ENEMY && behaviorType2 & BehaviorType::ENEMY)
     {
         nonStaticCollision(staticPhy, otherPhy, minOverlap);
+        return;
+    }
+     //daño en área al player
+    if (behaviorType2 & BehaviorType::AREADAMAGE || behaviorType1 & BehaviorType::AREADAMAGE){
+        if(staticEnt.hasComponent<LifeComponent>() && staticEnt.hasTag<PlayerTag>()){
+            em.getComponent<LifeComponent>(staticEnt).decreaseLife();
+        }
+        if(otherEnt.hasComponent<LifeComponent>() && otherEnt.hasTag<PlayerTag>()){
+            em.getComponent<LifeComponent>(otherEnt).decreaseLife();
+        }
         return;
     }
 
@@ -190,7 +200,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     if (isAtkPlayer1 || isAtkPlayer2 || isAtkEnemy1 || isAtkEnemy2)
     {
         if ((behaviorType2 & BehaviorType::SHIELD || behaviorType1 & BehaviorType::SHIELD)
-            && (isAtkEnemy1 || isAtkEnemy2))
+            && (isAtkEnemy1 || isAtkEnemy2) && behaviorType1 != BehaviorType::AREADAMAGE && behaviorType2 != BehaviorType::AREADAMAGE)
         {
             auto* staticEntPtr = &staticEnt;
             auto* otherEntPtr = &otherEnt;
@@ -216,7 +226,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
             return;
         }
 
-        // // Colisiones de enemigos con el jugador
+        // Colisiones de enemigos con el jugador
         if (!(behaviorType1 & BehaviorType::SHIELD || behaviorType2 & BehaviorType::SHIELD))
             handlePlayerCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, minOverlap, behaviorType1, behaviorType2);
 

@@ -119,6 +119,13 @@ void InputSystem::update(EntityManager& em)
             vel *= INP_SPEED;
         }
 
+        if(IsKeyDown(in.attarea)){
+            em.addComponent<AttackComponent>(e, AttackComponent{});
+            if(e.hasComponent<AttackComponent>()){
+                 em.getComponent<AttackComponent>(e).attack(AttackType::AreaAttack);
+            }
+        }
+
         // if(IsKeyDown(in.seek) && !bb.tactive){
         //    // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
         //     bb.behaviour = SB::Seek;

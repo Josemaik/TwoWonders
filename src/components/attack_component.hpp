@@ -1,6 +1,6 @@
 #pragma once
 
-enum struct AttackType { Melee, Ranged, Bomb, AttackPlayer, TripleShot, HealSpell};
+enum struct AttackType { Melee, Ranged, Bomb, AttackPlayer, TripleShot, HealSpell, AreaAttack};
 
 struct AttackComponent
 {
