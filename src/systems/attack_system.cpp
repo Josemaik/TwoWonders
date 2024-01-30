@@ -84,13 +84,13 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     case AttackType::TripleShot: createAttackMultipleShot(em, ent, att, 3);
         break;
     case AttackType::AreaAttack: {
-        auto& li = em.getSingleton<LevelInfo>();
-        if (li.playerID == ent.getID()){
+        // auto& li = em.getSingleton<LevelInfo>();
+        if (ent.hasTag<GolemTag>()){
             auto& e{ em.newEntity() };
             em.addTag<HitPlayerTag>(e);
-            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 3.0f, 0.1f, 3.0f }, .color = GREEN });
-            auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
-            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::AreaAttack, .life_time = 4.0f });
+            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 4.0f, 0.1f, 4.0f }, .color = GREEN });
+            auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
+            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::AreaAttack, .life_time = 7.0f });
             ElementalType tipoElemental;
             if (ent.hasComponent<TypeComponent>())
                 tipoElemental = em.getComponent<TypeComponent>(ent).type;

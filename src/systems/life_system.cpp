@@ -24,6 +24,15 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
                 }
             }
 
+            if(ent.hasTag<GolemTag>()){
+                if (!lif.decreaseNextFrame)
+                    lif.decreaseNextFrame = true;
+                else
+                    lif.decreaseNextFrame = false;
+
+                em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
+            }
+
             lif.markedForDeletion = true;
         }
 
