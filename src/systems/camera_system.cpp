@@ -16,16 +16,16 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
         {
             if (!li.enemyPositions.empty())
             {
-                float x{ 0.f }, y{ 0.f }, z{ 0.f };
+                double x{ 0.0 }, y{ 0.0 }, z{ 0.0 };
                 for (auto& e : li.enemyPositions)
                 {
                     x += e.x();
                     y += e.y();
                     z += e.z();
                 }
-                x /= li.enemyPositions.size();
-                y /= li.enemyPositions.size();
-                z /= li.enemyPositions.size();
+                x /= static_cast<double>(li.enemyPositions.size());
+                y /= static_cast<double>(li.enemyPositions.size());
+                z /= static_cast<double>(li.enemyPositions.size());
 
                 // Calcular el punto que está a un tercio del camino entre la posición del jugador y la posición media de los enemigos
                 vec3d enemyPos = { x, y, z };
