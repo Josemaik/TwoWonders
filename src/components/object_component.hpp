@@ -1,6 +1,6 @@
 #pragma once
 
-enum struct Object_type { None, Life, Sword, Bomb, Coin, BombExplode, Coin30, ShopItem_Bomb, ShopItem_ExtraLife, ShopItem_Life, Key, Heal_Spell ,AreaAttack};
+enum struct Object_type { None, Life, Sword, Bomb, Coin, BombExplode, Coin30, ShopItem_Bomb, ShopItem_ExtraLife, ShopItem_Life, Key, Heal_Spell ,AreaAttack,Spiderweb};
 
 struct ObjectComponent
 {

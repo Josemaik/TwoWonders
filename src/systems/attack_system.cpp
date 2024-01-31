@@ -102,6 +102,22 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         }
     }
         break;
+    case AttackType::Spiderweb: {
+        if(ent.hasTag<GolemTag>()){
+            auto& e { em.newEntity() };
+            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 4.0f, 0.1f, 4.0f }, .color = GREEN });
+            auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
+            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Spiderweb, .life_time = 7.0f });
+            ElementalType tipoElemental;
+            if (ent.hasComponent<TypeComponent>())
+                tipoElemental = em.getComponent<TypeComponent>(ent).type;
+            else
+                tipoElemental = ElementalType::Neutral;
+            em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
+            em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SPIDERWEB });
+        }
+    }
+        break;
     default:
         break;
     }
