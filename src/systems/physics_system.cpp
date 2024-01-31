@@ -31,7 +31,7 @@ void PhysicsSystem::update(EntityManager& em, float dt)
             phy.dragactivated = false;
             // float dragFactor = 0.3f;
             // vel -= dragFactor;
-            vel /= 2;
+            vel /= phy.kDrag;
         }
 
         pos.setX((pos.x() + vel.x()));

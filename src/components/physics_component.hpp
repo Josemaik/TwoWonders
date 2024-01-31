@@ -37,6 +37,6 @@ struct PhysicsComponent
     static constexpr double kEpsilon{ 0.1 };
     //rozamiento
     bool dragactivated { false };
-    static constexpr double kDrag{ 1.20 };
+    static constexpr double kDrag{ 3.0 };
 
 };
