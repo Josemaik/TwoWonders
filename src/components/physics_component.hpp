@@ -36,6 +36,7 @@ struct PhysicsComponent
     //controla la llegada , se ha sustituido por arrivalradius en la ia
     static constexpr double kEpsilon{ 0.1 };
     //rozamiento
-    static constexpr double kDrag{ 1.20 };
+    bool dragactivated { false };
+    static constexpr double kDrag{ 3.0 };
 
 };
