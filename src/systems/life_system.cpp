@@ -20,7 +20,7 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
                 if(em.getComponent<AIComponent>(ent).healbeforedie){
                     em.getComponent<AttackComponent>(ent).attack(AttackType::HealSpell);
                 }else{
-                    em.getComponent<AttackComponent>(ent).attack(AttackType::Bomb);
+                    em.getComponent<AttackComponent>(ent).attack(AttackType::HealSpell);
                 }
             }
 

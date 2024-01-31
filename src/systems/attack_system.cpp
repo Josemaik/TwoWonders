@@ -76,7 +76,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     {
         auto& e{ em.newEntity() };
         em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = GREEN });
-        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Heal_Spell, .life_time = 0.0f });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Heal_Spell, .life_time = 1.0f });
         break;
     }
     case AttackType::AttackPlayer:

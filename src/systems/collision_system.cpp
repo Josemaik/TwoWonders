@@ -454,11 +454,12 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
             }
             else if (typeBala == ElementalType::Neutral)
                 em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(2);
-            else
+            else{
                 em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(1);
                 if(balac.atackgolem){
                    em.getComponent<PhysicsComponent>(*ent2Ptr).dragactivatedtime = true;
                 }
+            }
         }
     }
 }

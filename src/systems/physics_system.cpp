@@ -4,7 +4,7 @@
 
 void PhysicsSystem::update(EntityManager& em, float dt)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([dt, &em](Entity&, PhysicsComponent& phy,ColliderComponent& collc)
+    em.forEach<SYSCMPs, SYSTAGs>([dt, &em](Entity&, PhysicsComponent& phy)
     {
         auto& pos = phy.position;
         auto& vel = phy.velocity;
