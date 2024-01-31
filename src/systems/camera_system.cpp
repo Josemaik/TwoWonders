@@ -38,7 +38,7 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
             cameraPos -= vec3d{ 2.f, 7.f, 2.f };
         }
 
-        float t = 0.2f; // Velocidad de la transición
+        float t = 0.1f; // Velocidad de la transición
         if (li.transition)
         {
             transitionTime += dt;
