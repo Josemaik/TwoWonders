@@ -28,4 +28,6 @@ struct ColliderComponent
 
     BBox boundingBox{};
     BehaviorType behaviorType;
+
+    bool atackgolem{false};
 };

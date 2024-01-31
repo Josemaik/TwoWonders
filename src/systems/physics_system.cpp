@@ -4,7 +4,7 @@
 
 void PhysicsSystem::update(EntityManager& em, float dt)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([dt, &em](Entity&, PhysicsComponent& phy)
+    em.forEach<SYSCMPs, SYSTAGs>([dt, &em](Entity&, PhysicsComponent& phy,ColliderComponent& collc)
     {
         auto& pos = phy.position;
         auto& vel = phy.velocity;
@@ -27,6 +27,17 @@ void PhysicsSystem::update(EntityManager& em, float dt)
         // }
         // Player únicamente tiene velocidad linear
         // if(e.hasTag<PlayerTag>() || e.hasTag<HitPlayerTag>()){
+        //Terminar esto
+        if(phy.dragactivatedtime){
+            phy.dragactivatedtime = false;
+            phy.dragactivated = true;
+            if(phy.elapsed_stunned >= phy.countdown_sttuned){
+                phy.elapsed_stunned = 0;
+                phy.dragactivatedtime = false;
+            }
+            phy.plusdeltatime(dt,phy.elapsed_stunned);
+        }
+
         if(phy.dragactivated){
             phy.dragactivated = false;
             // float dragFactor = 0.3f;

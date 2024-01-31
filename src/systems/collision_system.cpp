@@ -426,9 +426,11 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
         }
 
         // Ahora sabemos seguro que la entidad con la que ha colisionado la bala está en la entidad 2, pero es enemigo o jugador?
-        // Lo comprobamos con el tipo de comportamiento
-        bool isPlayer2 = em.getComponent<ColliderComponent>(*ent2Ptr).behaviorType & BehaviorType::PLAYER;
-        bool isEnemy2 = em.getComponent<ColliderComponent>(*ent2Ptr).behaviorType & BehaviorType::ENEMY;
+        // Lo comprobamos con el tipo de comportamientoto
+        auto& c = em.getComponent<ColliderComponent>(*ent2Ptr);
+        auto& balac = em.getComponent<ColliderComponent>(*ent1Ptr);
+        bool isPlayer2 = c.behaviorType & BehaviorType::PLAYER;
+        bool isEnemy2 = c.behaviorType & BehaviorType::ENEMY;
 
         // Si la bala es del jugador y ha colisionado con un enemigo, o si la bala es de un enemigo y ha colisionado con el jugador, se baja la vida
         if ((isPlayer2 && (atkEn1 || atkEn2)) || (isEnemy2 && (atkPl1 || atkPl2)))
@@ -454,6 +456,9 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                 em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(2);
             else
                 em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(1);
+                if(balac.atackgolem){
+                   em.getComponent<PhysicsComponent>(*ent2Ptr).dragactivatedtime = true;
+                }
         }
     }
 }
