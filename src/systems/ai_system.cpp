@@ -10,7 +10,7 @@ void perception(BlackBoard_t& bb, AIComponent& ai, float dt) {
     //Perception time reached
     // ai.accumulated_dt -= ai.perceptionTime;
     // Al pulsar la G , la ia con seek va a la posición del player
-    if(ai.elapsed_perception >= ai.countdown_perception){
+    if (ai.elapsed_perception >= ai.countdown_perception) {
         ai.elapsed_perception = 0;
         if (bb.tactive) {
             ai.tx = bb.tx;
@@ -23,25 +23,44 @@ void perception(BlackBoard_t& bb, AIComponent& ai, float dt) {
             //  id {static_cast<int>(e.getID()) };
             // std::printf("[%d] VOY! (%.1f,%.1f)\n",id,ai.tx,ai.tz);
         }
-    }else{
-        ai.plusdeltatime(dt,ai.elapsed_perception);
+    }
+    else {
+        ai.plusdeltatime(dt, ai.elapsed_perception);
     }
 }
 // Actualizar las IA
 void AISystem::update(EntityManager& em, float dt)
 {
+    bool isDetected{ false };
+    std::vector<vec3d> enemyPositions{};
+    auto& li = em.getSingleton<LevelInfo>();
     auto& bb = em.getSingleton<BlackBoard_t>();
-    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, AIComponent& ai,LifeComponent& lc)
+    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, AIComponent& ai, LifeComponent& lc)
     {
         //percibir el entorno
         perception(bb, ai, dt);
         // Actualizar datos de los slimes en blackboard
-        if(e.hasTag<SlimeTag>()){
-            bb.updateSlimeInfo(e.getID(),em.getComponent<PhysicsComponent>(e).position,em.getComponent<LifeComponent>(e).life);
+        if (e.hasTag<SlimeTag>()) {
+            bb.updateSlimeInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life);
         }
+
+        if (!isDetected && ai.playerdetected)
+        {
+            li.playerDetected = true;
+            isDetected = true;
+        }
+
+        if (ai.playerdetected)
+            enemyPositions.push_back(phy.position);
+
         if (ai.behaviourTree) {
-            ai.behaviourTree->run({ em,e,ai,phy,lc,dt});
+            ai.behaviourTree->run({ em,e,ai,phy,lc,dt });
             return;
         }
     });
+
+    if (!isDetected && li.playerDetected)
+        li.playerDetected = false;
+
+    li.enemyPositions = enemyPositions;
 }

@@ -208,6 +208,7 @@ void Game::normalExecution(EntityManager& em, float deltaTime)
     projectile_system.update(em, deltaTime);
     life_system.update(em, deltaTime);
     sound_system.update();
+    camera_system.update(em, engine, deltaTime);
     render_system.update(em, engine, false, false);
     event_system.update(evm, em);
 }

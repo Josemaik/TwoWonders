@@ -130,18 +130,6 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
         {
             auto& r{ em.getComponent<RenderComponent>(e) };
             if (r.visible) {
-                // Revisamos si es el jugador para mover la cámara
-                if (e.hasTag<PlayerTag>())
-                {
-                    if (!r.cameraChange)
-                        engine.setPositionCamera({ r.position.x() + 8.f, r.position.y() + 10.f, r.position.z() + 8.f });
-                    else
-                        engine.setPositionCamera({ r.position.x() - 8.f, r.position.y() + 10.f, r.position.z() + 8.f });
-
-                    engine.setTargetCamera(r.position);
-                }
-                // Comprobar si tiene el componente vida
-
                 Color colorEntidad = r.color;
 
                 // Comprobar el tipo y si es enemigo cambiarle el color
@@ -236,7 +224,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     }
                     else if (e.hasTag<GolemTag>())
                     {
-                        scl = { 0.33, 0.33, 0.33 };
+                        scl = { 0.4, 0.4, 0.4 };
                         pos.setY(pos.y() - 1.1);
                     }
 
