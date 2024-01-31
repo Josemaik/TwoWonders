@@ -27,6 +27,12 @@ void PhysicsSystem::update(EntityManager& em, float dt)
         // }
         // Player únicamente tiene velocidad linear
         // if(e.hasTag<PlayerTag>() || e.hasTag<HitPlayerTag>()){
+        if(phy.dragactivated){
+            phy.dragactivated = false;
+            // float dragFactor = 0.3f;
+            // vel -= dragFactor;
+            vel /= phy.kDrag;
+        }
 
         pos.setX((pos.x() + vel.x()));
         pos.setY((pos.y() + vel.y()));
@@ -54,9 +60,12 @@ void PhysicsSystem::update(EntityManager& em, float dt)
         //     phy.v_linear =  std::clamp(phy.v_linear,  -phy.kMaxVLin, phy.kMaxVLin);
         //     phy.v_angular = std::clamp(phy.v_angular, -phy.kMaxAAng, phy.kMaxAAng);
         //     // drag
+        // if(phy.dragactivated){
         //     auto drag { dt * std::abs(phy.v_linear) * phy.kDrag };
         //     if ( phy.v_linear > 0 ) phy.v_linear -= drag;
         //     else                    phy.v_linear += drag;
+        // }
+
         // }
         // comprobar si están en el suelo
         if (phy.alreadyGrounded)
