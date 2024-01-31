@@ -133,11 +133,18 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 // Revisamos si es el jugador para mover la cámara
                 if (e.hasTag<PlayerTag>())
                 {
+                    vec3d pos{};
                     if (!r.cameraChange)
-                        engine.setPositionCamera({ r.position.x() + 8.f, r.position.y() + 10.f, r.position.z() + 8.f });
+                        pos = { r.position.x() + 30.f, r.position.y() + 40.f, r.position.z() + 30.f };
                     else
-                        engine.setPositionCamera({ r.position.x() - 8.f, r.position.y() + 10.f, r.position.z() + 8.f });
+                        pos = { r.position.x() - 10.f, r.position.y() + 25.f, r.position.z() + 8.f };
 
+                    auto& li = em.getSingleton<LevelInfo>();
+                    if (li.playerDetected)
+                    {
+                        pos -= vec3d{ 2.f, 7.f, 2.f };
+                    }
+                    engine.setPositionCamera(pos);
                     engine.setTargetCamera(r.position);
                 }
                 // Comprobar si tiene el componente vida

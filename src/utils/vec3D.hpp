@@ -232,6 +232,18 @@ struct vec3D
         return os;
     }
 
+    // Cuando DataT es float, pasarlo a double
+    constexpr vec3D<double> toDouble() const noexcept
+    {
+        return vec3D<double>{ static_cast<double>(x_), static_cast<double>(y_), static_cast<double>(z_) };
+    }
+
+    constexpr vec3D<float> toFloat() const noexcept
+    {
+        return vec3D<float>{ static_cast<float>(x_), static_cast<float>(y_), static_cast<float>(z_) };
+    }
+
+
     void updateLowest(vec3D const& v) noexcept
     {
         if (x_ <= y_ && x_ <= z_) {

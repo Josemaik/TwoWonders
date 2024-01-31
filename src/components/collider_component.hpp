@@ -12,7 +12,7 @@ enum BehaviorType {
     ZONE = 0x20,
     SHIELD = 0x40,
     ENDING = 0x80,
-    HEAL = 0X100
+    HEAL = 0X100,
 };
 
 struct ColliderComponent

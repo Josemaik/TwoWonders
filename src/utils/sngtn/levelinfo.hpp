@@ -37,6 +37,7 @@ struct LevelInfo
 
   //Referencia al player
   std::size_t playerID;
+  bool playerDetected{ false };
   std::unordered_set<std::size_t> enemiesID{};
   NotLoadSet notLoadSet{};
 
@@ -45,5 +46,5 @@ struct LevelInfo
   int segundos{ 1000 };
   uint8_t mapID{ 0 };
 
-  GameScreen currentScreen = GameScreen::LOGO;
+  GameScreen currentScreen = GameScreen::GAMEPLAY;
 };
