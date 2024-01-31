@@ -27,9 +27,9 @@ void PhysicsSystem::update(EntityManager& em, float dt)
         // }
         // Player únicamente tiene velocidad linear
         // if(e.hasTag<PlayerTag>() || e.hasTag<HitPlayerTag>()){
-        //Terminar esto
+
+        //Stuneo al jugador durante un tiempo provocado por el golpe de un golem
         if(phy.dragactivatedtime){
-            phy.dragactivatedtime = false;
             phy.dragactivated = true;
             if(phy.elapsed_stunned >= phy.countdown_sttuned){
                 phy.elapsed_stunned = 0;
@@ -37,7 +37,7 @@ void PhysicsSystem::update(EntityManager& em, float dt)
             }
             phy.plusdeltatime(dt,phy.elapsed_stunned);
         }
-
+        //Stunear o RAlentizar al player
         if(phy.dragactivated){
             phy.dragactivated = false;
             // float dragFactor = 0.3f;
