@@ -180,6 +180,26 @@ void ENGI::GameEngine::setProjectionCamera(int proj)
     camera.projection = proj;
 }
 
+vec3d ENGI::GameEngine::getPositionCamera()
+{
+    return vec3d(camera.position.x, camera.position.y, camera.position.z);
+}
+
+vec3d ENGI::GameEngine::getTargetCamera()
+{
+    return vec3d(camera.target.x, camera.target.y, camera.target.z);
+}
+
+vec3d ENGI::GameEngine::getUpCamera()
+{
+    return vec3d(camera.up.x, camera.up.y, camera.up.z);
+}
+
+float ENGI::GameEngine::getFovyCamera()
+{
+    return camera.fovy;
+}
+
 ////// AUX //////
 
 Mesh ENGI::GameEngine::genMeshCube(float width, float height, float lenght)

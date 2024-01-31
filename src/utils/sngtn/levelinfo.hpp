@@ -39,6 +39,8 @@ struct LevelInfo
   std::size_t playerID;
   bool playerDetected{ false };
   std::unordered_set<std::size_t> enemiesID{};
+  std::vector<vec3d> enemyPositions{};
+  bool transition{ false };
   NotLoadSet notLoadSet{};
 
   uint16_t num_zone{};

@@ -130,25 +130,6 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
         {
             auto& r{ em.getComponent<RenderComponent>(e) };
             if (r.visible) {
-                // Revisamos si es el jugador para mover la cámara
-                if (e.hasTag<PlayerTag>())
-                {
-                    vec3d pos{};
-                    if (!r.cameraChange)
-                        pos = { r.position.x() + 30.f, r.position.y() + 40.f, r.position.z() + 30.f };
-                    else
-                        pos = { r.position.x() - 10.f, r.position.y() + 25.f, r.position.z() + 8.f };
-
-                    auto& li = em.getSingleton<LevelInfo>();
-                    if (li.playerDetected)
-                    {
-                        pos -= vec3d{ 2.f, 7.f, 2.f };
-                    }
-                    engine.setPositionCamera(pos);
-                    engine.setTargetCamera(r.position);
-                }
-                // Comprobar si tiene el componente vida
-
                 Color colorEntidad = r.color;
 
                 // Comprobar el tipo y si es enemigo cambiarle el color
@@ -243,7 +224,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     }
                     else if (e.hasTag<GolemTag>())
                     {
-                        scl = { 0.33, 0.33, 0.33 };
+                        scl = { 0.4, 0.4, 0.4 };
                         pos.setY(pos.y() - 1.1);
                     }
 

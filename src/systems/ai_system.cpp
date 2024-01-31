@@ -32,6 +32,7 @@ void perception(BlackBoard_t& bb, AIComponent& ai, float dt) {
 void AISystem::update(EntityManager& em, float dt)
 {
     bool isDetected{ false };
+    std::vector<vec3d> enemyPositions{};
     auto& li = em.getSingleton<LevelInfo>();
     auto& bb = em.getSingleton<BlackBoard_t>();
     em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, AIComponent& ai, LifeComponent& lc)
@@ -49,6 +50,9 @@ void AISystem::update(EntityManager& em, float dt)
             isDetected = true;
         }
 
+        if (ai.playerdetected)
+            enemyPositions.push_back(phy.position);
+
         if (ai.behaviourTree) {
             ai.behaviourTree->run({ em,e,ai,phy,lc,dt });
             return;
@@ -57,4 +61,6 @@ void AISystem::update(EntityManager& em, float dt)
 
     if (!isDetected && li.playerDetected)
         li.playerDetected = false;
+
+    li.enemyPositions = enemyPositions;
 }
