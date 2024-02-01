@@ -36,7 +36,14 @@ struct PhysicsComponent
     //controla la llegada , se ha sustituido por arrivalradius en la ia
     static constexpr double kEpsilon{ 0.1 };
     //rozamiento
+    //rozamiento por ataque en area
     bool dragactivated { false };
+    //rozamiento por ataque melee de golem
+    bool dragactivatedtime {false};
+    double countdown_sttuned{ 6.0 }; // seconds
+    double elapsed_stunned{ 1.0 };
+    void plusdeltatime(double deltaTime, double& elapsed) { elapsed += deltaTime; };
+
     static constexpr double kDrag{ 3.0 };
 
 };

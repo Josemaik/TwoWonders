@@ -57,6 +57,12 @@ struct BTActionShoot : BTNode_t{
                     return BTNodeStatus_t::success;
                 }
                     break;
+                // case AIComponent::TypeShoot::SpiderWeb:{
+                //     att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai.SPEED_AI;
+                //     att.attack(AttackType::Spiderweb);
+                //     return BTNodeStatus_t::success;
+                // }
+                    break;
                 default:
                     break;
                 }

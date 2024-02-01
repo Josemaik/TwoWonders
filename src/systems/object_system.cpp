@@ -123,22 +123,22 @@ bool ObjectSystem::buyExtraLife(EntityManager& em, Entity* ent) {
 }
 
 void ObjectSystem::explodeBombHeal(EntityManager& em, Entity& ent) {
-    createExplodeBomb(em, ent, BehaviorType::HEAL);
-    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY);
+    createExplodeBomb(em, ent, BehaviorType::HEAL, GREEN);
+    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY, GREEN);
 }
 
 void ObjectSystem::explodeBomb(EntityManager& em, Entity& ent) {
-    createExplodeBomb(em, ent, BehaviorType::ATK_PLAYER);
-    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY);
+    createExplodeBomb(em, ent, BehaviorType::ATK_PLAYER, BLACK);
+    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY, BLACK);
 }
 
-void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type) {
+void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type,Color color) {
     if (ent.hasComponent<RenderComponent>()) {
         auto& ren = em.getComponent<RenderComponent>(ent);
         // Crear una entidad que quite vida
         auto& e{ em.newEntity() };
         em.addTag<HitPlayerTag>(e);
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = ren.position, .scale = { 3.0f, 1.0f, 3.0f }, .color = BLACK });
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = ren.position, .scale = { 3.0f, 1.0f, 3.0f }, .color = color });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
         em.addComponent<LifeComponent>(e, LifeComponent{ .life = 5, .countdown = 0.0f });
         em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f });

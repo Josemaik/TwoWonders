@@ -27,11 +27,25 @@ void PhysicsSystem::update(EntityManager& em, float dt)
         // }
         // Player únicamente tiene velocidad linear
         // if(e.hasTag<PlayerTag>() || e.hasTag<HitPlayerTag>()){
+
+        //Stuneo al jugador durante un tiempo provocado por el golpe de un golem
+        if(phy.dragactivatedtime){
+            phy.dragactivated = true;
+            if(phy.elapsed_stunned >= phy.countdown_sttuned){
+                phy.elapsed_stunned = 0;
+                phy.dragactivatedtime = false;
+            }
+            phy.plusdeltatime(dt,phy.elapsed_stunned);
+        }
+        //Stunear o RAlentizar al player
         if(phy.dragactivated){
             phy.dragactivated = false;
             // float dragFactor = 0.3f;
             // vel -= dragFactor;
             vel /= phy.kDrag;
+        }else{
+            // si el player no esta siendo ralentizado-> no esta siendo capturado por tearaña
+            em.getSingleton<BlackBoard_t>().playerhunted = false;
         }
 
         pos.setX((pos.x() + vel.x()));

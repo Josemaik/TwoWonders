@@ -280,7 +280,7 @@
                 "position": [-52.0, 0.0, -5.0],
                 "scale": [1.0, 1.0, 1.0],
                 "color": [0, 82, 172, 255]
-            }   
+            }
         ],
         "zones": [
             {
@@ -406,11 +406,11 @@
             },
             {
                 "position": [-2.0 ,0.0, -21.0],
-                "scale": [1.0, 2.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
                 "color": [0, 121, 241, 255],
-                "max_speed": 0.5,
+                "max_speed": 0.3,
                 "life": 6,
-                "type": 1,
+                "type": 4,
                 "element": 3,
                 "arrival_radius": 0.1,
                 "detect_radius": 9.0,
@@ -484,9 +484,38 @@
                 "countdown_shoot": 0.5,
                 "countdown_perception": 6.1,
                 "scale_to_respawn_attack": 2.0
-            }            
+            }
         ],
         "npcs": [],
-        "player": []
+        "player": [],
+        "comentarios": [
+            {
+                "position": [-2.0 ,0.0, -21.0],
+                "scale": [1.0, 2.0, 1.0],
+                "color": [0, 121, 241, 255],
+                "max_speed": 0.5,
+                "life": 6,
+                "type": 1,
+                "element": 3,
+                "arrival_radius": 0.1,
+                "detect_radius": 9.0,
+                "attack_radius": 6.0,
+                "tx": 0.0,
+                "tz": 0.0,
+                "time2arrive": 1.0,
+                "tactive": true,
+                "perceptionTime": 0.3,
+                "path": [
+                    [-7.0, 0.0, -20.0],
+                    [-3.0, 0.0, -20.0],
+                    [-7.0, 0.0, -20.0],
+                    [-3.0, 0.0, -20.0]
+                ],
+                "countdown_stop": 0.8,
+                "countdown_shoot": 0.5,
+                "countdown_perception": 2.0,
+                "scale_to_respawn_attack": 2.0
+            }
+        ]
     }
 }
