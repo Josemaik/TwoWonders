@@ -10,7 +10,7 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
             // Si es enemigo creamos un objeto
             if (ent.hasTag<EnemyTag>() && !lif.decreaseNextFrame)
                 createObject(em, em.getComponent<PhysicsComponent>(ent).position);
-
+            //Si es un slime
             if (ent.hasTag<SlimeTag>())
             {
                 if (!lif.decreaseNextFrame)
@@ -23,14 +23,27 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
                     em.getComponent<AttackComponent>(ent).attack(AttackType::HealSpell);
                 }
             }
-
+            //si es un golem
             if(ent.hasTag<GolemTag>()){
                 if (!lif.decreaseNextFrame)
                     lif.decreaseNextFrame = true;
                 else
                     lif.decreaseNextFrame = false;
 
-                em.getComponent<AttackComponent>(ent).attack(AttackType::Spiderweb);
+                em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
+            }
+            //Si es una bala
+            if(ent.hasTag<HitPlayerTag>()){
+                if (!lif.decreaseNextFrame)
+                    lif.decreaseNextFrame = true;
+                else
+                    lif.decreaseNextFrame = false;
+
+                if(ent.hasComponent<ColliderComponent>() && ent.hasComponent<AttackComponent>()){
+                    if(em.getComponent<ColliderComponent>(ent).atackspider){
+                        em.getComponent<AttackComponent>(ent).attack(AttackType::Spiderweb);
+                    }
+                }
             }
 
             lif.markedForDeletion = true;

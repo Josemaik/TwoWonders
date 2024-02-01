@@ -6,6 +6,11 @@ void ProjectileSystem::update(EntityManager& em, float deltaTime) {
         if (pro.checkRange(deltaTime)) {
             if (e.hasComponent<LifeComponent>())
                 em.getComponent<LifeComponent>(e).markedForDeletion = true;
+                if(e.hasComponent<ColliderComponent>()){
+                    if(em.getComponent<ColliderComponent>(e).atackspider){
+                        em.getComponent<LifeComponent>(e).life = 0;
+                    }
+                }
             else
                 dead_entities.insert(e.getID());
         }

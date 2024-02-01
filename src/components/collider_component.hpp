@@ -30,4 +30,5 @@ struct ColliderComponent
     BehaviorType behaviorType;
 
     bool atackgolem{false};
+    bool atackspider{false};
 };
