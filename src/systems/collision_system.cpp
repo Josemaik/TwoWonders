@@ -221,6 +221,23 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
             if (isAtkEnemy2)
                 std::swap(staticEntPtr, otherEntPtr);
 
+            //Si cualquiera de las dos entidades es una bala y es generada por una araña
+            // creo una telaraña antes de borrar la bala
+            if(staticEnt.hasComponent<ColliderComponent>()){
+                auto& balac = em.getComponent<ColliderComponent>(staticEnt);
+                if(balac.atackspider){
+                    em.getComponent<AttackComponent>(staticEnt).attack(AttackType::Spiderweb);
+                    return;
+                }
+            }
+            if(otherEnt.hasComponent<ColliderComponent>()){
+                auto& balac = em.getComponent<ColliderComponent>(otherEnt);
+                if(balac.atackspider){
+                    em.getComponent<AttackComponent>(otherEnt).attack(AttackType::Spiderweb);
+                    return;
+                }
+            }
+
             dead_entities.insert(staticEntPtr->getID());
             return;
         }
@@ -443,21 +460,31 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                 typeEnemyPlayer = em.getComponent<TypeComponent>(*ent2Ptr).type;
 
             // Destruir bala
-            dead_entities.insert(ent1Ptr->getID());
-
-            // Comprobar el tipo de la bala y el enemigo/player
-            if ((typeBala == ElementalType::Fuego && typeEnemyPlayer == ElementalType::Hielo) ||
-                (typeBala == ElementalType::Hielo && typeEnemyPlayer == ElementalType::Agua) ||
-                (typeBala == ElementalType::Agua && typeEnemyPlayer == ElementalType::Fuego))
-            {
-                em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(3);
+            // si es dispara por una araña creo un ataque de telaraña antes de matarla
+            bool balalaunchedbyspider{false};
+            if(balac.atackspider){
+                em.getComponent<AttackComponent>(*ent1Ptr).attack(AttackType::Spiderweb);
+                balalaunchedbyspider = true;
+            }else{
+                dead_entities.insert(ent1Ptr->getID());
             }
-            else if (typeBala == ElementalType::Neutral)
-                em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(2);
-            else{
-                em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(1);
-                if(balac.atackgolem){
-                   em.getComponent<PhysicsComponent>(*ent2Ptr).dragactivatedtime = true;
+
+            //Si la bala es lanzada por una araña no quita vida
+            if(!balalaunchedbyspider){
+                // Comprobar el tipo de la bala y el enemigo/player
+                if ((typeBala == ElementalType::Fuego && typeEnemyPlayer == ElementalType::Hielo) ||
+                    (typeBala == ElementalType::Hielo && typeEnemyPlayer == ElementalType::Agua) ||
+                    (typeBala == ElementalType::Agua && typeEnemyPlayer == ElementalType::Fuego))
+                {
+                    em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(3);
+                }
+                else if (typeBala == ElementalType::Neutral)
+                    em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(2);
+                else{
+                    em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(1);
+                    if(balac.atackgolem){
+                    em.getComponent<PhysicsComponent>(*ent2Ptr).dragactivatedtime = true;
+                    }
                 }
             }
         }
