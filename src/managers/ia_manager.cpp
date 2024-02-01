@@ -595,10 +595,10 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     case 4:
     {
         em.addTag<SpiderTag>(e);
-        // auto* d_p_h = &tree.createNode<BTDecisionPlayerHunted>();
-        // auto* d_s_1 = &tree.createNode<BTAction_Seek>();
-        // auto* a_a_6 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee);
-        //auto* sequence0 = &tree.createNode<BTNodeSequence_t>(d_p_h, d_s_1, a_a_6);
+        auto* d_p_h = &tree.createNode<BTDecisionPlayerHunted>();
+        auto* d_s_1 = &tree.createNode<BTAction_Seek>();
+        auto* a_a_6 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee);
+        auto* sequence0 = &tree.createNode<BTNodeSequence_t>(d_p_h, d_s_1, a_a_6);
 
         auto* d_ra = &tree.createNode<BTDecisionReadyforAttack>();
         auto* a_as = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer); // fail si disparo succes si no disparo
@@ -613,7 +613,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* patrol_6 = &tree.createNode<BTAction_Patrol>();
         auto* sequence3 = &tree.createNode<BTNodeSequence_t>(patrol_6);
 
-        tree.createNode<BTNodeSelector_t>(sequence1, sequence2, sequence3);
+        tree.createNode<BTNodeSelector_t>(sequence0,sequence1, sequence2, sequence3);
         //Escribir arbol de araña
     }
         break;

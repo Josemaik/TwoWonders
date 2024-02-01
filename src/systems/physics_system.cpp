@@ -43,6 +43,9 @@ void PhysicsSystem::update(EntityManager& em, float dt)
             // float dragFactor = 0.3f;
             // vel -= dragFactor;
             vel /= phy.kDrag;
+        }else{
+            // si el player no esta siendo ralentizado-> no esta siendo capturado por tearaña
+            em.getSingleton<BlackBoard_t>().playerhunted = false;
         }
 
         pos.setX((pos.x() + vel.x()));

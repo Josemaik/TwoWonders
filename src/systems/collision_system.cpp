@@ -182,12 +182,15 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     //Telaraña
      if ((behaviorType2 & BehaviorType::SPIDERWEB || behaviorType1 & BehaviorType::SPIDERWEB) && (staticEnt.hasTag<PlayerTag>() || otherEnt.hasTag<PlayerTag>())){
         if(staticEnt.hasComponent<PhysicsComponent>() && staticEnt.hasTag<PlayerTag>()){
+            em.getSingleton<BlackBoard_t>().playerhunted = true;
             em.getComponent<PhysicsComponent>(staticEnt).dragactivated = true;
+            return;
         }
         if(otherEnt.hasComponent<PhysicsComponent>() && otherEnt.hasTag<PlayerTag>()){
+            em.getSingleton<BlackBoard_t>().playerhunted = true;
             em.getComponent<PhysicsComponent>(otherEnt).dragactivated = true;
+            return;
         }
-        return;
      }
 
 

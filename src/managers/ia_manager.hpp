@@ -30,6 +30,7 @@
 #include "../utils/bt/decision_checklifes.hpp"
 #include "../utils/bt/decision_flee_or_curepartner.hpp"
 #include "../utils/bt/decision_readyforheal.hpp"
+#include "../utils/bt/decision_playerhunted.hpp"
 struct Ia_man
 {
     using jsonType = const rapidjson::Value&;

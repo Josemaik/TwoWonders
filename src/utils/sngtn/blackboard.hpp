@@ -12,6 +12,7 @@ struct SlimeInfo {
 struct BlackBoard_t {
     double tx { 0.0 } , tz { 0.0 };
     bool tactive { false };
+    bool playerhunted{false};
     //Target Entity
     std::size_t teid{};
     //Path
