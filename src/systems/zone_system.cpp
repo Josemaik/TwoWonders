@@ -34,7 +34,6 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                 {
                     auto* playerEn = em.getEntityByID(li.playerID);
                     auto& p = em.getComponent<PhysicsComponent>(*playerEn);
-                    auto& r = em.getComponent<RenderComponent>(*playerEn);
 
                     switch (zon.zone)
                     {
@@ -98,7 +97,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         // MAZMORRA //
 
                     case 20: // TP a la cueva de la mazmorra
-                        r.cameraChange = true;
+                        li.cameraChange = true;
 
                         map.reset(em, 1, iam);
                         li.transition = true;
@@ -108,7 +107,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         break;
 
                     case 21: // TP desde la cueva de la mazmorra
-                        r.cameraChange = false;
+                        li.cameraChange = false;
 
                         map.reset(em, 0, iam);
                         li.transition = true;

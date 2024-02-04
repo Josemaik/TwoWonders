@@ -327,7 +327,7 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
                 DrawTextEx(GetFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), Vector2{ 120,250 }, 20, 1, DARKGRAY);
                 DrawText("Player Detected?:", 5, 270, 20, BLACK);
                 DrawTextEx(GetFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", Vector2{ 200,270 }, 20, 1, DARKGRAY);
-                 DrawText("Player hunted?:", 5, 290, 20, BLACK);
+                DrawText("Player hunted?:", 5, 290, 20, BLACK);
                 DrawTextEx(GetFontDefault(), (em.getSingleton<BlackBoard_t>().playerhunted == 0) ? "No" : "Sí", Vector2{ 200,290 }, 20, 1, DARKGRAY);
                 // So ademas de pasar el ratón por encima , clicko activo la edición de parámetros de esa entidad
                 if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -599,6 +599,17 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         //         20,
         //         BLACK);
         // // }
+    }
+
+    if (li.lockedEnemy != li.max)
+    {
+        auto& enemy = *em.getEntityByID(li.lockedEnemy);
+        auto& r = em.getComponent<RenderComponent>(enemy);
+
+        engine.drawCircle(static_cast<int>(engine.getWorldToScreenX(r.position)),
+            static_cast<int>(engine.getWorldToScreenY(r.position)),
+            5,
+            WHITE);
     }
 }
 

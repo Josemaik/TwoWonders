@@ -21,7 +21,7 @@ void InputSystem::update(EntityManager& em)
     if (!playerEn->hasTag<PlayerTag>() && IsKeyReleased(KEY_ENTER))
         em.destroyAll();
 
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, InputComponent& in, RenderComponent& ren)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, InputComponent& in)
     {
         // Resetear la velocidad
         phy.velocity = {};
@@ -47,7 +47,7 @@ void InputSystem::update(EntityManager& em)
            // std::cout << "NO BLOQUEADOS \n";
         if (IsKeyDown(in.right)) {
 
-            if (!ren.cameraChange)
+            if (!li.cameraChange)
             {
                 vel.setX(vel.x() + INP_SPEED);
                 vel.setZ(vel.z() - INP_SPEED);
@@ -63,7 +63,7 @@ void InputSystem::update(EntityManager& em)
         }
         if (IsKeyDown(in.left)) {
 
-            if (!ren.cameraChange)
+            if (!li.cameraChange)
             {
                 vel.setX(vel.x() - INP_SPEED);
                 vel.setZ(vel.z() + INP_SPEED);
@@ -80,7 +80,7 @@ void InputSystem::update(EntityManager& em)
         }
         if (IsKeyDown(in.up)) {
 
-            if (!ren.cameraChange)
+            if (!li.cameraChange)
             {
                 vel.setX(vel.x() - INP_SPEED);
                 vel.setZ(vel.z() - INP_SPEED);
@@ -96,7 +96,7 @@ void InputSystem::update(EntityManager& em)
         }
         if (IsKeyDown(in.down)) {
 
-            if (!ren.cameraChange)
+            if (!li.cameraChange)
             {
                 vel.setX(vel.x() + INP_SPEED);
                 vel.setZ(vel.z() + INP_SPEED);

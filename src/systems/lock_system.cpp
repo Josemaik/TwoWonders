@@ -69,6 +69,4 @@ void LockSystem::update(EntityManager& em)
     {
         li.lockedEnemy = li.max;
     }
-
-    std::cout << li.lockInput << std::endl;
 }

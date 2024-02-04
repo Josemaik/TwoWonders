@@ -120,6 +120,10 @@ void ENGI::GameEngine::drawTexture(Texture2D texture, int posX, int posY, Color 
     DrawTexture(texture, posX, posY, tint);
 }
 
+void ENGI::GameEngine::drawCircle(int posX, int posY, float radius, Color color) {
+    DrawCircle(posX, posY, radius, color);
+}
+
 ////// TEXT //////
 
 void ENGI::GameEngine::drawText(const char* text, int posX, int posY, int fontSize, Color color) {

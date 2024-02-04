@@ -22,5 +22,4 @@ struct RenderComponent
     Model model{};
     Mesh mesh{};
     bool meshLoaded{ false };
-    bool cameraChange{ false };
 };

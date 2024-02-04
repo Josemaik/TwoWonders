@@ -7,12 +7,15 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
 
     if (playerEn.hasTag<PlayerTag>())
     {
-        auto& r = em.getComponent<RenderComponent>(playerEn);
-        cameraPos = { r.position.x() + 33.f, r.position.y() + 43.f, r.position.z() + 32.f };
-        cameraTar = r.position;
+        auto& phy = em.getComponent<RenderComponent>(playerEn);
+        cameraPos = { phy.position.x() + 33.f, phy.position.y() + 43.f, phy.position.z() + 33.f };
+        cameraTar = phy.position;
+
+        if (li.cameraChange)
+            cameraPos = { phy.position.x() - 33.f, phy.position.y() + 43.f, phy.position.z() + 33.f };
 
         auto& li = em.getSingleton<LevelInfo>();
-        if (li.playerDetected)
+        if (li.playerDetected && li.lockedEnemy == li.max)
         {
             if (!li.enemyPositions.empty())
             {
@@ -29,13 +32,28 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
 
                 // Calcular el punto que está a un tercio del camino entre la posición del jugador y la posición media de los enemigos
                 vec3d enemyPos = { x, y, z };
-                vec3d oneThirdPoint = r.position + (enemyPos - r.position) / 4.0;
+                vec3d oneFourthPoint = phy.position + (enemyPos - phy.position) / 4.0;
 
-                cameraTar = oneThirdPoint;
-                cameraPos = { oneThirdPoint.x() + 33.f, oneThirdPoint.y() + 43.f, oneThirdPoint.z() + 33.f };
+                cameraTar = oneFourthPoint;
+                cameraPos = { oneFourthPoint.x() + 33.f, oneFourthPoint.y() + 43.f, oneFourthPoint.z() + 33.f };
+
+                if (li.cameraChange)
+                    cameraPos = { oneFourthPoint.x() - 33.f, oneFourthPoint.y() + 43.f, oneFourthPoint.z() + 33.f };
             }
 
             cameraPos -= vec3d{ 2.f, 7.f, 2.f };
+        }
+        else if (li.lockedEnemy != li.max)
+        {
+            auto& enemy = *em.getEntityByID(li.lockedEnemy);
+            auto& lockedEnemyPos = em.getComponent<PhysicsComponent>(enemy).position;
+            vec3d oneFourthPoint = phy.position + (lockedEnemyPos - phy.position) / 4.0;
+
+            cameraTar = oneFourthPoint;
+            cameraPos = { oneFourthPoint.x() + 28.f, oneFourthPoint.y() + 40.f, oneFourthPoint.z() + 28.f };
+
+            if (li.cameraChange)
+                cameraPos = { oneFourthPoint.x() - 28.f, oneFourthPoint.y() + 40.f, oneFourthPoint.z() + 28.f };
         }
 
         float t = 0.1f; // Velocidad de la transición
@@ -52,6 +70,7 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
                 t = 1.f;
             }
         }
+
         vec3d currentCameraPos = ge.getPositionCamera();
         vec3d currentCameraTarget = ge.getTargetCamera();
         vec3d newCameraPos = currentCameraPos + t * (cameraPos - currentCameraPos);
