@@ -305,7 +305,6 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
      for (auto const& e : em.getEntities()) {
         if (e.hasComponent<AIComponent>()) {
             auto& col = em.getComponent<ColliderComponent>(e);
-            auto& aic{ em.getComponent<AIComponent>(e) };
             RayCast ray = engine.getMouseRay(); ray = engine.getMouseRay();
             if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
                 if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -375,7 +374,6 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
     for (auto const& e : em.getEntities()) {
         if (e.hasComponent<AIComponent>()) {
             RayCast ray = engine.getMouseRay();
-            auto& aic{ em.getComponent<AIComponent>(e) };
             auto& col = em.getComponent<ColliderComponent>(e);
             auto& ren = em.getComponent<RenderComponent>(e);
             // Comprobar si el rayo intersecta con el collider
