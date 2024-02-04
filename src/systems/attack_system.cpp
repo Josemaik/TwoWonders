@@ -164,7 +164,7 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
     em.addTag<HitPlayerTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3d{0, 0, 0} : att.vel * scale_to_respawn_attack), .scale = { isRanged ? 0.5 : 2.0, isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 2.0 }, .color = BLACK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = isRanged ? att.vel : vec3d{0, 0, 0}, .gravity = 0, .orientation = phy.orientation });
-    auto& l = em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
     em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = static_cast<float>(isRanged ? ranged : 0.2) });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
     if (ent.hasTag<PlayerTag>())

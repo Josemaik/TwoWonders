@@ -2,9 +2,8 @@
 #include <iomanip>
 #include "../../libs/raygui.h"
 
-void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debugphy, bool debugAI)
+void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debugphy, bool debugAI,double dt)
 {
-
     // Actualizamos la posicion de render del componente de fisicas
     em.forEach<SYSCMPs, SYSTAGs>([](Entity&, PhysicsComponent& phy, RenderComponent& ren)
     {
@@ -17,7 +16,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debu
     // Dibuja todas las entidades con componente de render
     drawEntities(em, engine);
 
-    endFrame(engine, em, debugphy, debugAI);
+    endFrame(engine, em, debugphy, debugAI,dt);
 }
 
 void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
@@ -257,14 +256,17 @@ void RenderSystem::beginFrame(ENGI::GameEngine& engine)
 }
 
 // Se termina el dibujado
-void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debugphy, bool debugAI)
+void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debugphy, bool debugAI,double dt)
 {
     engine.endMode3D();
 
     drawHUD(em, engine, debugphy);
+    // Si se pulsa F2 se activa editor  de parámetros In-game
     if (debugAI) {
         drawEditorInGameIA(engine, em);
     }
+    //debugger visual IA
+    drawDebuggerInGameIA(engine,em,dt);
 
     engine.endDrawing();
 }
@@ -279,30 +281,80 @@ double SelectValue(double value, float posx, float posy, float height, float wid
     // seteamos el nuevo valor
     return static_cast<double>(floatvalue);
 }
+//Debugger visual in-game
+void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em,double dt){
+    // engine.beginDrawing();
+    Rectangle windowRect = { 470, 80, 330, 180 };
+    DrawRectangleLinesEx(windowRect, 2, DARKGRAY);
+    DrawRectangleRec(windowRect, Color{255, 255, 255, 128});
+     Vector2 textPositionInfo = { 480, 90 };
+     DrawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
+     auto& debugsnglt = em.getSingleton<Debug_t>();
+     for (auto const& e : em.getEntities()) {
+        if (e.hasComponent<AIComponent>()) {
+            auto& col = em.getComponent<ColliderComponent>(e);
+            RayCast ray = engine.getMouseRay(); ray = engine.getMouseRay();
+            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
+                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                            isSelectedfordebug = !isSelectedfordebug;
+                            debugsnglt.IA_id_debug = e.getID();
+                }
+            }
+            if (isSelectedfordebug && e.getID() == debugsnglt.IA_id_debug) {
+                auto& aic = em.getComponent<AIComponent>(*em.getEntityByID(debugsnglt.IA_id_debug));
+                auto& ren = em.getComponent<RenderComponent>(*em.getEntityByID(debugsnglt.IA_id_debug));
+                engine.beginMode3D();
+                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
+                engine.endMode3D();
+                DrawText("Node active:", 480, 110, 20, BLACK);
+                if(debugsnglt.elapsed >= debugsnglt.countdown){
+                    debugsnglt.elapsed = 0;
+                    debugsnglt.text = aic.bh;
+                }else{
+                    debugsnglt.plusdeltatime(dt,debugsnglt.elapsed);
+                }
+                DrawTextEx(GetFontDefault(), debugsnglt.text, Vector2{ 610,110 }, 20, 1, DARKGRAY);
+                DrawText("TEID:", 480, 130, 20, BLACK);
+                DrawTextEx(GetFontDefault(), std::to_string(aic.teid).c_str(), Vector2{ 550,130 }, 20, 1, DARKGRAY);
+                DrawText("TX:", 480, 150, 20, BLACK);
+                DrawTextEx(GetFontDefault(), std::to_string(aic.tx).c_str(), Vector2{ 520,150 }, 20, 1, DARKGRAY);
+                DrawText("TZ:", 480, 170, 20, BLACK);
+                DrawTextEx(GetFontDefault(), std::to_string(aic.tz).c_str(), Vector2{ 520,170 }, 20, 1, DARKGRAY);
+                DrawText("Culldown:", 480, 190, 20, BLACK);
+                DrawTextEx(GetFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), Vector2{ 590,190 }, 20, 1, DARKGRAY);
+                DrawText("Player Detected?:", 480, 210, 20, BLACK);
+                DrawTextEx(GetFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", Vector2{ 680,210 }, 20, 1, RED);
+                DrawText("Player hunted?:", 480, 230, 20, BLACK);
+                DrawTextEx(GetFontDefault(), (em.getSingleton<BlackBoard_t>().playerhunted == 0) ? "No" : "Sí", Vector2{ 680,230 }, 20, 1, RED);
+            }
+        }
+     }
+    //  engine.endDrawing();
+}
 //Editor In-Game
 void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& em) {
-    engine.beginDrawing();
+    // engine.beginDrawing();
 
     // Dibujar un rectángulo que simula una ventana
     Rectangle windowRect = { 0, 100, 340, 550 };
     DrawRectangleLinesEx(windowRect, 2, DARKGRAY);
-    DrawRectangleRec(windowRect, RAYWHITE);
+    DrawRectangleRec(windowRect, Color{255, 255, 255, 128});
 
     // Dibujar el texto "debugger IA" en el centro de la ventana
     Vector2 textSize = MeasureTextEx(GetFontDefault(), "Debugger IA", 20, 1);
     Vector2 textPosition = { windowRect.x + 20,
                              windowRect.y + 10 };
 
-    DrawTextEx(GetFontDefault(), "Debugger IA", textPosition, 20, 1, DARKBLUE);
+    DrawTextEx(GetFontDefault(), "Editor IA", textPosition, 20, 1, DARKBLUE);
 
     // Dibujar una línea recta debajo del texto
     float lineY = textPosition.y + textSize.y + 5;  // Ajusta la posición de la línea según tus necesidades
     DrawLine(static_cast<int>(windowRect.x), static_cast<int>(lineY), static_cast<int>(windowRect.x) + static_cast<int>(windowRect.width),
         static_cast<int>(lineY), DARKGRAY);
     // Dibujar el texto "INFO" debajo de la línea
-    Vector2 textPositionInfo = { windowRect.x + 5, lineY + 10 };
-    Vector2 textPositionParameters = { windowRect.x + 5, 290 };
-    DrawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
+
+    Vector2 textPositionParameters = { windowRect.x + 5, 150 };
+
     DrawTextEx(GetFontDefault(), "PARÁMETROS", textPositionParameters, 20, 1, RED);
 
     auto& debugsnglt = em.getSingleton<Debug_t>();
@@ -310,32 +362,16 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
     for (auto const& e : em.getEntities()) {
         if (e.hasComponent<AIComponent>()) {
             RayCast ray = engine.getMouseRay();
-            auto& aic{ em.getComponent<AIComponent>(e) };
             auto& col = em.getComponent<ColliderComponent>(e);
             auto& ren = em.getComponent<RenderComponent>(e);
             // Comprobar si el rayo intersecta con el collider
             if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
-                DrawText("Node active:", static_cast<int>(textPositionInfo.x), static_cast<int>(textPositionInfo.y + 20), 20, BLACK);
-                DrawTextEx(GetFontDefault(), aic.bh, Vector2{ textPositionInfo.x + 130,textPositionInfo.y + 20 }, 20, 1, DARKGRAY);
-                DrawText("TEID:", 5, 190, 20, BLACK);
-                DrawTextEx(GetFontDefault(), std::to_string(aic.teid).c_str(), Vector2{ 70,190 }, 20, 1, DARKGRAY);
-                DrawText("TX:", 5, 210, 20, BLACK);
-                DrawTextEx(GetFontDefault(), std::to_string(aic.tx).c_str(), Vector2{ 70,210 }, 20, 1, DARKGRAY);
-                DrawText("TZ:", 5, 230, 20, BLACK);
-                DrawTextEx(GetFontDefault(), std::to_string(aic.tz).c_str(), Vector2{ 70,230 }, 20, 1, DARKGRAY);
-                DrawText("Culldown:", 5, 250, 20, BLACK);
-                DrawTextEx(GetFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), Vector2{ 120,250 }, 20, 1, DARKGRAY);
-                DrawText("Player Detected?:", 5, 270, 20, BLACK);
-                DrawTextEx(GetFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", Vector2{ 200,270 }, 20, 1, DARKGRAY);
-                 DrawText("Player hunted?:", 5, 290, 20, BLACK);
-                DrawTextEx(GetFontDefault(), (em.getSingleton<BlackBoard_t>().playerhunted == 0) ? "No" : "Sí", Vector2{ 200,290 }, 20, 1, DARKGRAY);
-                // So ademas de pasar el ratón por encima , clicko activo la edición de parámetros de esa entidad
                 if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                     isSelected = !isSelected;
                     debugsnglt.IA_id = e.getID();
                 }
-                // si es seleccionada => wires morados
-                // no es seleccionada => wires rojos
+            //     // si es seleccionada => wires morados
+            //     // no es seleccionada => wires rojos
                 engine.beginMode3D();
                 engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
                 engine.endMode3D();
@@ -349,27 +385,27 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
                     auto& aic = em.getComponent<AIComponent>(*em.getEntityByID(debugsnglt.IA_id));
                     auto& phy = em.getComponent<PhysicsComponent>(*em.getEntityByID(debugsnglt.IA_id));
                     // ID DE LA ENTIDAD SELECCIONADA
-                    DrawText("EID:", 5, 310, 20, BLACK);
-                    DrawText(std::to_string(debugsnglt.IA_id).c_str(), 55, 310, 20, DARKGRAY);
+                    DrawText("EID:", 5, 170, 20, BLACK);
+                    DrawText(std::to_string(debugsnglt.IA_id).c_str(), 55, 170, 20, DARKGRAY);
                     //Detect Radius
-                    aic.detect_radius = SelectValue(aic.detect_radius, 85.0, 330.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
+                    aic.detect_radius = SelectValue(aic.detect_radius, 85.0,200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
                     // Attack Radius
-                    aic.attack_radius = SelectValue(aic.attack_radius, 85.0, 370.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
+                    aic.attack_radius = SelectValue(aic.attack_radius, 85.0, 240.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
                     // Arrival Radius
-                    aic.arrival_radius = SelectValue(aic.arrival_radius, 85.0, 410.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
+                    aic.arrival_radius = SelectValue(aic.arrival_radius, 85.0, 280.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
                     // Max Speed
-                    phy.max_speed = SelectValue(phy.max_speed, 85.0, 450.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
+                    phy.max_speed = SelectValue(phy.max_speed, 85.0, 320.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
                     //COuntdown Perception
-                    aic.countdown_perception = SelectValue(aic.countdown_perception, 85.0, 490.0, 120.0, 30.0, "Perception", 0.0, 10.0);
+                    aic.countdown_perception = SelectValue(aic.countdown_perception, 85.0, 360.0, 120.0, 30.0, "Perception", 0.0, 10.0);
                     //Countdown Shoot
-                    aic.countdown_shoot = SelectValue(aic.countdown_shoot, 85.0, 530.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
+                    aic.countdown_shoot = SelectValue(aic.countdown_shoot, 85.0, 400.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
                     //Countdown stop
-                    aic.countdown_stop = SelectValue(aic.countdown_stop, 85.0, 570.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
+                    aic.countdown_stop = SelectValue(aic.countdown_stop, 85.0, 440.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
                 }
             }
         }
     }
-    engine.endDrawing();
+   // engine.endDrawing();
 }
 // Se dibuja el HUD
 void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy)
