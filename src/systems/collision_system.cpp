@@ -267,7 +267,10 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     }
 
     // Esto ya es cualquier colisión que no sea de player, paredes, zonas o ataques
-    nonStaticCollision(staticPhy, otherPhy, minOverlap);
+    //Si una de las entidades es una telaraña no se comprueba las colisiones
+    if(!behaviorType1 & BehaviorType::SPIDERWEB && !behaviorType2 & BehaviorType::SPIDERWEB){
+        nonStaticCollision(staticPhy, otherPhy, minOverlap);
+    }
 }
 
 void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
