@@ -636,6 +636,17 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         //         BLACK);
         // // }
     }
+
+    if (li.lockedEnemy != li.max)
+    {
+        auto& enemy = *em.getEntityByID(li.lockedEnemy);
+        auto& r = em.getComponent<RenderComponent>(enemy);
+
+        engine.drawCircle(static_cast<int>(engine.getWorldToScreenX(r.position)),
+            static_cast<int>(engine.getWorldToScreenY(r.position)),
+            5,
+            WHITE);
+    }
 }
 
 void RenderSystem::drawDeath(ENGI::GameEngine& engine)

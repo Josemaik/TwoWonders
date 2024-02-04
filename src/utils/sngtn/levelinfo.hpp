@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <unordered_set>
+#include <limits>
 #include "utils/types.hpp"
 
 // Enum que representa el estado del juego
@@ -41,7 +42,12 @@ struct LevelInfo
   std::unordered_set<std::size_t> enemiesID{};
   std::vector<vec3d> enemyPositions{};
   bool transition{ false };
+  bool cameraChange{ false };
+  bool lockInput{ false };
+  const std::size_t max = std::numeric_limits<std::size_t>::max();
+  std::size_t lockedEnemy{ max };
   NotLoadSet notLoadSet{};
+
 
   uint16_t num_zone{};
   bool drawzone{ false };

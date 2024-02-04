@@ -16,7 +16,7 @@ struct InputComponent
     // int Pursue { KEY_P };
     // int Avoid  { KEY_V };
     // int pathfollow  { KEY_T };
-    int attarea{ KEY_F };
+    int lockIn{ KEY_F };
 
     int last_key{};
 };

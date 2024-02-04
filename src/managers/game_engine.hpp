@@ -42,6 +42,7 @@ namespace ENGI {
         void drawModelWires(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
         void drawRectangle(int posX, int posY, int width, int height, Color color);
         void drawTexture(Texture2D texture, int posX, int posY, Color tint);
+        void drawCircle(int posX, int posY, float radius, Color color);
 
         // Text
         void drawText(const char* text, int posX, int posY, int fontSize, Color color);
