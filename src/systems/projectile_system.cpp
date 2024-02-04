@@ -4,7 +4,7 @@ void ProjectileSystem::update(EntityManager& em, float deltaTime) {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, ProjectileComponent& pro)
     {
         if (pro.checkRange(deltaTime)) {
-            if (e.hasComponent<LifeComponent>())
+            if (e.hasComponent<LifeComponent>()){
                 em.getComponent<LifeComponent>(e).markedForDeletion = true;
 
             if (e.hasComponent<ColliderComponent>()) {

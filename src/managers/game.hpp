@@ -43,7 +43,8 @@ private:
     void createShop(EntityManager& em);
     void createEnding(EntityManager& em);
     void normalExecution(EntityManager& em, float deltaTime);
-    void debugExecution(EntityManager& em, bool debugphy, bool debugai);
+
+    void debugExecution(EntityManager& em, bool debugphy,bool debugai,float deltaTime);
     void createSound(EntityManager& em);
 
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
