@@ -43,6 +43,14 @@ void LockSystem::update(EntityManager& em)
         if (li.lockedEnemy != li.max)
         {
             auto& enemy = *em.getEntityByID(li.lockedEnemy);
+
+            if (!enemy.hasTag<EnemyTag>())
+            {
+                li.lockedEnemy = li.max;
+                li.lockInput = false;
+                return;
+            }
+
             auto& lockedEnemyPos = em.getComponent<PhysicsComponent>(enemy).position;
             playerPhy.orientation = std::atan2(lockedEnemyPos.x() - playerPos.x(), lockedEnemyPos.z() - playerPos.z());
         }

@@ -48,6 +48,7 @@ struct SlimeTag {};
 struct SnowmanTag {};
 struct GolemTag {};
 struct SpiderTag {};
+
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, RampComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent, ShieldComponent, TypeComponent, LockComponent>;
 using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, WallTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag, GolemTag, SpiderTag>;
