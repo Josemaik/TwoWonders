@@ -1,19 +1,21 @@
 #include "projectile_system.hpp"
 
 void ProjectileSystem::update(EntityManager& em, float deltaTime) {
+
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, ProjectileComponent& pro)
     {
         if (pro.checkRange(deltaTime)) {
-            if (e.hasComponent<LifeComponent>()){
+            if (e.hasComponent<LifeComponent>()) {
                 em.getComponent<LifeComponent>(e).markedForDeletion = true;
 
-            if (e.hasComponent<ColliderComponent>()) {
-                if (em.getComponent<ColliderComponent>(e).attackType == AttackType::Spiderweb) {
-                    em.getComponent<LifeComponent>(e).life = 0;
+                if (e.hasComponent<ColliderComponent>()) {
+                    if (em.getComponent<ColliderComponent>(e).attackType == AttackType::Spiderweb) {
+                        em.getComponent<LifeComponent>(e).life = 0;
+                    }
                 }
+                else
+                    dead_entities.insert(e.getID());
             }
-            else
-                dead_entities.insert(e.getID());
         }
     });
 
