@@ -17,14 +17,15 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
                     lif.decreaseNextFrame = true;
                 else
                     lif.decreaseNextFrame = false;
-                if(em.getComponent<AIComponent>(ent).healbeforedie){
+                if (em.getComponent<AIComponent>(ent).healbeforedie) {
                     em.getComponent<AttackComponent>(ent).attack(AttackType::HealSpell);
-                }else{
+                }
+                else {
                     em.getComponent<AttackComponent>(ent).attack(AttackType::HealSpell);
                 }
             }
             //si es un golem
-            if(ent.hasTag<GolemTag>()){
+            if (ent.hasTag<GolemTag>()) {
                 if (!lif.decreaseNextFrame)
                     lif.decreaseNextFrame = true;
                 else
@@ -32,15 +33,16 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
 
                 em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
             }
+
             //Si es una bala
-            if(ent.hasTag<HitPlayerTag>()){
+            if (ent.hasTag<HitPlayerTag>()) {
                 if (!lif.decreaseNextFrame)
                     lif.decreaseNextFrame = true;
                 else
                     lif.decreaseNextFrame = false;
 
-                if(ent.hasComponent<ColliderComponent>() && ent.hasComponent<AttackComponent>()){
-                    if(em.getComponent<ColliderComponent>(ent).atackspider){
+                if (ent.hasComponent<ColliderComponent>() && ent.hasComponent<AttackComponent>()) {
+                    if (em.getComponent<ColliderComponent>(ent).attackType == AttackType::Spiderweb) {
                         em.getComponent<AttackComponent>(ent).attack(AttackType::Spiderweb);
                     }
                 }

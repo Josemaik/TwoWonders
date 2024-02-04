@@ -18,6 +18,7 @@
 #include "../systems/event_system.hpp"
 #include "../systems/sound_system.hpp"
 #include "../systems/camera_system.hpp"
+#include "../systems/lock_system.hpp"
 #include "game_engine.hpp"
 #include "ia_manager.hpp"
 
@@ -65,6 +66,7 @@ private:
     Map map{};
     SoundSystem sound_system{};
     CameraSystem camera_system{};
+    LockSystem lock_system{};
 };
 
 

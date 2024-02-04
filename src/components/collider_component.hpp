@@ -1,8 +1,10 @@
 #pragma once
 #include <functional>
 #include <utils/BBox.hpp>
+#include "attack_component.hpp"
 
-enum BehaviorType {
+enum BehaviorType
+{
     NOTHING = 0x00,
     PLAYER = 0x01,
     ENEMY = 0x02,
@@ -28,7 +30,5 @@ struct ColliderComponent
 
     BBox boundingBox{};
     BehaviorType behaviorType;
-
-    bool atackgolem{false};
-    bool atackspider{false};
+    AttackType attackType{ AttackType::None };
 };

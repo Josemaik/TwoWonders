@@ -138,7 +138,6 @@ void CollisionSystem::checkRampCollision(EntityManager& em, std::vector<Entity*>
                 break;
             }
         }
-
     }
 }
 
@@ -168,38 +167,13 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         nonStaticCollision(staticPhy, otherPhy, minOverlap);
         return;
     }
-     //daño en área al player
-    if (behaviorType2 & BehaviorType::AREADAMAGE || behaviorType1 & BehaviorType::AREADAMAGE){
-        if(staticEnt.hasComponent<LifeComponent>() && staticEnt.hasTag<PlayerTag>()){
-            em.getComponent<LifeComponent>(staticEnt).decreaseLife();
-        }
-        if(otherEnt.hasComponent<LifeComponent>() && otherEnt.hasTag<PlayerTag>()){
-            em.getComponent<LifeComponent>(otherEnt).decreaseLife();
-        }
-        return;
-    }
-
-    //Telaraña
-     if ((behaviorType2 & BehaviorType::SPIDERWEB || behaviorType1 & BehaviorType::SPIDERWEB) && (staticEnt.hasTag<PlayerTag>() || otherEnt.hasTag<PlayerTag>())){
-        if(staticEnt.hasComponent<PhysicsComponent>() && staticEnt.hasTag<PlayerTag>()){
-            em.getSingleton<BlackBoard_t>().playerhunted = true;
-            em.getComponent<PhysicsComponent>(staticEnt).dragactivated = true;
-            return;
-        }
-        if(otherEnt.hasComponent<PhysicsComponent>() && otherEnt.hasTag<PlayerTag>()){
-            em.getSingleton<BlackBoard_t>().playerhunted = true;
-            em.getComponent<PhysicsComponent>(otherEnt).dragactivated = true;
-            return;
-        }
-     }
-
-
 
     //BOMBA DE CURACION
     if (behaviorType2 & BehaviorType::HEAL || behaviorType1 & BehaviorType::HEAL)
     {
         if (staticEnt.hasComponent<LifeComponent>() && staticEnt.hasTag<SlimeTag>()) {
             em.getComponent<LifeComponent>(staticEnt).increaseLife();
+            return;
         }
         if (otherEnt.hasComponent<LifeComponent>() && otherEnt.hasTag<SlimeTag>()) {
             em.getComponent<LifeComponent>(otherEnt).increaseLife();
@@ -224,19 +198,24 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
             if (isAtkEnemy2)
                 std::swap(staticEntPtr, otherEntPtr);
 
-            //Si cualquiera de las dos entidades es una bala y es generada por una araña
+            // Si cualquiera de las dos entidades es una bala y es generada por una araña
             // creo una telaraña antes de borrar la bala
-            if(staticEnt.hasComponent<ColliderComponent>()){
-                auto& balac = em.getComponent<ColliderComponent>(staticEnt);
-                if(balac.atackspider){
-                    em.getComponent<AttackComponent>(staticEnt).attack(AttackType::Spiderweb);
+            if (staticEntPtr->hasComponent<ColliderComponent>())
+            {
+                auto& balaCol = em.getComponent<ColliderComponent>(*staticEntPtr);
+                if (balaCol.attackType & AttackType::Spiderweb)
+                {
+                    em.getComponent<AttackComponent>(*staticEntPtr).attack(AttackType::Spiderweb);
                     return;
                 }
             }
-            if(otherEnt.hasComponent<ColliderComponent>()){
-                auto& balac = em.getComponent<ColliderComponent>(otherEnt);
-                if(balac.atackspider){
-                    em.getComponent<AttackComponent>(otherEnt).attack(AttackType::Spiderweb);
+
+            if (otherEntPtr->hasComponent<ColliderComponent>())
+            {
+                auto& balaCol = em.getComponent<ColliderComponent>(*otherEntPtr);
+                if (balaCol.attackType & AttackType::Spiderweb)
+                {
+                    em.getComponent<AttackComponent>(*otherEntPtr).attack(AttackType::Spiderweb);
                     return;
                 }
             }
@@ -248,6 +227,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         handleAtkCollision(em, isAtkPlayer1, isAtkPlayer2, isAtkEnemy1, isAtkEnemy2, staticEnt, otherEnt);
         return;
     }
+
 
     if (behaviorType1 & BehaviorType::PLAYER || behaviorType2 & BehaviorType::PLAYER)
     {
@@ -261,9 +241,20 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
 
         // Colisiones de enemigos con el jugador
         if (!(behaviorType1 & BehaviorType::SHIELD || behaviorType2 & BehaviorType::SHIELD))
+        {
             handlePlayerCollision(em, staticEnt, otherEnt, staticPhy, otherPhy, minOverlap, behaviorType1, behaviorType2);
+        }
 
         return;
+    }
+
+    if (behaviorType2 & BehaviorType::SPIDERWEB || behaviorType1 & BehaviorType::SPIDERWEB)
+    {
+        if (behaviorType2 & BehaviorType::SPIDERWEB)
+            std::swap(behaviorType1, behaviorType2);
+
+        if (behaviorType2 & BehaviorType::ENEMY || behaviorType2 & BehaviorType::SHIELD)
+            return;
     }
 
     // Esto ya es cualquier colisión que no sea de player, paredes, zonas o ataques
@@ -412,7 +403,7 @@ void CollisionSystem::handleZoneCollision(EntityManager& em, Entity& staticEnt, 
     }
 }
 
-void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, vec3d& minOverlap, BehaviorType, BehaviorType behaviorType2)
+void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
 {
     // Sacamos punteros de las físicas y de las entidades para poder hacer swaps
     auto* staticPhy = &statPhy;
@@ -425,9 +416,30 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
     {
         std::swap(staticEntPtr, otherEntPtr);
         std::swap(staticPhy, otherPhy);
+        std::swap(behaviorType1, behaviorType2);
     }
-    classicCollision(*staticPhy, *otherPhy, minOverlap);
-    enemyCollision(em, *staticEntPtr);
+
+    if (behaviorType2 & BehaviorType::ENEMY)
+    {
+        classicCollision(*staticPhy, *otherPhy, minOverlap);
+        enemyCollision(em, *staticEntPtr);
+        return;
+    }
+
+    // Daño en área
+    if (behaviorType2 & BehaviorType::AREADAMAGE)
+    {
+        em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
+        return;
+    }
+
+    //Telaraña
+    if (behaviorType2 & BehaviorType::SPIDERWEB)
+    {
+        em.getSingleton<BlackBoard_t>().playerhunted = true;
+        staticPhy->dragActivated = true;
+        return;
+    }
 }
 
 void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& atkPl2, bool& atkEn1, bool& atkEn2, Entity& entity1, Entity& entity2)
@@ -448,7 +460,7 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
         // Ahora sabemos seguro que la entidad con la que ha colisionado la bala está en la entidad 2, pero es enemigo o jugador?
         // Lo comprobamos con el tipo de comportamientoto
         auto& c = em.getComponent<ColliderComponent>(*ent2Ptr);
-        auto& balac = em.getComponent<ColliderComponent>(*ent1Ptr);
+        auto& balaCol = em.getComponent<ColliderComponent>(*ent1Ptr);
         bool isPlayer2 = c.behaviorType & BehaviorType::PLAYER;
         bool isEnemy2 = c.behaviorType & BehaviorType::ENEMY;
 
@@ -464,16 +476,18 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
 
             // Destruir bala
             // si es dispara por una araña creo un ataque de telaraña antes de matarla
-            bool balalaunchedbyspider{false};
-            if(balac.atackspider){
+            bool balalaunchedbyspider{ false };
+            if (balaCol.attackType & AttackType::Spiderweb)
+            {
                 em.getComponent<AttackComponent>(*ent1Ptr).attack(AttackType::Spiderweb);
                 balalaunchedbyspider = true;
-            }else{
-                dead_entities.insert(ent1Ptr->getID());
             }
+            else
+                dead_entities.insert(ent1Ptr->getID());
 
             //Si la bala es lanzada por una araña no quita vida
-            if(!balalaunchedbyspider){
+            if (!balalaunchedbyspider)
+            {
                 // Comprobar el tipo de la bala y el enemigo/player
                 if ((typeBala == ElementalType::Fuego && typeEnemyPlayer == ElementalType::Hielo) ||
                     (typeBala == ElementalType::Hielo && typeEnemyPlayer == ElementalType::Agua) ||
@@ -483,10 +497,11 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                 }
                 else if (typeBala == ElementalType::Neutral)
                     em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(2);
-                else{
+                else
+                {
                     em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(1);
-                    if(balac.atackgolem){
-                    em.getComponent<PhysicsComponent>(*ent2Ptr).dragactivatedtime = true;
+                    if (balaCol.attackType & AttackType::GollemAttack) {
+                        em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
                     }
                 }
             }

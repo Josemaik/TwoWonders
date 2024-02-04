@@ -119,11 +119,12 @@ void InputSystem::update(EntityManager& em)
             vel *= INP_SPEED;
         }
 
-        if(IsKeyDown(in.attarea)){
-            em.addComponent<AttackComponent>(e, AttackComponent{});
-            if(e.hasComponent<AttackComponent>()){
-                 em.getComponent<AttackComponent>(e).attack(AttackType::AreaAttack);
-            }
+        if (IsKeyReleased(in.lockIn)) {
+            // em.addComponent<AttackComponent>(e, AttackComponent{});
+            // if(e.hasComponent<AttackComponent>()){
+            //      em.getComponent<AttackComponent>(e).attack(AttackType::AreaAttack);
+            // }
+            li.lockInput = !li.lockInput;
         }
 
         // if(IsKeyDown(in.seek) && !bb.tactive){
