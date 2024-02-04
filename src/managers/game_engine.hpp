@@ -59,6 +59,10 @@ namespace ENGI {
         void setUpCamera(vec3d up);
         void setFovyCamera(float fovy);
         void setProjectionCamera(int proj);
+        vec3d getPositionCamera();
+        vec3d getTargetCamera();
+        vec3d getUpCamera();
+        float getFovyCamera();
 
         // Aux
         Mesh genMeshCube(float width, float height, float lenght);

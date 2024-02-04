@@ -17,6 +17,7 @@
 #include "../systems/shield_system.hpp"
 #include "../systems/event_system.hpp"
 #include "../systems/sound_system.hpp"
+#include "../systems/camera_system.hpp"
 #include "game_engine.hpp"
 #include "ia_manager.hpp"
 
@@ -41,6 +42,7 @@ private:
     void createShop(EntityManager& em);
     void createEnding(EntityManager& em);
     void normalExecution(EntityManager& em, float deltaTime);
+
     void debugExecution(EntityManager& em, bool debugphy,bool debugai,float deltaTime);
     void createSound(EntityManager& em);
 
@@ -63,6 +65,7 @@ private:
     EventSystem event_system{};
     Map map{};
     SoundSystem sound_system{};
+    CameraSystem camera_system{};
 };
 
 

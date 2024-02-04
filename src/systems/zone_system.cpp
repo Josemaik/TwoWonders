@@ -43,6 +43,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
 
                     case 14: // TP a la cueva de la espada
                         map.reset(em, 2, iam);
+                        li.transition = true;
 
                         p.position.setX(49.0);
                         p.position.setZ(85.0);
@@ -50,6 +51,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
 
                     case 15: // TP desde la cueva de la espada
                         map.reset(em, 0, iam);
+                        li.transition = true;
 
                         p.position.setX(-5.0);
                         p.position.setZ(-4.5);
@@ -59,6 +61,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
 
                     case 16: // TP a la cueva de las monedas
                         map.reset(em, 2, iam);
+                        li.transition = true;
 
                         p.position.setX(71.0);
                         p.position.setZ(85.0);
@@ -66,6 +69,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
 
                     case 17: // TP desde la cueva de las monedas
                         map.reset(em, 0, iam);
+                        li.transition = true;
 
                         p.position.setX(3.0);
                         p.position.setZ(-20.0);
@@ -75,6 +79,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
 
                     case 18: // TP a la cueva de la tienda
                         map.reset(em, 2, iam);
+                        li.transition = true;
 
                         p.position.setX(93.0);
                         p.position.setY(0.0);
@@ -83,6 +88,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
 
                     case 19: // TP desde la cueva de la tienda
                         map.reset(em, 0, iam);
+                        li.transition = true;
 
                         p.position.setX(-17.0);
                         p.position.setY(2.0);
@@ -95,6 +101,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         r.cameraChange = true;
 
                         map.reset(em, 1, iam);
+                        li.transition = true;
 
                         p.position.setX(61.0);
                         p.position.setZ(-65.0);
@@ -104,6 +111,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         r.cameraChange = false;
 
                         map.reset(em, 0, iam);
+                        li.transition = true;
 
                         p.position.setX(-50.0);
                         p.position.setZ(-3.5);
