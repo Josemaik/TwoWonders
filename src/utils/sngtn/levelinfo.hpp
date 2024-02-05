@@ -48,6 +48,7 @@ struct LevelInfo
   std::size_t lockedEnemy{ max };
   NotLoadSet notLoadSet{};
 
+  bool debugIA2{ false };
 
   uint16_t num_zone{};
   bool drawzone{ false };

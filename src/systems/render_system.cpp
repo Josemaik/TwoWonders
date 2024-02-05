@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "../../libs/raygui.h"
 
-void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debugphy, bool debugAI,double dt)
+void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debugphy, bool debugAI, double dt)
 {
     // Actualizamos la posicion de render del componente de fisicas
     em.forEach<SYSCMPs, SYSTAGs>([](Entity&, PhysicsComponent& phy, RenderComponent& ren)
@@ -16,7 +16,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debu
     // Dibuja todas las entidades con componente de render
     drawEntities(em, engine);
 
-    endFrame(engine, em, debugphy, debugAI,dt);
+    endFrame(engine, em, debugphy, debugAI, dt);
 }
 
 void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
@@ -256,7 +256,7 @@ void RenderSystem::beginFrame(ENGI::GameEngine& engine)
 }
 
 // Se termina el dibujado
-void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debugphy, bool debugAI,double dt)
+void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debugphy, bool debugAI, double dt)
 {
     engine.endMode3D();
 
@@ -266,7 +266,10 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool de
         drawEditorInGameIA(engine, em);
     }
     //debugger visual IA
-    drawDebuggerInGameIA(engine,em,dt);
+    auto& li = em.getSingleton<LevelInfo>();
+
+    if (li.debugIA2)
+        drawDebuggerInGameIA(engine, em, dt);
 
     engine.endDrawing();
 }
@@ -282,22 +285,22 @@ double SelectValue(double value, float posx, float posy, float height, float wid
     return static_cast<double>(floatvalue);
 }
 //Debugger visual in-game
-void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em,double dt){
+void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt) {
     // engine.beginDrawing();
     Rectangle windowRect = { 470, 80, 330, 180 };
     DrawRectangleLinesEx(windowRect, 2, DARKGRAY);
-    DrawRectangleRec(windowRect, Color{255, 255, 255, 128});
-     Vector2 textPositionInfo = { 480, 90 };
-     DrawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
-     auto& debugsnglt = em.getSingleton<Debug_t>();
-     for (auto const& e : em.getEntities()) {
+    DrawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
+    Vector2 textPositionInfo = { 480, 90 };
+    DrawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
+    auto& debugsnglt = em.getSingleton<Debug_t>();
+    for (auto const& e : em.getEntities()) {
         if (e.hasComponent<AIComponent>()) {
             auto& col = em.getComponent<ColliderComponent>(e);
             RayCast ray = engine.getMouseRay(); ray = engine.getMouseRay();
             if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
                 if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                            isSelectedfordebug = !isSelectedfordebug;
-                            debugsnglt.IA_id_debug = e.getID();
+                    isSelectedfordebug = !isSelectedfordebug;
+                    debugsnglt.IA_id_debug = e.getID();
                 }
             }
             if (isSelectedfordebug && e.getID() == debugsnglt.IA_id_debug) {
@@ -307,11 +310,12 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
                 engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
                 engine.endMode3D();
                 DrawText("Node active:", 480, 110, 20, BLACK);
-                if(debugsnglt.elapsed >= debugsnglt.countdown){
+                if (debugsnglt.elapsed >= debugsnglt.countdown) {
                     debugsnglt.elapsed = 0;
                     debugsnglt.text = aic.bh;
-                }else{
-                    debugsnglt.plusdeltatime(dt,debugsnglt.elapsed);
+                }
+                else {
+                    debugsnglt.plusdeltatime(dt, debugsnglt.elapsed);
                 }
                 DrawTextEx(GetFontDefault(), debugsnglt.text, Vector2{ 610,110 }, 20, 1, DARKGRAY);
                 DrawText("TEID:", 480, 130, 20, BLACK);
@@ -328,7 +332,7 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
                 DrawTextEx(GetFontDefault(), (em.getSingleton<BlackBoard_t>().playerhunted == 0) ? "No" : "Sí", Vector2{ 680,230 }, 20, 1, RED);
             }
         }
-     }
+    }
     //  engine.endDrawing();
 }
 //Editor In-Game
@@ -338,7 +342,7 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
     // Dibujar un rectángulo que simula una ventana
     Rectangle windowRect = { 0, 100, 340, 550 };
     DrawRectangleLinesEx(windowRect, 2, DARKGRAY);
-    DrawRectangleRec(windowRect, Color{255, 255, 255, 128});
+    DrawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
 
     // Dibujar el texto "debugger IA" en el centro de la ventana
     Vector2 textSize = MeasureTextEx(GetFontDefault(), "Debugger IA", 20, 1);
@@ -370,8 +374,8 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
                     isSelected = !isSelected;
                     debugsnglt.IA_id = e.getID();
                 }
-            //     // si es seleccionada => wires morados
-            //     // no es seleccionada => wires rojos
+                //     // si es seleccionada => wires morados
+                //     // no es seleccionada => wires rojos
                 engine.beginMode3D();
                 engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
                 engine.endMode3D();
@@ -388,7 +392,7 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
                     DrawText("EID:", 5, 170, 20, BLACK);
                     DrawText(std::to_string(debugsnglt.IA_id).c_str(), 55, 170, 20, DARKGRAY);
                     //Detect Radius
-                    aic.detect_radius = SelectValue(aic.detect_radius, 85.0,200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
+                    aic.detect_radius = SelectValue(aic.detect_radius, 85.0, 200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
                     // Attack Radius
                     aic.attack_radius = SelectValue(aic.attack_radius, 85.0, 240.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
                     // Arrival Radius
@@ -405,7 +409,7 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
             }
         }
     }
-   // engine.endDrawing();
+    // engine.endDrawing();
 }
 // Se dibuja el HUD
 void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy)

@@ -127,6 +127,10 @@ void InputSystem::update(EntityManager& em)
             li.lockInput = !li.lockInput;
         }
 
+        if (IsKeyReleased(in.debugIA2)) {
+            li.debugIA2 = !li.debugIA2;
+        }
+
         // if(IsKeyDown(in.seek) && !bb.tactive){
         //    // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
         //     bb.behaviour = SB::Seek;
