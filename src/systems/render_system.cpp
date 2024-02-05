@@ -202,6 +202,14 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                             r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                             r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                         }
+                        else if (e.hasTag<SpiderTag>())
+                        {
+                            r.model = LoadModel("assets/models/Spider.obj");
+                            Texture2D t0 = LoadTexture("assets/models/textures/Spider_UV.png");
+                            Texture2D t = LoadTexture("assets/models/textures/Spider_texture.png");
+                            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                            r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+                        }
                         else
                         {
                             r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
@@ -225,6 +233,11 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                         scl = { 0.33, 0.33, 0.33 };
                         pos.setY(pos.y() - 1.1);
                     }
+                    else if (e.hasTag<SpiderTag>())
+                    {
+                        scl = { 0.33, 0.33, 0.33 };
+                        pos.setY(pos.y() - 0.7);
+                    }
                     else if (e.hasTag<GolemTag>())
                     {
                         scl = { 0.4, 0.4, 0.4 };
@@ -234,7 +247,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
                     engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
 
-                    if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>())
+                    if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>() && !e.hasTag<SpiderTag>())
                     {
                         int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
                         if (orientationInDegreesInt % 90 == 0)
@@ -645,15 +658,29 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         // // }
     }
 
+    std::size_t enemyID = li.max;
+    Color color;
+
     if (li.lockedEnemy != li.max)
     {
-        auto& enemy = *em.getEntityByID(li.lockedEnemy);
+        enemyID = li.lockedEnemy;
+        color = WHITE;
+    }
+    else if (li.closestEnemy != li.max)
+    {
+        enemyID = li.closestEnemy;
+        color = { 200, 200, 200, 100 };
+    }
+
+    if (enemyID != li.max)
+    {
+        auto& enemy = *em.getEntityByID(enemyID);
         auto& r = em.getComponent<RenderComponent>(enemy);
 
         engine.drawCircle(static_cast<int>(engine.getWorldToScreenX(r.position)),
             static_cast<int>(engine.getWorldToScreenY(r.position)),
             5,
-            WHITE);
+            color);
     }
 }
 
