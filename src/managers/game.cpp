@@ -26,7 +26,7 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -0.0f, 0.0f, -0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
 
     em.addComponent<InformationComponent>(e, InformationComponent{});
@@ -144,8 +144,10 @@ void Game::run()
         {
             if (em.getEntities().empty())
             {
+                li.resetGame = false;
                 li.num_zone = 0;
                 zone_system.reset();
+                lock_system.reset();
                 li.notLoadSet.clear();
                 createEntities(em, evm);
                 map.reset(em, 0, iam);
@@ -154,12 +156,12 @@ void Game::run()
             input_system.update(em);
             // seleccionar modo de debug ( physics o AI)
             if (input_system.debugModePhysics) {
-                debugExecution(em, true, false,deltaTime);
+                debugExecution(em, true, false, deltaTime);
             }
             else if (input_system.debugModeAI) {
-                debugExecution(em, false, true,deltaTime);
+                debugExecution(em, false, true, deltaTime);
             }
-            else {
+            else if (!li.resetGame) {
                 normalExecution(em, deltaTime);
             }
             break;
@@ -210,10 +212,10 @@ void Game::normalExecution(EntityManager& em, float deltaTime)
     life_system.update(em, deltaTime);
     sound_system.update();
     camera_system.update(em, engine, deltaTime);
-    render_system.update(em, engine, false, false,deltaTime);
+    render_system.update(em, engine, false, false, deltaTime);
     event_system.update(evm, em);
 }
-void Game::debugExecution(EntityManager& em, bool debugphy, bool debugai,float deltaTime)
+void Game::debugExecution(EntityManager& em, bool debugphy, bool debugai, float deltaTime)
 {
-    render_system.update(em, engine, debugphy, debugai,deltaTime);
+    render_system.update(em, engine, debugphy, debugai, deltaTime);
 }

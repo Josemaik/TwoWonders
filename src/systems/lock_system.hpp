@@ -10,7 +10,7 @@ struct LockSystem
     using SYSTAGs = MP::TypeList<EnemyTag>;
 
     void update(EntityManager& em);
-
+    void reset() { enemies.clear(); }
 private:
     std::vector<std::pair<std::size_t, double>> enemies{};
 };

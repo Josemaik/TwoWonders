@@ -19,7 +19,11 @@ void InputSystem::update(EntityManager& em)
         return;
 
     if (!playerEn->hasTag<PlayerTag>() && IsKeyReleased(KEY_ENTER))
+    {
         em.destroyAll();
+        li.resetGame = true;
+        return;
+    }
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, InputComponent& in)
     {

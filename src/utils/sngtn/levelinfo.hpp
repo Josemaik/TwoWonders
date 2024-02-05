@@ -46,9 +46,11 @@ struct LevelInfo
   bool lockInput{ false };
   const std::size_t max = std::numeric_limits<std::size_t>::max();
   std::size_t lockedEnemy{ max };
+  std::size_t closestEnemy{ max };
   NotLoadSet notLoadSet{};
 
   bool debugIA2{ false };
+  bool resetGame{ false };
 
   uint16_t num_zone{};
   bool drawzone{ false };
