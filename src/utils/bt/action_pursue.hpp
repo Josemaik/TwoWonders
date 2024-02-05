@@ -11,7 +11,6 @@ struct BTAction_Pursue : BTNode_t{
         if( !ectx.ai.tactive ) return BTNodeStatus_t::fail;
          ectx.ai.bh = "patrolling";
         //get target entity by id
-    //    std::cout << "TOY PURSUE \n";
         auto const& e_opt { ectx.em.getEntityByID(ectx.ai.teid) };
         if ( !e_opt ) { ectx.ai.tactive = false; return BTNodeStatus_t::running; };
         auto const& phyTarget = ectx.em.getComponent<PhysicsComponent>(*e_opt);

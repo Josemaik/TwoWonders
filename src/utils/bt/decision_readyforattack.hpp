@@ -8,12 +8,10 @@ struct BTDecisionReadyforAttack : BTNode_t{
     BTDecisionReadyforAttack()  {}
 
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
-    //    std::cout << "Compruebo ataque \n";
         ectx.ai.bh = "check ready attack";
         auto& li = ectx.em.getSingleton<LevelInfo>();
         auto* playerEn = ectx.em.getEntityByID(li.playerID);
         if (not playerEn) {
-         //   std::cout << "ME VOY DE ATTACK";
             return BTNodeStatus_t::fail; // No hay player
         }
         // Si hay player
@@ -26,7 +24,6 @@ struct BTDecisionReadyforAttack : BTNode_t{
                 // paro al enemigo
                 ectx.phy.velocity = vec3d{};
                 if(ectx.ai.elapsed_stop >= ectx.ai.countdown_stop){
-                //    std::cout << "ATACAR\n";
                     ectx.ai.elapsed_shoot = 0;
                     ectx.ai.elapsed_stop = 0;
                     ectx.ai.ready_attack = true;

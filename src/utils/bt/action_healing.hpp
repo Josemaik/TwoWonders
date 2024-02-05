@@ -12,7 +12,6 @@ struct BTAction_Healing : BTNode_t{
         if( !ectx.ai.tactive ) return BTNodeStatus_t::fail;
         ectx.ai.bh = "Healing";
         ectx.lifec.increaseLife();
-        // std::cout << "ME HE CURADO \n";
         return BTNodeStatus_t::success;
     }
 };

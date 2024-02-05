@@ -35,9 +35,7 @@ void InputSystem::update(EntityManager& em)
         // Actualizar la velocidad
         int keysPressed = 0;
         // if(phy.blockXZ){
-        //   // std::cout << "BLOQUEADOS \n";
         //     if (IsKeyDown(in.up)) {
-        //         //std::cout << "SUBIRRR";
         //         vel.setY(vel.y() + INP_SPEED);
         //         in.last_key = in.up;
         //         keysPressed++;
@@ -48,7 +46,6 @@ void InputSystem::update(EntityManager& em)
         //         keysPressed++;
         //     }
         // }else{
-           // std::cout << "NO BLOQUEADOS \n";
         if (IsKeyDown(in.right)) {
 
             if (!li.cameraChange)

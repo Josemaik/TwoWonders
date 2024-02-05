@@ -44,7 +44,6 @@ void ShieldSystem::update(EntityManager& em) {
         else
         {
             // Se elimina shi.shield
-            std::cout << "Se borra el escudo" << std::endl;
             //em.destroyEntity(ent.getID());
         }
     });

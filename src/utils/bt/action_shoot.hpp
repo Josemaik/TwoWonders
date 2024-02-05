@@ -27,7 +27,6 @@ struct BTActionShoot : BTNode_t{
             // }
             // ectx.ai.elapsed_shoot = 0;
             if(ectx.ai.ready_attack){
-                //  std::cout << "HE DISPARADO \n";
                 ectx.ai.ready_attack = false;
                     switch (shoot)
                 {
@@ -67,7 +66,6 @@ struct BTActionShoot : BTNode_t{
                     break;
                 }
             }
-          //std::cout << "NO HE DISPARADO \n";
         // }
         // Si no puedo atacar por culldown pero sigo en radio de ataque
         // if(ectx.ai.on_attack_radius){

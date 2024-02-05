@@ -150,7 +150,6 @@ void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, Atta
 }
 
 void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack, double const ranged) {
-    //std::cout << "CREO LA BALA";
     auto const& phy = em.getComponent<PhysicsComponent>(ent);
 
     // Comprobar el tipo del ataque

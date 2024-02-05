@@ -153,11 +153,9 @@ namespace ETMG {
         template <typename CMP, typename... InitTypes>
         CMP& addComponent(Entity& e, InitTypes&&... args)
         {
-            // std::cout << "Adding component " << typeid(CMP).name() << std::endl;
             // Revisamos si ya tiene el componente
             if (e.template hasComponent<CMP>())
             {
-                // std::cout << "Component " << typeid(CMP).name() << " already present" << std::endl;
                 return getComponent<CMP>(e);
             }
 

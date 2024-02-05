@@ -9,7 +9,6 @@ struct BTDecisionFleeorCurePartner : BTNode_t{
     BTDecisionFleeorCurePartner()  {}
 
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
-        // std::cout << "CHECK LIFES \n";
         ectx.ai.bh = "flee or cure partner";
         // Semilla
         std::srand(static_cast<unsigned int>(std::time(0)));

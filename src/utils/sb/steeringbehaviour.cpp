@@ -77,7 +77,6 @@ Steer_t STBH::Seek(PhysicsComponent const& phy, vec3d const& target) {
         // auto acceleration { phy.kMaxVLin / (1 + angular_velocity_size) };
         steering.v_x = std::clamp((target.x() - phy.position.x()), -phy.max_speed, phy.max_speed);
         steering.v_z = std::clamp((target.z() - phy.position.z()), -phy.max_speed, phy.max_speed);
-        // std::cout << "X=" << steering.v_x << " " << "Z=" << steering.v_z << "\n";
         // steering.v_x = std::clamp(distance.x(), -phy.max_speed, phy.max_speed);
         // steering.v_z = std::clamp(distance.z(), -phy.max_speed, phy.max_speed);
         return steering;

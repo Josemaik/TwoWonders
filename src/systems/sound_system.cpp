@@ -31,9 +31,7 @@ void SoundSystem::initBanks(const std::string& master_bank_location, const std::
     ERRCHECK(soundSystem->loadBankFile(music_bank_location.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &music_bank));
     //ERRCHECK(master_bank->getLoadingState(&loadingState));
     //ERRCHECK(strings_bank->getLoadingState(&loadingState));
-    ERRCHECK(ui_bank->getLoadingState(&loadingState));
-
-    std::cout << loadingState << std::endl; //dona 3 = FMOD_STUDIO_LOADING_STATE_LOADING (loading in progress)  
+    ERRCHECK(ui_bank->getLoadingState(&loadingState)); //dona 3 = FMOD_STUDIO_LOADING_STATE_LOADING (loading in progress)
 }
 
 //crear instancies d'events
