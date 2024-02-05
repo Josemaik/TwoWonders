@@ -85,6 +85,8 @@ struct AIComponent
     // SB behaviour {SB::Arrive};
     double txp{},tzp{};
     bool target_obtained { false };
+    //velocity boofer
+    bool boofedvelocity{false};
     // Timers
     double countdown_change_dir{ 1.5 }, countdown_stop{ 0.8 }, countdown_shoot{ 0.5 }, countdown_change_position{ 3.0 }
     ,countdown_fleeing{3.0}, countdown_perception{0.5}; // seconds
