@@ -11,7 +11,7 @@ struct RenderSystem
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, GameEngine& engine, bool debugphy, bool debugAI,double dt);
+    void update(EntityManager& em, GameEngine& engine, double dt);
 
     void drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawLogoKaiwa(ENGI::GameEngine& engine);
@@ -19,19 +19,19 @@ struct RenderSystem
     void drawEnding(ENGI::GameEngine& engine);
     void drawStory(ENGI::GameEngine& engine);
     void unloadModels(EntityManager& em, ENGI::GameEngine& engine);
-    void drawEditorInGameIA(ENGI::GameEngine& engine,EntityManager& em);
-    void drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em,double dt);
+    void drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& em);
+    void drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt);
 
     // Funciones double dtprivadas para organizar el codigo
 private:
     void beginFrame(ENGI::GameEngine& engine);
-    void endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debugph,bool debugAI,double dt);
+    void endFrame(ENGI::GameEngine& engine, EntityManager& em, double dt);
     void drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy);
     void drawEntities(EntityManager& em, ENGI::GameEngine& engine);
     void drawDeath(ENGI::GameEngine& engine);
-    bool edit_parameters{false};
-    bool isSelected{false};
-    bool isSelectedfordebug{false};
+    bool edit_parameters{ false };
+    bool isSelected{ false };
+    bool isSelectedfordebug{ false };
 };
 
 #endif // !RENDER_SYSTEM

@@ -14,9 +14,6 @@ struct InputSystem
     void update(EntityManager& em);
 
     bool pressEnter();
-
-    bool debugModePhysics{ false };
-    bool debugModeAI{ false };
 };
 
 #endif // !INPUT_MANAGER

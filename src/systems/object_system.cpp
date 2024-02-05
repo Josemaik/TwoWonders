@@ -1,6 +1,8 @@
 #include "object_system.hpp"
 
 void ObjectSystem::update(EntityManager& em, float deltaTime) {
+    auto& li = em.getSingleton<LevelInfo>();
+
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ObjectComponent& obj)
     {
         if (obj.decreaseLifeTime(deltaTime) && (!obj.inmortal))
@@ -8,7 +10,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             if (obj.type == Object_type::BombExplode || obj.type == Object_type::Heal_Spell)
                 obj.effect();
             else
-                dead_entities.insert(ent.getID());
+                li.dead_entities.insert(ent.getID());
 
         }
 
@@ -74,7 +76,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 break;
             }
             if (shop_object)
-                dead_entities.insert(ent.getID());
+                li.dead_entities.insert(ent.getID());
             else
                 obj.active = false;
 
@@ -82,12 +84,6 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 li.notLoadSet.insert(std::make_pair(obj.mapID, obj.objID));
         }
     });
-
-    if (!dead_entities.empty())
-    {
-        em.destroyEntities(dead_entities);
-        dead_entities.clear();
-    }
 }
 
 // ent->hasComponent<LifeComponent<()
@@ -132,7 +128,7 @@ void ObjectSystem::explodeBomb(EntityManager& em, Entity& ent) {
     createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY, BLACK);
 }
 
-void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type,Color color) {
+void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type, Color color) {
     if (ent.hasComponent<RenderComponent>()) {
         auto& ren = em.getComponent<RenderComponent>(ent);
         // Crear una entidad que quite vida

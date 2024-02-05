@@ -23,6 +23,7 @@
 #include "../utils/sngtn/blackboard.hpp"
 #include "../utils/sngtn/debug_singleton.hpp"
 #include "../utils/sngtn/levelinfo.hpp"
+#include "../utils/sngtn/input_info.hpp"
 // #include <nlohmann/json.hpp>
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
@@ -52,7 +53,7 @@ struct SpiderTag {};
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, RampComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent, ShieldComponent, TypeComponent, LockComponent>;
 using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, WallTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag, GolemTag, SpiderTag>;
-using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t>;
+using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;

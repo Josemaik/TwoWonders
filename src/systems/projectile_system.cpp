@@ -2,6 +2,8 @@
 
 void ProjectileSystem::update(EntityManager& em, float deltaTime) {
 
+    auto& li = em.getSingleton<LevelInfo>();
+
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, ProjectileComponent& pro)
     {
         if (pro.checkRange(deltaTime)) {
@@ -14,14 +16,8 @@ void ProjectileSystem::update(EntityManager& em, float deltaTime) {
                     }
                 }
                 else
-                    dead_entities.insert(e.getID());
+                    li.dead_entities.insert(e.getID());
             }
         }
     });
-
-    if (!dead_entities.empty())
-    {
-        em.destroyEntities(dead_entities);
-        dead_entities.clear();
-    }
 }

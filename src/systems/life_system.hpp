@@ -15,7 +15,6 @@ struct LifeSystem
 
 private:
     void createObject(EntityManager& em, vec3d pos);
-    deathSet dead_entities{};
 };
 
 #endif // !LIFE_SYSTEM

@@ -3,20 +3,36 @@
 void InputSystem::update(EntityManager& em)
 {
     auto& li = em.getSingleton<LevelInfo>();
+    auto& inpi = em.getSingleton<InputInfo>();
     auto& bb = em.getSingleton<BlackBoard_t>();
     auto* playerEn = em.getEntityByID(li.playerID);
 
     // DEBUG PHYSICS
     if (IsKeyReleased(KEY_F1))
-        debugModePhysics = !debugModePhysics;
+    {
+        inpi.debugPhy = !inpi.debugPhy;
+        inpi.debugAI1 = false;
+        inpi.debugAI2 = false;
+        return;
+    }
 
-    if (debugModePhysics)
-        return;
-    //DEBUG AI
+    //DEBUG AI - Stop Game
     if (IsKeyReleased(KEY_F2))
-        debugModeAI = !debugModeAI;
-    if (debugModeAI)
+    {
+        inpi.debugAI1 = !inpi.debugAI1;
+        inpi.debugPhy = false;
+        inpi.debugAI2 = false;
         return;
+    }
+
+    //DEBUG AI - Real Time
+    if (IsKeyReleased(KEY_F3))
+    {
+        inpi.debugAI2 = !inpi.debugAI2;
+        inpi.debugPhy = false;
+        inpi.debugAI1 = false;
+        return;
+    }
 
     if (!playerEn->hasTag<PlayerTag>() && IsKeyReleased(KEY_ENTER))
     {
@@ -125,11 +141,7 @@ void InputSystem::update(EntityManager& em)
             // if(e.hasComponent<AttackComponent>()){
             //      em.getComponent<AttackComponent>(e).attack(AttackType::AreaAttack);
             // }
-            li.lockInput = !li.lockInput;
-        }
-
-        if (IsKeyReleased(in.debugIA2)) {
-            li.debugIA2 = !li.debugIA2;
+            inpi.lockOn = !inpi.lockOn;
         }
 
         // if(IsKeyDown(in.seek) && !bb.tactive){

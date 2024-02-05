@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "../../libs/raygui.h"
 
-void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debugphy, bool debugAI, double dt)
+void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt)
 {
     // Actualizamos la posicion de render del componente de fisicas
     em.forEach<SYSCMPs, SYSTAGs>([](Entity&, PhysicsComponent& phy, RenderComponent& ren)
@@ -16,7 +16,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, bool debu
     // Dibuja todas las entidades con componente de render
     drawEntities(em, engine);
 
-    endFrame(engine, em, debugphy, debugAI, dt);
+    endFrame(engine, em, dt);
 }
 
 void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
@@ -273,19 +273,19 @@ void RenderSystem::beginFrame(ENGI::GameEngine& engine)
 }
 
 // Se termina el dibujado
-void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, bool debugphy, bool debugAI, double dt)
+void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double dt)
 {
     engine.endMode3D();
 
-    drawHUD(em, engine, debugphy);
+    auto& inpi = em.getSingleton<InputInfo>();
+
+    drawHUD(em, engine, inpi.debugPhy);
     // Si se pulsa F2 se activa editor  de parámetros In-game
-    if (debugAI) {
+    if (inpi.debugAI1) {
         drawEditorInGameIA(engine, em);
     }
-    //debugger visual IA
-    auto& li = em.getSingleton<LevelInfo>();
-
-    if (li.debugIA2)
+    // Visual Debug AI
+    if (inpi.debugAI2)
         drawDebuggerInGameIA(engine, em, dt);
 
     engine.endDrawing();
