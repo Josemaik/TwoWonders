@@ -72,7 +72,6 @@ private:
     bool resolveCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, double overlap);
 
     Octree octree;
-    deathSet dead_entities{};
     pairsType checkedPairs{};
     std::vector<RampComponent*> ramps{};
 

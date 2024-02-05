@@ -21,7 +21,6 @@ private:
     void createKey(EntityManager& em);
 
     bool keyCreated{ false };
-    deathSet dead_entities{};
 };
 
 #endif // !ZONE_SYSTEM

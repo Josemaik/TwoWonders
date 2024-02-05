@@ -124,12 +124,6 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
             zon.changeZone = false;
         }
     });
-
-    if (!dead_entities.empty())
-    {
-        em.destroyEntities(dead_entities);
-        dead_entities.clear();
-    }
 }
 
 void ZoneSystem::deleteZoneEnemies(EntityManager&)
@@ -188,5 +182,4 @@ void ZoneSystem::createKey(EntityManager& em)
 void ZoneSystem::reset()
 {
     keyCreated = false;
-    dead_entities.clear();
 }

@@ -1,6 +1,8 @@
 #include "life_system.hpp"
 
 void LifeSystem::update(EntityManager& em, float deltaTime) {
+    auto& li = em.getSingleton<LevelInfo>();
+
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, LifeComponent& lif)
     {
         lif.decreaseCountdown(deltaTime);
@@ -52,15 +54,9 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
         }
 
         if (lif.markedForDeletion && !lif.decreaseNextFrame)
-            dead_entities.insert(ent.getID());
+            li.dead_entities.insert(ent.getID());
 
     });
-
-    if (!dead_entities.empty())
-    {
-        em.destroyEntities(dead_entities);
-        dead_entities.clear();
-    }
 }
 
 // Se podra crear objetos: vida, bomba, moneda o nada

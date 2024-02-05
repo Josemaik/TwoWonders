@@ -216,15 +216,12 @@ void Map::destroyMap(EntityManager& em)
 {
     using CMPS = MP::TypeList<>;
     using TAGS = MP::TypeList<GroundTag, WaterTag, WallTag, ZoneTag, RampTag, DoorTag, ObjectTag, EnemyTag>;
-
-    deathSet set{};
+    auto& li = em.getSingleton<LevelInfo>();
 
     em.forEachAny<CMPS, TAGS>([&](Entity& entity)
     {
-        set.insert(entity.getID());
+        li.dead_entities.insert(entity.getID());
     });
-
-    em.destroyEntities(set);
 }
 
 void Map::reset(EntityManager& em, uint8_t mapID, Ia_man& iam)

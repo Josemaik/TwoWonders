@@ -35,6 +35,7 @@ struct LevelInfo
   };
 
   using NotLoadSet = std::unordered_set<std::pair<uint8_t, uint8_t>, pair_hash, pair_equal>;
+  using deathSet = std::set<std::size_t, std::greater<std::size_t>>;
 
   //Referencia al player
   std::size_t playerID;
@@ -43,11 +44,11 @@ struct LevelInfo
   std::vector<vec3d> enemyPositions{};
   bool transition{ false };
   bool cameraChange{ false };
-  bool lockInput{ false };
   const std::size_t max = std::numeric_limits<std::size_t>::max();
   std::size_t lockedEnemy{ max };
   std::size_t closestEnemy{ max };
   NotLoadSet notLoadSet{};
+  deathSet dead_entities{};
 
   bool debugIA2{ false };
   bool resetGame{ false };

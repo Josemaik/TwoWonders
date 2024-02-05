@@ -7,6 +7,7 @@ void LockSystem::update(EntityManager& em)
 
     if (player.hasComponent<PhysicsComponent>())
     {
+        auto& inpi = em.getSingleton<InputInfo>();
         auto& playerPhy = em.getComponent<PhysicsComponent>(player);
         auto& playerPos = playerPhy.position;
         enemies.clear();
@@ -29,13 +30,13 @@ void LockSystem::update(EntityManager& em)
             return a.second < b.second;
         });
 
-        if (li.lockInput)
+        if (inpi.lockOn)
         {
             if (enemies.empty())
             {
                 li.lockedEnemy = li.max;
                 li.closestEnemy = li.max;
-                li.lockInput = false;
+                inpi.lockOn = false;
             }
             else
             {
@@ -50,7 +51,7 @@ void LockSystem::update(EntityManager& em)
                 if (!enemy.hasTag<EnemyTag>())
                 {
                     li.lockedEnemy = li.max;
-                    li.lockInput = false;
+                    inpi.lockOn = false;
                     return;
                 }
 

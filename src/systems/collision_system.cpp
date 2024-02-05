@@ -4,6 +4,8 @@
 
 void CollisionSystem::update(EntityManager& em)
 {
+    auto& li = em.getSingleton<LevelInfo>();
+
     // Liberar el octree
     octree.clear();
     std::vector<Entity*> EntsForRamps{};
@@ -13,7 +15,7 @@ void CollisionSystem::update(EntityManager& em)
         auto& pos = phy.position;
         if (pos.y() < -20.)
         {
-            dead_entities.insert(e.getID());
+            li.dead_entities.insert(e.getID());
             return;
         }
 
@@ -41,12 +43,6 @@ void CollisionSystem::update(EntityManager& em)
     checkRampCollision(em, EntsForRamps);
 
     // checkBorderCollision(em, ECPair);
-
-    if (!dead_entities.empty())
-    {
-        em.destroyEntities(dead_entities);
-        dead_entities.clear();
-    }
 }
 
 // Función recursiva qué revisa las colisiones de las entidades del octree actual con otras entidades
@@ -220,7 +216,8 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
                 }
             }
 
-            dead_entities.insert(staticEntPtr->getID());
+            auto& li = em.getSingleton<LevelInfo>();
+            li.dead_entities.insert(staticEntPtr->getID());
             return;
         }
 
@@ -259,13 +256,14 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
 
     // Esto ya es cualquier colisión que no sea de player, paredes, zonas o ataques
     //Si una de las entidades es una telaraña no se comprueba las colisiones
-    if(!(behaviorType1 & BehaviorType::SPIDERWEB) && !(behaviorType2 & BehaviorType::SPIDERWEB)){
+    if (!(behaviorType1 & BehaviorType::SPIDERWEB) && !(behaviorType2 & BehaviorType::SPIDERWEB)) {
         nonStaticCollision(staticPhy, otherPhy, minOverlap);
     }
 }
 
 void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
 {
+    auto& li = em.getSingleton<LevelInfo>();
 
     // Sacamos punteros de las físicas y de las entidades para poder hacer swaps
     auto* staticPhy = &statPhy;
@@ -326,7 +324,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
         if (!staticEntPtr->hasTag<WaterTag>())
-            dead_entities.insert(otherEntPtr->getID());
+            li.dead_entities.insert(otherEntPtr->getID());
 
         return;
     }
@@ -351,7 +349,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         auto& ic = em.getComponent<InformationComponent>(*otherEntPtr);
         if (ic.hasKey)
         {
-            dead_entities.insert(staticEntPtr->getID());
+            li.dead_entities.insert(staticEntPtr->getID());
 
             ic.hasKey = false;
             return;
@@ -485,7 +483,10 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                 balalaunchedbyspider = true;
             }
             else
-                dead_entities.insert(ent1Ptr->getID());
+            {
+                auto& li = em.getSingleton<LevelInfo>();
+                li.dead_entities.insert(ent1Ptr->getID());
+            }
 
             //Si la bala es lanzada por una araña no quita vida
             if (!balalaunchedbyspider)
