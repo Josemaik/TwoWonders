@@ -181,6 +181,10 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                         else if (e.hasTag<SlimeTag>())
                         {
                             r.model = LoadModel("assets/models/Slime.obj");
+                            Texture2D t0 = LoadTexture("assets/models/textures/Slime_uv.png");
+                            Texture2D t = LoadTexture("assets/models/textures/Slime_texture.png");
+                            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                            r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                         }
                         else if (e.hasTag<SnowmanTag>())
                         {
