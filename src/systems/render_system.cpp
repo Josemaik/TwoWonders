@@ -443,40 +443,78 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         if (e.hasTag<PlayerTag>())
         {
             // Dibujar background HUD
-            engine.drawRectangle(0, 0, 580, 60, WHITE);
-            engine.drawRectangle(0, 55, 100, 30, WHITE);
+            // engine.drawRectangle(0, 0, 580, 60, WHITE);
+            engine.drawRectangle(7, 50, 100, 20, DARKGRAY);
+            engine.drawRectangle(650, 540, 100, 20, DARKGRAY);
 
             // Dibujar vidas restantes del player en el HUD
             if (e.hasComponent<LifeComponent>())
             {
                 auto const& l{ em.getComponent<LifeComponent>(e) };
-                std::string vida = "Vidas: " + std::to_string(l.life) + " (max " + std::to_string(l.maxLife) + ") - ";
-                engine.drawText(vida.c_str(), 10, 10, 20, BLACK);
+
+                // Define the dimensions of the health bar
+                int barWidth = 40;
+                int barHeight = 20;
+                int barX = 10;
+                int barY = 10;
+                int spacing = 4; // Spacing between each small rectangle
+
+                engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * l.maxLife + 2, barHeight + 4, DARKGRAY);
+                // engine.drawRectangle(barX - 3, barY + 20, (barWidth + spacing) * l.maxLife + 2, barHeight + 4, DARKGRAY);
+
+                // Draw the health portion of the health bar
+                for (int i = 0; i < l.life; ++i)
+                {
+                    // Calculate the x position of the current rectangle
+                    int currentX = barX + i * (barWidth + spacing);
+
+                    // Draw the rectangle
+                    engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
+                }
             }
 
-            // Dibujar las bombas y monedas actuales
-            if (e.hasComponent<InformationComponent>())
+            // Dibujamos una barra para el maná
+            int barWidth = 200;
+            int barHeight = 20;
+            int barX = 7;
+            int barY = 30;
+
+            engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
+
+
+
+            auto const& plfi{ em.getSingleton<PlayerInfo>() };
+            std::string info_text = std::to_string(plfi.coins);
+
+            int posX = 735;
+
+            // Sacamos el número de dígitos que tiene el número de monedas
+            int num_digits = 0;
+            int temp = plfi.coins;
+            while (temp > 0)
             {
-                auto const& info{ em.getComponent<InformationComponent>(e) };
-                std::string info_text = "Bombas: " + std::to_string(info.bombs) + " (max " + std::to_string(info.max_bombs) + ") - Monedas: " + std::to_string(info.coins);
-                engine.drawText(info_text.c_str(), 200, 10, 20, BLACK);
+                temp /= 10;
+                num_digits++;
 
-                std::string debug_txt = "F1 to DEBUG";
-                engine.drawText(debug_txt.c_str(), 420, 35, 20, BLACK);
+                if (num_digits > 1)
+                    posX -= 10;
             }
+
+            engine.drawText(info_text.c_str(), posX, 541, 18, YELLOW);
+
 
             // Dibujar el countdown restante del ataque del player en el HUD
-            if (e.hasComponent<AttackComponent>())
-            {
-                auto const& a{ em.getComponent<AttackComponent>(e) };
-                std::string countdown_ataque;
-                if (a.elapsed > a.countdown)
-                    countdown_ataque = "Ataque listo (SPACE) - Bomba lista (B)";
-                else
-                    countdown_ataque = "Ataque listo en: " + std::to_string(-1 * (a.elapsed - 1.0f)) + " segundos";
+            // if (e.hasComponent<AttackComponent>())
+            // {
+            //     auto const& a{ em.getComponent<AttackComponent>(e) };
+            //     std::string countdown_ataque;
+            //     if (a.elapsed > a.countdown)
+            //         countdown_ataque = "Ataque listo (SPACE) - Bomba lista (B)";
+            //     else
+            //         countdown_ataque = "Ataque listo en: " + std::to_string(-1 * (a.elapsed - 1.0f)) + " segundos";
 
-                engine.drawText(countdown_ataque.c_str(), 10, 35, 20, BLACK);
-            }
+            //     engine.drawText(countdown_ataque.c_str(), 10, 35, 20, BLACK);
+            // }
 
             // Dibujar el tipo de ataque que tiene equipado
             if (e.hasComponent<TypeComponent>())
@@ -484,13 +522,13 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 auto const& t{ em.getComponent<TypeComponent>(e) };
 
                 if (t.type == ElementalType::Neutral)
-                    engine.drawText("Neutral", 10, 60, 20, BLACK);
+                    engine.drawText("Neutral", 17, 50, 18, WHITE);
                 else if (t.type == ElementalType::Agua)
-                    engine.drawText("Agua", 10, 60, 20, BLUE);
+                    engine.drawText("Agua", 17, 50, 18, BLUE);
                 else if (t.type == ElementalType::Fuego)
-                    engine.drawText("Fuego", 10, 60, 20, RED);
+                    engine.drawText("Fuego", 17, 50, 18, RED);
                 else
-                    engine.drawText("Hielo", 10, 60, 20, SKYBLUE);
+                    engine.drawText("Hielo", 17, 50, 18, SKYBLUE);
             }
 
         }
@@ -633,18 +671,18 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
         // Dibujar zona para mostrar ejemplo de uso del eventmanager
-        auto& linfo = em.getSingleton<LevelInfo>();
-        if (linfo.drawzone == true) {
-            engine.drawText("CAMBIANDO DE \n ZONA...", 600, 10, 25, RED);
-            if (linfo.segundos == 0) {
-                linfo.drawzone = false;
-                linfo.segundos = 1000;
-            }
-            linfo.segundos--;
-        }
-        else {
-            engine.drawText(("ZONA " + std::to_string(linfo.num_zone)).c_str(), 600, 10, 50, RED);
-        }
+        // auto& linfo = em.getSingleton<LevelInfo>();
+        // if (linfo.drawzone == true) {
+        //     engine.drawText("CAMBIANDO DE \n ZONA...", 600, 10, 25, RED);
+        //     if (linfo.segundos == 0) {
+        //         linfo.drawzone = false;
+        //         linfo.segundos = 1000;
+        //     }
+        //     linfo.segundos--;
+        // }
+        // else {
+        //     engine.drawText(("ZONA " + std::to_string(linfo.num_zone)).c_str(), 600, 10, 50, RED);
+        // }
 
         // Dibujar el ID de las entidades // DEBUG
         // if (debug)
@@ -675,12 +713,15 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
     if (enemyID != li.max)
     {
         auto& enemy = *em.getEntityByID(enemyID);
-        auto& r = em.getComponent<RenderComponent>(enemy);
+        if (enemy.hasComponent<RenderComponent>())
+        {
+            auto& r = em.getComponent<RenderComponent>(enemy);
 
-        engine.drawCircle(static_cast<int>(engine.getWorldToScreenX(r.position)),
-            static_cast<int>(engine.getWorldToScreenY(r.position)),
-            5,
-            color);
+            engine.drawCircle(static_cast<int>(engine.getWorldToScreenX(r.position)),
+                static_cast<int>(engine.getWorldToScreenY(r.position)),
+                5,
+                color);
+        }
     }
 }
 

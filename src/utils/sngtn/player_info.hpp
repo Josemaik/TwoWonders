@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-struct InformationComponent {
+struct PlayerInfo {
     uint16_t coins{}, bombs{}, max_bombs{ 8 };
     bool hasKey{ false };
 

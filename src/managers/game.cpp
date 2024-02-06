@@ -23,13 +23,12 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);// -2 -12 63 -71
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -0.0f, 0.0f, -0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.0f, -0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
 
-    em.addComponent<InformationComponent>(e, InformationComponent{});
     em.addComponent<TypeComponent>(e, TypeComponent{});
     // em.addComponent<EventComponent>(e);
     evm.registerListener(e, EVENT_CODE_CHANGE_ZONE);
@@ -155,8 +154,6 @@ void Game::run()
 
             input_system.update(em);
 
-
-
             // seleccionar modo de debug ( physics o AI)
             if (!li.resetGame) {
                 ai_system.update(em, deltaTime);
@@ -186,7 +183,6 @@ void Game::run()
             }
 
             break;
-
         }
 
         // case GameScreen::DEAD:
@@ -213,7 +209,7 @@ void Game::run()
     }
 
     //liberar bancos
-    sound_system.liberar();
+    sound_system.clear();
     render_system.unloadModels(em, engine);
 
     engine.closeWindow();
