@@ -59,4 +59,24 @@ struct LevelInfo
   uint8_t mapID{ 0 };
 
   GameScreen currentScreen = GameScreen::GAMEPLAY;
+
+  void reset()
+  {
+    playerDetected = false;
+    enemiesID.clear();
+    enemyPositions.clear();
+    transition = false;
+    cameraChange = false;
+    lockedEnemy = max;
+    closestEnemy = max;
+    notLoadSet.clear();
+    dead_entities.clear();
+    debugIA2 = false;
+    resetGame = false;
+    num_zone = 0;
+    drawzone = false;
+    segundos = 1000;
+    mapID = 0;
+  }
+
 };

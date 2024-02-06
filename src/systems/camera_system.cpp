@@ -76,12 +76,17 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
             }
         }
 
+        // Get current camera position, target and fovy
         vec3d currentCameraPos = ge.getPositionCamera();
         vec3d currentCameraTarget = ge.getTargetCamera();
         float currentCameraFovy = ge.getFovyCamera();
+
+        // Interpolate between current and new camera position, target and fovy
         vec3d newCameraPos = currentCameraPos + t * (cameraPos - currentCameraPos);
         vec3d newCameraTarget = currentCameraTarget + t * (cameraTar - currentCameraTarget);
         float newCameraFovy = currentCameraFovy + t * (cameraFovy - currentCameraFovy);
+
+        // Set new camera position, target and fovy
         ge.setPositionCamera(newCameraPos);
         ge.setTargetCamera(newCameraTarget);
         ge.setFovyCamera(newCameraFovy);

@@ -16,6 +16,13 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
 
     // Se pone la direccion en la que este mirando el player
     if (ent.hasTag<PlayerTag>() && ent.hasComponent<InputComponent>()) {
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        if (plfi.mana <= MANA_CUT)
+        {
+            att.createAttack = false;
+            return;
+        }
+
         auto& phy = em.getComponent<PhysicsComponent>(ent);
 
         static const double ATTACK_SPEED = 0.5f;
@@ -165,7 +172,19 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
     em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = static_cast<float>(isRanged ? ranged : 0.2) });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
     if (ent.hasTag<PlayerTag>())
+    {
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+
+        auto& plfi = em.getSingleton<PlayerInfo>();
+
+        if (plfi.mana > 0.0)
+        {
+            plfi.mana -= MANA_CUT;
+
+            if (plfi.mana < 0.0)
+                plfi.mana = 0;
+        }
+    }
     else {
         auto& c = em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_ENEMY });
         if (ent.hasTag<GolemTag>()) {
