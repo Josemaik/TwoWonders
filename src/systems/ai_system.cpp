@@ -39,9 +39,12 @@ void AISystem::update(EntityManager& em, float dt)
     {
         //percibir el entorno
         perception(bb, ai, dt);
-        // Actualizar datos de los slimes en blackboard
+        // Actualizar datos de los slimes y subditos en blackboard
         if (e.hasTag<SlimeTag>()) {
-            bb.updateSlimeInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life);
+            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life,0);
+        }
+        if(e.hasTag<SubditoTag>()){
+             bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life,1);
         }
 
         if (!isDetected && ai.playerdetected)

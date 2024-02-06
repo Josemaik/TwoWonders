@@ -212,7 +212,7 @@
                 "scale_to_respawn_attack": 2.0
             },
             {
-                "position": [73.0, 0.0, -87.0],
+                "position": [61.0, 0.0, -88.0],
                 "scale": [2.0, 2.0, 2.0],
                 "color": [0, 121, 241, 255],
                 "max_speed": 0.55,
@@ -240,6 +240,35 @@
             }
         ],
         "npcs": [],
-        "player": []
+        "player": [],
+        "comentarios": [
+            {
+                "position": [73.0, 0.0, -87.0],
+                "scale": [2.0, 2.0, 2.0],
+                "color": [0, 121, 241, 255],
+                "max_speed": 0.55,
+                "life": 15,
+                "type": 3,
+                "element": 2,
+                "arrival_radius": 0.7,
+                "detect_radius": 15.0,
+                "attack_radius": 10.0,
+                "tx": 0.0,
+                "tz": 0.0,
+                "time2arrive": 7.0,
+                "tactive": true,
+                "perceptionTime": 0.2,
+                "path": [
+                    [73.0, 0.0, -87.0],
+                    [69.0, 0.0, -87.0],
+                    [73.0, 0.0, -87.0],
+                    [69.0, 0.0, -87.0]
+                ],
+                "countdown_stop": 0.0,
+                "countdown_shoot": 0.5,
+                "countdown_perception": 0.5,
+                "scale_to_respawn_attack": 2.0
+            }
+        ]
     }
 }

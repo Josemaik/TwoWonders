@@ -41,6 +41,7 @@ struct Ia_man
     void createEnemies(EntityManager& em);
     void createEnemy(EntityManager& em, jsonType json);
     void resetVec();
+    void createSubditos(EntityManager& em, uint16_t tam);
 private:
     bool createdzone2{ false }, createdzone3{ false }, createdzone4{ false },
         createdzone5{ false }, createdzone6{ false }, createdzone12{ false },

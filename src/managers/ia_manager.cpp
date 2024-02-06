@@ -585,10 +585,11 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
 
     case 3:
     {
-        auto* patrol_7 = &tree.createNode<BTAction_Patrol>();
-        auto* ready_7 = &tree.createNode<BTDecisionReadyforAttack>();
-        auto* atack_7 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot);
-        [[maybe_unused]] auto* sequence7_3 = &tree.createNode<BTNodeSequence_t>(patrol_7, ready_7, atack_7);
+        em.addTag<BossFinalTag>(e);
+        // auto* patrol_7 = &tree.createNode<BTAction_Patrol>();
+        // auto* ready_7 = &tree.createNode<BTDecisionReadyforAttack>();
+        // auto* atack_7 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot);
+        // [[maybe_unused]] auto* sequence7_3 = &tree.createNode<BTNodeSequence_t>(patrol_7, ready_7, atack_7);
 
         break;
     }
@@ -633,3 +634,27 @@ void Ia_man::resetVec()
 {
     vec_t.clear();
 }
+
+//Generación de subditos
+vec3d getRandomPosInRAdius(){
+
+}
+void Ia_man::createSubditos(EntityManager& em, uint16_t tam){
+    for(int i = 0; i < tam;i++){
+        auto& e{ em.newEntity() };
+        em.addTag<SubditoTag>(e);
+
+        auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getRandomPosInRAdius(), .scale = vec3d{ 1.0,2.0,1.0 }, .color = GRAY});
+        auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .max_speed = 0.5 });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
+        em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
+        em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Neutral });
+
+        //aqui el bt
+
+        // em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = arrival_radius, .detect_radius = detect_radius, .attack_radius = attack_radius, .tx = tx, .tz = tz,.time2arrive = time2arrive, .tactive = tactive, .perceptionTime = static_cast<float>(perceptionTime),
+        //     .path = path, .countdown_stop = countdown_stop, .countdown_shoot = countdown_shoot, .countdown_perception = countdown_perception, .behaviourTree = &tree });
+
+        // em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = scale_to_respawn_attack });
+    }
+ }
