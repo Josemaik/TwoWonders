@@ -3,28 +3,25 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-// Virtual Entity
-struct TEntity{
+#include "entity.hpp"
 
-};
-
-// TNode
-struct TNode{
+// Node
+struct Node{
 private:
-    TEntity* entity;
-    std::vector<TNode*> children;
-    TNode* parent;
-    glm::vec3 translation;
-    glm::vec3 rotation;
-    glm::vec3 scale;
-    glm::mat4 transformationMatrix;
+    Entity* m_entity;
+    std::vector<Node*> m_children;
+    Node* m_parent;
+    glm::vec3 m_translation;
+    glm::vec3 m_rotation;
+    glm::vec3 m_scale;
+    glm::mat4 m_transformationMatrix;
 
 public:
-    TNode();
-    int addChild(TNode* child);
+    Node();
+    int addChild(Node* child);
     // 0 : child erase | -1 : child not found
-    int removeChild(TNode* child);
-    bool setEntity(TEntity* newEntity);
+    int removeChild(Node* child);
+    bool setEntity(Entity* newEntity);
 
     // Transform
     void traverse(glm::mat4 parentMatrix);
@@ -32,10 +29,13 @@ public:
     void setRotation(glm::vec3 newRotation);
     void setScale(glm::vec3 newScale);
     void setTransformationMatrix(glm::mat4 newMatrix);
+    void translate(glm::vec3 newTranslate);
+    void rotate(glm::vec3 newRotate);
+    void scale(glm::vec3 newScale);
 
     // Getters
-    TEntity* getEntity();
-    TNode* getParent();
+    Entity* getEntity();
+    Node* getParent();
     glm::vec3 getTranslation();
     glm::vec3 getRotation();
     glm::vec3 getScale();
