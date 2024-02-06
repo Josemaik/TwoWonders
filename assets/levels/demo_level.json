@@ -413,7 +413,7 @@
                 "type": 4,
                 "element": 3,
                 "arrival_radius": 0.1,
-                "detect_radius": 25.0,
+                "detect_radius": 10.0,
                 "attack_radius": 6.0,
                 "tx": 0.0,
                 "tz": 0.0,

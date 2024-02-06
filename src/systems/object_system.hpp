@@ -17,7 +17,7 @@ private:
     void explodeBombHeal(EntityManager& em, Entity& ent);
 
     // Shop
-    bool buyBomb(EntityManager& em, Entity* ent);
+    bool buyBomb(EntityManager& em);
     bool buyExtraLife(EntityManager& em, Entity* ent);
     bool buyLife(EntityManager& em, Entity* ent);
 };

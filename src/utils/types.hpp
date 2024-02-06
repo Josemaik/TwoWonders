@@ -14,17 +14,16 @@
 #include "../components/ai_component.hpp"
 #include "../components/projectile_component.hpp"
 #include "../components/object_component.hpp"
-#include "../components/information_component.hpp"
 #include "../components/zone_component.hpp"
 #include "../components/shield_component.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
 //singelton
+#include "../utils/sngtn/player_info.hpp"
 #include "../utils/sngtn/blackboard.hpp"
 #include "../utils/sngtn/debug_singleton.hpp"
 #include "../utils/sngtn/levelinfo.hpp"
 #include "../utils/sngtn/input_info.hpp"
-// #include <nlohmann/json.hpp>
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
 
@@ -51,9 +50,9 @@ struct GolemTag {};
 struct SpiderTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
-using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, RampComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, InformationComponent, ZoneComponent, ShieldComponent, TypeComponent, LockComponent>;
+using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, RampComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, ZoneComponent, ShieldComponent, TypeComponent, LockComponent>;
 using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, WallTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag, GolemTag, SpiderTag>;
-using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo>;
+using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;

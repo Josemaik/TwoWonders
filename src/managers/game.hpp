@@ -21,9 +21,7 @@
 #include "../systems/lock_system.hpp"
 #include "game_engine.hpp"
 #include "ia_manager.hpp"
-
-
-#include "map.hpp"
+#include "map_manager.hpp"
 
 struct Game
 {
@@ -64,7 +62,7 @@ private:
     ZoneSystem zone_system{};
     ShieldSystem shield_system{};
     EventSystem event_system{};
-    Map map{};
+    MapManager map{};
     SoundSystem sound_system{};
     CameraSystem camera_system{};
     LockSystem lock_system{};

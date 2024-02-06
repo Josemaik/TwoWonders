@@ -1,11 +1,11 @@
 #pragma once
-#ifndef MAP
-#define MAP
+#ifndef MAP_MANAGER
+#define MAP_MANAGER
 
 #include "../utils/types.hpp"
 #include "ia_manager.hpp"
 
-struct Map
+struct MapManager
 {
     void createMap(EntityManager& em, uint8_t mapID, Ia_man& iam);
     void reset(EntityManager& em, uint8_t mapID, Ia_man& iam);
@@ -16,4 +16,4 @@ private:
     void generateMapFromJSON(EntityManager& em, const mapType& map, Ia_man& iam);
 };
 
-#endif // !MAP
+#endif // !MAP_MANAGER

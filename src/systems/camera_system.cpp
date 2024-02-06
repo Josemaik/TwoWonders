@@ -8,11 +8,12 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
     if (playerEn.hasTag<PlayerTag>())
     {
         auto& phy = em.getComponent<RenderComponent>(playerEn);
-        cameraPos = { phy.position.x() + 33.f, phy.position.y() + 43.f, phy.position.z() + 33.f };
+        cameraPos = { phy.position.x() + 33.f, phy.position.y() + 35.f, phy.position.z() + 33.f };
         cameraTar = phy.position;
+        cameraFovy = 20.f;
 
         if (li.cameraChange)
-            cameraPos = { phy.position.x() - 33.f, phy.position.y() + 43.f, phy.position.z() + 33.f };
+            cameraPos = { phy.position.x() - 33.f, phy.position.y() + 35.f, phy.position.z() + 33.f };
 
         auto& li = em.getSingleton<LevelInfo>();
         if (li.playerDetected && li.lockedEnemy == li.max)
@@ -35,13 +36,15 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
                 vec3d oneFourthPoint = phy.position + (enemyPos - phy.position) / 4.0;
 
                 cameraTar = oneFourthPoint;
-                cameraPos = { oneFourthPoint.x() + 33.f, oneFourthPoint.y() + 43.f, oneFourthPoint.z() + 33.f };
+                cameraPos = { oneFourthPoint.x() + 33.f, oneFourthPoint.y() + 35.f, oneFourthPoint.z() + 33.f };
 
                 if (li.cameraChange)
-                    cameraPos = { oneFourthPoint.x() - 33.f, oneFourthPoint.y() + 43.f, oneFourthPoint.z() + 33.f };
+                    cameraPos = { oneFourthPoint.x() - 33.f, oneFourthPoint.y() + 35.f, oneFourthPoint.z() + 33.f };
             }
 
-            cameraPos -= vec3d{ 2.f, 7.f, 2.f };
+
+            cameraPos += vec3d{ 2.f, 10.f, 2.f };
+            cameraFovy = 18.f;
         }
         else if (li.lockedEnemy != li.max)
         {
@@ -50,10 +53,12 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
             vec3d oneFourthPoint = phy.position + (lockedEnemyPos - phy.position) / 4.0;
 
             cameraTar = oneFourthPoint;
-            cameraPos = { oneFourthPoint.x() + 28.f, oneFourthPoint.y() + 40.f, oneFourthPoint.z() + 28.f };
+            cameraPos = { oneFourthPoint.x() + 28.f, oneFourthPoint.y() + 45.f, oneFourthPoint.z() + 28.f };
 
             if (li.cameraChange)
-                cameraPos = { oneFourthPoint.x() - 28.f, oneFourthPoint.y() + 40.f, oneFourthPoint.z() + 28.f };
+                cameraPos = { oneFourthPoint.x() - 28.f, oneFourthPoint.y() + 45.f, oneFourthPoint.z() + 28.f };
+
+            cameraFovy = 18.f;
         }
 
         float t = 0.1f; // Velocidad de la transición
@@ -73,9 +78,12 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
 
         vec3d currentCameraPos = ge.getPositionCamera();
         vec3d currentCameraTarget = ge.getTargetCamera();
+        float currentCameraFovy = ge.getFovyCamera();
         vec3d newCameraPos = currentCameraPos + t * (cameraPos - currentCameraPos);
         vec3d newCameraTarget = currentCameraTarget + t * (cameraTar - currentCameraTarget);
+        float newCameraFovy = currentCameraFovy + t * (cameraFovy - currentCameraFovy);
         ge.setPositionCamera(newCameraPos);
         ge.setTargetCamera(newCameraTarget);
+        ge.setFovyCamera(newCameraFovy);
     }
 }

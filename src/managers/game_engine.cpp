@@ -5,8 +5,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     ENGI::GameEngine::initWindow(width_, height_, "Two Wonders");
 
     ENGI::GameEngine::setUpCamera({ 0.0f, 01.0f, 0.0f });
-    ENGI::GameEngine::setFovyCamera(20.0f);
-    ENGI::GameEngine::setProjectionCamera(CAMERA_PERSPECTIVE);
+    ENGI::GameEngine::setProjectionCamera(CAMERA_ORTHOGRAPHIC);
 
     // Logo Two Wonders
     Image logo_two_wonders = ENGI::GameEngine::loadImage("assets/logo_two_wonders.png");

@@ -81,7 +81,7 @@ void SoundSystem::update() {
     ERRCHECK(soundSystem->update());
 }
 
-void SoundSystem::liberar() {
+void SoundSystem::clear() {
     //ERRCHECK(eventDescription->releaseAllInstances());
     ERRCHECK(master_bank->unload());
     ERRCHECK(strings_bank->unload());

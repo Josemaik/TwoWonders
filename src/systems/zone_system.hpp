@@ -5,14 +5,14 @@
 #include "../managers/game_engine.hpp"
 #include "../managers/ia_manager.hpp"
 #include "../managers/eventmanager.hpp"
-#include "../managers/map.hpp"
+#include "../managers/map_manager.hpp"
 
 struct ZoneSystem
 {
     using SYSCMPs = MP::TypeList<ZoneComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam, Eventmanager& evm, Map& map);
+    void update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam, Eventmanager& evm, MapManager& map);
     void reset();
 
 private:

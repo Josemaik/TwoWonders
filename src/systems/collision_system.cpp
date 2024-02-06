@@ -346,12 +346,12 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
 
     if (staticEntPtr->hasTag<DoorTag>() && behaviorType2 & BehaviorType::PLAYER)
     {
-        auto& ic = em.getComponent<InformationComponent>(*otherEntPtr);
-        if (ic.hasKey)
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        if (plfi.hasKey)
         {
             li.dead_entities.insert(staticEntPtr->getID());
 
-            ic.hasKey = false;
+            plfi.hasKey = false;
             return;
         }
     }

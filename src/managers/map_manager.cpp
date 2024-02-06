@@ -1,7 +1,7 @@
-#include "map.hpp"
+#include "map_manager.hpp"
 #include <fstream>
 
-void Map::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
+void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
 
     mapType map{};
     auto& li = em.getSingleton<LevelInfo>();
@@ -31,7 +31,7 @@ void Map::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
     generateMapFromJSON(em, map, iam);
 }
 
-mapType Map::loadMap(const std::string& mapFile)
+mapType MapManager::loadMap(const std::string& mapFile)
 {
     std::ifstream file(mapFile);
     rapidjson::IStreamWrapper isw(file);
@@ -40,7 +40,7 @@ mapType Map::loadMap(const std::string& mapFile)
     return map;
 }
 
-void Map::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_man& iam)
+void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_man& iam)
 {
     const rapidjson::Value& overworld = map["overworld"];
     const rapidjson::Value& groundArray = overworld["ground"];
@@ -186,7 +186,7 @@ void Map::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_man& iam
 
         // Creamos los componentes
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0 });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero() });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
         em.addComponent<ObjectComponent>(entity, ObjectComponent{ .type = type, .inmortal = true, .mapID = mapId, .objID = objId });
     }
@@ -212,7 +212,7 @@ void Map::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_man& iam
     // }
 }
 
-void Map::destroyMap(EntityManager& em)
+void MapManager::destroyMap(EntityManager& em)
 {
     using CMPS = MP::TypeList<>;
     using TAGS = MP::TypeList<GroundTag, WaterTag, WallTag, ZoneTag, RampTag, DoorTag, ObjectTag, EnemyTag>;
@@ -224,7 +224,7 @@ void Map::destroyMap(EntityManager& em)
     });
 }
 
-void Map::reset(EntityManager& em, uint8_t mapID, Ia_man& iam)
+void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man& iam)
 {
     destroyMap(em);
     createMap(em, mapID, iam);

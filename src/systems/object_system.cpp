@@ -17,11 +17,12 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
         // Recuperamos la entidad del player
         auto& li = em.getSingleton<LevelInfo>();
         auto* playerEnt = em.getEntityByID(li.playerID);
-
         bool shop_object = true;
 
         // Si existe el player se aplica el efecto del objeto
         if (playerEnt && obj.active) {
+            auto& plfi = em.getSingleton<PlayerInfo>();
+
             switch (obj.type)
             {
             case Object_type::Life:
@@ -35,22 +36,19 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 break;
 
             case Object_type::Bomb:
-                if (playerEnt->hasComponent<InformationComponent>())
-                    em.getComponent<InformationComponent>(*playerEnt).addBomb();
+                plfi.addBomb();
                 break;
 
             case Object_type::Coin:
-                if (playerEnt->hasComponent<InformationComponent>())
-                    em.getComponent<InformationComponent>(*playerEnt).addCoin();
+                plfi.addCoin();
                 break;
 
             case Object_type::Coin30:
-                if (playerEnt->hasComponent<InformationComponent>())
-                    em.getComponent<InformationComponent>(*playerEnt).add30Coins();
+                plfi.add30Coins();
                 break;
 
             case Object_type::ShopItem_Bomb:
-                shop_object = buyBomb(em, playerEnt);
+                shop_object = buyBomb(em);
                 break;
 
             case Object_type::ShopItem_Life:
@@ -68,8 +66,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 explodeBombHeal(em, ent);
                 break;
             case Object_type::Key:
-                if (playerEnt->hasComponent<InformationComponent>())
-                    em.getComponent<InformationComponent>(*playerEnt).addKey();
+                plfi.addKey();
                 break;
 
             default:
@@ -88,16 +85,17 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
 
 // ent->hasComponent<LifeComponent<()
 
-bool ObjectSystem::buyBomb(EntityManager& em, Entity* ent) {
-    if (ent->hasComponent<InformationComponent>()) {
-        return em.getComponent<InformationComponent>(*ent).buyBomb();
-    }
-    return false;
+bool ObjectSystem::buyBomb(EntityManager& em) {
+    auto& plfi = em.getSingleton<PlayerInfo>();
+
+    return plfi.buyBomb();
 }
 
 bool ObjectSystem::buyLife(EntityManager& em, Entity* ent) {
-    if (ent->hasComponent<InformationComponent>() && ent->hasComponent<LifeComponent>()) {
-        if (em.getComponent<InformationComponent>(*ent).decreaseCoins(10)) {
+    auto& plfi = em.getSingleton<PlayerInfo>();
+
+    if (ent->hasComponent<LifeComponent>()) {
+        if (plfi.decreaseCoins(10)) {
             em.getComponent<LifeComponent>(*ent).increaseLife();
             em.getComponent<LifeComponent>(*ent).increaseLife();
             return true;
@@ -107,8 +105,10 @@ bool ObjectSystem::buyLife(EntityManager& em, Entity* ent) {
 }
 
 bool ObjectSystem::buyExtraLife(EntityManager& em, Entity* ent) {
-    if (ent->hasComponent<InformationComponent>() && ent->hasComponent<LifeComponent>()) {
-        if (em.getComponent<InformationComponent>(*ent).decreaseCoins(30)) {
+    auto& plfi = em.getSingleton<PlayerInfo>();
+
+    if (ent->hasComponent<LifeComponent>()) {
+        if (plfi.decreaseCoins(30)) {
             em.getComponent<LifeComponent>(*ent).increaseMaxLife();
             em.getComponent<LifeComponent>(*ent).increaseLife();
             em.getComponent<LifeComponent>(*ent).increaseLife();

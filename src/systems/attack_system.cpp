@@ -57,15 +57,12 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         auto& li = em.getSingleton<LevelInfo>();
         if (li.playerID == ent.getID())
         {
-            if (ent.hasComponent<InformationComponent>())
-            {
-                auto& inf = em.getComponent<InformationComponent>(ent);
-                if (inf.bombs > 0) {
-                    auto& e{ em.newEntity() };
-                    em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
-                    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::BombExplode, .life_time = 2.0f });
-                    inf.decreaseBomb();
-                }
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            if (plfi.bombs > 0) {
+                auto& e{ em.newEntity() };
+                em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
+                em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::BombExplode, .life_time = 2.0f });
+                plfi.decreaseBomb();
             }
         }
         else
