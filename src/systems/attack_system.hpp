@@ -13,8 +13,10 @@ struct AttackSystem
 
 private:
     void createAttack(EntityManager& em, Entity& e, AttackComponent& att);
-    void createAttackRangedOrMelee(EntityManager& em, Entity& e, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack,double const ranged);
+    void createAttackRangedOrMelee(EntityManager& em, Entity& e, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack, double const ranged);
     void createAttackMultipleShot(EntityManager& em, Entity& ent, AttackComponent& att, int numShots);
+
+    static constexpr double MANA_CUT = 15.0f;
 };
 
 #endif // !ATTACK_SYSTEM

@@ -14,7 +14,7 @@ private:
     vec3d cameraTar{};
     float cameraFovy{ 20.f };
     float transitionTime{ 0.f };
-    float transitionLimit{ 0.15f };
+    float transitionLimit{ 0.4f };
 };
 
 #endif

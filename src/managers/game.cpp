@@ -23,7 +23,7 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);// -2 -12 63 -71
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 0.0f, 0.0f, -0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -0.0f, 0.0f, -0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
@@ -77,6 +77,7 @@ void Game::run()
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
+    auto& plfi = em.getSingleton<PlayerInfo>();
 
     // Inicializa una variable donde tener el tiempo entre frames
     float deltaTime{}, currentTime{};
@@ -141,16 +142,8 @@ void Game::run()
         // CODIGO DEL GAMEPLAY
         case GameScreen::GAMEPLAY:
         {
-            if (em.getEntities().empty())
-            {
-                li.resetGame = false;
-                li.num_zone = 0;
-                zone_system.reset();
-                lock_system.reset();
-                li.notLoadSet.clear();
-                createEntities(em, evm);
-                map.reset(em, 0, iam);
-            }
+            if (em.getEntities().empty() || li.resetGame)
+                resetGame(em, engine, render_system);
 
             input_system.update(em);
 
@@ -195,11 +188,8 @@ void Game::run()
             if (input_system.pressEnter())
                 li.currentScreen = GameScreen::TITLE;
 
-            em.destroyAll();
-            render_system.unloadModels(em, engine);
             render_system.drawEnding(engine);
-            zone_system.reset();
-            li.notLoadSet.clear();
+            resetGame(em, engine, render_system);
             break;
         }
 
@@ -213,4 +203,19 @@ void Game::run()
     render_system.unloadModels(em, engine);
 
     engine.closeWindow();
+}
+
+void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& plfi = em.getSingleton<PlayerInfo>();
+
+    em.destroyAll();
+    rs.unloadModels(em, engine);
+    li.reset();
+    plfi.reset();
+    zone_system.reset();
+    lock_system.reset();
+    createEntities(em, evm);
+    map.reset(em, 0, iam);
 }

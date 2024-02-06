@@ -444,64 +444,18 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         {
             // Dibujar background HUD
             // engine.drawRectangle(0, 0, 580, 60, WHITE);
-            engine.drawRectangle(7, 50, 100, 20, DARKGRAY);
-            engine.drawRectangle(650, 540, 100, 20, DARKGRAY);
 
             // Dibujar vidas restantes del player en el HUD
             if (e.hasComponent<LifeComponent>())
             {
-                auto const& l{ em.getComponent<LifeComponent>(e) };
-
-                // Define the dimensions of the health bar
-                int barWidth = 40;
-                int barHeight = 20;
-                int barX = 10;
-                int barY = 10;
-                int spacing = 4; // Spacing between each small rectangle
-
-                engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * l.maxLife + 2, barHeight + 4, DARKGRAY);
-                // engine.drawRectangle(barX - 3, barY + 20, (barWidth + spacing) * l.maxLife + 2, barHeight + 4, DARKGRAY);
-
-                // Draw the health portion of the health bar
-                for (int i = 0; i < l.life; ++i)
-                {
-                    // Calculate the x position of the current rectangle
-                    int currentX = barX + i * (barWidth + spacing);
-
-                    // Draw the rectangle
-                    engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
-                }
+                drawHealthBar(engine, em, e);
             }
 
-            // Dibujamos una barra para el maná
-            int barWidth = 200;
-            int barHeight = 20;
-            int barX = 7;
-            int barY = 30;
+            // Dibujamos la cantidad de mana restante del player en el HUD
+            drawManaBar(engine, em);
 
-            engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
-
-
-
-            auto const& plfi{ em.getSingleton<PlayerInfo>() };
-            std::string info_text = std::to_string(plfi.coins);
-
-            int posX = 735;
-
-            // Sacamos el número de dígitos que tiene el número de monedas
-            int num_digits = 0;
-            int temp = plfi.coins;
-            while (temp > 0)
-            {
-                temp /= 10;
-                num_digits++;
-
-                if (num_digits > 1)
-                    posX -= 10;
-            }
-
-            engine.drawText(info_text.c_str(), posX, 541, 18, YELLOW);
-
+            // Dibujamos el número de monedas en pantalla
+            drawCoinBar(engine, em);
 
             // Dibujar el countdown restante del ataque del player en el HUD
             // if (e.hasComponent<AttackComponent>())
@@ -519,6 +473,9 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             // Dibujar el tipo de ataque que tiene equipado
             if (e.hasComponent<TypeComponent>())
             {
+                // Rectangulo del tipo de magia
+                engine.drawRectangle(7, 50, 100, 20, DARKGRAY);
+
                 auto const& t{ em.getComponent<TypeComponent>(e) };
 
                 if (t.type == ElementalType::Neutral)
@@ -740,4 +697,76 @@ void RenderSystem::unloadModels(EntityManager& em, ENGI::GameEngine& engine)
         engine.unloadModel(ren.model);
         ren.meshLoaded = false;
     });
+}
+
+void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, const Entity& e)
+{
+    auto const& l{ em.getComponent<LifeComponent>(e) };
+
+    // Datos de la barra de vida
+    int barWidth = 40;
+    int barHeight = 20;
+    int barX = 10;
+    int barY = 10;
+    int spacing = 4;
+
+    // Rectángulo de fondo para la barra de vida
+    engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * l.maxLife + 2, barHeight + 4, DARKGRAY);
+
+    // Dibujamos cada parte de la barra de vida
+    for (int i = 0; i < l.life; ++i)
+    {
+        // Posición X de cada trozo
+        int currentX = barX + i * (barWidth + spacing);
+
+        // Dibujamos el rectángulo
+        engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
+    }
+}
+
+void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
+{
+    // Barra para las monedas monedas
+    engine.drawRectangle(650, 540, 100, 20, DARKGRAY);
+
+    auto const& plfi{ em.getSingleton<PlayerInfo>() };
+    std::string info_text = std::to_string(plfi.coins);
+
+    int posX = 735;
+
+    // Sacamos el número de dígitos que tiene el número de monedas
+    int num_digits = 0;
+    int temp = plfi.coins;
+    while (temp > 0)
+    {
+        temp /= 10;
+        num_digits++;
+
+        if (num_digits > 1)
+            posX -= 10;
+    }
+
+    engine.drawText(info_text.c_str(), posX, 541, 18, YELLOW);
+}
+
+void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
+{
+    // Datos para la barra para el maná
+    int barWidth = 200;
+    int barHeight = 20;
+    int barX = 7;
+    int barY = 30;
+
+    engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
+
+    auto& plfi{ em.getSingleton<PlayerInfo>() };
+
+    int manaWidth = static_cast<int>(static_cast<float>(barWidth) * (static_cast<float>(plfi.mana) / static_cast<float>(plfi.max_mana)));
+
+    // Interpolación
+    int new_manaWidth = plfi.bar_width + static_cast<int>((static_cast<float>(manaWidth) - static_cast<float>(plfi.bar_width)) * 0.175f);
+    // Dibujamos la barra de maná
+    engine.drawRectangle(barX + 2, barY + 3, new_manaWidth, barHeight - 6, SKYBLUE);
+
+    plfi.bar_width = new_manaWidth;
 }
