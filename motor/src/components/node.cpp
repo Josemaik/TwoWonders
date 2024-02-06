@@ -32,16 +32,19 @@ bool Node::setEntity(Entity* newEntity) {
 
 void Node::traverse(glm::mat4 parentMatrix) {
 
-    // TODO: check bool updateMatrix
-
-    m_transformationMatrix = parentMatrix * glm::translate(glm::mat4(1.0f), m_translation)
-                          * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f))
-                          * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f))
-                          * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f))
-                          * glm::scale(glm::mat4(1.0f), m_scale);
+    // Check changes
+    if(updateMatrix){
+        m_transformationMatrix = parentMatrix * glm::translate(glm::mat4(1.0f), m_translation)
+                * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f))
+                * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f))
+                * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f))
+                * glm::scale(glm::mat4(1.0f), m_scale);
+        updateMatrix = false;
+    }
 
     // Draw Entity
-    //m_entity->draw(m_transformationMatrix);
+    if(m_entity)
+        m_entity->draw(m_transformationMatrix);
 
     for (Node* child : m_children) {
         child->traverse(m_transformationMatrix);
@@ -50,17 +53,17 @@ void Node::traverse(glm::mat4 parentMatrix) {
 
 void Node::setTranslation(glm::vec3 newTranslation) {
     m_translation = newTranslation;
-    // TODO: bool true updateMatrix
+    updateMatrix = true;
 }
 
 void Node::setRotation(glm::vec3 newRotation) {
     m_rotation = newRotation;
-    // TODO: bool true updateMatrix
+    updateMatrix = true;
 }
 
 void Node::setScale(glm::vec3 newScale) {
     m_scale = newScale;
-    // TODO: bool true updateMatrix
+    updateMatrix = true;
 }
 
 void Node::setTransformationMatrix(glm::mat4 newMatrix) {

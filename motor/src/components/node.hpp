@@ -15,6 +15,7 @@ private:
     glm::vec3 m_rotation;
     glm::vec3 m_scale;
     glm::mat4 m_transformationMatrix;
+    bool updateMatrix {true};
 
 public:
     Node();
