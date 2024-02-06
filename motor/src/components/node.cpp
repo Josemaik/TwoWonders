@@ -41,7 +41,7 @@ void Node::traverse(glm::mat4 parentMatrix) {
                           * glm::scale(glm::mat4(1.0f), m_scale);
 
     // Draw Entity
-    m_entity->draw(m_transformationMatrix);
+    //m_entity->draw(m_transformationMatrix);
 
     for (Node* child : m_children) {
         child->traverse(m_transformationMatrix);

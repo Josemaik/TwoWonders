@@ -33,9 +33,9 @@ $(OBJSUBDIRS) :
 
 # Otras reglas
 
-.PHONY : dir clean game
+.PHONY : dir clean engine
 
-game: $(APP)
+engine: $(APP)
 	./$(APP)
 
 dir:

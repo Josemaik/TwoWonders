@@ -1,47 +1,48 @@
 #include "components/node.hpp"
 #include "components/entity.hpp"
+#include <memory>
 
 int main()
 {
     //---- Crear la estructura del árbol ----
-    Node *nScene = new Node ();
-    Node *nLight = new Node ();
-    Node *nCamera = new Node ();
-    Node *nCarGroup = new Node ();
-    Node *nChassis = new Node ();
-    Node *nWheel1 = new Node ();
-    Node *nWheel2 = new Node ();
-    Node *nWheel3 = new Node ();
-    Node *nWheel4 = new Node ();
+    auto nScene = std::make_unique<Node>();
+    auto nLight = std::make_unique<Node>();
+    auto nCamera = std::make_unique<Node>();
+    auto nCarGroup = std::make_unique<Node>();
+    auto nChassis = std::make_unique<Node>();
+    auto nWheel1 = std::make_unique<Node>();
+    auto nWheel2 = std::make_unique<Node>();
+    auto nWheel3 = std::make_unique<Node>();
+    auto nWheel4 = std::make_unique<Node>();
 
-    nScene->addChild(nLight);
-    nScene->addChild(nCamera);
-    nScene->addChild(nCarGroup);
+    nScene->addChild(nLight.get());
+    nScene->addChild(nCamera.get());
+    nScene->addChild(nCarGroup.get());
     
-    nCarGroup->addChild(nChassis);
-    nCarGroup->addChild(nWheel1);
-    nCarGroup->addChild(nWheel2);
-    nCarGroup->addChild(nWheel3);
-    nCarGroup->addChild(nWheel4);
+    nCarGroup->addChild(nChassis.get());
+    nCarGroup->addChild(nWheel1.get());
+    nCarGroup->addChild(nWheel2.get());
+    nCarGroup->addChild(nWheel3.get());
+    nCarGroup->addChild(nWheel4.get());
     
     //---- Añadir entidades a los nodos ----
-    Light *eLight = new Light();
-    Camera *eCamera = new Camera();
+    auto eLight = std::make_unique<Light>();
+    auto eCamera = std::make_unique<Camera>();
 
-    Mesh *eMeshChassis = new Mesh();
-    Mesh *eMeshWheel1 = new Mesh();
-    Mesh *eMeshWheel2 = new Mesh();
-    Mesh *eMeshWheel3 = new Mesh();
-    Mesh *eMeshWheel4 = new Mesh();
+    auto eMeshChassis = std::make_unique<Mesh>();
+    auto eMeshWheel1 = std::make_unique<Mesh>();
+    auto eMeshWheel2 = std::make_unique<Mesh>();
+    auto eMeshWheel3 = std::make_unique<Mesh>();
+    auto eMeshWheel4 = std::make_unique<Mesh>();
 
-    nLight->setEntity(eLight);
-    nCamera->setEntity(eCamera);
+    nLight->setEntity(eLight.get());
+    nCamera->setEntity(eCamera.get());
 
-    nChassis->setEntity(eMeshChassis);
-    nChassis->setEntity(eMeshWheel1);
-    nChassis->setEntity(eMeshWheel2);
-    nChassis->setEntity(eMeshWheel3);
-    nChassis->setEntity(eMeshWheel4);
+    nChassis->setEntity(eMeshChassis.get());
+    nChassis->setEntity(eMeshWheel1.get());
+    nChassis->setEntity(eMeshWheel2.get());
+    nChassis->setEntity(eMeshWheel3.get());
+    nChassis->setEntity(eMeshWheel4.get());
 
     //---- Aplicar transformaciones a nodos
     nLight->setTranslation({0, 100, 0});
