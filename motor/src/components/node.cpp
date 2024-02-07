@@ -46,7 +46,7 @@ void Node::traverse(glm::mat4 parentMatrix) {
     if(m_entity)
         m_entity->draw(m_transformationMatrix);
 
-    // printTransformationMatrix();
+    printTransformationMatrix();
 
     for (Node* child : m_children) {
         if(m_updateMatrix)
