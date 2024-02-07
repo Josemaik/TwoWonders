@@ -7,7 +7,7 @@ Node::Node()
     : m_entity(nullptr), 
       m_parent(nullptr), 
       m_translation(0.0f), 
-      m_rotation(0.0f), 
+      m_rotation(1.0f, 0.0f, 0.0f, 0.0f), 
       m_scale(1.0f), 
       m_transformationMatrix(1.0f) {}
 
@@ -35,12 +35,12 @@ bool Node::setEntity(Entity* newEntity) {
 void Node::traverse(glm::mat4 parentMatrix) {
 
     // Check changes
-    if(m_updateMatrix)
-        m_transformationMatrix = parentMatrix * glm::translate(glm::mat4(1.0f), m_translation)
-                * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f))
-                * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f))
-                * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f))
+    if(m_updateMatrix){
+        m_transformationMatrix = parentMatrix 
+                * glm::translate(glm::mat4(1.0f), m_translation)
+                * glm::mat4_cast(m_rotation)
                 * glm::scale(glm::mat4(1.0f), m_scale);
+    }
 
     // Draw Entity
     if(m_entity)
@@ -62,8 +62,8 @@ void Node::setTranslation(glm::vec3 newTranslation) {
     m_updateMatrix = true;
 }
 
-void Node::setRotation(glm::vec3 newRotation) {
-    m_rotation = newRotation;
+void Node::setRotation(glm::vec3 axis, float angle) {
+    m_rotation = glm::angleAxis(glm::radians(angle), glm::normalize(axis));
     m_updateMatrix = true;
 }
 
@@ -77,15 +77,20 @@ void Node::setTransformationMatrix(glm::mat4 newMatrix) {
 }
 
 void Node::translate(glm::vec3 newTranslate){ setTranslation(m_translation + newTranslate); }
-void Node::rotate(glm::vec3 newRotate){ setRotation(m_rotation + newRotate); }
 void Node::scale(glm::vec3 newScale){ setScale(m_scale + newScale); }
+
+void Node::rotate(glm::vec3 axis, float angle){ 
+    auto additionalRotation = glm::angleAxis(glm::radians(angle), glm::normalize(axis));
+    m_rotation = additionalRotation * m_rotation;
+    m_updateMatrix = true; 
+}
 
 // GETTERS
 
 Entity* Node::getEntity() { return m_entity; }
 Node* Node::getParent() { return m_parent; }
 glm::vec3 Node::getTranslation() { return m_translation;}
-glm::vec3 Node::getRotation() { return m_rotation; }
+glm::quat Node::getRotation() { return m_rotation; }
 glm::vec3 Node::getScale() { return m_scale; }
 glm::mat4 Node::getTransformationMatrix() { return m_transformationMatrix; }
 

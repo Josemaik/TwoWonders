@@ -56,7 +56,7 @@ int main()
 
     //---- Aplicar transformaciones a nodos
     nLight->setTranslation({0, 100, 0});
-    nCamera->setRotation({10, 0, 0});
+    nCamera->setRotation({1, 0, 0}, 10.0f);
     nCamera->translate({0, 0, 200});
     nCarGroup->setScale({2, 2, 2});
 
