@@ -1,5 +1,7 @@
 #include "node.hpp"
 #include <algorithm>
+#include <iostream>
+#include <iomanip>
 
 Node::Node()
     : m_entity(nullptr), 
@@ -33,37 +35,41 @@ bool Node::setEntity(Entity* newEntity) {
 void Node::traverse(glm::mat4 parentMatrix) {
 
     // Check changes
-    if(updateMatrix){
+    if(m_updateMatrix)
         m_transformationMatrix = parentMatrix * glm::translate(glm::mat4(1.0f), m_translation)
                 * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f))
                 * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f))
                 * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f))
                 * glm::scale(glm::mat4(1.0f), m_scale);
-        updateMatrix = false;
-    }
 
     // Draw Entity
     if(m_entity)
         m_entity->draw(m_transformationMatrix);
 
+    // printTransformationMatrix();
+
     for (Node* child : m_children) {
+        if(m_updateMatrix)
+            child->m_updateMatrix = true;
         child->traverse(m_transformationMatrix);
     }
+
+    m_updateMatrix = false;
 }
 
 void Node::setTranslation(glm::vec3 newTranslation) {
     m_translation = newTranslation;
-    updateMatrix = true;
+    m_updateMatrix = true;
 }
 
 void Node::setRotation(glm::vec3 newRotation) {
     m_rotation = newRotation;
-    updateMatrix = true;
+    m_updateMatrix = true;
 }
 
 void Node::setScale(glm::vec3 newScale) {
     m_scale = newScale;
-    updateMatrix = true;
+    m_updateMatrix = true;
 }
 
 void Node::setTransformationMatrix(glm::mat4 newMatrix) {
@@ -82,3 +88,15 @@ glm::vec3 Node::getTranslation() { return m_translation;}
 glm::vec3 Node::getRotation() { return m_rotation; }
 glm::vec3 Node::getScale() { return m_scale; }
 glm::mat4 Node::getTransformationMatrix() { return m_transformationMatrix; }
+
+// AUXILIARS
+
+void Node::printTransformationMatrix() {
+    std::cout << nodeName << " --> Transformation Matrix:" << std::endl;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            std::cout << std::setw(2) << m_transformationMatrix[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}

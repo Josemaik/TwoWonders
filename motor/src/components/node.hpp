@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -15,9 +16,11 @@ private:
     glm::vec3 m_rotation;
     glm::vec3 m_scale;
     glm::mat4 m_transformationMatrix;
-    bool updateMatrix {true};
+    bool m_updateMatrix {false};
 
 public:
+    std::string nodeName;
+
     Node();
     int addChild(Node* child);
     // 0 : child erase | -1 : child not found
@@ -41,4 +44,7 @@ public:
     glm::vec3 getRotation();
     glm::vec3 getScale();
     glm::mat4 getTransformationMatrix();
+
+    // Auxiliars
+    void printTransformationMatrix();
 };

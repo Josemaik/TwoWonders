@@ -1,6 +1,8 @@
 #include "components/node.hpp"
 #include "components/entity.hpp"
 #include <memory>
+#include <iostream>
+#include <iomanip>
 
 int main()
 {
@@ -14,6 +16,16 @@ int main()
     auto nWheel2 = std::make_unique<Node>();
     auto nWheel3 = std::make_unique<Node>();
     auto nWheel4 = std::make_unique<Node>();
+
+    nScene->nodeName = "Scene";
+    nLight->nodeName = "Light";
+    nCamera->nodeName = "Camera";
+    nCarGroup->nodeName = "CarGroup";
+    nChassis->nodeName = "Chassis";
+    nWheel1->nodeName = "Wheel1";
+    nWheel2->nodeName = "Wheel2";
+    nWheel3->nodeName = "Wheel3";
+    nWheel4->nodeName = "Wheel4";
 
     nScene->addChild(nLight.get());
     nScene->addChild(nCamera.get());
