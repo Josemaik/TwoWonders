@@ -1,8 +1,6 @@
 #include "components/node.hpp"
 #include "components/entity.hpp"
 #include <memory>
-#include <iostream>
-#include <iomanip>
 
 int main()
 {
