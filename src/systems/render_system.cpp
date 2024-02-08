@@ -497,7 +497,6 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 else
                     engine.drawText("Hielo", 17, 50, 18, SKYBLUE);
             }
-
         }
 
         // Dibujar el precio d elos objetos de la tienda
@@ -527,19 +526,43 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
 
-        //Vidas HUD
-        if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
+        // Vidas HUD
+        if (e.hasTag<EnemyTag>() && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
-            auto const& l{ em.getComponent<LifeComponent>(e) };
+            auto& l{ em.getComponent<LifeComponent>(e) };
 
-            engine.drawText(std::to_string(l.life).c_str(),
-                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
-                20,
-                BLACK);
+            // engine.drawText(std::to_string(l.life).c_str(),
+            //     static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+            //     static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+            //     20,
+            //     BLACK);
+
+            // Datos para la barra para la barra de vida
+            int barWidth = 40;
+            int barHeight = 4;
+            int barX = engine.getWorldToScreenX(r.position) - 18;
+            int barY = engine.getWorldToScreenY(r.position) - r.scale.y() * 35;
+
+            engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
+
+            // Normaliza la vida actual del personaje
+            float normalizedLife = (static_cast<float>(l.life) / static_cast<float>(l.maxLife));
+
+            // Calcula la anchura de la barra de vida
+            int lifeWidth = static_cast<int>(barWidth * normalizedLife);
+
+            if (!l.vidaMax())
+                lifeWidth = l.life_width + static_cast<int>((static_cast<float>(lifeWidth) - static_cast<float>(l.life_width)) * 0.25);
+
+            // Dibujamos la barra de vida
+            engine.drawRectangle(barX, barY, lifeWidth, barHeight, RED);
+
+            l.life_width = lifeWidth;
+
+            // if (e.hasTag<SpiderTag>())
+            //     std::cout << newLifeWidth << std::endl;
         }
-
 
         if (debugphy && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
         {
@@ -761,22 +784,29 @@ void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
 
 void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
 {
+    auto& plfi{ em.getSingleton<PlayerInfo>() };
+
+    if (plfi.mana > plfi.max_mana)
+        plfi.mana = plfi.max_mana - 2;
+
     // Datos para la barra para el maná
-    int barWidth = 200;
+    int barWidth = plfi.max_mana * 2;
     int barHeight = 20;
     int barX = 7;
     int barY = 30;
 
-    engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
-
-    auto& plfi{ em.getSingleton<PlayerInfo>() };
+    engine.drawRectangle(barX, barY, barWidth + 6, barHeight, DARKGRAY);
 
     int manaWidth = static_cast<int>(static_cast<float>(barWidth) * (static_cast<float>(plfi.mana) / static_cast<float>(plfi.max_mana)));
 
     // Interpolación
-    int new_manaWidth = plfi.bar_width + static_cast<int>((static_cast<float>(manaWidth) - static_cast<float>(plfi.bar_width)) * 0.175f);
-    // Dibujamos la barra de maná
-    engine.drawRectangle(barX + 2, barY + 3, new_manaWidth, barHeight - 6, SKYBLUE);
+    if (plfi.mana != plfi.max_mana)
+        manaWidth = plfi.mana_width + static_cast<int>((static_cast<float>(manaWidth) - static_cast<float>(plfi.mana_width)) * 0.175f);
 
-    plfi.bar_width = new_manaWidth;
+    // Dibujamos la barra de maná
+    engine.drawRectangle(barX + 3, barY + 3, manaWidth, barHeight - 6, SKYBLUE);
+
+    plfi.mana_width = manaWidth;
+
+    std::cout << plfi.mana_width << std::endl;
 }

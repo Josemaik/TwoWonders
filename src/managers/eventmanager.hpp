@@ -49,14 +49,15 @@ public:
 
             // Notifica a cada listener interesado en el evento
             for (const auto& lr : listeners) {
-                    if(lr.interestCode == event.code){
-                        if(event.code == 1){
-                            em.getSingleton<LevelInfo>().drawzone = true;
-                        }
+                if (lr.interestCode == event.code) {
+                    if (event.code == 1) {
+                        em.getSingleton<LevelInfo>().drawzone = true;
                     }
+                }
             }
         }
     }
+
 private:
     // Lista de registros de listeners
     std::vector<ListenerRegistration> listeners;

@@ -321,6 +321,14 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Si cualquiera de los impactos es con una bala, se baja la vida del otro
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
+        if (staticEntPtr->hasTag<DestructibleTag>())
+        {
+            if (staticEntPtr->hasComponent<LifeComponent>())
+                em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
+
+            return;
+        }
+
         if (!staticEntPtr->hasTag<WaterTag>())
             li.dead_entities.insert(otherEntPtr->getID());
 

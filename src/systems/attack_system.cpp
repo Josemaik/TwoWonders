@@ -177,12 +177,17 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
 
         auto& plfi = em.getSingleton<PlayerInfo>();
 
-        if (plfi.mana > 0.0)
+        if (ent.hasComponent<LifeComponent>())
         {
-            plfi.mana -= MANA_CUT;
+            auto& lif = em.getComponent<LifeComponent>(ent);
 
-            if (plfi.mana < 0.0)
-                plfi.mana = 0;
+            if (lif.life == lif.maxLife && plfi.mana > 0.0)
+            {
+                plfi.mana -= MANA_CUT;
+
+                if (plfi.mana < 0.0)
+                    plfi.mana = 0;
+            }
         }
     }
     else {
