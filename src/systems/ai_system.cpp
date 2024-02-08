@@ -35,19 +35,21 @@ void AISystem::update(EntityManager& em, float dt)
     std::vector<vec3d> enemyPositions{};
     auto& li = em.getSingleton<LevelInfo>();
     auto& bb = em.getSingleton<BlackBoard_t>();
+    bb.idsubditos.clear();
+
     em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, AIComponent& ai, LifeComponent& lc)
     {
         //percibir el entorno
         perception(bb, ai, dt);
         // Actualizar datos de los slimes y subditos en blackboard
         if (e.hasTag<SlimeTag>()) {
-            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life,0);
+            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life, 0);
         }
-        if(e.hasTag<SubditoTag>()){
-             bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life,1);
+        if (e.hasTag<SubditoTag>()) {
+            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life, 1);
         }
-        if(e.hasTag<BossFinalTag>()){
-            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life,2);
+        if (e.hasTag<BossFinalTag>()) {
+            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life, 2);
         }
 
         if (!isDetected && ai.playerdetected)
@@ -65,8 +67,33 @@ void AISystem::update(EntityManager& em, float dt)
         }
     });
 
+    if (!bb.idsubditos.empty())
+    {
+        std::vector<std::size_t> keysToRemove;
+
+        for (const auto& s : bb.subditosData) {
+            bool remove = true;
+            for (const auto& id : bb.idsubditos) {
+                if (s.first == id) {
+                    remove = false;
+                    break;
+                }
+            }
+            if (remove) {
+                keysToRemove.push_back(s.first);
+            }
+        }
+
+        for (const auto& key : keysToRemove) {
+            bb.subditosData.erase(key);
+        }
+    }
+    else if (!bb.subditosData.empty())
+        bb.subditosData.clear();
+
     if (!isDetected && li.playerDetected)
         li.playerDetected = false;
+
 
     li.enemyPositions = enemyPositions;
 }
