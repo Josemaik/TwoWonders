@@ -147,22 +147,22 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
         em.addComponent<RampComponent>(entity, RampComponent{ .min = min, .max = max, .slope = slope, .offset = offset });
     }
 
-    for (rapidjson::SizeType i = 0; i < doorArray.Size(); i++)
-    {
-        auto& entity = em.newEntity();
-        em.addTag<DoorTag>(entity);
+    // for (rapidjson::SizeType i = 0; i < doorArray.Size(); i++)
+    // {
+    //     auto& entity = em.newEntity();
+    //     em.addTag<DoorTag>(entity);
 
-        // Extraemos los datos del json
-        const rapidjson::Value& door = doorArray[i];
-        vec3d position{ door["position"][0].GetDouble(), door["position"][1].GetDouble(), door["position"][2].GetDouble() };
-        vec3d scale{ door["scale"][0].GetDouble(), door["scale"][1].GetDouble(), door["scale"][2].GetDouble() };
-        Color color{ static_cast<u_char>(door["color"][0].GetUint()), static_cast<u_char>(door["color"][1].GetUint()), static_cast<u_char>(door["color"][2].GetUint()), static_cast<u_char>(door["color"][3].GetUint()) };
+    //     // Extraemos los datos del json
+    //     const rapidjson::Value& door = doorArray[i];
+    //     vec3d position{ door["position"][0].GetDouble(), door["position"][1].GetDouble(), door["position"][2].GetDouble() };
+    //     vec3d scale{ door["scale"][0].GetDouble(), door["scale"][1].GetDouble(), door["scale"][2].GetDouble() };
+    //     Color color{ static_cast<u_char>(door["color"][0].GetUint()), static_cast<u_char>(door["color"][1].GetUint()), static_cast<u_char>(door["color"][2].GetUint()), static_cast<u_char>(door["color"][3].GetUint()) };
 
-        // Creamos los componentes
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0 });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-    }
+    //     // Creamos los componentes
+    //     auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color });
+    //     auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0 });
+    //     em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+    // }
 
     for (rapidjson::SizeType i = 0; i < destructibleArray.Size(); i++)
     {

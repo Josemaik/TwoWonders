@@ -1,14 +1,20 @@
 #include "zone_system.hpp"
 
 void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Eventmanager& evm, MapManager& map) {
-
+    auto& li = em.getSingleton<LevelInfo>();
+    if (li.num_zone == 11) {
+        auto& bb = em.getSingleton<BlackBoard_t>();
+        if (bb.create_subdito) {
+            iam.createSubdito(em, 3.0);
+            bb.create_subdito = false;
+        }
+    }
     updateZoneEnemies(em);
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, ZoneComponent& zon)
     {
         if (zon.changeZone) {
             // Comprobar en que zona estamos
-            auto& li = em.getSingleton<LevelInfo>();
             if (li.num_zone != zon.zone) {
                 // crear una funcion que devuelva un Evento
                 //Crear enemigos de la zona nueva
@@ -18,7 +24,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                 evm.scheduleEvent(Event{ EVENT_CODE_CHANGE_ZONE });
                 //borro enemigos si cambio de zona
                 deleteZoneEnemies(em);
-                iam.createEnemiesZone(em, zon.zone);
+                // iam.createEnemiesZone(em, zon.zone);
                 // Es una zona
                 li.num_zone = zon.zone;
                 if (zon.zone <= 13)

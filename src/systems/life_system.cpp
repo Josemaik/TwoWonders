@@ -50,6 +50,15 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
                 }
             }
 
+            if(ent.hasTag<SubditoTag>()){
+                if (!lif.decreaseNextFrame)
+                    lif.decreaseNextFrame = true;
+                else
+                    lif.decreaseNextFrame = false;
+                auto& bb = em.getSingleton<BlackBoard_t>();
+                bb.subditosData.erase(ent.getID());
+            }
+
             lif.markedForDeletion = true;
         }
 
