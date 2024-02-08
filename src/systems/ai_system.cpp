@@ -46,6 +46,9 @@ void AISystem::update(EntityManager& em, float dt)
         if(e.hasTag<SubditoTag>()){
              bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life,1);
         }
+        if(e.hasTag<BossFinalTag>()){
+            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life,2);
+        }
 
         if (!isDetected && ai.playerdetected)
         {

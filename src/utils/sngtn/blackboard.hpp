@@ -16,6 +16,10 @@ struct BlackBoard_t {
     bool playerhunted{false};
     //Target Entity
     std::size_t teid{};
+    //centinela para crear súbditos
+    uint16_t tam_subditos_tocreate{0};
+    //Posicion Boss Final
+    vec3d boss_position{};
     //Path
     // Path_t<4> path { vec3d{8.0, 0.0, 4.0} , {3.0,0.0,4.0} , {3.0,0.0,5.0}, {8.0,0.0,5.0} };
     //Actualizar información IA slimes
@@ -25,7 +29,11 @@ struct BlackBoard_t {
         if(type == 0){
             slimeData[id] = EntInfo;
         }else{
-            subditosData[id] = EntInfo;
+            if(type == 1){
+                subditosData[id] = EntInfo;
+            }else{
+                boss_position = position;
+            }
         }
 
     }

@@ -4,6 +4,7 @@
 
 #include "../utils/types.hpp"
 #include <cstdint>
+#include <cmath>
 
 //behaviour tree , node sequece and node selector
 #include "../utils/bt/behaviourtree.hpp"
@@ -23,6 +24,7 @@
 #include "../utils/bt/action_jumptoplayer.hpp"
 #include "../utils/bt/action_healing.hpp"
 #include "../utils/bt/action_heal_mate.hpp"
+#include "../utils/bt/action_generatesubditos.hpp"
 //decision
 #include "../utils/bt/decision_playerdetected.hpp"
 #include "../utils/bt/decision_readyforattack.hpp"
@@ -31,6 +33,7 @@
 #include "../utils/bt/decision_flee_or_curepartner.hpp"
 #include "../utils/bt/decision_readyforheal.hpp"
 #include "../utils/bt/decision_playerhunted.hpp"
+#include "../utils/bt/decision_subditosalreadygenerated.hpp"
 struct Ia_man
 {
     using jsonType = const rapidjson::Value&;
@@ -41,7 +44,8 @@ struct Ia_man
     void createEnemies(EntityManager& em);
     void createEnemy(EntityManager& em, jsonType json);
     void resetVec();
-    void createSubditos(EntityManager& em, uint16_t tam);
+    void createSubditos(EntityManager& em, uint16_t tam,double generate_radius);
+    vec3d getRandomPosAroundBoss(double radio,const vec3d& spawnerPos);
 private:
     bool createdzone2{ false }, createdzone3{ false }, createdzone4{ false },
         createdzone5{ false }, createdzone6{ false }, createdzone12{ false },

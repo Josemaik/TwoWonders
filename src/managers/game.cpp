@@ -77,6 +77,7 @@ void Game::run()
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
+    auto& bb = em.getSingleton<BlackBoard_t>();
 
     // Inicializa una variable donde tener el tiempo entre frames
     float deltaTime{}, currentTime{};
@@ -173,6 +174,17 @@ void Game::run()
                 {
                     em.destroyEntities(li.dead_entities);
                     li.dead_entities.clear();
+                }
+                //Creación de súbditos
+                if(bb.tam_subditos_tocreate == 1){
+                    iam.createSubditos(em,1,3.0);
+                    bb.tam_subditos_tocreate = 0;
+                }
+                if(bb.tam_subditos_tocreate == 2){
+                   iam.createSubditos(em,2,4.0);
+                   bb.tam_subditos_tocreate = 0;
+                   auto& bb = em.getSingleton<BlackBoard_t>();
+                   std::cout << bb.subditosData.size() << "\n";
                 }
 
                 render_system.update(em, engine, deltaTime);

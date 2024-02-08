@@ -9,11 +9,14 @@ struct BTDAction_GenerateSubditos : BTNode_t {
         // comprobar radio de cura
         //obtenemos blackboard
         auto& bb = ectx.em.getSingleton<BlackBoard_t>();
-        if(bb.subditosData.size() == 0){
-            //genero 2 subditos
-
-        }else{
-            //genero 1 subdito
+        switch (bb.subditosData.size())
+        {
+        case 0:  bb.tam_subditos_tocreate = 2; return BTNodeStatus_t::fail;
+            break;
+        case 1: bb.tam_subditos_tocreate = 1; return BTNodeStatus_t::fail;
+            break;
+        default: return BTNodeStatus_t::fail;
+            break;
         }
     }
 };

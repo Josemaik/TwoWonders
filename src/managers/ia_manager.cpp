@@ -586,7 +586,15 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     case 3:
     {
         em.addTag<BossFinalTag>(e);
-        // auto* patrol_7 = &tree.createNode<BTAction_Patrol>();
+
+        auto* patrol = &tree.createNode<BTAction_Patrol>();
+
+        auto* d_pd = &tree.createNode<BTDecisionPlayerDetected>();
+        auto* d_gs = &tree.createNode<BTDecisionSubditosAlreadyGenerated>();
+        auto* a_gs = &tree.createNode<BTDAction_GenerateSubditos>();
+        auto* sequence = &tree.createNode<BTNodeSequence_t>(d_pd,d_gs,a_gs);
+
+        tree.createNode<BTNodeSelector_t>(sequence,patrol);
         // auto* ready_7 = &tree.createNode<BTDecisionReadyforAttack>();
         // auto* atack_7 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot);
         // [[maybe_unused]] auto* sequence7_3 = &tree.createNode<BTNodeSequence_t>(patrol_7, ready_7, atack_7);
@@ -636,24 +644,42 @@ void Ia_man::resetVec()
 }
 
 //Generación de subditos
-vec3d getRandomPosInRAdius(){
+vec3d Ia_man::getRandomPosAroundBoss(double radio,const vec3d& spawnerPos) {
+    // Generar un ángulo aleatorio en radianes
+    double angle = ((double)rand() / RAND_MAX) * 2 * M_PI;
+    // Generar una distancia aleatoria dentro del radio
+    double distance = ((double)rand() / RAND_MAX) * radio;
+    // Calcular las coordenadas x e y a partir del ángulo y la distancia
+    double random_x = cos(angle) * distance;
+    double random_z = sin(angle) * distance;
+    // Desplazar las coordenadas alrededor del spawner
+    double spawn_x = spawnerPos.x();
+    double spawn_z = spawnerPos.z();
 
+    // Crear un objeto vec3d con las coordenadas generadas
+    vec3d posicion;
+    posicion.setX(spawn_x + random_x);
+    posicion.setZ(spawn_z + random_z);
+
+    return posicion;
 }
-void Ia_man::createSubditos(EntityManager& em, uint16_t tam){
+void Ia_man::createSubditos(EntityManager& em, uint16_t tam, double generate_radius){
+    //get boss final position
+    auto& bb = em.getSingleton<BlackBoard_t>();
+    vec3d const boss_pos = bb.boss_position;
     for(int i = 0; i < tam;i++){
+        //create subditos and spawn around boss
         auto& e{ em.newEntity() };
         em.addTag<SubditoTag>(e);
 
-        auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getRandomPosInRAdius(), .scale = vec3d{ 1.0,2.0,1.0 }, .color = GRAY});
+        auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getRandomPosAroundBoss(generate_radius,boss_pos), .scale = vec3d{ 1.0,2.0,1.0 }, .color = GRAY});
         auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .max_speed = 0.5 });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
         em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Neutral });
 
         //aqui el bt
-
-        // em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = arrival_radius, .detect_radius = detect_radius, .attack_radius = attack_radius, .tx = tx, .tz = tz,.time2arrive = time2arrive, .tactive = tactive, .perceptionTime = static_cast<float>(perceptionTime),
-        //     .path = path, .countdown_stop = countdown_stop, .countdown_shoot = countdown_shoot, .countdown_perception = countdown_perception, .behaviourTree = &tree });
+        em.addComponent<AIComponent>(e, AIComponent{.behaviourTree = &tree });
 
         // em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = scale_to_respawn_attack });
     }
