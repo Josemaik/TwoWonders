@@ -43,13 +43,13 @@ void AISystem::update(EntityManager& em, float dt)
         perception(bb, ai, dt);
         // Actualizar datos de los slimes y subditos en blackboard
         if (e.hasTag<SlimeTag>()) {
-            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life, 0);
+            bb.updateInfo(e.getID(), phy.position, lc.life, 0);
         }
         if (e.hasTag<SubditoTag>()) {
-            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life, 1);
+            bb.updateInfo(e.getID(), phy.position, lc.life, 1);
         }
         if (e.hasTag<BossFinalTag>()) {
-            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life, 2);
+            bb.updateInfo(e.getID(), phy.position, lc.life, 2);
         }
 
         if (!isDetected && ai.playerdetected)

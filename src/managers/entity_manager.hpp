@@ -133,7 +133,7 @@ namespace ETMG {
 
             std::size_t id_{}; // ID de la entidad
             typename cmp_info::mask_type cmp_mask_{}; // Máscara de componentes
-            typename cmp_info::mask_type tag_mask_{}; // Máscara de tags
+            typename tag_info::mask_type tag_mask_{}; // Máscara de tags
             key_storage_type cmp_keys_{}; // Tupla de las claves de los componentes
         };
 

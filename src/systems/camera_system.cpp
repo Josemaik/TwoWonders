@@ -15,7 +15,6 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
         if (li.cameraChange)
             cameraPos = { phy.position.x() - 33.f, phy.position.y() + 35.f, phy.position.z() + 33.f };
 
-        auto& li = em.getSingleton<LevelInfo>();
         if (li.playerDetected && li.lockedEnemy == li.max)
         {
             if (!li.enemyPositions.empty())

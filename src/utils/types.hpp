@@ -48,6 +48,8 @@ struct SlimeTag {};
 struct SnowmanTag {};
 struct GolemTag {};
 struct SpiderTag {};
+struct BossFinalTag {};
+struct SubditoTag {};
 struct DestructibleTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,

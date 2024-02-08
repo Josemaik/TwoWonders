@@ -13,6 +13,7 @@ void AttackSystem::update(EntityManager& em, float deltaTime) {
 
 void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att) {
     att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
+    auto& phy = em.getComponent<PhysicsComponent>(ent);
 
     // Se pone la direccion en la que este mirando el player
     if (ent.hasTag<PlayerTag>() && ent.hasComponent<InputComponent>()) {
@@ -22,8 +23,6 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             att.createAttack = false;
             return;
         }
-
-        auto& phy = em.getComponent<PhysicsComponent>(ent);
 
         static const double ATTACK_SPEED = 0.5f;
 
@@ -67,7 +66,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             auto& plfi = em.getSingleton<PlayerInfo>();
             if (plfi.bombs > 0) {
                 auto& e{ em.newEntity() };
-                em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
+                em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
                 em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::BombExplode, .life_time = 2.0f });
                 plfi.decreaseBomb();
             }
@@ -75,7 +74,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         else
         {
             auto& e{ em.newEntity() };
-            em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
+            em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
             em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::BombExplode, .life_time = 2.0f });
         }
         break;
@@ -83,7 +82,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     case AttackType::HealSpell:
     {
         auto& e{ em.newEntity() };
-        em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = GREEN });
+        em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = GREEN });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Heal_Spell, .life_time = 1.0f });
         break;
     }
@@ -96,7 +95,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         if (ent.hasTag<GolemTag>()) {
             auto& e{ em.newEntity() };
             em.addTag<HitPlayerTag>(e);
-            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 4.0f, 0.1f, 4.0f }, .color = GREEN });
+            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 4.0f, 0.1f, 4.0f }, .color = GREEN });
             auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
             em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::AreaAttack, .life_time = 7.0f });
             ElementalType tipoElemental;
@@ -113,7 +112,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     case AttackType::Spiderweb: {
         //createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack,1.0);
         auto& e{ em.newEntity() };
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * 2, .scale = { 3.0f, 0.1f, 3.0f }, .color = GREEN });
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 3.0f, 0.1f, 3.0f }, .color = GREEN });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Spiderweb, .life_time = 4.0f });
         ElementalType tipoElemental;

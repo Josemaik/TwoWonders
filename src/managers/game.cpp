@@ -1,5 +1,6 @@
 #include "game.hpp"
-//#include "../utils/memory_viewer.hpp"
+// #include "../utils/memory_viewer.hpp"
+// #include <chrono>
 
 void Game::createShield(EntityManager& em, Entity& ent)
 {
@@ -24,7 +25,7 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);// -2 -12 63 -71
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -49.0f, 0.0f, -3.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -0.0f, 0.0f, -0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
@@ -75,6 +76,7 @@ void Game::run()
     // - Colocar despues de donde se quiere medir el tiempo
     // auto t2 = high_resolution_clock::now();
     // duration<float, std::milli> duration = t2 - t1;
+    // std::cout << duration.count() << "ms\n";
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
@@ -148,7 +150,8 @@ void Game::run()
             input_system.update(em);
 
             // seleccionar modo de debug ( physics o AI)
-            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1)) {
+            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1))
+            {
                 ai_system.update(em, deltaTime);
                 physics_system.update(em, deltaTime);
                 collision_system.update(em);
@@ -171,9 +174,8 @@ void Game::run()
                 render_system.update(em, engine, deltaTime);
                 event_system.update(evm, em);
             }
-            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1)) {
+            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1))
                 render_system.update(em, engine, deltaTime);
-            }
 
             break;
         }

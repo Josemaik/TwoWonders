@@ -109,7 +109,8 @@ namespace MP
 
     // Get the smallest type
     template <typename LIST>
-    using smallest_type = IFT_t<LIST::size() <= 8, std::uint8_t,
+    using smallest_type =
+        IFT_t<LIST::size() <= 8, std::uint8_t,
         IFT_t<LIST::size() <= 16, std::uint16_t,
         IFT_t<LIST::size() <= 32, std::uint32_t,
         std::uint64_t>>>;

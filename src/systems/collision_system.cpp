@@ -196,25 +196,9 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
 
             // Si cualquiera de las dos entidades es una bala y es generada por una araña
             // creo una telaraña antes de borrar la bala
-            if (staticEntPtr->hasComponent<ColliderComponent>())
-            {
-                auto& balaCol = em.getComponent<ColliderComponent>(*staticEntPtr);
-                if (balaCol.attackType & AttackType::Spiderweb)
-                {
-                    em.getComponent<AttackComponent>(*staticEntPtr).attack(AttackType::Spiderweb);
-                    return;
-                }
-            }
-
-            if (otherEntPtr->hasComponent<ColliderComponent>())
-            {
-                auto& balaCol = em.getComponent<ColliderComponent>(*otherEntPtr);
-                if (balaCol.attackType & AttackType::Spiderweb)
-                {
-                    em.getComponent<AttackComponent>(*otherEntPtr).attack(AttackType::Spiderweb);
-                    return;
-                }
-            }
+            auto& balaCol = em.getComponent<ColliderComponent>(*staticEntPtr);
+            if (balaCol.attackType & AttackType::Spiderweb)
+                em.getComponent<AttackComponent>(*staticEntPtr).attack(AttackType::Spiderweb);
 
             auto& li = em.getSingleton<LevelInfo>();
             li.dead_entities.insert(staticEntPtr->getID());
@@ -321,13 +305,8 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Si cualquiera de los impactos es con una bala, se baja la vida del otro
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
-        if (staticEntPtr->hasTag<DestructibleTag>())
-        {
-            if (staticEntPtr->hasComponent<LifeComponent>())
-                em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
-
-            return;
-        }
+        if (staticEntPtr->hasTag<DestructibleTag>() && staticEntPtr->hasComponent<LifeComponent>())
+            em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
 
         if (!staticEntPtr->hasTag<WaterTag>())
             li.dead_entities.insert(otherEntPtr->getID());
@@ -500,18 +479,19 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
             //Si la bala es lanzada por una araña no quita vida
             if (!balalaunchedbyspider)
             {
+                auto& li = em.getComponent<LifeComponent>(*ent2Ptr);
                 // Comprobar el tipo de la bala y el enemigo/player
                 if ((typeBala == ElementalType::Fuego && typeEnemyPlayer == ElementalType::Hielo) ||
                     (typeBala == ElementalType::Hielo && typeEnemyPlayer == ElementalType::Agua) ||
                     (typeBala == ElementalType::Agua && typeEnemyPlayer == ElementalType::Fuego))
                 {
-                    em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(3);
+                    li.decreaseLife(3);
                 }
                 else if (typeBala == ElementalType::Neutral)
-                    em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(2);
+                    li.decreaseLife(2);
                 else
                 {
-                    em.getComponent<LifeComponent>(*ent2Ptr).decreaseLife(1);
+                    li.decreaseLife(1);
                     if (balaCol.attackType & AttackType::GollemAttack) {
                         em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
                     }

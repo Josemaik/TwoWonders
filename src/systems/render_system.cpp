@@ -11,11 +11,13 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt
         ren.setOrientation(phy.orientation);
     });
 
+    // Empezamos el frame
     beginFrame(engine);
 
     // Dibuja todas las entidades con componente de render
     drawEntities(em, engine);
 
+    // Terminamos el frame
     endFrame(engine, em, dt);
 }
 
@@ -123,145 +125,140 @@ void RenderSystem::drawStory(ENGI::GameEngine& engine) {
 
 void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
 {
-    for (auto const& e : em.getEntities())
+    using SYSCMPs = MP::TypeList<RenderComponent>;
+
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, RenderComponent& r)
     {
-        if (e.hasComponent<RenderComponent>())
-        {
-            auto& r{ em.getComponent<RenderComponent>(e) };
-            if (r.visible) {
-                Color colorEntidad = r.color;
+        if (r.visible) {
+            Color colorEntidad = r.color;
 
-                // Comprobar el tipo y si es enemigo cambiarle el color
-                if (!e.hasTag<PlayerTag>() && e.hasComponent<TypeComponent>()) {
-                    auto& t{ em.getComponent<TypeComponent>(e) };
+            // Comprobar el tipo y si es enemigo cambiarle el color
+            if (!e.hasTag<PlayerTag>() && e.hasComponent<TypeComponent>()) {
+                auto& t{ em.getComponent<TypeComponent>(e) };
 
-                    switch (t.type)
-                    {
-                    case ElementalType::Neutral:
-                        colorEntidad = GRAY;
-                        break;
-
-                    case ElementalType::Agua:
-                        colorEntidad = BLUE;
-                        break;
-
-                    case ElementalType::Fuego:
-                        colorEntidad = RED;
-                        break;
-
-                    case ElementalType::Hielo:
-                        colorEntidad = SKYBLUE;
-                        break;
-
-                    default:
-                        break;
-                    }
-                }
-
-                if (e.hasComponent<LifeComponent>()) {
-                    auto& l{ em.getComponent<LifeComponent>(e) };
-                    if (l.elapsed < l.countdown)
-                        colorEntidad = MAROON;
-                }
-                if (!e.hasTag<ZoneTag>())
+                switch (t.type)
                 {
-                    vec3d scl = { 1.0, 1.0, 1.0 };
-                    vec3d pos = { r.position.x(), r.position.y(), r.position.z() };
-                    // Solo generamos la malla si no existe
-                    if (!r.meshLoaded)
-                    {
-                        if (e.hasTag<PlayerTag>())
-                        {
-                            r.model = LoadModel("assets/models/main_character.obj");
-                            Texture2D t0 = LoadTexture("assets/models/textures/main_character_uv_V2.png");
-                            Texture2D t = LoadTexture("assets/models/textures/main_character_texture_V2.png");
-                            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                            r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                        }
-                        else if (e.hasTag<SlimeTag>())
-                        {
-                            r.model = LoadModel("assets/models/Slime.obj");
-                            Texture2D t0 = LoadTexture("assets/models/textures/Slime_uv.png");
-                            Texture2D t = LoadTexture("assets/models/textures/Slime_texture.png");
-                            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                            r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                        }
-                        else if (e.hasTag<SnowmanTag>())
-                        {
-                            r.model = LoadModel("assets/models/snowman.obj");
-                            Texture2D t0 = LoadTexture("assets/models/textures/snowman_uv.png");
-                            Texture2D t = LoadTexture("assets/models/textures/snowman_texture.png");
-                            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                            r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                        }
-                        else if (e.hasTag<GolemTag>())
-                        {
-                            r.model = LoadModel("assets/models/Golem.obj");
-                            Texture2D t0 = LoadTexture("assets/models/textures/Golem_uv.png");
-                            Texture2D t = LoadTexture("assets/models/textures/Golem_texture.png");
-                            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                            r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                        }
-                        else if (e.hasTag<SpiderTag>())
-                        {
-                            r.model = LoadModel("assets/models/Spider.obj");
-                            Texture2D t0 = LoadTexture("assets/models/textures/Spider_UV.png");
-                            Texture2D t = LoadTexture("assets/models/textures/Spider_texture.png");
-                            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                            r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                        }
-                        else
-                        {
-                            if (r.scale != vec3d::zero())
-                            {
-                                r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
-                                r.model = engine.loadModelFromMesh(r.mesh);
-                            }
-                        }
-                        r.meshLoaded = true;
-                    }
+                case ElementalType::Neutral:
+                    colorEntidad = GRAY;
+                    break;
 
+                case ElementalType::Agua:
+                    colorEntidad = BLUE;
+                    break;
+
+                case ElementalType::Fuego:
+                    colorEntidad = RED;
+                    break;
+
+                case ElementalType::Hielo:
+                    colorEntidad = SKYBLUE;
+                    break;
+
+                default:
+                    break;
+                }
+            }
+
+            if (e.hasComponent<LifeComponent>()) {
+                auto& l{ em.getComponent<LifeComponent>(e) };
+                if (l.elapsed < l.countdown)
+                    colorEntidad = MAROON;
+            }
+            if (!e.hasTag<ZoneTag>())
+            {
+                vec3d scl = { 1.0, 1.0, 1.0 };
+                vec3d pos = { r.position.x(), r.position.y(), r.position.z() };
+                // Solo generamos la malla si no existe
+                if (!r.meshLoaded)
+                {
                     if (e.hasTag<PlayerTag>())
                     {
-                        scl = { 0.33, 0.33, 0.33 };
-                        pos.setY(pos.y() - .5);
+                        r.model = LoadModel("assets/models/main_character.obj");
+                        Texture2D t0 = LoadTexture("assets/models/textures/main_character_uv_V2.png");
+                        Texture2D t = LoadTexture("assets/models/textures/main_character_texture_V2.png");
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SlimeTag>())
                     {
-                        scl = { 0.33, 0.33, 0.33 };
-                        pos.setY(pos.y() - .6);
+                        r.model = LoadModel("assets/models/Slime.obj");
+                        Texture2D t0 = LoadTexture("assets/models/textures/Slime_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/Slime_texture.png");
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SnowmanTag>())
                     {
-                        scl = { 0.33, 0.33, 0.33 };
-                        pos.setY(pos.y() - 1.1);
-                    }
-                    else if (e.hasTag<SpiderTag>())
-                    {
-                        scl = { 0.33, 0.33, 0.33 };
-                        pos.setY(pos.y() - 0.7);
+                        r.model = LoadModel("assets/models/snowman.obj");
+                        Texture2D t0 = LoadTexture("assets/models/textures/snowman_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/snowman_texture.png");
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<GolemTag>())
                     {
-                        scl = { 0.4, 0.4, 0.4 };
-                        pos.setY(pos.y() - 1.1);
+                        r.model = LoadModel("assets/models/Golem.obj");
+                        Texture2D t0 = LoadTexture("assets/models/textures/Golem_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/Golem_texture.png");
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
-
-                    float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
-                    engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
-
-                    if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>() && !e.hasTag<SpiderTag>())
+                    else if (e.hasTag<SpiderTag>())
                     {
-                        int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
-                        if (orientationInDegreesInt % 90 == 0)
-                            engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
-                        else
-                            engine.drawModelWires(r.model, pos, r.rotationVec, orientationInDegrees, scl, BLACK);
+                        r.model = LoadModel("assets/models/Spider.obj");
+                        Texture2D t0 = LoadTexture("assets/models/textures/Spider_UV.png");
+                        Texture2D t = LoadTexture("assets/models/textures/Spider_texture.png");
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
+                    else
+                    {
+                        r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
+                        r.model = engine.loadModelFromMesh(r.mesh);
+                    }
+                    r.meshLoaded = true;
+                }
+
+                if (e.hasTag<PlayerTag>())
+                {
+                    scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - .5);
+                }
+                else if (e.hasTag<SlimeTag>())
+                {
+                    scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - .6);
+                }
+                else if (e.hasTag<SnowmanTag>())
+                {
+                    scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 1.1);
+                }
+                else if (e.hasTag<SpiderTag>())
+                {
+                    scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 0.7);
+                }
+                else if (e.hasTag<GolemTag>())
+                {
+                    scl = { 0.4, 0.4, 0.4 };
+                    pos.setY(pos.y() - 1.1);
+                }
+
+                float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
+                engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
+
+                if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>() && !e.hasTag<SpiderTag>())
+                {
+                    int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
+                    if (orientationInDegreesInt % 90 == 0)
+                        engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
+                    else
+                        engine.drawModelWires(r.model, pos, r.rotationVec, orientationInDegrees, scl, BLACK);
                 }
             }
         }
-    }
+    });
 }
 
 // Empieza el dibujado y se limpia la pantalla
@@ -293,6 +290,7 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
 
     engine.endDrawing();
 }
+
 //Dibuja Slider en función de los parámetros
 double SelectValue(double value, float posx, float posy, float height, float width, const char* text, float min_value, float max_value) {
     // pasamos a float el valor
@@ -313,50 +311,52 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
     Vector2 textPositionInfo = { 480, 90 };
     DrawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
     auto& debugsnglt = em.getSingleton<Debug_t>();
-    for (auto const& e : em.getEntities()) {
-        if (e.hasComponent<AIComponent>()) {
-            auto& col = em.getComponent<ColliderComponent>(e);
-            RayCast ray = engine.getMouseRay(); ray = engine.getMouseRay();
-            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
-                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                    isSelectedfordebug = !isSelectedfordebug;
-                    debugsnglt.IA_id_debug = e.getID();
-                }
-            }
-            if (isSelectedfordebug && e.getID() == debugsnglt.IA_id_debug) {
-                auto& aic = em.getComponent<AIComponent>(*em.getEntityByID(debugsnglt.IA_id_debug));
-                auto& ren = em.getComponent<RenderComponent>(*em.getEntityByID(debugsnglt.IA_id_debug));
-                engine.beginMode3D();
-                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
-                engine.endMode3D();
-                DrawText("Node active:", 480, 110, 20, BLACK);
-                if (debugsnglt.elapsed >= debugsnglt.countdown) {
-                    debugsnglt.elapsed = 0;
-                    debugsnglt.text = aic.bh;
-                }
-                else {
-                    debugsnglt.plusdeltatime(dt, debugsnglt.elapsed);
-                }
-                DrawTextEx(GetFontDefault(), debugsnglt.text, Vector2{ 610,110 }, 20, 1, DARKGRAY);
-                DrawText("TEID:", 480, 130, 20, BLACK);
-                DrawTextEx(GetFontDefault(), std::to_string(aic.teid).c_str(), Vector2{ 550,130 }, 20, 1, DARKGRAY);
-                DrawText("TX:", 480, 150, 20, BLACK);
-                DrawTextEx(GetFontDefault(), std::to_string(aic.tx).c_str(), Vector2{ 520,150 }, 20, 1, DARKGRAY);
-                DrawText("TZ:", 480, 170, 20, BLACK);
-                DrawTextEx(GetFontDefault(), std::to_string(aic.tz).c_str(), Vector2{ 520,170 }, 20, 1, DARKGRAY);
-                DrawText("Culldown:", 480, 190, 20, BLACK);
-                DrawTextEx(GetFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), Vector2{ 590,190 }, 20, 1, DARKGRAY);
-                DrawText("Player Detected?:", 480, 210, 20, BLACK);
-                DrawTextEx(GetFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", Vector2{ 680,210 }, 20, 1, RED);
-                DrawText("Player hunted?:", 480, 230, 20, BLACK);
-                DrawTextEx(GetFontDefault(), (em.getSingleton<BlackBoard_t>().playerhunted == 0) ? "No" : "Sí", Vector2{ 680,230 }, 20, 1, RED);
-                DrawText("Subditos alive:", 480, 250, 20, BLACK);
-                DrawTextEx(GetFontDefault(), std::to_string(em.getSingleton<BlackBoard_t>().subditosData.size()).c_str(), Vector2{ 680,250 }, 20, 1, RED);
-                DrawText("Subditos id alive:", 480, 270, 20, BLACK);
-                DrawTextEx(GetFontDefault(), std::to_string(em.getSingleton<BlackBoard_t>().idsubditos.size()).c_str(), Vector2{ 680,270 }, 20, 1, RED);
+
+    using SYSCMPss = MP::TypeList<AIComponent, ColliderComponent, RenderComponent>;
+    using SYSTAGss = MP::TypeList<EnemyTag>;
+
+    // AQUI PONDRIA
+    em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, ColliderComponent& col, RenderComponent& ren)
+    {
+        RayCast ray = engine.getMouseRay(); ray = engine.getMouseRay();
+        if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                isSelectedfordebug = !isSelectedfordebug;
+                debugsnglt.IA_id_debug = e.getID();
             }
         }
-    }
+        if (isSelectedfordebug && e.getID() == debugsnglt.IA_id_debug) {
+            auto& bb = em.getSingleton<BlackBoard_t>();
+            engine.beginMode3D();
+            engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
+            engine.endMode3D();
+            DrawText("Node active:", 480, 110, 20, BLACK);
+            if (debugsnglt.elapsed >= debugsnglt.countdown) {
+                debugsnglt.elapsed = 0;
+                debugsnglt.text = aic.bh;
+            }
+            else {
+                debugsnglt.plusdeltatime(dt, debugsnglt.elapsed);
+            }
+            DrawTextEx(GetFontDefault(), debugsnglt.text, Vector2{ 610,110 }, 20, 1, DARKGRAY);
+            DrawText("TEID:", 480, 130, 20, BLACK);
+            DrawTextEx(GetFontDefault(), std::to_string(aic.teid).c_str(), Vector2{ 550,130 }, 20, 1, DARKGRAY);
+            DrawText("TX:", 480, 150, 20, BLACK);
+            DrawTextEx(GetFontDefault(), std::to_string(aic.tx).c_str(), Vector2{ 520,150 }, 20, 1, DARKGRAY);
+            DrawText("TZ:", 480, 170, 20, BLACK);
+            DrawTextEx(GetFontDefault(), std::to_string(aic.tz).c_str(), Vector2{ 520,170 }, 20, 1, DARKGRAY);
+            DrawText("Culldown:", 480, 190, 20, BLACK);
+            DrawTextEx(GetFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), Vector2{ 590,190 }, 20, 1, DARKGRAY);
+            DrawText("Player Detected?:", 480, 210, 20, BLACK);
+            DrawTextEx(GetFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", Vector2{ 680,210 }, 20, 1, RED);
+            DrawText("Player hunted?:", 480, 230, 20, BLACK);
+            DrawTextEx(GetFontDefault(), (bb.playerhunted == 0) ? "No" : "Sí", Vector2{ 680,230 }, 20, 1, RED);
+            DrawText("Subditos alive:", 480, 250, 20, BLACK);
+            DrawTextEx(GetFontDefault(), std::to_string(bb.subditosData.size()).c_str(), Vector2{ 680,250 }, 20, 1, RED);
+            DrawText("Subditos id alive:", 480, 270, 20, BLACK);
+            DrawTextEx(GetFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), Vector2{ 680,270 }, 20, 1, RED);
+        }
+    });
     //  engine.endDrawing();
 }
 //Editor In-Game
@@ -386,53 +386,52 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
     DrawTextEx(GetFontDefault(), "PARÁMETROS", textPositionParameters, 20, 1, RED);
 
     auto& debugsnglt = em.getSingleton<Debug_t>();
+
+    using SYSCMPss = MP::TypeList<AIComponent, PhysicsComponent, ColliderComponent, RenderComponent>;
+    using SYSTAGss = MP::TypeList<EnemyTag>;
+
     // AQUI PONDRIA
-    for (auto const& e : em.getEntities()) {
-        if (e.hasComponent<AIComponent>()) {
-            RayCast ray = engine.getMouseRay();
-            auto& col = em.getComponent<ColliderComponent>(e);
-            auto& ren = em.getComponent<RenderComponent>(e);
-            // Comprobar si el rayo intersecta con el collider
-            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
-                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                    isSelected = !isSelected;
-                    debugsnglt.IA_id = e.getID();
-                }
-                //     // si es seleccionada => wires morados
-                //     // no es seleccionada => wires rojos
-                engine.beginMode3D();
-                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
-                engine.endMode3D();
+    em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, PhysicsComponent& phy, ColliderComponent& col, RenderComponent& ren)
+    {
+        RayCast ray = engine.getMouseRay();
+        // Comprobar si el rayo intersecta con el collider
+        if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                isSelected = !isSelected;
+                debugsnglt.IA_id = e.getID();
             }
-            if (isSelected && e.getID() == debugsnglt.IA_id) {
-                engine.beginMode3D();
-                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
-                engine.endMode3D();
-                // si se seleccionada una entidad se muestra el Editor de parámetros
-                if (isSelected) {
-                    auto& aic = em.getComponent<AIComponent>(*em.getEntityByID(debugsnglt.IA_id));
-                    auto& phy = em.getComponent<PhysicsComponent>(*em.getEntityByID(debugsnglt.IA_id));
-                    // ID DE LA ENTIDAD SELECCIONADA
-                    DrawText("EID:", 5, 170, 20, BLACK);
-                    DrawText(std::to_string(debugsnglt.IA_id).c_str(), 55, 170, 20, DARKGRAY);
-                    //Detect Radius
-                    aic.detect_radius = SelectValue(aic.detect_radius, 85.0, 200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
-                    // Attack Radius
-                    aic.attack_radius = SelectValue(aic.attack_radius, 85.0, 240.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
-                    // Arrival Radius
-                    aic.arrival_radius = SelectValue(aic.arrival_radius, 85.0, 280.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
-                    // Max Speed
-                    phy.max_speed = SelectValue(phy.max_speed, 85.0, 320.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
-                    //COuntdown Perception
-                    aic.countdown_perception = SelectValue(aic.countdown_perception, 85.0, 360.0, 120.0, 30.0, "Perception", 0.0, 10.0);
-                    //Countdown Shoot
-                    aic.countdown_shoot = SelectValue(aic.countdown_shoot, 85.0, 400.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
-                    //Countdown stop
-                    aic.countdown_stop = SelectValue(aic.countdown_stop, 85.0, 440.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
-                }
+            //     // si es seleccionada => wires morados
+            //     // no es seleccionada => wires rojos
+            engine.beginMode3D();
+            engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
+            engine.endMode3D();
+        }
+        if (isSelected && e.getID() == debugsnglt.IA_id) {
+            engine.beginMode3D();
+            engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
+            engine.endMode3D();
+            // si se seleccionada una entidad se muestra el Editor de parámetros
+            if (isSelected) {
+                // ID DE LA ENTIDAD SELECCIONADA
+                DrawText("EID:", 5, 170, 20, BLACK);
+                DrawText(std::to_string(debugsnglt.IA_id).c_str(), 55, 170, 20, DARKGRAY);
+                //Detect Radius
+                aic.detect_radius = SelectValue(aic.detect_radius, 85.0, 200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
+                // Attack Radius
+                aic.attack_radius = SelectValue(aic.attack_radius, 85.0, 240.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
+                // Arrival Radius
+                aic.arrival_radius = SelectValue(aic.arrival_radius, 85.0, 280.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
+                // Max Speed
+                phy.max_speed = SelectValue(phy.max_speed, 85.0, 320.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
+                //COuntdown Perception
+                aic.countdown_perception = SelectValue(aic.countdown_perception, 85.0, 360.0, 120.0, 30.0, "Perception", 0.0, 10.0);
+                //Countdown Shoot
+                aic.countdown_shoot = SelectValue(aic.countdown_shoot, 85.0, 400.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
+                //Countdown stop
+                aic.countdown_stop = SelectValue(aic.countdown_stop, 85.0, 440.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
             }
         }
-    }
+    });
     // engine.endDrawing();
 }
 // Se dibuja el HUD
@@ -541,8 +540,8 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             // Datos para la barra para la barra de vida
             int barWidth = 40;
             int barHeight = 4;
-            int barX = engine.getWorldToScreenX(r.position) - 18;
-            int barY = engine.getWorldToScreenY(r.position) - r.scale.y() * 35;
+            int barX = static_cast<int>(engine.getWorldToScreenX(r.position)) - 18;
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 35);
 
             engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
 
@@ -550,7 +549,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             float normalizedLife = (static_cast<float>(l.life) / static_cast<float>(l.maxLife));
 
             // Calcula la anchura de la barra de vida
-            int lifeWidth = static_cast<int>(barWidth * normalizedLife);
+            int lifeWidth = static_cast<int>(static_cast<float>(barWidth) * normalizedLife);
 
             if (!l.vidaMax())
                 lifeWidth = l.life_width + static_cast<int>((static_cast<float>(lifeWidth) - static_cast<float>(l.life_width)) * 0.25);
@@ -790,7 +789,7 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
         plfi.mana = plfi.max_mana - 2;
 
     // Datos para la barra para el maná
-    int barWidth = plfi.max_mana * 2;
+    int barWidth = static_cast<int>(plfi.max_mana) * 2;
     int barHeight = 20;
     int barX = 7;
     int barY = 30;
@@ -807,6 +806,4 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
     engine.drawRectangle(barX + 3, barY + 3, manaWidth, barHeight - 6, SKYBLUE);
 
     plfi.mana_width = manaWidth;
-
-    std::cout << plfi.mana_width << std::endl;
 }

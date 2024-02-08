@@ -9,7 +9,7 @@ struct LifeComponent
     void decreaseLife(); // decrease 1 life
     void decreaseLife(int minusLife);
 
-    void increaseLife();
+    void increaseLife(int i = 2);
     void increaseMaxLife();
     void decreaseCountdown(float deltaTime) { elapsed += deltaTime; };
     bool vidaMax() { return (life == maxLife); };

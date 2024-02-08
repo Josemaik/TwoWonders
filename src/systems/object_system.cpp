@@ -15,7 +15,6 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
         }
 
         // Recuperamos la entidad del player
-        auto& li = em.getSingleton<LevelInfo>();
         auto* playerEnt = em.getEntityByID(li.playerID);
         bool shop_object = true;
 
@@ -100,8 +99,8 @@ bool ObjectSystem::buyLife(EntityManager& em, Entity* ent) {
 
     if (ent->hasComponent<LifeComponent>()) {
         if (plfi.decreaseCoins(10)) {
-            em.getComponent<LifeComponent>(*ent).increaseLife();
-            em.getComponent<LifeComponent>(*ent).increaseLife();
+            auto& life = em.getComponent<LifeComponent>(*ent);
+            life.increaseLife(4);
             return true;
         }
     }
@@ -114,8 +113,7 @@ bool ObjectSystem::buyExtraLife(EntityManager& em, Entity* ent) {
     if (ent->hasComponent<LifeComponent>()) {
         if (plfi.decreaseCoins(30)) {
             em.getComponent<LifeComponent>(*ent).increaseMaxLife();
-            em.getComponent<LifeComponent>(*ent).increaseLife();
-            em.getComponent<LifeComponent>(*ent).increaseLife();
+            em.getComponent<LifeComponent>(*ent).increaseLife(4);
             return true;
         }
     }
