@@ -585,10 +585,19 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
 
     case 3:
     {
-        auto* patrol_7 = &tree.createNode<BTAction_Patrol>();
-        auto* ready_7 = &tree.createNode<BTDecisionReadyforAttack>();
-        auto* atack_7 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot);
-        [[maybe_unused]] auto* sequence7_3 = &tree.createNode<BTNodeSequence_t>(patrol_7, ready_7, atack_7);
+        em.addTag<BossFinalTag>(e);
+
+        auto* patrol = &tree.createNode<BTAction_Patrol>();
+
+        auto* d_pd = &tree.createNode<BTDecisionPlayerDetected>();
+        auto* d_gs = &tree.createNode<BTDecisionSubditosAlreadyGenerated>();
+        auto* a_gs = &tree.createNode<BTDAction_GenerateSubditos>();
+        auto* sequence = &tree.createNode<BTNodeSequence_t>(d_pd,d_gs,a_gs);
+
+        tree.createNode<BTNodeSelector_t>(sequence,patrol);
+        // auto* ready_7 = &tree.createNode<BTDecisionReadyforAttack>();
+        // auto* atack_7 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot);
+        // [[maybe_unused]] auto* sequence7_3 = &tree.createNode<BTNodeSequence_t>(patrol_7, ready_7, atack_7);
 
         break;
     }
@@ -633,3 +642,62 @@ void Ia_man::resetVec()
 {
     vec_t.clear();
 }
+
+//Generación de subditos
+vec3d Ia_man::getRandomPosAroundBoss(double radio,const vec3d& spawnerPos) {
+    // Generar un ángulo aleatorio en radianes
+    double angle = ((double)rand() / RAND_MAX) * 2 * M_PI;
+    // Generar una distancia aleatoria dentro del radio
+    double distance = ((double)rand() / RAND_MAX) * radio;
+    // Calcular las coordenadas x e y a partir del ángulo y la distancia
+    double random_x = cos(angle) * distance;
+    double random_z = sin(angle) * distance;
+    // Desplazar las coordenadas alrededor del spawner
+    double spawn_x = spawnerPos.x();
+    double spawn_z = spawnerPos.z();
+
+    // Crear un objeto vec3d con las coordenadas generadas
+    vec3d posicion;
+    posicion.setX(spawn_x + random_x);
+    posicion.setZ(spawn_z + random_z);
+
+    return posicion;
+}
+void Ia_man::createSubditos(EntityManager& em, uint16_t tam, double generate_radius){
+    //get boss final position
+    auto& bb = em.getSingleton<BlackBoard_t>();
+    vec3d const boss_pos = bb.boss_position;
+    for(int i = 0; i < tam;i++){
+        //create subditos and spawn around boss
+        auto& e{ em.newEntity() };
+        em.addTag<SubditoTag>(e);
+
+        auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getRandomPosAroundBoss(generate_radius,boss_pos), .scale = vec3d{ 1.0,2.0,1.0 }, .color = GRAY});
+        auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .max_speed = 0.5 });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
+        em.addComponent<LifeComponent>(e, LifeComponent{ .life = 2 });
+        em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Neutral });
+
+        //aqui el bt
+        auto* d_a_1 = &tree.createNode<BTDecisionReadyforAttack>();
+        auto* a_a_1 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee); // fail si disparo succes si no disparo
+        auto* d_r_1 = &tree.createNode<BTDecisionOnAttackRadius>();
+        auto* sequence1_1 = &tree.createNode<BTNodeSequence_t>(d_a_1, a_a_1, d_r_1);
+
+        auto* d_1_1 = &tree.createNode<BTDecisionPlayerDetected>();
+        auto* a_s_1 = &tree.createNode<BTAction_Pursue>();
+        auto* sequence1_2 = &tree.createNode<BTNodeSequence_t>(d_1_1, a_s_1);
+
+
+        // auto* patrol_1 = &tree.createNode<BTAction_Patrol>();
+        // auto* sequence1_3 = &tree.createNode<BTNodeSequence_t>(patrol_1);
+
+        tree.createNode<BTNodeSelector_t>(sequence1_1, sequence1_2);
+
+
+        em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = 0.1, .detect_radius = 10.0, .attack_radius = 2.5, .tx = 0.0, .tz = 0.0,.time2arrive = 1.0, .tactive = true, .perceptionTime = static_cast<float>(0.2),
+        .path = vec3d{}, .countdown_stop = 0.8, .countdown_shoot = 0.5, .countdown_perception = 0.5, .behaviourTree = &tree });
+
+        em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = 5.0 });
+    }
+ }

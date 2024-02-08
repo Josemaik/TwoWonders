@@ -23,7 +23,8 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);// -2 -12 63 -71
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -0.0f, 0.0f, -0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
+
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -49.0f, 0.0f, -3.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
@@ -77,6 +78,7 @@ void Game::run()
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
+    auto& bb = em.getSingleton<BlackBoard_t>();
 
     // Inicializa una variable donde tener el tiempo entre frames
     float deltaTime{}, currentTime{};
@@ -166,6 +168,15 @@ void Game::run()
                     em.destroyEntities(li.dead_entities);
                     li.dead_entities.clear();
                 }
+                //Creación de súbditos
+                // if(bb.tam_subditos_tocreate == 1){
+                //     iam.createSubditos(em,1,3.0);
+                //     bb.tam_subditos_tocreate = 0;
+                // }
+                if(bb.tam_subditos_tocreate == 2){
+                   iam.createSubditos(em,2,4.0);
+                   bb.tam_subditos_tocreate = 0;
+                }
 
                 render_system.update(em, engine, deltaTime);
                 event_system.update(evm, em);
@@ -204,6 +215,7 @@ void Game::run()
     engine.closeWindow();
 }
 
+
 void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
 {
     auto& li = em.getSingleton<LevelInfo>();
@@ -218,3 +230,4 @@ void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
     createEntities(em, evm);
     map.reset(em, 0, iam);
 }
+

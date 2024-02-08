@@ -193,7 +193,7 @@
                 "type": 2,
                 "element": 0,
                 "arrival_radius": 0.1,
-                "detect_radius": 8.0,
+                "detect_radius": 4.0,
                 "attack_radius": 6.0,
                 "tx": 0.0,
                 "tz": 0.0,
@@ -211,6 +211,37 @@
                 "countdown_perception": 1.0,
                 "scale_to_respawn_attack": 2.0
             },
+            {
+                "position": [61.0, 0.0, -88.0],
+                "scale": [2.0, 2.0, 2.0],
+                "color": [0, 121, 241, 255],
+                "max_speed": 0.35,
+                "life": 15,
+                "type": 3,
+                "element": 2,
+                "arrival_radius": 0.7,
+                "detect_radius": 15.0,
+                "attack_radius": 10.0,
+                "tx": 0.0,
+                "tz": 0.0,
+                "time2arrive": 7.0,
+                "tactive": true,
+                "perceptionTime": 0.2,
+                "path": [
+                    [66.0, 0.0, -90.0],
+                    [57.0, 0.0, -90.0],
+                    [57.0, 0.0, -84.0],
+                    [66.0, 0.0, -84.0]
+                ],
+                "countdown_stop": 0.0,
+                "countdown_shoot": 0.5,
+                "countdown_perception": 0.5,
+                "scale_to_respawn_attack": 2.0
+            }
+        ],
+        "npcs": [],
+        "player": [],
+        "comentarios": [
             {
                 "position": [73.0, 0.0, -87.0],
                 "scale": [2.0, 2.0, 2.0],
@@ -238,8 +269,6 @@
                 "countdown_perception": 0.5,
                 "scale_to_respawn_attack": 2.0
             }
-        ],
-        "npcs": [],
-        "player": []
+        ]
     }
 }
