@@ -176,15 +176,13 @@ void Game::run()
                     li.dead_entities.clear();
                 }
                 //Creación de súbditos
-                if(bb.tam_subditos_tocreate == 1){
-                    iam.createSubditos(em,1,3.0);
-                    bb.tam_subditos_tocreate = 0;
-                }
+                // if(bb.tam_subditos_tocreate == 1){
+                //     iam.createSubditos(em,1,3.0);
+                //     bb.tam_subditos_tocreate = 0;
+                // }
                 if(bb.tam_subditos_tocreate == 2){
                    iam.createSubditos(em,2,4.0);
                    bb.tam_subditos_tocreate = 0;
-                   auto& bb = em.getSingleton<BlackBoard_t>();
-                   std::cout << bb.subditosData.size() << "\n";
                 }
 
                 render_system.update(em, engine, deltaTime);

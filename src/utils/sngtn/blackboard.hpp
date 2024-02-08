@@ -30,6 +30,7 @@ struct BlackBoard_t {
             slimeData[id] = EntInfo;
         }else{
             if(type == 1){
+                //std::cout << "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \n";
                 subditosData[id] = EntInfo;
             }else{
                 boss_position = position;
