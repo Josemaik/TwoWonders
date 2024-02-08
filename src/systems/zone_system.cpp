@@ -2,10 +2,10 @@
 
 void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Eventmanager& evm, MapManager& map) {
     auto& li = em.getSingleton<LevelInfo>();
-    if(li.num_zone == 11){
+    if (li.num_zone == 11) {
         auto& bb = em.getSingleton<BlackBoard_t>();
-        if(bb.create_subdito){
-            iam.createSubdito(em,3.0);
+        if (bb.create_subdito) {
+            iam.createSubdito(em, 3.0);
             bb.create_subdito = false;
         }
     }
@@ -24,7 +24,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                 evm.scheduleEvent(Event{ EVENT_CODE_CHANGE_ZONE });
                 //borro enemigos si cambio de zona
                 deleteZoneEnemies(em);
-                iam.createEnemiesZone(em, zon.zone);
+                // iam.createEnemiesZone(em, zon.zone);
                 // Es una zona
                 li.num_zone = zon.zone;
                 if (zon.zone <= 13)

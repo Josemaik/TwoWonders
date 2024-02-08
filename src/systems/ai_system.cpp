@@ -43,13 +43,13 @@ void AISystem::update(EntityManager& em, float dt)
         perception(bb, ai, dt);
         // Actualizar datos de los slimes y subditos en blackboard
         if (e.hasTag<SlimeTag>()) {
-            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life,0);
+            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life, 0);
         }
-        if(e.hasTag<SubditoTag>()){
-             bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life,1);
+        if (e.hasTag<SubditoTag>()) {
+            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life, 1);
         }
-        if(e.hasTag<BossFinalTag>()){
-            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life,2);
+        if (e.hasTag<BossFinalTag>()) {
+            bb.updateInfo(e.getID(), em.getComponent<PhysicsComponent>(e).position, em.getComponent<LifeComponent>(e).life, 2);
         }
 
         if (!isDetected && ai.playerdetected)
@@ -66,20 +66,34 @@ void AISystem::update(EntityManager& em, float dt)
             return;
         }
     });
-    bool remove{true};
-    for(auto&s : bb.subditosData){
-        remove = true;
-        for(auto& id : bb.idsubditos){
-            if(s.first == id){
-                remove = false;
+
+    if (!bb.idsubditos.empty())
+    {
+        std::vector<std::size_t> keysToRemove;
+
+        for (const auto& s : bb.subditosData) {
+            bool remove = true;
+            for (const auto& id : bb.idsubditos) {
+                if (s.first == id) {
+                    remove = false;
+                    break;
+                }
+            }
+            if (remove) {
+                keysToRemove.push_back(s.first);
             }
         }
-        if(remove){
-            bb.subditosData.erase(s.first);
+
+        for (const auto& key : keysToRemove) {
+            bb.subditosData.erase(key);
         }
     }
+    else if (!bb.subditosData.empty())
+        bb.subditosData.clear();
+
     if (!isDetected && li.playerDetected)
         li.playerDetected = false;
+
 
     li.enemyPositions = enemyPositions;
 }

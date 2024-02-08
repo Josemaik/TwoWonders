@@ -212,8 +212,11 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                         }
                         else
                         {
-                            r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
-                            r.model = engine.loadModelFromMesh(r.mesh);
+                            if (r.scale != vec3d::zero())
+                            {
+                                r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
+                                r.model = engine.loadModelFromMesh(r.mesh);
+                            }
                         }
                         r.meshLoaded = true;
                     }
@@ -439,7 +442,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
     auto* playerEn = em.getEntityByID(li.playerID);
     if (not playerEn) {
         drawDeath(engine);
-         return;
+        return;
     }
     else if (!playerEn->hasTag<PlayerTag>()) { drawDeath(engine); return; }
 
