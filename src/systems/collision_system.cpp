@@ -281,9 +281,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     }
 
     if (behaviorType2 & BehaviorType::ZONE)
-    {
         return;
-    }
 
     // Nos aseguramos que el suelo siempre esté en staticEntPtr
     if (otherEntPtr->hasTag<GroundTag>() || otherEntPtr->hasTag<WaterTag>())
@@ -329,7 +327,6 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
-
     //Si impacta enemigo con pared
     if (behaviorType2 & BehaviorType::ENEMY)
     {
@@ -344,6 +341,9 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
+    if (behaviorType2 & BehaviorType::SPIDERWEB)
+        return;
+
     if (staticEntPtr->hasTag<DoorTag>() && behaviorType2 & BehaviorType::PLAYER)
     {
         auto& plfi = em.getSingleton<PlayerInfo>();
@@ -355,6 +355,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
             return;
         }
     }
+
     // Colisiones con paredes
     staticCollision(*otherPhy, *staticPhy, minOverlap);
 }

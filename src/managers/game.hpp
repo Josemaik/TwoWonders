@@ -40,9 +40,7 @@ private:
     void createCoin(EntityManager& em);
     void createShop(EntityManager& em);
     void createEnding(EntityManager& em);
-    void normalExecution(EntityManager& em, float deltaTime);
-
-    void debugExecution(EntityManager& em, float deltaTime);
+    void resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs);
     void createSound(EntityManager& em);
 
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };

@@ -29,6 +29,9 @@ private:
     void drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy);
     void drawEntities(EntityManager& em, ENGI::GameEngine& engine);
     void drawDeath(ENGI::GameEngine& engine);
+    void drawCoinBar(ENGI::GameEngine& engine, EntityManager& em);
+    void drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, const Entity& e);
+    void drawManaBar(ENGI::GameEngine& engine, EntityManager& em);
     bool edit_parameters{ false };
     bool isSelected{ false };
     bool isSelectedfordebug{ false };

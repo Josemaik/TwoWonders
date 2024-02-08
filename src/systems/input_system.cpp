@@ -36,7 +36,6 @@ void InputSystem::update(EntityManager& em)
 
     if (!playerEn->hasTag<PlayerTag>() && IsKeyReleased(KEY_ENTER))
     {
-        em.destroyAll();
         li.resetGame = true;
         return;
     }
@@ -181,9 +180,18 @@ void InputSystem::update(EntityManager& em)
         //     bb.tactive = true;
         // }
 
+        auto& plfi = em.getSingleton<PlayerInfo>();
+
         // Codigo para el ataque
         if (IsKeyDown(in.space) && e.hasComponent<AttackComponent>())
             em.getComponent<AttackComponent>(e).attack(AttackType::AttackPlayer);
+        else if (plfi.mana < plfi.max_mana)
+        {
+            plfi.mana += .1;
+
+            if (plfi.mana > plfi.max_mana)
+                plfi.mana = plfi.max_mana;
+        }
 
         // Codigo para la bomba
         if (IsKeyDown(KEY_B) && e.hasComponent<AttackComponent>())
