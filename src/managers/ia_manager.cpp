@@ -663,14 +663,14 @@ vec3d Ia_man::getRandomPosAroundBoss(double radio,const vec3d& spawnerPos) {
 
     return posicion;
 }
-void Ia_man::createSubditos(EntityManager& em, uint16_t tam, double generate_radius){
-    //get boss final position
-    auto& bb = em.getSingleton<BlackBoard_t>();
-    vec3d const boss_pos = bb.boss_position;
-    for(int i = 0; i < tam;i++){
+void Ia_man::createSubdito(EntityManager& em, double generate_radius){
+        //get boss final position
+        auto& bb = em.getSingleton<BlackBoard_t>();
+        vec3d const boss_pos = bb.boss_position;
         //create subditos and spawn around boss
         auto& e{ em.newEntity() };
         em.addTag<SubditoTag>(e);
+        em.addTag<EnemyTag>(e);
 
         auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getRandomPosAroundBoss(generate_radius,boss_pos), .scale = vec3d{ 1.0,2.0,1.0 }, .color = GRAY});
         auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .max_speed = 0.5 });
@@ -699,5 +699,4 @@ void Ia_man::createSubditos(EntityManager& em, uint16_t tam, double generate_rad
         .path = vec3d{}, .countdown_stop = 0.8, .countdown_shoot = 0.5, .countdown_perception = 0.5, .behaviourTree = &tree });
 
         em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = 5.0 });
-    }
  }

@@ -35,6 +35,8 @@ void AISystem::update(EntityManager& em, float dt)
     std::vector<vec3d> enemyPositions{};
     auto& li = em.getSingleton<LevelInfo>();
     auto& bb = em.getSingleton<BlackBoard_t>();
+    bb.idsubditos.clear();
+
     em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, AIComponent& ai, LifeComponent& lc)
     {
         //percibir el entorno
@@ -64,7 +66,18 @@ void AISystem::update(EntityManager& em, float dt)
             return;
         }
     });
-
+    bool remove{true};
+    for(auto&s : bb.subditosData){
+        remove = true;
+        for(auto& id : bb.idsubditos){
+            if(s.first == id){
+                remove = false;
+            }
+        }
+        if(remove){
+            bb.subditosData.erase(s.first);
+        }
+    }
     if (!isDetected && li.playerDetected)
         li.playerDetected = false;
 

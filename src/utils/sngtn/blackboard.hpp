@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <utils/path.hpp>
 #include <utils/vec3D.hpp>
+#include <vector>
 
 //Estructura para almacenar información de una IA
 struct Info {
@@ -17,7 +18,7 @@ struct BlackBoard_t {
     //Target Entity
     std::size_t teid{};
     //centinela para crear súbditos
-    uint16_t tam_subditos_tocreate{0};
+    bool create_subdito{false};
     //Posicion Boss Final
     vec3d boss_position{};
     //Path
@@ -32,6 +33,7 @@ struct BlackBoard_t {
             if(type == 1){
                 //std::cout << "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \n";
                 subditosData[id] = EntInfo;
+                idsubditos.push_back(id);
             }else{
                 boss_position = position;
             }
@@ -40,5 +42,6 @@ struct BlackBoard_t {
     }
     std::unordered_map<std::size_t, Info> slimeData;
     std::unordered_map<std::size_t, Info> subditosData;
+    std::vector<size_t> idsubditos;
 
 };

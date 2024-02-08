@@ -304,7 +304,7 @@ double SelectValue(double value, float posx, float posy, float height, float wid
 //Debugger visual in-game
 void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt) {
     // engine.beginDrawing();
-    Rectangle windowRect = { 470, 80, 330, 200 };
+    Rectangle windowRect = { 470, 80, 330, 230 };
     DrawRectangleLinesEx(windowRect, 2, DARKGRAY);
     DrawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
     Vector2 textPositionInfo = { 480, 90 };
@@ -347,8 +347,10 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
                 DrawTextEx(GetFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", Vector2{ 680,210 }, 20, 1, RED);
                 DrawText("Player hunted?:", 480, 230, 20, BLACK);
                 DrawTextEx(GetFontDefault(), (em.getSingleton<BlackBoard_t>().playerhunted == 0) ? "No" : "Sí", Vector2{ 680,230 }, 20, 1, RED);
-                 DrawText("Subditos alive:", 480, 250, 20, BLACK);
+                DrawText("Subditos alive:", 480, 250, 20, BLACK);
                 DrawTextEx(GetFontDefault(), std::to_string(em.getSingleton<BlackBoard_t>().subditosData.size()).c_str(), Vector2{ 680,250 }, 20, 1, RED);
+                DrawText("Subditos id alive:", 480, 270, 20, BLACK);
+                DrawTextEx(GetFontDefault(), std::to_string(em.getSingleton<BlackBoard_t>().idsubditos.size()).c_str(), Vector2{ 680,270 }, 20, 1, RED);
             }
         }
     }
@@ -436,16 +438,6 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
     auto& li = em.getSingleton<LevelInfo>();
     auto* playerEn = em.getEntityByID(li.playerID);
     if (not playerEn) {
-        // auto& bb = em.getSingleton<BlackBoard_t>();
-        // for(auto& s : bb.subditosData){
-        //     bb.subditosData.erase(s.first);
-        // }
-        // for(auto& e : em.getEntities()){
-        //     if(e.hasTag<SubditoTag>()){
-        //         em.getComponent<LifeComponent>(e).markedForDeletion = true;
-        //     }
-        // }
-        // bb.subditosData.clear();
         drawDeath(engine);
          return;
     }

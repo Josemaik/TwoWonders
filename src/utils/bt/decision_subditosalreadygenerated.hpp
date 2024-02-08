@@ -10,7 +10,7 @@ struct BTDecisionSubditosAlreadyGenerated : BTNode_t {
         //obtenemos blackboard
         auto& bb = ectx.em.getSingleton<BlackBoard_t>();
         // si encuentro un slime que tenga menos de 3 vidas, guardo como objetivo su posición
-        if(bb.subditosData.size() == 0 || bb.subditosData.size() == 1){
+        if(bb.subditosData.size() < 2){
             //no hay subditos vivos o hay soolo 1
             return BTNodeStatus_t::success;
         }else{

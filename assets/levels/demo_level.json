@@ -375,7 +375,15 @@
     },
     "underworld":
     {
-        "objects": [],
+        "objects": [
+            {
+                "position": [-49.0, 0.0, -3.0],
+                "scale": [0.5, 0.5, 0.5],
+                "color": [253, 249, 0, 255],
+                "type": 2,
+                "id": 0
+            }
+        ],
         "enemies": [
             {
                 "position": [-33.0, 2.0, -15.0],
