@@ -33,15 +33,6 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     // em.addComponent<EventComponent>(e);
     evm.registerListener(e, EVENT_CODE_CHANGE_ZONE);
 
-
-    auto& e2{ em.newEntity() };
-    em.addTag<DestructibleTag>(e2);
-    auto& r2 = em.addComponent<RenderComponent>(e2, RenderComponent{ .position = { -0.0f, 0.0f, -05.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
-    auto& p2 = em.addComponent<PhysicsComponent>(e2, PhysicsComponent{ .position = { r2.position }, .velocity = { .0f, .0f, .0f }, .gravity = 0 });
-    em.addComponent<ColliderComponent>(e2, ColliderComponent{ p2.position, r2.scale, BehaviorType::STATIC });
-    em.addComponent<LifeComponent>(e2, LifeComponent{ .life = 2 });
-
-
     // Shield
     createShield(em, e);
 

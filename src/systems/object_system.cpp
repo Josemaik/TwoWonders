@@ -35,6 +35,10 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                     em.addComponent<AttackComponent>(*playerEnt, AttackComponent{});
                 break;
 
+            case Object_type::Mana_Potion:
+                plfi.mana += 40;
+                break;
+
             case Object_type::Bomb:
                 plfi.addBomb();
                 break;

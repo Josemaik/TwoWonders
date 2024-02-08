@@ -49,9 +49,12 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
     const rapidjson::Value& zoneArray = overworld["zones"];
     const rapidjson::Value& rampArray = overworld["ramps"];
     const rapidjson::Value& doorArray = overworld["doors"];
+    const rapidjson::Value& destructibleArray = overworld["destructibles"];
     const rapidjson::Value& underworld = map["underworld"];
     const rapidjson::Value& objectArray = underworld["objects"];
     const rapidjson::Value& enemyArray = underworld["enemies"];
+    const rapidjson::Value& id = map["id"];
+    uint8_t mapId = static_cast<uint8_t>(id.GetUint());
 
     for (rapidjson::SizeType i = 0; i < groundArray.Size(); i++)
     {
@@ -161,9 +164,25 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     }
 
-    const rapidjson::Value& id = map["id"];
+    for (rapidjson::SizeType i = 0; i < destructibleArray.Size(); i++)
+    {
+        auto& entity = em.newEntity();
+        em.addTag<DestructibleTag>(entity);
 
-    uint8_t mapId = static_cast<uint8_t>(id.GetUint());
+        // Extraemos los datos del json
+        const rapidjson::Value& destructible = destructibleArray[i];
+        vec3d position{ destructible["position"][0].GetDouble(), destructible["position"][1].GetDouble(), destructible["position"][2].GetDouble() };
+        vec3d scale{ destructible["scale"][0].GetDouble(), destructible["scale"][1].GetDouble(), destructible["scale"][2].GetDouble() };
+        Color color{ static_cast<u_char>(destructible["color"][0].GetUint()), static_cast<u_char>(destructible["color"][1].GetUint()), static_cast<u_char>(destructible["color"][2].GetUint()), static_cast<u_char>(destructible["color"][3].GetUint()) };
+        int life{ destructible["life"].GetInt() };
+
+        // Creamos los componentes
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0 });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+        em.addComponent<LifeComponent>(entity, LifeComponent{ .life = life });
+    }
+
     for (rapidjson::SizeType i = 0; i < objectArray.Size(); i++)
     {
         auto& li = em.getSingleton<LevelInfo>();
@@ -215,13 +234,10 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
 void MapManager::destroyMap(EntityManager& em)
 {
     using CMPS = MP::TypeList<>;
-    using TAGS = MP::TypeList<GroundTag, WaterTag, WallTag, ZoneTag, RampTag, DoorTag, ObjectTag, EnemyTag>;
+    using TAGS = MP::TypeList<GroundTag, WaterTag, WallTag, ZoneTag, RampTag, DoorTag, ObjectTag, EnemyTag, DestructibleTag>;
     auto& li = em.getSingleton<LevelInfo>();
 
-    em.forEachAny<CMPS, TAGS>([&](Entity& entity)
-    {
-        li.dead_entities.insert(entity.getID());
-    });
+    em.forEachAny<CMPS, TAGS>([&](Entity& entity) { li.dead_entities.insert(entity.getID()); });
 }
 
 void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man& iam)

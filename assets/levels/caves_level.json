@@ -111,7 +111,8 @@
             }
         ],
         "ramps": [],
-        "doors": []
+        "doors": [],
+        "destructibles": []
     },
     "underworld":
     {

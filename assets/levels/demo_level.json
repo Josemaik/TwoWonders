@@ -369,8 +369,14 @@
                 "offset": [0.0, 6.0]
             }
         ],
-        "doors": [
-
+        "doors": [],
+        "destructibles": [
+            {
+                "position": [-11.0, 0.0, 0.0],
+                "scale": [1.0, 1.0, 2.0],
+                "color": [127, 106, 79, 255],
+                "life": 1
+            }
         ]
     },
     "underworld":
