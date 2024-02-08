@@ -487,7 +487,6 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 else
                     engine.drawText("Hielo", 17, 50, 18, SKYBLUE);
             }
-
         }
 
         // Dibujar el precio d elos objetos de la tienda
@@ -517,7 +516,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
 
-        //Vidas HUD
+        // Vidas HUD
         if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
@@ -529,7 +528,6 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 20,
                 BLACK);
         }
-
 
         if (debugphy && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
         {
@@ -764,9 +762,9 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
     int manaWidth = static_cast<int>(static_cast<float>(barWidth) * (static_cast<float>(plfi.mana) / static_cast<float>(plfi.max_mana)));
 
     // Interpolación
-    int new_manaWidth = plfi.bar_width + static_cast<int>((static_cast<float>(manaWidth) - static_cast<float>(plfi.bar_width)) * 0.175f);
+    int new_manaWidth = plfi.mana_width + static_cast<int>((static_cast<float>(manaWidth) - static_cast<float>(plfi.mana_width)) * 0.175f);
     // Dibujamos la barra de maná
     engine.drawRectangle(barX + 2, barY + 3, new_manaWidth, barHeight - 6, SKYBLUE);
 
-    plfi.bar_width = new_manaWidth;
+    plfi.mana_width = new_manaWidth;
 }

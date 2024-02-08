@@ -5,7 +5,7 @@
 struct PlayerInfo {
     uint16_t coins{}, bombs{}, max_bombs{ 8 };
     double max_mana{ 100.0 }, mana{ max_mana };
-    int bar_width{};
+    int mana_width{};
     bool hasKey{ false };
 
     void addCoin() { coins += 5; }
@@ -43,7 +43,7 @@ struct PlayerInfo {
         bombs = 0;
         max_mana = 100.0;
         mana = max_mana;
-        bar_width = 0;
+        mana_width = 0;
         hasKey = false;
     }
 };
