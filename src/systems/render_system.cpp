@@ -211,6 +211,23 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
+                    else if (e.hasTag<BossFinalTag>())
+                    {
+                        r.model = LoadModel("assets/models/Boss.obj");
+                        Texture2D t0 = LoadTexture("assets/models/textures/Boss_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/Boss_texture.png");
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+                    }
+                    else if (e.hasTag<SubditoTag>())
+                    {
+                        r.model = LoadModel("assets/models/Boss_sub_1.obj");
+                        Texture2D t0 = LoadTexture("assets/models/textures/Boss_sub_1_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/Boss_sub_1_texture.png");
+
+                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                    }
                     else
                     {
                         r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
@@ -244,11 +261,23 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     scl = { 0.4, 0.4, 0.4 };
                     pos.setY(pos.y() - 1.1);
                 }
+                else if (e.hasTag<BossFinalTag>())
+                {
+                    scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 1.1);
+                    colorEntidad = { 125, 125, 125, 255 };
+                }
+                else if (e.hasTag<SubditoTag>())
+                {
+                    scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 1.1);
+                }
+
 
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
                 engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
 
-                if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>() && !e.hasTag<SpiderTag>())
+                if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>() && !e.hasTag<SpiderTag>() && !e.hasTag<BossFinalTag>() && !e.hasTag<SubditoTag>())
                 {
                     int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
                     if (orientationInDegreesInt % 90 == 0)
