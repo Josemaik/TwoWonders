@@ -2,13 +2,6 @@
 
 void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Eventmanager& evm, MapManager& map) {
     auto& li = em.getSingleton<LevelInfo>();
-    if (li.num_zone == 11) {
-        auto& bb = em.getSingleton<BlackBoard_t>();
-        if (bb.create_subdito) {
-            iam.createSubdito(em, 3.0);
-            bb.create_subdito = false;
-        }
-    }
     updateZoneEnemies(em);
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, ZoneComponent& zon)
@@ -21,7 +14,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                 // if(!iam.checkEnemiesCreaeted(zon.zone)){
                 // }
                 //lanzar evento
-                evm.scheduleEvent(Event{ EVENT_CODE_CHANGE_ZONE });
+                // evm.scheduleEvent(Event{ EVENT_CODE_CHANGE_ZONE });
                 //borro enemigos si cambio de zona
                 deleteZoneEnemies(em);
                 // iam.createEnemiesZone(em, zon.zone);
@@ -29,11 +22,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                 li.num_zone = zon.zone;
                 if (zon.zone <= 13)
                 {
-                    // if (ent.hasComponent<RenderComponent>()) {
-                    //     auto& r = em.getComponent<RenderComponent>(ent);
-                    //     engine.setPositionCamera({ r.position.x(), 30.0, r.position.z() + 12.0 });
-                    //     engine.setTargetCamera({ r.position.x(), r.position.y() + 3.0, r.position.z() });
-                    // }
+                    // Aquí pondremos cosas de las zonas que no sean de tp
                 }
                 // Es un TP
                 else
@@ -130,6 +119,27 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
             zon.changeZone = false;
         }
     });
+
+    // Cosas que hacer en cada zona
+    switch (li.num_zone)
+    {
+    case 1:
+    {
+        checkChests(em, evm, 1);
+        break;
+    }
+    case 11:
+    {
+        auto& bb = em.getSingleton<BlackBoard_t>();
+        if (bb.create_subdito) {
+            iam.createSubdito(em, 3.0);
+            bb.create_subdito = false;
+        }
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 void ZoneSystem::deleteZoneEnemies(EntityManager&)
@@ -180,9 +190,57 @@ void ZoneSystem::createKey(EntityManager& em)
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 83., 0., -71.0 }, .scale = { 1., 0.3, 0.3 }, .color = GOLD });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0, .0, .0 } });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = Object_type::Key, .inmortal = true });
+    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Key, .inmortal = true });
 
     keyCreated = true;
+}
+
+void ZoneSystem::checkChests(EntityManager& em, Eventmanager& evm, uint16_t zone)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    using chestCMP = MP::TypeList<ChestComponent, PhysicsComponent>;
+    using noTag = MP::TypeList<>;
+
+    em.forEach<chestCMP, noTag>([&](Entity& e, ChestComponent& ch, PhysicsComponent& phy)
+    {
+        if (ch.zone == zone)
+        {
+            // Revisamos si el cofre ha sido abierto
+            std::pair<uint8_t, uint8_t> pair{ li.mapID, ch.id };
+
+            if (li.notLoadSet.find(pair) != li.notLoadSet.end())
+                return;
+
+            // Calcula la distancia entre la posición del jugador y la posición del cofre
+            auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+            auto& playerPos = playerPhy.position;
+
+            double distance = playerPos.distance(phy.position);
+
+            // Si el cofre se encuentra a menos de 2 unidades de distancia del se muestra el mensaje de abrir cofre
+            if (distance < 2.0 && !ch.isOpen && !ch.showButton)
+            {
+                ch.showButton = true;
+                std::cout << "Chest" << std::endl;
+            }
+            else if (distance > 2.0 && ch.showButton)
+            {
+                ch.showButton = false;
+            }
+
+            auto& inpi = em.getSingleton<InputInfo>();
+
+            if (inpi.interact && ch.showButton && !ch.isOpen)
+            {
+                ch.isOpen = true;
+                ch.showButton = false;
+                li.chestToOpen = e.getID();
+                evm.scheduleEvent(Event{ EventCodes::OpenChest });
+                li.notLoadSet.insert(pair);
+            }
+
+        }
+    });
 }
 
 void ZoneSystem::reset()

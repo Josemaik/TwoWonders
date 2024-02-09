@@ -1,13 +1,11 @@
 #pragma once
 #ifndef EVENT_SYSTEM
 #define EVENT_SYSTEM
-
-
 #include "../utils/types.hpp"
 
 struct EventSystem
 {
-    void update(Eventmanager& evm,EntityManager& em){ evm.dispatchEvents(em); };
+    void update(Eventmanager& evm, ObjectSystem& os, EntityManager& em) { evm.dispatchEvents(em, os); };
 };
 
-#endif
+#endif // !EVENT_SYSTEM

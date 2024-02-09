@@ -492,6 +492,17 @@
                 "scale_to_respawn_attack": 2.0
             }
         ],
+        "interactables": [
+            {
+                "position": [5.0, 0.0, 0.0],
+                "scale": [1.0, 1.0, 1.0],
+                "color": [255, 255, 255, 255],
+                "type": 1,
+                "zone": 1,
+                "content": 2,
+                "id": 0
+            }
+        ],
         "npcs": [],
         "player": [],
         "comentarios": [

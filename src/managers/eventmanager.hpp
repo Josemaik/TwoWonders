@@ -2,27 +2,43 @@
 #ifndef EVENT_MANAGER
 #define EVENT_MANAGER
 
+#include "../systems/object_system.hpp"
 #include "../utils/types.hpp"
 #include <cstdint>
 #include <vector>
 
-
-//Eventos
-static const uint16_t EVENT_CODE_CHANGE_ZONE = 1;
-
-
 struct Event {
     uint16_t code; // Código identificador del evento
+};
+
+//Eventos
+enum EventCodes
+{
+    SpawnKey = 0x01,
+    OpenChest = 0x02,
 };
 
 // Clase ListenerRegistration para almacenar datos sobre un listener registrado
 struct ListenerRegistration {
 
     uint16_t interestCode;
-    const Entity& listener;
+    const Entity* listener;
 
     ListenerRegistration(uint16_t code, const Entity& entity)
-        : interestCode(code), listener(entity) {}
+        : interestCode(code), listener(&entity) {}
+
+    // Constructor de copia
+    ListenerRegistration(const ListenerRegistration& other)
+        : interestCode(other.interestCode), listener(other.listener) {}
+
+    // Operador de asignación de movimiento
+    ListenerRegistration& operator=(ListenerRegistration&& other) noexcept {
+        if (this != &other) {
+            interestCode = other.interestCode;
+            listener = other.listener;
+        }
+        return *this;
+    }
 };
 
 struct Eventmanager
@@ -34,13 +50,30 @@ public:
     }
 
     // Registra un listener en el gestor de eventos
-    void registerListener(const Entity& listener, uint16_t code) {
+    void registerListener(const Entity& listener, uint16_t code)
+    {
         ListenerRegistration lr(code, listener);
         listeners.push_back(lr);
     }
 
+    // Quita un listener del gestor de eventos
+    void unregisterListener(const Entity& listener, uint16_t code)
+    {
+        std::vector<decltype(listeners)::iterator> toRemove{};
+        for (auto it = listeners.begin(); it != listeners.end(); ++it) {
+            if (it->listener == &listener && it->interestCode == code) {
+                toRemove.push_back(it);
+                break;
+            }
+        }
+
+        for (auto& lr : toRemove) {
+            listeners.erase(lr);
+        }
+    }
+
     // Dispara todos los eventos pendientes
-    void dispatchEvents(EntityManager& em) {
+    void dispatchEvents(EntityManager& em, ObjectSystem& os) {
         // Recorre todos los eventos pendientes
         while (!events.empty()) {
             // Obtiene el siguiente evento y lo elimina de la cola
@@ -49,13 +82,36 @@ public:
 
             // Notifica a cada listener interesado en el evento
             for (const auto& lr : listeners) {
-                if (lr.interestCode == event.code) {
-                    if (event.code == 1) {
-                        em.getSingleton<LevelInfo>().drawzone = true;
+                if (lr.interestCode & event.code) {
+                    switch (event.code)
+                    {
+                    case EventCodes::SpawnKey:
+                        // Llama a la función de callback del listener
+                        // em.getComponent<EventComponent>(lr.listener).onSpawnKey();
+                        break;
+                    case EventCodes::OpenChest:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        auto& playerPos = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
+                        auto& chest = *em.getEntityByID(li.chestToOpen);
+                        auto& chestComp = em.getComponent<ChestComponent>(chest);
+
+                        os.addObject(chestComp.content, playerPos);
+                        li.chestToOpen = li.max;
+                        break;
                     }
+                    }
+
+                    continue;
                 }
             }
         }
+    }
+
+    void reset()
+    {
+        listeners.clear();
+        events.clear();
     }
 
 private:

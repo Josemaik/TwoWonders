@@ -257,6 +257,11 @@ struct vec3D
         }
     }
 
+    constexpr DataT distance(vec3D const& rhs) const
+    {
+        return (rhs - *this).length();
+    }
+
 private:
     DataT x_{}, y_{}, z_{};
     mutable std::optional<DataT> length_{};

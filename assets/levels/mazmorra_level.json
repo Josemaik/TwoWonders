@@ -240,6 +240,7 @@
                 "scale_to_respawn_attack": 2.0
             }
         ],
+        "interactables": [],
         "npcs": [],
         "player": [],
         "comentarios": [

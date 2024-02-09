@@ -16,6 +16,7 @@ struct ZoneSystem
     void reset();
 
 private:
+    void checkChests(EntityManager& em, Eventmanager& evm, uint16_t zone);
     void updateZoneEnemies(EntityManager& em);
     void deleteZoneEnemies(EntityManager& em);
     void createKey(EntityManager& em);

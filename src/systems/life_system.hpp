@@ -5,16 +5,17 @@
 #include <functional>
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
+#include "object_system.hpp"
 
 struct LifeSystem
 {
     using SYSCMPs = MP::TypeList<LifeComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, float deltaTime);
+    void update(EntityManager& em, ObjectSystem& os, float deltaTime);
 
 private:
-    void createObject(EntityManager& em, vec3d pos);
+    void createObject(EntityManager& em, ObjectSystem& os, vec3d pos);
 };
 
 #endif // !LIFE_SYSTEM

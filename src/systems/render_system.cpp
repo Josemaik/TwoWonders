@@ -504,19 +504,19 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             {
                 auto& ren{ em.getComponent<RenderComponent>(e) };
                 auto& obj{ em.getComponent<ObjectComponent>(e) };
-                if (obj.type == Object_type::ShopItem_Bomb)
+                if (obj.type == ObjectType::ShopItem_Bomb)
                     engine.drawText("20",
                         static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
                         static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
                         20,
                         BLACK);
-                else if (obj.type == Object_type::ShopItem_Life)
+                else if (obj.type == ObjectType::ShopItem_Life)
                     engine.drawText("10",
                         static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
                         static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
                         20,
                         BLACK);
-                else if (obj.type == Object_type::ShopItem_ExtraLife)
+                else if (obj.type == ObjectType::ShopItem_ExtraLife)
                     engine.drawText("30",
                         static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
                         static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
@@ -561,6 +561,20 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             // if (e.hasTag<SpiderTag>())
             //     std::cout << newLifeWidth << std::endl;
+        }
+
+        if (e.hasComponent<ChestComponent>() && e.hasComponent<RenderComponent>())
+        {
+            auto& ren{ em.getComponent<RenderComponent>(e) };
+            auto& chest{ em.getComponent<ChestComponent>(e) };
+            if (chest.showButton)
+            {
+                engine.drawText("E",
+                    static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
+                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 50),
+                    20,
+                    BLACK);
+            }
         }
 
         if (debugphy && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)

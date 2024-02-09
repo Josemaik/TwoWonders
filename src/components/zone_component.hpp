@@ -1,7 +1,8 @@
 #pragma once
 #include <cstdint>
 
-struct ZoneComponent{
+struct ZoneComponent
+{
     uint16_t zone{};
     bool changeZone{ false };
 };

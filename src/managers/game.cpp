@@ -30,10 +30,11 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-
     em.addComponent<TypeComponent>(e, TypeComponent{});
-    // em.addComponent<EventComponent>(e);
-    evm.registerListener(e, EVENT_CODE_CHANGE_ZONE);
+
+    // Listeners de eventos para el jugador
+    evm.registerListener(e, EventCodes::SpawnKey);
+    evm.registerListener(e, EventCodes::OpenChest);
 
     // Shield
     createShield(em, e);
@@ -161,9 +162,10 @@ void Game::run()
                 object_system.update(em, deltaTime);
                 attack_system.update(em, deltaTime);
                 projectile_system.update(em, deltaTime);
-                life_system.update(em, deltaTime);
+                life_system.update(em, object_system, deltaTime);
                 sound_system.update();
                 camera_system.update(em, engine, deltaTime);
+                event_system.update(evm, object_system, em);
 
                 if (!li.dead_entities.empty())
                 {
@@ -172,7 +174,6 @@ void Game::run()
                 }
 
                 render_system.update(em, engine, deltaTime);
-                event_system.update(evm, em);
             }
             else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1))
                 render_system.update(em, engine, deltaTime);

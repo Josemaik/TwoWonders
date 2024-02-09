@@ -1,10 +1,10 @@
 #pragma once
 
-enum struct Object_type { None, Life, Sword, Bomb, Coin, BombExplode, Coin30, ShopItem_Bomb, ShopItem_ExtraLife, ShopItem_Life, Key, Heal_Spell, Mana_Potion, AreaAttack, Spiderweb };
+enum struct ObjectType { None, Life, Sword, Bomb, Coin, BombExplode, Coin30, ShopItem_Bomb, ShopItem_ExtraLife, ShopItem_Life, Key, Heal_Spell, Mana_Potion, AreaAttack, Spiderweb };
 
 struct ObjectComponent
 {
-    Object_type type{ Object_type::Coin };
+    ObjectType type{ ObjectType::Coin };
     float life_time{ 10.0f }, elapsed{ 0.0f };
     bool active{ false };
 

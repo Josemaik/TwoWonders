@@ -50,6 +50,7 @@ struct LevelInfo
   NotLoadSet notLoadSet{};
   deathSet dead_entities{};
 
+  std::size_t chestToOpen{ max };
   bool debugIA2{ false };
   bool resetGame{ false };
 

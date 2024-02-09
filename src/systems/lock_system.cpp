@@ -17,7 +17,7 @@ void LockSystem::update(EntityManager& em)
             auto& pos = phy.position;
 
             // Calcula la distancia entre la posición del jugador y la posición del enemigo
-            double distance = std::sqrt(std::pow(playerPos.x() - pos.x(), 2) + std::pow(playerPos.y() - pos.y(), 2) + std::pow(playerPos.z() - pos.z(), 2));
+            double distance = playerPos.distance(pos);
 
             // Si el enemigo se encuentra a menos de 10 unidades de distancia del jugador se inserta en el set
             if (distance < 10.0)
