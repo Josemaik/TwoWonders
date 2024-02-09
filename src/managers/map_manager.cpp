@@ -53,6 +53,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
     const rapidjson::Value& underworld = map["underworld"];
     const rapidjson::Value& objectArray = underworld["objects"];
     const rapidjson::Value& enemyArray = underworld["enemies"];
+    const rapidjson::Value& interactablesArray = underworld["interactables"];
     const rapidjson::Value& id = map["id"];
     uint8_t mapId = static_cast<uint8_t>(id.GetUint());
 
@@ -191,14 +192,14 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
 
         std::pair<uint8_t, uint8_t> pair{ mapId, objId };
 
-        if (li.notLoadSet.find(pair) != li.notLoadSet.end())
+        if (li.dontLoad.find(pair) != li.dontLoad.end())
             continue;
 
         // Extraemos los datos del json
         vec3d position{ obj["position"][0].GetDouble(), obj["position"][1].GetDouble(), obj["position"][2].GetDouble() };
         vec3d scale{ obj["scale"][0].GetDouble(), obj["scale"][1].GetDouble(), obj["scale"][2].GetDouble() };
         Color color{ static_cast<u_char>(obj["color"][0].GetUint()), static_cast<u_char>(obj["color"][1].GetUint()), static_cast<u_char>(obj["color"][2].GetUint()), static_cast<u_char>(obj["color"][3].GetUint()) };
-        Object_type type{ static_cast<Object_type>(obj["type"].GetDouble()) };
+        ObjectType type{ static_cast<ObjectType>(obj["type"].GetDouble()) };
 
         auto& entity = em.newEntity();
         em.addTag<ObjectTag>(entity);
@@ -207,13 +208,45 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color });
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero() });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-        em.addComponent<ObjectComponent>(entity, ObjectComponent{ .type = type, .inmortal = true, .mapID = mapId, .objID = objId });
+        em.addComponent<ObjectComponent>(entity, ObjectComponent{ .type = type, .inmortal = true, .objID = objId });
     }
 
     for (rapidjson::SizeType i = 0; i < enemyArray.Size(); i++)
     {
         const rapidjson::Value& enemy = enemyArray[i];
         iam.createEnemy(em, enemy);
+    }
+
+    for (rapidjson::SizeType i = 0; i < interactablesArray.Size(); i++)
+    {
+        const rapidjson::Value& interactable = interactablesArray[i];
+
+        // Extraemos los datos del json
+        vec3d position{ interactable["position"][0].GetDouble(), interactable["position"][1].GetDouble(), interactable["position"][2].GetDouble() };
+        vec3d scale{ interactable["scale"][0].GetDouble(), interactable["scale"][1].GetDouble(), interactable["scale"][2].GetDouble() };
+        Color color{ static_cast<u_char>(interactable["color"][0].GetUint()), static_cast<u_char>(interactable["color"][1].GetUint()), static_cast<u_char>(interactable["color"][2].GetUint()), static_cast<u_char>(interactable["color"][3].GetUint()) };
+        InteractableType type{ static_cast<InteractableType>(interactable["type"].GetInt()) };
+
+        // Creamos los componentes
+        auto& entity = em.newEntity();
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero() });
+
+        switch (type)
+        {
+        case 1:
+        {
+            // Es un cofre
+            em.addTag<ChestTag>(entity);
+            uint16_t zone = static_cast<uint16_t>(interactable["zone"].GetUint());
+            ObjectType content{ static_cast<ObjectType>(interactable["content"].GetInt()) };
+            uint8_t interId = static_cast<uint8_t>(interactable["id"].GetUint());
+
+            em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+            em.addComponent<ChestComponent>(entity, ChestComponent{ .id = interId, .zone = zone, .dropPosition = { vec3d::zero() }, .content = content });
+            break;
+        }
+        }
     }
 
     // pseudo codigo para scheduling xdddd
@@ -234,7 +267,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
 void MapManager::destroyMap(EntityManager& em)
 {
     using CMPS = MP::TypeList<>;
-    using TAGS = MP::TypeList<GroundTag, WaterTag, WallTag, ZoneTag, RampTag, DoorTag, ObjectTag, EnemyTag, DestructibleTag>;
+    using TAGS = MP::TypeList<GroundTag, WaterTag, WallTag, ZoneTag, RampTag, DoorTag, ObjectTag, EnemyTag, DestructibleTag, ChestTag>;
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEachAny<CMPS, TAGS>([&](Entity& entity) { li.dead_entities.insert(entity.getID()); });

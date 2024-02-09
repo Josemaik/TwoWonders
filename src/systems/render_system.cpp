@@ -211,6 +211,23 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
+                    else if (e.hasTag<BossFinalTag>())
+                    {
+                        r.model = LoadModel("assets/models/Boss.obj");
+                        Texture2D t0 = LoadTexture("assets/models/textures/Boss_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/Boss_texture.png");
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+                    }
+                    else if (e.hasTag<SubditoTag>())
+                    {
+                        r.model = LoadModel("assets/models/Boss_sub_1.obj");
+                        Texture2D t0 = LoadTexture("assets/models/textures/Boss_sub_1_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/Boss_sub_1_texture.png");
+
+                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                    }
                     else
                     {
                         r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
@@ -244,11 +261,23 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     scl = { 0.4, 0.4, 0.4 };
                     pos.setY(pos.y() - 1.1);
                 }
+                else if (e.hasTag<BossFinalTag>())
+                {
+                    scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 1.1);
+                    colorEntidad = { 125, 125, 125, 255 };
+                }
+                else if (e.hasTag<SubditoTag>())
+                {
+                    scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 1.1);
+                }
+
 
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
                 engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
 
-                if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>() && !e.hasTag<SpiderTag>())
+                if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>() && !e.hasTag<SpiderTag>() && !e.hasTag<BossFinalTag>() && !e.hasTag<SubditoTag>())
                 {
                     int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
                     if (orientationInDegreesInt % 90 == 0)
@@ -504,19 +533,19 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             {
                 auto& ren{ em.getComponent<RenderComponent>(e) };
                 auto& obj{ em.getComponent<ObjectComponent>(e) };
-                if (obj.type == Object_type::ShopItem_Bomb)
+                if (obj.type == ObjectType::ShopItem_Bomb)
                     engine.drawText("20",
                         static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
                         static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
                         20,
                         BLACK);
-                else if (obj.type == Object_type::ShopItem_Life)
+                else if (obj.type == ObjectType::ShopItem_Life)
                     engine.drawText("10",
                         static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
                         static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
                         20,
                         BLACK);
-                else if (obj.type == Object_type::ShopItem_ExtraLife)
+                else if (obj.type == ObjectType::ShopItem_ExtraLife)
                     engine.drawText("30",
                         static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
                         static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
@@ -561,6 +590,20 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             // if (e.hasTag<SpiderTag>())
             //     std::cout << newLifeWidth << std::endl;
+        }
+
+        if (e.hasComponent<ChestComponent>() && e.hasComponent<RenderComponent>())
+        {
+            auto& ren{ em.getComponent<RenderComponent>(e) };
+            auto& chest{ em.getComponent<ChestComponent>(e) };
+            if (chest.showButton)
+            {
+                engine.drawText("E",
+                    static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
+                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 50),
+                    20,
+                    BLACK);
+            }
         }
 
         if (debugphy && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)

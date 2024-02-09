@@ -10,6 +10,7 @@ struct ObjectSystem
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em, float deltaTime);
+    void addObject(ObjectType type, vec3d pos);
 
 private:
     void explodeBomb(EntityManager& em, Entity& ent);
@@ -20,6 +21,10 @@ private:
     bool buyBomb(EntityManager& em);
     bool buyExtraLife(EntityManager& em, Entity* ent);
     bool buyLife(EntityManager& em, Entity* ent);
+    void createObjects(EntityManager& em);
+
+    // Vector de crear objetos
+    std::vector<std::pair<ObjectType, vec3d>> toCreate{};
 };
 
 #endif // !OBJECT_SYSTEM

@@ -16,4 +16,5 @@ struct InputInfo
     bool debugAI2{ false };
 
     bool lockOn{ false };
+    bool interact{ false };
 };

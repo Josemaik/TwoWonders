@@ -114,7 +114,7 @@ void CollisionSystem::checkRampCollision(EntityManager& em, std::vector<Entity*>
 
             auto& min = ramp.min;
             auto& max = ramp.max;
-            auto& offset = ramp.offset;
+            auto& offSet = ramp.offset;
 
             if (pos.x() >= ramp.min.x && pos.x() <= max.x && pos.z() >= min.y && pos.z() <= max.y)
             {
@@ -122,13 +122,13 @@ void CollisionSystem::checkRampCollision(EntityManager& em, std::vector<Entity*>
                 auto& phy = em.getComponent<PhysicsComponent>(*e);
 
                 double baseHeight = ren.scale.y() / 2 - 0.5;
-                double newHeight = 0.0;
+                double newHeight = baseHeight + ramp.slope;
 
                 // Deltas para calcular la altura
-                if (offset.x == 0.0)
-                    newHeight = baseHeight + ramp.slope * (pos.z() + offset.y);
+                if (offSet.x == 0.0)
+                    newHeight *= (pos.z() + offSet.y);
                 else
-                    newHeight = baseHeight + ramp.slope * (pos.x() + offset.x);
+                    newHeight *= (pos.x() + offSet.x);
 
                 phy.position.setY(newHeight);
                 break;

@@ -1,6 +1,6 @@
 #include "life_system.hpp"
 
-void LifeSystem::update(EntityManager& em, float deltaTime) {
+void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, LifeComponent& lif)
@@ -11,7 +11,7 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
         {
             // Si es enemigo creamos un objeto
             if (ent.hasTag<EnemyTag>() && !lif.decreaseNextFrame)
-                createObject(em, em.getComponent<PhysicsComponent>(ent).position);
+                createObject(em, os, em.getComponent<PhysicsComponent>(ent).position);
             //Si es un slime
             if (ent.hasTag<SlimeTag>())
             {
@@ -50,7 +50,7 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
                 }
             }
 
-            if(ent.hasTag<SubditoTag>()){
+            if (ent.hasTag<SubditoTag>()) {
                 if (!lif.decreaseNextFrame)
                     lif.decreaseNextFrame = true;
                 else
@@ -69,42 +69,37 @@ void LifeSystem::update(EntityManager& em, float deltaTime) {
 }
 
 // Se podra crear objetos: vida, bomba, moneda o nada
-void LifeSystem::createObject(EntityManager& em, vec3d pos) {
+void LifeSystem::createObject(EntityManager&, ObjectSystem& os, vec3d pos) {
     int random_value = std::rand();
     if (random_value % 5 > 0) {
-        Object_type tipo_nuevo_objeto{};
+        ObjectType tipo_nuevo_objeto{};
         Color color_nuevo_objeto{};
         if (random_value % 5 == 1)
         {
-            tipo_nuevo_objeto = Object_type::Bomb;
+            tipo_nuevo_objeto = ObjectType::Bomb;
             color_nuevo_objeto = GRAY;
         }
         else if (random_value % 5 == 2)
         {
-            tipo_nuevo_objeto = Object_type::Coin;
+            tipo_nuevo_objeto = ObjectType::Coin;
             color_nuevo_objeto = YELLOW;
         }
         else if (random_value % 5 == 3)
         {
-            tipo_nuevo_objeto = Object_type::Life;
+            tipo_nuevo_objeto = ObjectType::Life;
             color_nuevo_objeto = RED;
         }
         else if (random_value % 5 == 4)
         {
-            tipo_nuevo_objeto = Object_type::Mana_Potion;
+            tipo_nuevo_objeto = ObjectType::Mana_Potion;
             color_nuevo_objeto = SKYBLUE;
         }
         else
         {
-            tipo_nuevo_objeto = Object_type::None;
+            tipo_nuevo_objeto = ObjectType::None;
         }
 
-        // Se crea el nuevo objeto
-        auto& e{ em.newEntity() };
-        em.addTag<ObjectTag>(e);
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = { 0.5, 0.5, 0.5 }, .color = color_nuevo_objeto });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position } });
-        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = tipo_nuevo_objeto });
+        // Se crea el nuevo objeto en el object system
+        os.addObject(tipo_nuevo_objeto, pos);
     }
 }

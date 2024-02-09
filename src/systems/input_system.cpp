@@ -193,6 +193,15 @@ void InputSystem::update(EntityManager& em)
                 plfi.mana = plfi.max_mana;
         }
 
+        if (IsKeyPressed(in.interact))
+        {
+            inpi.interact = true;
+        }
+        else if (IsKeyReleased(in.interact))
+        {
+            inpi.interact = false;
+        }
+
         // Codigo para la bomba
         if (IsKeyDown(KEY_B) && e.hasComponent<AttackComponent>())
             em.getComponent<AttackComponent>(e).attack(AttackType::Bomb);

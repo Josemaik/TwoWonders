@@ -7,7 +7,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
     {
         if (obj.decreaseLifeTime(deltaTime) && (!obj.inmortal))
         {
-            if (obj.type == Object_type::BombExplode || obj.type == Object_type::Heal_Spell)
+            if (obj.type == ObjectType::BombExplode || obj.type == ObjectType::Heal_Spell)
                 obj.effect();
             else
                 li.dead_entities.insert(ent.getID());
@@ -24,51 +24,51 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
 
             switch (obj.type)
             {
-            case Object_type::Life:
+            case ObjectType::Life:
                 if (playerEnt->hasComponent<LifeComponent>())
                     em.getComponent<LifeComponent>(*playerEnt).increaseLife();
                 break;
 
-            case Object_type::Sword:
+            case ObjectType::Sword:
                 if (!playerEnt->hasComponent<AttackComponent>())
                     em.addComponent<AttackComponent>(*playerEnt, AttackComponent{});
                 break;
 
-            case Object_type::Mana_Potion:
+            case ObjectType::Mana_Potion:
                 plfi.mana += 40;
                 break;
 
-            case Object_type::Bomb:
+            case ObjectType::Bomb:
                 plfi.addBomb();
                 break;
 
-            case Object_type::Coin:
+            case ObjectType::Coin:
                 plfi.addCoin();
                 break;
 
-            case Object_type::Coin30:
+            case ObjectType::Coin30:
                 plfi.add30Coins();
                 break;
 
-            case Object_type::ShopItem_Bomb:
+            case ObjectType::ShopItem_Bomb:
                 shop_object = buyBomb(em);
                 break;
 
-            case Object_type::ShopItem_Life:
+            case ObjectType::ShopItem_Life:
                 shop_object = buyLife(em, playerEnt);
                 break;
 
-            case Object_type::ShopItem_ExtraLife:
+            case ObjectType::ShopItem_ExtraLife:
                 shop_object = buyExtraLife(em, playerEnt);
                 break;
 
-            case Object_type::BombExplode:
+            case ObjectType::BombExplode:
                 explodeBomb(em, ent);
                 break;
-            case Object_type::Heal_Spell:
+            case ObjectType::Heal_Spell:
                 explodeBombHeal(em, ent);
                 break;
-            case Object_type::Key:
+            case ObjectType::Key:
                 plfi.addKey();
                 break;
 
@@ -80,10 +80,13 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             else
                 obj.active = false;
 
-            if (obj.mapID != 255 && obj.objID != 255)
-                li.notLoadSet.insert(std::make_pair(obj.mapID, obj.objID));
+            if (obj.objID != 255)
+                li.dontLoad.insert(std::make_pair(li.mapID, obj.objID));
         }
     });
+
+    if (!toCreate.empty())
+        createObjects(em);
 }
 
 // ent->hasComponent<LifeComponent<()
@@ -142,4 +145,72 @@ void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorTyp
         em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, type });
     }
+}
+
+void ObjectSystem::addObject(ObjectType type, vec3d pos)
+{
+    toCreate.push_back(std::make_pair(type, pos));
+}
+
+void ObjectSystem::createObjects(EntityManager& em)
+{
+    // Se crean los objetos del vector
+    for (auto& [obj, pos] : toCreate)
+    {
+        Color color{};
+        vec3d scl{ 0.5, 0.5, 0.5 };
+        bool inmortal = false;
+
+        switch (obj)
+        {
+        case ObjectType::Life:
+        {
+            color = RED;
+            break;
+        }
+        case ObjectType::Coin:
+        {
+            color = YELLOW;
+            break;
+        }
+        case ObjectType::Bomb:
+        {
+            color = GRAY;
+            break;
+        }
+        case ObjectType::Mana_Potion:
+        {
+            color = SKYBLUE;
+            break;
+        }
+        case ObjectType::Sword:
+        {
+            color = GRAY;
+            scl = { 1.5, 0.3, 0.3 };
+            inmortal = true;
+            break;
+        }
+        case ObjectType::Key:
+        {
+            color = GOLD;
+            scl = { 1.5, 0.3, 0.3 };
+            inmortal = true;
+            break;
+        }
+
+        default:
+            break;
+        }
+
+        // Se crea el nuevo objeto
+        auto& e{ em.newEntity() };
+        em.addTag<ObjectTag>(e);
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = scl, .color = color });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position } });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = obj, .inmortal = inmortal });
+    }
+
+    // Limpiamos el vector
+    toCreate.clear();
 }

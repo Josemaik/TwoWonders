@@ -32,7 +32,7 @@ private:
     void drawCoinBar(ENGI::GameEngine& engine, EntityManager& em);
     void drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, const Entity& e);
     void drawManaBar(ENGI::GameEngine& engine, EntityManager& em);
-    bool edit_parameters{ false };
+
     bool isSelected{ false };
     bool isSelectedfordebug{ false };
 };

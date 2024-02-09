@@ -4,7 +4,7 @@
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
 #include "../managers/ia_manager.hpp"
-#include "../managers/eventmanager.hpp"
+#include "../managers/event_manager.hpp"
 #include "../managers/map_manager.hpp"
 
 struct ZoneSystem
@@ -12,15 +12,11 @@ struct ZoneSystem
     using SYSCMPs = MP::TypeList<ZoneComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam, Eventmanager& evm, MapManager& map);
-    void reset();
+    void update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam, EventManager& evm, MapManager& map);
 
 private:
-    void updateZoneEnemies(EntityManager& em);
-    void deleteZoneEnemies(EntityManager& em);
-    void createKey(EntityManager& em);
-
-    bool keyCreated{ false };
+    void checkChests(EntityManager& em, EventManager& evm, uint16_t zone);
+    void checkDungeonSlimes(EntityManager& em, EventManager& evm);
 };
 
 #endif // !ZONE_SYSTEM

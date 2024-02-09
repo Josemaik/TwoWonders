@@ -1,10 +1,10 @@
 #pragma once
 
-enum struct Object_type { None, Life, Sword, Bomb, Coin, BombExplode, Coin30, ShopItem_Bomb, ShopItem_ExtraLife, ShopItem_Life, Key, Heal_Spell, Mana_Potion, AreaAttack, Spiderweb };
+enum struct ObjectType { None, Life, Sword, Bomb, Coin, BombExplode, Coin30, ShopItem_Bomb, ShopItem_ExtraLife, ShopItem_Life, Key, Heal_Spell, Mana_Potion, AreaAttack, Spiderweb };
 
 struct ObjectComponent
 {
-    Object_type type{ Object_type::Coin };
+    ObjectType type{ ObjectType::Coin };
     float life_time{ 10.0f }, elapsed{ 0.0f };
     bool active{ false };
 
@@ -15,7 +15,7 @@ struct ObjectComponent
         return elapsed >= life_time ? true : false;
     }
 
-    uint8_t mapID{ 255 };
+    // ID del objeto para que no vuelva a cargar cuando se recargue el nivel
     uint8_t objID{ 255 };
 
     void effect() { active = true; }

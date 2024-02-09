@@ -5,6 +5,11 @@
 #include "../utils/types.hpp"
 #include "ia_manager.hpp"
 
+enum InteractableType
+{
+    Chest = 0x01,
+};
+
 struct MapManager
 {
     void createMap(EntityManager& em, uint8_t mapID, Ia_man& iam);
