@@ -1,6 +1,6 @@
 #include "zone_system.hpp"
 
-void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Eventmanager& evm, MapManager& map) {
+void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, EventManager& evm, MapManager& map) {
     auto& li = em.getSingleton<LevelInfo>();
     updateZoneEnemies(em);
 
@@ -195,7 +195,7 @@ void ZoneSystem::createKey(EntityManager& em)
     keyCreated = true;
 }
 
-void ZoneSystem::checkChests(EntityManager& em, Eventmanager& evm, uint16_t zone)
+void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone)
 {
     auto& li = em.getSingleton<LevelInfo>();
     using chestCMP = MP::TypeList<ChestComponent, PhysicsComponent>;
@@ -219,14 +219,11 @@ void ZoneSystem::checkChests(EntityManager& em, Eventmanager& evm, uint16_t zone
 
             // Si el cofre se encuentra a menos de 2 unidades de distancia del se muestra el mensaje de abrir cofre
             if (distance < 2.0 && !ch.isOpen && !ch.showButton)
-            {
                 ch.showButton = true;
-                std::cout << "Chest" << std::endl;
-            }
+
             else if (distance > 2.0 && ch.showButton)
-            {
                 ch.showButton = false;
-            }
+
 
             auto& inpi = em.getSingleton<InputInfo>();
 

@@ -34,7 +34,7 @@ struct Game
     void run();
 
 private:
-    void createEntities(EntityManager& em, Eventmanager& evm);
+    void createEntities(EntityManager& em);
     void createSword(EntityManager& em);
     void createShield(EntityManager& em, Entity& ent);
     void createCoin(EntityManager& em);
@@ -45,7 +45,7 @@ private:
 
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};
-    Eventmanager evm{};
+    EventManager evm{};
     Ia_man iam{};
     PhysicsSystem physics_system{};
     RenderSystem render_system{};

@@ -187,8 +187,6 @@ void ObjectSystem::createObjects(EntityManager& em)
             break;
         }
 
-        std::cout << static_cast<int>(obj) << std::endl;
-
         // Se crea el nuevo objeto
         auto& e{ em.newEntity() };
         em.addTag<ObjectTag>(e);

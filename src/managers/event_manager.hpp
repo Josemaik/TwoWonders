@@ -41,35 +41,12 @@ struct ListenerRegistration {
     }
 };
 
-struct Eventmanager
+struct EventManager
 {
 public:
     // Programa un evento para ser despachado tan pronto como sea posible
     void scheduleEvent(const Event& event) {
         events.push_back(event);
-    }
-
-    // Registra un listener en el gestor de eventos
-    void registerListener(const Entity& listener, uint16_t code)
-    {
-        ListenerRegistration lr(code, listener);
-        listeners.push_back(lr);
-    }
-
-    // Quita un listener del gestor de eventos
-    void unregisterListener(const Entity& listener, uint16_t code)
-    {
-        std::vector<decltype(listeners)::iterator> toRemove{};
-        for (auto it = listeners.begin(); it != listeners.end(); ++it) {
-            if (it->listener == &listener && it->interestCode == code) {
-                toRemove.push_back(it);
-                break;
-            }
-        }
-
-        for (auto& lr : toRemove) {
-            listeners.erase(lr);
-        }
     }
 
     // Dispara todos los eventos pendientes
@@ -80,19 +57,23 @@ public:
             Event& event = events.back();
             events.pop_back();
 
-            // Notifica a cada listener interesado en el evento
-            for (const auto& lr : listeners) {
-                if (lr.interestCode & event.code) {
+            using CMPs = MP::TypeList<ListenerComponent>;
+            using noTag = MP::TypeList<>;
+
+            // Notifica a todos los listeners que estén interesados en el evento
+            em.forEach<CMPs, noTag>([&](Entity& e, ListenerComponent& lc)
+            {
+                if (lc.codeMask & event.code)
+                {
                     switch (event.code)
                     {
                     case EventCodes::SpawnKey:
-                        // Llama a la función de callback del listener
-                        // em.getComponent<EventComponent>(lr.listener).onSpawnKey();
+
                         break;
                     case EventCodes::OpenChest:
                     {
                         auto& li = em.getSingleton<LevelInfo>();
-                        auto& playerPos = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
+                        auto& playerPos = em.getComponent<PhysicsComponent>(e).position;
                         auto& chest = *em.getEntityByID(li.chestToOpen);
                         auto& chestComp = em.getComponent<ChestComponent>(chest);
 
@@ -101,22 +82,14 @@ public:
                         break;
                     }
                     }
-
-                    continue;
                 }
-            }
+            });
         }
     }
 
-    void reset()
-    {
-        listeners.clear();
-        events.clear();
-    }
+    void reset() { events.clear(); }
 
 private:
-    // Lista de registros de listeners
-    std::vector<ListenerRegistration> listeners;
     // Cola de eventos pendientes
     std::vector<Event> events;
 };

@@ -19,7 +19,7 @@ void Game::createEnding(EntityManager& em)
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
 }
 
-void Game::createEntities(EntityManager& em, Eventmanager& evm)
+void Game::createEntities(EntityManager& em)
 {
     // Player
     auto& e{ em.newEntity() };
@@ -27,14 +27,15 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
 
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -0.0f, 0.0f, -0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
+    auto& lis = em.addComponent<ListenerComponent>(e, ListenerComponent{});
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<TypeComponent>(e, TypeComponent{});
 
     // Listeners de eventos para el jugador
-    evm.registerListener(e, EventCodes::SpawnKey);
-    evm.registerListener(e, EventCodes::OpenChest);
+    lis.addCode(EventCodes::SpawnKey);
+    lis.addCode(EventCodes::OpenChest);
 
     // Shield
     createShield(em, e);
@@ -135,7 +136,7 @@ void Game::run()
 
             if (em.getEntities().empty())
             {
-                createEntities(em, evm);
+                createEntities(em);
                 map.reset(em, 0, iam);
             }
 
@@ -222,7 +223,7 @@ void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
     plfi.reset();
     zone_system.reset();
     lock_system.reset();
-    createEntities(em, evm);
+    createEntities(em);
     map.reset(em, 0, iam);
 }
 

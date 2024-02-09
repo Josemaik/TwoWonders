@@ -232,7 +232,6 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color });
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero() });
 
-        std::cout << "Type: " << type << "\n\n\n" << std::endl;
         switch (type)
         {
         case 1:
