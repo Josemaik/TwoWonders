@@ -13,15 +13,10 @@ struct ZoneSystem
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam, EventManager& evm, MapManager& map);
-    void reset();
 
 private:
     void checkChests(EntityManager& em, EventManager& evm, uint16_t zone);
-    void updateZoneEnemies(EntityManager& em);
-    void deleteZoneEnemies(EntityManager& em);
-    void createKey(EntityManager& em);
-
-    bool keyCreated{ false };
+    void checkDungeonSlimes(EntityManager& em, EventManager& evm);
 };
 
 #endif // !ZONE_SYSTEM

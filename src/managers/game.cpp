@@ -34,7 +34,7 @@ void Game::createEntities(EntityManager& em)
     em.addComponent<TypeComponent>(e, TypeComponent{});
 
     // Listeners de eventos para el jugador
-    lis.addCode(EventCodes::SpawnKey);
+    lis.addCode(EventCodes::SpawnDungeonKey);
     lis.addCode(EventCodes::OpenChest);
 
     // Shield
@@ -221,7 +221,6 @@ void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
     rs.unloadModels(em, engine);
     li.reset();
     plfi.reset();
-    zone_system.reset();
     lock_system.reset();
     createEntities(em);
     map.reset(em, 0, iam);

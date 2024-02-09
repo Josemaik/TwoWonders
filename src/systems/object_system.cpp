@@ -80,8 +80,8 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             else
                 obj.active = false;
 
-            if (obj.mapID != 255 && obj.objID != 255)
-                li.notLoadSet.insert(std::make_pair(obj.mapID, obj.objID));
+            if (obj.objID != 255)
+                li.dontLoad.insert(std::make_pair(li.mapID, obj.objID));
         }
     });
 
@@ -155,11 +155,12 @@ void ObjectSystem::addObject(ObjectType type, vec3d pos)
 void ObjectSystem::createObjects(EntityManager& em)
 {
     // Se crean los objetos del vector
-    Color color{};
-
     for (auto& [obj, pos] : toCreate)
     {
+        Color color{};
         vec3d scl{ 0.5, 0.5, 0.5 };
+        bool inmortal = false;
+
         switch (obj)
         {
         case ObjectType::Life:
@@ -182,6 +183,20 @@ void ObjectSystem::createObjects(EntityManager& em)
             color = SKYBLUE;
             break;
         }
+        case ObjectType::Sword:
+        {
+            color = GRAY;
+            scl = { 1.5, 0.3, 0.3 };
+            inmortal = true;
+            break;
+        }
+        case ObjectType::Key:
+        {
+            color = GOLD;
+            scl = { 1.5, 0.3, 0.3 };
+            inmortal = true;
+            break;
+        }
 
         default:
             break;
@@ -193,8 +208,9 @@ void ObjectSystem::createObjects(EntityManager& em)
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = scl, .color = color });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position } });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = obj });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = obj, .inmortal = inmortal });
     }
 
+    // Limpiamos el vector
     toCreate.clear();
 }

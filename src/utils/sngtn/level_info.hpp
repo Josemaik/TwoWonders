@@ -11,6 +11,7 @@ enum struct GameScreen { LOGO, TITLE, STORY, GAMEPLAY, /*DEAD,*/ OPTIONS, ENDING
 //Memoria global de nivel
 struct LevelInfo
 {
+  static constexpr std::size_t max = std::numeric_limits<std::size_t>::max();
 
   // types for unordered_set of pairs
   struct pair_hash
@@ -34,50 +35,57 @@ struct LevelInfo
     }
   };
 
-  using NotLoadSet = std::unordered_set<std::pair<uint8_t, uint8_t>, pair_hash, pair_equal>;
+  using notLoadSet = std::unordered_set<std::pair<uint8_t, uint8_t>, pair_hash, pair_equal>;
   using deathSet = std::set<std::size_t, std::greater<std::size_t>>;
 
-  //Referencia al player
+  // Referencia al player
   std::size_t playerID;
   bool playerDetected{ false };
-  std::unordered_set<std::size_t> enemiesID{};
+
+  // Variables de la cámara
   std::vector<vec3d> enemyPositions{};
   bool transition{ false };
   bool cameraChange{ false };
-  const std::size_t max = std::numeric_limits<std::size_t>::max();
+
+  // Variables de lock on
   std::size_t lockedEnemy{ max };
   std::size_t closestEnemy{ max };
-  NotLoadSet notLoadSet{};
+
+  // Variables de carga de entidades
+  notLoadSet dontLoad{};
   deathSet dead_entities{};
 
+  // Variables relacionadas con los eventos
   std::size_t chestToOpen{ max };
+  bool dungeonKeyCreated{ false };
+
+  // Variables de debug
   bool debugIA2{ false };
   bool resetGame{ false };
 
+  // Variables de zona y el nivel
   uint16_t num_zone{};
-  bool drawzone{ false };
-  int segundos{ 1000 };
   uint8_t mapID{ 0 };
 
+  // Estado del juego
   GameScreen currentScreen = GameScreen::GAMEPLAY;
 
   void reset()
   {
     playerDetected = false;
-    enemiesID.clear();
     enemyPositions.clear();
     transition = false;
     cameraChange = false;
     lockedEnemy = max;
     closestEnemy = max;
-    notLoadSet.clear();
+    dontLoad.clear();
     dead_entities.clear();
     debugIA2 = false;
     resetGame = false;
     num_zone = 0;
-    drawzone = false;
-    segundos = 1000;
     mapID = 0;
+    chestToOpen = max;
+    dungeonKeyCreated = false;
   }
 
 };

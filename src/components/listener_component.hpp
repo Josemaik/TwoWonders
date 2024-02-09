@@ -9,6 +9,10 @@ struct ListenerComponent
     // Función para quitar un código de evento
     void removeCode(uint16_t code) { codeMask &= static_cast<uint16_t>(~(1u << code)); }
 
+    // Función para comprobar si un código de evento está registrado
+    bool hasCode(uint16_t code) const { return codeMask & static_cast<uint16_t>(1u << code); }
+
+private:
     // Máscara para añadir códigos en binario
     uint16_t codeMask{};
 };

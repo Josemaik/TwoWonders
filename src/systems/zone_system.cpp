@@ -2,7 +2,6 @@
 
 void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, EventManager& evm, MapManager& map) {
     auto& li = em.getSingleton<LevelInfo>();
-    updateZoneEnemies(em);
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, ZoneComponent& zon)
     {
@@ -16,7 +15,6 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                 //lanzar evento
                 // evm.scheduleEvent(Event{ EVENT_CODE_CHANGE_ZONE });
                 //borro enemigos si cambio de zona
-                deleteZoneEnemies(em);
                 // iam.createEnemiesZone(em, zon.zone);
                 // Es una zona
                 li.num_zone = zon.zone;
@@ -128,6 +126,11 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
         checkChests(em, evm, 1);
         break;
     }
+    case 10:
+    {
+        checkDungeonSlimes(em, evm);
+        break;
+    }
     case 11:
     {
         auto& bb = em.getSingleton<BlackBoard_t>();
@@ -137,62 +140,34 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
         }
         break;
     }
+    case 12:
+    {
+        checkDungeonSlimes(em, evm);
+    }
     default:
         break;
     }
 }
 
-void ZoneSystem::deleteZoneEnemies(EntityManager&)
+void ZoneSystem::checkDungeonSlimes(EntityManager& em, EventManager& evm)
 {
-    // auto const& li = em.getSingleton<LevelInfo>();
-
-    // for (auto& enemy : li.enemiesID)
-    //     dead_entities.insert(enemy);
-
-}
-
-void ZoneSystem::updateZoneEnemies(EntityManager& em)
-{
-    using noCMPs = MP::TypeList<>;
-    using enemyTag = MP::TypeList<EnemyTag>;
-
     auto& li = em.getSingleton<LevelInfo>();
 
-    std::unordered_set<std::size_t> enemies;
-    em.forEach<noCMPs, enemyTag>([&](Entity& ent)
+    if (!li.dungeonKeyCreated)
     {
-        enemies.insert(ent.getID());
-    });
+        using noCMPs = MP::TypeList<>;
+        using enemyTag = MP::TypeList<EnemyTag>;
+        bool slimesDead{ true };
 
-    if (enemies != li.enemiesID)
-        li.enemiesID = std::move(enemies);
+        em.forEach<noCMPs, enemyTag>([&](Entity& ent)
+        {
+            if (slimesDead && ent.hasTag<SlimeTag>())
+                slimesDead = false;
+        });
 
-    bool slimesDead{ true };
-
-    for (auto enemy : li.enemiesID)
-    {
-        auto ent = em.getEntityByID(enemy);
-
-        if (ent->hasTag<SlimeTag>())
-            slimesDead = false;
+        if (slimesDead)
+            evm.scheduleEvent(Event{ EventCodes::SpawnDungeonKey });
     }
-
-    if ((li.num_zone == 12 || li.num_zone == 11) && slimesDead && !keyCreated)
-        createKey(em);
-}
-
-void ZoneSystem::createKey(EntityManager& em)
-{
-    auto& e{ em.newEntity() };
-
-    em.addTag<ObjectTag>(e);
-
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 83., 0., -71.0 }, .scale = { 1., 0.3, 0.3 }, .color = GOLD });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .0, .0, .0 } });
-    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Key, .inmortal = true });
-
-    keyCreated = true;
 }
 
 void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone)
@@ -208,7 +183,7 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone
             // Revisamos si el cofre ha sido abierto
             std::pair<uint8_t, uint8_t> pair{ li.mapID, ch.id };
 
-            if (li.notLoadSet.find(pair) != li.notLoadSet.end())
+            if (li.dontLoad.find(pair) != li.dontLoad.end())
                 return;
 
             // Calcula la distancia entre la posición del jugador y la posición del cofre
@@ -233,14 +208,9 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone
                 ch.showButton = false;
                 li.chestToOpen = e.getID();
                 evm.scheduleEvent(Event{ EventCodes::OpenChest });
-                li.notLoadSet.insert(pair);
+                li.dontLoad.insert(pair);
             }
 
         }
     });
-}
-
-void ZoneSystem::reset()
-{
-    keyCreated = false;
 }

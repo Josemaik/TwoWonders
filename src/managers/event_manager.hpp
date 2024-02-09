@@ -14,31 +14,10 @@ struct Event {
 //Eventos
 enum EventCodes
 {
+    NoEvent = 0x00,
     SpawnKey = 0x01,
-    OpenChest = 0x02,
-};
-
-// Clase ListenerRegistration para almacenar datos sobre un listener registrado
-struct ListenerRegistration {
-
-    uint16_t interestCode;
-    const Entity* listener;
-
-    ListenerRegistration(uint16_t code, const Entity& entity)
-        : interestCode(code), listener(&entity) {}
-
-    // Constructor de copia
-    ListenerRegistration(const ListenerRegistration& other)
-        : interestCode(other.interestCode), listener(other.listener) {}
-
-    // Operador de asignación de movimiento
-    ListenerRegistration& operator=(ListenerRegistration&& other) noexcept {
-        if (this != &other) {
-            interestCode = other.interestCode;
-            listener = other.listener;
-        }
-        return *this;
-    }
+    SpawnDungeonKey = 0x02,
+    OpenChest = 0x04,
 };
 
 struct EventManager
@@ -63,13 +42,21 @@ public:
             // Notifica a todos los listeners que estén interesados en el evento
             em.forEach<CMPs, noTag>([&](Entity& e, ListenerComponent& lc)
             {
-                if (lc.codeMask & event.code)
+                if (lc.hasCode(event.code))
                 {
                     switch (event.code)
                     {
                     case EventCodes::SpawnKey:
-
                         break;
+
+                    case EventCodes::SpawnDungeonKey:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        vec3d pos{ 83.0, 0.0, -71.0 };
+                        os.addObject(ObjectType::Key, pos);
+                        li.dungeonKeyCreated = true;
+                        break;
+                    }
                     case EventCodes::OpenChest:
                     {
                         auto& li = em.getSingleton<LevelInfo>();

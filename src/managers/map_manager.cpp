@@ -192,7 +192,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
 
         std::pair<uint8_t, uint8_t> pair{ mapId, objId };
 
-        if (li.notLoadSet.find(pair) != li.notLoadSet.end())
+        if (li.dontLoad.find(pair) != li.dontLoad.end())
             continue;
 
         // Extraemos los datos del json
@@ -208,7 +208,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color });
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero() });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-        em.addComponent<ObjectComponent>(entity, ObjectComponent{ .type = type, .inmortal = true, .mapID = mapId, .objID = objId });
+        em.addComponent<ObjectComponent>(entity, ObjectComponent{ .type = type, .inmortal = true, .objID = objId });
     }
 
     for (rapidjson::SizeType i = 0; i < enemyArray.Size(); i++)

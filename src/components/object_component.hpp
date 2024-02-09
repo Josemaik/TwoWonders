@@ -15,7 +15,7 @@ struct ObjectComponent
         return elapsed >= life_time ? true : false;
     }
 
-    uint8_t mapID{ 255 };
+    // ID del objeto para que no vuelva a cargar cuando se recargue el nivel
     uint8_t objID{ 255 };
 
     void effect() { active = true; }

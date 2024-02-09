@@ -23,7 +23,7 @@
 #include "../utils/sngtn/player_info.hpp"
 #include "../utils/sngtn/blackboard.hpp"
 #include "../utils/sngtn/debug_singleton.hpp"
-#include "../utils/sngtn/levelinfo.hpp"
+#include "../utils/sngtn/level_info.hpp"
 #include "../utils/sngtn/input_info.hpp"
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
