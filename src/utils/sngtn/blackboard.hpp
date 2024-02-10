@@ -19,6 +19,7 @@ struct BlackBoard_t {
     std::size_t teid{};
     //centinela para crear súbditos
     bool create_subdito{ false };
+    bool activate_shield { false };
     //Posicion Boss Final
     vec3d boss_position{};
     //Path

@@ -27,7 +27,7 @@ void Game::createEntities(EntityManager& em, Eventmanager& evm)
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -49.0f, 0.0f, -3.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     em.addComponent<InputComponent>(e, InputComponent{});
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 26 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
 
     em.addComponent<TypeComponent>(e, TypeComponent{});
