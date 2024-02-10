@@ -29,7 +29,7 @@ void Game::createEntities(EntityManager& em)
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     auto& lis = em.addComponent<ListenerComponent>(e, ListenerComponent{});
     em.addComponent<InputComponent>(e, InputComponent{});
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 26 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<TypeComponent>(e, TypeComponent{});
 
