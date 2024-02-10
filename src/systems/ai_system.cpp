@@ -37,7 +37,7 @@ void AISystem::update(EntityManager& em, float dt)
     auto& bb = em.getSingleton<BlackBoard_t>();
     bb.idsubditos.clear();
 
-    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, AIComponent& ai, LifeComponent& lc)
+    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy,RenderComponent& ren, AIComponent& ai, LifeComponent& lc)
     {
         //percibir el entorno
         perception(bb, ai, dt);
@@ -62,7 +62,7 @@ void AISystem::update(EntityManager& em, float dt)
             enemyPositions.push_back(phy.position);
 
         if (ai.behaviourTree) {
-            ai.behaviourTree->run({ em,e,ai,phy,lc,dt });
+            ai.behaviourTree->run({ em,e,ai,phy,ren,lc,dt });
             return;
         }
     });

@@ -594,7 +594,11 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* a_gs = &tree.createNode<BTDAction_GenerateSubditos>();
         auto* sequence = &tree.createNode<BTNodeSequence_t>(d_pd, d_gs, a_gs);
 
-        tree.createNode<BTNodeSelector_t>(sequence, patrol);
+        auto* d_h = &tree.createNode<BTDecisionReadyforHeal>();
+        auto* a_hm = &tree.createNode<BTAction_HealMate>();
+        auto* sequence1 = &tree.createNode<BTNodeSequence_t>(d_h, a_hm);
+
+        tree.createNode<BTNodeSelector_t>(sequence,sequence1,patrol);
         // auto* ready_7 = &tree.createNode<BTDecisionReadyforAttack>();
         // auto* atack_7 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot);
         // [[maybe_unused]] auto* sequence7_3 = &tree.createNode<BTNodeSequence_t>(patrol_7, ready_7, atack_7);
