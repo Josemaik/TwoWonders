@@ -18,6 +18,7 @@ struct EntityContext_t {
     // DrakeComponent& drc;
     //Components
     PhysicsComponent& phy;
+    RenderComponent& ren;
     LifeComponent& lifec;
     float deltatime;
 };

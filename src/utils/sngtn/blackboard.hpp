@@ -24,7 +24,8 @@ struct BlackBoard_t {
     //Path
     // Path_t<4> path { vec3d{8.0, 0.0, 4.0} , {3.0,0.0,4.0} , {3.0,0.0,5.0}, {8.0,0.0,5.0} };
     //Actualizar información IA slimes
-    void updateInfo(std::size_t id, vec3d position, int life, uint16_t type) {
+    void 
+    updateInfo(std::size_t id, vec3d position, int life, uint16_t type) {
         Info EntInfo(position, life);
         // si el tipo es 0 es slime, si es 1 es subdito
         if (type == 0) {
