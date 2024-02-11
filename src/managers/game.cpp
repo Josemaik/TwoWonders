@@ -8,7 +8,7 @@ void Game::createShield(EntityManager& em, Entity& ent)
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = DARKBROWN });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
-    em.addComponent<ShieldComponent>(e, ShieldComponent{});
+    em.addComponent<ShieldComponent>(e, ShieldComponent{.createdby= EntitieswithShield::Player});
 }
 
 void Game::createEnding(EntityManager& em)

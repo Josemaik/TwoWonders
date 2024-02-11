@@ -34,6 +34,7 @@
 #include "../utils/bt/decision_readyforheal.hpp"
 #include "../utils/bt/decision_playerhunted.hpp"
 #include "../utils/bt/decision_subditosalreadygenerated.hpp"
+#include "../utils/bt/decision_activateorquit_shield.hpp"
 struct Ia_man
 {
     using jsonType = const rapidjson::Value&;

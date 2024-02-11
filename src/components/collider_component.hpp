@@ -16,7 +16,8 @@ enum BehaviorType
     ENDING = 0x80,
     HEAL = 0x100,
     AREADAMAGE = 0x200,
-    SPIDERWEB = 0x400
+    SPIDERWEB = 0x400,
+    SUBDITOSHIELD = 0x800
 };
 
 struct ColliderComponent
