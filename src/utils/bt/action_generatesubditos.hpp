@@ -12,6 +12,8 @@ struct BTDAction_GenerateSubditos : BTNode_t {
             ectx.ai.elapsed_spawning = 0;
             auto& bb = ectx.em.getSingleton<BlackBoard_t>();
             bb.create_subdito = true;
+            //debilitar
+            ectx.lifec.decreaseLife();
             return BTNodeStatus_t::fail;
         }else{
             ectx.ai.plusdeltatime(ectx.deltatime,ectx.ai.elapsed_spawning);
