@@ -58,20 +58,20 @@ void ShieldSystem::update(EntityManager& em) {
                             p.position = phy_pl.position;
                             p.orientation = phy_pl.orientation;
 
-                            static const double SHIELD_DISTANCE = 1.5;
+                            static const double SHIELD_DISTANCE = 1.2;
 
                             double offsetX = sin(p.orientation) * SHIELD_DISTANCE;
                             double offsetZ = cos(p.orientation) * SHIELD_DISTANCE;
 
                             p.position += { offsetX, 0.0f, offsetZ };
                             if (offsetX == 0.75 || offsetX == -0.75)
-                                    r.scale = { 0.5f, 1.0f, 1.0f };
+                                    r.scale = { 1.0f, 1.0f, 1.0f };
                             else
-                                    r.scale = { 1.0f, 1.0f, 0.5f };
+                                    r.scale = { 2.0f, 1.0f, 0.25f };
                             }
                     }
                 }
-                if(subassociated == false){
+                if(subassociated == false || !bb.activate_shield){
                     em.getComponent<LifeComponent>(ent).markedForDeletion = true;
                 }
             }

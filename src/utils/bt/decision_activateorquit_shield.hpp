@@ -16,14 +16,16 @@ struct BTDecisionActivateorQuit_Shield : BTNode_t{
                     for(const auto& sub : bb.subditosData){
                         if((*ectx.em.getEntityByID(sub.first)).hasComponent<RenderComponent>()){
                             auto& e{ ectx.em.newEntity() };
-                            auto& r = ectx.em.addComponent<RenderComponent>(e, RenderComponent{ .position = ectx.em.getComponent<RenderComponent>(*ectx.em.getEntityByID(sub.first)).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = DARKBROWN });
+                            auto& r = ectx.em.addComponent<RenderComponent>(e, RenderComponent{ .position = ectx.em.getComponent<RenderComponent>(*ectx.em.getEntityByID(sub.first)).position, .scale = { 2.0f, 1.0f, 0.5f }, .color = DARKBROWN });
                             auto& p = ectx.em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position });
-                            ectx.em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
+                            ectx.em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SUBDITOSHIELD });
                             ectx.em.addComponent<ShieldComponent>(e, ShieldComponent{.activeShield=true,.createdby= EntitieswithShield::Subdito,.id_subdito=sub.first});
                             ectx.em.addComponent<LifeComponent>(e, LifeComponent{.life = 2});
                         }
                     }
                 }
+            }else{
+                
             }
         }
         ectx.ai.plusdeltatime(ectx.deltatime,ectx.ai.elapsed_shield);

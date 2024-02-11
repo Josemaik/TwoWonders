@@ -221,6 +221,22 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
             return;
         }
 
+        if ((behaviorType2 & BehaviorType::SUBDITOSHIELD || behaviorType1 & BehaviorType::SUBDITOSHIELD) && (isAtkPlayer1 || isAtkPlayer2)) {
+            auto* bulletEntityPtr = isAtkPlayer1 ? &otherEnt : &staticEnt; // La bala es el otroEnt si isAtkPlayer1 es verdadero, de lo contrario, es staticEnt
+
+            // Verifica si la entidad de la bala tiene un componente de colisión
+            //if (bulletEntityPtr->hasComponent<ColliderComponent>()) {
+                auto& bulletCollider = em.getComponent<ColliderComponent>(*bulletEntityPtr);
+
+                // Verifica si la bala es del tipo que puede ser destruida por el escudo del subdito
+                // if (bulletCollider.) {
+                    auto& li = em.getSingleton<LevelInfo>();
+                    li.dead_entities.insert(bulletEntityPtr->getID()); // Marca la bala como muerta
+                    return;
+                // }
+            //}
+        }
+
         handleAtkCollision(em, isAtkPlayer1, isAtkPlayer2, isAtkEnemy1, isAtkEnemy2, staticEnt, otherEnt);
         return;
     }

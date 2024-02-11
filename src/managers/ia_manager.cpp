@@ -705,7 +705,7 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
     tree.createNode<BTNodeSelector_t>(sequence1_1, sequence1_2);
 
 
-    em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = 0.1, .detect_radius = 10.0, .attack_radius = 2.5, .tx = 0.0, .tz = 0.0,.time2arrive = 1.0, .tactive = true, .perceptionTime = static_cast<float>(0.2),
+    em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = 0.1, .detect_radius = 18.0, .attack_radius = 2.5, .tx = 0.0, .tz = 0.0,.time2arrive = 1.0, .tactive = true, .perceptionTime = static_cast<float>(0.2),
     .path = vec3d{}, .countdown_stop = 0.8, .countdown_shoot = 0.5, .countdown_perception = 0.5, .behaviourTree = &tree });
 
     em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = 5.0 });
