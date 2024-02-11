@@ -711,27 +711,29 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
 
     auto* d_1_1 = &tree.createNode<BTDecisionPlayerDetected>();
 
-    auto* a_s_1{&tree.createNode<BTAction_Pursue>()};
+    
     double attack_radius_p, countdown_shoot_p,countdown_stop_p{};
     if(type_attk == AIComponent::TypeShoot::Melee){
-        auto* a_s_1 = &tree.createNode<BTAction_Pursue>();
+        auto* a_s_1{&tree.createNode<BTAction_Pursue>()};
         attack_radius_p = 2.5;
         countdown_shoot_p = 0.4;
         countdown_stop_p = 0.8;
+        auto* sequence1_2 = &tree.createNode<BTNodeSequence_t>(d_1_1, a_s_1);
+        tree.createNode<BTNodeSelector_t>(sequence1_1, sequence1_2);
     }else{
-        auto* a_s_1 = &tree.createNode<BTAction_Seek>();
+       auto* a_s_1{&tree.createNode<BTAction_Seek>()};
         attack_radius_p = 4.5;
         countdown_shoot_p = 0.2;
         countdown_stop_p = 0.5;
+        auto* sequence1_2 = &tree.createNode<BTNodeSequence_t>(d_1_1, a_s_1);
+        tree.createNode<BTNodeSelector_t>(sequence1_1, sequence1_2);
     }
 
-    auto* sequence1_2 = &tree.createNode<BTNodeSequence_t>(d_1_1, a_s_1);
+    
 
 
-    // auto* patrol_1 = &tree.createNode<BTAction_Patrol>();
-    // auto* sequence1_3 = &tree.createNode<BTNodeSequence_t>(patrol_1);
 
-    tree.createNode<BTNodeSelector_t>(sequence1_1, sequence1_2);
+    
 
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = type_ele });
     em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = 0.1, .detect_radius = 18.0, .attack_radius = attack_radius_p, .tx = 0.0, .tz = 0.0,.time2arrive = 1.0, .tactive = true, .perceptionTime = static_cast<float>(0.2),
