@@ -682,7 +682,7 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
     auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .max_speed = 0.4 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 2 });
-    em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Neutral });
+    
 
     // Creamos el arbol de comportamiento
     vec_t.push_back(std::make_unique<BehaviourTree_t>());
@@ -694,13 +694,18 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
     //aqui el bt
     auto* d_a_1 = &tree.createNode<BTDecisionReadyforAttack>();
 
-    AIComponent::TypeShoot type{};
+    ElementalType type_ele{};
+    AIComponent::TypeShoot type_attk{};
     if(randomNum <= 50){
-        type = AIComponent::TypeShoot::Melee;
+        type_attk = AIComponent::TypeShoot::Melee;
+        type_ele = ElementalType::Fuego;
+        wp.max_speed = 0.5;
     }else{
-        type = AIComponent::TypeShoot::OneShoottoPlayer;
+        type_attk = AIComponent::TypeShoot::OneShoottoPlayer;
+        type_ele = ElementalType::Hielo;
+        wp.max_speed = 0.4;
     }
-    auto* a_a_1 = &tree.createNode<BTActionShoot>(type); // fail si disparo succes si no disparo
+    auto* a_a_1 = &tree.createNode<BTActionShoot>(type_attk); // fail si disparo succes si no disparo
     auto* d_r_1 = &tree.createNode<BTDecisionOnAttackRadius>();
     auto* sequence1_1 = &tree.createNode<BTNodeSequence_t>(d_a_1, a_a_1, d_r_1);
 
@@ -708,7 +713,7 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
 
     auto* a_s_1{&tree.createNode<BTAction_Pursue>()};
     double attack_radius_p, countdown_shoot_p,countdown_stop_p{};
-    if(type == AIComponent::TypeShoot::Melee){
+    if(type_attk == AIComponent::TypeShoot::Melee){
         auto* a_s_1 = &tree.createNode<BTAction_Pursue>();
         attack_radius_p = 2.5;
         countdown_shoot_p = 0.4;
@@ -728,6 +733,7 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
 
     tree.createNode<BTNodeSelector_t>(sequence1_1, sequence1_2);
 
+    em.addComponent<TypeComponent>(e, TypeComponent{ .type = type_ele });
     em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = 0.1, .detect_radius = 18.0, .attack_radius = attack_radius_p, .tx = 0.0, .tz = 0.0,.time2arrive = 1.0, .tactive = true, .perceptionTime = static_cast<float>(0.2),
     .path = vec3d{}, .countdown_stop = countdown_stop_p, .countdown_shoot = countdown_shoot_p, .countdown_perception = 0.2, .behaviourTree = &tree });
 
