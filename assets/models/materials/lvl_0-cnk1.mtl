@@ -1,0 +1,82 @@
+# Blender 4.0.2 MTL File: 'Zona_0-Bosque.blend'
+# www.blender.org
+
+newmtl Arbol_2.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:/godo/estudios/uni/4º/abp/hito 3/niveles/Zona_0-Bosque/Arbol_2.1_texture.psd
+
+newmtl Arbol_2.004
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:/godo/estudios/uni/4º/abp/hito 3/niveles/Zona_0-Bosque/Arbol_2_texture.psd
+
+newmtl Arbol_2.005
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:/godo/estudios/uni/4º/abp/hito 3/niveles/Zona_0-Bosque/Arbol_2.1_texture.psd
+
+newmtl Arbol_2.006
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:/godo/estudios/uni/4º/abp/hito 3/niveles/Zona_0-Bosque/Arbol_2_texture.psd
+
+newmtl Campamento_1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:/godo/estudios/uni/4º/abp/hito 3/niveles/Zona_0-Bosque/campamento_1_texture.psd
+
+newmtl Campamento_1_agua
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 0.600000
+illum 9
+map_Kd E:/godo/estudios/uni/4º/abp/hito 3/niveles/Zona_0-Bosque/campamento_1_texture.psd
+
+newmtl Hoguera
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:/godo/estudios/uni/4º/abp/hito 3/niveles/Zona_0-Bosque/hoguera_texture.psd
+
+newmtl chunk
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:/godo/estudios/uni/4º/abp/hito 3/niveles/Zona_0-Bosque/lvl0_texture.psd

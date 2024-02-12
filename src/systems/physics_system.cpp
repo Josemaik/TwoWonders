@@ -18,8 +18,8 @@ void PhysicsSystem::update(EntityManager& em, float dt)
         // if(e.hasTag<PlayerTag>() || e.hasTag<HitPlayerTag>()){
         if (std::abs(vel.x()) > phy.max_speed || std::abs(vel.y()) > phy.max_speed || std::abs(vel.z()) > phy.max_speed)
         {
+            std::cout << "aja\n";
             vel.normalize();
-            vel *= phy.max_speed;
         }
         // }else{
         //         //Normalizar la velocidad

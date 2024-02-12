@@ -174,59 +174,67 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     if (e.hasTag<PlayerTag>())
                     {
                         r.model = LoadModel("assets/models/main_character.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/main_character_uv_V2.png");
-                        Texture2D t = LoadTexture("assets/models/textures/main_character_texture_V2.png");
+                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/main_character_uv_V2.png");
+                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/main_character_texture_V2.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SlimeTag>())
                     {
                         r.model = LoadModel("assets/models/Slime.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Slime_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Slime_texture.png");
+                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Slime_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Slime_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SnowmanTag>())
                     {
                         r.model = LoadModel("assets/models/snowman.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/snowman_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/snowman_texture.png");
+                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/snowman_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/snowman_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<GolemTag>())
                     {
                         r.model = LoadModel("assets/models/Golem.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Golem_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Golem_texture.png");
+                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Golem_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Golem_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SpiderTag>())
                     {
                         r.model = LoadModel("assets/models/Spider.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Spider_UV.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Spider_texture.png");
+                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Spider_UV.png");
+                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Spider_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<BossFinalTag>())
                     {
                         r.model = LoadModel("assets/models/Boss.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Boss_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Boss_texture.png");
+                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Boss_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Boss_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SubditoTag>())
                     {
                         r.model = LoadModel("assets/models/Boss_sub_1.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Boss_sub_1_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Boss_sub_1_texture.png");
+                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Boss_sub_1_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Boss_sub_1_texture.png");
 
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                    }
+                    else if (e.hasTag<GroundTag>())
+                    {
+                        r.model = LoadModel("assets/models/map_models/lvl_0-cnk0.obj");
+                        // Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
+                        // Texture2D t2 = LoadTexture("assets/models/textures/map_textures/lvl_0-extras_texture.png");
+                        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t2;
                     }
                     else
                     {
@@ -238,8 +246,8 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
 
                 if (e.hasTag<PlayerTag>())
                 {
-                    scl = { 0.33, 0.33, 0.33 };
-                    pos.setY(pos.y() - .5);
+                    //scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 1.5);
                 }
                 else if (e.hasTag<SlimeTag>())
                 {
@@ -280,7 +288,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>() && !e.hasTag<SpiderTag>() && !e.hasTag<BossFinalTag>() && !e.hasTag<SubditoTag>())
                 {
                     int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
-                    if (orientationInDegreesInt % 90 == 0)
+                    if (orientationInDegreesInt % 90 == 0 && std::abs(orientationInDegreesInt) != 270 && std::abs(orientationInDegreesInt) != 90)
                         engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
                     else
                         engine.drawModelWires(r.model, pos, r.rotationVec, orientationInDegrees, scl, BLACK);
@@ -665,7 +673,6 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 static_cast<float>(boxSize.z()),
                 BLUE);
             engine.endMode3D();
-
         }
 
         if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
@@ -677,7 +684,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             auto& col = em.getComponent<ColliderComponent>(e);
             auto& ren = em.getComponent<RenderComponent>(e);
             // Comprobar si el rayo intersecta con el collider
-            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE))
+            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::ZONE))
             {
                 // Dibujar el HUD de debug
                 engine.drawRectangle(0, 60, 150, 240, WHITE);

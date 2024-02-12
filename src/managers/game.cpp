@@ -25,8 +25,8 @@ void Game::createEntities(EntityManager& em)
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);// -2 -12 63 -71
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -0.0f, 0.0f, -0.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 10.856, 1.714, -1.514 }, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position } });
     auto& lis = em.addComponent<ListenerComponent>(e, ListenerComponent{});
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
@@ -38,7 +38,7 @@ void Game::createEntities(EntityManager& em)
     lis.addCode(EventCodes::OpenChest);
 
     // Shield
-    createShield(em, e);
+    // createShield(em, e);
 
     // Ending
     createEnding(em);

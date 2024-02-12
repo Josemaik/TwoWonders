@@ -283,6 +283,10 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ZONE)
         return;
 
+    if (staticEntPtr->hasTag<WallTag>() && otherEntPtr->hasTag<WallTag>()) {
+        return;
+    }
+
     // Nos aseguramos que el suelo siempre esté en staticEntPtr
     if (otherEntPtr->hasTag<GroundTag>() || otherEntPtr->hasTag<WaterTag>())
     {
@@ -582,6 +586,7 @@ void CollisionSystem::classicCollision(PhysicsComponent& phy1, PhysicsComponent&
     }
     else if (minOverlap.z() < minOverlap.y())
     {
+        std::cout << "OverlapZ: " << minOverlap.z() << "\n";
         resolveCollision<&vec3d::z, &vec3d::setZ>(phy1, phy2, minOverlap.z());
     }
     else

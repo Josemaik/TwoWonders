@@ -49,7 +49,7 @@ struct CollisionSystem
     // using octreeMap = std::unordered_map<std::size_t, std::unordered_set<Octree*>>;
 
     CollisionSystem()
-        : octree(0, BBox(vec3d{ 0.0, 0.0, 0.0 }, vec3d{ 300.0, 50.0, 300.0 })) {}
+        : octree(0, BBox(vec3d{ 0.0, 0.0, 0.0 }, vec3d{ 500.0, 50.0, 500.0 })) {}
 
     void update(EntityManager& em);
 private:

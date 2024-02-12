@@ -8,9 +8,9 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
     if (playerEn.hasTag<PlayerTag>())
     {
         auto& phy = em.getComponent<RenderComponent>(playerEn);
-        cameraPos = { phy.position.x() + 33.f, phy.position.y() + 35.f, phy.position.z() + 33.f };
+        cameraPos = { phy.position.x() - 33.f, phy.position.y() + 35.f, phy.position.z() + 33.f };
         cameraTar = phy.position;
-        cameraFovy = 20.f;
+        cameraFovy = 90.f;
 
         if (li.cameraChange)
             cameraPos = { phy.position.x() - 33.f, phy.position.y() + 35.f, phy.position.z() + 33.f };
