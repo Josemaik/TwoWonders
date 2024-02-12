@@ -43,7 +43,7 @@ struct CollisionSystem
     };
 
     // Se van a buscar las entidad que tengan estos componentes y tags
-    using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent, ColliderComponent>;
+    using SYSCMPs = MP::TypeList<PhysicsComponent, ColliderComponent>;
     using SYSTAGs = MP::TypeList<>;
     using pairsType = std::unordered_set<std::pair<std::size_t, std::size_t>, pair_hash, pair_equal>;
     // using octreeMap = std::unordered_map<std::size_t, std::unordered_set<Octree*>>;

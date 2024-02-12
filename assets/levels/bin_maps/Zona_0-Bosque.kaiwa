@@ -16,13 +16,13 @@
                 ],
 				"Walls":[
 					{
-						"position":[46.303, 0.0, 7.0],
+						"position":[45.303, 0.0, 7.0],
 						"scale":[8.0, 99.0, 10.0],
 						"rotation":[0.0, -0.0, 1.0],
 						"orientation": 0.0
 					},
 					{
-						"position":[-33.681, -25.393, 7.0],
+						"position":[-17.681, -25.393, 7.0],
 						"scale":[65.53, 12.308, 10.0],
 						"rotation":[0.0, 0.0, 0.0],
 						"orientation": 0.0
@@ -34,25 +34,25 @@
 						"orientation": 0.0
 					},
 					{
-						"position":[-44.751, 0.0, 7.0],
+						"position":[-44.751, 4.0, 7.0],
 						"scale":[11.772, 90.169, 10.0],
-						"rotation":[0.0, -0.0, 1.0],
+						"rotation":[0.0, 0.0, 0.0],
 						"orientation": 0.0
 					},
 					{
-						"position":[-37.373, -8.699, 7.0],
+						"position":[-33.373, -8.699, 7.0],
 						"scale":[33.265, 23.007, 10.0],
 						"rotation":[0.0, 0.0, 0.0],
 						"orientation": 0.0
 					},
 					{
-						"position":[25.988, 36.788, 7.0],
+						"position":[28.988, 37.788, 7.0],
 						"scale":[24.511, 23.007, 10.0],
 						"rotation":[0.0, 0.0, 0.0],
 						"orientation": 0.0
 					},
 					{
-						"position":[-7.922, 40.824, 7.0],
+						"position":[7.922, 42.824, 7.0],
 						"scale":[38.759, 12.077, 10.0],
 						"rotation":[0.0, 0.0, 0.0],
 						"orientation": 0.0
@@ -90,16 +90,24 @@
 							"position":[-3.683, 19.773, 1.649]
 						}
                     ],
-					"Objects":[],
+					"Objects":[
+						{
+							"position": [-33.0, 25.9, 7.5],
+							"scale": [0.5, 0.5, 0.5],
+							"color": [130, 130, 130, 255],
+							"type": 2,
+							"id": 1
+						}
+					],
 					"Enemies":[],
 					"Interactives":[
 						{
 							"position":[-35.858, 15.096, 7.0],
-							"scale":[5.012, 5.563, 10.0],
+							"scale":[5.0, 5.0, 5.0],
 							"rotation":[0.0, 0.0, 0.0],
 							"orientation": 0.0,
 							"type": 1,
-							"zone": 1,
+							"zone": 0,
 							"content": 2,
 							"id": 0
 						}

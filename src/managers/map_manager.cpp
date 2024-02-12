@@ -70,39 +70,42 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
 
     for (rapidjson::SizeType i = 0; i < groundArray.Size(); i++)
     {
-        auto& entity = em.newEntity();
-        em.addTag<GroundTag>(entity);
+        auto& groundEntity = em.newEntity();
+        em.addTag<GroundTag>(groundEntity);
 
         // Extraemos los datos del json
         const rapidjson::Value& ground = groundArray[i];
-        vec3d position{ ground["position"][0].GetDouble(), ground["position"][2].GetDouble(), ground["position"][1].GetDouble() };
-        vec3d scale{ ground["scale"][0].GetDouble(), ground["scale"][2].GetDouble(), ground["scale"][1].GetDouble() };
+        vec3d groundPosition{ ground["position"][0].GetDouble(), ground["position"][2].GetDouble(), -ground["position"][1].GetDouble() };
+        vec3d groundScale{ ground["scale"][0].GetDouble(), ground["scale"][2].GetDouble(), ground["scale"][1].GetDouble() };
         vec3d rotationVec{ ground["rotation"][0].GetDouble(), ground["rotation"][2].GetDouble(), ground["rotation"][1].GetDouble() };
         double orientation{ ground["orientation"].GetDouble() };
         Color color{ BEIGE };
 
-        // Creamos los componentes
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-    }
+        // Creamos los componentes del suelo
+        auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .rotationVec = rotationVec });
+        auto& p = em.addComponent<PhysicsComponent>(groundEntity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
+        em.addComponent<ColliderComponent>(groundEntity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
 
-    for (rapidjson::SizeType i = 0; i < wallArray.Size(); i++)
-    {
-        auto& entity = em.newEntity();
-        em.addTag<WallTag>(entity);
-        // Extraemos los datos del json
-        const rapidjson::Value& wall = wallArray[i];
-        vec3d position{ wall["position"][0].GetDouble(), wall["position"][2].GetDouble(), wall["position"][1].GetDouble() };
-        vec3d scale{ wall["scale"][0].GetDouble(), wall["scale"][2].GetDouble(), wall["scale"][1].GetDouble() };
-        vec3d rotationVec{ wall["rotation"][0].GetDouble(), wall["rotation"][2].GetDouble(), wall["rotation"][1].GetDouble() };
-        double orientation{ wall["orientation"].GetDouble() };
-        Color color{ LIME };
+        // Creamos las 4 zonas
+        vec3d zoneScale = groundScale / 2; // Dividimos la escala del suelo por 2
+        zoneScale.setY(2); // Elevamos la zona en 2 unidades en y
+        for (int j = 0; j < 4; j++)
+        {
+            auto& zoneEntity = em.newEntity();
+            em.addTag<ZoneTag>(zoneEntity);
 
-        // Creamos los componentes
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+            // Ajustamos la posición de la zona
+            vec3d zonePosition = groundPosition;
+            zonePosition.setX(groundPosition.x() + (j % 2 - 0.5) * zoneScale.x());
+            zonePosition.setZ(groundPosition.z() + (j / 2 - 0.5) * zoneScale.z());
+            zonePosition.setY(groundPosition.y() + 2); // Elevamos la zona en 2 unidades en y
+
+            // Creamos los componentes de la zona
+            em.addComponent<ZoneComponent>(zoneEntity, ZoneComponent{ .zone = static_cast<uint16_t>(j) });
+            auto& r = em.addComponent<RenderComponent>(zoneEntity, RenderComponent{ .position = zonePosition, .scale = zoneScale, .visible = false });
+            auto& p = em.addComponent<PhysicsComponent>(zoneEntity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0 });
+            em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ p.position, r.scale, BehaviorType::ZONE });
+        }
     }
 
     for (rapidjson::SizeType i = 0; i < zoneArray.Size(); i++)
@@ -119,8 +122,26 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
         // Creamos los componentes
         em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = zoneNumber });
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .visible = false });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0 });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0 });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::ZONE });
+    }
+
+    for (rapidjson::SizeType i = 0; i < wallArray.Size(); i++)
+    {
+        auto& entity = em.newEntity();
+        em.addTag<WallTag>(entity);
+        // Extraemos los datos del json
+        const rapidjson::Value& wall = wallArray[i];
+        vec3d position{ wall["position"][0].GetDouble(), wall["position"][2].GetDouble(), -wall["position"][1].GetDouble() };
+        vec3d scale{ wall["scale"][0].GetDouble(), wall["scale"][2].GetDouble(), wall["scale"][1].GetDouble() };
+        vec3d rotationVec{ wall["rotation"][0].GetDouble(), wall["rotation"][2].GetDouble(), wall["rotation"][1].GetDouble() };
+        double orientation{ wall["orientation"].GetDouble() };
+        Color color{ LIME };
+
+        // Creamos los componentes
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     }
 
     for (rapidjson::SizeType i = 0; i < rampArray.Size(); i++)
@@ -142,7 +163,7 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
 
         // Creamos los componentes
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
-        em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = rotationVec });
+        em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = rotationVec });
         em.addComponent<RampComponent>(entity, RampComponent{ .min = min, .max = max, .slope = slope, .offset = offset });
     }
 
@@ -161,29 +182,29 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
 
         // Creamos los componentes
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     }
 
     for (rapidjson::SizeType i = 0; i < destructibleArray.Size(); i++)
     {
-        // auto& entity = em.newEntity();
-        // em.addTag<DestructibleTag>(entity);
+        auto& entity = em.newEntity();
+        em.addTag<DestructibleTag>(entity);
 
-        // // Extraemos los datos del json
-        // const rapidjson::Value& destructible = destructibleArray[i];
-        // vec3d position{ destructible["position"][0].GetDouble(), destructible["position"][2].GetDouble(), destructible["position"][1].GetDouble() };
-        // vec3d scale{ destructible["scale"][0].GetDouble(), destructible["scale"][2].GetDouble(), destructible["scale"][1].GetDouble() };
-        // vec3d rotationVec{ destructible["rotation"][0].GetDouble(), destructible["rotation"][2].GetDouble(), destructible["rotation"][1].GetDouble() };
-        // double orientation{ destructible["orientation"].GetDouble() };
-        // Color color{ BROWN };
-        // int life{ destructible["life"].GetInt() };
+        // Extraemos los datos del json
+        const rapidjson::Value& destructible = destructibleArray[i];
+        vec3d position{ destructible["position"][0].GetDouble(), destructible["position"][2].GetDouble(), -destructible["position"][1].GetDouble() };
+        vec3d scale{ destructible["scale"][0].GetDouble(), destructible["scale"][2].GetDouble(), destructible["scale"][1].GetDouble() };
+        vec3d rotationVec{ destructible["rotation"][0].GetDouble(), destructible["rotation"][2].GetDouble(), destructible["rotation"][1].GetDouble() };
+        double orientation{ destructible["orientation"].GetDouble() };
+        Color color{ BROWN };
+        int life{ destructible["life"].GetInt() };
 
-        // // Creamos los componentes
-        // auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
-        // auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
-        // em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-        // em.addComponent<LifeComponent>(entity, LifeComponent{ .life = life });
+        // Creamos los componentes
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+        em.addComponent<LifeComponent>(entity, LifeComponent{ .life = life });
     }
 
     for (rapidjson::SizeType i = 0; i < objectArray.Size(); i++)
@@ -208,7 +229,7 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
 
         // Creamos los componentes
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero() });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
         em.addComponent<ObjectComponent>(entity, ObjectComponent{ .type = type, .inmortal = true, .objID = objId });
     }
@@ -221,36 +242,36 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
 
     for (rapidjson::SizeType i = 0; i < interactablesArray.Size(); i++)
     {
-        // const rapidjson::Value& interactable = interactablesArray[i];
+        const rapidjson::Value& interactable = interactablesArray[i];
 
-        // // Extraemos los datos del json
-        // vec3d position{ interactable["position"][0].GetDouble(), interactable["position"][2].GetDouble(), interactable["position"][1].GetDouble() };
-        // vec3d scale{ interactable["scale"][0].GetDouble(), interactable["scale"][2].GetDouble(), interactable["scale"][1].GetDouble() };
-        // vec3d rotationVec{ interactable["rotation"][0].GetDouble(), interactable["rotation"][2].GetDouble(), interactable["rotation"][1].GetDouble() };
-        // double orientation{ interactable["orientation"].GetDouble() };
-        // Color color{ LIGHTGRAY };
-        // InteractableType type{ static_cast<InteractableType>(interactable["type"].GetInt()) };
+        // Extraemos los datos del json
+        vec3d position{ interactable["position"][0].GetDouble(), interactable["position"][2].GetDouble(), -interactable["position"][1].GetDouble() };
+        vec3d scale{ interactable["scale"][0].GetDouble(), interactable["scale"][2].GetDouble(), interactable["scale"][1].GetDouble() };
+        vec3d rotationVec{ interactable["rotation"][0].GetDouble(), interactable["rotation"][2].GetDouble(), interactable["rotation"][1].GetDouble() };
+        double orientation{ interactable["orientation"].GetDouble() };
+        Color color{ LIGHTGRAY };
+        InteractableType type{ static_cast<InteractableType>(interactable["type"].GetInt()) };
 
-        // // Creamos los componentes
-        // auto& entity = em.newEntity();
-        // auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
-        // auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
+        // Creamos los componentes
+        auto& entity = em.newEntity();
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
 
-        // switch (type)
-        // {
-        // case 1:
-        // {
-        //     // Es un cofre
-        //     em.addTag<ChestTag>(entity);
-        //     uint16_t zone = static_cast<uint16_t>(interactable["zone"].GetUint());
-        //     ObjectType content{ static_cast<ObjectType>(interactable["content"].GetInt()) };
-        //     uint8_t interId = static_cast<uint8_t>(interactable["id"].GetUint());
+        switch (type)
+        {
+        case 1:
+        {
+            // Es un cofre
+            em.addTag<ChestTag>(entity);
+            uint16_t zone = static_cast<uint16_t>(interactable["zone"].GetUint());
+            ObjectType content{ static_cast<ObjectType>(interactable["content"].GetInt()) };
+            uint8_t interId = static_cast<uint8_t>(interactable["id"].GetUint());
 
-        //     em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-        //     em.addComponent<ChestComponent>(entity, ChestComponent{ .id = interId, .zone = zone, .dropPosition = { vec3d::zero() }, .content = content });
-        //     break;
-        // }
-        // }
+            em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+            em.addComponent<ChestComponent>(entity, ChestComponent{ .id = interId, .zone = zone, .dropPosition = { vec3d::zero() }, .content = content });
+            break;
+        }
+        }
     }
 
     // pseudo codigo para scheduling xdddd

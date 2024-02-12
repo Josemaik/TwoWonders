@@ -45,7 +45,7 @@ struct LevelInfo
   // Variables de la cámara
   std::vector<vec3d> enemyPositions{};
   bool transition{ false };
-  bool cameraChange{ true };
+  bool cameraChange{ false };
 
   // Variables de lock on
   std::size_t lockedEnemy{ max };
@@ -75,7 +75,7 @@ struct LevelInfo
     playerDetected = false;
     enemyPositions.clear();
     transition = false;
-    cameraChange = true;
+    cameraChange = false;
     lockedEnemy = max;
     closestEnemy = max;
     dontLoad.clear();

@@ -9,6 +9,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt
     {
         ren.setPosition(phy.position);
         ren.setOrientation(phy.orientation);
+        ren.setScale(phy.scale);
     });
 
     // Empezamos el frame
@@ -231,9 +232,16 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     else if (e.hasTag<GroundTag>())
                     {
                         r.model = LoadModel("assets/models/map_models/lvl_0-cnk0.obj");
-                        // Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
+                        // int materialCount;
+                        // Material* materials = LoadMaterials("assets/models/materials/lvl_0-cnk0.mtl", &materialCount);
+
+                        // if (materialCount > 0) {
+                        //     r.model.materials[0] = materials[0]; // Asume que el modelo tiene al menos un material
+                        // }
+
+                        Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
                         // Texture2D t2 = LoadTexture("assets/models/textures/map_textures/lvl_0-extras_texture.png");
-                        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t2;
                     }
                     else
@@ -247,7 +255,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 if (e.hasTag<PlayerTag>())
                 {
                     //scl = { 0.33, 0.33, 0.33 };
-                    pos.setY(pos.y() - 1.5);
+                    pos.setY(pos.y() - 1.8);
                 }
                 else if (e.hasTag<SlimeTag>())
                 {
@@ -608,7 +616,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             {
                 engine.drawText("E",
                     static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
-                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 50),
+                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 8),
                     20,
                     BLACK);
             }
@@ -621,7 +629,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             engine.drawText(std::to_string(l.life).c_str(),
                 static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 8.0),
                 20,
                 BLACK);
 
@@ -657,8 +665,21 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
         }
 
-        if (debugphy && e.hasComponent<ColliderComponent>())
+        if (debugphy && e.hasComponent<ZoneComponent>())
         {
+            auto& ren{ em.getComponent<RenderComponent>(e) };
+            auto& z{ em.getComponent<ZoneComponent>(e) };
+
+            engine.drawText(std::to_string(z.zone).c_str(),
+                static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
+                static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 50),
+                20,
+                BLACK);
+        }
+
+        if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
+        {
+
             auto& col{ em.getComponent<ColliderComponent>(e) };
 
             // Calcular la posición y el tamaño de la bounding box
@@ -673,19 +694,30 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 static_cast<float>(boxSize.z()),
                 BLUE);
             engine.endMode3D();
-        }
 
-        if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
-        {
             auto& phy = em.getComponent<PhysicsComponent>(e);
 
             RayCast ray = engine.getMouseRay();
 
-            auto& col = em.getComponent<ColliderComponent>(e);
             auto& ren = em.getComponent<RenderComponent>(e);
             // Comprobar si el rayo intersecta con el collider
             if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::ZONE))
             {
+                auto& col{ em.getComponent<ColliderComponent>(e) };
+
+                // Calcular la posición y el tamaño de la bounding box
+                vec3d boxPosition = (col.boundingBox.min + col.boundingBox.max) / 2;
+                vec3d boxSize = col.boundingBox.max - col.boundingBox.min;
+
+                // Dibujar la bounding box
+                engine.beginMode3D();
+                engine.drawCubeWires(boxPosition,
+                    static_cast<float>(boxSize.x()),
+                    static_cast<float>(boxSize.y()),
+                    static_cast<float>(boxSize.z()),
+                    BLUE);
+                engine.endMode3D();
+
                 // Dibujar el HUD de debug
                 engine.drawRectangle(0, 60, 150, 240, WHITE);
                 engine.drawText("Posición", 10, 70, 20, BLACK);

@@ -9,7 +9,7 @@ void CollisionSystem::update(EntityManager& em)
     // Liberar el octree
     octree.clear();
     std::vector<Entity*> EntsForRamps{};
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren, ColliderComponent& col)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
     {
         // Si la entidad está por debajo del suelo, se destruye
         auto& pos = phy.position;
@@ -20,7 +20,7 @@ void CollisionSystem::update(EntityManager& em)
         }
 
         // Actualizar bounding box
-        auto& scl = ren.scale;
+        auto& scl = phy.scale;
         col.updateBox(pos, scl, phy.gravity, phy.orientation);
 
         // Insertar en el Octree
@@ -283,9 +283,15 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ZONE)
         return;
 
-    if (staticEntPtr->hasTag<WallTag>() && otherEntPtr->hasTag<WallTag>()) {
-        return;
+    if (staticEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<WallTag>())
+    {
+        if (otherEntPtr->hasTag<WallTag>())
+            std::swap(staticEntPtr, otherEntPtr);
+
+        if (otherEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<DestructibleTag>())
+            return;
     }
+
 
     // Nos aseguramos que el suelo siempre esté en staticEntPtr
     if (otherEntPtr->hasTag<GroundTag>() || otherEntPtr->hasTag<WaterTag>())
@@ -452,7 +458,7 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
     //Meteorit
     if (behaviorType2 & BehaviorType::METEORITE)
     {
-        if(em.getEntityByID(staticEntPtr->getID())->hasTag<PlayerTag>()){
+        if (em.getEntityByID(staticEntPtr->getID())->hasTag<PlayerTag>()) {
             em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife(2);
         }
         auto& li = em.getSingleton<LevelInfo>();
@@ -586,7 +592,6 @@ void CollisionSystem::classicCollision(PhysicsComponent& phy1, PhysicsComponent&
     }
     else if (minOverlap.z() < minOverlap.y())
     {
-        std::cout << "OverlapZ: " << minOverlap.z() << "\n";
         resolveCollision<&vec3d::z, &vec3d::setZ>(phy1, phy2, minOverlap.z());
     }
     else

@@ -10,6 +10,7 @@ struct PhysicsComponent
 
     vec3d position{};
     vec3d velocity{};
+    vec3d scale{};
 
     double gravity{ KGravity };
     bool alreadyGrounded{ false };

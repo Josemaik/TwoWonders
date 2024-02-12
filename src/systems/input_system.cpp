@@ -50,7 +50,7 @@ void InputSystem::update(EntityManager& em)
         // Actualizar la velocidad
         int keysPressed = 0;
 
-        if(IsKeyDown(in.air_attack) && e.hasComponent<AttackComponent>()){
+        if (IsKeyDown(in.air_attack) && e.hasComponent<AttackComponent>()) {
             em.getComponent<AttackComponent>(e).pos_respawn_air_attack = phy.position;
             em.getComponent<AttackComponent>(e).attack(AttackType::AirAttack);
         }
@@ -140,13 +140,9 @@ void InputSystem::update(EntityManager& em)
             vel *= INP_SPEED;
         }
 
-        if (IsKeyReleased(in.lockIn)) {
-            // em.addComponent<AttackComponent>(e, AttackComponent{});
-            // if(e.hasComponent<AttackComponent>()){
-            //      em.getComponent<AttackComponent>(e).attack(AttackType::AreaAttack);
-            // }
+        if (IsKeyReleased(in.lockIn))
             inpi.lockOn = !inpi.lockOn;
-        }
+
 
         // if(IsKeyDown(in.seek) && !bb.tactive){
         //    // bb = { phy.position.x() , phy.position.z(), true, e.getID() };

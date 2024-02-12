@@ -1,6 +1,6 @@
 #include "collider_component.hpp"
 
-void ColliderComponent::updateBox(vec3d pos, vec3d scale, double gravity, double orientation)
+void ColliderComponent::updateBox(vec3d pos, vec3d scale, double gravity, double)
 {
     vec3d min = pos - (scale / 2);
     vec3d max = pos + (scale / 2);
@@ -9,8 +9,8 @@ void ColliderComponent::updateBox(vec3d pos, vec3d scale, double gravity, double
     if (gravity > 0.)
         max.setY(max.y() + 0.5);
 
-    float orientationInDegrees = static_cast<float>(orientation * (180.0f / M_PI));
-    int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
+    // float orientationInDegrees = static_cast<float>(orientation * (180.0f / M_PI));
+    // int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
 
     // if (std::abs(orientationInDegreesInt) == 270 || std::abs(orientationInDegreesInt) == 90)
     // {

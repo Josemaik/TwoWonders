@@ -1,18 +1,24 @@
 #pragma once
 
-enum struct ElementalType { Neutral, Agua, Fuego, Hielo };
+enum ElementalType
+{
+    Neutral = 0x01,
+    Agua = 0x02,
+    Fuego = 0x04,
+    Hielo = 0x08
+};
 
 struct TypeComponent
 {
     ElementalType type{ ElementalType::Neutral };
 
-    void changeType(){
+    void changeType() {
         switch (type)
         {
         case ElementalType::Neutral:
             type = ElementalType::Agua;
             break;
-        
+
         case ElementalType::Agua:
             type = ElementalType::Fuego;
             break;
@@ -30,7 +36,7 @@ struct TypeComponent
         }
     }
 
-    void changeType(ElementalType newType){
+    void changeType(ElementalType newType) {
         type = newType;
     }
 };

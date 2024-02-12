@@ -6,16 +6,16 @@ void Game::createShield(EntityManager& em, Entity& ent)
 {
     auto& e{ em.newEntity() };
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = DARKBROWN });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
-    em.addComponent<ShieldComponent>(e, ShieldComponent{.createdby= EntitieswithShield::Player});
+    em.addComponent<ShieldComponent>(e, ShieldComponent{ .createdby = EntitieswithShield::Player });
 }
 
 void Game::createEnding(EntityManager& em)
 {
     auto& e{ em.newEntity() };
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = {83.0f, 1.0f, -87.0f}, .scale = {1.0f, 1.0f, 1.0f}, .color = WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .gravity = 0 });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
 }
 
@@ -25,8 +25,8 @@ void Game::createEntities(EntityManager& em)
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);// -2 -12 63 -71
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { 10.856, 1.714, -1.514 }, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position } });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -33.0, 7.5, 25.9 }, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
     auto& lis = em.addComponent<ListenerComponent>(e, ListenerComponent{});
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
