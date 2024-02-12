@@ -221,7 +221,7 @@
                 "type": 3,
                 "element": 2,
                 "arrival_radius": 0.7,
-                "detect_radius": 15.0,
+                "detect_radius": 8.0,
                 "attack_radius": 10.0,
                 "tx": 0.0,
                 "tz": 0.0,
