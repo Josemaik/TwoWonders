@@ -13,6 +13,7 @@ struct AttackSystem
 
 private:
     void createAttack(EntityManager& em, Entity& e, AttackComponent& att);
+    vec3d getPosMeteorito(uint16_t fase,vec3d posplayer);
     void createAttackRangedOrMelee(EntityManager& em, Entity& e, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack, double const ranged);
     void createAttackMultipleShot(EntityManager& em, Entity& ent, AttackComponent& att, int numShots);
 

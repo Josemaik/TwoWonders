@@ -11,6 +11,19 @@ void AttackSystem::update(EntityManager& em, float deltaTime) {
     });
 }
 
+vec3d AttackSystem::getPosMeteorito(uint16_t fase, vec3d posplayer){
+    switch (fase)
+    {
+    case 3: return vec3d{posplayer.x() - 1, posplayer.y() + 5, posplayer.z()};
+        break;
+    case 2: return vec3d{posplayer.x() + 1, posplayer.y() + 5, posplayer.z() + 1};
+        break;
+    case 1: return vec3d{posplayer.x() + 1 ,posplayer.y() + 5, posplayer.z() - 1};
+        break;
+    default: break;
+    }
+}
+
 void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att) {
     att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
     auto& phy = em.getComponent<PhysicsComponent>(ent);
@@ -42,7 +55,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             att.type = AttackType::Melee;
     }
 
-
+    bool is_air_attack{false};
     // Tipo de ataque
     switch (att.type)
     {
@@ -108,7 +121,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::AREADAMAGE });
         }
     }
-                               break;
+        break;
     case AttackType::Spiderweb: {
         //createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack,1.0);
         auto& e{ em.newEntity() };
@@ -123,12 +136,43 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SPIDERWEB });
     }
-                              break;
+        break;
+    case AttackType::AirAttack:{
+        if(att.air_attack_fases == 0){
+            is_air_attack = false;
+            att.air_attack_fases = 4;
+
+        }else{
+            is_air_attack = true;
+            switch (att.air_attack_fases)
+            {
+            case 4: { //primera fase : creo indicador de donde se lanzara attaque
+                auto& e{ em.newEntity() };
+                auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 4.0f, 0.1f, 4.0f }, .color = ORANGE });
+                auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
+                em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::NOTHING });
+            }
+                break;
+            case 3: case 2: case 1: { //creo 1 meteorito
+                auto& e{ em.newEntity() };
+                auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getPosMeteorito(att.air_attack_fases,phy.position), .scale = { 1.0f, 1.0f, 1.0f }, .color = BROWN });
+                auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
+                em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
+            }
+            default:
+                break;
+            }   
+            att.air_attack_fases--;
+        }
+    }
+        break;
     default:
         break;
     }
-
-    att.createAttack = false;
+    //if air attack not running reset createattack
+    if(!is_air_attack){
+         att.createAttack = false;
+    }
 }
 
 void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, AttackComponent& att, int numShots) {

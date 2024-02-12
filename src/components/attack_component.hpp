@@ -11,7 +11,8 @@ enum AttackType
     HealSpell = 0x20,
     AreaAttack = 0x40,
     Spiderweb = 0x80,
-    GollemAttack = 0x100
+    GollemAttack = 0x100,
+    AirAttack = 0x200
 };
 
 struct AttackComponent
@@ -23,6 +24,7 @@ struct AttackComponent
     bool createAttack{ false };
     float countdown{ 1.0f }, elapsed{ 1.0f }; // en segundos
     vec3d vel{};
+    uint16_t air_attack_fases{4};
 
     void attack(AttackType typeAttack) {
         if (elapsed >= countdown) {
