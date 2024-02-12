@@ -15,7 +15,7 @@ struct InputComponent
     // int Flee   { KEY_F };
     // int Pursue { KEY_P };
     // int Avoid  { KEY_V };
-    // int pathfollow  { KEY_T };
+    int air_attack  { KEY_T };
     int lockIn{ KEY_F };
     int interact{ KEY_E };
     int debugPhy{ KEY_F1 };
