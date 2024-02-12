@@ -51,7 +51,8 @@ void InputSystem::update(EntityManager& em)
         int keysPressed = 0;
 
         if(IsKeyDown(in.air_attack) && e.hasComponent<AttackComponent>()){
-             em.getComponent<AttackComponent>(e).attack(AttackType::AirAttack);
+            em.getComponent<AttackComponent>(e).pos_respawn_air_attack = phy.position;
+            em.getComponent<AttackComponent>(e).attack(AttackType::AirAttack);
         }
         // if(phy.blockXZ){
         //     if (IsKeyDown(in.up)) {
