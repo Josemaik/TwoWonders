@@ -5,9 +5,9 @@ void AttackSystem::update(EntityManager& em, float deltaTime) {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, AttackComponent& att)
     {
         if (att.createAttack)
-            createAttack(em, ent, att);
+            createAttack(em, ent, att, deltaTime);
 
-        att.decreaseCountdown(deltaTime);
+        att.decreaseCountdown(deltaTime,att.elapsed);
     });
 }
 
@@ -22,9 +22,10 @@ vec3d AttackSystem::getPosMeteorito(uint16_t fase, vec3d posplayer){
         break;
     default: break;
     }
+    return vec3d{};
 }
 
-void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att) {
+void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att,float dt) {
     att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
     auto& phy = em.getComponent<PhysicsComponent>(ent);
 
@@ -138,31 +139,49 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     }
         break;
     case AttackType::AirAttack:{
-        if(att.air_attack_fases == 0){
+        if(att.air_attack_fases == 0){ // si se acaban las fases, reseteo contador
             is_air_attack = false;
             att.air_attack_fases = 4;
+            att.warning_created = false;
 
         }else{
+            bool attk_available{false};
             is_air_attack = true;
             switch (att.air_attack_fases)
             {
             case 4: { //primera fase : creo indicador de donde se lanzara attaque
-                auto& e{ em.newEntity() };
-                auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 4.0f, 0.1f, 4.0f }, .color = ORANGE });
-                auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
-                em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::NOTHING });
+                if(!att.warning_created){
+                    auto& e{ em.newEntity() };
+                    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 4.0f, 0.1f, 4.0f }, .color = ORANGE });
+                    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Meteorit, .life_time = 5.0f });
+                    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
+                    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
+                    att.warning_created = true;
+                }
+                if(att.elapsed_warning_airatk >= att.countdown_warning_airatk){
+                    att.elapsed_warning_airatk = 0;
+                    attk_available = true;
+                }
+                att.decreaseCountdown(dt,att.elapsed_warning_airatk);
             }
                 break;
             case 3: case 2: case 1: { //creo 1 meteorito
-                auto& e{ em.newEntity() };
-                auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getPosMeteorito(att.air_attack_fases,phy.position), .scale = { 1.0f, 1.0f, 1.0f }, .color = BROWN });
-                auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
-                em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
+                if(att.elapsed_air_attk >= att.countdown_air_attk){
+                    att.elapsed_air_attk = 0;
+                    attk_available = true;
+                    auto& e{ em.newEntity() };
+                    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getPosMeteorito(att.air_attack_fases,att.pos_respawn_air_attack), .scale = { 1.0f, 1.0f, 1.0f }, .color = BROWN });
+                    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
+                    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::METEORITE });
+                }
+                att.decreaseCountdown(dt,att.elapsed_air_attk);
             }
             default:
                 break;
             }   
-            att.air_attack_fases--;
+            if(attk_available){
+                att.air_attack_fases--;
+            }
         }
     }
         break;
@@ -170,9 +189,9 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         break;
     }
     //if air attack not running reset createattack
-    if(!is_air_attack){
+    if(!is_air_attack)
          att.createAttack = false;
-    }
+    
 }
 
 void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, AttackComponent& att, int numShots) {
