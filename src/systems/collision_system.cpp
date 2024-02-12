@@ -444,6 +444,17 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         staticPhy->dragActivated = true;
         return;
     }
+
+    //Meteorit
+    if (behaviorType2 & BehaviorType::METEORITE)
+    {
+        if(em.getEntityByID(staticEntPtr->getID())->hasTag<PlayerTag>()){
+            em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife(2);
+        }
+        auto& li = em.getSingleton<LevelInfo>();
+        li.dead_entities.insert(otherEntPtr->getID());
+        return;
+    }
 }
 
 void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& atkPl2, bool& atkEn1, bool& atkEn2, Entity& entity1, Entity& entity2)

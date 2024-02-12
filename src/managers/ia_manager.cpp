@@ -600,7 +600,12 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
 
         auto* shield = &tree.createNode<BTDecisionActivateorQuit_Shield>();
 
-        tree.createNode<BTNodeSelector_t>(sequence,sequence1,shield,patrol);
+        auto* d_pd2 = &tree.createNode<BTDecisionPlayerDetected>();
+        auto* d_raa = &tree.createNode<BTDecisionReadyforAirAttack>();
+        auto* d_as = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Air_attack);
+        auto* sequence2 = &tree.createNode<BTNodeSequence_t>(d_pd2, d_raa,d_as);
+
+        tree.createNode<BTNodeSelector_t>(sequence,sequence1,sequence2,shield,patrol);
         // auto* ready_7 = &tree.createNode<BTDecisionReadyforAttack>();
         // auto* atack_7 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot);
         // [[maybe_unused]] auto* sequence7_3 = &tree.createNode<BTNodeSequence_t>(patrol_7, ready_7, atack_7);
@@ -729,11 +734,6 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
         tree.createNode<BTNodeSelector_t>(sequence1_1, sequence1_2);
     }
 
-    
-
-
-
-    
 
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = type_ele });
     em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = 0.1, .detect_radius = 18.0, .attack_radius = attack_radius_p, .tx = 0.0, .tz = 0.0,.time2arrive = 1.0, .tactive = true, .perceptionTime = static_cast<float>(0.2),

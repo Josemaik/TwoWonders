@@ -56,11 +56,14 @@ struct BTActionShoot : BTNode_t{
                     return BTNodeStatus_t::success;
                 }
                     break;
-                // case AIComponent::TypeShoot::SpiderWeb:{
-                //     att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai.SPEED_AI;
-                //     att.attack(AttackType::Spiderweb);
-                //     return BTNodeStatus_t::success;
-                // }
+                case AIComponent::TypeShoot::Air_attack:{
+                    auto& li = ectx.em.getSingleton<LevelInfo>();
+                    auto* playerEn = ectx.em.getEntityByID(li.playerID);
+                    auto& plphy = ectx.em.getComponent<PhysicsComponent>(*playerEn);
+                    att.pos_respawn_air_attack = plphy.position;
+                    att.attack(AttackType::AirAttack);
+                    return BTNodeStatus_t::fail;
+                }
                     break;
                 default:
                     break;
