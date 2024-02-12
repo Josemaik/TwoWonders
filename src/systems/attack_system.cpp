@@ -152,7 +152,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             case 4: { //primera fase : creo indicador de donde se lanzara attaque
                 if(!att.warning_created){
                     auto& e{ em.newEntity() };
-                    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 4.0f, 0.1f, 4.0f }, .color = ORANGE });
+                    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = att.pos_respawn_air_attack, .scale = { 4.0f, 0.1f, 4.0f }, .color = ORANGE });
                     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Meteorit, .life_time = 5.0f });
                     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
                     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
