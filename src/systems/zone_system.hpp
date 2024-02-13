@@ -16,6 +16,8 @@ struct ZoneSystem
 
 private:
     void checkChests(EntityManager& em, EventManager& evm, uint16_t zone);
+    void checkSpawns(EntityManager& em, EventManager& evm);
+    void checkDoors(EntityManager& em, EventManager& evm);
     void checkDungeonSlimes(EntityManager& em, EventManager& evm);
 };
 

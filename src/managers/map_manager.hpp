@@ -5,11 +5,6 @@
 #include "../utils/types.hpp"
 #include "ia_manager.hpp"
 
-enum InteractableType
-{
-    Chest = 0x01,
-};
-
 struct MapManager
 {
     void createMap(EntityManager& em, uint8_t mapID, Ia_man& iam);
@@ -20,6 +15,8 @@ private:
     void destroyMap(EntityManager& em);
     void generateMapFromJSON(EntityManager& em, const mapType& map, Ia_man& iam);
     void generateChunkFromJSON(EntityManager& em, const rapidjson::Value& chunk, Ia_man& iam, uint8_t mapID, int& j);
+
+    vec3d groundPos{};
 };
 
 #endif // !MAP_MANAGER

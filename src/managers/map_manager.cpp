@@ -79,7 +79,7 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
         vec3d groundScale{ ground["scale"][0].GetDouble(), ground["scale"][2].GetDouble(), ground["scale"][1].GetDouble() };
         vec3d rotationVec{ ground["rotation"][0].GetDouble(), ground["rotation"][2].GetDouble(), ground["rotation"][1].GetDouble() };
         double orientation{ ground["orientation"].GetDouble() };
-        Color color{ BEIGE };
+        Color color{ 255, 255, 255, 255 };
 
         // Creamos los componentes del suelo
         auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .rotationVec = rotationVec });
@@ -93,14 +93,17 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
             r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
 
             r.meshLoaded = true;
+            groundPos = groundPosition;
         }
         else
         {
-            r.model = LoadModel("assets/models/map_models/lvl_0-cnk1.obj");
+            auto& modelEntity = em.newEntity();
+            auto& r2 = em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = groundPos, .scale = groundScale, .color = color, .rotationVec = rotationVec });
+            r2.model = LoadModel("assets/models/map_models/lvl_0-cnk1.obj");
             Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
-            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+            r2.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
 
-            r.meshLoaded = true;
+            r2.meshLoaded = true;
         }
 
         // Creamos las 4 zonas
@@ -108,7 +111,7 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
         zoneScale.setY(2); // Elevamos la zona en 2 unidades en y
         int k = 0;
         int limit = j + 4;
-        for (j; j < limit; j++)
+        for (; j < limit; j++)
         {
             auto& zoneEntity = em.newEntity();
             em.addTag<ZoneTag>(zoneEntity);
@@ -126,6 +129,9 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
             em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ p.position, r.scale, BehaviorType::ZONE });
             k += 1;
         }
+
+        if (!r.meshLoaded)
+            em.destroyComponent<RenderComponent>(groundEntity);
     }
 
     for (rapidjson::SizeType i = 0; i < wallArray.Size(); i++)
@@ -265,19 +271,31 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
         auto& entity = em.newEntity();
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+        em.addComponent<InteractiveComponent>(entity);
 
         switch (type)
         {
-        case 1:
+        case InteractableType::Chest:
         {
-            // Es un cofre
             em.addTag<ChestTag>(entity);
             uint16_t zone = static_cast<uint16_t>(interactable["zone"].GetUint());
             ObjectType content{ static_cast<ObjectType>(interactable["content"].GetInt()) };
             uint8_t interId = static_cast<uint8_t>(interactable["id"].GetUint());
 
-            em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
             em.addComponent<ChestComponent>(entity, ChestComponent{ .id = interId, .zone = zone, .dropPosition = { vec3d::zero() }, .content = content });
+            break;
+        }
+        case InteractableType::Spawn:
+        {
+            em.addTag<SpawnTag>(entity);
+            r.color = ORANGE;
+            break;
+        }
+        case InteractableType::Door:
+        {
+            em.addTag<DoorTag>(entity);
+            r.color = DARKBROWN;
             break;
         }
         }

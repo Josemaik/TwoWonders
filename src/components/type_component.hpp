@@ -3,10 +3,10 @@
 
 enum struct ElementalType : uint8_t
 {
-    Neutral = 0x01,
-    Water = 0x02,
-    Fire = 0x04,
-    Ice = 0x08
+    Neutral = 1,
+    Water = 2,
+    Fire = 3,
+    Ice = 4
 };
 
 struct TypeComponent

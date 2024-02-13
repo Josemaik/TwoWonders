@@ -42,6 +42,7 @@ private:
     void createEnding(EntityManager& em);
     void resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs);
     void createSound(EntityManager& em);
+    void createPlayer(EntityManager& em, Entity player);
 
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};

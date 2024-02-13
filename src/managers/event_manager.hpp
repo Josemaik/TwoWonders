@@ -7,17 +7,18 @@
 #include <cstdint>
 #include <vector>
 
-struct Event {
-    uint16_t code; // Código identificador del evento
+//Eventos
+enum EventCodes : uint16_t
+{
+    SpawnKey,
+    SpawnDungeonKey,
+    OpenChest,
+    SetSpawn,
+    OpenDoor,
 };
 
-//Eventos
-enum EventCodes
-{
-    NoEvent = 0x00,
-    SpawnKey = 0x01,
-    SpawnDungeonKey = 0x02,
-    OpenChest = 0x04,
+struct Event {
+    EventCodes code; // Código identificador del evento
 };
 
 struct EventManager
@@ -66,6 +67,24 @@ public:
 
                         os.addObject(chestComp.content, playerPos);
                         li.chestToOpen = li.max;
+                        break;
+                    }
+                    case EventCodes::SetSpawn:
+                    {
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+                        auto& playerPos = em.getComponent<PhysicsComponent>(e).position;
+                        plfi.spawnPoint = playerPos;
+                        auto& life = em.getComponent<LifeComponent>(e);
+                        life.life = life.maxLife;
+                        break;
+                    }
+                    case EventCodes::OpenDoor:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+
+                        plfi.hasKey = false;
+                        li.dead_entities.insert(li.doorToOpen);
                         break;
                     }
                     }

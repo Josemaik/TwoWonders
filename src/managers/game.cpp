@@ -21,27 +21,40 @@ void Game::createEnding(EntityManager& em)
 
 void Game::createEntities(EntityManager& em)
 {
+    auto& plfi = em.getSingleton<PlayerInfo>();
+    if (plfi.spawnPoint == vec3d::zero())
+        plfi.spawnPoint = { -33.0, 5.5, 30.9 };
+    else
+        std::cout << "aja\n";
+
+
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);// -2 -12 63 -71
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -33.0, 17.5, 30.9 }, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0 });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
     auto& lis = em.addComponent<ListenerComponent>(e, ListenerComponent{});
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<TypeComponent>(e, TypeComponent{});
+    em.addComponent<AttackComponent>(e, AttackComponent{});
+    auto& t = em.addComponent<TypeComponent>(e, TypeComponent{});
+
+    for (int i = 0; i < plfi.types.size(); i++)
+        t.types[i] = static_cast<ElementalType>(plfi.types[i]);
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
     lis.addCode(EventCodes::OpenChest);
+    lis.addCode(EventCodes::SetSpawn);
+    lis.addCode(EventCodes::OpenDoor);
 
     // Shield
     // createShield(em, e);
 
     // Ending
-    createEnding(em);
+    // createEnding(em);
 
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
@@ -220,7 +233,7 @@ void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
     bb.subditosData.clear();
     rs.unloadModels(em, engine);
     li.reset();
-    plfi.reset();
+    // plfi.reset();
     lock_system.reset();
     createEntities(em);
     map.reset(em, 0, iam);

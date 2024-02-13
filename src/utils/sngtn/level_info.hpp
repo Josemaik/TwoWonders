@@ -57,6 +57,7 @@ struct LevelInfo
 
   // Variables relacionadas con los eventos
   std::size_t chestToOpen{ max };
+  std::size_t doorToOpen{ max };
   bool dungeonKeyCreated{ false };
 
   // Variables de debug

@@ -241,6 +241,9 @@ namespace ETMG {
 
                 auto key = e.template getComponentKey<CMP>();
                 this->template getCMPStorage<CMP>().erase(key);
+
+                // Elimina el componente de la máscara de componentes
+                e.cmp_mask_ &= ~cmp_info::template mask<CMP>();
             }
         }
 

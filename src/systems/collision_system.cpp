@@ -335,6 +335,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         {
             if (otherEntPtr->hasComponent<TypeComponent>())
             {
+                std::cout << "hola\n";
                 auto& bulletType = em.getComponent<TypeComponent>(*otherEntPtr);
                 if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(bulletType.type))
                     em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
@@ -364,17 +365,17 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::SPIDERWEB)
         return;
 
-    if (staticEntPtr->hasTag<DoorTag>() && behaviorType2 & BehaviorType::PLAYER)
-    {
-        auto& plfi = em.getSingleton<PlayerInfo>();
-        if (plfi.hasKey)
-        {
-            li.dead_entities.insert(staticEntPtr->getID());
+    // if (staticEntPtr->hasTag<DoorTag>() && behaviorType2 & BehaviorType::PLAYER)
+    // {
+    //     auto& plfi = em.getSingleton<PlayerInfo>();
+    //     if (plfi.hasKey)
+    //     {
+    //         li.dead_entities.insert(staticEntPtr->getID());
 
-            plfi.hasKey = false;
-            return;
-        }
-    }
+    //         plfi.hasKey = false;
+    //         return;
+    //     }
+    // }
 
     // Colisiones con paredes
     staticCollision(*otherPhy, *staticPhy, minOverlap);

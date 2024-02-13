@@ -1,12 +1,16 @@
 #pragma once
-
 #include <cstdint>
+#include <array>
 
 struct PlayerInfo {
     uint16_t coins{}, bombs{}, max_bombs{ 8 };
     double max_mana{ 100.0 }, mana{ max_mana };
     int mana_width{};
     bool hasKey{ false };
+    bool isDead{ false };
+    vec3d spawnPoint{};
+    uint8_t type{ 1 };
+    std::array<uint8_t, 4> types{ 1, 1, 1, 1 };
 
     void addCoin() { coins += 5; }
     void addKey() { hasKey = true; }

@@ -128,7 +128,23 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     }
     case 1:
     {
-        checkChests(em, evm, 1);
+        // checkChests(em, evm, 1);
+        break;
+    }
+    case 4:
+    {
+        checkChests(em, evm, 4);
+        checkDoors(em, evm);
+        break;
+    }
+    case 5:
+    {
+        checkDoors(em, evm);
+        break;
+    }
+    case 6:
+    {
+        checkSpawns(em, evm);
         break;
     }
     case 10:
@@ -178,10 +194,10 @@ void ZoneSystem::checkDungeonSlimes(EntityManager& em, EventManager& evm)
 void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone)
 {
     auto& li = em.getSingleton<LevelInfo>();
-    using chestCMP = MP::TypeList<ChestComponent, PhysicsComponent>;
-    using noTag = MP::TypeList<>;
+    using chestCMP = MP::TypeList<ChestComponent, InteractiveComponent, PhysicsComponent>;
+    using chestTag = MP::TypeList<ChestTag>;
 
-    em.forEach<chestCMP, noTag>([&](Entity& e, ChestComponent& ch, PhysicsComponent& phy)
+    em.forEach<chestCMP, chestTag>([&](Entity& e, ChestComponent& ch, InteractiveComponent& ic, PhysicsComponent& phy)
     {
         if (ch.zone == zone)
         {
@@ -198,19 +214,18 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone
             double distance = playerPos.distance(phy.position);
 
             // Si el cofre se encuentra a menos de 2 unidades de distancia del se muestra el mensaje de abrir cofre
-            if (distance < 4.5 && !ch.isOpen && !ch.showButton)
-                ch.showButton = true;
+            if (distance < 5.5 && !ch.isOpen && !ic.showButton)
+                ic.showButton = true;
 
-            else if (distance > 4.5 && ch.showButton)
-                ch.showButton = false;
-
+            else if (distance > 5.5 && ic.showButton)
+                ic.showButton = false;
 
             auto& inpi = em.getSingleton<InputInfo>();
 
-            if (inpi.interact && ch.showButton && !ch.isOpen)
+            if (inpi.interact && ic.showButton && !ch.isOpen)
             {
                 ch.isOpen = true;
-                ch.showButton = false;
+                ic.showButton = false;
                 li.chestToOpen = e.getID();
                 evm.scheduleEvent(Event{ EventCodes::OpenChest });
                 li.dontLoad.insert(pair);
@@ -218,4 +233,65 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone
 
         }
     });
+}
+
+void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    using noCMP = MP::TypeList<InteractiveComponent, PhysicsComponent>;
+    using spawnTag = MP::TypeList<SpawnTag>;
+
+    em.forEach<noCMP, spawnTag>([&](Entity&, InteractiveComponent& ic, PhysicsComponent& phy)
+    {
+        auto& playerEnt = *em.getEntityByID(li.playerID);
+        auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
+        auto& playerPos = playerPhy.position;
+
+        double distance = playerPos.distance(phy.position);
+
+        if (distance < 4.5 && !ic.showButton && !li.playerDetected)
+            ic.showButton = true;
+
+        else if (distance > 4.5 && ic.showButton)
+            ic.showButton = false;
+
+        auto& inpi = em.getSingleton<InputInfo>();
+
+        if (inpi.interact && ic.showButton)
+        {
+            evm.scheduleEvent(Event{ EventCodes::SetSpawn });
+        }
+    });
+}
+
+void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    using noCMP = MP::TypeList<InteractiveComponent, PhysicsComponent>;
+    using doorTag = MP::TypeList<DoorTag>;
+
+    em.forEach<noCMP, doorTag>([&](Entity& e, InteractiveComponent& ic, PhysicsComponent& phy)
+    {
+        auto& playerEnt = *em.getEntityByID(li.playerID);
+        auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
+        auto& playerPos = playerPhy.position;
+
+        double distance = playerPos.distance(phy.position);
+
+        if (distance < 4.5 && !ic.showButton)
+            ic.showButton = true;
+
+        else if (distance > 4.5 && ic.showButton)
+            ic.showButton = false;
+
+        auto& inpi = em.getSingleton<InputInfo>();
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        if (inpi.interact && ic.showButton && plfi.hasKey)
+        {
+            std::cout << "Abriendo puerta\n";
+            li.doorToOpen = e.getID();
+            evm.scheduleEvent(Event{ EventCodes::OpenDoor });
+        }
+    });
+
 }

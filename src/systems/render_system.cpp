@@ -229,21 +229,21 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                     }
-                    else if (e.hasTag<GroundTag>())
-                    {
-                        r.model = LoadModel("assets/models/map_models/lvl_0-cnk0.obj");
-                        // int materialCount;
-                        // Material* materials = LoadMaterials("assets/models/materials/lvl_0-cnk0.mtl", &materialCount);
+                    // else if (e.hasTag<GroundTag>())
+                    // {
+                    //     r.model = LoadModel("assets/models/map_models/lvl_0-cnk1.obj");
+                    //     // int materialCount;
+                    //     // Material* materials = LoadMaterials("assets/models/materials/lvl_0-cnk0.mtl", &materialCount);
 
-                        // if (materialCount > 0) {
-                        //     r.model.materials[0] = materials[0]; // Asume que el modelo tiene al menos un material
-                        // }
+                    //     // if (materialCount > 0) {
+                    //     //     r.model.materials[0] = materials[0]; // Asume que el modelo tiene al menos un material
+                    //     // }
 
-                        Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
-                        // Texture2D t2 = LoadTexture("assets/models/textures/map_textures/lvl_0-extras_texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t2;
-                    }
+                    //     Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
+                    //     // Texture2D t2 = LoadTexture("assets/models/textures/map_textures/lvl_0-extras_texture.png");
+                    //     r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                    //     // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t2;
+                    // }
                     else
                     {
                         r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
@@ -611,11 +611,11 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             //     std::cout << newLifeWidth << std::endl;
         }
 
-        if (e.hasComponent<ChestComponent>() && e.hasComponent<RenderComponent>())
+        if (e.hasComponent<InteractiveComponent>() && e.hasComponent<RenderComponent>())
         {
             auto& ren{ em.getComponent<RenderComponent>(e) };
-            auto& chest{ em.getComponent<ChestComponent>(e) };
-            if (chest.showButton)
+            auto& inter{ em.getComponent<InteractiveComponent>(e) };
+            if (inter.showButton)
             {
                 engine.drawText("E",
                     static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
@@ -809,7 +809,8 @@ void RenderSystem::drawDeath(ENGI::GameEngine& engine)
 
 void RenderSystem::unloadModels(EntityManager& em, ENGI::GameEngine& engine)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, PhysicsComponent&, RenderComponent& ren)
+    using SYSCMPs = MP::TypeList<RenderComponent>;
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, RenderComponent& ren)
     {
         // engine.unloadMesh(ren.mesh);
         engine.unloadModel(ren.model);

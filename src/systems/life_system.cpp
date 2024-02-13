@@ -59,12 +59,20 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 bb.subditosData.erase(ent.getID());
             }
 
+            if (ent.hasTag<PlayerTag>() && ent.hasComponent<TypeComponent>())
+            {
+                auto& plfi = em.getSingleton<PlayerInfo>();
+                auto& type = em.getComponent<TypeComponent>(ent);
+
+                for (int i = 0; i < type.types.size(); i++)
+                    plfi.types[i] = static_cast<int>(type.types[i]);
+            }
+
             lif.markedForDeletion = true;
         }
 
         if (lif.markedForDeletion && !lif.decreaseNextFrame)
             li.dead_entities.insert(ent.getID());
-
     });
 }
 
