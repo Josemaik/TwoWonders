@@ -703,12 +703,12 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
     AIComponent::TypeShoot type_attk{};
     if (randomNum <= 50) {
         type_attk = AIComponent::TypeShoot::Melee;
-        type_ele = ElementalType::Fuego;
+        type_ele = ElementalType::Fire;
         wp.max_speed = 0.5;
     }
     else {
         type_attk = AIComponent::TypeShoot::OneShoottoPlayer;
-        type_ele = ElementalType::Hielo;
+        type_ele = ElementalType::Ice;
         wp.max_speed = 0.4;
     }
     auto* a_a_1 = &tree.createNode<BTActionShoot>(type_attk); // fail si disparo succes si no disparo

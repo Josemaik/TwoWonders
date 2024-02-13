@@ -143,15 +143,15 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     colorEntidad = GRAY;
                     break;
 
-                case ElementalType::Agua:
+                case ElementalType::Water:
                     colorEntidad = BLUE;
                     break;
 
-                case ElementalType::Fuego:
+                case ElementalType::Fire:
                     colorEntidad = RED;
                     break;
 
-                case ElementalType::Hielo:
+                case ElementalType::Ice:
                     colorEntidad = SKYBLUE;
                     break;
 
@@ -254,7 +254,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
 
                 if (e.hasTag<PlayerTag>())
                 {
-                    //scl = { 0.33, 0.33, 0.33 };
+                    // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.8);
                 }
                 else if (e.hasTag<SlimeTag>())
@@ -264,7 +264,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 }
                 else if (e.hasTag<SnowmanTag>())
                 {
-                    scl = { 0.33, 0.33, 0.33 };
+                    // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
                 }
                 else if (e.hasTag<SpiderTag>())
@@ -490,6 +490,9 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
     }
     else if (!playerEn->hasTag<PlayerTag>()) { drawDeath(engine); return; }
 
+    if (debugphy)
+        pointedEntity = std::numeric_limits<std::size_t>::max();
+
     // Visualizar las vidas del player
     for (auto const& e : em.getEntities())
     {
@@ -534,9 +537,9 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
                 if (t.type == ElementalType::Neutral)
                     engine.drawText("Neutral", 17, 50, 18, WHITE);
-                else if (t.type == ElementalType::Agua)
+                else if (t.type == ElementalType::Water)
                     engine.drawText("Agua", 17, 50, 18, BLUE);
-                else if (t.type == ElementalType::Fuego)
+                else if (t.type == ElementalType::Fire)
                     engine.drawText("Fuego", 17, 50, 18, RED);
                 else
                     engine.drawText("Hielo", 17, 50, 18, SKYBLUE);
@@ -586,7 +589,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             int barWidth = 40;
             int barHeight = 4;
             int barX = static_cast<int>(engine.getWorldToScreenX(r.position)) - 18;
-            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 35);
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 15);
 
             engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
 
@@ -645,12 +648,12 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                     tipo = "Neutral";
                     color = BLACK;
                 }
-                else if (t.type == ElementalType::Agua)
+                else if (t.type == ElementalType::Water)
                 {
                     tipo = "Agua";
                     color = BLUE;
                 }
-                else if (t.type == ElementalType::Fuego)
+                else if (t.type == ElementalType::Fire)
                 {
                     tipo = "Fuego";
                     color = RED;
@@ -679,7 +682,6 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
         if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
         {
-
             auto& col{ em.getComponent<ColliderComponent>(e) };
 
             // Calcular la posición y el tamaño de la bounding box
@@ -701,8 +703,10 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             auto& ren = em.getComponent<RenderComponent>(e);
             // Comprobar si el rayo intersecta con el collider
-            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::ZONE))
+            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::ZONE) && pointedEntity != li.playerID)
             {
+                pointedEntity = e.getID();
+
                 auto& col{ em.getComponent<ColliderComponent>(e) };
 
                 // Calcular la posición y el tamaño de la bounding box

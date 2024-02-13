@@ -332,7 +332,14 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
         if (staticEntPtr->hasTag<DestructibleTag>() && staticEntPtr->hasComponent<LifeComponent>())
-            em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
+        {
+            if (otherEntPtr->hasComponent<TypeComponent>())
+            {
+                auto& bulletType = em.getComponent<TypeComponent>(*otherEntPtr);
+                if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(bulletType.type))
+                    em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
+            }
+        }
 
         if (!staticEntPtr->hasTag<WaterTag>())
             li.dead_entities.insert(otherEntPtr->getID());
@@ -518,9 +525,9 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
             {
                 auto& li = em.getComponent<LifeComponent>(*ent2Ptr);
                 // Comprobar el tipo de la bala y el enemigo/player
-                if ((typeBala == ElementalType::Fuego && typeEnemyPlayer == ElementalType::Hielo) ||
-                    (typeBala == ElementalType::Hielo && typeEnemyPlayer == ElementalType::Agua) ||
-                    (typeBala == ElementalType::Agua && typeEnemyPlayer == ElementalType::Fuego))
+                if ((typeBala == ElementalType::Fire && typeEnemyPlayer == ElementalType::Ice) ||
+                    (typeBala == ElementalType::Ice && typeEnemyPlayer == ElementalType::Water) ||
+                    (typeBala == ElementalType::Water && typeEnemyPlayer == ElementalType::Fire))
                 {
                     li.decreaseLife(3);
                 }

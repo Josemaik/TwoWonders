@@ -65,18 +65,19 @@
 						"scale":[37.266, 6.088, 10.0],
 						"rotation":[0.0, -0.0, 1.0],
 						"orientation": -180.0,
-						"life": 1
+						"life": 1,
+						"weaknesses": [1]
 					},
 					{
 						"position":[-28.917, 40.53, 7.0],
 						"scale":[37.266, 6.088, 10.0],
 						"rotation":[0.0, -0.0, 1.0],
 						"orientation": -180.0,
-						"life": 1
+						"life": 1,
+						"weaknesses": [4]
 					}
 				],
-				"Doors": [],
-				"Zones": []
+				"Doors": []
             }
         },
         {   
@@ -92,14 +93,69 @@
                     ],
 					"Objects":[
 						{
-							"position": [-33.0, 25.9, 7.5],
+							"position": [-33.0, 30.9, 7.5],
 							"scale": [0.5, 0.5, 0.5],
 							"color": [130, 130, 130, 255],
 							"type": 2,
 							"id": 1
 						}
 					],
-					"Enemies":[],
+					"Enemies":[
+						{
+							"position": [11.0, 4.0, 0.0],
+							"scale": [2.0, 4.0, 2.0],
+							"color": [0, 121, 241, 255],
+							"max_speed": 0.5,
+							"life": 6,
+							"type": 1,
+							"element": 2,
+							"arrival_radius": 0.1,
+							"detect_radius": 30.0,
+							"attack_radius": 14.0,
+							"tx": 0.0,
+							"tz": 0.0,
+							"time2arrive": 1.0,
+							"tactive": true,
+							"perceptionTime": 0.1,
+							"path": [
+								[11.0, 4.0, 3.0],
+								[14.0, 4.0, 0.0],
+								[11.0, 4.0, 3.0],
+								[14.0, 4.0, 0.0]
+							],
+							"countdown_stop": 0.8,
+							"countdown_shoot": 0.5,
+							"countdown_perception": 1.2,
+							"scale_to_respawn_attack": 2.0
+						},
+						{
+							"position": [-16.0, 4.0, -21.0],
+							"scale": [2.0, 4.0, 2.0],
+							"color": [0, 121, 241, 255],
+							"max_speed": 0.5,
+							"life": 6,
+							"type": 1,
+							"element": 1,
+							"arrival_radius": 0.1,
+							"detect_radius": 30.0,
+							"attack_radius": 15.0,
+							"tx": 0.0,
+							"tz": 0.0,
+							"time2arrive": 1.0,
+							"tactive": true,
+							"perceptionTime": 0.1,
+							"path": [
+								[-16.0, 4.0, -23.0],
+								[-18.0, 4.0, -21.0],
+								[-16.0, 4.0, -23.0],
+								[-18.0, 4.0, -21.0]
+							],
+							"countdown_stop": 0.8,
+							"countdown_shoot": 0.5,
+							"countdown_perception": 6.1,
+							"scale_to_respawn_attack": 2.0
+						}
+					],
 					"Interactives":[
 						{
 							"position":[-35.858, 15.096, 7.0],
@@ -108,7 +164,7 @@
 							"orientation": 0.0,
 							"type": 1,
 							"zone": 0,
-							"content": 2,
+							"content": 16,
 							"id": 0
 						}
 					]
@@ -119,83 +175,84 @@
     {
     "Chunk1":[
         {
-            "overworld":[
+            "overworld":
             {
             "Ground":[
                 {
                     "position":[0.0, 99.0, 0.0],
                     "scale":[99.0, 99.0, 4.0],
-                    "rotation":[0.0, 0.0, 0.0]
+                    "rotation":[0.0, 0.0, 0.0],
+					"orientation": 0.0
                 }
             ],
             "Walls":[
                 {
                     "position":[15.791, 56.764, 7.0],
                     "scale":[32.325, 20.799, 10.0],
-                    "rotation":[0.0, 0.0, 0.0]
+                    "rotation":[0.0, 0.0, 0.0],
+					"orientation": 0.0
                 },
                 {
-                    "position":[44.537, 97.757, 7.0],
+                    "position":[97.757, 44.537, 7.0],
                     "scale":[99.0, 10.428, 10.0],
-                    "rotation":[0.0, -0.0, -90.0]
+                    "rotation":[0.0, -0.0, 0.0],
+					"orientation": 0.0
                 },
                 {
-                    "position":[6.364, 52.219, 7.0],
-                    "scale":[12.399, 25.044, 10.0],
-                    "rotation":[0.0, -0.0, -37.095]
-                },
-                {
-                    "position":[-44.751, 97.542, 7.0],
+                    "position":[97.542, -44.751, 7.0],
                     "scale":[103.507, 11.772, 10.0],
-                    "rotation":[0.0, -0.0, -90.0]
+                    "rotation":[0.0, -0.0, 0.0],
+					"orientation": 0.0
                 },
                 {
                     "position":[-35.77, 92.878, 7.0],
                     "scale":[21.89, 20.125, 10.0],
-                    "rotation":[0.0, 0.0, 0.0]
+                    "rotation":[0.0, 0.0, 0.0],
+					"orientation": 0.0
                 },
                 {
                     "position":[-18.257, 88.511, 7.0],
                     "scale":[21.89, 11.437, 10.0],
-                    "rotation":[0.0, 0.0, 0.0]
-                },
-                {
-                    "position":[-42.125, 83.955, 7.0],
-                    "scale":[5.286, 19.845, 10.0],
-                    "rotation":[0.0, -0.0, -49.216]
+                    "rotation":[0.0, 0.0, 0.0],
+					"orientation": 0.0
                 },
                 {
                     "position":[-39.107, 138.413, 7.0],
                     "scale":[11.241, 10.461, 10.0],
-                    "rotation":[0.0, 0.0, 0.0]
+                    "rotation":[0.0, 0.0, 0.0],
+					"orientation": 0.0
                 },
                 {
                     "position":[-38.895, 126.11, 7.0],
                     "scale":[11.241, 14.989, 10.0],
-                    "rotation":[0.0, 0.0, 0.0]
+                    "rotation":[0.0, 0.0, 0.0],
+					"orientation": 0.0
                 },
                 {
                     "position":[-29.738, 129.693, 7.0],
                     "scale":[8.982, 8.474, 10.0],
-                    "rotation":[0.0, 0.0, 0.0]
+                    "rotation":[0.0, 0.0, 0.0],
+					"orientation": 0.0
                 },
                 {
                     "position":[0.0, 145.69, 7.0],
                     "scale":[99.0, 8.0, 10.0],
-                    "rotation":[0.0, 0.0, 0.0]
+                    "rotation":[0.0, 0.0, 0.0],
+					"orientation": 0.0
                 },
                 {
                     "position":[0.0, 145.69, 7.0],
                     "scale":[45.628, 8.0, 0.0],
-                    "rotation":[0.0, 0.0, 0.0]
+                    "rotation":[0.0, 0.0, 0.0],
+					"orientation": 0.0
                 }
             ],
             "Ramps":[
             ],
             "Destroyables":[
-            ]
+            ],
+			"Doors": []
         	}
-        ]
         },
         {
             "underworld":

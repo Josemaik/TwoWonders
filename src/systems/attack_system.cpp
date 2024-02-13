@@ -26,7 +26,7 @@ vec3d AttackSystem::getPosMeteorito(uint16_t fase, vec3d posplayer) {
 }
 
 void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att, float dt) {
-    att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
+    // att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
     auto& phy = em.getComponent<PhysicsComponent>(ent);
 
     // Se pone la direccion en la que este mirando el player
@@ -38,9 +38,9 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             return;
         }
 
+        // Calculamos la velocidad basada en la orientación del jugador
         static const double ATTACK_SPEED = 1.5f;
 
-        // Calculamos la velocidad basada en la orientación del jugador
         double velX = sin(phy.orientation) * ATTACK_SPEED;
         double velZ = cos(phy.orientation) * ATTACK_SPEED;
 

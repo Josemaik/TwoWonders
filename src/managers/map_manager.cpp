@@ -46,20 +46,20 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
     uint8_t mapID = static_cast<uint8_t>(id.GetUint());
 
     const rapidjson::Value& chunks = map["Chunks"];
-    for (rapidjson::SizeType i = 0; i < chunks.Size() - 1; i++)
+    int j = 0;
+    for (rapidjson::SizeType i = 0; i < chunks.Size(); i++)
     {
         std::string chunkName = "Chunk" + std::to_string(i);
         const rapidjson::Value& chunk = chunks[i][chunkName.c_str()];
-        generateChunkFromJSON(em, chunk, iam, mapID);
+        generateChunkFromJSON(em, chunk, iam, mapID, j);
     }
 }
 
-void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value& chunk, Ia_man& iam, uint8_t mapID)
+void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value& chunk, Ia_man& iam, uint8_t mapID, int& j)
 {
     const rapidjson::Value& overworld = chunk[0]["overworld"];
     const rapidjson::Value& groundArray = overworld["Ground"];
     const rapidjson::Value& wallArray = overworld["Walls"];
-    const rapidjson::Value& zoneArray = overworld["Zones"];
     const rapidjson::Value& rampArray = overworld["Ramps"];
     const rapidjson::Value& doorArray = overworld["Doors"];
     const rapidjson::Value& destructibleArray = overworld["Destroyables"];
@@ -86,18 +86,37 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
         auto& p = em.addComponent<PhysicsComponent>(groundEntity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
         em.addComponent<ColliderComponent>(groundEntity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
 
+        if (j < 4)
+        {
+            r.model = LoadModel("assets/models/map_models/lvl_0-cnk0.obj");
+            Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
+            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+            r.meshLoaded = true;
+        }
+        else
+        {
+            r.model = LoadModel("assets/models/map_models/lvl_0-cnk1.obj");
+            Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
+            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+            r.meshLoaded = true;
+        }
+
         // Creamos las 4 zonas
         vec3d zoneScale = groundScale / 2; // Dividimos la escala del suelo por 2
         zoneScale.setY(2); // Elevamos la zona en 2 unidades en y
-        for (int j = 0; j < 4; j++)
+        int k = 0;
+        int limit = j + 4;
+        for (j; j < limit; j++)
         {
             auto& zoneEntity = em.newEntity();
             em.addTag<ZoneTag>(zoneEntity);
 
             // Ajustamos la posición de la zona
             vec3d zonePosition = groundPosition;
-            zonePosition.setX(groundPosition.x() + (j % 2 - 0.5) * zoneScale.x());
-            zonePosition.setZ(groundPosition.z() + (j / 2 - 0.5) * zoneScale.z());
+            zonePosition.setX(groundPosition.x() + (k % 2 - 0.5) * zoneScale.x());
+            zonePosition.setZ(groundPosition.z() + (k / 2 - 0.5) * zoneScale.z());
             zonePosition.setY(groundPosition.y() + 2); // Elevamos la zona en 2 unidades en y
 
             // Creamos los componentes de la zona
@@ -105,25 +124,8 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
             auto& r = em.addComponent<RenderComponent>(zoneEntity, RenderComponent{ .position = zonePosition, .scale = zoneScale, .visible = false });
             auto& p = em.addComponent<PhysicsComponent>(zoneEntity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0 });
             em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ p.position, r.scale, BehaviorType::ZONE });
+            k += 1;
         }
-    }
-
-    for (rapidjson::SizeType i = 0; i < zoneArray.Size(); i++)
-    {
-        auto& entity = em.newEntity();
-        em.addTag<ZoneTag>(entity);
-
-        // Extraemos los datos del json
-        const rapidjson::Value& zone = zoneArray[i];
-        vec3d position{ zone["position"][0].GetDouble(), zone["position"][2].GetDouble(), zone["position"][1].GetDouble() };
-        vec3d scale{ zone["scale"][0].GetDouble(), zone["scale"][2].GetDouble(), zone["scale"][1].GetDouble() };
-        uint16_t zoneNumber{ static_cast<uint16_t>(zone["zone"].GetUint()) };
-
-        // Creamos los componentes
-        em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = zoneNumber });
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .visible = false });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0 });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::ZONE });
     }
 
     for (rapidjson::SizeType i = 0; i < wallArray.Size(); i++)
@@ -205,6 +207,13 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
         em.addComponent<LifeComponent>(entity, LifeComponent{ .life = life });
+        auto& d = em.addComponent<DestructibleComponent>(entity);
+
+        for (rapidjson::SizeType j = 0; j < destructible["weaknesses"].Size(); j++)
+        {
+            auto& weakness = destructible["weaknesses"][j];
+            d.addWeakness(static_cast<ElementalType>(weakness.GetInt()));
+        }
     }
 
     for (rapidjson::SizeType i = 0; i < objectArray.Size(); i++)

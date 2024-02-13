@@ -25,8 +25,8 @@ void Game::createEntities(EntityManager& em)
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);// -2 -12 63 -71
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -33.0, 7.5, 25.9 }, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -33.0, 17.5, 30.9 }, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0 });
     auto& lis = em.addComponent<ListenerComponent>(e, ListenerComponent{});
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });

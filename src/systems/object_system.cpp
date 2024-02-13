@@ -71,6 +71,13 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             case ObjectType::Key:
                 plfi.addKey();
                 break;
+            case ObjectType::Fire_Spell:
+                if (playerEnt->hasComponent<TypeComponent>())
+                {
+                    auto& type = em.getComponent<TypeComponent>(*playerEnt);
+                    if (!type.hasType(ElementalType::Fire))
+                        type.addType(ElementalType::Fire);
+                }
 
             default:
                 break;
@@ -158,7 +165,7 @@ void ObjectSystem::createObjects(EntityManager& em)
     for (auto& [obj, pos] : toCreate)
     {
         Color color{};
-        vec3d scl{ 0.5, 0.5, 0.5 };
+        vec3d scl{ 1.5, 1.5, 1.5 };
         bool inmortal = false;
 
         switch (obj)
@@ -193,6 +200,13 @@ void ObjectSystem::createObjects(EntityManager& em)
         case ObjectType::Key:
         {
             color = GOLD;
+            scl = { 1.5, 0.3, 0.3 };
+            inmortal = true;
+            break;
+        }
+        case ObjectType::Fire_Spell:
+        {
+            color = RED;
             scl = { 1.5, 0.3, 0.3 };
             inmortal = true;
             break;

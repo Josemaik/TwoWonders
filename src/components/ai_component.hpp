@@ -18,10 +18,10 @@ struct BehaviourTree_t;
 struct AIComponent
 {
     // Type of shoots
-    enum class TypeShoot : uint8_t { OneShootonDir, OneShoottoPlayer, TripleShoot, Melee, SpiderWeb, Air_attack};
+    enum class TypeShoot : uint8_t { OneShootonDir, OneShoottoPlayer, TripleShoot, Melee, SpiderWeb, Air_attack };
     // TypeShoot currentshoot{};
     // Default velocity
-    double SPEED_AI = 0.2;
+    double SPEED_AI = 0.6;
     // Data for patrol behaviour
     static constexpr uint8_t max_patrol{ 10 };
     std::array<vec3d, max_patrol> patrol{};
@@ -54,48 +54,48 @@ struct AIComponent
     vec3d getRandomPosinRange(double xmin, double xmax, double zmin, double zmax);
     // Data for detect player
     double detect_radius{ 15.0 };
-    double attack_radius { 6.0 };
-    bool on_attack_radius { false };
+    double attack_radius{ 6.0 };
+    bool on_attack_radius{ false };
     bool playerdetected{ false };
     //Ataque
-    bool ready_attack {false};
+    bool ready_attack{ false };
     // data for steering behaviour
     // SB behaviour { SB::Arrive };
     // posicion objetivo
-    double tx { 0 }, tz { 0 };
+    double tx{ 0 }, tz{ 0 };
     //tiempor para llegar al objetivo
-    double time2arrive { 0.5 };
+    double time2arrive{ 0.5 };
     //activar o no comportamiento
-    bool tactive { false };
+    bool tactive{ false };
     //perception time ( couldown )
-    float perceptionTime { 0.1f }; // Frequency inverse
-    float accumulated_dt { 0.0f };
+    float perceptionTime{ 0.1f }; // Frequency inverse
+    float accumulated_dt{ 0.0f };
     //Target Entity
     std::size_t teid{};
     //heal
-    bool healbeforedie{false};
-    double slimex{},slimez{};
+    bool healbeforedie{ false };
+    double slimex{}, slimez{};
     std::size_t slimetarget{};
     //area
-    bool attackbeforedie{false};
+    bool attackbeforedie{ false };
     //PATH
-    Path_t<4> path { };
-    Path_t<4>::iterator pathIt { };
-    bool path_initialized { false };
+    Path_t<4> path{ };
+    Path_t<4>::iterator pathIt{ };
+    bool path_initialized{ false };
     // SB behaviour {SB::Arrive};
-    double txp{},tzp{};
-    bool target_obtained { false };
+    double txp{}, tzp{};
+    bool target_obtained{ false };
     //velocity boofer
-    bool boofedvelocity{false};
+    bool boofedvelocity{ false };
     // Timers
     double countdown_change_dir{ 1.5 }, countdown_stop{ 0.8 }, countdown_shoot{ 0.5 }, countdown_change_position{ 3.0 }
-    ,countdown_fleeing{3.0}, countdown_perception{0.5}, couldown_spawning{1.0}, countdown_heal{4.0}, countdown_shield{2.5},
-    countdown_air_attack{1.0}; // seconds
+        , countdown_fleeing{ 3.0 }, countdown_perception{ 0.5 }, couldown_spawning{ 1.0 }, countdown_heal{ 4.0 }, countdown_shield{ 2.5 },
+        countdown_air_attack{ 1.0 }; // seconds
     double elapsed_change_position{ 1.0 }, elapsed_stop{ 1.0 }, elapsed_change_dir{ 1.0 }, elapsed_shoot{ 1.0 },
-    elapsed_fleeing{1.0}, elapsed_perception{1.0}, elapsed_spawning{1.0}, elapsed_heal{1.0},elapsed_shield{1.0},
-    elapsed_air_attack{1.0};
+        elapsed_fleeing{ 1.0 }, elapsed_perception{ 1.0 }, elapsed_spawning{ 1.0 }, elapsed_heal{ 1.0 }, elapsed_shield{ 1.0 },
+        elapsed_air_attack{ 1.0 };
     void plusdeltatime(double deltaTime, double& elapsed) { elapsed += deltaTime; };
     // Behaviour trees
-    const char* bh {};
+    const char* bh{};
     BehaviourTree_t* behaviourTree{ nullptr };
 };

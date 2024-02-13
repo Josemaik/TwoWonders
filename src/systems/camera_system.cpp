@@ -43,7 +43,7 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
 
 
             cameraPos += vec3d{ 2.f, 10.f, 2.f };
-            cameraFovy = 18.f;
+            cameraFovy = 80.f;
         }
         else if (li.lockedEnemy != li.max)
         {
@@ -57,7 +57,7 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
             if (li.cameraChange)
                 cameraPos = { oneFourthPoint.x() - 28.f, oneFourthPoint.y() + 45.f, oneFourthPoint.z() + 28.f };
 
-            cameraFovy = 18.f;
+            cameraFovy = 75.f;
         }
 
         float t = 0.1f; // Velocidad de la transición

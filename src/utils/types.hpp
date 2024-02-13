@@ -11,6 +11,7 @@
 #include "../components/ramp_component.hpp"
 #include "../components/chest_component.hpp"
 #include "../components/listener_component.hpp"
+#include "../components/destructible_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
 #include "../components/projectile_component.hpp"
@@ -55,7 +56,7 @@ struct DestructibleTag {};
 struct ChestTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
-using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, RampComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, ZoneComponent, ShieldComponent, TypeComponent, ChestComponent, ListenerComponent>;
+using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, RampComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, ZoneComponent, ShieldComponent, TypeComponent, ChestComponent, ListenerComponent, DestructibleComponent>;
 using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, WallTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag, GolemTag, SpiderTag, BossFinalTag, SubditoTag, DestructibleTag, ChestTag>;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
