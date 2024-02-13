@@ -274,7 +274,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 }
                 else if (e.hasTag<GolemTag>())
                 {
-                    scl = { 0.4, 0.4, 0.4 };
+                    // scl = { 0.4, 0.4, 0.4 };
                     pos.setY(pos.y() - 1.1);
                 }
                 else if (e.hasTag<BossFinalTag>())

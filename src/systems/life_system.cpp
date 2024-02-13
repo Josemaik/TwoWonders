@@ -64,6 +64,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 auto& plfi = em.getSingleton<PlayerInfo>();
                 auto& type = em.getComponent<TypeComponent>(ent);
 
+                plfi.type = static_cast<int>(type.type);
                 for (int i = 0; i < type.types.size(); i++)
                     plfi.types[i] = static_cast<int>(type.types[i]);
             }
