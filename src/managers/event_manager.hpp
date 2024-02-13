@@ -3,6 +3,7 @@
 #define EVENT_MANAGER
 
 #include "../systems/object_system.hpp"
+#include "map_manager.hpp"
 #include "../utils/types.hpp"
 #include <cstdint>
 #include <vector>
@@ -30,7 +31,7 @@ public:
     }
 
     // Dispara todos los eventos pendientes
-    void dispatchEvents(EntityManager& em, ObjectSystem& os) {
+    void dispatchEvents(EntityManager& em, MapManager& mm, Ia_man& iam, ObjectSystem& os) {
         // Recorre todos los eventos pendientes
         while (!events.empty()) {
             // Obtiene el siguiente evento y lo elimina de la cola
@@ -76,6 +77,16 @@ public:
                         plfi.spawnPoint = playerPos;
                         auto& life = em.getComponent<LifeComponent>(e);
                         life.life = life.maxLife;
+                        plfi.mana = plfi.max_mana - 3.0;
+
+                        auto& tc = em.getComponent<TypeComponent>(e);
+                        plfi.type = static_cast<int>(tc.type);
+
+                        for (std::size_t i = 0; i < tc.types.size(); i++)
+                            plfi.types[i] = static_cast<int>(tc.types[i]);
+
+                        mm.spawnReset(em, iam);
+
                         break;
                     }
                     case EventCodes::OpenDoor:

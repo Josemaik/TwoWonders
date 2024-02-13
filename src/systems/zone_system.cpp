@@ -257,7 +257,7 @@ void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
 
         auto& inpi = em.getSingleton<InputInfo>();
 
-        if (inpi.interact && ic.showButton)
+        if (inpi.interact && ic.showButton && !li.playerDetected)
         {
             evm.scheduleEvent(Event{ EventCodes::SetSpawn });
         }

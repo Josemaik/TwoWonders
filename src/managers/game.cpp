@@ -41,7 +41,7 @@ void Game::createEntities(EntityManager& em)
     em.addComponent<AttackComponent>(e, AttackComponent{});
     auto& t = em.addComponent<TypeComponent>(e, TypeComponent{});
 
-    for (int i = 0; i < plfi.types.size(); i++)
+    for (std::size_t i = 0; i < plfi.types.size(); i++)
         t.types[i] = static_cast<ElementalType>(plfi.types[i]);
 
     // Listeners de eventos para el jugador
@@ -179,7 +179,7 @@ void Game::run()
                 life_system.update(em, object_system, deltaTime);
                 sound_system.update();
                 camera_system.update(em, engine, deltaTime);
-                event_system.update(evm, object_system, em);
+                event_system.update(em, evm, iam, map, object_system);
 
                 if (!li.dead_entities.empty())
                 {
@@ -226,7 +226,6 @@ void Game::run()
 void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
 {
     auto& li = em.getSingleton<LevelInfo>();
-    auto& plfi = em.getSingleton<PlayerInfo>();
     auto& bb = em.getSingleton<BlackBoard_t>();
 
     em.destroyAll();

@@ -33,6 +33,7 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
 
 mapType MapManager::loadMap(const std::string& mapFile)
 {
+    fileMap = mapFile;
     std::ifstream file(mapFile);
     rapidjson::IStreamWrapper isw(file);
     rapidjson::Document map;
@@ -61,13 +62,43 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
     const rapidjson::Value& groundArray = overworld["Ground"];
     const rapidjson::Value& wallArray = overworld["Walls"];
     const rapidjson::Value& rampArray = overworld["Ramps"];
-    const rapidjson::Value& doorArray = overworld["Doors"];
     const rapidjson::Value& destructibleArray = overworld["Destroyables"];
     const rapidjson::Value& underworld = chunk[1]["underworld"];
     const rapidjson::Value& objectArray = underworld["Objects"];
     const rapidjson::Value& enemyArray = underworld["Enemies"];
     const rapidjson::Value& interactablesArray = underworld["Interactives"];
 
+    generateGround(em, groundArray, j);
+
+    generateWalls(em, wallArray);
+
+    generateRamps(em, rampArray);
+
+    generateDestructibles(em, destructibleArray);
+
+    generateObjects(em, objectArray, mapID);
+
+    generateEnemies(em, enemyArray, iam);
+
+    generateInteractables(em, interactablesArray);
+
+    // pseudo codigo para scheduling xdddd
+    // for enemy : map[enemies]
+    // {
+
+    //     if(tiempo pasado > x)
+    //     {
+    //         texturas enemigo = map[enemies][slime][texturas][1];
+    //     }
+    //     else
+    //     {
+    //         texturas enemigo = map[enemies][slime][texturas][0];
+    //     }
+    // }
+}
+
+void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groundArray, int& j)
+{
     for (rapidjson::SizeType i = 0; i < groundArray.Size(); i++)
     {
         auto& groundEntity = em.newEntity();
@@ -133,7 +164,10 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
         if (!r.meshLoaded)
             em.destroyComponent<RenderComponent>(groundEntity);
     }
+}
 
+void MapManager::generateWalls(EntityManager& em, const rapidjson::Value& wallArray)
+{
     for (rapidjson::SizeType i = 0; i < wallArray.Size(); i++)
     {
         auto& entity = em.newEntity();
@@ -151,7 +185,10 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     }
+}
 
+void MapManager::generateRamps(EntityManager& em, const rapidjson::Value& rampArray)
+{
     for (rapidjson::SizeType i = 0; i < rampArray.Size(); i++)
     {
         auto& entity = em.newEntity();
@@ -174,26 +211,10 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
         em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = rotationVec });
         em.addComponent<RampComponent>(entity, RampComponent{ .min = min, .max = max, .slope = slope, .offset = offset });
     }
+}
 
-    for (rapidjson::SizeType i = 0; i < doorArray.Size(); i++)
-    {
-        auto& entity = em.newEntity();
-        em.addTag<DoorTag>(entity);
-
-        // Extraemos los datos del json
-        const rapidjson::Value& door = doorArray[i];
-        vec3d position{ door["position"][0].GetDouble(), door["position"][2].GetDouble(), door["position"][1].GetDouble() };
-        vec3d scale{ door["scale"][0].GetDouble(), door["scale"][2].GetDouble(), door["scale"][1].GetDouble() };
-        vec3d rotationVec{ door["rotation"][0].GetDouble(), door["rotation"][2].GetDouble(), door["rotation"][1].GetDouble() };
-        double orientation{ door["orientation"].GetDouble() };
-        Color color{ DARKBROWN };
-
-        // Creamos los componentes
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-    }
-
+void MapManager::generateDestructibles(EntityManager& em, const rapidjson::Value& destructibleArray)
+{
     for (rapidjson::SizeType i = 0; i < destructibleArray.Size(); i++)
     {
         auto& entity = em.newEntity();
@@ -221,7 +242,10 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
             d.addWeakness(static_cast<ElementalType>(weakness.GetInt()));
         }
     }
+}
 
+void MapManager::generateObjects(EntityManager& em, const rapidjson::Value& objectArray, uint8_t mapID)
+{
     for (rapidjson::SizeType i = 0; i < objectArray.Size(); i++)
     {
         auto& li = em.getSingleton<LevelInfo>();
@@ -248,13 +272,19 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
         em.addComponent<ObjectComponent>(entity, ObjectComponent{ .type = type, .inmortal = true, .objID = objId });
     }
+}
 
+void MapManager::generateEnemies(EntityManager& em, const rapidjson::Value& enemyArray, Ia_man& iam)
+{
     for (rapidjson::SizeType i = 0; i < enemyArray.Size(); i++)
     {
         const rapidjson::Value& enemy = enemyArray[i];
         iam.createEnemy(em, enemy);
     }
+}
 
+void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value& interactablesArray)
+{
     for (rapidjson::SizeType i = 0; i < interactablesArray.Size(); i++)
     {
         const rapidjson::Value& interactable = interactablesArray[i];
@@ -300,22 +330,7 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
         }
         }
     }
-
-    // pseudo codigo para scheduling xdddd
-    // for enemy : map[enemies]
-    // {
-
-    //     if(tiempo pasado > x)
-    //     {
-    //         texturas enemigo = map[enemies][slime][texturas][1];
-    //     }
-    //     else
-    //     {
-    //         texturas enemigo = map[enemies][slime][texturas][0];
-    //     }
-    // }
 }
-
 
 void MapManager::destroyMap(EntityManager& em)
 {
@@ -325,6 +340,114 @@ void MapManager::destroyMap(EntityManager& em)
 
     em.forEachAny<CMPS, TAGS>([&](Entity& entity) { li.dead_entities.insert(entity.getID()); });
 }
+
+void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
+{
+    using TAGs = MP::TypeList <EnemyTag, DestructibleTag>;
+    destroyParts<TAGs>(em);
+
+    mapType map = loadMap(fileMap);
+
+    const rapidjson::Value& chunks = map["Chunks"];
+    for (rapidjson::SizeType i = 0; i < chunks.Size(); i++)
+    {
+        std::string chunkName = "Chunk" + std::to_string(i);
+        const rapidjson::Value& chunk = chunks[i][chunkName.c_str()];
+        const rapidjson::Value& enemyArray = chunk[1]["underworld"]["Enemies"];
+
+        generateEnemies(em, enemyArray, iam);
+    }
+
+    for (rapidjson::SizeType i = 0; i < chunks.Size(); i++)
+    {
+        std::string chunkName = "Chunk" + std::to_string(i);
+        const rapidjson::Value& chunk = chunks[i][chunkName.c_str()];
+        const rapidjson::Value& destructibleArray = chunk[0]["overworld"]["Destroyables"];
+
+        generateDestructibles(em, destructibleArray);
+    }
+}
+
+// template<>
+// void MapManager::resetTag<WallTag>(EntityManager& em)
+// {
+//     mapType map = loadMap(fileMap);
+
+//     const rapidjson::Value& chunks = map["Chunks"];
+//     for (rapidjson::SizeType i = 0; i < chunks.Size(); i++)
+//     {
+//         std::string chunkName = "Chunk" + std::to_string(i);
+//         const rapidjson::Value& chunk = chunks[i][chunkName.c_str()];
+//         const rapidjson::Value& wallArray = chunk[0]["overworld"]["Walls"];
+
+//         generateWalls(em, wallArray);
+//     }
+// }
+
+// template<>
+// void MapManager::resetTag<RampTag>(EntityManager& em)
+// {
+//     mapType map = loadMap(fileMap);
+
+//     const rapidjson::Value& chunks = map["Chunks"];
+//     for (rapidjson::SizeType i = 0; i < chunks.Size(); i++)
+//     {
+//         std::string chunkName = "Chunk" + std::to_string(i);
+//         const rapidjson::Value& chunk = chunks[i][chunkName.c_str()];
+//         const rapidjson::Value& rampArray = chunk[0]["overworld"]["Ramps"];
+
+//         generateWalls(em, rampArray);
+//     }
+// }
+
+// template<>
+// void MapManager::resetTag<DestructibleTag>(EntityManager& em)
+// {
+//     mapType map = loadMap(fileMap);
+
+//     const rapidjson::Value& chunks = map["Chunks"];
+//     for (rapidjson::SizeType i = 0; i < chunks.Size(); i++)
+//     {
+//         std::string chunkName = "Chunk" + std::to_string(i);
+//         const rapidjson::Value& chunk = chunks[i][chunkName.c_str()];
+//         const rapidjson::Value& destructibleArray = chunk[0]["overworld"]["Destroyables"];
+
+//         generateDestructibles(em, destructibleArray);
+//     }
+// }
+
+// template<>
+// void MapManager::resetTag<EnemyTag>(EntityManager& em, Ia_man& iam)
+// {
+//     mapType map = loadMap(fileMap);
+
+//     const rapidjson::Value& chunks = map["Chunks"];
+//     for (rapidjson::SizeType i = 0; i < chunks.Size(); i++)
+//     {
+//         std::string chunkName = "Chunk" + std::to_string(i);
+//         const rapidjson::Value& chunk = chunks[i][chunkName.c_str()];
+//         const rapidjson::Value& enemyArray = chunk[1]["underworld"]["Enemies"];
+
+//         generateEnemies(em, enemyArray, iam);
+//     }
+// }
+
+// template<>
+// void MapManager::resetTag<ObjectTag>(EntityManager& em)
+// {
+//     mapType map = loadMap(fileMap);
+//     auto& li = em.getSingleton<LevelInfo>();
+
+//     const rapidjson::Value& chunks = map["Chunks"];
+//     for (rapidjson::SizeType i = 0; i < chunks.Size(); i++)
+//     {
+//         std::string chunkName = "Chunk" + std::to_string(i);
+//         const rapidjson::Value& chunk = chunks[i][chunkName.c_str()];
+//         const rapidjson::Value& objectsArray = chunk[1]["underworld"]["Objects"];
+
+//         generateObjects(em, objectsArray, li.mapID);
+//     }
+// }
 
 void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man& iam)
 {
