@@ -16,9 +16,12 @@ struct BTDecisionActivateorQuit_Shield : BTNode_t{
                 if(bb.subditosData.size() != 0){
                     for(const auto& sub : bb.subditosData){
                         if((*ectx.em.getEntityByID(sub.first)).hasComponent<RenderComponent>()){
+                            //recoger subditocomponent
+                            // poner un flag
+                            // subditosystem -> maneje el cambio de color y que active una barra de salud verde arriba
                             auto &rensub = ectx.em.getComponent<RenderComponent>(*ectx.em.getEntityByID(sub.first));
                             rensub.colormutable = !rensub.colormutable;
-                            
+
                             // sub.second
                             //ectx.ren.shieldactivate = true
                             //flag para textura de escudo
