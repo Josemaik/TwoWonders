@@ -117,24 +117,11 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
         auto& p = em.addComponent<PhysicsComponent>(groundEntity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
         em.addComponent<ColliderComponent>(groundEntity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
 
-        if (j < 4)
-        {
-            r.model = LoadModel("assets/models/map_models/lvl_0-cnk0.obj");
-            Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
-            r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-
-            r.meshLoaded = true;
-            groundPos = groundPosition;
-        }
-        else
+        if (j >= 4)
         {
             auto& modelEntity = em.newEntity();
+            em.addTag<GroundTag>(modelEntity);
             auto& r2 = em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = groundPos, .scale = groundScale, .color = color, .rotationVec = rotationVec });
-            r2.model = LoadModel("assets/models/map_models/lvl_0-cnk1.obj");
-            Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
-            r2.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-
-            r2.meshLoaded = true;
         }
 
         // Creamos las 4 zonas
@@ -161,7 +148,7 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
             k += 1;
         }
 
-        if (!r.meshLoaded)
+        if (j > 4)
             em.destroyComponent<RenderComponent>(groundEntity);
     }
 }

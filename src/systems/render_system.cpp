@@ -229,21 +229,19 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                     }
-                    // else if (e.hasTag<GroundTag>())
-                    // {
-                    //     r.model = LoadModel("assets/models/map_models/lvl_0-cnk1.obj");
-                    //     // int materialCount;
-                    //     // Material* materials = LoadMaterials("assets/models/materials/lvl_0-cnk0.mtl", &materialCount);
-
-                    //     // if (materialCount > 0) {
-                    //     //     r.model.materials[0] = materials[0]; // Asume que el modelo tiene al menos un material
-                    //     // }
-
-                    //     Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
-                    //     // Texture2D t2 = LoadTexture("assets/models/textures/map_textures/lvl_0-extras_texture.png");
-                    //     r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                    //     // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t2;
-                    // }
+                    else if (e.hasTag<GroundTag>() && !jaja)
+                    {
+                        r.model = LoadModel("assets/models/map_models/lvl_0-cnk0.obj");
+                        jaja = true;
+                        Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                    }
+                    else if (e.hasTag<GroundTag>() && jaja)
+                    {
+                        r.model = LoadModel("assets/models/map_models/lvl_0-cnk1.obj");
+                        Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                    }
                     else
                     {
                         r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));

@@ -9,7 +9,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd E:/godo/estudios/uni/4º/abp/hito 3/niveles/Zona_0-Bosque/Arbol_2_texture.psd
+map_Kd ../textures/map_textures/Arbol_2_texture.png
 
 newmtl Arbol_2.1
 Ns 250.000000
@@ -19,7 +19,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd E:/godo/estudios/uni/4º/abp/hito 3/niveles/Zona_0-Bosque/Arbol_2.1_texture.psd
+map_Kd ../textures/map_textures/Arbol_2.1_texture.png
 
 newmtl chunk
 Ns 0.000000
@@ -29,4 +29,4 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd E:/godo/estudios/uni/4º/abp/hito 3/niveles/Zona_0-Bosque/lvl0_texture.psd
+map_Kd ../textures/map_textures/lvl0_texture.png
