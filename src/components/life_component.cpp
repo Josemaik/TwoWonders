@@ -2,7 +2,7 @@
 
 void LifeComponent::decreaseLife() {
     if ((elapsed >= countdown) && (life > 0)) {
-        lifeloosedlastframe = true;
+        lifeLost = 1;
         life -= 1;
         elapsed = 0;
     }
@@ -10,7 +10,7 @@ void LifeComponent::decreaseLife() {
 
 void LifeComponent::decreaseLife(int minusLife) {
     if ((elapsed >= countdown) && (life > 0)) {
-        lifeloosedlastframe = true;
+        lifeLost = minusLife;
         life -= minusLife;
         elapsed = 0;
         if (life < 0)

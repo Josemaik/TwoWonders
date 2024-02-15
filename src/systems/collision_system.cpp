@@ -254,6 +254,21 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
             return;
     }
 
+    if (behaviorType2 & BehaviorType::METEORITE || behaviorType1 & BehaviorType::METEORITE)
+    {
+        auto* meteoriteEntPtr = &staticEnt;
+        auto* otherEntPtr = &otherEnt;
+
+        if (behaviorType2 & BehaviorType::METEORITE)
+            std::swap(meteoriteEntPtr, otherEntPtr);
+
+        auto& li = em.getSingleton<LevelInfo>();
+        li.dead_entities.insert(meteoriteEntPtr->getID());
+    }
+
+    if (behaviorType2 & BehaviorType::WARNINGZONE || behaviorType1 & BehaviorType::WARNINGZONE)
+        return;
+
     // Esto ya es cualquier colisión que no sea de player, paredes, zonas o ataques
     //Si una de las entidades es una telaraña no se comprueba las colisiones
     if (!(behaviorType1 & BehaviorType::SPIDERWEB) && !(behaviorType2 & BehaviorType::SPIDERWEB)) {
@@ -448,7 +463,7 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
     //Meteorit
     if (behaviorType2 & BehaviorType::METEORITE)
     {
-        if(em.getEntityByID(staticEntPtr->getID())->hasTag<PlayerTag>()){
+        if (em.getEntityByID(staticEntPtr->getID())->hasTag<PlayerTag>()) {
             em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife(2);
         }
         auto& li = em.getSingleton<LevelInfo>();

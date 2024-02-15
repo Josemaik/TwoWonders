@@ -4,13 +4,17 @@
 #include <utils/path.hpp>
 #include <utils/vec3D.hpp>
 #include <vector>
+#include "../../components/subject_component.hpp"
 
 //Estructura para almacenar información de una IA
-struct InfoSub {
+struct InfoSub
+{
+    InfoSub() = default;
+    InfoSub(vec3d position, int life, bool acshield) : position(position), life(life) { subComp.setShield(acshield); }
+
     vec3d position{};
     int life{};
-    bool activeshield{false};
-    int shieldlife{2};
+    SubjectComponent subComp{};
 };
 
 struct InfoSlime {
@@ -26,18 +30,18 @@ struct BlackBoard_t {
     std::size_t teid{};
     //centinela para crear súbditos
     bool create_subdito{ false };
-    bool activate_shield { false };
+    bool activate_shield{ false };
     //Posicion Boss Final
     vec3d boss_position{};
     //Path
     // Path_t<4> path { vec3d{8.0, 0.0, 4.0} , {3.0,0.0,4.0} , {3.0,0.0,5.0}, {8.0,0.0,5.0} };
     //Actualizar información IA slimes
-    void 
-    updateInfoSlime(std::size_t id, vec3d position, int life) {
+    void
+        updateInfoSlime(std::size_t id, vec3d position, int life) {
         // si el tipo es 0 es slime, si es 1 es subdito
         // if (type == 0) {
-            InfoSlime EntInfo(position, life);
-            slimeData[id] = EntInfo;
+        InfoSlime EntInfo(position, life);
+        slimeData[id] = EntInfo;
         // }
         // else {
         //     if (type == 1) {
@@ -53,13 +57,13 @@ struct BlackBoard_t {
 
     }
     void
-    updateInfoSub(std::size_t id, vec3d position, int life, bool acshield){
-        InfoSub EntInfo(position, life,acshield);
+        updateInfoSub(std::size_t id, vec3d position, int life, bool acshield) {
+        InfoSub EntInfo(position, life, acshield);
         subditosData[id] = EntInfo;
         idsubditos.push_back(id);
     }
-       void
-    updateInfoBoss(vec3d position){
+    void
+        updateInfoBoss(vec3d position) {
         boss_position = position;
     }
     std::unordered_map<std::size_t, InfoSlime> slimeData;

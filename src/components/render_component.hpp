@@ -16,7 +16,6 @@ struct RenderComponent
     vec3d scale{};
     double orientation{ 0.0 };
     Color color{};
-    bool colormutable{true};
     bool visible{ true };
     vec3d rotationVec{ 0.0, 0.1, 0.0 };
 

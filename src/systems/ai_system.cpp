@@ -37,7 +37,7 @@ void AISystem::update(EntityManager& em, float dt)
     auto& bb = em.getSingleton<BlackBoard_t>();
     bb.idsubditos.clear();
 
-    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy,RenderComponent& ren, AIComponent& ai, LifeComponent& lc)
+    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, RenderComponent& ren, AIComponent& ai, LifeComponent& lc)
     {
         //percibir el entorno
         perception(bb, ai, dt);
@@ -45,8 +45,9 @@ void AISystem::update(EntityManager& em, float dt)
         if (e.hasTag<SlimeTag>()) {
             bb.updateInfoSlime(e.getID(), phy.position, lc.life);
         }
-        if (e.hasTag<SubditoTag>()) {
-            bb.updateInfoSub(e.getID(), phy.position, lc.life, ren.colormutable);     
+        if (e.hasTag<SubjectTag>() && e.hasComponent<SubjectComponent>()) {
+            auto& sub = em.getComponent<SubjectComponent>(e);
+            bb.updateInfoSub(e.getID(), phy.position, lc.life, sub.activeShield);
         }
         if (e.hasTag<BossFinalTag>()) {
             bb.updateInfoBoss(phy.position);

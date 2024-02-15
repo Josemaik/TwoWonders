@@ -158,10 +158,10 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     break;
                 }
             }
-            
-            if(!r.colormutable && e.hasTag<SubditoTag>()){
+
+            if (e.hasTag<SubjectTag>() && e.hasComponent<SubjectComponent>() && em.getComponent<SubjectComponent>(e).activeShield)
                 colorEntidad = GREEN;
-            }
+
             if (e.hasComponent<LifeComponent>()) {
                 auto& l{ em.getComponent<LifeComponent>(e) };
                 if (l.elapsed < l.countdown)
@@ -222,7 +222,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
-                    else if (e.hasTag<SubditoTag>())
+                    else if (e.hasTag<SubjectTag>())
                     {
                         r.model = LoadModel("assets/models/Boss_sub_1.obj");
                         Texture2D t0 = LoadTexture("assets/models/textures/Boss_sub_1_uv.png");
@@ -270,7 +270,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     pos.setY(pos.y() - 1.1);
                     colorEntidad = { 125, 125, 125, 255 };
                 }
-                else if (e.hasTag<SubditoTag>())
+                else if (e.hasTag<SubjectTag>())
                 {
                     scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
@@ -280,7 +280,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
                 engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
 
-                if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>() && !e.hasTag<SpiderTag>() && !e.hasTag<BossFinalTag>() && !e.hasTag<SubditoTag>())
+                if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>() && !e.hasTag<SpiderTag>() && !e.hasTag<BossFinalTag>() && !e.hasTag<SubjectTag>())
                 {
                     int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
                     if (orientationInDegreesInt % 90 == 0)
@@ -591,8 +591,28 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             l.life_width = lifeWidth;
 
-            // if (e.hasTag<SpiderTag>())
-            //     std::cout << newLifeWidth << std::endl;
+            if (e.hasTag<SubjectTag>() && e.hasComponent<SubjectComponent>())
+            {
+                auto& sub{ em.getComponent<SubjectComponent>(e) };
+
+                // Dibujamos una barra de vida para el escudo si es que tiene uno activo
+                if (sub.activeShield)
+                {
+                    engine.drawRectangle(barX, barY - 10, barWidth, barHeight, DARKGRAY);
+                    float normalizedShieldLife = (static_cast<float>(sub.shieldLife) / static_cast<float>(sub.maxShieldLife));
+
+                    // Calcula la anchura de la barra de vida
+                    int shieldWidth = static_cast<int>(static_cast<float>(barWidth) * normalizedShieldLife);
+
+                    if (sub.shieldLife != sub.maxShieldLife)
+                        shieldWidth = sub.shieldLifeWidth + static_cast<int>((shieldWidth - sub.shieldLifeWidth) * 0.25);
+
+                    // Dibujamos la barra de vida
+                    engine.drawRectangle(barX, barY - 10, shieldWidth, barHeight, GREEN);
+
+                    sub.shieldLifeWidth = shieldWidth;
+                }
+            }
         }
 
         if (e.hasComponent<ChestComponent>() && e.hasComponent<RenderComponent>())
