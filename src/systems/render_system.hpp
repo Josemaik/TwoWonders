@@ -21,6 +21,7 @@ struct RenderSystem
     void unloadModels(EntityManager& em, ENGI::GameEngine& engine);
     void drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& em);
     void drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt);
+    void drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss);
 
     // Funciones double dtprivadas para organizar el codigo
 private:

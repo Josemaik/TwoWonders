@@ -100,8 +100,8 @@ void Game::run()
     float deltaTime{}, currentTime{};
 
     createSound(em);
-
-    while (!engine.windowShouldClose())
+    li.sound_system = &sound_system;
+    while (!li.gameShouldEnd)
     {
         deltaTime = engine.getFrameTime();
 
@@ -139,6 +139,13 @@ void Game::run()
             break;
         }
 
+        // CODIGO DE LA PANTALLA DE PAUSA
+        case GameScreen::PAUSE:
+        {
+            render_system.drawPauseMenu(engine, em, sound_system);
+            break;
+        }
+
         // CODIGO DE LA PANTALLA DE HISTORIA
         case GameScreen::STORY:
         {
@@ -165,7 +172,7 @@ void Game::run()
             input_system.update(em);
 
             // seleccionar modo de debug ( physics o AI)
-            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1))
+            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause))
             {
                 ai_system.update(em, deltaTime);
                 physics_system.update(em, deltaTime);
@@ -189,7 +196,7 @@ void Game::run()
 
                 render_system.update(em, engine, deltaTime);
             }
-            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1))
+            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1 || inpi.pause))
                 render_system.update(em, engine, deltaTime);
 
             break;
@@ -213,6 +220,9 @@ void Game::run()
         default:
             break;
         }
+
+        if (engine.windowShouldClose())
+            li.gameShouldEnd = true;
     }
 
     //liberar bancos
@@ -221,7 +231,6 @@ void Game::run()
 
     engine.closeWindow();
 }
-
 
 void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
 {
@@ -236,5 +245,6 @@ void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
     lock_system.reset();
     createEntities(em);
     map.reset(em, 0, iam);
+    li.sound_system = &sound_system;
 }
 

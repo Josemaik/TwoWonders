@@ -320,13 +320,20 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
 {
     engine.endMode3D();
 
+    auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
 
     drawHUD(em, engine, inpi.debugPhy);
+
+    if (inpi.pause && li.sound_system != nullptr)
+        drawPauseMenu(engine, em, *li.sound_system);
+    else if (li.sound_system == nullptr)
+        inpi.pause = false;
+
     // Si se pulsa F2 se activa editor  de parámetros In-game
-    if (inpi.debugAI1) {
+    if (inpi.debugAI1)
         drawEditorInGameIA(engine, em);
-    }
+
     // Visual Debug AI
     if (inpi.debugAI2)
         drawDebuggerInGameIA(engine, em, dt);
@@ -345,6 +352,54 @@ double SelectValue(double value, float posx, float posy, float height, float wid
     // seteamos el nuevo valor
     return static_cast<double>(floatvalue);
 }
+
+void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss)
+{
+    float windowWidth = 330.0f;
+    float windowHeight = 330.0f;
+
+    Rectangle windowRect = {
+        static_cast<float>(engine.getScreenWidth()) / 2.0f - windowWidth / 2.0f,
+        static_cast<float>(engine.getScreenHeight()) / 2.0f - windowHeight / 2.0f,
+        windowWidth,
+        windowHeight
+    };
+    DrawRectangleLinesEx(windowRect, 2, BLACK);
+    DrawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
+    DrawTextEx(GetFontDefault(), "PAUSA", Vector2{ windowRect.x + 100, windowRect.y + 40 }, 40, 1, BLACK);
+
+    // Boton de volver al inicio
+    Rectangle btn1Rec = { 300, 250, 200, 50 };
+    Rectangle btn2Rec = { 300, 320, 200, 50 };
+    Rectangle btn3Rec = { 300, 390, 200, 50 };
+    auto& li = em.getSingleton<LevelInfo>();
+
+    if (GuiButton(btn1Rec, "CONTINUAR")) {
+        auto& inpi = em.getSingleton<InputInfo>();
+        inpi.pause = false;
+        ss.seleccion_menu();
+    }
+
+    if (GuiButton(btn2Rec, "VOLVER AL INICIO")) {
+        li.currentScreen = GameScreen::TITLE;
+        ss.seleccion_menu();
+    }
+
+    if (CheckCollisionPointRec(GetMousePosition(), btn1Rec) || CheckCollisionPointRec(GetMousePosition(), btn2Rec)) {
+        if (ss.pushed == false)
+            ss.sonido_mov();
+        ss.pushed = true;
+    }
+    else
+        ss.pushed = false;
+
+    if (GuiButton(btn3Rec, "SALIR")) {
+        auto& li = em.getSingleton<LevelInfo>();
+        li.gameShouldEnd = true;
+        return;
+    }
+}
+
 //Debugger visual in-game
 void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt) {
     // engine.beginDrawing();

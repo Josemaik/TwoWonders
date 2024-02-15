@@ -121,7 +121,7 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
         {
             auto& modelEntity = em.newEntity();
             em.addTag<GroundTag>(modelEntity);
-            auto& r2 = em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = groundPos, .scale = groundScale, .color = color, .rotationVec = rotationVec });
+            em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = groundPos, .scale = groundScale, .color = color, .rotationVec = rotationVec });
         }
 
         // Creamos las 4 zonas

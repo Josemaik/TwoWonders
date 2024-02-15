@@ -7,12 +7,23 @@ void InputSystem::update(EntityManager& em)
     auto& bb = em.getSingleton<BlackBoard_t>();
     auto* playerEn = em.getEntityByID(li.playerID);
 
+    // PAUSE
+    if (IsKeyReleased(KEY_ESCAPE) && li.currentScreen == GameScreen::GAMEPLAY)
+    {
+        inpi.pause = !inpi.pause;
+        inpi.debugAI1 = false;
+        inpi.debugAI2 = false;
+        inpi.debugPhy = false;
+        return;
+    }
+
     // DEBUG PHYSICS
     if (IsKeyReleased(KEY_F1))
     {
         inpi.debugPhy = !inpi.debugPhy;
         inpi.debugAI1 = false;
         inpi.debugAI2 = false;
+        inpi.pause = false;
         return;
     }
 
@@ -22,6 +33,7 @@ void InputSystem::update(EntityManager& em)
         inpi.debugAI1 = !inpi.debugAI1;
         inpi.debugPhy = false;
         inpi.debugAI2 = false;
+        inpi.pause = false;
         return;
     }
 
@@ -31,6 +43,7 @@ void InputSystem::update(EntityManager& em)
         inpi.debugAI2 = !inpi.debugAI2;
         inpi.debugPhy = false;
         inpi.debugAI1 = false;
+        inpi.pause = false;
         return;
     }
 
@@ -79,7 +92,6 @@ void InputSystem::update(EntityManager& em)
                 vel.setZ(vel.z() + INP_SPEED);
             }
 
-            in.last_key = in.right;
             keysPressed++;
         }
         if (IsKeyDown(in.left)) {
@@ -96,7 +108,6 @@ void InputSystem::update(EntityManager& em)
                 vel.setZ(vel.z() - INP_SPEED);
             }
 
-            in.last_key = in.left;
             keysPressed++;
         }
         if (IsKeyDown(in.up)) {
@@ -112,7 +123,6 @@ void InputSystem::update(EntityManager& em)
                 vel.setZ(vel.z() - INP_SPEED);
             }
 
-            in.last_key = in.up;
             keysPressed++;
         }
         if (IsKeyDown(in.down)) {
@@ -128,7 +138,6 @@ void InputSystem::update(EntityManager& em)
                 vel.setZ(vel.z() + INP_SPEED);
             }
 
-            in.last_key = in.down;
             keysPressed++;
         }
         // }
@@ -195,13 +204,20 @@ void InputSystem::update(EntityManager& em)
         }
 
         if (IsKeyPressed(in.interact))
-        {
             inpi.interact = true;
-        }
         else if (IsKeyReleased(in.interact))
-        {
             inpi.interact = false;
-        }
+
+
+        // if (IsKeyPressed(in.pause) && !inpi.pause && li.currentScreen == GameScreen::GAMEPLAY)
+        // {
+        //     li.currentScreen = GameScreen::PAUSE;
+        //     inpi.pause = true;
+        // }
+        // else if (inpi.pause && IsKeyReleased(in.pause))
+        // {
+        //     inpi.pause = false;
+        // }
 
         // Codigo para la bomba
         if (IsKeyDown(KEY_B) && e.hasComponent<AttackComponent>())
