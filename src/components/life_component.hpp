@@ -3,6 +3,7 @@
 struct LifeComponent
 {
     int life{ 1 }, maxLife{ life }, life_width{};
+    bool lifeloosedlastframe{false};
     float countdown{ 1.0f }, elapsed{ 1.0f }; // En segundos
     bool markedForDeletion{ false };
 

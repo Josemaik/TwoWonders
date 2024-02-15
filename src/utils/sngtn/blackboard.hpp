@@ -6,7 +6,14 @@
 #include <vector>
 
 //Estructura para almacenar información de una IA
-struct Info {
+struct InfoSub {
+    vec3d position{};
+    int life{};
+    bool activeshield{false};
+    int shieldlife{2};
+};
+
+struct InfoSlime {
     vec3d position{};
     int life{};
 };
@@ -26,26 +33,37 @@ struct BlackBoard_t {
     // Path_t<4> path { vec3d{8.0, 0.0, 4.0} , {3.0,0.0,4.0} , {3.0,0.0,5.0}, {8.0,0.0,5.0} };
     //Actualizar información IA slimes
     void 
-    updateInfo(std::size_t id, vec3d position, int life, uint16_t type) {
-        Info EntInfo(position, life);
+    updateInfoSlime(std::size_t id, vec3d position, int life) {
         // si el tipo es 0 es slime, si es 1 es subdito
-        if (type == 0) {
+        // if (type == 0) {
+            InfoSlime EntInfo(position, life);
             slimeData[id] = EntInfo;
-        }
-        else {
-            if (type == 1) {
-                //std::cout << "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \n";
-                subditosData[id] = EntInfo;
-                idsubditos.push_back(id);
-            }
-            else {
-                boss_position = position;
-            }
-        }
+        // }
+        // else {
+        //     if (type == 1) {
+        //         //std::cout << "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \n";
+        //         InfoSub EntInfo(position, life);
+        //         subditosData[id] = EntInfo;
+        //         idsubditos.push_back(id);
+        //     }
+        //     else {
+        //         boss_position = position;
+        //     }
+        // }
 
     }
-    std::unordered_map<std::size_t, Info> slimeData;
-    std::unordered_map<std::size_t, Info> subditosData;
+    void
+    updateInfoSub(std::size_t id, vec3d position, int life, bool acshield){
+        InfoSub EntInfo(position, life,acshield);
+        subditosData[id] = EntInfo;
+        idsubditos.push_back(id);
+    }
+       void
+    updateInfoBoss(vec3d position){
+        boss_position = position;
+    }
+    std::unordered_map<std::size_t, InfoSlime> slimeData;
+    std::unordered_map<std::size_t, InfoSub> subditosData;
     std::vector<size_t> idsubditos;
 
 };

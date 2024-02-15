@@ -61,7 +61,14 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
 
             lif.markedForDeletion = true;
         }
-
+        // if(lif.lifeloosedlastframe){
+        //     if(ent.hasTag<SubditoTag>()){
+        //         auto& bb = em.getSingleton<BlackBoard_t>();
+        //         for(auto& sub : bb.subditosData){
+        //             if(sub.id)
+        //         }
+        //     } 
+        // }
         if (lif.markedForDeletion && !lif.decreaseNextFrame)
             li.dead_entities.insert(ent.getID());
 

@@ -158,7 +158,10 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     break;
                 }
             }
-
+            
+            if(!r.colormutable && e.hasTag<SubditoTag>()){
+                colorEntidad = GREEN;
+            }
             if (e.hasComponent<LifeComponent>()) {
                 auto& l{ em.getComponent<LifeComponent>(e) };
                 if (l.elapsed < l.countdown)
