@@ -264,16 +264,15 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
 
         auto& li = em.getSingleton<LevelInfo>();
         li.dead_entities.insert(meteoriteEntPtr->getID());
+
+        return;
     }
 
     if (behaviorType2 & BehaviorType::WARNINGZONE || behaviorType1 & BehaviorType::WARNINGZONE)
         return;
 
     // Esto ya es cualquier colisión que no sea de player, paredes, zonas o ataques
-    //Si una de las entidades es una telaraña no se comprueba las colisiones
-    if (!(behaviorType1 & BehaviorType::SPIDERWEB) && !(behaviorType2 & BehaviorType::SPIDERWEB)) {
-        nonStaticCollision(staticPhy, otherPhy, minOverlap);
-    }
+    nonStaticCollision(staticPhy, otherPhy, minOverlap);
 }
 
 void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
@@ -359,8 +358,14 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
-    if (behaviorType2 & BehaviorType::SPIDERWEB)
+    if (behaviorType2 & BehaviorType::SPIDERWEB || behaviorType2 & BehaviorType::WARNINGZONE)
         return;
+
+    if (behaviorType2 & BehaviorType::METEORITE)
+    {
+        li.dead_entities.insert(otherEntPtr->getID());
+        return;
+    }
 
     if (staticEntPtr->hasTag<DoorTag>() && behaviorType2 & BehaviorType::PLAYER)
     {

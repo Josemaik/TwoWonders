@@ -12,7 +12,7 @@ struct BTDecisionActivateorQuit_Shield : BTNode_t {
             //bb.activate_shield = !bb.activate_shield;
            // ectx.ren.colormutable = !ectx.ren.colormutable;
             // if(bb.activate_shield){
-            std::cout << bb.subditosData.size() << "\n";
+            // std::cout << bb.subditosData.size() << "\n";
             if (bb.subditosData.size() != 0) {
                 for (const auto& sub : bb.subditosData) {
                     if ((*ectx.em.getEntityByID(sub.first)).hasComponent<RenderComponent>()) {

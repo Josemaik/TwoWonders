@@ -1,5 +1,4 @@
 #include "steeringbehaviour.hpp"
-#include <printf.h>
 #include <cmath>
 #include <numbers>
 #include <algorithm>

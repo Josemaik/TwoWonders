@@ -21,7 +21,6 @@ void perception(BlackBoard_t& bb, AIComponent& ai, float dt) {
             bb.tactive = false;
             // ai.pathIt = bb.path.begin();
             //  id {static_cast<int>(e.getID()) };
-            // std::printf("[%d] VOY! (%.1f,%.1f)\n",id,ai.tx,ai.tz);
         }
     }
     else {

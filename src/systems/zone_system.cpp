@@ -123,7 +123,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     {
     case 5:
     {
-        checkChests(em, evm, 5);
+        checkChests(em, evm, li.num_zone);
         break;
     }
     case 10:
