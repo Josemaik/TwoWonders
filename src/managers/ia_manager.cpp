@@ -603,9 +603,9 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* d_pd2 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* d_raa = &tree.createNode<BTDecisionReadyforAirAttack>();
         auto* d_as = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Air_attack);
-        auto* sequence2 = &tree.createNode<BTNodeSequence_t>(d_pd2, d_raa,d_as);
+        auto* sequence2 = &tree.createNode<BTNodeSequence_t>(d_pd2, d_raa, d_as);
 
-        tree.createNode<BTNodeSelector_t>(sequence,sequence1,sequence2,shield,patrol);
+        tree.createNode<BTNodeSelector_t>(sequence, sequence1, sequence2, shield, patrol);
         // auto* ready_7 = &tree.createNode<BTDecisionReadyforAttack>();
         // auto* atack_7 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot);
         // [[maybe_unused]] auto* sequence7_3 = &tree.createNode<BTNodeSequence_t>(patrol_7, ready_7, atack_7);
@@ -680,14 +680,14 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
     vec3d const boss_pos = bb.boss_position;
     //create subditos and spawn around boss
     auto& e{ em.newEntity() };
-    em.addTag<SubditoTag>(e);
+    em.addTag<SubjectTag>(e);
     em.addTag<EnemyTag>(e);
 
     auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getRandomPosAroundBoss(generate_radius,boss_pos), .scale = vec3d{ 1.0,2.0,1.0 }, .color = GRAY });
     auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .max_speed = 0.4 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 2 });
-    
+
 
     // Creamos el arbol de comportamiento
     vec_t.push_back(std::make_unique<BehaviourTree_t>());
@@ -701,11 +701,12 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
 
     ElementalType type_ele{};
     AIComponent::TypeShoot type_attk{};
-    if(randomNum <= 50){
+    if (randomNum <= 50) {
         type_attk = AIComponent::TypeShoot::Melee;
         type_ele = ElementalType::Fuego;
         wp.max_speed = 0.5;
-    }else{
+    }
+    else {
         type_attk = AIComponent::TypeShoot::OneShoottoPlayer;
         type_ele = ElementalType::Hielo;
         wp.max_speed = 0.4;
@@ -716,17 +717,18 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
 
     auto* d_1_1 = &tree.createNode<BTDecisionPlayerDetected>();
 
-    
-    double attack_radius_p, countdown_shoot_p,countdown_stop_p{};
-    if(type_attk == AIComponent::TypeShoot::Melee){
-        auto* a_s_1{&tree.createNode<BTAction_Pursue>()};
+
+    double attack_radius_p, countdown_shoot_p, countdown_stop_p{};
+    if (type_attk == AIComponent::TypeShoot::Melee) {
+        auto* a_s_1{ &tree.createNode<BTAction_Pursue>() };
         attack_radius_p = 2.5;
         countdown_shoot_p = 0.4;
         countdown_stop_p = 0.8;
         auto* sequence1_2 = &tree.createNode<BTNodeSequence_t>(d_1_1, a_s_1);
         tree.createNode<BTNodeSelector_t>(sequence1_1, sequence1_2);
-    }else{
-       auto* a_s_1{&tree.createNode<BTAction_Seek>()};
+    }
+    else {
+        auto* a_s_1{ &tree.createNode<BTAction_Seek>() };
         attack_radius_p = 4.5;
         countdown_shoot_p = 0.2;
         countdown_stop_p = 0.5;
@@ -736,6 +738,7 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
 
 
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = type_ele });
+    em.addComponent<SubjectComponent>(e, SubjectComponent{});
     em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = 0.1, .detect_radius = 18.0, .attack_radius = attack_radius_p, .tx = 0.0, .tz = 0.0,.time2arrive = 1.0, .tactive = true, .perceptionTime = static_cast<float>(0.2),
     .path = vec3d{}, .countdown_stop = countdown_stop_p, .countdown_shoot = countdown_shoot_p, .countdown_perception = 0.2, .behaviourTree = &tree });
 

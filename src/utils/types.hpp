@@ -11,6 +11,7 @@
 #include "../components/ramp_component.hpp"
 #include "../components/chest_component.hpp"
 #include "../components/listener_component.hpp"
+#include "../components/subject_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
 #include "../components/projectile_component.hpp"
@@ -50,13 +51,13 @@ struct SnowmanTag {};
 struct GolemTag {};
 struct SpiderTag {};
 struct BossFinalTag {};
-struct SubditoTag {};
+struct SubjectTag {};
 struct DestructibleTag {};
 struct ChestTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
-using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, RampComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, ZoneComponent, ShieldComponent, TypeComponent, ChestComponent, ListenerComponent>;
-using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, WallTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag, GolemTag, SpiderTag, BossFinalTag, SubditoTag, DestructibleTag, ChestTag>;
+using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, RampComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, ZoneComponent, ShieldComponent, TypeComponent, ChestComponent, ListenerComponent, SubjectComponent>;
+using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, WallTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag, GolemTag, SpiderTag, BossFinalTag, SubjectTag, DestructibleTag, ChestTag>;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;

@@ -146,11 +146,7 @@
         ],
         "ramps": [],
         "doors": [
-            {
-                "position": [61.0, 0.0, -78.0],
-                "scale": [2.0, 4.0, 1.0],
-                "color": [127, 106, 79, 255]
-            }
+            
         ],
         "destructibles": []
     },
@@ -270,6 +266,11 @@
                 "countdown_shoot": 0.5,
                 "countdown_perception": 0.5,
                 "scale_to_respawn_attack": 2.0
+            },
+            {
+                "position": [61.0, 0.0, -78.0],
+                "scale": [2.0, 4.0, 1.0],
+                "color": [127, 106, 79, 255]
             }
         ]
     }

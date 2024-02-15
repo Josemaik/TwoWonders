@@ -1,5 +1,4 @@
 #include "physics_system.hpp"
-#include <printf.h>
 #include <math.h>
 
 void PhysicsSystem::update(EntityManager& em, float dt)

@@ -121,9 +121,9 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     // Cosas que hacer en cada zona
     switch (li.num_zone)
     {
-    case 1:
+    case 5:
     {
-        checkChests(em, evm, 1);
+        checkChests(em, evm, li.num_zone);
         break;
     }
     case 10:
