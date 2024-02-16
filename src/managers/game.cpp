@@ -156,7 +156,7 @@ void Game::run()
                 ai_system.update(em, deltaTime);
                 physics_system.update(em, deltaTime);
                 collision_system.update(em);
-                zone_system.update(em, engine, iam, evm, map);
+                zone_system.update(em, engine, iam, evm, map,deltaTime);
                 lock_system.update(em);
                 shield_system.update(em);
                 object_system.update(em, deltaTime);

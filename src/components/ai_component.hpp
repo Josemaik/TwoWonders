@@ -87,9 +87,10 @@ struct AIComponent
     bool target_obtained { false };
     //velocity boofer
     bool boofedvelocity{false};
-    // Timers
+    // Timers fase 1 //spawn 0.5 heal 2.0
+        //    fase 2 // spawn 0.25 heal 1.0 shield 0.4
     double countdown_change_dir{ 1.5 }, countdown_stop{ 0.8 }, countdown_shoot{ 0.5 }, countdown_change_position{ 3.0 }
-    ,countdown_fleeing{3.0}, countdown_perception{0.5}, couldown_spawning{0.5}, countdown_heal{2.0}, countdown_shield{2.5},
+    ,countdown_fleeing{3.0}, countdown_perception{0.5}, couldown_spawning{0.5}, countdown_heal{1.5}, countdown_shield{0.7},
     countdown_air_attack{1.0}; // seconds
     double elapsed_change_position{ 1.0 }, elapsed_stop{ 1.0 }, elapsed_change_dir{ 1.0 }, elapsed_shoot{ 1.0 },
     elapsed_fleeing{1.0}, elapsed_perception{1.0}, elapsed_spawning{1.0}, elapsed_heal{1.0},elapsed_shield{1.0},

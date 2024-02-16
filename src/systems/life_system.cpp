@@ -79,10 +79,10 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
             }
 
             if(ent.hasTag<BossFinalTag>()){
-                if (!lif.decreaseNextFrame)
-                    lif.decreaseNextFrame = true;
-                else
-                    lif.decreaseNextFrame = false;
+                // if (!lif.decreaseNextFrame)
+                //     lif.decreaseNextFrame = true;
+                // else
+                //     lif.decreaseNextFrame = false;
                  auto& bb = em.getSingleton<BlackBoard_t>();
                  bb.boss_fase++;
             }

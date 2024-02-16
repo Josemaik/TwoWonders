@@ -608,9 +608,9 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto&bb = em.getSingleton<BlackBoard_t>();
         if(bb.boss_fase == 1)
             tree.createNode<BTNodeSelector_t>(sequence, sequence1, patrol);
-        else
+        else{
             tree.createNode<BTNodeSelector_t>(sequence, sequence1, sequence2, shield, patrol);
-
+        }
         break;
     }
     case 4:
@@ -644,10 +644,18 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
 
 
     // Creamos el componente IA
-    em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = arrival_radius, .detect_radius = detect_radius, .attack_radius = attack_radius, .tx = tx, .tz = tz,.time2arrive = time2arrive, .tactive = tactive, .perceptionTime = static_cast<float>(perceptionTime),
+    auto& ai = em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = arrival_radius, .detect_radius = detect_radius, .attack_radius = attack_radius, .tx = tx, .tz = tz,.time2arrive = time2arrive, .tactive = tactive, .perceptionTime = static_cast<float>(perceptionTime),
         .path = path, .countdown_stop = countdown_stop, .countdown_shoot = countdown_shoot, .countdown_perception = countdown_perception, .behaviourTree = &tree });
 
     em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = scale_to_respawn_attack });
+
+    auto&bb = em.getSingleton<BlackBoard_t>();
+    if(bb.boss_fase == 2){
+        ai.couldown_spawning = 0.35;
+        ai.countdown_heal = 1.0;
+        ai.countdown_shield = 0.6;
+        ai.countdown_air_attack = 0.85;
+    }
 }
 
 void Ia_man::resetVec()

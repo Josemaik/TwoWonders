@@ -34,6 +34,7 @@ struct BlackBoard_t {
     //Posicion Boss Final
     vec3d boss_position{};
     uint16_t boss_fase{1};
+    double countdown_change_fase{8.0}, elapsed_change_fase{1.0};
     //Path
     // Path_t<4> path { vec3d{8.0, 0.0, 4.0} , {3.0,0.0,4.0} , {3.0,0.0,5.0}, {8.0,0.0,5.0} };
     //Actualizar información IA slimes
@@ -46,6 +47,7 @@ struct BlackBoard_t {
 
     }
     void
+
         updateInfoSub(std::size_t id, vec3d position, int life, bool acshield) {
         InfoSub EntInfo(position, life, acshield);
         subditosData[id] = EntInfo;
