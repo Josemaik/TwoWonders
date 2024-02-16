@@ -742,7 +742,11 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
     if (type_attk == AIComponent::TypeShoot::Melee) {
         auto* a_s_1{ &tree.createNode<BTAction_Pursue>() };
         attack_radius_p = 2.5;
-        countdown_shoot_p = 0.4;
+        if(bb.boss_fase == 1){
+            countdown_shoot_p = 0.4;
+        }else{
+            countdown_shoot_p = 0.7;
+        }
         countdown_stop_p = 0.8;
         auto* sequence1_2 = &tree.createNode<BTNodeSequence_t>(d_1_1, a_s_1);
         tree.createNode<BTNodeSelector_t>(sequence1_1, sequence1_2);
