@@ -74,9 +74,11 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             case ObjectType::Fire_Spell:
                 if (playerEnt->hasComponent<TypeComponent>())
                 {
-                    auto& type = em.getComponent<TypeComponent>(*playerEnt);
-                    if (!type.hasType(ElementalType::Fire))
-                        type.addType(ElementalType::Fire);
+                    Spell fire_pell = { "Fire Ball", "A flaming ball of destruction", Spells::Fire1, ElementalType::Fire, 15, 1 };
+                    plfi.addSpell(fire_pell);
+                    // auto& type = em.getComponent<TypeComponent>(*playerEnt);
+                    // if (!type.hasType(ElementalType::Fire))
+                    //     type.addType(ElementalType::Fire);
                 }
 
             default:

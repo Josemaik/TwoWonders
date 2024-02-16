@@ -335,7 +335,6 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         {
             if (otherEntPtr->hasComponent<TypeComponent>())
             {
-                std::cout << "hola\n";
                 auto& bulletType = em.getComponent<TypeComponent>(*otherEntPtr);
                 if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(bulletType.type))
                     em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();

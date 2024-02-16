@@ -14,6 +14,7 @@ struct InputComponent
     int space{ KEY_SPACE };
     int enter{ KEY_ENTER };
     int pause{ KEY_ESCAPE };
+    int inventory{ KEY_I };
 
     // Teclas de mecánicas
     int air_attack{ KEY_T };

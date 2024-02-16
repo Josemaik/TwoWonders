@@ -50,10 +50,20 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         // Comprobar si la vida de la entidad es la maxima y elegir que tipo de ataque usa
         if (att.type == AttackType::AttackPlayer)
         {
-            if (ent.hasComponent<TypeComponent>())
-                att.type = em.getComponent<TypeComponent>(ent).type == ElementalType::Neutral ? AttackType::Melee : AttackType::Ranged;
+            auto& plfi = em.getSingleton<PlayerInfo>();
+
+            if (plfi.currentSpell == Spells::None)
+                att.type = AttackType::Melee;
             else
-                att.type = AttackType::Ranged;
+            {
+                createSpellAttack(em, ent, att);
+                return;
+            }
+
+            // if (ent.hasComponent<TypeComponent>())
+            //     att.type = em.getComponent<TypeComponent>(ent).type == ElementalType::Neutral ? AttackType::Melee : AttackType::Ranged;
+            // else
+            //     att.type = AttackType::Ranged;
 
             // if (ent.hasComponent<LifeComponent>() && em.getComponent<LifeComponent>(ent).vidaMax())
             //     att.type = AttackType::Ranged;
@@ -268,6 +278,65 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
         if (ent.hasTag<SpiderTag>()) {
             em.addComponent<AttackComponent>(e);
             c.attackType = AttackType::Spiderweb;
+        }
+    }
+}
+
+void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackComponent& att)
+{
+    auto& plfi = em.getSingleton<PlayerInfo>();
+    ElementalType tipoElemental;
+
+    switch (plfi.currentSpell)
+    {
+    case Spells::Fire1:
+        att.type = AttackType::Ranged;
+        tipoElemental = ElementalType::Fire;
+        break;
+    case Spells::Ice1:
+        att.type = AttackType::Ranged;
+        tipoElemental = ElementalType::Ice;
+        break;
+    case Spells::Water1:
+        att.type = AttackType::Ranged;
+        tipoElemental = ElementalType::Water;
+        break;
+    case Spells::Fire2:
+        att.type = AttackType::Ranged;
+        tipoElemental = ElementalType::Fire;
+        break;
+    case Spells::Ice2:
+        att.type = AttackType::Ranged;
+        tipoElemental = ElementalType::Ice;
+        break;
+    case Spells::Water2:
+        att.type = AttackType::Ranged;
+        tipoElemental = ElementalType::Water;
+        break;
+    default:
+        att.type = AttackType::Ranged;
+        tipoElemental = ElementalType::Neutral;
+        break;
+    }
+    // Crear la entidad ataque
+    auto& e{ em.newEntity() };
+    em.addTag<HitPlayerTag>(e);
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * att.scale_to_respawn_attack, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
+    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f });
+    em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+
+    for (auto& s : plfi.spells)
+    {
+        if (s.spell == plfi.currentSpell)
+        {
+            plfi.mana -= s.cost;
+
+            if (plfi.mana < 0.0)
+                plfi.mana = 0;
+            break;
         }
     }
 }

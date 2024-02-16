@@ -14,6 +14,17 @@ void InputSystem::update(EntityManager& em)
         inpi.debugAI1 = false;
         inpi.debugAI2 = false;
         inpi.debugPhy = false;
+        inpi.inventory = false;
+        return;
+    }
+
+    // INVENTORY
+    if (IsKeyReleased(KEY_I) && li.currentScreen == GameScreen::GAMEPLAY && !inpi.pause)
+    {
+        inpi.inventory = !inpi.inventory;
+        inpi.debugAI1 = false;
+        inpi.debugAI2 = false;
+        inpi.debugPhy = false;
         return;
     }
 
@@ -24,6 +35,7 @@ void InputSystem::update(EntityManager& em)
         inpi.debugAI1 = false;
         inpi.debugAI2 = false;
         inpi.pause = false;
+        inpi.inventory = false;
         return;
     }
 
@@ -34,6 +46,7 @@ void InputSystem::update(EntityManager& em)
         inpi.debugPhy = false;
         inpi.debugAI2 = false;
         inpi.pause = false;
+        inpi.inventory = false;
         return;
     }
 
@@ -224,8 +237,8 @@ void InputSystem::update(EntityManager& em)
             em.getComponent<AttackComponent>(e).attack(AttackType::Bomb);
 
         // Codigo para cambiar de tipo de ataque
-        if (IsKeyReleased(KEY_Q) && e.hasComponent<TypeComponent>())
-            em.getComponent<TypeComponent>(e).changeType();
+        if (IsKeyReleased(KEY_Q))
+            plfi.changeCurrentSpell();
 
         // Codigo para curarse // DEBUG
         if (IsKeyDown(KEY_Z) && e.hasComponent<LifeComponent>())

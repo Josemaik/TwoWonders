@@ -172,7 +172,7 @@ void Game::run()
             input_system.update(em);
 
             // seleccionar modo de debug ( physics o AI)
-            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause))
+            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory))
             {
                 ai_system.update(em, deltaTime);
                 physics_system.update(em, deltaTime);
@@ -196,7 +196,7 @@ void Game::run()
 
                 render_system.update(em, engine, deltaTime);
             }
-            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1 || inpi.pause))
+            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory))
                 render_system.update(em, engine, deltaTime);
 
             break;

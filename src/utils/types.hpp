@@ -21,6 +21,7 @@
 #include "../components/shield_component.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
+#include "../utils/Item.hpp"
 //singelton
 #include "../utils/sngtn/player_info.hpp"
 #include "../utils/sngtn/blackboard.hpp"

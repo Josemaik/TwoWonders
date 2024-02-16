@@ -327,15 +327,18 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
 
     if (inpi.pause && li.sound_system != nullptr)
         drawPauseMenu(engine, em, *li.sound_system);
-    else if (li.sound_system == nullptr)
+    else if (inpi.pause && li.sound_system == nullptr)
         inpi.pause = false;
 
+    else if (inpi.inventory)
+        drawInventory(engine, em);
+
     // Si se pulsa F2 se activa editor  de parámetros In-game
-    if (inpi.debugAI1)
+    else if (inpi.debugAI1)
         drawEditorInGameIA(engine, em);
 
     // Visual Debug AI
-    if (inpi.debugAI2)
+    else if (inpi.debugAI2)
         drawDebuggerInGameIA(engine, em, dt);
 
     engine.endDrawing();
@@ -400,6 +403,88 @@ void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, So
     }
 }
 
+void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
+{
+    float windowWidth = 330.0f;
+    float windowHeight = 330.0f;
+
+    Rectangle windowRect = {
+        static_cast<float>(engine.getScreenWidth()) / 2.0f - windowWidth / 2.0f,
+        static_cast<float>(engine.getScreenHeight()) / 2.0f - windowHeight / 2.0f,
+        windowWidth,
+        windowHeight
+    };
+    DrawRectangleLinesEx(windowRect, 2, BLACK);
+    DrawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
+    DrawTextEx(GetFontDefault(), "INVENTARIO", Vector2{ windowRect.x + 50, windowRect.y + 30 }, 40, 1, BLACK);
+
+    // Boton de volver al inicio
+    auto& plfi = em.getSingleton<PlayerInfo>();
+    float posY = 250.f;
+
+    for (auto& item : plfi.inventory)
+    {
+        Rectangle btnRec = { 300, posY, 200, 50 };
+        GuiButton(btnRec, item.name.c_str());
+        posY += 50.f;
+    }
+
+
+    if (plfi.hasKey)
+    {
+        Rectangle btnRec = { 300, posY, 200, 50 };
+        GuiButton(btnRec, "Llave");
+        posY += 50.f;
+    }
+
+    bool neutral{ false }, water{ false }, fire{ false }, ice{ false };
+    for (uint8_t i = 0; i < plfi.types.size(); i++)
+    {
+        std::cout << "Fire: " << fire << std::endl;
+        if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Neutral && !neutral)
+        {
+            Rectangle btnRec = { 300, posY, 200, 50 };
+            GuiButton(btnRec, "Bastón de hechicero");
+            neutral = true;
+            posY += 50.f;
+        }
+
+        else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Water && !water)
+        {
+            Rectangle btnRec = { 300, posY, 200, 50 };
+            GuiButton(btnRec, "Chorro de agua");
+            water = true;
+            posY += 50.f;
+        }
+
+        else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Fire && !fire)
+        {
+            std::cout << "FIRE\n";
+            Rectangle btnRec = { 300, posY, 200, 50 };
+            GuiButton(btnRec, "Bola de fuego");
+            fire = true;
+            posY += 50.f;
+        }
+
+        else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Ice && !ice)
+        {
+            Rectangle btnRec = { 300, posY, 200, 50 };
+            GuiButton(btnRec, "Rayo de hielo");
+            ice = true;
+            posY += 50.f;
+        }
+    }
+
+
+    // if (GuiButton(btn1Rec, "CONTINUAR")) {
+    //     li.currentScreen = GameScreen::GAMEPLAY;
+    // }
+
+    // if (GuiButton(btn2Rec, "VOLVER AL INICIO")) {
+    //     li.currentScreen = GameScreen::TITLE;
+    // }
+}
+
 //Debugger visual in-game
 void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt) {
     // engine.beginDrawing();
@@ -457,6 +542,7 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
     });
     //  engine.endDrawing();
 }
+
 //Editor In-Game
 void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& em) {
     // engine.beginDrawing();

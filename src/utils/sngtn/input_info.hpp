@@ -12,6 +12,7 @@ struct InputInfo
     bool space{ false };
     bool enter{ false };
     bool pause{ false };
+    bool inventory{ false };
 
     // Teclas de debug
     bool debugPhy{ false };
