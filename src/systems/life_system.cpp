@@ -78,6 +78,15 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 bb.subditosData.erase(ent.getID());
             }
 
+            if(ent.hasTag<BossFinalTag>()){
+                // if (!lif.decreaseNextFrame)
+                //     lif.decreaseNextFrame = true;
+                // else
+                //     lif.decreaseNextFrame = false;
+                 auto& bb = em.getSingleton<BlackBoard_t>();
+                 bb.boss_fase++;
+            }
+
             lif.markedForDeletion = true;
         }
 

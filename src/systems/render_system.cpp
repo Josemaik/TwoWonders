@@ -726,15 +726,21 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
         // Dibujar zona para mostrar ejemplo de uso del eventmanager
-        // auto& linfo = em.getSingleton<LevelInfo>();
-        // if (linfo.drawzone == true) {
-        //     engine.drawText("CAMBIANDO DE \n ZONA...", 600, 10, 25, RED);
-        //     if (linfo.segundos == 0) {
-        //         linfo.drawzone = false;
-        //         linfo.segundos = 1000;
-        //     }
-        //     linfo.segundos--;
-        // }
+        auto& linfo = em.getSingleton<LevelInfo>();
+        auto& bb = em.getSingleton<BlackBoard_t>();
+        if (linfo.num_zone == 11) {
+            if(bb.boss_fase == 1){
+                engine.drawText("FASE 1", 500, 10, 70, RED);
+            }else{
+                engine.drawText("FASE 2", 500, 10, 70, ORANGE);
+            }
+            
+            // if (linfo.segundos == 0) {
+            //     linfo.drawzone = false;
+            //     linfo.segundos = 1000;
+            // }
+            // linfo.segundos--;
+        }
         // else {
         //     engine.drawText(("ZONA " + std::to_string(linfo.num_zone)).c_str(), 600, 10, 50, RED);
         // }

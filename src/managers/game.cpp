@@ -78,7 +78,6 @@ void Game::run()
     // - Colocar despues de donde se quiere medir el tiempo
     // auto t2 = high_resolution_clock::now();
     // duration<float, std::milli> duration = t2 - t1;
-    // std::cout << duration.count() << "ms\n";
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
@@ -157,7 +156,7 @@ void Game::run()
                 ai_system.update(em, deltaTime);
                 physics_system.update(em, deltaTime);
                 collision_system.update(em);
-                zone_system.update(em, engine, iam, evm, map);
+                zone_system.update(em, engine, iam, evm, map,deltaTime);
                 lock_system.update(em);
                 shield_system.update(em);
                 object_system.update(em, deltaTime);

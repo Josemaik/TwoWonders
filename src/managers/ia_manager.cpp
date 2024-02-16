@@ -604,12 +604,13 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* d_raa = &tree.createNode<BTDecisionReadyforAirAttack>();
         auto* d_as = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Air_attack);
         auto* sequence2 = &tree.createNode<BTNodeSequence_t>(d_pd2, d_raa, d_as);
-
-        tree.createNode<BTNodeSelector_t>(sequence, sequence1, sequence2, shield, patrol);
-        // auto* ready_7 = &tree.createNode<BTDecisionReadyforAttack>();
-        // auto* atack_7 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot);
-        // [[maybe_unused]] auto* sequence7_3 = &tree.createNode<BTNodeSequence_t>(patrol_7, ready_7, atack_7);
-
+        
+        auto&bb = em.getSingleton<BlackBoard_t>();
+        if(bb.boss_fase == 1)
+            tree.createNode<BTNodeSelector_t>(sequence, sequence1, patrol);
+        else{
+            tree.createNode<BTNodeSelector_t>(sequence, sequence1, sequence2, shield, patrol);
+        }
         break;
     }
     case 4:
@@ -643,16 +644,35 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
 
 
     // Creamos el componente IA
-    em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = arrival_radius, .detect_radius = detect_radius, .attack_radius = attack_radius, .tx = tx, .tz = tz,.time2arrive = time2arrive, .tactive = tactive, .perceptionTime = static_cast<float>(perceptionTime),
+    auto& ai = em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = arrival_radius, .detect_radius = detect_radius, .attack_radius = attack_radius, .tx = tx, .tz = tz,.time2arrive = time2arrive, .tactive = tactive, .perceptionTime = static_cast<float>(perceptionTime),
         .path = path, .countdown_stop = countdown_stop, .countdown_shoot = countdown_shoot, .countdown_perception = countdown_perception, .behaviourTree = &tree });
 
     em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = scale_to_respawn_attack });
+
+    auto&bb = em.getSingleton<BlackBoard_t>();
+    if(bb.boss_fase == 2){
+        ai.couldown_spawning = 0.35;
+        ai.countdown_heal = 1.0;
+        ai.countdown_shield = 0.6;
+        ai.countdown_air_attack = 0.85;
+    }
 }
 
 void Ia_man::resetVec()
 {
     vec_t.clear();
 }
+
+void Ia_man::createBossFinalFase2(EntityManager& em, const mapType& map){
+    const rapidjson::Value& underworld = map["underworld"];
+    const rapidjson::Value& bossfase2 = underworld["bossfinalfase2"];
+    for (rapidjson::SizeType i = 0; i < bossfase2.Size(); i++)
+    {
+        const rapidjson::Value& enemy = bossfase2[i];
+        createEnemy(em, enemy);
+    }
+}
+
 
 //Generación de subditos
 vec3d Ia_man::getRandomPosAroundBoss(double radio, const vec3d& spawnerPos) {
@@ -722,7 +742,11 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
     if (type_attk == AIComponent::TypeShoot::Melee) {
         auto* a_s_1{ &tree.createNode<BTAction_Pursue>() };
         attack_radius_p = 2.5;
-        countdown_shoot_p = 0.4;
+        if(bb.boss_fase == 1){
+            countdown_shoot_p = 0.4;
+        }else{
+            countdown_shoot_p = 0.7;
+        }
         countdown_stop_p = 0.8;
         auto* sequence1_2 = &tree.createNode<BTNodeSequence_t>(d_1_1, a_s_1);
         tree.createNode<BTNodeSelector_t>(sequence1_1, sequence1_2);
