@@ -138,6 +138,13 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
             iam.createSubdito(em, 3.0);
             bb.create_subdito = false;
         }
+
+        if(bb.boss_fase == 2){
+            mapType maptype{};
+            maptype = map.loadMap("assets/levels/mazmorra_level.json");
+            iam.createBossFinalFase2(em,maptype);
+        }
+        
         break;
     }
     case 12:

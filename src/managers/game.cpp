@@ -78,7 +78,6 @@ void Game::run()
     // - Colocar despues de donde se quiere medir el tiempo
     // auto t2 = high_resolution_clock::now();
     // duration<float, std::milli> duration = t2 - t1;
-    // std::cout << duration.count() << "ms\n";
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();

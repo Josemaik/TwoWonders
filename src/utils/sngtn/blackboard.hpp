@@ -33,6 +33,7 @@ struct BlackBoard_t {
     bool activate_shield{ false };
     //Posicion Boss Final
     vec3d boss_position{};
+    uint16_t boss_fase{1};
     //Path
     // Path_t<4> path { vec3d{8.0, 0.0, 4.0} , {3.0,0.0,4.0} , {3.0,0.0,5.0}, {8.0,0.0,5.0} };
     //Actualizar información IA slimes
@@ -42,18 +43,6 @@ struct BlackBoard_t {
         // if (type == 0) {
         InfoSlime EntInfo(position, life);
         slimeData[id] = EntInfo;
-        // }
-        // else {
-        //     if (type == 1) {
-        //         //std::cout << "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \n";
-        //         InfoSub EntInfo(position, life);
-        //         subditosData[id] = EntInfo;
-        //         idsubditos.push_back(id);
-        //     }
-        //     else {
-        //         boss_position = position;
-        //     }
-        // }
 
     }
     void

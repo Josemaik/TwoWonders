@@ -604,11 +604,12 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* d_raa = &tree.createNode<BTDecisionReadyforAirAttack>();
         auto* d_as = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Air_attack);
         auto* sequence2 = &tree.createNode<BTNodeSequence_t>(d_pd2, d_raa, d_as);
-
-        tree.createNode<BTNodeSelector_t>(sequence, sequence1, sequence2, shield, patrol);
-        // auto* ready_7 = &tree.createNode<BTDecisionReadyforAttack>();
-        // auto* atack_7 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::TripleShoot);
-        // [[maybe_unused]] auto* sequence7_3 = &tree.createNode<BTNodeSequence_t>(patrol_7, ready_7, atack_7);
+        
+        auto&bb = em.getSingleton<BlackBoard_t>();
+        if(bb.boss_fase == 1)
+            tree.createNode<BTNodeSelector_t>(sequence, sequence1, patrol);
+        else
+            tree.createNode<BTNodeSelector_t>(sequence, sequence1, sequence2, shield, patrol);
 
         break;
     }
@@ -653,6 +654,17 @@ void Ia_man::resetVec()
 {
     vec_t.clear();
 }
+
+void Ia_man::createBossFinalFase2(EntityManager& em, const mapType& map){
+    const rapidjson::Value& underworld = map["underworld"];
+    const rapidjson::Value& bossfase2 = underworld["bossfinalfase2"];
+    for (rapidjson::SizeType i = 0; i < bossfase2.Size(); i++)
+    {
+        const rapidjson::Value& enemy = bossfase2[i];
+        createEnemy(em, enemy);
+    }
+}
+
 
 //Generación de subditos
 vec3d Ia_man::getRandomPosAroundBoss(double radio, const vec3d& spawnerPos) {

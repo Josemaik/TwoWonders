@@ -1,6 +1,7 @@
 #pragma once 
 #ifndef ZONE_SYSTEM
 #define ZONE_SYSTEM
+#include <fstream>
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
 #include "../managers/ia_manager.hpp"
