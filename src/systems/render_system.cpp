@@ -324,13 +324,13 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
 }
 
 //Dibuja Slider en función de los parámetros
-double SelectValue(double value, float posx, float posy, float height, float width, const char* text, float min_value, float max_value) {
+double SelectValue(ENGI::GameEngine& engine, double value, float posx, float posy, float height, float width, const char* text, float min_value, float max_value) {
     // pasamos a float el valor
     float floatvalue = static_cast<float>(value);
     // dibujamos el slider para modificar su valor
     int new_detect_radius = GuiSliderBar(Rectangle(posx, posy, height, width), text, NULL, &floatvalue, min_value, max_value);
     new_detect_radius = new_detect_radius + 1;
-    DrawText(std::to_string(floatvalue).c_str(), 220, static_cast<int>(posy + 5.0f), 20, BLUE);
+    engine.drawText(std::to_string(floatvalue).c_str(), 220, static_cast<int>(posy + 5.0f), 20, BLUE);
     // seteamos el nuevo valor
     return static_cast<double>(floatvalue);
 }
@@ -338,10 +338,10 @@ double SelectValue(double value, float posx, float posy, float height, float wid
 void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt) {
     // engine.beginDrawing();
     Rectangle windowRect = { 470, 80, 330, 230 };
-    DrawRectangleLinesEx(windowRect, 2, DARKGRAY);
-    DrawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
+    engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
+    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
     Vector2 textPositionInfo = { 480, 90 };
-    DrawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
+    engine.drawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
     auto& debugsnglt = em.getSingleton<Debug_t>();
 
     using SYSCMPss = MP::TypeList<AIComponent, ColliderComponent, RenderComponent>;
@@ -362,7 +362,7 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
             engine.beginMode3D();
             engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
             engine.endMode3D();
-            DrawText("Node active:", 480, 110, 20, BLACK);
+            engine.drawText("Node active:", 480, 110, 20, BLACK);
             if (debugsnglt.elapsed >= debugsnglt.countdown) {
                 debugsnglt.elapsed = 0;
                 debugsnglt.text = aic.bh;
@@ -370,23 +370,23 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
             else {
                 debugsnglt.plusdeltatime(dt, debugsnglt.elapsed);
             }
-            DrawTextEx(GetFontDefault(), debugsnglt.text, Vector2{ 610,110 }, 20, 1, DARKGRAY);
-            DrawText("TEID:", 480, 130, 20, BLACK);
-            DrawTextEx(GetFontDefault(), std::to_string(aic.teid).c_str(), Vector2{ 550,130 }, 20, 1, DARKGRAY);
-            DrawText("TX:", 480, 150, 20, BLACK);
-            DrawTextEx(GetFontDefault(), std::to_string(aic.tx).c_str(), Vector2{ 520,150 }, 20, 1, DARKGRAY);
-            DrawText("TZ:", 480, 170, 20, BLACK);
-            DrawTextEx(GetFontDefault(), std::to_string(aic.tz).c_str(), Vector2{ 520,170 }, 20, 1, DARKGRAY);
-            DrawText("Culldown:", 480, 190, 20, BLACK);
-            DrawTextEx(GetFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), Vector2{ 590,190 }, 20, 1, DARKGRAY);
-            DrawText("Player Detected?:", 480, 210, 20, BLACK);
-            DrawTextEx(GetFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", Vector2{ 680,210 }, 20, 1, RED);
-            DrawText("Player hunted?:", 480, 230, 20, BLACK);
-            DrawTextEx(GetFontDefault(), (bb.playerhunted == 0) ? "No" : "Sí", Vector2{ 680,230 }, 20, 1, RED);
-            DrawText("Subditos alive:", 480, 250, 20, BLACK);
-            DrawTextEx(GetFontDefault(), std::to_string(bb.subditosData.size()).c_str(), Vector2{ 680,250 }, 20, 1, RED);
-            DrawText("Subditos id alive:", 480, 270, 20, BLACK);
-            DrawTextEx(GetFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), Vector2{ 680,270 }, 20, 1, RED);
+            engine.drawTextEx(GetFontDefault(), debugsnglt.text, Vector2{ 610,110 }, 20, 1, DARKGRAY);
+            engine.drawText("TEID:", 480, 130, 20, BLACK);
+            engine.drawTextEx(GetFontDefault(), std::to_string(aic.teid).c_str(), Vector2{ 550,130 }, 20, 1, DARKGRAY);
+            engine.drawText("TX:", 480, 150, 20, BLACK);
+            engine.drawTextEx(GetFontDefault(), std::to_string(aic.tx).c_str(), Vector2{ 520,150 }, 20, 1, DARKGRAY);
+            engine.drawText("TZ:", 480, 170, 20, BLACK);
+            engine.drawTextEx(GetFontDefault(), std::to_string(aic.tz).c_str(), Vector2{ 520,170 }, 20, 1, DARKGRAY);
+            engine.drawText("Culldown:", 480, 190, 20, BLACK);
+            engine.drawTextEx(GetFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), Vector2{ 590,190 }, 20, 1, DARKGRAY);
+            engine.drawText("Player Detected?:", 480, 210, 20, BLACK);
+            engine.drawTextEx(GetFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", Vector2{ 680,210 }, 20, 1, RED);
+            engine.drawText("Player hunted?:", 480, 230, 20, BLACK);
+            engine.drawTextEx(GetFontDefault(), (bb.playerhunted == 0) ? "No" : "Sí", Vector2{ 680,230 }, 20, 1, RED);
+            engine.drawText("Subditos alive:", 480, 250, 20, BLACK);
+            engine.drawTextEx(GetFontDefault(), std::to_string(bb.subditosData.size()).c_str(), Vector2{ 680,250 }, 20, 1, RED);
+            engine.drawText("Subditos id alive:", 480, 270, 20, BLACK);
+            engine.drawTextEx(GetFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), Vector2{ 680,270 }, 20, 1, RED);
         }
     });
     //  engine.endDrawing();
@@ -397,15 +397,15 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
 
     // Dibujar un rectángulo que simula una ventana
     Rectangle windowRect = { 0, 100, 340, 550 };
-    DrawRectangleLinesEx(windowRect, 2, DARKGRAY);
-    DrawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
+    engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
+    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
 
     // Dibujar el texto "debugger IA" en el centro de la ventana
     Vector2 textSize = MeasureTextEx(GetFontDefault(), "Debugger IA", 20, 1);
     Vector2 textPosition = { windowRect.x + 20,
                              windowRect.y + 10 };
 
-    DrawTextEx(GetFontDefault(), "Editor IA", textPosition, 20, 1, DARKBLUE);
+    engine.drawTextEx(GetFontDefault(), "Editor IA", textPosition, 20, 1, DARKBLUE);
 
     // Dibujar una línea recta debajo del texto
     float lineY = textPosition.y + textSize.y + 5;  // Ajusta la posición de la línea según tus necesidades
@@ -415,7 +415,7 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
 
     Vector2 textPositionParameters = { windowRect.x + 5, 150 };
 
-    DrawTextEx(GetFontDefault(), "PARÁMETROS", textPositionParameters, 20, 1, RED);
+    engine.drawTextEx(GetFontDefault(), "PARÁMETROS", textPositionParameters, 20, 1, RED);
 
     auto& debugsnglt = em.getSingleton<Debug_t>();
 
@@ -445,22 +445,22 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
             // si se seleccionada una entidad se muestra el Editor de parámetros
             if (isSelected) {
                 // ID DE LA ENTIDAD SELECCIONADA
-                DrawText("EID:", 5, 170, 20, BLACK);
-                DrawText(std::to_string(debugsnglt.IA_id).c_str(), 55, 170, 20, DARKGRAY);
+                engine.drawText("EID:", 5, 170, 20, BLACK);
+                engine.drawText(std::to_string(debugsnglt.IA_id).c_str(), 55, 170, 20, DARKGRAY);
                 //Detect Radius
-                aic.detect_radius = SelectValue(aic.detect_radius, 85.0, 200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
+                aic.detect_radius = SelectValue(engine, aic.detect_radius, 85.0, 200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
                 // Attack Radius
-                aic.attack_radius = SelectValue(aic.attack_radius, 85.0, 240.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
+                aic.attack_radius = SelectValue(engine, aic.attack_radius, 85.0, 240.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
                 // Arrival Radius
-                aic.arrival_radius = SelectValue(aic.arrival_radius, 85.0, 280.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
+                aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 85.0, 280.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
                 // Max Speed
-                phy.max_speed = SelectValue(phy.max_speed, 85.0, 320.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
+                phy.max_speed = SelectValue(engine, phy.max_speed, 85.0, 320.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
                 //COuntdown Perception
-                aic.countdown_perception = SelectValue(aic.countdown_perception, 85.0, 360.0, 120.0, 30.0, "Perception", 0.0, 10.0);
+                aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 85.0, 360.0, 120.0, 30.0, "Perception", 0.0, 10.0);
                 //Countdown Shoot
-                aic.countdown_shoot = SelectValue(aic.countdown_shoot, 85.0, 400.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
+                aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 85.0, 400.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
                 //Countdown stop
-                aic.countdown_stop = SelectValue(aic.countdown_stop, 85.0, 440.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
+                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 85.0, 440.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
             }
         }
     });
