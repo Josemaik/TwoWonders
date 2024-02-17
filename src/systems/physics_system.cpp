@@ -56,12 +56,13 @@ void PhysicsSystem::update(EntityManager& em, float dt)
             phy.orientation = std::atan2(vel.x(), vel.z());
         }
         
-        if(ent.hasTag<SpiderTag>()){
+        //Orientamos a enemigos hacia el player si están parados
+        if(ent.hasTag<SpiderTag>() || ent.hasTag<SnowmanTag>()){
             if(vel.x() == 0 && vel.z() == 0){
                 auto& bb = em.getSingleton<BlackBoard_t>();
                 vec3d targetpos{bb.tx,0.0,bb.tz};
                 vec3d direction = targetpos - phy.position;
-                phy.orientation = atan2(direction.z(), direction.x());
+                phy.orientation = std::atan2(direction.x(), direction.z());
             }
         }
         
