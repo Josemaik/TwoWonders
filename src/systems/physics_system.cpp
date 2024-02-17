@@ -3,7 +3,7 @@
 
 void PhysicsSystem::update(EntityManager& em, float dt)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([dt, &em](Entity&, PhysicsComponent& phy)
+    em.forEach<SYSCMPs, SYSTAGs>([dt, &em](Entity& ent, PhysicsComponent& phy)
     {
         auto& pos = phy.position;
         auto& vel = phy.velocity;
@@ -51,9 +51,22 @@ void PhysicsSystem::update(EntityManager& em, float dt)
         pos.setX((pos.x() + vel.x()));
         pos.setY((pos.y() + vel.y()));
         pos.setZ((pos.z() + vel.z()));
-
-        if (vel.x() != 0 || vel.z() != 0)
+        // if(!phy.orientated_before){
+        if (vel.x() != 0 || vel.z() != 0){
             phy.orientation = std::atan2(vel.x(), vel.z());
+        }
+        
+        if(ent.hasTag<SpiderTag>()){
+            if(vel.x() == 0 && vel.z() == 0){
+                auto& bb = em.getSingleton<BlackBoard_t>();
+                vec3d targetpos{bb.tx,0.0,bb.tz};
+                vec3d direction = targetpos - phy.position;
+                phy.orientation = atan2(direction.z(), direction.x());
+            }
+        }
+        
+        // }
+        
         // }else{ //Enemigo tiene aceleracion lineal y velocidad angular
         //     phy.orientation += dt * vel_a;
         //     if(phy.orientation > 2*PI) phy.orientation -= 2*PI;

@@ -4,7 +4,7 @@
 
 
 struct BTDecisionReadyforAttack : BTNode_t{
-
+    
     BTDecisionReadyforAttack()  {}
 
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
@@ -18,8 +18,24 @@ struct BTDecisionReadyforAttack : BTNode_t{
         auto& plphy = ectx.em.getComponent<PhysicsComponent>(*playerEn);
         auto const distance = (ectx.phy.position - plphy.position).lengthSQ();
         //Compruebo si esta dentro del radio de ataque y se acabo el culldown
+        //ectx.phy.orientated_before = false;
         if(distance < (ectx.ai.attack_radius * ectx.ai.attack_radius)){
             ectx.ai.on_attack_radius = true;
+
+            //Oriento hacia el jugador
+            // if(!ectx.phy.orientated_to_player){
+            //     vec3d direction = plphy.position - ectx.phy.position;
+            //     auto target_orientation = atan2(direction.z(), direction.x());
+            //     if (target_orientation < 0) target_orientation += 2 * PI;
+            //     adjustAnglePiMinusPi(target_orientation);
+            //     ectx.phy.orientation = target_orientation;
+            //     double angle_difference = std::abs(ectx.phy.orientation - target_orientation);
+            //     if (angle_difference < 0.1) {
+            //         ectx.phy.orientated_to_player = true;
+            //     }
+            // }
+            // // ectx.phy.orientated_before = true;
+
             if(ectx.ai.elapsed_shoot >= ectx.ai.countdown_shoot){
                 // paro al enemigo
                 ectx.phy.velocity = vec3d{};
@@ -48,6 +64,10 @@ struct BTDecisionReadyforAttack : BTNode_t{
 
     }
 
-// private:
+private:
+    void adjustAnglePiMinusPi(double& angle){
+                while      ( angle >  PI ) angle -= 2*PI;
+                while      ( angle < -PI ) angle += 2*PI;
+    }
 //     bool alternative { false };
 };
