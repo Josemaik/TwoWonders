@@ -40,12 +40,16 @@ namespace ENGI {
         void drawCubeWires(vec3d pos, float width, float height, float lenght, Color color);
         void drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
         void drawModelWires(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
+        // Rectangle
         void drawRectangle(int posX, int posY, int width, int height, Color color);
+        void drawRectangleLinesEx(Rectangle rec, float lineThick, Color color);
+        void drawRectangleRec(Rectangle rec, Color color);
         void drawTexture(Texture2D texture, int posX, int posY, Color tint);
         void drawCircle(int posX, int posY, float radius, Color color);
 
         // Text
         void drawText(const char* text, int posX, int posY, int fontSize, Color color);
+        void drawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint);
 
         // Window
         void initWindow(int width, int height, const char* title);

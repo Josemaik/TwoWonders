@@ -50,53 +50,43 @@ float ENGI::GameEngine::getFrameTime() {
 
 ////// DRAWING //////
 
-void ENGI::GameEngine::beginDrawing()
-{
+void ENGI::GameEngine::beginDrawing(){
     BeginDrawing();
 }
 
-void ENGI::GameEngine::clearBackground(Color color)
-{
+void ENGI::GameEngine::clearBackground(Color color){
     ClearBackground(color);
 }
 
-void ENGI::GameEngine::drawGrid(int slices, float spacing)
-{
+void ENGI::GameEngine::drawGrid(int slices, float spacing){
     DrawGrid(slices, spacing);
 }
 
-void ENGI::GameEngine::endDrawing()
-{
+void ENGI::GameEngine::endDrawing(){
     EndDrawing();
 }
 
-void ENGI::GameEngine::beginMode3D()
-{
+void ENGI::GameEngine::beginMode3D(){
     BeginMode3D(camera);
 }
 
-void ENGI::GameEngine::endMode3D()
-{
+void ENGI::GameEngine::endMode3D(){
     EndMode3D();
 }
 
-void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color)
-{
+void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color){
     DrawLine3D(startPos.toRaylib(), endPos.toRaylib(), color);
 }
 
-void ENGI::GameEngine::drawCube(vec3d pos, float width, float height, float lenght, Color color)
-{
+void ENGI::GameEngine::drawCube(vec3d pos, float width, float height, float lenght, Color color){
     DrawCube(pos.toRaylib(), width, height, lenght, color);
 }
 
-void ENGI::GameEngine::drawCubeWires(vec3d pos, float width, float height, float lenght, Color color)
-{
+void ENGI::GameEngine::drawCubeWires(vec3d pos, float width, float height, float lenght, Color color){
     DrawCubeWires(pos.toRaylib(), width, height, lenght, color);
 }
 
-void ENGI::GameEngine::drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint)
-{
+void ENGI::GameEngine::drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint){
     // Matriz de transformación (incluyendo escalado)
     // Matrix transform = MatrixScale(scale.x, scale.y, scale.z);
 
@@ -106,13 +96,20 @@ void ENGI::GameEngine::drawModel(Model model, vec3d position, vec3d rotationAxis
     DrawModelEx(model, position.toRaylib(), rotationAxis.toRaylib(), rotationAngle, scale.toRaylib(), tint);
 }
 
-void ENGI::GameEngine::drawModelWires(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint)
-{
+void ENGI::GameEngine::drawModelWires(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint){
     DrawModelWiresEx(model, position.toRaylib(), rotationAxis.toRaylib(), rotationAngle, scale.toRaylib(), tint);
 }
 
 void ENGI::GameEngine::drawRectangle(int posX, int posY, int width, int height, Color color) {
     DrawRectangle(posX, posY, width, height, color);
+}
+
+void ENGI::GameEngine::drawRectangleLinesEx(Rectangle rec, float lineThick, Color color){
+    DrawRectangleLinesEx(rec, lineThick, color);
+}
+
+void ENGI::GameEngine::drawRectangleRec(Rectangle rec, Color color){
+    DrawRectangleRec(rec, color);
 }
 
 void ENGI::GameEngine::drawTexture(Texture2D texture, int posX, int posY, Color tint) {
@@ -127,6 +124,10 @@ void ENGI::GameEngine::drawCircle(int posX, int posY, float radius, Color color)
 
 void ENGI::GameEngine::drawText(const char* text, int posX, int posY, int fontSize, Color color) {
     DrawText(text, posX, posY, fontSize, color);
+}
+
+void ENGI::GameEngine::drawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint){
+    DrawTextEx(font, text, position, fontSize, spacing, tint);
 }
 
 ////// WINDOW //////
