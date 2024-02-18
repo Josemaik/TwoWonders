@@ -13,6 +13,6 @@ struct Camera:Entity{
     void draw(glm::mat4) const override {};
 };
 
-struct Mesh:Entity{
-    void draw(glm::mat4) const override {};
-};
+// struct Mesh:Entity{
+//     void draw(glm::mat4) const override {};
+// };
