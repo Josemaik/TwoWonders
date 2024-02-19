@@ -8,6 +8,7 @@ struct PlayerInfo {
     double max_mana{ 100.0 }, mana{ max_mana };
     int mana_width{};
     bool hasKey{ false };
+    bool hasStaff{ false };
     std::vector<Item> inventory{};
     std::vector<Spell> spells{};
     Spells currentSpell{};

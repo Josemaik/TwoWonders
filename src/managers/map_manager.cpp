@@ -11,7 +11,7 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
     {
     case 0:
         li.mapID = 0;
-        map = loadMap("assets/levels/bin_maps/Zona_0-Bosque.kaiwa");
+        map = loadMap("levels/maps/lvl_0.kaiwa");
         break;
 
     case 1:
@@ -48,6 +48,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
 
     const rapidjson::Value& chunks = map["Chunks"];
     int j = 0;
+    std::cout << chunks.Size() << std::endl;
     for (rapidjson::SizeType i = 0; i < chunks.Size(); i++)
     {
         std::string chunkName = "Chunk" + std::to_string(i);
@@ -62,11 +63,11 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
     const rapidjson::Value& groundArray = overworld["Ground"];
     const rapidjson::Value& wallArray = overworld["Walls"];
     const rapidjson::Value& rampArray = overworld["Ramps"];
-    const rapidjson::Value& destructibleArray = overworld["Destroyables"];
+    const rapidjson::Value& interactablesArray = overworld["Interactive"];
+    const rapidjson::Value& destructibleArray = overworld["Destroyable"];
     const rapidjson::Value& underworld = chunk[1]["underworld"];
     const rapidjson::Value& objectArray = underworld["Objects"];
     const rapidjson::Value& enemyArray = underworld["Enemies"];
-    const rapidjson::Value& interactablesArray = underworld["Interactives"];
 
     generateGround(em, groundArray, j);
 
@@ -78,7 +79,7 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
 
     generateObjects(em, objectArray, mapID);
 
-    generateEnemies(em, enemyArray, iam);
+    // generateEnemies(em, enemyArray, iam);
 
     generateInteractables(em, interactablesArray);
 
@@ -108,9 +109,9 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
         const rapidjson::Value& ground = groundArray[i];
         vec3d groundPosition{ ground["position"][0].GetDouble(), ground["position"][2].GetDouble(), -ground["position"][1].GetDouble() };
         vec3d groundScale{ ground["scale"][0].GetDouble(), ground["scale"][2].GetDouble(), ground["scale"][1].GetDouble() };
-        vec3d rotationVec{ ground["rotation"][0].GetDouble(), ground["rotation"][2].GetDouble(), ground["rotation"][1].GetDouble() };
-        double orientation{ ground["orientation"].GetDouble() };
-        Color color{ 255, 255, 255, 255 };
+        vec3d rotationVec{ ground["rotVector"][0].GetDouble(), ground["rotVector"][2].GetDouble(), ground["rotVector"][1].GetDouble() };
+        double orientation{ ground["rotation"].GetDouble() };
+        Color color{ BEIGE };
 
         // Creamos los componentes del suelo
         auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .rotationVec = rotationVec });
@@ -122,6 +123,9 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
             auto& modelEntity = em.newEntity();
             em.addTag<GroundTag>(modelEntity);
             em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = groundPos, .scale = groundScale, .color = color, .rotationVec = rotationVec });
+        }
+        else {
+            groundPos = groundPosition;
         }
 
         // Creamos las 4 zonas
@@ -163,12 +167,12 @@ void MapManager::generateWalls(EntityManager& em, const rapidjson::Value& wallAr
         const rapidjson::Value& wall = wallArray[i];
         vec3d position{ wall["position"][0].GetDouble(), wall["position"][2].GetDouble(), -wall["position"][1].GetDouble() };
         vec3d scale{ wall["scale"][0].GetDouble(), wall["scale"][2].GetDouble(), wall["scale"][1].GetDouble() };
-        vec3d rotationVec{ wall["rotation"][0].GetDouble(), wall["rotation"][2].GetDouble(), wall["rotation"][1].GetDouble() };
-        double orientation{ wall["orientation"].GetDouble() };
+        vec3d rotationVec{ wall["rotVector"][0].GetDouble(), wall["rotVector"][2].GetDouble(), wall["rotVector"][1].GetDouble() };
+        double orientation{ wall["rotation"].GetDouble() };
         Color color{ LIME };
 
         // Creamos los componentes
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color,.visible = false, .rotationVec = rotationVec });
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color,  .visible = false, .rotationVec = rotationVec });
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     }
@@ -186,7 +190,7 @@ void MapManager::generateRamps(EntityManager& em, const rapidjson::Value& rampAr
         vec3d position{ ramp["position"][0].GetDouble(), ramp["position"][2].GetDouble(), ramp["position"][1].GetDouble() };
         vec3d scale{ ramp["scale"][0].GetDouble(), ramp["scale"][2].GetDouble(), ramp["scale"][1].GetDouble() };
         Color color{ BEIGE };
-        float orientation{ ramp["rotation"].GetFloat() };
+        float orientation{ ramp["rotVector"].GetFloat() };
         vec3d rotationVec{ ramp["rotVector"][0].GetDouble(), ramp["rotVector"][2].GetDouble(), ramp["rotVector"][1].GetDouble() };
         vec2d min{ ramp["min"][0].GetDouble(), ramp["min"][1].GetDouble() };
         vec2d max{ ramp["max"][0].GetDouble(), ramp["max"][1].GetDouble() };
@@ -211,8 +215,8 @@ void MapManager::generateDestructibles(EntityManager& em, const rapidjson::Value
         const rapidjson::Value& destructible = destructibleArray[i];
         vec3d position{ destructible["position"][0].GetDouble(), destructible["position"][2].GetDouble(), -destructible["position"][1].GetDouble() };
         vec3d scale{ destructible["scale"][0].GetDouble(), destructible["scale"][2].GetDouble(), destructible["scale"][1].GetDouble() };
-        vec3d rotationVec{ destructible["rotation"][0].GetDouble(), destructible["rotation"][2].GetDouble(), destructible["rotation"][1].GetDouble() };
-        double orientation{ destructible["orientation"].GetDouble() };
+        vec3d rotationVec{ destructible["rotVector"][0].GetDouble(), destructible["rotVector"][2].GetDouble(), destructible["rotVector"][1].GetDouble() };
+        double orientation{ destructible["rotation"].GetDouble() };
         Color color{ BROWN };
         int life{ destructible["life"].GetInt() };
 
@@ -279,8 +283,8 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         // Extraemos los datos del json
         vec3d position{ interactable["position"][0].GetDouble(), interactable["position"][2].GetDouble(), -interactable["position"][1].GetDouble() };
         vec3d scale{ interactable["scale"][0].GetDouble(), interactable["scale"][2].GetDouble(), interactable["scale"][1].GetDouble() };
-        vec3d rotationVec{ interactable["rotation"][0].GetDouble(), interactable["rotation"][2].GetDouble(), interactable["rotation"][1].GetDouble() };
-        double orientation{ interactable["orientation"].GetDouble() };
+        vec3d rotationVec{ interactable["rotVector"][0].GetDouble(), interactable["rotVector"][2].GetDouble(), interactable["rotVector"][1].GetDouble() };
+        double orientation{ interactable["rotation"].GetDouble() };
         Color color{ LIGHTGRAY };
         InteractableType type{ static_cast<InteractableType>(interactable["type"].GetInt()) };
 

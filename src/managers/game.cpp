@@ -38,7 +38,6 @@ void Game::createEntities(EntityManager& em)
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e, AttackComponent{});
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
@@ -172,7 +171,7 @@ void Game::run()
                 ai_system.update(em, deltaTime);
                 physics_system.update(em, deltaTime);
                 collision_system.update(em);
-                zone_system.update(em, engine, iam, evm, map,deltaTime);
+                zone_system.update(em, engine, iam, evm, map, deltaTime);
                 lock_system.update(em);
                 shield_system.update(em);
                 object_system.update(em, deltaTime);
