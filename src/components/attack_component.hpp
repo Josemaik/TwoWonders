@@ -27,7 +27,7 @@ struct AttackComponent
     //air attack
     bool warning_created{ false };
     uint16_t air_attack_fases{ 4 };
-
+    bool createAttack{ false };
     vec3d pos_respawn_air_attack{};
 
     void attack(AttackType typeAttack) {

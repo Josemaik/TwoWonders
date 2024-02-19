@@ -1,6 +1,6 @@
 #include "zone_system.hpp"
 
-void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, EventManager& evm, MapManager& map,float& dt) {
+void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, EventManager& evm, MapManager& map, float&) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, ZoneComponent& zon)
@@ -149,21 +149,21 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     }
     case 11:
     {
-        auto& bb = em.getSingleton<BlackBoard_t>();
-        if (bb.create_subdito) {
-            iam.createSubdito(em, 3.0);
-            bb.create_subdito = false;
-        }
-        if(bb.boss_fase == 2){
-            if(bb.elapsed_change_fase >= bb.countdown_change_fase){
-                mapType maptype{};
-                maptype = map.loadMap("assets/levels/mazmorra_level.json");
-                iam.createBossFinalFase2(em,maptype);
-                bb.boss_fase++;
-            }else{
-                bb.elapsed_change_fase+=dt;
-            }
-        }
+        // auto& bb = em.getSingleton<BlackBoard_t>();
+        // if (bb.create_subdito) {
+        //     iam.createSubdito(em, 3.0);
+        //     bb.create_subdito = false;
+        // }
+        // if(bb.boss_fase == 2){
+        //     if(bb.elapsed_change_fase >= bb.countdown_change_fase){
+        //         mapType maptype{};
+        //         maptype = map.loadMap("assets/levels/mazmorra_level.json");
+        //         iam.createBossFinalFase2(em,maptype);
+        //         bb.boss_fase++;
+        //     }else{
+        //         bb.elapsed_change_fase+=dt;
+        //     }
+        // }
 
         break;
     }
