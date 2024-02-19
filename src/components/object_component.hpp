@@ -21,6 +21,7 @@ enum struct ObjectType
     Fire_Spell,
     Ice_Spell,
     Water_Spell,
+    Basic_Staff
 };
 
 struct ObjectComponent

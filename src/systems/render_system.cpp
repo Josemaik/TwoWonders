@@ -234,15 +234,22 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     }
                     else if (e.hasTag<GroundTag>() && !jaja)
                     {
-                        r.model = LoadModel("assets/models/map_models/lvl_0-cnk0.obj");
+                        r.model = LoadModel("levels/Zona_0-Bosque/objs/lvl_0-cnk_0.obj");
                         jaja = true;
-                        Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
+                        Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                     }
-                    else if (e.hasTag<GroundTag>() && jaja)
+                    else if (e.hasTag<GroundTag>() && jaja && !jaja2)
                     {
-                        r.model = LoadModel("assets/models/map_models/lvl_0-cnk1.obj");
-                        Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
+                        r.model = LoadModel("levels/Zona_0-Bosque/objs/lvl_0-cnk_1.obj");
+                        jaja2 = true;
+                        Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                    }
+                    else if (e.hasTag<GroundTag>() && jaja && jaja2)
+                    {
+                        r.model = LoadModel("levels/Zona_0-Bosque/objs/lvl_0-cnk_2.obj");
+                        Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                     }
                     else
@@ -253,48 +260,60 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     r.meshLoaded = true;
                 }
 
+                bool in{ false };
                 if (e.hasTag<PlayerTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.8);
+                    in = true;
                 }
                 else if (e.hasTag<SlimeTag>())
                 {
                     scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - .6);
+                    in = true;
                 }
                 else if (e.hasTag<SnowmanTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
+                    in = true;
                 }
                 else if (e.hasTag<SpiderTag>())
                 {
                     scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 0.7);
+                    in = true;
                 }
                 else if (e.hasTag<GolemTag>())
                 {
                     // scl = { 0.4, 0.4, 0.4 };
                     pos.setY(pos.y() - 1.1);
+                    in = true;
                 }
                 else if (e.hasTag<BossFinalTag>())
                 {
                     scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
                     colorEntidad = { 125, 125, 125, 255 };
+                    in = true;
                 }
                 else if (e.hasTag<SubjectTag>())
                 {
                     scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
+                    in = true;
                 }
-
+                else if (e.hasTag<GroundTag>())
+                {
+                    colorEntidad = BEIGE;
+                }
 
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
                 engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
 
-                if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>() && !e.hasTag<SpiderTag>() && !e.hasTag<BossFinalTag>() && !e.hasTag<SubjectTag>())
+
+                if (!in)
                 {
                     int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
                     if (orientationInDegreesInt % 90 == 0 && std::abs(orientationInDegreesInt) != 270 && std::abs(orientationInDegreesInt) != 90)
@@ -911,12 +930,13 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         auto& linfo = em.getSingleton<LevelInfo>();
         auto& bb = em.getSingleton<BlackBoard_t>();
         if (linfo.num_zone == 11) {
-            if(bb.boss_fase == 1){
+            if (bb.boss_fase == 1) {
                 engine.drawText("FASE 1", 500, 10, 70, RED);
-            }else{
+            }
+            else {
                 engine.drawText("FASE 2", 500, 10, 70, ORANGE);
             }
-            
+
             // if (linfo.segundos == 0) {
             //     linfo.drawzone = false;
             //     linfo.segundos = 1000;

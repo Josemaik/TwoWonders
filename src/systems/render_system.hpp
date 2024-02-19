@@ -39,6 +39,7 @@ private:
     bool isSelectedfordebug{ false };
     std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
     bool jaja{ false };
+    bool jaja2{ false };
 };
 
 #endif // !RENDER_SYSTEM

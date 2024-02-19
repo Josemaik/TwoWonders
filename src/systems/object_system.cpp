@@ -78,6 +78,18 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 // auto& type = em.getComponent<TypeComponent>(*playerEnt);
                 // if (!type.hasType(ElementalType::Fire))
                 //     type.addType(ElementalType::Fire);
+                break;
+            }
+            case ObjectType::Basic_Staff:
+            {
+                Item staff = { "Basic Staff", "A basic staff" };
+                plfi.addItem(staff);
+                if (!playerEnt->hasComponent<AttackComponent>())
+                    em.addComponent<AttackComponent>(*playerEnt, AttackComponent{});
+                // auto& type = em.getComponent<TypeComponent>(*playerEnt);
+                // if (!type.hasType(ElementalType::Fire))
+                //     type.addType(ElementalType::Fire);
+                break;
             }
             default:
                 break;
