@@ -2,8 +2,9 @@
 #include <iomanip>
 #include "../../libs/raygui.h"
 
-void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt)
+void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt, Shader& shader)
 {
+    shaderPtr = &shader;
     // Actualizamos la posicion de render del componente de fisicas
     em.forEach<SYSCMPs, SYSTAGs>([](Entity&, PhysicsComponent& phy, RenderComponent& ren)
     {
@@ -236,21 +237,43 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     {
                         r.model = LoadModel("levels/Zona_0-Bosque/objs/lvl_0-cnk_0.obj");
                         jaja = true;
-                        Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        // Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+                        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        r.model.materials[0].shader = *shaderPtr;
+                        r.model.materials[1].shader = *shaderPtr;
+                        r.model.materials[2].shader = *shaderPtr;
                     }
                     else if (e.hasTag<GroundTag>() && jaja && !jaja2)
                     {
                         r.model = LoadModel("levels/Zona_0-Bosque/objs/lvl_0-cnk_1.obj");
                         jaja2 = true;
-                        Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        // Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+                        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        r.model.materials[0].shader = *shaderPtr;
+                        r.model.materials[1].shader = *shaderPtr;
+                        r.model.materials[2].shader = *shaderPtr;
+                        r.model.materials[3].shader = *shaderPtr;
+                        r.model.materials[4].shader = *shaderPtr;
+
+
                     }
                     else if (e.hasTag<GroundTag>() && jaja && jaja2)
                     {
                         r.model = LoadModel("levels/Zona_0-Bosque/objs/lvl_0-cnk_2.obj");
-                        Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        // Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+                        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+                        r.model.materials[0].shader = *shaderPtr;
+                        r.model.materials[1].shader = *shaderPtr;
+                        r.model.materials[2].shader = *shaderPtr;
+                        r.model.materials[3].shader = *shaderPtr;
+                        r.model.materials[4].shader = *shaderPtr;
+                    }
+                    else if (e.hasTag<ShaderTag>())
+                    {
+                        r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
+                        r.model = engine.loadModelFromMesh(r.mesh);
+                        r.model.materials[0].shader = *shaderPtr;
                     }
                     else
                     {

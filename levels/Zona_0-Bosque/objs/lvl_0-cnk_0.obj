@@ -1,6 +1,6 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib ../lvl_0-cnk_0.mtl
+mtllib lvl_0-cnk_0.mtl
 o Arbol_1.001
 v -46.891003 1.855470 45.249119
 v -46.143211 1.855470 45.558865

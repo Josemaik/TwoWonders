@@ -1,6 +1,6 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib ../lvl_0-cnk_1.mtl
+mtllib lvl_0-cnk_1.mtl
 o Cofre.002
 v -33.762257 1.978545 -129.530640
 v -33.762257 2.112233 -129.767029

@@ -11,7 +11,7 @@ struct RenderSystem
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, GameEngine& engine, double dt);
+    void update(EntityManager& em, GameEngine& engine, double dt, Shader& shader);
 
     void drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawLogoKaiwa(ENGI::GameEngine& engine);
@@ -40,6 +40,7 @@ private:
     std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
     bool jaja{ false };
     bool jaja2{ false };
+    Shader* shaderPtr{ nullptr };
 };
 
 #endif // !RENDER_SYSTEM

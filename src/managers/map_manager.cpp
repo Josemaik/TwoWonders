@@ -112,7 +112,7 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
         vec3d groundScale{ ground["scale"][0].GetDouble(), ground["scale"][2].GetDouble(), ground["scale"][1].GetDouble() };
         vec3d rotationVec{ ground["rotVector"][0].GetDouble(), ground["rotVector"][2].GetDouble(), ground["rotVector"][1].GetDouble() };
         double orientation{ ground["rotation"].GetDouble() };
-        Color color{ BEIGE };
+        Color color{ WHITE };
 
         // Creamos los componentes del suelo
         auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .rotationVec = rotationVec });
