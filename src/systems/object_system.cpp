@@ -71,7 +71,14 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             case ObjectType::Key:
                 plfi.addKey();
                 break;
-
+            case ObjectType::Fire_Spell:
+            {
+                Spell fire_pell = { "Fire Ball", "A flaming ball of destruction", Spells::Fire1, ElementalType::Fire, 15, 1 };
+                plfi.addSpell(fire_pell);
+                // auto& type = em.getComponent<TypeComponent>(*playerEnt);
+                // if (!type.hasType(ElementalType::Fire))
+                //     type.addType(ElementalType::Fire);
+            }
             default:
                 break;
             }
@@ -140,7 +147,7 @@ void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorTyp
         auto& e{ em.newEntity() };
         em.addTag<HitPlayerTag>(e);
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = ren.position, .scale = { 3.0f, 1.0f, 3.0f }, .color = color });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0 });
         em.addComponent<LifeComponent>(e, LifeComponent{ .life = 5, .countdown = 0.0f });
         em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, type });
@@ -158,7 +165,7 @@ void ObjectSystem::createObjects(EntityManager& em)
     for (auto& [obj, pos] : toCreate)
     {
         Color color{};
-        vec3d scl{ 0.5, 0.5, 0.5 };
+        vec3d scl{ 1.5, 1.5, 1.5 };
         bool inmortal = false;
 
         switch (obj)
@@ -197,6 +204,13 @@ void ObjectSystem::createObjects(EntityManager& em)
             inmortal = true;
             break;
         }
+        case ObjectType::Fire_Spell:
+        {
+            color = RED;
+            scl = { 1.5, 0.3, 0.3 };
+            inmortal = true;
+            break;
+        }
 
         default:
             break;
@@ -206,7 +220,7 @@ void ObjectSystem::createObjects(EntityManager& em)
         auto& e{ em.newEntity() };
         em.addTag<ObjectTag>(e);
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = scl, .color = color });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position } });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = obj, .inmortal = inmortal });
     }

@@ -9,7 +9,7 @@ void CollisionSystem::update(EntityManager& em)
     // Liberar el octree
     octree.clear();
     std::vector<Entity*> EntsForRamps{};
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren, ColliderComponent& col)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
     {
         // Si la entidad está por debajo del suelo, se destruye
         auto& pos = phy.position;
@@ -20,7 +20,7 @@ void CollisionSystem::update(EntityManager& em)
         }
 
         // Actualizar bounding box
-        auto& scl = ren.scale;
+        auto& scl = phy.scale;
         col.updateBox(pos, scl, phy.gravity, phy.orientation);
 
         // Insertar en el Octree
@@ -205,22 +205,6 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
             return;
         }
 
-        // if ((behaviorType2 & BehaviorType::SUBDITOSHIELD || behaviorType1 & BehaviorType::SUBDITOSHIELD) && (isAtkPlayer1 || isAtkPlayer2)) {
-        //     //auto* bulletEntityPtr = isAtkPlayer1 ? &otherEnt : &staticEnt; // La bala es el otroEnt si isAtkPlayer1 es verdadero, de lo contrario, es staticEnt
-
-        //     // Verifica si la entidad de la bala tiene un componente de colisión
-        //     //if (bulletEntityPtr->hasComponent<ColliderComponent>()) {
-        //         //auto& bulletCollider = em.getComponent<ColliderComponent>(*bulletEntityPtr);
-
-        //         // Verifica si la bala es del tipo que puede ser destruida por el escudo del subdito
-        //         // if (bulletCollider.) {
-        //             // auto& li = em.getSingleton<LevelInfo>();
-        //             // li.dead_entities.insert(bulletEntityPtr->getID()); // Marca la bala como muerta
-        //             // return;
-        //         // }
-        //     //}
-        // }
-
         handleAtkCollision(em, isAtkPlayer1, isAtkPlayer2, isAtkEnemy1, isAtkEnemy2, staticEnt, otherEnt);
         return;
     }
@@ -297,6 +281,16 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ZONE)
         return;
 
+    if (staticEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<WallTag>())
+    {
+        if (otherEntPtr->hasTag<WallTag>())
+            std::swap(staticEntPtr, otherEntPtr);
+
+        if (otherEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<DestructibleTag>())
+            return;
+    }
+
+
     // Nos aseguramos que el suelo siempre esté en staticEntPtr
     if (otherEntPtr->hasTag<GroundTag>() || otherEntPtr->hasTag<WaterTag>())
     {
@@ -336,7 +330,14 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
         if (staticEntPtr->hasTag<DestructibleTag>() && staticEntPtr->hasComponent<LifeComponent>())
-            em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
+        {
+            if (otherEntPtr->hasComponent<TypeComponent>())
+            {
+                auto& bulletType = em.getComponent<TypeComponent>(*otherEntPtr);
+                if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(bulletType.type))
+                    em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
+            }
+        }
 
         if (!staticEntPtr->hasTag<WaterTag>())
             li.dead_entities.insert(otherEntPtr->getID());
@@ -367,17 +368,17 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
-    if (staticEntPtr->hasTag<DoorTag>() && behaviorType2 & BehaviorType::PLAYER)
-    {
-        auto& plfi = em.getSingleton<PlayerInfo>();
-        if (plfi.hasKey)
-        {
-            li.dead_entities.insert(staticEntPtr->getID());
+    // if (staticEntPtr->hasTag<DoorTag>() && behaviorType2 & BehaviorType::PLAYER)
+    // {
+    //     auto& plfi = em.getSingleton<PlayerInfo>();
+    //     if (plfi.hasKey)
+    //     {
+    //         li.dead_entities.insert(staticEntPtr->getID());
 
-            plfi.hasKey = false;
-            return;
-        }
-    }
+    //         plfi.hasKey = false;
+    //         return;
+    //     }
+    // }
 
     // Colisiones con paredes
     staticCollision(*otherPhy, *staticPhy, minOverlap);
@@ -528,9 +529,9 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
             {
                 auto& li = em.getComponent<LifeComponent>(*ent2Ptr);
                 // Comprobar el tipo de la bala y el enemigo/player
-                if ((typeBala == ElementalType::Fuego && typeEnemyPlayer == ElementalType::Hielo) ||
-                    (typeBala == ElementalType::Hielo && typeEnemyPlayer == ElementalType::Agua) ||
-                    (typeBala == ElementalType::Agua && typeEnemyPlayer == ElementalType::Fuego))
+                if ((typeBala == ElementalType::Fire && typeEnemyPlayer == ElementalType::Ice) ||
+                    (typeBala == ElementalType::Ice && typeEnemyPlayer == ElementalType::Water) ||
+                    (typeBala == ElementalType::Water && typeEnemyPlayer == ElementalType::Fire))
                 {
                     li.decreaseLife(3);
                 }

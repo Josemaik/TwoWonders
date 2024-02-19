@@ -92,32 +92,26 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
 
         if (lif.markedForDeletion && !lif.decreaseNextFrame)
             li.dead_entities.insert(ent.getID());
-
     });
 }
 
 // Se podra crear objetos: vida, bomba, moneda o nada
 void LifeSystem::createObject(EntityManager&, ObjectSystem& os, vec3d pos) {
     int random_value = std::rand();
-    if (random_value % 5 > 0) {
+    if (random_value % 4 > 0) {
         ObjectType tipo_nuevo_objeto{};
         Color color_nuevo_objeto{};
-        if (random_value % 5 == 1)
-        {
-            tipo_nuevo_objeto = ObjectType::Bomb;
-            color_nuevo_objeto = GRAY;
-        }
-        else if (random_value % 5 == 2)
+        if (random_value % 4 == 1)
         {
             tipo_nuevo_objeto = ObjectType::Coin;
             color_nuevo_objeto = YELLOW;
         }
-        else if (random_value % 5 == 3)
+        else if (random_value % 4 == 2)
         {
             tipo_nuevo_objeto = ObjectType::Life;
             color_nuevo_objeto = RED;
         }
-        else if (random_value % 5 == 4)
+        else if (random_value % 4 == 3)
         {
             tipo_nuevo_objeto = ObjectType::Mana_Potion;
             color_nuevo_objeto = SKYBLUE;

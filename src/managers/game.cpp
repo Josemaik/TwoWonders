@@ -6,7 +6,7 @@ void Game::createShield(EntityManager& em, Entity& ent)
 {
     auto& e{ em.newEntity() };
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = DARKBROWN });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
     em.addComponent<ShieldComponent>(e, ShieldComponent{ .createdby = EntitieswithShield::Player });
 }
@@ -15,33 +15,42 @@ void Game::createEnding(EntityManager& em)
 {
     auto& e{ em.newEntity() };
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = {83.0f, 1.0f, -87.0f}, .scale = {1.0f, 1.0f, 1.0f}, .color = WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .gravity = 0 });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
 }
 
 void Game::createEntities(EntityManager& em)
 {
+    auto& plfi = em.getSingleton<PlayerInfo>();
+    if (plfi.spawnPoint == vec3d::zero())
+        plfi.spawnPoint = { -33.0, 5.5, 30.9 };
+    else
+        std::cout << "aja\n";
+
+
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);// -2 -12 63 -71
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -48.0f, 0.0f, -2.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     auto& lis = em.addComponent<ListenerComponent>(e, ListenerComponent{});
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<TypeComponent>(e, TypeComponent{});
+    em.addComponent<AttackComponent>(e, AttackComponent{});
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
     lis.addCode(EventCodes::OpenChest);
+    lis.addCode(EventCodes::SetSpawn);
+    lis.addCode(EventCodes::OpenDoor);
 
     // Shield
-    createShield(em, e);
+    // createShield(em, e);
 
     // Ending
-    createEnding(em);
+    // createEnding(em);
 
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
@@ -86,8 +95,8 @@ void Game::run()
     float deltaTime{}, currentTime{};
 
     createSound(em);
-
-    while (!engine.windowShouldClose())
+    li.sound_system = &sound_system;
+    while (!li.gameShouldEnd)
     {
         deltaTime = engine.getFrameTime();
 
@@ -125,6 +134,13 @@ void Game::run()
             break;
         }
 
+        // CODIGO DE LA PANTALLA DE PAUSA
+        case GameScreen::PAUSE:
+        {
+            render_system.drawPauseMenu(engine, em, sound_system);
+            break;
+        }
+
         // CODIGO DE LA PANTALLA DE HISTORIA
         case GameScreen::STORY:
         {
@@ -151,7 +167,7 @@ void Game::run()
             input_system.update(em);
 
             // seleccionar modo de debug ( physics o AI)
-            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1))
+            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory))
             {
                 ai_system.update(em, deltaTime);
                 physics_system.update(em, deltaTime);
@@ -165,7 +181,7 @@ void Game::run()
                 life_system.update(em, object_system, deltaTime);
                 sound_system.update();
                 camera_system.update(em, engine, deltaTime);
-                event_system.update(evm, object_system, em);
+                event_system.update(em, evm, iam, map, object_system);
 
                 if (!li.dead_entities.empty())
                 {
@@ -175,7 +191,7 @@ void Game::run()
 
                 render_system.update(em, engine, deltaTime);
             }
-            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1))
+            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory))
                 render_system.update(em, engine, deltaTime);
 
             break;
@@ -199,6 +215,9 @@ void Game::run()
         default:
             break;
         }
+
+        if (engine.windowShouldClose())
+            li.gameShouldEnd = true;
     }
 
     //liberar bancos
@@ -208,20 +227,19 @@ void Game::run()
     engine.closeWindow();
 }
 
-
 void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
 {
     auto& li = em.getSingleton<LevelInfo>();
-    auto& plfi = em.getSingleton<PlayerInfo>();
     auto& bb = em.getSingleton<BlackBoard_t>();
 
     em.destroyAll();
     bb.subditosData.clear();
     rs.unloadModels(em, engine);
     li.reset();
-    plfi.reset();
+    // plfi.reset();
     lock_system.reset();
     createEntities(em);
     map.reset(em, 0, iam);
+    li.sound_system = &sound_system;
 }
 

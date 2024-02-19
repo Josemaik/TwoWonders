@@ -4,9 +4,10 @@
 #include <unordered_set>
 #include <limits>
 #include "utils/types.hpp"
+#include "../../systems/sound_system.hpp"
 
 // Enum que representa el estado del juego
-enum struct GameScreen { LOGO, TITLE, STORY, GAMEPLAY, /*DEAD,*/ OPTIONS, ENDING };
+enum struct GameScreen { LOGO, TITLE, STORY, GAMEPLAY, /*DEAD,*/ OPTIONS, ENDING, PAUSE };
 
 //Memoria global de nivel
 struct LevelInfo
@@ -57,6 +58,7 @@ struct LevelInfo
 
   // Variables relacionadas con los eventos
   std::size_t chestToOpen{ max };
+  std::size_t doorToOpen{ max };
   bool dungeonKeyCreated{ false };
 
   // Variables de debug
@@ -66,6 +68,10 @@ struct LevelInfo
   // Variables de zona y el nivel
   uint16_t num_zone{};
   uint8_t mapID{ 0 };
+
+  // Para estado de pausa y cerrar el juego
+  SoundSystem* sound_system{ nullptr };
+  bool gameShouldEnd{ false };
 
   // Estado del juego
   GameScreen currentScreen = GameScreen::GAMEPLAY;
@@ -86,6 +92,8 @@ struct LevelInfo
     mapID = 0;
     chestToOpen = max;
     dungeonKeyCreated = false;
+    sound_system = nullptr;
+    gameShouldEnd = false;
   }
 
 };

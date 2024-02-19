@@ -21,6 +21,8 @@ struct RenderSystem
     void unloadModels(EntityManager& em, ENGI::GameEngine& engine);
     void drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& em);
     void drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt);
+    void drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss);
+    void drawInventory(ENGI::GameEngine& engine, EntityManager& em);
 
     // Funciones double dtprivadas para organizar el codigo
 private:
@@ -35,6 +37,8 @@ private:
 
     bool isSelected{ false };
     bool isSelectedfordebug{ false };
+    std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
+    bool jaja{ false };
 };
 
 #endif // !RENDER_SYSTEM

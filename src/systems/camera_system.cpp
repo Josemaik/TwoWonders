@@ -8,12 +8,12 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
     if (playerEn.hasTag<PlayerTag>())
     {
         auto& phy = em.getComponent<RenderComponent>(playerEn);
-        cameraPos = { phy.position.x() + 33.f, phy.position.y() + 35.f, phy.position.z() + 33.f };
+        cameraPos = { phy.position.x() + 66.f, phy.position.y() + 70.f, phy.position.z() + 66.f };
         cameraTar = phy.position;
-        cameraFovy = 20.f;
-
+        cameraFovy = 70.f;
+        li.cameraChange = false;
         if (li.cameraChange)
-            cameraPos = { phy.position.x() - 33.f, phy.position.y() + 35.f, phy.position.z() + 33.f };
+            cameraPos = { phy.position.x() - 66.f, phy.position.y() + 70.f, phy.position.z() + 66.f };
 
         if (li.playerDetected && li.lockedEnemy == li.max)
         {
@@ -35,15 +35,15 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
                 vec3d oneFourthPoint = phy.position + (enemyPos - phy.position) / 4.0;
 
                 cameraTar = oneFourthPoint;
-                cameraPos = { oneFourthPoint.x() + 33.f, oneFourthPoint.y() + 35.f, oneFourthPoint.z() + 33.f };
+                cameraPos = { oneFourthPoint.x() + 66.f, oneFourthPoint.y() + 70.f, oneFourthPoint.z() + 66.f };
 
                 if (li.cameraChange)
-                    cameraPos = { oneFourthPoint.x() - 33.f, oneFourthPoint.y() + 35.f, oneFourthPoint.z() + 33.f };
+                    cameraPos = { oneFourthPoint.x() - 66.f, oneFourthPoint.y() + 70.f, oneFourthPoint.z() + 66.f };
             }
 
 
             cameraPos += vec3d{ 2.f, 10.f, 2.f };
-            cameraFovy = 18.f;
+            cameraFovy = 60.f;
         }
         else if (li.lockedEnemy != li.max)
         {
@@ -52,12 +52,12 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
             vec3d oneFourthPoint = phy.position + (lockedEnemyPos - phy.position) / 4.0;
 
             cameraTar = oneFourthPoint;
-            cameraPos = { oneFourthPoint.x() + 28.f, oneFourthPoint.y() + 45.f, oneFourthPoint.z() + 28.f };
+            cameraPos = { oneFourthPoint.x() + 56.f, oneFourthPoint.y() + 90.f, oneFourthPoint.z() + 56.f };
 
             if (li.cameraChange)
-                cameraPos = { oneFourthPoint.x() - 28.f, oneFourthPoint.y() + 45.f, oneFourthPoint.z() + 28.f };
+                cameraPos = { oneFourthPoint.x() - 56.f, oneFourthPoint.y() + 90.f, oneFourthPoint.z() + 56.f };
 
-            cameraFovy = 18.f;
+            cameraFovy = 55.f;
         }
 
         float t = 0.1f; // Velocidad de la transición

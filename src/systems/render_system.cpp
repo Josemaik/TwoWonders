@@ -9,6 +9,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt
     {
         ren.setPosition(phy.position);
         ren.setOrientation(phy.orientation);
+        ren.setScale(phy.scale);
     });
 
     // Empezamos el frame
@@ -142,15 +143,15 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     colorEntidad = GRAY;
                     break;
 
-                case ElementalType::Agua:
+                case ElementalType::Water:
                     colorEntidad = BLUE;
                     break;
 
-                case ElementalType::Fuego:
+                case ElementalType::Fire:
                     colorEntidad = RED;
                     break;
 
-                case ElementalType::Hielo:
+                case ElementalType::Ice:
                     colorEntidad = SKYBLUE;
                     break;
 
@@ -177,58 +178,71 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     if (e.hasTag<PlayerTag>())
                     {
                         r.model = LoadModel("assets/models/main_character.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/main_character_uv_V2.png");
-                        Texture2D t = LoadTexture("assets/models/textures/main_character_texture_V2.png");
+                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/main_character_uv_V2.png");
+                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/main_character_texture_V2.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SlimeTag>())
                     {
                         r.model = LoadModel("assets/models/Slime.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Slime_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Slime_texture.png");
+                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Slime_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Slime_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SnowmanTag>())
                     {
                         r.model = LoadModel("assets/models/snowman.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/snowman_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/snowman_texture.png");
+                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/snowman_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/snowman_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<GolemTag>())
                     {
                         r.model = LoadModel("assets/models/Golem.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Golem_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Golem_texture.png");
+                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Golem_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Golem_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SpiderTag>())
                     {
                         r.model = LoadModel("assets/models/Spider.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Spider_UV.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Spider_texture.png");
+                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Spider_UV.png");
+                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Spider_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<BossFinalTag>())
                     {
                         r.model = LoadModel("assets/models/Boss.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Boss_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Boss_texture.png");
+                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Boss_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Boss_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SubjectTag>())
                     {
                         r.model = LoadModel("assets/models/Boss_sub_1.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Boss_sub_1_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Boss_sub_1_texture.png");
+                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Boss_sub_1_uv.png");
+                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Boss_sub_1_texture.png");
 
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                    }
+                    else if (e.hasTag<GroundTag>() && !jaja)
+                    {
+                        r.model = LoadModel("assets/models/map_models/lvl_0-cnk0.obj");
+                        jaja = true;
+                        Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
+                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                    }
+                    else if (e.hasTag<GroundTag>() && jaja)
+                    {
+                        r.model = LoadModel("assets/models/map_models/lvl_0-cnk1.obj");
+                        Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                     }
                     else
@@ -241,8 +255,8 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
 
                 if (e.hasTag<PlayerTag>())
                 {
-                    scl = { 0.33, 0.33, 0.33 };
-                    pos.setY(pos.y() - .5);
+                    // scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 1.8);
                 }
                 else if (e.hasTag<SlimeTag>())
                 {
@@ -251,7 +265,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 }
                 else if (e.hasTag<SnowmanTag>())
                 {
-                    scl = { 0.33, 0.33, 0.33 };
+                    // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
                 }
                 else if (e.hasTag<SpiderTag>())
@@ -261,7 +275,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 }
                 else if (e.hasTag<GolemTag>())
                 {
-                    scl = { 0.4, 0.4, 0.4 };
+                    // scl = { 0.4, 0.4, 0.4 };
                     pos.setY(pos.y() - 1.1);
                 }
                 else if (e.hasTag<BossFinalTag>())
@@ -283,7 +297,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>() && !e.hasTag<SpiderTag>() && !e.hasTag<BossFinalTag>() && !e.hasTag<SubjectTag>())
                 {
                     int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
-                    if (orientationInDegreesInt % 90 == 0)
+                    if (orientationInDegreesInt % 90 == 0 && std::abs(orientationInDegreesInt) != 270 && std::abs(orientationInDegreesInt) != 90)
                         engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
                     else
                         engine.drawModelWires(r.model, pos, r.rotationVec, orientationInDegrees, scl, BLACK);
@@ -309,15 +323,25 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
 {
     engine.endMode3D();
 
+    auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
 
     drawHUD(em, engine, inpi.debugPhy);
+
+    if (inpi.pause && li.sound_system != nullptr)
+        drawPauseMenu(engine, em, *li.sound_system);
+    else if (inpi.pause && li.sound_system == nullptr)
+        inpi.pause = false;
+
+    else if (inpi.inventory)
+        drawInventory(engine, em);
+
     // Si se pulsa F2 se activa editor  de parámetros In-game
-    if (inpi.debugAI1) {
+    else if (inpi.debugAI1)
         drawEditorInGameIA(engine, em);
-    }
+
     // Visual Debug AI
-    if (inpi.debugAI2)
+    else if (inpi.debugAI2)
         drawDebuggerInGameIA(engine, em, dt);
 
     engine.endDrawing();
@@ -334,6 +358,136 @@ double SelectValue(ENGI::GameEngine& engine, double value, float posx, float pos
     // seteamos el nuevo valor
     return static_cast<double>(floatvalue);
 }
+
+void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss)
+{
+    float windowWidth = 330.0f;
+    float windowHeight = 330.0f;
+
+    Rectangle windowRect = {
+        static_cast<float>(engine.getScreenWidth()) / 2.0f - windowWidth / 2.0f,
+        static_cast<float>(engine.getScreenHeight()) / 2.0f - windowHeight / 2.0f,
+        windowWidth,
+        windowHeight
+    };
+    DrawRectangleLinesEx(windowRect, 2, BLACK);
+    DrawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
+    DrawTextEx(GetFontDefault(), "PAUSA", Vector2{ windowRect.x + 100, windowRect.y + 40 }, 40, 1, BLACK);
+
+    // Boton de volver al inicio
+    Rectangle btn1Rec = { 300, 250, 200, 50 };
+    Rectangle btn2Rec = { 300, 320, 200, 50 };
+    Rectangle btn3Rec = { 300, 390, 200, 50 };
+    auto& li = em.getSingleton<LevelInfo>();
+
+    if (GuiButton(btn1Rec, "CONTINUAR")) {
+        auto& inpi = em.getSingleton<InputInfo>();
+        inpi.pause = false;
+        ss.seleccion_menu();
+    }
+
+    if (GuiButton(btn2Rec, "VOLVER AL INICIO")) {
+        li.currentScreen = GameScreen::TITLE;
+        ss.seleccion_menu();
+    }
+
+    if (CheckCollisionPointRec(GetMousePosition(), btn1Rec) || CheckCollisionPointRec(GetMousePosition(), btn2Rec)) {
+        if (ss.pushed == false)
+            ss.sonido_mov();
+        ss.pushed = true;
+    }
+    else
+        ss.pushed = false;
+
+    if (GuiButton(btn3Rec, "SALIR")) {
+        auto& li = em.getSingleton<LevelInfo>();
+        li.gameShouldEnd = true;
+        return;
+    }
+}
+
+void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
+{
+    float windowWidth = 330.0f;
+    float windowHeight = 330.0f;
+
+    Rectangle windowRect = {
+        static_cast<float>(engine.getScreenWidth()) / 2.0f - windowWidth / 2.0f,
+        static_cast<float>(engine.getScreenHeight()) / 2.0f - windowHeight / 2.0f,
+        windowWidth,
+        windowHeight
+    };
+    DrawRectangleLinesEx(windowRect, 2, BLACK);
+    DrawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
+    DrawTextEx(GetFontDefault(), "INVENTARIO", Vector2{ windowRect.x + 50, windowRect.y + 30 }, 40, 1, BLACK);
+
+    // Boton de volver al inicio
+    auto& plfi = em.getSingleton<PlayerInfo>();
+    float posY = 250.f;
+
+    for (auto& item : plfi.inventory)
+    {
+        Rectangle btnRec = { 300, posY, 200, 50 };
+        GuiButton(btnRec, item.name.c_str());
+        posY += 50.f;
+    }
+
+
+    if (plfi.hasKey)
+    {
+        Rectangle btnRec = { 300, posY, 200, 50 };
+        GuiButton(btnRec, "Llave");
+        posY += 50.f;
+    }
+
+    // bool neutral{ false }, water{ false }, fire{ false }, ice{ false };
+    // for (uint8_t i = 0; i < plfi.types.size(); i++)
+    // {
+    //     std::cout << "Fire: " << fire << std::endl;
+    //     if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Neutral && !neutral)
+    //     {
+    //         Rectangle btnRec = { 300, posY, 200, 50 };
+    //         GuiButton(btnRec, "Bastón de hechicero");
+    //         neutral = true;
+    //         posY += 50.f;
+    //     }
+
+    //     else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Water && !water)
+    //     {
+    //         Rectangle btnRec = { 300, posY, 200, 50 };
+    //         GuiButton(btnRec, "Chorro de agua");
+    //         water = true;
+    //         posY += 50.f;
+    //     }
+
+    //     else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Fire && !fire)
+    //     {
+    //         std::cout << "FIRE\n";
+    //         Rectangle btnRec = { 300, posY, 200, 50 };
+    //         GuiButton(btnRec, "Bola de fuego");
+    //         fire = true;
+    //         posY += 50.f;
+    //     }
+
+    //     else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Ice && !ice)
+    //     {
+    //         Rectangle btnRec = { 300, posY, 200, 50 };
+    //         GuiButton(btnRec, "Rayo de hielo");
+    //         ice = true;
+    //         posY += 50.f;
+    //     }
+    // }
+
+
+    // if (GuiButton(btn1Rec, "CONTINUAR")) {
+    //     li.currentScreen = GameScreen::GAMEPLAY;
+    // }
+
+    // if (GuiButton(btn2Rec, "VOLVER AL INICIO")) {
+    //     li.currentScreen = GameScreen::TITLE;
+    // }
+}
+
 //Debugger visual in-game
 void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt) {
     // engine.beginDrawing();
@@ -391,6 +545,7 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
     });
     //  engine.endDrawing();
 }
+
 //Editor In-Game
 void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& em) {
     // engine.beginDrawing();
@@ -477,6 +632,9 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
     }
     else if (!playerEn->hasTag<PlayerTag>()) { drawDeath(engine); return; }
 
+    if (debugphy)
+        pointedEntity = std::numeric_limits<std::size_t>::max();
+
     // Visualizar las vidas del player
     for (auto const& e : em.getEntities())
     {
@@ -521,9 +679,9 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
                 if (t.type == ElementalType::Neutral)
                     engine.drawText("Neutral", 17, 50, 18, WHITE);
-                else if (t.type == ElementalType::Agua)
+                else if (t.type == ElementalType::Water)
                     engine.drawText("Agua", 17, 50, 18, BLUE);
-                else if (t.type == ElementalType::Fuego)
+                else if (t.type == ElementalType::Fire)
                     engine.drawText("Fuego", 17, 50, 18, RED);
                 else
                     engine.drawText("Hielo", 17, 50, 18, SKYBLUE);
@@ -573,7 +731,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             int barWidth = 40;
             int barHeight = 4;
             int barX = static_cast<int>(engine.getWorldToScreenX(r.position)) - 18;
-            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 35);
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 15);
 
             engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
 
@@ -615,15 +773,15 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
 
-        if (e.hasComponent<ChestComponent>() && e.hasComponent<RenderComponent>())
+        if (e.hasComponent<InteractiveComponent>() && e.hasComponent<RenderComponent>())
         {
             auto& ren{ em.getComponent<RenderComponent>(e) };
-            auto& chest{ em.getComponent<ChestComponent>(e) };
-            if (chest.showButton)
+            auto& inter{ em.getComponent<InteractiveComponent>(e) };
+            if (inter.showButton)
             {
                 engine.drawText("E",
                     static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
-                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 50),
+                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 8),
                     20,
                     BLACK);
             }
@@ -636,7 +794,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             engine.drawText(std::to_string(l.life).c_str(),
                 static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 8.0),
                 20,
                 BLACK);
 
@@ -652,12 +810,12 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                     tipo = "Neutral";
                     color = BLACK;
                 }
-                else if (t.type == ElementalType::Agua)
+                else if (t.type == ElementalType::Water)
                 {
                     tipo = "Agua";
                     color = BLUE;
                 }
-                else if (t.type == ElementalType::Fuego)
+                else if (t.type == ElementalType::Fire)
                 {
                     tipo = "Fuego";
                     color = RED;
@@ -672,7 +830,19 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
         }
 
-        if (debugphy && e.hasComponent<ColliderComponent>())
+        if (debugphy && e.hasComponent<ZoneComponent>())
+        {
+            auto& ren{ em.getComponent<RenderComponent>(e) };
+            auto& z{ em.getComponent<ZoneComponent>(e) };
+
+            engine.drawText(std::to_string(z.zone).c_str(),
+                static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
+                static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 50),
+                20,
+                BLACK);
+        }
+
+        if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
         {
             auto& col{ em.getComponent<ColliderComponent>(e) };
 
@@ -689,19 +859,31 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 BLUE);
             engine.endMode3D();
 
-        }
-
-        if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
-        {
             auto& phy = em.getComponent<PhysicsComponent>(e);
 
             RayCast ray = engine.getMouseRay();
 
-            auto& col = em.getComponent<ColliderComponent>(e);
             auto& ren = em.getComponent<RenderComponent>(e);
             // Comprobar si el rayo intersecta con el collider
-            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE))
+            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::ZONE) && pointedEntity != li.playerID)
             {
+                pointedEntity = e.getID();
+
+                auto& col{ em.getComponent<ColliderComponent>(e) };
+
+                // Calcular la posición y el tamaño de la bounding box
+                vec3d boxPosition = (col.boundingBox.min + col.boundingBox.max) / 2;
+                vec3d boxSize = col.boundingBox.max - col.boundingBox.min;
+
+                // Dibujar la bounding box
+                engine.beginMode3D();
+                engine.drawCubeWires(boxPosition,
+                    static_cast<float>(boxSize.x()),
+                    static_cast<float>(boxSize.y()),
+                    static_cast<float>(boxSize.z()),
+                    BLUE);
+                engine.endMode3D();
+
                 // Dibujar el HUD de debug
                 engine.drawRectangle(0, 60, 150, 240, WHITE);
                 engine.drawText("Posición", 10, 70, 20, BLACK);
@@ -795,7 +977,8 @@ void RenderSystem::drawDeath(ENGI::GameEngine& engine)
 
 void RenderSystem::unloadModels(EntityManager& em, ENGI::GameEngine& engine)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, PhysicsComponent&, RenderComponent& ren)
+    using SYSCMPs = MP::TypeList<RenderComponent>;
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, RenderComponent& ren)
     {
         // engine.unloadMesh(ren.mesh);
         engine.unloadModel(ren.model);

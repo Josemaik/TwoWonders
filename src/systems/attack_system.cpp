@@ -26,7 +26,8 @@ vec3d AttackSystem::getPosMeteorito(uint16_t fase, vec3d posplayer) {
 }
 
 void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att, float dt) {
-    att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
+    // att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
+
     auto& phy = em.getComponent<PhysicsComponent>(ent);
 
     // Se pone la direccion en la que este mirando el player
@@ -38,22 +39,39 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             return;
         }
 
-        static const double ATTACK_SPEED = 0.5f;
-
         // Calculamos la velocidad basada en la orientación del jugador
+        static const double ATTACK_SPEED = 1.5f;
+
         double velX = sin(phy.orientation) * ATTACK_SPEED;
         double velZ = cos(phy.orientation) * ATTACK_SPEED;
 
         // Asignamos la velocidad al ataque
         att.vel = { velX , 0 , velZ };
-    }
 
-    // Comprobar si la vida de la entidad es la maxima y elegir que tipo de ataque usa
-    if (att.type == AttackType::AttackPlayer) {
-        if (ent.hasComponent<LifeComponent>() && em.getComponent<LifeComponent>(ent).vidaMax())
-            att.type = AttackType::Ranged;
-        else
-            att.type = AttackType::Melee;
+        // Comprobar si la vida de la entidad es la maxima y elegir que tipo de ataque usa
+        if (att.type == AttackType::AttackPlayer)
+        {
+            auto& plfi = em.getSingleton<PlayerInfo>();
+
+            if (plfi.currentSpell == Spells::None)
+                att.type = AttackType::Melee;
+            else
+            {
+                createSpellAttack(em, ent, att);
+                att.createAttack = false;
+                return;
+            }
+
+            // if (ent.hasComponent<TypeComponent>())
+            //     att.type = em.getComponent<TypeComponent>(ent).type == ElementalType::Neutral ? AttackType::Melee : AttackType::Ranged;
+            // else
+            //     att.type = AttackType::Ranged;
+
+            // if (ent.hasComponent<LifeComponent>() && em.getComponent<LifeComponent>(ent).vidaMax())
+            //     att.type = AttackType::Ranged;
+            // else
+            //     att.type = AttackType::Melee;
+        }
     }
 
     bool is_air_attack{ false };
@@ -109,8 +127,8 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         if (ent.hasTag<GolemTag>()) {
             auto& e{ em.newEntity() };
             em.addTag<HitPlayerTag>(e);
-            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 4.0f, 0.1f, 4.0f }, .color = GREEN });
-            auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
+            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 18.0f, 0.1f, 18.0f }, .color = GREEN });
+            auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
             em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::AreaAttack, .life_time = 7.0f });
             ElementalType tipoElemental;
             if (ent.hasComponent<TypeComponent>())
@@ -127,7 +145,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         //createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack,1.0);
         auto& e{ em.newEntity() };
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 3.0f, 0.1f, 3.0f }, .color = GREEN });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Spiderweb, .life_time = 4.0f });
         ElementalType tipoElemental;
         if (ent.hasComponent<TypeComponent>())
@@ -157,6 +175,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
                     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Meteorit, .life_time = 5.0f });
                     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
                     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::WARNINGZONE });
+
                     att.warning_created = true;
                 }
                 if (att.elapsed_warning_airatk >= att.countdown_warning_airatk) {
@@ -173,6 +192,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
                     auto& e{ em.newEntity() };
                     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getPosMeteorito(att.air_attack_fases,att.pos_respawn_air_attack), .scale = { 1.0f, 1.0f, 1.0f }, .color = BROWN });
                     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
+
                     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::METEORITE });
                 }
                 att.decreaseCountdown(dt, att.elapsed_air_attk);
@@ -229,31 +249,16 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
     // Crear la entidad ataque
     auto& e{ em.newEntity() };
     em.addTag<HitPlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3d{0, 0, 0} : att.vel * scale_to_respawn_attack), .scale = { isRanged ? 0.5 : 2.0, isRanged ? 0.5 : 1.0, isRanged ? 0.5 : 2.0 }, .color = BLACK });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = isRanged ? att.vel : vec3d{0, 0, 0}, .gravity = 0, .orientation = phy.orientation });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3d{0, 0, 0} : att.vel * scale_to_respawn_attack), .scale = { isRanged ? 1.5 : 6.0, isRanged ? 1.5 : 3.0, isRanged ? 1.5 : 6.0 }, .color = BLACK });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = isRanged ? att.vel : vec3d{0, 0, 0}, .scale = r.scale, .gravity = 0, .orientation = phy.orientation });
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
     em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = static_cast<float>(isRanged ? ranged : 0.2) });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
     if (ent.hasTag<PlayerTag>())
-    {
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
 
-        auto& plfi = em.getSingleton<PlayerInfo>();
-
-        if (ent.hasComponent<LifeComponent>())
-        {
-            auto& lif = em.getComponent<LifeComponent>(ent);
-
-            if (lif.life == lif.maxLife && plfi.mana > 0.0)
-            {
-                plfi.mana -= MANA_CUT;
-
-                if (plfi.mana < 0.0)
-                    plfi.mana = 0;
-            }
-        }
-    }
-    else {
+    else
+    {
         auto& c = em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_ENEMY });
         if (ent.hasTag<GolemTag>()) {
             c.attackType = AttackType::GollemAttack;
@@ -261,6 +266,65 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
         if (ent.hasTag<SpiderTag>()) {
             em.addComponent<AttackComponent>(e);
             c.attackType = AttackType::Spiderweb;
+        }
+    }
+}
+
+void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackComponent& att)
+{
+    auto& plfi = em.getSingleton<PlayerInfo>();
+    ElementalType tipoElemental;
+
+    switch (plfi.currentSpell)
+    {
+    case Spells::Fire1:
+        att.type = AttackType::Ranged;
+        tipoElemental = ElementalType::Fire;
+        break;
+    case Spells::Ice1:
+        att.type = AttackType::Ranged;
+        tipoElemental = ElementalType::Ice;
+        break;
+    case Spells::Water1:
+        att.type = AttackType::Ranged;
+        tipoElemental = ElementalType::Water;
+        break;
+    case Spells::Fire2:
+        att.type = AttackType::Ranged;
+        tipoElemental = ElementalType::Fire;
+        break;
+    case Spells::Ice2:
+        att.type = AttackType::Ranged;
+        tipoElemental = ElementalType::Ice;
+        break;
+    case Spells::Water2:
+        att.type = AttackType::Ranged;
+        tipoElemental = ElementalType::Water;
+        break;
+    default:
+        att.type = AttackType::Ranged;
+        tipoElemental = ElementalType::Neutral;
+        break;
+    }
+    // Crear la entidad ataque
+    auto& e{ em.newEntity() };
+    em.addTag<HitPlayerTag>(e);
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
+    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 3.0f });
+    em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+
+    for (auto& s : plfi.spells)
+    {
+        if (s.spell == plfi.currentSpell)
+        {
+            plfi.mana -= s.cost;
+
+            if (plfi.mana < 0.0)
+                plfi.mana = 0;
+            break;
         }
     }
 }

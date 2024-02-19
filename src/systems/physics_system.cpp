@@ -18,7 +18,6 @@ void PhysicsSystem::update(EntityManager& em, float dt)
         if (std::abs(vel.x()) > phy.max_speed || std::abs(vel.y()) > phy.max_speed || std::abs(vel.z()) > phy.max_speed)
         {
             vel.normalize();
-            vel *= phy.max_speed;
         }
         // }else{
         //         //Normalizar la velocidad

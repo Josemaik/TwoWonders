@@ -3,21 +3,23 @@
 #define EVENT_MANAGER
 
 #include "../systems/object_system.hpp"
+#include "map_manager.hpp"
 #include "../utils/types.hpp"
 #include <cstdint>
 #include <vector>
 
-struct Event {
-    uint16_t code; // Código identificador del evento
+//Eventos
+enum EventCodes : uint16_t
+{
+    SpawnKey,
+    SpawnDungeonKey,
+    OpenChest,
+    SetSpawn,
+    OpenDoor,
 };
 
-//Eventos
-enum EventCodes
-{
-    NoEvent = 0x00,
-    SpawnKey = 0x01,
-    SpawnDungeonKey = 0x02,
-    OpenChest = 0x04,
+struct Event {
+    EventCodes code; // Código identificador del evento
 };
 
 struct EventManager
@@ -29,7 +31,7 @@ public:
     }
 
     // Dispara todos los eventos pendientes
-    void dispatchEvents(EntityManager& em, ObjectSystem& os) {
+    void dispatchEvents(EntityManager& em, MapManager& mm, Ia_man& iam, ObjectSystem& os) {
         // Recorre todos los eventos pendientes
         while (!events.empty()) {
             // Obtiene el siguiente evento y lo elimina de la cola
@@ -66,6 +68,28 @@ public:
 
                         os.addObject(chestComp.content, playerPos);
                         li.chestToOpen = li.max;
+                        break;
+                    }
+                    case EventCodes::SetSpawn:
+                    {
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+                        auto& playerPos = em.getComponent<PhysicsComponent>(e).position;
+                        plfi.spawnPoint = playerPos;
+                        auto& life = em.getComponent<LifeComponent>(e);
+                        life.life = life.maxLife;
+                        plfi.mana = plfi.max_mana - 3.0;
+
+                        mm.spawnReset(em, iam);
+
+                        break;
+                    }
+                    case EventCodes::OpenDoor:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+
+                        plfi.hasKey = false;
+                        li.dead_entities.insert(li.doorToOpen);
                         break;
                     }
                     }

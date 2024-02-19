@@ -7,12 +7,35 @@ void InputSystem::update(EntityManager& em)
     auto& bb = em.getSingleton<BlackBoard_t>();
     auto* playerEn = em.getEntityByID(li.playerID);
 
+    // PAUSE
+    if (IsKeyReleased(KEY_ESCAPE) && li.currentScreen == GameScreen::GAMEPLAY)
+    {
+        inpi.pause = !inpi.pause;
+        inpi.debugAI1 = false;
+        inpi.debugAI2 = false;
+        inpi.debugPhy = false;
+        inpi.inventory = false;
+        return;
+    }
+
+    // INVENTORY
+    if (IsKeyReleased(KEY_I) && li.currentScreen == GameScreen::GAMEPLAY && !inpi.pause)
+    {
+        inpi.inventory = !inpi.inventory;
+        inpi.debugAI1 = false;
+        inpi.debugAI2 = false;
+        inpi.debugPhy = false;
+        return;
+    }
+
     // DEBUG PHYSICS
     if (IsKeyReleased(KEY_F1))
     {
         inpi.debugPhy = !inpi.debugPhy;
         inpi.debugAI1 = false;
         inpi.debugAI2 = false;
+        inpi.pause = false;
+        inpi.inventory = false;
         return;
     }
 
@@ -22,6 +45,8 @@ void InputSystem::update(EntityManager& em)
         inpi.debugAI1 = !inpi.debugAI1;
         inpi.debugPhy = false;
         inpi.debugAI2 = false;
+        inpi.pause = false;
+        inpi.inventory = false;
         return;
     }
 
@@ -31,6 +56,7 @@ void InputSystem::update(EntityManager& em)
         inpi.debugAI2 = !inpi.debugAI2;
         inpi.debugPhy = false;
         inpi.debugAI1 = false;
+        inpi.pause = false;
         return;
     }
 
@@ -50,7 +76,7 @@ void InputSystem::update(EntityManager& em)
         // Actualizar la velocidad
         int keysPressed = 0;
 
-        if(IsKeyDown(in.air_attack) && e.hasComponent<AttackComponent>()){
+        if (IsKeyDown(in.air_attack) && e.hasComponent<AttackComponent>()) {
             em.getComponent<AttackComponent>(e).pos_respawn_air_attack = phy.position;
             em.getComponent<AttackComponent>(e).attack(AttackType::AirAttack);
         }
@@ -79,7 +105,6 @@ void InputSystem::update(EntityManager& em)
                 vel.setZ(vel.z() + INP_SPEED);
             }
 
-            in.last_key = in.right;
             keysPressed++;
         }
         if (IsKeyDown(in.left)) {
@@ -96,7 +121,6 @@ void InputSystem::update(EntityManager& em)
                 vel.setZ(vel.z() - INP_SPEED);
             }
 
-            in.last_key = in.left;
             keysPressed++;
         }
         if (IsKeyDown(in.up)) {
@@ -112,7 +136,6 @@ void InputSystem::update(EntityManager& em)
                 vel.setZ(vel.z() - INP_SPEED);
             }
 
-            in.last_key = in.up;
             keysPressed++;
         }
         if (IsKeyDown(in.down)) {
@@ -128,7 +151,6 @@ void InputSystem::update(EntityManager& em)
                 vel.setZ(vel.z() + INP_SPEED);
             }
 
-            in.last_key = in.down;
             keysPressed++;
         }
         // }
@@ -140,13 +162,9 @@ void InputSystem::update(EntityManager& em)
             vel *= INP_SPEED;
         }
 
-        if (IsKeyReleased(in.lockIn)) {
-            // em.addComponent<AttackComponent>(e, AttackComponent{});
-            // if(e.hasComponent<AttackComponent>()){
-            //      em.getComponent<AttackComponent>(e).attack(AttackType::AreaAttack);
-            // }
+        if (IsKeyReleased(in.lockIn))
             inpi.lockOn = !inpi.lockOn;
-        }
+
 
         // if(IsKeyDown(in.seek) && !bb.tactive){
         //    // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
@@ -199,21 +217,28 @@ void InputSystem::update(EntityManager& em)
         }
 
         if (IsKeyPressed(in.interact))
-        {
             inpi.interact = true;
-        }
         else if (IsKeyReleased(in.interact))
-        {
             inpi.interact = false;
-        }
+
+
+        // if (IsKeyPressed(in.pause) && !inpi.pause && li.currentScreen == GameScreen::GAMEPLAY)
+        // {
+        //     li.currentScreen = GameScreen::PAUSE;
+        //     inpi.pause = true;
+        // }
+        // else if (inpi.pause && IsKeyReleased(in.pause))
+        // {
+        //     inpi.pause = false;
+        // }
 
         // Codigo para la bomba
         if (IsKeyDown(KEY_B) && e.hasComponent<AttackComponent>())
             em.getComponent<AttackComponent>(e).attack(AttackType::Bomb);
 
         // Codigo para cambiar de tipo de ataque
-        if (IsKeyReleased(KEY_Q) && e.hasComponent<TypeComponent>())
-            em.getComponent<TypeComponent>(e).changeType();
+        if (IsKeyReleased(KEY_Q))
+            plfi.changeCurrentSpell();
 
         // Codigo para curarse // DEBUG
         if (IsKeyDown(KEY_Z) && e.hasComponent<LifeComponent>())

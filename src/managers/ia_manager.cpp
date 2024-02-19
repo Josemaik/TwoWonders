@@ -53,7 +53,7 @@ void createEnemiesofType(EntityManager& em, std::vector<EnemyData>vec, Behaviour
         auto& enemy{ em.newEntity() };
         em.addTag<EnemyTag>(enemy);
         auto& r = em.addComponent<RenderComponent>(enemy, RenderComponent{ .position = data.position, .scale = { 1.0f, 1.0f, 1.0f }, .color = data.color ,.visible = data.visible });
-        auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = { r.position }, .velocity = { .2, .0, .0 } });
+        auto& p = em.addComponent<PhysicsComponent>(enemy, PhysicsComponent{ .position = r.position , .velocity = { .2, .0, .0 }, .scale = r.scale, });
         em.addComponent<LifeComponent>(enemy, LifeComponent{ .life = data.num_lifes });
         em.addComponent<ColliderComponent>(enemy, ColliderComponent{ p.position, r.scale, BehaviorType::ENEMY });
 
@@ -492,7 +492,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     em.addTag<EnemyTag>(e);
 
     auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = position, .scale = scale, .color = color });
-    auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .max_speed = max_speed });
+    auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .scale = wr.scale, .max_speed = max_speed });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = life });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = element });
@@ -604,7 +604,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* d_raa = &tree.createNode<BTDecisionReadyforAirAttack>();
         auto* d_as = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Air_attack);
         auto* sequence2 = &tree.createNode<BTNodeSequence_t>(d_pd2, d_raa, d_as);
-        
+    
         auto&bb = em.getSingleton<BlackBoard_t>();
         if(bb.boss_fase == 1)
             tree.createNode<BTNodeSelector_t>(sequence, sequence1, patrol);
@@ -723,12 +723,12 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
     AIComponent::TypeShoot type_attk{};
     if (randomNum <= 50) {
         type_attk = AIComponent::TypeShoot::Melee;
-        type_ele = ElementalType::Fuego;
+        type_ele = ElementalType::Fire;
         wp.max_speed = 0.5;
     }
     else {
         type_attk = AIComponent::TypeShoot::OneShoottoPlayer;
-        type_ele = ElementalType::Hielo;
+        type_ele = ElementalType::Ice;
         wp.max_speed = 0.4;
     }
     auto* a_a_1 = &tree.createNode<BTActionShoot>(type_attk); // fail si disparo succes si no disparo
@@ -763,6 +763,7 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
 
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = type_ele });
     em.addComponent<SubjectComponent>(e, SubjectComponent{});
+
     em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = 0.1, .detect_radius = 18.0, .attack_radius = attack_radius_p, .tx = 0.0, .tz = 0.0,.time2arrive = 1.0, .tactive = true, .perceptionTime = static_cast<float>(0.2),
     .path = vec3d{}, .countdown_stop = countdown_stop_p, .countdown_shoot = countdown_shoot_p, .countdown_perception = 0.2, .behaviourTree = &tree });
 

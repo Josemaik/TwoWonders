@@ -11,6 +11,8 @@
 #include "../components/ramp_component.hpp"
 #include "../components/chest_component.hpp"
 #include "../components/listener_component.hpp"
+#include "../components/destructible_component.hpp"
+#include "../components/interactive_component.hpp"
 #include "../components/subject_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
@@ -20,6 +22,7 @@
 #include "../components/shield_component.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
+#include "../utils/Item.hpp"
 //singelton
 #include "../utils/sngtn/player_info.hpp"
 #include "../utils/sngtn/blackboard.hpp"
@@ -54,10 +57,11 @@ struct BossFinalTag {};
 struct SubjectTag {};
 struct DestructibleTag {};
 struct ChestTag {};
+struct SpawnTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
-using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, RampComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, ZoneComponent, ShieldComponent, TypeComponent, ChestComponent, ListenerComponent, SubjectComponent>;
-using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, WallTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag, GolemTag, SpiderTag, BossFinalTag, SubjectTag, DestructibleTag, ChestTag>;
+using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, RampComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, ZoneComponent, ShieldComponent, TypeComponent, ChestComponent, ListenerComponent, DestructibleComponent, InteractiveComponent, SubjectComponent>;
+using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, WallTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag, GolemTag, SpiderTag, BossFinalTag, SubjectTag, DestructibleTag, ChestTag, SpawnTag>;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;

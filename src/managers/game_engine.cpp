@@ -18,6 +18,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     ENGI::GameEngine::imageResize(&logo_kaiwa_games, width_, static_cast<int>(height_ / 2)); // 2.49
     texture_logo_kaiwa_games = ENGI::GameEngine::loadTextureFromImage(logo_kaiwa_games);
     ENGI::GameEngine::unloadImage(logo_kaiwa_games);
+    SetExitKey(KEY_F8);
 }
 
 ////// IMAGE AND TEXTURE //////
