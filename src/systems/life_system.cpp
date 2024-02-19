@@ -59,16 +59,6 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 bb.subditosData.erase(ent.getID());
             }
 
-            if (ent.hasTag<PlayerTag>() && ent.hasComponent<TypeComponent>())
-            {
-                auto& plfi = em.getSingleton<PlayerInfo>();
-                auto& tc = em.getComponent<TypeComponent>(ent);
-
-                plfi.type = static_cast<int>(tc.type);
-                for (std::size_t i = 0; i < tc.types.size(); i++)
-                    plfi.types[i] = static_cast<int>(tc.types[i]);
-            }
-
             lif.markedForDeletion = true;
         }
 

@@ -93,60 +93,7 @@
                     ],
 					"Objects":[],
 					"Enemies":[
-						{
-							"position": [-13.0, 4.0, -10.0],
-							"scale": [2.0, 4.0, 2.0],
-							"color": [0, 121, 241, 255],
-							"max_speed": 0.5,
-							"life": 2,
-							"type": 1,
-							"element": 1,
-							"arrival_radius": 0.1,
-							"detect_radius": 30.0,
-							"attack_radius": 20.0,
-							"tx": 0.0,
-							"tz": 0.0,
-							"time2arrive": 1.0,
-							"tactive": true,
-							"perceptionTime": 0.5,
-							"path": [
-								[12.0, 4.0, -12.0],
-								[-14.0, 4.0, -8.0],
-								[12.0, 4.0, -12.0],
-								[-14.0, 4.0, -8.0]
-							],
-							"countdown_stop": 0.8,
-							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 2.0
-						},
-						{
-							"position": [-16.0, 4.0, -21.0],
-							"scale": [2.0, 4.0, 2.0],
-							"color": [0, 121, 241, 255],
-							"max_speed": 0.5,
-							"life": 2,
-							"type": 1,
-							"element": 1,
-							"arrival_radius": 0.1,
-							"detect_radius": 30.0,
-							"attack_radius": 20.0,
-							"tx": 0.0,
-							"tz": 0.0,
-							"time2arrive": 1.0,
-							"tactive": true,
-							"perceptionTime": 0.1,
-							"path": [
-								[-16.0, 4.0, -23.0],
-								[18.0, 4.0, -21.0],
-								[-16.0, 4.0, -23.0],
-								[18.0, 4.0, -21.0]
-							],
-							"countdown_stop": 0.8,
-							"countdown_shoot": 0.5,
-							"countdown_perception": 1.0,
-							"scale_to_respawn_attack": 2.0
-						}
+						
 					],
 					"Interactives":[
 						{

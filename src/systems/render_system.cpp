@@ -437,43 +437,43 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
         posY += 50.f;
     }
 
-    bool neutral{ false }, water{ false }, fire{ false }, ice{ false };
-    for (uint8_t i = 0; i < plfi.types.size(); i++)
-    {
-        std::cout << "Fire: " << fire << std::endl;
-        if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Neutral && !neutral)
-        {
-            Rectangle btnRec = { 300, posY, 200, 50 };
-            GuiButton(btnRec, "Bastón de hechicero");
-            neutral = true;
-            posY += 50.f;
-        }
+    // bool neutral{ false }, water{ false }, fire{ false }, ice{ false };
+    // for (uint8_t i = 0; i < plfi.types.size(); i++)
+    // {
+    //     std::cout << "Fire: " << fire << std::endl;
+    //     if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Neutral && !neutral)
+    //     {
+    //         Rectangle btnRec = { 300, posY, 200, 50 };
+    //         GuiButton(btnRec, "Bastón de hechicero");
+    //         neutral = true;
+    //         posY += 50.f;
+    //     }
 
-        else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Water && !water)
-        {
-            Rectangle btnRec = { 300, posY, 200, 50 };
-            GuiButton(btnRec, "Chorro de agua");
-            water = true;
-            posY += 50.f;
-        }
+    //     else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Water && !water)
+    //     {
+    //         Rectangle btnRec = { 300, posY, 200, 50 };
+    //         GuiButton(btnRec, "Chorro de agua");
+    //         water = true;
+    //         posY += 50.f;
+    //     }
 
-        else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Fire && !fire)
-        {
-            std::cout << "FIRE\n";
-            Rectangle btnRec = { 300, posY, 200, 50 };
-            GuiButton(btnRec, "Bola de fuego");
-            fire = true;
-            posY += 50.f;
-        }
+    //     else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Fire && !fire)
+    //     {
+    //         std::cout << "FIRE\n";
+    //         Rectangle btnRec = { 300, posY, 200, 50 };
+    //         GuiButton(btnRec, "Bola de fuego");
+    //         fire = true;
+    //         posY += 50.f;
+    //     }
 
-        else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Ice && !ice)
-        {
-            Rectangle btnRec = { 300, posY, 200, 50 };
-            GuiButton(btnRec, "Rayo de hielo");
-            ice = true;
-            posY += 50.f;
-        }
-    }
+    //     else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Ice && !ice)
+    //     {
+    //         Rectangle btnRec = { 300, posY, 200, 50 };
+    //         GuiButton(btnRec, "Rayo de hielo");
+    //         ice = true;
+    //         posY += 50.f;
+    //     }
+    // }
 
 
     // if (GuiButton(btn1Rec, "CONTINUAR")) {

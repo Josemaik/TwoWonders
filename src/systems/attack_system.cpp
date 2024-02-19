@@ -57,6 +57,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             else
             {
                 createSpellAttack(em, ent, att);
+                att.createAttack = false;
                 return;
             }
 
@@ -252,25 +253,10 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
     em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = static_cast<float>(isRanged ? ranged : 0.2) });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
     if (ent.hasTag<PlayerTag>())
-    {
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
 
-        auto& plfi = em.getSingleton<PlayerInfo>();
-
-        if (ent.hasComponent<TypeComponent>())
-        {
-            auto& type = em.getComponent<TypeComponent>(ent);
-
-            if (type.type != ElementalType::Neutral && plfi.mana > 0.0)
-            {
-                plfi.mana -= MANA_CUT;
-
-                if (plfi.mana < 0.0)
-                    plfi.mana = 0;
-            }
-        }
-    }
-    else {
+    else
+    {
         auto& c = em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_ENEMY });
         if (ent.hasTag<GolemTag>()) {
             c.attackType = AttackType::GollemAttack;
@@ -321,10 +307,10 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
     // Crear la entidad ataque
     auto& e{ em.newEntity() };
     em.addTag<HitPlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + att.vel * att.scale_to_respawn_attack, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0 });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f });
+    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 3.0f });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
 

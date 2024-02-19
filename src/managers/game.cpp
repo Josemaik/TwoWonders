@@ -39,10 +39,6 @@ void Game::createEntities(EntityManager& em)
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<AttackComponent>(e, AttackComponent{});
-    auto& t = em.addComponent<TypeComponent>(e, TypeComponent{});
-
-    for (std::size_t i = 0; i < plfi.types.size(); i++)
-        t.types[i] = static_cast<ElementalType>(plfi.types[i]);
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);

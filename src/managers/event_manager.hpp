@@ -79,12 +79,6 @@ public:
                         life.life = life.maxLife;
                         plfi.mana = plfi.max_mana - 3.0;
 
-                        auto& tc = em.getComponent<TypeComponent>(e);
-                        plfi.type = static_cast<int>(tc.type);
-
-                        for (std::size_t i = 0; i < tc.types.size(); i++)
-                            plfi.types[i] = static_cast<int>(tc.types[i]);
-
                         mm.spawnReset(em, iam);
 
                         break;

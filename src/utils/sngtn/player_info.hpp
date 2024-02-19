@@ -13,8 +13,6 @@ struct PlayerInfo {
     Spells currentSpell{};
     bool isDead{ false };
     vec3d spawnPoint{};
-    uint8_t type{ 1 };
-    std::array<uint8_t, 4> types{ 1, 1, 1, 1 };
 
     void addSpell(Spell spell) { spells.push_back(spell); currentSpell = spell.spell; }
     void changeCurrentSpell()
