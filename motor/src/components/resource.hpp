@@ -1,33 +1,42 @@
 #pragma once
 #include <iostream>
-#include "entity.hpp"
 
-struct Resource : public Entity{
+struct Resource{
+    std::string name;
+
     virtual ~Resource() {};
-
     virtual bool load() = 0;
     virtual void unload() = 0;
     virtual bool isLoaded() const = 0;
 };
 
-// Struct Mesh
+// Struct Mesh // .obj
 struct Mesh : public Resource{
+    // float* vertex, normal, coord. textures
+    // int* index
+
     bool load() override { return true; }
     void unload() override {}
     bool isLoaded() const override { return true; }
 
-    void draw(glm::mat4) const override { std::cout << "Draw a mesh" << std::endl; };
+    void draw() { std::cout << "Draw a mesh" << std::endl; /* OpenGL */ };
 };
 
-// Struct Texture
+// Struct Texture // .png
 struct Texture : public Resource{
+    // int id (glGenTextures)
+    // int width, heigh
+
     bool load() override { return true; }
     void unload() override {}
     bool isLoaded() const override { return true; }
 };
 
-// Struct Material
+// Struct Material // .mtl
 struct Material : public Resource{
+    // coeficientes light
+    // resources Textures
+
     bool load() override { return true; }
     void unload() override {}
     bool isLoaded() const override { return true; }
@@ -35,6 +44,9 @@ struct Material : public Resource{
 
 // Struct Shader
 struct Shader : public Resource{
+    // int id (glCreateProgram)
+    // setInt, setFloat, setMat4
+
     bool load() override { return true; }
     void unload() override {}
     bool isLoaded() const override { return true; }

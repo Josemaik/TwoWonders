@@ -8,6 +8,7 @@
 struct ResourceManager{
 public:
     template<typename T> T& getResource(const std::string& id){
+        // resource is null -> loadResource
         return *static_cast<T*>(m_resources[id].get());
     }
 

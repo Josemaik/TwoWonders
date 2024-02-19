@@ -2,11 +2,13 @@
 #include "components/entity.hpp"
 #include "managers/resource_manager.hpp"
 
+#include <iostream>
+
 int main(){
 
     // Load resources
     ResourceManager rm;
-    Mesh& meshWheel = rm.loadResource<Mesh>("mesh_wheel");
+    Mesh& rMeshWheel = rm.loadResource<Mesh>("mesh_wheel.obj");
 
     // Create scene
     auto nScene = std::make_unique<Node>();
@@ -18,12 +20,14 @@ int main(){
     nScene->addChild(nCamera.get());
     nScene->addChild(nWheel.get());
 
-    nWheel->setEntity(&meshWheel);
+    auto eModelWheel = std::make_unique<Model>();
+    eModelWheel->meshes.push_back(&rMeshWheel);
+    nWheel->setEntity(eModelWheel.get());
 
     nScene->traverse(glm::mat4());
 
     // Unload resources
-    rm.unloadResource("mesh_wheel");
+    rm.unloadResource("mesh_wheel.obj");
 
     // //---- Crear la estructura del árbol ----
     // auto nScene = std::make_unique<Node>();

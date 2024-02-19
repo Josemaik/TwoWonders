@@ -97,7 +97,7 @@ glm::mat4 Node::getTransformationMatrix() { return m_transformationMatrix; }
 // AUXILIARS
 
 void Node::printTransformationMatrix() {
-    std::cout << nodeName << " --> Transformation Matrix:" << std::endl;
+    std::cout << name << " --> Transformation Matrix:" << std::endl;
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
             std::cout << std::setw(2) << m_transformationMatrix[i][j] << " ";

@@ -20,7 +20,7 @@ private:
     bool m_updateMatrix {false};
 
 public:
-    std::string nodeName;
+    std::string name;
 
     Node();
     int addChild(Node* child);
