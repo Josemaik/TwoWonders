@@ -1,25 +1,29 @@
-// #include "components/node.hpp"
-// #include "components/entity.hpp"
+#include "components/node.hpp"
+#include "components/entity.hpp"
 #include "managers/resource_manager.hpp"
 
 int main(){
 
+    // Load resources
     ResourceManager rm;
+    Mesh& meshWheel = rm.loadResource<Mesh>("mesh_wheel");
 
-    try{
-        // Mesh
-        Mesh& mesh = rm.loadResource<Mesh>("mesh_id");
-        if(mesh.isLoaded())
-            rm.unloadResource("mesh_id");
+    // Create scene
+    auto nScene = std::make_unique<Node>();
+    auto nLight = std::make_unique<Node>();
+    auto nCamera = std::make_unique<Node>();
+    auto nWheel = std::make_unique<Node>();
 
-        // Shader
-        Shader& shader = rm.loadResource<Shader>("shader_id");
-        if(shader.isLoaded())
-            rm.unloadResource("shader_id");
+    nScene->addChild(nLight.get());
+    nScene->addChild(nCamera.get());
+    nScene->addChild(nWheel.get());
 
-    } catch (const std::exception& e){
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
+    nWheel->setEntity(&meshWheel);
+
+    nScene->traverse(glm::mat4());
+
+    // Unload resources
+    rm.unloadResource("mesh_wheel");
 
     // //---- Crear la estructura del árbol ----
     // auto nScene = std::make_unique<Node>();
