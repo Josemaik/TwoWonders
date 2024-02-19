@@ -1,5 +1,7 @@
 #pragma once
 #include "../components/resource.hpp"
+#include "../components/resource_mesh.hpp"
+
 #include <string>
 #include <memory>
 #include <iostream>

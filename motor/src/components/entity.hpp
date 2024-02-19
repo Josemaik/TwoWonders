@@ -1,5 +1,5 @@
 #pragma once
-#include "resource.hpp"
+#include "resource_mesh.hpp"
 
 #include <vector>
 #include <glm/glm.hpp>
@@ -18,8 +18,7 @@ struct Camera:Entity{
 };
 
 struct Model:Entity{
-    std::vector<Mesh*> meshes; 
-    // --> std::vector<std::unique_ptr<Mesh>> meshes; 
+    std::vector<std::shared_ptr<Mesh>> meshes; 
     
     void draw(glm::mat4) const override { 
         std::cout << "Draw a model" << std::endl; 

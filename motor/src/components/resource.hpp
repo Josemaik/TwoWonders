@@ -10,18 +10,6 @@ struct Resource{
     virtual bool isLoaded() const = 0;
 };
 
-// Struct Mesh // .obj
-struct Mesh : public Resource{
-    // float* vertex, normal, coord. textures
-    // int* index
-
-    bool load() override { return true; }
-    void unload() override {}
-    bool isLoaded() const override { return true; }
-
-    void draw() { std::cout << "Draw a mesh" << std::endl; /* OpenGL */ };
-};
-
 // Struct Texture // .png
 struct Texture : public Resource{
     // int id (glGenTextures)

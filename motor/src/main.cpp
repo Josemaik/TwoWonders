@@ -21,9 +21,10 @@ int main(){
     nScene->addChild(nWheel.get());
 
     auto eModelWheel = std::make_unique<Model>();
-    eModelWheel->meshes.push_back(&rMeshWheel);
+    eModelWheel->meshes.push_back(std::make_shared<Mesh>(rMeshWheel));
     nWheel->setEntity(eModelWheel.get());
 
+    // Draw entities
     nScene->traverse(glm::mat4());
 
     // Unload resources
