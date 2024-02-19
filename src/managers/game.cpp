@@ -23,7 +23,10 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -33.0, 5.5, 30.9 };
+        plfi.spawnPoint = { 7.0  , 4.0  ,-127.0 };
+        //-9.0, 4.0, -50.0
+        //26.0, 4.0, -65.0
+        //-32.0   4.0  -107.0
 
     // Player
     auto& e{ em.newEntity() };
@@ -177,6 +180,9 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory))
             {
+                auto& li = em.getSingleton<LevelInfo>();
+                std::cout << li.num_zone << "jijij \n";
+
                 ai_system.update(em, deltaTime);
                 physics_system.update(em, deltaTime);
                 collision_system.update(em);
