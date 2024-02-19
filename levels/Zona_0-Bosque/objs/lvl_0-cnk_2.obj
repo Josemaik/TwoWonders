@@ -1,6 +1,6 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib ../lvl_0-cnk_2.mtl
+mtllib lvl_0-cnk_2.mtl
 o barricada.002
 v 91.836967 1.807216 -146.559738
 v 91.836967 10.722299 -146.600433

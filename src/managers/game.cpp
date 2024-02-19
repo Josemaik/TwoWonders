@@ -24,9 +24,6 @@ void Game::createEntities(EntityManager& em)
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
         plfi.spawnPoint = { -33.0, 5.5, 30.9 };
-    else
-        std::cout << "aja\n";
-
 
     // Player
     auto& e{ em.newEntity() };
@@ -64,6 +61,18 @@ void Game::createSound(EntityManager&) {
 
 void Game::run()
 {
+
+    Shader shader = LoadShader(TextFormat("assets/shaders/lighting.vs", 330),
+        TextFormat("assets/shaders/lighting.fs", 330));
+
+    // Get some required shader locations
+    shader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(shader, "viewPos");
+
+    // Ambient light level (some basic lighting)
+    int ambientLoc = GetShaderLocation(shader, "ambient");
+    float ambientValue[4] = { 2.1f, 2.1f, 2.1f, 2.0f };
+    SetShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
+
     engine.setTargetFPS(30);
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
@@ -188,10 +197,10 @@ void Game::run()
                     li.dead_entities.clear();
                 }
 
-                render_system.update(em, engine, deltaTime);
+                render_system.update(em, engine, deltaTime, shader);
             }
             else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory))
-                render_system.update(em, engine, deltaTime);
+                render_system.update(em, engine, deltaTime, shader);
 
             break;
         }
@@ -224,6 +233,7 @@ void Game::run()
     render_system.unloadModels(em, engine);
 
     engine.closeWindow();
+    UnloadShader(shader);
 }
 
 void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)

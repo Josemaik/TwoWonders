@@ -279,16 +279,7 @@
 						}
 					],
 					"Interactive":[
-						{
-							"position":[-35.403, 127.166, 7.0],
-							"scale":[6.494, 7.101, 10.0],
-							"rotation": 0.0,
-							"rotVector":[0.0, 0.0, 0.0],
-							"type": 1,
-							"zone": 0,
-							"content": 16,
-							"id": 0
-						}
+						
 					]
 				}
 			},
