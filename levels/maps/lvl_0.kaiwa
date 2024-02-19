@@ -363,7 +363,16 @@
 						}
 					],
 					"Ramps":[],
-					"Destroyable":[],
+					"Destroyable":[
+						{
+							"position":[83.499, 71.391, 7.0],
+							"scale":[27.179, 7.128, 10.0],
+							"rotation": 0.0,
+							"rotVector":[0.0, 0.0, 0.0],
+							"life": 1,
+							"weaknesses": [1]
+						}
+					],
 					"Interactive":[
 						{
 							"position":[70.237, 65.72, 7.0],
@@ -380,16 +389,6 @@
 							"scale":[7.38, 2.388, 10.0],
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0],
-							"type": 1,
-							"zone": 0,
-							"content": 16,
-							"id": 0
-						},
-						{
-							"position":[83.499, 71.391, 7.0],
-							"scale":[27.179, 7.128, 10.0],
-							"rotation": 90.0,
-							"rotVector":[0.0, 0.0, -1.0],
 							"type": 1,
 							"zone": 0,
 							"content": 16,
