@@ -132,13 +132,31 @@
 					"Objects": [],
 					"Enemies":[
 						{
-							"position":[14.606, 9.397, 3.75]
-						},
-						{
-							"position":[-0.009, 13.932, 3.75]
-						},
-						{
-							"position":[-18.007, 10.692, 3.75]
+							"position":[25.797, 4.0, 8.75],
+							"scale": [2.0, 2.0, 2.0],
+							"color": [0, 121, 241, 255],
+							"max_speed": 0.33,
+							"life": 10,
+							"type": 2,
+							"element": 2,
+							"arrival_radius": 0.1,
+							"detect_radius": 7.0,
+							"attack_radius": 2.5,
+							"tx": 0.0,
+							"tz": 0.0,
+							"time2arrive": 1.0,
+							"tactive": true,
+							"perceptionTime": 0.2,
+							"path": [
+								[35.797, 4.66, 8.75],
+								[25.797, 4.66, 8.75],
+								[35.797, 4.66, 8.75],
+								[25.797, 4.66, 8.75]
+							],
+							"countdown_stop": 0.8,
+							"countdown_shoot": 0.5,
+							"countdown_perception": 0.5,
+							"scale_to_respawn_attack": 7.0
 						}
 					]
 				}
@@ -277,30 +295,7 @@
 			{
 				"underworld":{
 					"Enemies":[
-						{
-							"position":[-20.797, 50.66, 3.75]
-						},
-						{
-							"position":[-8.461, 50.66, 3.75]
-						},
-						{
-							"position":[3.461, 51.075, 3.75]
-						},
-						{
-							"position":[-35.415, 108.404, 3.75]
-						},
-						{
-							"position":[-25.877, 111.307, 3.75]
-						},
-						{
-							"position":[-17.065, 116.283, 3.75]
-						},
-						{
-							"position":[15.155, 133.948, 3.75]
-						},
-						{
-							"position":[33.194, 134.197, 3.75]
-						}
+						
 					],
 					"Objects": []
 				}
@@ -415,15 +410,7 @@
 			{
 				"underworld":{
 					"Enemies":[
-						{
-							"position":[72.705, 128.209, 3.75]
-						},
-						{
-							"position":[96.963, 128.727, 3.75]
-						},
-						{
-							"position":[119.356, 79.165, 3.75]
-						}
+						
 					],
 					"Objects": []
 				}

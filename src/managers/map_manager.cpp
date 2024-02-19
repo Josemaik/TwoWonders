@@ -69,6 +69,7 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
     const rapidjson::Value& objectArray = underworld["Objects"];
     const rapidjson::Value& enemyArray = underworld["Enemies"];
 
+
     generateGround(em, groundArray, j);
 
     generateWalls(em, wallArray);
@@ -79,7 +80,7 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
 
     generateObjects(em, objectArray, mapID);
 
-    // generateEnemies(em, enemyArray, iam);
+    generateEnemies(em, enemyArray, iam);
 
     generateInteractables(em, interactablesArray);
 
