@@ -434,7 +434,7 @@
                 ],
                 "countdown_stop": 0.8,
                 "countdown_shoot": 0.4,
-                "countdown_perception": 2.0,
+                "countdown_perception": 0.1,
                 "scale_to_respawn_attack": 2.0
             },
             {
@@ -494,11 +494,11 @@
         ],
         "interactables": [
             {
-                "position": [5.0, 0.0, 0.0],
+                "position": [-48.0, 0.0, -2.0],
                 "scale": [1.0, 1.0, 1.0],
                 "color": [255, 255, 255, 255],
                 "type": 1,
-                "zone": 1,
+                "zone": 5,
                 "content": 2,
                 "id": 0
             }

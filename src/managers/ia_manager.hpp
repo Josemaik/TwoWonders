@@ -47,6 +47,7 @@ struct Ia_man
     void createEnemy(EntityManager& em, jsonType json);
     void resetVec();
     void createSubdito(EntityManager& em,double generate_radius);
+    void createBossFinalFase2(EntityManager& em, const mapType& map);
     vec3d getRandomPosAroundBoss(double radio,const vec3d& spawnerPos);
 private:
     bool createdzone2{ false }, createdzone3{ false }, createdzone4{ false },

@@ -1,6 +1,6 @@
 #include "zone_system.hpp"
 
-void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, EventManager& evm, MapManager& map) {
+void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, EventManager& evm, MapManager& map,float& dt) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, ZoneComponent& zon)
@@ -123,17 +123,12 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     {
     case 0:
     {
-        checkChests(em, evm, 0);
-        break;
-    }
-    case 1:
-    {
-        // checkChests(em, evm, 1);
+        checkChests(em, evm, li.num_zone);
         break;
     }
     case 4:
     {
-        checkChests(em, evm, 4);
+        checkChests(em, evm, li.num_zone);
         checkDoors(em, evm);
         break;
     }
@@ -159,6 +154,17 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
             iam.createSubdito(em, 3.0);
             bb.create_subdito = false;
         }
+        if(bb.boss_fase == 2){
+            if(bb.elapsed_change_fase >= bb.countdown_change_fase){
+                mapType maptype{};
+                maptype = map.loadMap("assets/levels/mazmorra_level.json");
+                iam.createBossFinalFase2(em,maptype);
+                bb.boss_fase++;
+            }else{
+                bb.elapsed_change_fase+=dt;
+            }
+        }
+
         break;
     }
     case 12:

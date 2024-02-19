@@ -4,9 +4,20 @@
 #include <utils/path.hpp>
 #include <utils/vec3D.hpp>
 #include <vector>
+#include "../../components/subject_component.hpp"
 
 //Estructura para almacenar información de una IA
-struct Info {
+struct InfoSub
+{
+    InfoSub() = default;
+    InfoSub(vec3d position, int life, bool acshield) : position(position), life(life) { subComp.setShield(acshield); }
+
+    vec3d position{};
+    int life{};
+    SubjectComponent subComp{};
+};
+
+struct InfoSlime {
     vec3d position{};
     int life{};
 };
@@ -19,33 +30,36 @@ struct BlackBoard_t {
     std::size_t teid{};
     //centinela para crear súbditos
     bool create_subdito{ false };
-    bool activate_shield { false };
+    bool activate_shield{ false };
     //Posicion Boss Final
     vec3d boss_position{};
+    uint16_t boss_fase{1};
+    double countdown_change_fase{8.0}, elapsed_change_fase{1.0};
     //Path
     // Path_t<4> path { vec3d{8.0, 0.0, 4.0} , {3.0,0.0,4.0} , {3.0,0.0,5.0}, {8.0,0.0,5.0} };
     //Actualizar información IA slimes
-    void 
-    updateInfo(std::size_t id, vec3d position, int life, uint16_t type) {
-        Info EntInfo(position, life);
+
+    void
+        updateInfoSlime(std::size_t id, vec3d position, int life) {
         // si el tipo es 0 es slime, si es 1 es subdito
-        if (type == 0) {
-            slimeData[id] = EntInfo;
-        }
-        else {
-            if (type == 1) {
-                //std::cout << "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \n";
-                subditosData[id] = EntInfo;
-                idsubditos.push_back(id);
-            }
-            else {
-                boss_position = position;
-            }
-        }
+        // if (type == 0) {
+        InfoSlime EntInfo(position, life);
+        slimeData[id] = EntInfo;
 
     }
-    std::unordered_map<std::size_t, Info> slimeData;
-    std::unordered_map<std::size_t, Info> subditosData;
+    void
+
+        updateInfoSub(std::size_t id, vec3d position, int life, bool acshield) {
+        InfoSub EntInfo(position, life, acshield);
+        subditosData[id] = EntInfo;
+        idsubditos.push_back(id);
+    }
+    void
+        updateInfoBoss(vec3d position) {
+        boss_position = position;
+    }
+    std::unordered_map<std::size_t, InfoSlime> slimeData;
+    std::unordered_map<std::size_t, InfoSub> subditosData;
     std::vector<size_t> idsubditos;
 
 };

@@ -20,7 +20,8 @@ struct MapManager
         // Luego, resetea cada parte
         (resetTag<Tags>(em), ...);
     }
-private:
+  
+  private:
     mapType loadMap(const std::string& path);
     void destroyMap(EntityManager& em);
     void generateMapFromJSON(EntityManager& em, const mapType& map, Ia_man& iam);

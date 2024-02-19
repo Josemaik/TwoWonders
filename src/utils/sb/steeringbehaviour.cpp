@@ -1,5 +1,4 @@
 #include "steeringbehaviour.hpp"
-#include <printf.h>
 #include <cmath>
 #include <numbers>
 #include <algorithm>
@@ -32,15 +31,20 @@ double calculatePointDistance(vec3d const& target, vec3d const& origin) {
 //         return steering;
 // }
 
-// Steer_t face(PhysicsComponent const& phy, vec3d target, const double time2arrive){
-//       // Calculate target orientation
+// Steer_t face(PhysicsComponent const& phy, vec3d target){
+//         Steer_t steering;
+//        // Calculate target orientation
 //         auto distx { target.x() - phy.position.x() };
 //         auto distz { target.z() - phy.position.z() };
 //         auto target_orientation { std::atan2(distz,distx) };
 //         if( target_orientation < 0 ) target_orientation += 2*PI;
 
-//         // Set angular velocity
-//         return align(phy,target_orientation,time2arrive);
+//         // Align and Set angular velocity 
+//         auto angular_distance = target_orientation - phy.orientation;
+//         adjustAnglePiMinusPi(angular_distance);
+
+//         steering.orientation =std::clamp(angular_distance, -phy.kMaxVAng,phy.kMaxVAng);
+//         return steering;
 // }
 
 Steer_t STBH::Arrive(PhysicsComponent const& phy, vec3d const& target, double const arrivalRadious) {
@@ -51,7 +55,7 @@ Steer_t STBH::Arrive(PhysicsComponent const& phy, vec3d const& target, double co
         if (tdist < arrivalRadious)
                 steering.arrived = true;
         // face target
-        // auto ang_steer { face(phy,target,time2arrive) };
+        //steering.orientation =  face(phy,target).orientation;
 
         // accelerate to arrive to the point
         //Target linear velocity
@@ -69,6 +73,10 @@ Steer_t STBH::Seek(PhysicsComponent const& phy, vec3d const& target) {
         // auto const distance = target - phy.position;
 
         //Face the target
+        //steering.orientation =  face(phy,target).orientation;
+       // vec3d direction = target - phy.position;
+        // Set the orientation to face the direction
+       //steering.orientation = atan2(direction.z(), direction.x());
         // auto asteer { face(phy,target,time2arrive) };
         // steering.angular = std::clamp(asteer.angular,-phy.kMaxVAng,phy.kMaxVAng);
 

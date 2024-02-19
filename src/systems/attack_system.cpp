@@ -27,6 +27,7 @@ vec3d AttackSystem::getPosMeteorito(uint16_t fase, vec3d posplayer) {
 
 void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att, float dt) {
     // att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
+
     auto& phy = em.getComponent<PhysicsComponent>(ent);
 
     // Se pone la direccion en la que este mirando el player
@@ -72,7 +73,6 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             //     att.type = AttackType::Melee;
         }
     }
-
 
     bool is_air_attack{ false };
     // Tipo de ataque
@@ -173,8 +173,9 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
                     auto& e{ em.newEntity() };
                     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = att.pos_respawn_air_attack, .scale = { 4.0f, 0.1f, 4.0f }, .color = ORANGE });
                     em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Meteorit, .life_time = 5.0f });
-                    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
-                    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
+                    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
+                    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::WARNINGZONE });
+
                     att.warning_created = true;
                 }
                 if (att.elapsed_warning_airatk >= att.countdown_warning_airatk) {
@@ -190,7 +191,8 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
                     attk_available = true;
                     auto& e{ em.newEntity() };
                     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getPosMeteorito(att.air_attack_fases,att.pos_respawn_air_attack), .scale = { 1.0f, 1.0f, 1.0f }, .color = BROWN });
-                    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
+                    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
+
                     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::METEORITE });
                 }
                 att.decreaseCountdown(dt, att.elapsed_air_attk);

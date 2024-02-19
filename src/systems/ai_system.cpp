@@ -21,7 +21,6 @@ void perception(BlackBoard_t& bb, AIComponent& ai, float dt) {
             bb.tactive = false;
             // ai.pathIt = bb.path.begin();
             //  id {static_cast<int>(e.getID()) };
-            // std::printf("[%d] VOY! (%.1f,%.1f)\n",id,ai.tx,ai.tz);
         }
     }
     else {
@@ -37,19 +36,21 @@ void AISystem::update(EntityManager& em, float dt)
     auto& bb = em.getSingleton<BlackBoard_t>();
     bb.idsubditos.clear();
 
-    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy,RenderComponent& ren, AIComponent& ai, LifeComponent& lc)
+    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, RenderComponent& ren, AIComponent& ai, LifeComponent& lc)
+
     {
         //percibir el entorno
         perception(bb, ai, dt);
         // Actualizar datos de los slimes y subditos en blackboard
         if (e.hasTag<SlimeTag>()) {
-            bb.updateInfo(e.getID(), phy.position, lc.life, 0);
+            bb.updateInfoSlime(e.getID(), phy.position, lc.life);
         }
-        if (e.hasTag<SubditoTag>()) {
-            bb.updateInfo(e.getID(), phy.position, lc.life, 1);
+        if (e.hasTag<SubjectTag>() && e.hasComponent<SubjectComponent>()) {
+            auto& sub = em.getComponent<SubjectComponent>(e);
+            bb.updateInfoSub(e.getID(), phy.position, lc.life, sub.activeShield);
         }
         if (e.hasTag<BossFinalTag>()) {
-            bb.updateInfo(e.getID(), phy.position, lc.life, 2);
+            bb.updateInfoBoss(phy.position);
         }
 
         if (!isDetected && ai.playerdetected)

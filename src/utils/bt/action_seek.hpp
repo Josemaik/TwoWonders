@@ -1,6 +1,5 @@
 #pragma once
 #include "node.hpp"
-#include <printf.h>
 #include <cmath>
 #include <numbers>
 #include <algorithm>
@@ -15,7 +14,7 @@ struct BTAction_Seek : BTNode_t {
 
             return BTNodeStatus_t::fail;
         }
-         ectx.ai.bh = "seeking";
+        ectx.ai.bh = "seeking";
         Steer_t steering = STBH::Seek(ectx.phy, { ectx.ai.tx,0.0,ectx.ai.tz });
 
         ectx.phy.velocity = vec3d{ steering.v_x, 0.0, steering.v_z };

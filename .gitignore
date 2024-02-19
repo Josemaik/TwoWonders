@@ -5,3 +5,6 @@ ZeldaWonders
 TwoWonders
 *.zip
 release
+motor/Motor
+motor/obj
+motor/release

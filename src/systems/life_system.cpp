@@ -5,6 +5,25 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, LifeComponent& lif)
     {
+        if (lif.lifeLost > 0)
+        {
+            // Si es un subdito y tiene escudo activo, se le resta al escudo
+            if (ent.hasTag<SubjectTag>() && ent.hasComponent<SubjectComponent>())
+            {
+                auto& sub = em.getComponent<SubjectComponent>(ent);
+                if (sub.activeShield)
+                {
+                    lif.life += lif.lifeLost;
+                    sub.decreaseShield();
+
+                    if (sub.shieldLife == 0)
+                        sub.activeShield = false;
+                }
+            }
+
+            lif.lifeLost = 0;
+        }
+
         lif.decreaseCountdown(deltaTime);
 
         if (lif.life == 0)
@@ -50,13 +69,22 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 }
             }
 
-            if (ent.hasTag<SubditoTag>()) {
+            if (ent.hasTag<SubjectTag>()) {
                 if (!lif.decreaseNextFrame)
                     lif.decreaseNextFrame = true;
                 else
                     lif.decreaseNextFrame = false;
                 auto& bb = em.getSingleton<BlackBoard_t>();
                 bb.subditosData.erase(ent.getID());
+            }
+
+            if(ent.hasTag<BossFinalTag>()){
+                // if (!lif.decreaseNextFrame)
+                //     lif.decreaseNextFrame = true;
+                // else
+                //     lif.decreaseNextFrame = false;
+                 auto& bb = em.getSingleton<BlackBoard_t>();
+                 bb.boss_fase++;
             }
 
             lif.markedForDeletion = true;
