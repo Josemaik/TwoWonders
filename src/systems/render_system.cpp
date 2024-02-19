@@ -187,10 +187,10 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     else if (e.hasTag<SlimeTag>())
                     {
                         r.model = LoadModel("assets/models/Slime.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Slime_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Slime_texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+                        // Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Slime_uv.png");
+                        // Texture2D t = LoadTexture("assets/models/textures/entity_textures/Slime_texture.png");
+                        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+                        // r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SnowmanTag>())
                     {
@@ -292,7 +292,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 }
                 else if (e.hasTag<SlimeTag>())
                 {
-                    scl = { 0.33, 0.33, 0.33 };
+                    //scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - .6);
                     in = true;
                 }
@@ -304,7 +304,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 }
                 else if (e.hasTag<SpiderTag>())
                 {
-                    scl = { 0.33, 0.33, 0.33 };
+                   // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 0.7);
                     in = true;
                 }
@@ -950,22 +950,22 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
         // Dibujar zona para mostrar ejemplo de uso del eventmanager
-        auto& linfo = em.getSingleton<LevelInfo>();
-        auto& bb = em.getSingleton<BlackBoard_t>();
-        if (linfo.num_zone == 11) {
-            if (bb.boss_fase == 1) {
-                engine.drawText("FASE 1", 500, 10, 70, RED);
-            }
-            else {
-                engine.drawText("FASE 2", 500, 10, 70, ORANGE);
-            }
+        // auto& linfo = em.getSingleton<LevelInfo>();
+        // auto& bb = em.getSingleton<BlackBoard_t>();
+        // if (linfo.num_zone == 11) {
+        //     if (bb.boss_fase == 1) {
+        //         engine.drawText("FASE 1", 500, 10, 70, RED);
+        //     }
+        //     else {
+        //         engine.drawText("FASE 2", 500, 10, 70, ORANGE);
+        //     }
 
-            // if (linfo.segundos == 0) {
-            //     linfo.drawzone = false;
-            //     linfo.segundos = 1000;
-            // }
-            // linfo.segundos--;
-        }
+        //     // if (linfo.segundos == 0) {
+        //     //     linfo.drawzone = false;
+        //     //     linfo.segundos = 1000;
+        //     // }
+        //     // linfo.segundos--;
+        // }
         // else {
         //     engine.drawText(("ZONA " + std::to_string(linfo.num_zone)).c_str(), 600, 10, 50, RED);
         // }

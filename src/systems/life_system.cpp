@@ -52,7 +52,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 else
                     lif.decreaseNextFrame = false;
 
-                em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
+                //em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
             }
 
             //Si es una bala

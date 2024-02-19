@@ -578,7 +578,7 @@ void CollisionSystem::floorCollision(PhysicsComponent& phy1, PhysicsComponent& p
 // Efecto de cuando se choca con un enemigo
 void CollisionSystem::enemyCollision(EntityManager& em, Entity& damagedEntity)
 {
-    em.getComponent<LifeComponent>(damagedEntity).decreaseLife(1);
+    //em.getComponent<LifeComponent>(damagedEntity).decreaseLife(1);
 }
 
 // Efecto de cuando se choca contra una pared - podría expandirse para más usos en el futuro
