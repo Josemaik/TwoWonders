@@ -23,16 +23,16 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 7.0  , 4.0  ,-127.0 };
-        //-9.0, 4.0, -50.0
-        //26.0, 4.0, -65.0
-        //-32.0   4.0  -107.0
+        plfi.spawnPoint = { -33.0, 5.5, 30.9 };
+    //-9.0, 4.0, -50.0
+    //26.0, 4.0, -65.0
+    //-32.0   4.0  -107.0
 
-    // Player
+// Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);// -2 -12 63 -71
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, });
 
     auto& lis = em.addComponent<ListenerComponent>(e, ListenerComponent{});
     em.addComponent<InputComponent>(e, InputComponent{});
@@ -73,7 +73,7 @@ void Game::run()
 
     // Ambient light level (some basic lighting)
     int ambientLoc = GetShaderLocation(shader, "ambient");
-    float ambientValue[4] = { 2.1f, 2.1f, 2.1f, 2.0f };
+    float ambientValue[4] = { 3.1f, 3.1f, 2.1f, 20.0f };
     SetShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
 
     engine.setTargetFPS(30);
@@ -180,9 +180,6 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory))
             {
-                auto& li = em.getSingleton<LevelInfo>();
-                std::cout << li.num_zone << "jijij \n";
-
                 ai_system.update(em, deltaTime);
                 physics_system.update(em, deltaTime);
                 collision_system.update(em);

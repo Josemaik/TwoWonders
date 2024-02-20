@@ -233,46 +233,53 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                     }
-                    else if (e.hasTag<GroundTag>() && !jaja)
+                    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk0Tag>())
                     {
-                        r.model = LoadModel("levels/Zona_0-Bosque/objs/lvl_0-cnk_0.obj");
-                        jaja = true;
-                        // Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
-                        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].shader = *shaderPtr;
-                        r.model.materials[1].shader = *shaderPtr;
-                        r.model.materials[2].shader = *shaderPtr;
-                    }
-                    else if (e.hasTag<GroundTag>() && jaja && !jaja2)
-                    {
-                        r.model = LoadModel("levels/Zona_0-Bosque/objs/lvl_0-cnk_1.obj");
-                        jaja2 = true;
-                        // Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
-                        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].shader = *shaderPtr;
-                        r.model.materials[1].shader = *shaderPtr;
-                        r.model.materials[2].shader = *shaderPtr;
-                        r.model.materials[3].shader = *shaderPtr;
-                        r.model.materials[4].shader = *shaderPtr;
+                        // Primero se carga este modelo
+                        r.model = LoadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_0.obj");
 
-
+                        for (int i = 0; i < r.model.materialCount; i++)
+                        {
+                            r.model.materials[i].shader = *shaderPtr;
+                        }
                     }
-                    else if (e.hasTag<GroundTag>() && jaja && jaja2)
+                    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk1Tag>())
                     {
-                        r.model = LoadModel("levels/Zona_0-Bosque/objs/lvl_0-cnk_2.obj");
+                        r.model = LoadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_1.obj");
+
+                        for (int i = 0; i < r.model.materialCount; i++)
+                        {
+                            r.model.materials[i].shader = *shaderPtr;
+                        }
+                    }
+                    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk2Tag>())
+                    {
+                        r.model = LoadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_2.obj");
                         // Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
                         // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
 
-                        r.model.materials[0].shader = *shaderPtr;
-                        r.model.materials[1].shader = *shaderPtr;
-                        r.model.materials[2].shader = *shaderPtr;
-                        r.model.materials[3].shader = *shaderPtr;
-                        r.model.materials[4].shader = *shaderPtr;
+                        for (int i = 0; i < r.model.materialCount; i++)
+                        {
+                            r.model.materials[i].shader = *shaderPtr;
+                        }
                     }
-                    else if (e.hasTag<ShaderTag>())
+                    else if (e.hasTag<ChestTag>())
                     {
-                        r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
-                        r.model = engine.loadModelFromMesh(r.mesh);
+                        r.model = LoadModel("assets/models/Cofre.obj");
+                        // Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+                        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+                        for (int i = 0; i < r.model.materialCount; i++)
+                        {
+                            r.model.materials[i].shader = *shaderPtr;
+                        }
+                    }
+                    else if (e.hasTag<DestructibleTag>())
+                    {
+                        r.model = LoadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-troncos.obj");
+                        // Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+                        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
                         r.model.materials[0].shader = *shaderPtr;
                     }
                     else
@@ -304,7 +311,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 }
                 else if (e.hasTag<SpiderTag>())
                 {
-                   // scl = { 0.33, 0.33, 0.33 };
+                    // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 0.7);
                     in = true;
                 }
@@ -327,14 +334,13 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     pos.setY(pos.y() - 1.1);
                     in = true;
                 }
-                else if (e.hasTag<GroundTag>())
+                else if (e.hasTag<DestructibleTag>())
                 {
-                    colorEntidad = BEIGE;
+                    in = true;
                 }
 
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
                 engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
-
 
                 if (!in)
                 {

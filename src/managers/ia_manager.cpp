@@ -533,16 +533,16 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         // auto* d_r_6 = &tree.createNode<BTDecisionOnAttackRadius>();
         // auto* sequence6_1 = &tree.createNode<BTNodeSequence_t>(d_a_6, a_a_6, d_r_6);
 
-        
+
 
 
         // auto* patrol_6 = &tree.createNode<BTAction_Patrol>();
         // auto* sequence6_3 = &tree.createNode<BTNodeSequence_t>(patrol_6);
 
         // tree.createNode<BTNodeSelector_t>(sequence6_1, sequence6_2, sequence6_3);
-        
+
         tree.createNode<BTAction_Patrol>();
-        
+
         break;
     }
 
@@ -550,38 +550,38 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     {
         em.addTag<SlimeTag>(e);
 
-        auto* d_cl_3 = &tree.createNode<BTDecisionCheckLifes>();
+        // auto* d_cl_3 = &tree.createNode<BTDecisionCheckLifes>();
 
-        auto* d_foc3 = &tree.createNode<BTDecisionFleeorCurePartner>();
-        auto* d_rh3 = &tree.createNode<BTDecisionReadyforHeal>();
-        auto* a_hm3 = &tree.createNode<BTAction_HealMate>();
-        auto* sequence3_0_0 = &tree.createNode<BTNodeSequence_t>(d_foc3, d_rh3, a_hm3);
+        // auto* d_foc3 = &tree.createNode<BTDecisionFleeorCurePartner>();
+        // auto* d_rh3 = &tree.createNode<BTDecisionReadyforHeal>();
+        // auto* a_hm3 = &tree.createNode<BTAction_HealMate>();
+        // auto* sequence3_0_0 = &tree.createNode<BTNodeSequence_t>(d_foc3, d_rh3, a_hm3);
 
-        auto* a_f_3 = &tree.createNode<BTAction_Flee>();
-        auto* a_h_3 = &tree.createNode<BTAction_Healing>();
-        auto* sequence3_0_1 = &tree.createNode<BTNodeSequence_t>(a_f_3, a_h_3);
+        // auto* a_f_3 = &tree.createNode<BTAction_Flee>();
+        // auto* a_h_3 = &tree.createNode<BTAction_Healing>();
+        // auto* sequence3_0_1 = &tree.createNode<BTNodeSequence_t>(a_f_3, a_h_3);
 
-        auto* selector3_0 = &tree.createNode<BTNodeSelector_t>(sequence3_0_0, sequence3_0_1);
+        // auto* selector3_0 = &tree.createNode<BTNodeSelector_t>(sequence3_0_0, sequence3_0_1);
 
-        auto* sequence3_0 = &tree.createNode<BTNodeSequence_t>(d_cl_3, selector3_0);
+        // auto* sequence3_0 = &tree.createNode<BTNodeSequence_t>(d_cl_3, selector3_0);
 
-        auto* d_a_3 = &tree.createNode<BTDecisionReadyforAttack>();
-        auto* a_j_3 = &tree.createNode<BTAction_JumptoPlayer>();
-        //auto* a_a_3 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee); // fail si disparo succes si no disparo
-        auto* d_r_3 = &tree.createNode<BTDecisionOnAttackRadius>();
-        auto* sequence3_2 = &tree.createNode<BTNodeSequence_t>(d_a_3, a_j_3, d_r_3);
+        // auto* d_a_3 = &tree.createNode<BTDecisionReadyforAttack>();
+        // auto* a_j_3 = &tree.createNode<BTAction_JumptoPlayer>();
+        // //auto* a_a_3 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee); // fail si disparo succes si no disparo
+        // auto* d_r_3 = &tree.createNode<BTDecisionOnAttackRadius>();
+        // auto* sequence3_2 = &tree.createNode<BTNodeSequence_t>(d_a_3, a_j_3, d_r_3);
 
-        auto* d_1_3 = &tree.createNode<BTDecisionPlayerDetected>();
-        auto* a_s_3 = &tree.createNode<BTAction_Seek>();
-        auto* sequence3_3 = &tree.createNode<BTNodeSequence_t>(d_1_3, a_s_3);
+        // auto* d_1_3 = &tree.createNode<BTDecisionPlayerDetected>();
+        // auto* a_s_3 = &tree.createNode<BTAction_Seek>();
+        // auto* sequence3_3 = &tree.createNode<BTNodeSequence_t>(d_1_3, a_s_3);
 
 
-        auto* patrol_3 = &tree.createNode<BTAction_Patrol>();
-        auto* sequence3_4 = &tree.createNode<BTNodeSequence_t>(patrol_3);
+        // auto* patrol_3 = &tree.createNode<BTAction_Patrol>();
+        // auto* sequence3_4 = &tree.createNode<BTNodeSequence_t>(patrol_3);
 
-        
+
         tree.createNode<BTAction_Patrol>();
-        
+
         //tree.createNode<BTNodeSelector_t>(sequence3_0, sequence3_2, sequence3_3, sequence3_4);
         break;
     }
@@ -607,11 +607,11 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* d_raa = &tree.createNode<BTDecisionReadyforAirAttack>();
         auto* d_as = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Air_attack);
         auto* sequence2 = &tree.createNode<BTNodeSequence_t>(d_pd2, d_raa, d_as);
-    
-        auto&bb = em.getSingleton<BlackBoard_t>();
-        if(bb.boss_fase == 1)
+
+        auto& bb = em.getSingleton<BlackBoard_t>();
+        if (bb.boss_fase == 1)
             tree.createNode<BTNodeSelector_t>(sequence, sequence1, patrol);
-        else{
+        else {
             tree.createNode<BTNodeSelector_t>(sequence, sequence1, sequence2, shield, patrol);
         }
         break;
@@ -632,7 +632,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* d_1_6 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* a_s_6 = &tree.createNode<BTAction_Seek>();
         // auto* sequence2 = &tree.createNode<BTNodeSequence_t>(d_1_6, a_s_6);
-        &tree.createNode<BTNodeSequence_t>(d_1_6, a_s_6);
+        tree.createNode<BTNodeSequence_t>(d_1_6, a_s_6);
 
         // auto* patrol_6 = &tree.createNode<BTAction_Patrol>();
         // auto* sequence3 = &tree.createNode<BTNodeSequence_t>(patrol_6);
@@ -652,8 +652,8 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
 
     em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = scale_to_respawn_attack });
 
-    auto&bb = em.getSingleton<BlackBoard_t>();
-    if(bb.boss_fase == 2){
+    auto& bb = em.getSingleton<BlackBoard_t>();
+    if (bb.boss_fase == 2) {
         ai.couldown_spawning = 0.35;
         ai.countdown_heal = 1.0;
         ai.countdown_shield = 0.6;
@@ -666,7 +666,7 @@ void Ia_man::resetVec()
     vec_t.clear();
 }
 
-void Ia_man::createBossFinalFase2(EntityManager& em, const mapType& map){
+void Ia_man::createBossFinalFase2(EntityManager& em, const mapType& map) {
     const rapidjson::Value& underworld = map["underworld"];
     const rapidjson::Value& bossfase2 = underworld["bossfinalfase2"];
     for (rapidjson::SizeType i = 0; i < bossfase2.Size(); i++)
@@ -745,9 +745,10 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
     if (type_attk == AIComponent::TypeShoot::Melee) {
         auto* a_s_1{ &tree.createNode<BTAction_Pursue>() };
         attack_radius_p = 2.5;
-        if(bb.boss_fase == 1){
+        if (bb.boss_fase == 1) {
             countdown_shoot_p = 0.4;
-        }else{
+        }
+        else {
             countdown_shoot_p = 0.7;
         }
         countdown_stop_p = 0.8;
