@@ -19,14 +19,16 @@ struct Mesh : public Resource{
 public:
     // Mesh data
     std::vector<u_int16_t> index;
-    std::vector<std::shared_ptr<Vertex>> vertex;
-    std::vector<std::shared_ptr<Texture>> texture;
+    std::vector<Vertex> vertex;
+    std::vector<Texture> texture;
 
     bool load() override;
     void unload() override;
     bool isLoaded() const override;
 
     void draw();
+
+    void rellenar(std::vector<Vertex> vertices, std::vector<u_int16_t> indices, std::vector<Texture> textures);
 
 private:
     // Render data

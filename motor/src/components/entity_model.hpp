@@ -1,6 +1,7 @@
 #pragma once
 #include "entity.hpp"
 #include "resource_mesh.hpp"
+#include "../managers/resource_manager.hpp"
 
 #include <vector>
 #include <iostream>
@@ -16,7 +17,7 @@ public:
             meshes[i]->draw();
     };
 };
-
+/*
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -27,7 +28,7 @@ public:
     static std::shared_ptr<Model> loadModel(const std::string& filePath){
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs);
-        if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE/* || scene->mRootNode*/){
+        if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || scene->mRootNode){
             std::cerr << "[ERROR ASSIMP] : " << importer.GetErrorString() << std::endl;
             return nullptr;
         }
@@ -53,7 +54,8 @@ private:
 
     // Process a mesh and convert it into our Mesh representation
     static std::shared_ptr<Mesh> processMesh(aiMesh* mesh) {
-        std::shared_ptr<Mesh> resultMesh = std::make_shared<Mesh>();
+        ResourceManager& rm = ResourceManager::instance();
+        Mesh& resultMesh = rm.loadResource<Mesh>(mesh->mName.C_Str());
 
         // Process vertex
         for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
@@ -63,20 +65,21 @@ private:
             if (mesh->mTextureCoords[0])
                 vertices->textCoords = glm::vec3(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y, 0.0f);
 
-            resultMesh->vertex.push_back(vertices);
+            resultMesh.vertex.push_back(vertices);
         }
 
         // Process index
         for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
             aiFace face = mesh->mFaces[i];
             for (unsigned int j = 0; j < face.mNumIndices; ++j)
-                resultMesh->index.push_back(static_cast<unsigned short>(face.mIndices[j]));
+                resultMesh.index.push_back(static_cast<unsigned short>(face.mIndices[j]));
         }
 
         // Load mesh in memory
-        if(resultMesh)
-            resultMesh->load();
+        if(resultMesh.isLoaded())
+            resultMesh.setupMesh();
 
-        return resultMesh;
+        return std::make_shared<Mesh>(resultMesh);
     };
 };
+*/

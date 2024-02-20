@@ -12,16 +12,20 @@ int main(){
     std::cout << "--------" << std::endl;
 
     // Model
-    std::shared_ptr<Model> model = ModelLoader::loadModel("assets/main_character.obj");
+    //std::shared_ptr<Model> model = ModelLoader::loadModel("assets/main_character.obj");
+
+    // for(int i=0; i<model->meshes.size(); i++){
+    //     rm.loadResource(model->meshes[i]);
+    // }
 
     std::cout << "--------" << std::endl;
     std::cout << "- Draw -" << std::endl;
     std::cout << "--------" << std::endl;
 
-    if(!model)
-        std::cerr << "Failed to load model" << std::endl;
-    else
-        model->draw(glm::mat4(1.0f));
+    //if(!model)
+    //    std::cerr << "Failed to load model" << std::endl;
+    //else
+    //    model->draw(glm::mat4(1.0f));
 
     //// Load resources
     //ResourceManager rm;

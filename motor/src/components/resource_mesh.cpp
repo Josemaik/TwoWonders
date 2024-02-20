@@ -2,17 +2,29 @@
 
 bool Mesh::load(){ 
     //setupMesh();
-    std::cout << "Load a mesh" << std::endl;
-    return true; 
+    if(isLoaded()){
+        std::cout << "Load a mesh" << std::endl;
+        return true; 
+    }
+    else{
+        std::cout << "Error loading a mesh" << std::endl;
+        return false;
+    }
+}
+
+void Mesh::rellenar(std::vector<Vertex> vertices, std::vector<u_int16_t> indices, std::vector<Texture> textures){
+    this->vertex = vertices;
+    this->index = indices;
+    this->texture = textures;
+
+    setupMesh();
 }
 
 void Mesh::unload(){ 
-    /*
     glDeleteBuffers(1, m_VBO.get());
     glDeleteBuffers(1, m_EBO.get());
     glDeleteVertexArrays(1, m_VAO.get());
     std::cout << "Unload a mesh" << std::endl; 
-    */
 }
 
 bool Mesh::isLoaded() const{ 
@@ -24,22 +36,16 @@ void Mesh::setupMesh(){
     glGenVertexArrays(1, m_VAO.get());
     glGenBuffers(1, m_VBO.get());
     glGenBuffers(1, m_EBO.get());
-    // glGenVertexArrays(1, &m_VAO);
-    // glGenBuffers(1, &m_VBO);
-    // glGenBuffers(1, &m_EBO);
 
     // Bind vertex array
     glBindVertexArray(*m_VAO);
-    //glBindVertexArray(m_VAO);
 
     // Bind buffer and fill with vertex data
     glBindBuffer(GL_ARRAY_BUFFER, *m_VBO);
-    //glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferData(GL_ARRAY_BUFFER, vertex.size() * sizeof(Vertex), &index[0], GL_STATIC_DRAW);
 
     // Bind buffer and fill with index data
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_EBO);
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, index.size() * sizeof(u_int16_t), &index[0], GL_STATIC_DRAW);
 
     // Enable and specify vertex positions
