@@ -3,7 +3,7 @@ CCACHE 	   := ccache
 CC         := g++-12
 CCFLAGS    := -std=c++2b -g -Wall -Wpedantic -Wextra -Wconversion
 
-LIBS 	   := 
+LIBS 	   := -lglfw -lGLEW -lGL -lm -lassimp
 
 SANITIZE   := -fsanitize=address,undefined
 

@@ -1,34 +1,51 @@
 #include "components/node.hpp"
 #include "components/entity.hpp"
+#include "components/entity_model.hpp"
 #include "managers/resource_manager.hpp"
 
 #include <iostream>
 
 int main(){
 
-    // Load resources
-    ResourceManager rm;
-    Mesh& rMeshWheel = rm.loadResource<Mesh>("mesh_wheel.obj");
+    std::cout << "--------" << std::endl;
+    std::cout << "- Load -" << std::endl;
+    std::cout << "--------" << std::endl;
 
-    // Create scene
-    auto nScene = std::make_unique<Node>();
-    auto nLight = std::make_unique<Node>();
-    auto nCamera = std::make_unique<Node>();
-    auto nWheel = std::make_unique<Node>();
+    // Model
+    std::shared_ptr<Model> model = ModelLoader::loadModel("assets/main_character.obj");
 
-    nScene->addChild(nLight.get());
-    nScene->addChild(nCamera.get());
-    nScene->addChild(nWheel.get());
+    std::cout << "--------" << std::endl;
+    std::cout << "- Draw -" << std::endl;
+    std::cout << "--------" << std::endl;
 
-    auto eModelWheel = std::make_unique<Model>();
-    eModelWheel->meshes.push_back(std::make_shared<Mesh>(rMeshWheel));
-    nWheel->setEntity(eModelWheel.get());
+    if(!model)
+        std::cerr << "Failed to load model" << std::endl;
+    else
+        model->draw(glm::mat4(1.0f));
 
-    // Draw entities
-    nScene->traverse(glm::mat4());
-
-    // Unload resources
-    rm.unloadResource("mesh_wheel.obj");
+    //// Load resources
+    //ResourceManager rm;
+    //Mesh& rMeshWheel = rm.loadResource<Mesh>("mesh_wheel.obj");
+//
+    //// Create scene
+    //auto nScene = std::make_unique<Node>();
+    //auto nLight = std::make_unique<Node>();
+    //auto nCamera = std::make_unique<Node>();
+    //auto nWheel = std::make_unique<Node>();
+//
+    //nScene->addChild(nLight.get());
+    //nScene->addChild(nCamera.get());
+    //nScene->addChild(nWheel.get());
+//
+    //auto eModelWheel = std::make_unique<Model>();
+    //eModelWheel->meshes.push_back(std::make_shared<Mesh>(rMeshWheel));
+    //nWheel->setEntity(eModelWheel.get());
+//
+    //// Draw entities
+    //nScene->traverse(glm::mat4());
+//
+    //// Unload resources
+    //rm.unloadResource("mesh_wheel.obj");
 
     // //---- Crear la estructura del árbol ----
     // auto nScene = std::make_unique<Node>();
