@@ -34,6 +34,8 @@ private:
     void drawCoinBar(ENGI::GameEngine& engine, EntityManager& em);
     void drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, const Entity& e);
     void drawManaBar(ENGI::GameEngine& engine, EntityManager& em);
+    void loadModels(Entity& e, ENGI::GameEngine& engine, RenderComponent& r);
+    void loadShaders(Model& model);
 
     bool isSelected{ false };
     bool isSelectedfordebug{ false };
