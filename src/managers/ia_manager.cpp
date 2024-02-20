@@ -652,6 +652,11 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
 
     em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = scale_to_respawn_attack });
 
+    // Revisamos si está en el mapa tutorial para hacer que los enemigos no hagan daño
+    auto& li = em.getSingleton<LevelInfo>();
+    if (li.mapID == 0)
+        em.addTag<NoDamageTag>(e);
+
     auto& bb = em.getSingleton<BlackBoard_t>();
     if (bb.boss_fase == 2) {
         ai.couldown_spawning = 0.35;

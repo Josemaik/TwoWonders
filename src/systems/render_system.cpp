@@ -6,8 +6,10 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt
 {
     shaderPtr = &shader;
     // Actualizamos la posicion de render del componente de fisicas
-    em.forEach<SYSCMPs, SYSTAGs>([](Entity&, PhysicsComponent& phy, RenderComponent& ren)
+    em.forEach<SYSCMPs, SYSTAGs>([](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
     {
+        if (e.hasTag<SeparateModelTag>())
+            return;
         ren.setPosition(phy.position);
         ren.setOrientation(phy.orientation);
         ren.setScale(phy.scale);
@@ -178,57 +180,57 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 {
                     if (e.hasTag<PlayerTag>())
                     {
-                        r.model = LoadModel("assets/models/main_character.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/main_character_uv_V2.png");
-                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/main_character_texture_V2.png");
+                        r.model = engine.loadModel("assets/models/main_character.obj");
+                        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/main_character_uv_V2.png");
+                        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/main_character_texture_V2.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SlimeTag>())
                     {
-                        r.model = LoadModel("assets/models/Slime.obj");
-                        // Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Slime_uv.png");
-                        // Texture2D t = LoadTexture("assets/models/textures/entity_textures/Slime_texture.png");
+                        r.model = engine.loadModel("assets/models/Slime.obj");
+                        // Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Slime_uv.png");
+                        // Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Slime_texture.png");
                         // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         // r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SnowmanTag>())
                     {
-                        r.model = LoadModel("assets/models/snowman.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/snowman_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/snowman_texture.png");
+                        r.model = engine.loadModel("assets/models/snowman.obj");
+                        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/snowman_uv.png");
+                        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/snowman_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<GolemTag>())
                     {
-                        r.model = LoadModel("assets/models/Golem.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Golem_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Golem_texture.png");
+                        r.model = engine.loadModel("assets/models/Golem.obj");
+                        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Golem_uv.png");
+                        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Golem_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SpiderTag>())
                     {
-                        r.model = LoadModel("assets/models/Spider.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Spider_UV.png");
-                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Spider_texture.png");
+                        r.model = engine.loadModel("assets/models/Spider.obj");
+                        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Spider_UV.png");
+                        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Spider_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<BossFinalTag>())
                     {
-                        r.model = LoadModel("assets/models/Boss.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Boss_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Boss_texture.png");
+                        r.model = engine.loadModel("assets/models/Boss.obj");
+                        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Boss_uv.png");
+                        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Boss_texture.png");
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                     }
                     else if (e.hasTag<SubjectTag>())
                     {
-                        r.model = LoadModel("assets/models/Boss_sub_1.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Boss_sub_1_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Boss_sub_1_texture.png");
+                        r.model = engine.loadModel("assets/models/Boss_sub_1.obj");
+                        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Boss_sub_1_uv.png");
+                        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Boss_sub_1_texture.png");
 
                         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
                         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
@@ -236,7 +238,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     else if (e.hasTag<GroundTag>() && e.hasTag<Chunk0Tag>())
                     {
                         // Primero se carga este modelo
-                        r.model = LoadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_0.obj");
+                        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_0.obj");
 
                         for (int i = 0; i < r.model.materialCount; i++)
                         {
@@ -245,7 +247,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     }
                     else if (e.hasTag<GroundTag>() && e.hasTag<Chunk1Tag>())
                     {
-                        r.model = LoadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_1.obj");
+                        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_1.obj");
 
                         for (int i = 0; i < r.model.materialCount; i++)
                         {
@@ -254,8 +256,8 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     }
                     else if (e.hasTag<GroundTag>() && e.hasTag<Chunk2Tag>())
                     {
-                        r.model = LoadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_2.obj");
-                        // Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+                        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_2.obj");
+                        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
                         // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
 
                         for (int i = 0; i < r.model.materialCount; i++)
@@ -265,8 +267,8 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     }
                     else if (e.hasTag<ChestTag>())
                     {
-                        r.model = LoadModel("assets/models/Cofre.obj");
-                        // Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+                        r.model = engine.loadModel("assets/models/Cofre.obj");
+                        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
                         // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
 
                         for (int i = 0; i < r.model.materialCount; i++)
@@ -276,11 +278,25 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     }
                     else if (e.hasTag<DestructibleTag>())
                     {
-                        r.model = LoadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-troncos.obj");
-                        // Texture2D t = LoadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+                        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-troncos.obj");
+                        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
                         // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
 
-                        r.model.materials[0].shader = *shaderPtr;
+                        for (int i = 0; i < r.model.materialCount; i++)
+                        {
+                            r.model.materials[i].shader = *shaderPtr;
+                        }
+                    }
+                    else if (e.hasTag<DoorTag>())
+                    {
+                        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-barricada.obj");
+                        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+                        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+                        for (int i = 0; i < r.model.materialCount; i++)
+                        {
+                            r.model.materials[i].shader = *shaderPtr;
+                        }
                     }
                     else
                     {
@@ -686,7 +702,6 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
     // Visualizar las vidas del player
     for (auto const& e : em.getEntities())
     {
-
         if (e.hasTag<PlayerTag>())
         {
             // Dibujar background HUD
@@ -733,6 +748,29 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                     engine.drawText("Fuego", 17, 50, 18, RED);
                 else
                     engine.drawText("Hielo", 17, 50, 18, SKYBLUE);
+            }
+
+            if (li.mapID == 0 && e.hasComponent<AttackComponent>())
+            {
+                if (!li.tutorialEnemies.empty())
+                {
+                    for (auto& enemy : li.tutorialEnemies)
+                    {
+                        auto& ene = *em.getEntityByID(enemy);
+                        if (ene.hasComponent<RenderComponent>())
+                        {
+                            auto& ren{ em.getComponent<RenderComponent>(ene) };
+                            if (ren.visible && ene.hasTag<GolemTag>())
+                            {
+                                engine.drawText("SPACE",
+                                    static_cast<int>(engine.getWorldToScreenX(ren.position) - 25),
+                                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 9),
+                                    20,
+                                    WHITE);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -829,9 +867,9 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             {
                 engine.drawText("E",
                     static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
-                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 8),
+                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 9),
                     20,
-                    BLACK);
+                    WHITE);
             }
         }
 

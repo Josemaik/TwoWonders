@@ -217,6 +217,16 @@ Model ENGI::GameEngine::loadModelFromMesh(Mesh m)
     return LoadModelFromMesh(m);
 }
 
+Model ENGI::GameEngine::loadModel(const char* filename)
+{
+    return LoadModel(filename);
+}
+
+Texture2D ENGI::GameEngine::loadTexture(const char* filename)
+{
+    return LoadTexture(filename);
+}
+
 void ENGI::GameEngine::unloadMesh(Mesh m)
 {
     UnloadMesh(m);
