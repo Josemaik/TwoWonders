@@ -11,7 +11,7 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
     {
     case 0:
         li.mapID = 0;
-        map = loadMap("levels/maps/lvl_0.kaiwa");
+        map = loadMap("assets/levels/maps/lvl_0.kaiwa");
         break;
 
     case 1:
@@ -124,8 +124,14 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
             auto& modelEntity = em.newEntity();
             em.addTag<GroundTag>(modelEntity);
             em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = groundPos, .scale = groundScale, .color = color, .rotationVec = rotationVec });
+
+            if (j >= 8)
+                em.addTag<Chunk2Tag>(modelEntity);
+            else
+                em.addTag<Chunk1Tag>(modelEntity);
         }
         else {
+            em.addTag<Chunk0Tag>(groundEntity);
             groundPos = groundPosition;
         }
 
@@ -233,6 +239,16 @@ void MapManager::generateDestructibles(EntityManager& em, const rapidjson::Value
             auto& weakness = destructible["weaknesses"][j];
             d.addWeakness(static_cast<ElementalType>(weakness.GetInt()));
         }
+
+        r.visible = false;
+
+        vec3d modelPos{ groundPos };
+        if (destructible.HasMember("groundPos"))
+            modelPos = { destructible["groundPos"][0].GetDouble(), destructible["groundPos"][2].GetDouble(), -destructible["groundPos"][1].GetDouble() };
+
+        auto& modelEntity{ em.newEntity() };
+        em.addTag<DestructibleTag>(modelEntity);
+        em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = modelPos, .scale = scale, .color = color, .rotationVec = rotationVec });
     }
 }
 
@@ -304,7 +320,9 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
             uint16_t zone = static_cast<uint16_t>(interactable["zone"].GetUint());
             ObjectType content{ static_cast<ObjectType>(interactable["content"].GetInt()) };
             uint8_t interId = static_cast<uint8_t>(interactable["id"].GetUint());
+            bool visible = interactable["visible"].GetBool();
 
+            r.visible = visible;
             em.addComponent<ChestComponent>(entity, ChestComponent{ .id = interId, .zone = zone, .dropPosition = { vec3d::zero() }, .content = content });
             break;
         }

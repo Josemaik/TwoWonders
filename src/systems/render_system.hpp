@@ -38,8 +38,8 @@ private:
     bool isSelected{ false };
     bool isSelectedfordebug{ false };
     std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
-    bool jaja{ false };
-    bool jaja2{ false };
+    // bool chunk0Charged{ false };
+    // bool chunk1Charged{ false };
     Shader* shaderPtr{ nullptr };
 };
 

@@ -118,10 +118,9 @@ void CollisionSystem::checkRampCollision(EntityManager& em, std::vector<Entity*>
 
             if (pos.x() >= ramp.min.x && pos.x() <= max.x && pos.z() >= min.y && pos.z() <= max.y)
             {
-                auto& ren = em.getComponent<RenderComponent>(*e);
                 auto& phy = em.getComponent<PhysicsComponent>(*e);
 
-                double baseHeight = ren.scale.y() / 2 - 0.5;
+                double baseHeight = phy.scale.y() / 2 - 0.5;
                 double newHeight = baseHeight + ramp.slope;
 
                 // Deltas para calcular la altura
@@ -308,7 +307,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Colisiones con el suelo
     if (staticEntPtr->hasTag<GroundTag>())
     {
-        groundCollision(*otherPhy, em.getComponent<RenderComponent>(*otherEntPtr).scale, minOverlap);
+        groundCollision(*otherPhy, otherPhy->scale, minOverlap);
         return;
     }
 
@@ -345,12 +344,11 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
-    //Si impacta enemigo con pared
+    // Si impacta enemigo con pared
     if (behaviorType2 & BehaviorType::ENEMY)
     {
         if (staticEntPtr->hasTag<WaterTag>())
         {
-            //groundCollision(*otherPhy, em.getComponent<RenderComponent>(*otherEntPtr).scale, minOverlap);
             staticCollision(*otherPhy, *staticPhy, minOverlap);
             return;
         }
@@ -576,9 +574,9 @@ void CollisionSystem::floorCollision(PhysicsComponent& phy1, PhysicsComponent& p
 }
 
 // Efecto de cuando se choca con un enemigo
-void CollisionSystem::enemyCollision(EntityManager& em, Entity& damagedEntity)
+void CollisionSystem::enemyCollision(EntityManager&, Entity&)
 {
-    //em.getComponent<LifeComponent>(damagedEntity).decreaseLife(1);
+    // em.getComponent<LifeComponent>(damagedEntity).decreaseLife(1);
 }
 
 // Efecto de cuando se choca contra una pared - podría expandirse para más usos en el futuro

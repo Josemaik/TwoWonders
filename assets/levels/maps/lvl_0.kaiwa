@@ -115,14 +115,15 @@
 					"Destroyable":[],
 					"Interactive":[
 						{
-							"position":[-37.0, 35.0, 7.0],
+							"position":[-28.0, 31.0, 7.0],
 							"scale":[5.0, 5.0, 5.0],
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0],
 							"type": 1,
 							"zone": 0,
 							"content": 19,
-							"id": 0
+							"id": 0,
+							"visible": false
 						}
 					]
 				}
@@ -356,11 +357,22 @@
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0],
 							"life": 1,
-							"weaknesses": [1]
+							"weaknesses": [1],
+							"groundPos": [-82.0, 62.63, 4.5]
 						}
 					],
 					"Interactive":[
-						
+						{
+							"position": [-35.0, 127.0, 4.0],
+							"scale":[5.0, 5.0, 5.0],
+							"rotation": 0.0,
+							"rotVector":[0.0, 0.0, 0.0],
+							"type": 1,
+							"zone": 4,
+							"content": 6,
+							"id": 1,
+							"visible": false
+						}
 					]
 				}
 			},
@@ -635,7 +647,7 @@
 					"Destroyable":[
 						{
 							"position":[83.499, 71.391, 7.0],
-							"scale":[27.179, 7.128, 10.0],
+							"scale":[7.179, 27.179, 10.0],
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0],
 							"life": 1,
@@ -645,23 +657,25 @@
 					"Interactive":[
 						{
 							"position":[70.237, 65.72, 7.0],
-							"scale":[6.494, 7.101, 10.0],
+							"scale":[5.0, 5.0, 5.0],
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0],
 							"type": 1,
 							"zone": 0,
 							"content": 16,
-							"id": 0
+							"id": 0,
+							"visible": false
 						},
 						{
 							"position":[99.554, 145.935, 7.0],
-							"scale":[7.38, 2.388, 10.0],
+							"scale":[5.0, 5.0, 5.0],
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0],
 							"type": 1,
 							"zone": 0,
 							"content": 16,
-							"id": 0
+							"id": 0,
+							"visible": false
 						}
 					]
 				}
