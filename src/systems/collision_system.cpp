@@ -445,6 +445,13 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ENEMY)
     {
         classicCollision(*staticPhy, *otherPhy, minOverlap);
+
+        if (otherEntPtr->hasTag<NoDamageTag>() && !otherEntPtr->hasTag<SpiderTag>())
+        {
+            staticPhy->position -= 3 * staticPhy->velocity;
+            staticPhy->stopped = true;
+            return;
+        }
         enemyCollision(em, *staticEntPtr);
         return;
     }
@@ -574,9 +581,9 @@ void CollisionSystem::floorCollision(PhysicsComponent& phy1, PhysicsComponent& p
 }
 
 // Efecto de cuando se choca con un enemigo
-void CollisionSystem::enemyCollision(EntityManager&, Entity&)
+void CollisionSystem::enemyCollision(EntityManager& em, Entity& damagedEntity)
 {
-    // em.getComponent<LifeComponent>(damagedEntity).decreaseLife(1);
+    em.getComponent<LifeComponent>(damagedEntity).decreaseLife(1);
 }
 
 // Efecto de cuando se choca contra una pared - podría expandirse para más usos en el futuro

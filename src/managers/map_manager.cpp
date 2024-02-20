@@ -217,6 +217,7 @@ void MapManager::generateDestructibles(EntityManager& em, const rapidjson::Value
     {
         auto& entity = em.newEntity();
         em.addTag<DestructibleTag>(entity);
+        em.addTag<SeparateModelTag>(entity);
 
         // Extraemos los datos del json
         const rapidjson::Value& destructible = destructibleArray[i];
@@ -240,15 +241,15 @@ void MapManager::generateDestructibles(EntityManager& em, const rapidjson::Value
             d.addWeakness(static_cast<ElementalType>(weakness.GetInt()));
         }
 
-        r.visible = false;
-
         vec3d modelPos{ groundPos };
         if (destructible.HasMember("groundPos"))
             modelPos = { destructible["groundPos"][0].GetDouble(), destructible["groundPos"][2].GetDouble(), -destructible["groundPos"][1].GetDouble() };
 
-        auto& modelEntity{ em.newEntity() };
-        em.addTag<DestructibleTag>(modelEntity);
-        em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = modelPos, .scale = scale, .color = color, .rotationVec = rotationVec });
+        r.position = modelPos;
+
+        // auto& modelEntity{ em.newEntity() };
+        // em.addTag<DestructibleTag>(modelEntity);
+        // em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = modelPos, .scale = scale, .color = color, .rotationVec = rotationVec });
     }
 }
 
@@ -335,6 +336,8 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         case InteractableType::Door:
         {
             em.addTag<DoorTag>(entity);
+            em.addTag<SeparateModelTag>(entity);
+            r.position = groundPos;
             r.color = DARKBROWN;
             break;
         }
