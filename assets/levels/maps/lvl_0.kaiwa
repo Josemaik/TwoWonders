@@ -429,7 +429,8 @@
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
 							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"scale_to_respawn_attack": 7.0,
+							"orientation": -1.53
 						},
 						{
 							"position":[26.0, 4.0, -69.0],

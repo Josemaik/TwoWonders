@@ -497,6 +497,12 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = life });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = element });
 
+    if (json.HasMember("orientation"))
+    {
+        double orientation = json["orientation"].GetDouble();
+        wp.orientation = orientation;
+    }
+
     // Creamos el arbol de comportamiento
     vec_t.push_back(std::make_unique<BehaviourTree_t>());
     auto& tree = *vec_t.back();
