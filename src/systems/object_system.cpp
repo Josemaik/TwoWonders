@@ -73,11 +73,23 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 break;
             case ObjectType::Fire_Spell:
             {
-                Spell fire_pell = { "Fire Ball", "A flaming ball of destruction", Spells::Fire1, ElementalType::Fire, 15, 1 };
+                Spell fire_pell = { "Bola de fuego", "Una bola de destrucción masiva", Spells::Fire1, ElementalType::Fire, 15, 1 };
                 plfi.addSpell(fire_pell);
                 // auto& type = em.getComponent<TypeComponent>(*playerEnt);
                 // if (!type.hasType(ElementalType::Fire))
                 //     type.addType(ElementalType::Fire);
+                break;
+            }
+            case ObjectType::Basic_Staff:
+            {
+                Item staff = { "Bastón Básico", "É un bastón" };
+                plfi.addItem(staff);
+                if (!playerEnt->hasComponent<AttackComponent>())
+                    em.addComponent<AttackComponent>(*playerEnt, AttackComponent{});
+                // auto& type = em.getComponent<TypeComponent>(*playerEnt);
+                // if (!type.hasType(ElementalType::Fire))
+                //     type.addType(ElementalType::Fire);
+                break;
             }
             default:
                 break;

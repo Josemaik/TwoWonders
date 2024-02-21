@@ -49,7 +49,7 @@ namespace ENGI {
 
         // Text
         void drawText(const char* text, int posX, int posY, int fontSize, Color color);
-        void drawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint);
+        void drawTextEx(Font font, const char* text, Vector2 position, float fontSize, float spacing, Color tint);
 
         // Window
         void initWindow(int width, int height, const char* title);
@@ -72,6 +72,8 @@ namespace ENGI {
         // Aux
         Mesh genMeshCube(float width, float height, float lenght);
         Model loadModelFromMesh(Mesh m);
+        Model loadModel(const char* filename);
+        Texture2D loadTexture(const char* filename);
         void unloadMesh(Mesh m);
         void unloadModel(Model m);
         float getWorldToScreenX(vec3d pos);

@@ -2,11 +2,35 @@
 #include <iomanip>
 #include "../../libs/raygui.h"
 
-void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt)
+void RenderSystem::init()
 {
+    // Tamaño de la fuente
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
+
+    // Alineamiento del texto
+    GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+
+    // Color de la fuente de texto
+    GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, 0x000000ff);
+
+    // Fondo de los botones
+    GuiSetStyle(DEFAULT, BASE_COLOR_NORMAL, 0xAA0099FF);
+
+    // Color de los bordes
+    GuiSetStyle(TEXTBOX, BORDER_COLOR_NORMAL, 0x000000FF);
+
+    // Hacemos que GuiDrawText() pueda tener más de una línea
+    GuiSetStyle(DEFAULT, TEXT_WRAP_MODE, 2);
+}
+
+void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt, Shader& shader)
+{
+    shaderPtr = &shader;
     // Actualizamos la posicion de render del componente de fisicas
-    em.forEach<SYSCMPs, SYSTAGs>([](Entity&, PhysicsComponent& phy, RenderComponent& ren)
+    em.forEach<SYSCMPs, SYSTAGs>([](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
     {
+        if (e.hasTag<SeparateModelTag>())
+            return;
         ren.setPosition(phy.position);
         ren.setOrientation(phy.orientation);
         ren.setScale(phy.scale);
@@ -174,127 +198,61 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 vec3d pos = { r.position.x(), r.position.y(), r.position.z() };
                 // Solo generamos la malla si no existe
                 if (!r.meshLoaded)
-                {
-                    if (e.hasTag<PlayerTag>())
-                    {
-                        r.model = LoadModel("assets/models/main_character.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/main_character_uv_V2.png");
-                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/main_character_texture_V2.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                    }
-                    else if (e.hasTag<SlimeTag>())
-                    {
-                        r.model = LoadModel("assets/models/Slime.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Slime_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Slime_texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                    }
-                    else if (e.hasTag<SnowmanTag>())
-                    {
-                        r.model = LoadModel("assets/models/snowman.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/snowman_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/snowman_texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                    }
-                    else if (e.hasTag<GolemTag>())
-                    {
-                        r.model = LoadModel("assets/models/Golem.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Golem_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Golem_texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                    }
-                    else if (e.hasTag<SpiderTag>())
-                    {
-                        r.model = LoadModel("assets/models/Spider.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Spider_UV.png");
-                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Spider_texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                    }
-                    else if (e.hasTag<BossFinalTag>())
-                    {
-                        r.model = LoadModel("assets/models/Boss.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Boss_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Boss_texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                    }
-                    else if (e.hasTag<SubjectTag>())
-                    {
-                        r.model = LoadModel("assets/models/Boss_sub_1.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/entity_textures/Boss_sub_1_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/entity_textures/Boss_sub_1_texture.png");
+                    loadModels(e, engine, r);
 
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                    }
-                    else if (e.hasTag<GroundTag>() && !jaja)
-                    {
-                        r.model = LoadModel("assets/models/map_models/lvl_0-cnk0.obj");
-                        jaja = true;
-                        Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                    }
-                    else if (e.hasTag<GroundTag>() && jaja)
-                    {
-                        r.model = LoadModel("assets/models/map_models/lvl_0-cnk1.obj");
-                        Texture2D t = LoadTexture("assets/models/textures/map_textures/lvl0_texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                    }
-                    else
-                    {
-                        r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
-                        r.model = engine.loadModelFromMesh(r.mesh);
-                    }
-                    r.meshLoaded = true;
-                }
-
+                bool in{ false };
                 if (e.hasTag<PlayerTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.8);
+                    in = true;
                 }
                 else if (e.hasTag<SlimeTag>())
                 {
-                    scl = { 0.33, 0.33, 0.33 };
+                    //scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - .6);
+                    in = true;
                 }
                 else if (e.hasTag<SnowmanTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
+                    in = true;
                 }
                 else if (e.hasTag<SpiderTag>())
                 {
-                    scl = { 0.33, 0.33, 0.33 };
+                    // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 0.7);
+                    in = true;
                 }
                 else if (e.hasTag<GolemTag>())
                 {
                     // scl = { 0.4, 0.4, 0.4 };
-                    pos.setY(pos.y() - 1.1);
+                    pos.setY(pos.y() - 4.0);
+                    in = true;
                 }
                 else if (e.hasTag<BossFinalTag>())
                 {
                     scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
                     colorEntidad = { 125, 125, 125, 255 };
+                    in = true;
                 }
                 else if (e.hasTag<SubjectTag>())
                 {
                     scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
+                    in = true;
                 }
-
+                else if (e.hasTag<DestructibleTag>() || e.hasTag<GroundTag>() || e.hasTag<DoorTag>())
+                {
+                    in = true;
+                }
 
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
                 engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
 
-                if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>() && !e.hasTag<SpiderTag>() && !e.hasTag<BossFinalTag>() && !e.hasTag<SubjectTag>())
+                if (!in)
                 {
                     int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
                     if (orientationInDegreesInt % 90 == 0 && std::abs(orientationInDegreesInt) != 270 && std::abs(orientationInDegreesInt) != 90)
@@ -305,6 +263,127 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
             }
         }
     });
+}
+
+void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderComponent& r)
+{
+    if (e.hasTag<PlayerTag>())
+    {
+        r.model = engine.loadModel("assets/models/main_character.obj");
+        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/main_character_uv_V2.png");
+        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/main_character_texture_V2.png");
+        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+    }
+    else if (e.hasTag<SlimeTag>())
+    {
+        r.model = engine.loadModel("assets/models/Slime.obj");
+        // Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Slime_uv.png");
+        // Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Slime_texture.png");
+        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        // r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+    }
+    else if (e.hasTag<SnowmanTag>())
+    {
+        r.model = engine.loadModel("assets/models/snowman.obj");
+        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/snowman_uv.png");
+        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/snowman_texture.png");
+        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+    }
+    else if (e.hasTag<GolemTag>())
+    {
+        r.model = engine.loadModel("assets/models/Golem.obj");
+        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Golem_uv.png");
+        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Golem_texture.png");
+        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+    }
+    else if (e.hasTag<SpiderTag>())
+    {
+        r.model = engine.loadModel("assets/models/Spider.obj");
+        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Spider_UV.png");
+        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Spider_texture.png");
+        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+    }
+    else if (e.hasTag<BossFinalTag>())
+    {
+        r.model = engine.loadModel("assets/models/Boss.obj");
+        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Boss_uv.png");
+        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Boss_texture.png");
+        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+    }
+    else if (e.hasTag<SubjectTag>())
+    {
+        r.model = engine.loadModel("assets/models/Boss_sub_1.obj");
+        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Boss_sub_1_uv.png");
+        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Boss_sub_1_texture.png");
+
+        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+    }
+    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk0Tag>())
+    {
+        // Primero se carga este modelo
+        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_0.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk1Tag>())
+    {
+        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_1.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk2Tag>())
+    {
+        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_2.obj");
+        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<ChestTag>())
+    {
+        r.model = engine.loadModel("assets/models/Cofre.obj");
+        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<DestructibleTag>())
+    {
+        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-troncos.obj");
+        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<DoorTag>())
+    {
+        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-barricada.obj");
+        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+        loadShaders(r.model);
+    }
+    else
+    {
+        r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
+        r.model = engine.loadModelFromMesh(r.mesh);
+    }
+    r.meshLoaded = true;
+}
+
+void RenderSystem::loadShaders(Model& model)
+{
+    for (int i = 0; i < model.materialCount; i++)
+    {
+        model.materials[i].shader = *shaderPtr;
+    }
+
 }
 
 // Empieza el dibujado y se limpia la pantalla
@@ -325,8 +404,12 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
+    auto& txti = em.getSingleton<TextInfo>();
 
     drawHUD(em, engine, inpi.debugPhy);
+
+    if (txti.hasText())
+        drawTextBox(engine, em);
 
     if (inpi.pause && li.sound_system != nullptr)
         drawPauseMenu(engine, em, *li.sound_system);
@@ -410,6 +493,7 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
 {
     float windowWidth = 330.0f;
     float windowHeight = 330.0f;
+    float augment = 55.f;
 
     Rectangle windowRect = {
         static_cast<float>(engine.getScreenWidth()) / 2.0f - windowWidth / 2.0f,
@@ -429,15 +513,14 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
     {
         Rectangle btnRec = { 300, posY, 200, 50 };
         GuiButton(btnRec, item.name.c_str());
-        posY += 50.f;
+        posY += augment;
     }
-
 
     if (plfi.hasKey)
     {
         Rectangle btnRec = { 300, posY, 200, 50 };
         GuiButton(btnRec, "Llave");
-        posY += 50.f;
+        posY += augment;
     }
 
     // bool neutral{ false }, water{ false }, fire{ false }, ice{ false };
@@ -638,7 +721,6 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
     // Visualizar las vidas del player
     for (auto const& e : em.getEntities())
     {
-
         if (e.hasTag<PlayerTag>())
         {
             // Dibujar background HUD
@@ -685,6 +767,29 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                     engine.drawText("Fuego", 17, 50, 18, RED);
                 else
                     engine.drawText("Hielo", 17, 50, 18, SKYBLUE);
+            }
+
+            if (li.mapID == 0 && e.hasComponent<AttackComponent>())
+            {
+                if (!li.tutorialEnemies.empty())
+                {
+                    for (auto& enemy : li.tutorialEnemies)
+                    {
+                        auto& ene = *em.getEntityByID(enemy);
+                        if (ene.hasComponent<RenderComponent>())
+                        {
+                            auto& ren{ em.getComponent<RenderComponent>(ene) };
+                            if (ren.visible && ene.hasTag<GolemTag>())
+                            {
+                                engine.drawText("ESPACIO",
+                                    static_cast<int>(engine.getWorldToScreenX(ren.position) - 25),
+                                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 9),
+                                    20,
+                                    WHITE);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -781,9 +886,9 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             {
                 engine.drawText("E",
                     static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
-                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 8),
+                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 9),
                     20,
-                    BLACK);
+                    WHITE);
             }
         }
 
@@ -908,21 +1013,22 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
         // Dibujar zona para mostrar ejemplo de uso del eventmanager
-        auto& linfo = em.getSingleton<LevelInfo>();
-        auto& bb = em.getSingleton<BlackBoard_t>();
-        if (linfo.num_zone == 11) {
-            if(bb.boss_fase == 1){
-                engine.drawText("FASE 1", 500, 10, 70, RED);
-            }else{
-                engine.drawText("FASE 2", 500, 10, 70, ORANGE);
-            }
-            
-            // if (linfo.segundos == 0) {
-            //     linfo.drawzone = false;
-            //     linfo.segundos = 1000;
-            // }
-            // linfo.segundos--;
-        }
+        // auto& linfo = em.getSingleton<LevelInfo>();
+        // auto& bb = em.getSingleton<BlackBoard_t>();
+        // if (linfo.num_zone == 11) {
+        //     if (bb.boss_fase == 1) {
+        //         engine.drawText("FASE 1", 500, 10, 70, RED);
+        //     }
+        //     else {
+        //         engine.drawText("FASE 2", 500, 10, 70, ORANGE);
+        //     }
+
+        //     // if (linfo.segundos == 0) {
+        //     //     linfo.drawzone = false;
+        //     //     linfo.segundos = 1000;
+        //     // }
+        //     // linfo.segundos--;
+        // }
         // else {
         //     engine.drawText(("ZONA " + std::to_string(linfo.num_zone)).c_str(), 600, 10, 50, RED);
         // }
@@ -1061,4 +1167,30 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
     engine.drawRectangle(barX + 3, barY + 3, manaWidth, barHeight - 6, SKYBLUE);
 
     plfi.mana_width = manaWidth;
+}
+
+void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
+{
+    auto& txti = em.getSingleton<TextInfo>();
+    auto& textQueue = txti.getTextQueue();
+
+    float boxWidth = 600;
+    float boxHeight = 100;
+
+    float posX = static_cast<float>(engine.getScreenWidth() / 2) - boxWidth / 2;
+    float posY = static_cast<float>(engine.getScreenHeight() / 1.25) - boxHeight / 2;
+
+    auto str = textQueue.front();
+    auto text = const_cast<char*>(str.c_str());
+
+    // Dibujamos el cuadro de diálogo con RayGui
+    engine.drawRectangle(static_cast<int>(posX), static_cast<int>(posY), static_cast<int>(boxWidth), static_cast<int>(boxHeight), WHITE);
+    GuiTextBox({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.size()), false);
+    // GuiTextBoxMulti({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.size()), false);
+    auto& inpi = em.getSingleton<InputInfo>();
+    if (inpi.interact)
+    {
+        txti.popText();
+        inpi.interact = false;
+    }
 }

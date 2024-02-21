@@ -73,6 +73,9 @@ struct LevelInfo
   SoundSystem* sound_system{ nullptr };
   bool gameShouldEnd{ false };
 
+  // Tutorial
+  std::vector<std::size_t> tutorialEnemies{};
+
   // Estado del juego
   GameScreen currentScreen = GameScreen::GAMEPLAY;
 
@@ -95,5 +98,4 @@ struct LevelInfo
     sound_system = nullptr;
     gameShouldEnd = false;
   }
-
 };

@@ -24,21 +24,20 @@ void Game::createEntities(EntityManager& em)
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
         plfi.spawnPoint = { -33.0, 5.5, 30.9 };
-    else
-        std::cout << "aja\n";
+    //-9.0, 4.0, -50.0
+    //26.0, 4.0, -65.0
+    //-32.0   4.0  -107.0
 
-
-    // Player
+// Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);// -2 -12 63 -71
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, });
 
     auto& lis = em.addComponent<ListenerComponent>(e, ListenerComponent{});
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e, AttackComponent{});
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
@@ -65,6 +64,18 @@ void Game::createSound(EntityManager&) {
 
 void Game::run()
 {
+
+    Shader shader = LoadShader(TextFormat("assets/shaders/lighting.vs", 330),
+        TextFormat("assets/shaders/lighting.fs", 330));
+
+    // Get some required shader locations
+    shader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(shader, "viewPos");
+
+    // Ambient light level (some basic lighting)
+    int ambientLoc = GetShaderLocation(shader, "ambient");
+    float ambientValue[4] = { 3.1f, 3.1f, 3.1f, 20.0f };
+    SetShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
+
     engine.setTargetFPS(30);
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
@@ -90,6 +101,7 @@ void Game::run()
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
+    auto& txti = em.getSingleton<TextInfo>();
 
     // Inicializa una variable donde tener el tiempo entre frames
     float deltaTime{}, currentTime{};
@@ -167,12 +179,12 @@ void Game::run()
             input_system.update(em);
 
             // seleccionar modo de debug ( physics o AI)
-            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory))
+            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText()))
             {
                 ai_system.update(em, deltaTime);
                 physics_system.update(em, deltaTime);
                 collision_system.update(em);
-                zone_system.update(em, engine, iam, evm, map,deltaTime);
+                zone_system.update(em, engine, iam, evm, map, deltaTime);
                 lock_system.update(em);
                 shield_system.update(em);
                 object_system.update(em, deltaTime);
@@ -189,10 +201,10 @@ void Game::run()
                     li.dead_entities.clear();
                 }
 
-                render_system.update(em, engine, deltaTime);
+                render_system.update(em, engine, deltaTime, shader);
             }
-            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory))
-                render_system.update(em, engine, deltaTime);
+            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText()))
+                render_system.update(em, engine, deltaTime, shader);
 
             break;
         }
@@ -225,6 +237,7 @@ void Game::run()
     render_system.unloadModels(em, engine);
 
     engine.closeWindow();
+    UnloadShader(shader);
 }
 
 void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)

@@ -129,22 +129,42 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     case 4:
     {
         checkChests(em, evm, li.num_zone);
-        checkDoors(em, evm);
+        // checkDoors(em, evm);
+        checkTutorialEnemies(em);
         break;
     }
     case 5:
     {
-        checkDoors(em, evm);
+        // checkDoors(em, evm);
+        checkTutorialEnemies(em);
+
         break;
     }
     case 6:
     {
-        checkSpawns(em, evm);
+        // checkSpawns(em, evm);
+        checkTutorialEnemies(em);
+
+        break;
+    }
+    case 7:
+    {
+        checkTutorialEnemies(em);
+        break;
+    }
+    case 8:
+    {
+        checkDoors(em, evm);
+        break;
+    }
+    case 9:
+    {
+        checkDoors(em, evm);
         break;
     }
     case 10:
     {
-        checkDungeonSlimes(em, evm);
+        checkChests(em, evm, li.num_zone);
         break;
     }
     case 11:
@@ -235,6 +255,7 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone
                 li.chestToOpen = e.getID();
                 evm.scheduleEvent(Event{ EventCodes::OpenChest });
                 li.dontLoad.insert(pair);
+                inpi.interact = false;
             }
 
         }
@@ -244,10 +265,10 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone
 void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
 {
     auto& li = em.getSingleton<LevelInfo>();
-    using noCMP = MP::TypeList<InteractiveComponent, PhysicsComponent>;
+    using CMPs = MP::TypeList<InteractiveComponent, PhysicsComponent>;
     using spawnTag = MP::TypeList<SpawnTag>;
 
-    em.forEach<noCMP, spawnTag>([&](Entity&, InteractiveComponent& ic, PhysicsComponent& phy)
+    em.forEach<CMPs, spawnTag>([&](Entity&, InteractiveComponent& ic, PhysicsComponent& phy)
     {
         auto& playerEnt = *em.getEntityByID(li.playerID);
         auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
@@ -273,10 +294,10 @@ void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
 void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
 {
     auto& li = em.getSingleton<LevelInfo>();
-    using noCMP = MP::TypeList<InteractiveComponent, PhysicsComponent>;
+    using CMPs = MP::TypeList<InteractiveComponent, PhysicsComponent>;
     using doorTag = MP::TypeList<DoorTag>;
 
-    em.forEach<noCMP, doorTag>([&](Entity& e, InteractiveComponent& ic, PhysicsComponent& phy)
+    em.forEach<CMPs, doorTag>([&](Entity& e, InteractiveComponent& ic, PhysicsComponent& phy)
     {
         auto& playerEnt = *em.getEntityByID(li.playerID);
         auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
@@ -299,5 +320,24 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
             evm.scheduleEvent(Event{ EventCodes::OpenDoor });
         }
     });
+}
 
+void ZoneSystem::checkTutorialEnemies(EntityManager& em)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& playerPos = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
+    using noCMP = MP::TypeList<>;
+    using enemyTag = MP::TypeList<EnemyTag>;
+    li.tutorialEnemies.clear();
+
+    em.forEach<noCMP, enemyTag>([&](Entity& e)
+    {
+        auto& phy = em.getComponent<PhysicsComponent>(e);
+        double distance = playerPos.distance(phy.position);
+
+        if (distance < 15.0)
+        {
+            li.tutorialEnemies.push_back(e.getID());
+        }
+    });
 }

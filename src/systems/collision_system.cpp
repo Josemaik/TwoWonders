@@ -116,20 +116,62 @@ void CollisionSystem::checkRampCollision(EntityManager& em, std::vector<Entity*>
             auto& max = ramp.max;
             auto& offSet = ramp.offset;
 
-            if (pos.x() >= ramp.min.x && pos.x() <= max.x && pos.z() >= min.y && pos.z() <= max.y)
+            if (pos.x() >= min.x && pos.x() <= max.x && pos.z() >= min.y && pos.z() <= max.y)
             {
-                auto& ren = em.getComponent<RenderComponent>(*e);
                 auto& phy = em.getComponent<PhysicsComponent>(*e);
 
-                double baseHeight = ren.scale.y() / 2 - 0.5;
-                double newHeight = baseHeight + ramp.slope;
+                // baseheight provisionalmente a 0
+                double baseHeight = 0.0;
+                double newHeight;
 
-                // Deltas para calcular la altura
-                if (offSet.x == 0.0)
-                    newHeight *= (pos.z() + offSet.y);
-                else
-                    newHeight *= (pos.x() + offSet.x);
+                switch (ramp.type)
+                {
+                case RampType::Normal:
+                {
+                    // Calculamos la nueva altura dependiendo del slope
+                    newHeight = baseHeight + ramp.slope;
 
+                    // Utilizamos el offset para saber la dirección de la rampa,
+                    // si el offset en x es 0, la nueva altura se multiplica por la posición en z
+                    // 
+                    // Queremos que el offset siempre sea el contrario del punto donde empieza la rampa.
+                    // Por ejemplo, si la rampa te mueve hacia arriba por desde un 9x a un 14x,
+                    // el offset será -9x y el slope será positivo.
+                    // Si queremos invertir la rampa, el offset será -14x y el slope será negativo.
+                    if (offSet.x() == 0.0)
+                        newHeight *= (pos.z() + offSet.z());
+                    else
+                        newHeight *= (pos.x() + offSet.x());
+
+                    break;
+                }
+                case RampType::Triangular:
+                {
+                    // El punto objetivo se encuentra en offset.x, offset.z
+                    vec2d targetPoint = { offSet.x(), offSet.z() };
+
+                    // Calcula la distancia al punto objetivo
+                    double distanceToTarget = sqrt(pow(pos.x() - targetPoint.x, 2) + pow(pos.z() - targetPoint.y, 2));
+
+                    // Episilon para evitar divisiones por debajo de cierto valor
+                    double ep = 3;
+                    if (distanceToTarget < ep)
+                        distanceToTarget = ep;
+
+                    // Calcula la nueva altura basándose en la distancia al punto objetivo
+                    newHeight = baseHeight + (ramp.slope / distanceToTarget);
+
+                    break;
+                }
+                default:
+                    break;
+                }
+
+                // Nos aseguramos de que la nueva altura no sea menor que baseHeight
+                newHeight = std::max(newHeight, baseHeight);
+                newHeight += offSet.y();
+
+                // Ajustamos la posición en y con la nueva altura
                 phy.position.setY(newHeight);
                 break;
             }
@@ -308,7 +350,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Colisiones con el suelo
     if (staticEntPtr->hasTag<GroundTag>())
     {
-        groundCollision(*otherPhy, em.getComponent<RenderComponent>(*otherEntPtr).scale, minOverlap);
+        groundCollision(*otherPhy, otherPhy->scale, minOverlap);
         return;
     }
 
@@ -345,12 +387,11 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
-    //Si impacta enemigo con pared
+    // Si impacta enemigo con pared
     if (behaviorType2 & BehaviorType::ENEMY)
     {
         if (staticEntPtr->hasTag<WaterTag>())
         {
-            //groundCollision(*otherPhy, em.getComponent<RenderComponent>(*otherEntPtr).scale, minOverlap);
             staticCollision(*otherPhy, *staticPhy, minOverlap);
             return;
         }
@@ -447,6 +488,13 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ENEMY)
     {
         classicCollision(*staticPhy, *otherPhy, minOverlap);
+
+        if (otherEntPtr->hasTag<NoDamageTag>() && !otherEntPtr->hasTag<SpiderTag>())
+        {
+            staticPhy->position -= 3 * vec3d{ staticPhy->velocity.x(), 0, staticPhy->velocity.z() };
+            staticPhy->stopped = true;
+            return;
+        }
         enemyCollision(em, *staticEntPtr);
         return;
     }

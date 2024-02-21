@@ -11,7 +11,9 @@ struct RenderSystem
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, GameEngine& engine, double dt);
+    RenderSystem() { init(); };
+
+    void update(EntityManager& em, GameEngine& engine, double dt, Shader& shader);
 
     void drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawLogoKaiwa(ENGI::GameEngine& engine);
@@ -26,6 +28,7 @@ struct RenderSystem
 
     // Funciones double dtprivadas para organizar el codigo
 private:
+    void init();
     void beginFrame(ENGI::GameEngine& engine);
     void endFrame(ENGI::GameEngine& engine, EntityManager& em, double dt);
     void drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy);
@@ -34,11 +37,16 @@ private:
     void drawCoinBar(ENGI::GameEngine& engine, EntityManager& em);
     void drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, const Entity& e);
     void drawManaBar(ENGI::GameEngine& engine, EntityManager& em);
+    void loadModels(Entity& e, ENGI::GameEngine& engine, RenderComponent& r);
+    void loadShaders(Model& model);
+    void drawTextBox(ENGI::GameEngine& engine, EntityManager& em);
 
     bool isSelected{ false };
     bool isSelectedfordebug{ false };
     std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
-    bool jaja{ false };
+    // bool chunk0Charged{ false };
+    // bool chunk1Charged{ false };
+    Shader* shaderPtr{ nullptr };
 };
 
 #endif // !RENDER_SYSTEM
