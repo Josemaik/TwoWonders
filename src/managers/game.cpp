@@ -73,7 +73,7 @@ void Game::run()
 
     // Ambient light level (some basic lighting)
     int ambientLoc = GetShaderLocation(shader, "ambient");
-    float ambientValue[4] = { 3.1f, 3.1f, 2.1f, 20.0f };
+    float ambientValue[4] = { 3.1f, 3.1f, 3.1f, 20.0f };
     SetShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
 
     engine.setTargetFPS(30);
@@ -101,6 +101,7 @@ void Game::run()
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
+    auto& txti = em.getSingleton<TextInfo>();
 
     // Inicializa una variable donde tener el tiempo entre frames
     float deltaTime{}, currentTime{};
@@ -178,7 +179,7 @@ void Game::run()
             input_system.update(em);
 
             // seleccionar modo de debug ( physics o AI)
-            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory))
+            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText()))
             {
                 ai_system.update(em, deltaTime);
                 physics_system.update(em, deltaTime);
@@ -202,7 +203,7 @@ void Game::run()
 
                 render_system.update(em, engine, deltaTime, shader);
             }
-            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory))
+            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText()))
                 render_system.update(em, engine, deltaTime, shader);
 
             break;

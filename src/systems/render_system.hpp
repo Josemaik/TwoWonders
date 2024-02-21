@@ -11,6 +11,8 @@ struct RenderSystem
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
 
+    RenderSystem() { init(); };
+
     void update(EntityManager& em, GameEngine& engine, double dt, Shader& shader);
 
     void drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss);
@@ -26,6 +28,7 @@ struct RenderSystem
 
     // Funciones double dtprivadas para organizar el codigo
 private:
+    void init();
     void beginFrame(ENGI::GameEngine& engine);
     void endFrame(ENGI::GameEngine& engine, EntityManager& em, double dt);
     void drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy);
@@ -36,6 +39,7 @@ private:
     void drawManaBar(ENGI::GameEngine& engine, EntityManager& em);
     void loadModels(Entity& e, ENGI::GameEngine& engine, RenderComponent& r);
     void loadShaders(Model& model);
+    void drawTextBox(ENGI::GameEngine& engine, EntityManager& em);
 
     bool isSelected{ false };
     bool isSelectedfordebug{ false };
