@@ -448,7 +448,7 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
 
         if (otherEntPtr->hasTag<NoDamageTag>() && !otherEntPtr->hasTag<SpiderTag>())
         {
-            staticPhy->position -= 3 * staticPhy->velocity;
+            staticPhy->position -= 3 * vec3d{ staticPhy->velocity.x(), 0, staticPhy->velocity.z() };
             staticPhy->stopped = true;
             return;
         }

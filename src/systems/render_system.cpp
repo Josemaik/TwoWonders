@@ -207,7 +207,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 else if (e.hasTag<GolemTag>())
                 {
                     // scl = { 0.4, 0.4, 0.4 };
-                    pos.setY(pos.y() - 1.1);
+                    pos.setY(pos.y() - 4.0);
                     in = true;
                 }
                 else if (e.hasTag<BossFinalTag>())
@@ -227,6 +227,11 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 {
                     in = true;
                 }
+                else if (e.hasTag<GroundTag>())
+                {
+                    in = true;
+                }
+
 
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
                 engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
@@ -468,6 +473,7 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
 {
     float windowWidth = 330.0f;
     float windowHeight = 330.0f;
+    float augment = 55.f;
 
     Rectangle windowRect = {
         static_cast<float>(engine.getScreenWidth()) / 2.0f - windowWidth / 2.0f,
@@ -487,15 +493,14 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
     {
         Rectangle btnRec = { 300, posY, 200, 50 };
         GuiButton(btnRec, item.name.c_str());
-        posY += 50.f;
+        posY += augment;
     }
-
 
     if (plfi.hasKey)
     {
         Rectangle btnRec = { 300, posY, 200, 50 };
         GuiButton(btnRec, "Llave");
-        posY += 50.f;
+        posY += augment;
     }
 
     // bool neutral{ false }, water{ false }, fire{ false }, ice{ false };
