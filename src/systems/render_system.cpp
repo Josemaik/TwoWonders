@@ -505,70 +505,49 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
     DrawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
     DrawTextEx(GetFontDefault(), "INVENTARIO", Vector2{ windowRect.x + 50, windowRect.y + 30 }, 40, 1, BLACK);
 
-    // Boton de volver al inicio
     auto& plfi = em.getSingleton<PlayerInfo>();
-    float posY = 250.f;
+    Rectangle btn2Rec = { 300, 400, 200, 50 };
 
-    for (auto& item : plfi.inventory)
+    if (plfi.selectedItem == plfi.max)
     {
-        Rectangle btnRec = { 300, posY, 200, 50 };
-        GuiButton(btnRec, item.name.c_str());
-        posY += augment;
-    }
+        float posY = 250.f;
 
-    if (plfi.hasKey)
+        for (auto& item : plfi.inventory)
+        {
+            Rectangle btnRec = { 300, posY, 200, 50 };
+            if (GuiButton(btnRec, item.name.c_str()))
+                plfi.selectedItem = item.getID();
+            posY += augment;
+        }
+
+        // Botón de volver al juego
+        if (GuiButton(btn2Rec, "VOLVER"))
+        {
+            auto& inpi = em.getSingleton<InputInfo>();
+            inpi.inventory = false;
+        }
+    }
+    else
     {
-        Rectangle btnRec = { 300, posY, 200, 50 };
-        GuiButton(btnRec, "Llave");
-        posY += augment;
+        // Dibujamos la descripción del objeto seleccionado
+        auto& item = plfi.getItem(plfi.selectedItem);
+        auto text = const_cast<char*>(item.description.c_str());
+
+        GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_LEFT);
+
+        float descWidth = 300.f, descHeight = 150.f;
+        float posX = static_cast<float>(engine.getScreenWidth() / 2) - (descWidth / 2.0f);
+        float posY = static_cast<float>(engine.getScreenHeight() / 2) - (descHeight / 2.0f);
+        GuiTextBox({ posX, posY, descWidth, descHeight }, text, static_cast<int>(item.description.size()), false);
+        auto& plfi = em.getSingleton<PlayerInfo>();
+
+        // Boton de volver al inventario
+        if (GuiButton(btn2Rec, "VOLVER"))
+        {
+            plfi.selectedItem = plfi.max;
+            GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+        }
     }
-
-    // bool neutral{ false }, water{ false }, fire{ false }, ice{ false };
-    // for (uint8_t i = 0; i < plfi.types.size(); i++)
-    // {
-    //     std::cout << "Fire: " << fire << std::endl;
-    //     if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Neutral && !neutral)
-    //     {
-    //         Rectangle btnRec = { 300, posY, 200, 50 };
-    //         GuiButton(btnRec, "Bastón de hechicero");
-    //         neutral = true;
-    //         posY += 50.f;
-    //     }
-
-    //     else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Water && !water)
-    //     {
-    //         Rectangle btnRec = { 300, posY, 200, 50 };
-    //         GuiButton(btnRec, "Chorro de agua");
-    //         water = true;
-    //         posY += 50.f;
-    //     }
-
-    //     else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Fire && !fire)
-    //     {
-    //         std::cout << "FIRE\n";
-    //         Rectangle btnRec = { 300, posY, 200, 50 };
-    //         GuiButton(btnRec, "Bola de fuego");
-    //         fire = true;
-    //         posY += 50.f;
-    //     }
-
-    //     else if (static_cast<ElementalType>(plfi.types[i]) == ElementalType::Ice && !ice)
-    //     {
-    //         Rectangle btnRec = { 300, posY, 200, 50 };
-    //         GuiButton(btnRec, "Rayo de hielo");
-    //         ice = true;
-    //         posY += 50.f;
-    //     }
-    // }
-
-
-    // if (GuiButton(btn1Rec, "CONTINUAR")) {
-    //     li.currentScreen = GameScreen::GAMEPLAY;
-    // }
-
-    // if (GuiButton(btn2Rec, "VOLVER AL INICIO")) {
-    //     li.currentScreen = GameScreen::TITLE;
-    // }
 }
 
 //Debugger visual in-game
@@ -1180,13 +1159,13 @@ void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
     float posX = static_cast<float>(engine.getScreenWidth() / 2) - boxWidth / 2;
     float posY = static_cast<float>(engine.getScreenHeight() / 1.25) - boxHeight / 2;
 
-    auto str = textQueue.front();
+    auto& str = textQueue.front();
     auto text = const_cast<char*>(str.c_str());
 
     // Dibujamos el cuadro de diálogo con RayGui
     engine.drawRectangle(static_cast<int>(posX), static_cast<int>(posY), static_cast<int>(boxWidth), static_cast<int>(boxHeight), WHITE);
     GuiTextBox({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.size()), false);
-    // GuiTextBoxMulti({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.size()), false);
+
     auto& inpi = em.getSingleton<InputInfo>();
     if (inpi.interact)
     {
