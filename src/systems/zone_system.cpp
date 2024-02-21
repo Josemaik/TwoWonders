@@ -129,20 +129,20 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     case 4:
     {
         checkChests(em, evm, li.num_zone);
-        checkDoors(em, evm);
+        // checkDoors(em, evm);
         checkTutorialEnemies(em);
         break;
     }
     case 5:
     {
-        checkDoors(em, evm);
+        // checkDoors(em, evm);
         checkTutorialEnemies(em);
 
         break;
     }
     case 6:
     {
-        checkSpawns(em, evm);
+        // checkSpawns(em, evm);
         checkTutorialEnemies(em);
 
         break;
@@ -255,6 +255,7 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone
                 li.chestToOpen = e.getID();
                 evm.scheduleEvent(Event{ EventCodes::OpenChest });
                 li.dontLoad.insert(pair);
+                inpi.interact = false;
             }
 
         }

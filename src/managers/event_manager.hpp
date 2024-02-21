@@ -62,11 +62,13 @@ public:
                     case EventCodes::OpenChest:
                     {
                         auto& li = em.getSingleton<LevelInfo>();
+                        auto& txti = em.getSingleton<TextInfo>();
                         auto& playerPos = em.getComponent<PhysicsComponent>(e).position;
                         auto& chest = *em.getEntityByID(li.chestToOpen);
                         auto& chestComp = em.getComponent<ChestComponent>(chest);
 
                         os.addObject(chestComp.content, playerPos);
+                        txti.addText(chestComp.message);
                         li.chestToOpen = li.max;
                         break;
                     }

@@ -123,7 +123,8 @@
 							"zone": 0,
 							"content": 19,
 							"id": 0,
-							"visible": false
+							"visible": false,
+							"message": "¡Encontraste un bastón mágico!"
 						}
 					]
 				}
@@ -372,7 +373,8 @@
 							"zone": 4,
 							"content": 6,
 							"id": 1,
-							"visible": false
+							"visible": false,
+							"message": "¡Encontraste unas monedas!"
 						}
 					]
 				}
@@ -665,7 +667,8 @@
 							"zone": 10,
 							"content": 10,
 							"id": 3,
-							"visible": false
+							"visible": false,
+							"message": "¡Encontraste una llave!"
 						},
 						{
 							"position":[99.554, 140.935, 7.0],

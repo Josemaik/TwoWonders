@@ -36,6 +36,7 @@ private:
     void drawManaBar(ENGI::GameEngine& engine, EntityManager& em);
     void loadModels(Entity& e, ENGI::GameEngine& engine, RenderComponent& r);
     void loadShaders(Model& model);
+    void drawTextBox(ENGI::GameEngine& engine, EntityManager& em);
 
     bool isSelected{ false };
     bool isSelectedfordebug{ false };

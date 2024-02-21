@@ -322,9 +322,10 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
             ObjectType content{ static_cast<ObjectType>(interactable["content"].GetInt()) };
             uint8_t interId = static_cast<uint8_t>(interactable["id"].GetUint());
             bool visible = interactable["visible"].GetBool();
+            std::string message = interactable["message"].GetString();
 
             r.visible = visible;
-            em.addComponent<ChestComponent>(entity, ChestComponent{ .id = interId, .zone = zone, .dropPosition = { vec3d::zero() }, .content = content });
+            em.addComponent<ChestComponent>(entity, ChestComponent{ .id = interId, .zone = zone, .dropPosition = { vec3d::zero() }, .content = content, .message = message });
             break;
         }
         case InteractableType::Spawn:
