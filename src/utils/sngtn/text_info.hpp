@@ -16,7 +16,8 @@ struct TextInfo
 
     void popText()
     {
-        textQueue.pop();
+        if (hasText())
+            textQueue.pop();
     }
 
     const std::queue<std::string>& getTextQueue() const

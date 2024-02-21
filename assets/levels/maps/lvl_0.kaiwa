@@ -124,7 +124,11 @@
 							"content": 19,
 							"id": 0,
 							"visible": false,
-							"message": "¡Encontraste un bastón mágico!"
+							"message": [
+								"¡Encontraste un bastón mágico!", 
+								"Pero no conoces ningún hechizo...",
+								"...aún así podría servir como palo azotador."
+							]
 						}
 					]
 				}
@@ -374,7 +378,7 @@
 							"content": 6,
 							"id": 1,
 							"visible": false,
-							"message": "¡Encontraste unas monedas!"
+							"message": ["¡Encontraste 30 destellos!"]
 						}
 					]
 				}
@@ -668,7 +672,7 @@
 							"content": 10,
 							"id": 3,
 							"visible": false,
-							"message": "¡Encontraste una llave!"
+							"message": ["¡Encontraste una llave!", "Parece que es de un solo uso..."]
 						},
 						{
 							"position":[99.554, 140.935, 7.0],
