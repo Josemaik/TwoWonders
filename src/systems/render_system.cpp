@@ -388,8 +388,12 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
+    auto& txti = em.getSingleton<TextInfo>();
 
     drawHUD(em, engine, inpi.debugPhy);
+
+    if (txti.hasText())
+        drawTextBox(engine, em);
 
     if (inpi.pause && li.sound_system != nullptr)
         drawPauseMenu(engine, em, *li.sound_system);
@@ -1147,4 +1151,32 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
     engine.drawRectangle(barX + 3, barY + 3, manaWidth, barHeight - 6, SKYBLUE);
 
     plfi.mana_width = manaWidth;
+}
+
+void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
+{
+    auto& txti = em.getSingleton<TextInfo>();
+    auto& textQueue = txti.getTextQueue();
+
+    float boxWidth = 400;
+    float boxHeight = 100;
+
+    float posX = static_cast<float>(engine.getScreenWidth() / 2) - boxWidth / 2;
+    float posY = static_cast<float>(engine.getScreenHeight() / 1.25) - boxHeight / 2;
+
+    auto str = textQueue.front();
+    auto text = const_cast<char*>(str.c_str());
+
+    // Dibujamos con RayGui
+    GuiTextBox({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.size()), false);
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
+    GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+    GuiSetStyle(TEXTBOX, BACKGROUND_COLOR, 0xAA5588AA);
+
+    auto& inpi = em.getSingleton<InputInfo>();
+    if (inpi.interact)
+    {
+        inpi.interact = false;
+        txti.popText();
+    }
 }

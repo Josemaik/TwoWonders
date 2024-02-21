@@ -9,4 +9,5 @@ struct ChestComponent
 
     vec3d dropPosition{};
     ObjectType content{ ObjectType::None };
+    std::string message{};
 };

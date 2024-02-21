@@ -98,5 +98,4 @@ struct LevelInfo
     sound_system = nullptr;
     gameShouldEnd = false;
   }
-
 };
