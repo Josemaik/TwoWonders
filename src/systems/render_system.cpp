@@ -244,15 +244,10 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     pos.setY(pos.y() - 1.1);
                     in = true;
                 }
-                else if (e.hasTag<DestructibleTag>())
+                else if (e.hasTag<DestructibleTag>() || e.hasTag<GroundTag>() || e.hasTag<DoorTag>())
                 {
                     in = true;
                 }
-                else if (e.hasTag<GroundTag>())
-                {
-                    in = true;
-                }
-
 
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
                 engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
