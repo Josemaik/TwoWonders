@@ -6,5 +6,5 @@ struct RampComponent
     vec2d min{};
     vec2d max{};
     double slope{};
-    vec2d offset{};
+    vec3d offset{};
 };

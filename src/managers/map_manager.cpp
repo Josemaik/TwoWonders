@@ -197,12 +197,12 @@ void MapManager::generateRamps(EntityManager& em, const rapidjson::Value& rampAr
         vec3d position{ ramp["position"][0].GetDouble(), ramp["position"][2].GetDouble(), ramp["position"][1].GetDouble() };
         vec3d scale{ ramp["scale"][0].GetDouble(), ramp["scale"][2].GetDouble(), ramp["scale"][1].GetDouble() };
         Color color{ BEIGE };
-        float orientation{ ramp["rotVector"].GetFloat() };
+        float orientation{ ramp["rotation"].GetFloat() };
         vec3d rotationVec{ ramp["rotVector"][0].GetDouble(), ramp["rotVector"][2].GetDouble(), ramp["rotVector"][1].GetDouble() };
         vec2d min{ ramp["min"][0].GetDouble(), ramp["min"][1].GetDouble() };
         vec2d max{ ramp["max"][0].GetDouble(), ramp["max"][1].GetDouble() };
         double slope{ ramp["slope"].GetDouble() };
-        vec2d offset{ ramp["offset"][0].GetDouble(), ramp["offset"][1].GetDouble() };
+        vec3d offset{ ramp["offset"][0].GetDouble(), ramp["offset"][1].GetDouble(), ramp["offset"][2].GetDouble() };
 
         // Creamos los componentes
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
