@@ -116,56 +116,62 @@ void CollisionSystem::checkRampCollision(EntityManager& em, std::vector<Entity*>
             auto& max = ramp.max;
             auto& offSet = ramp.offset;
 
-            if (pos.x() >= ramp.min.x && pos.x() <= max.x && pos.z() >= min.y && pos.z() <= max.y)
+            if (pos.x() >= min.x && pos.x() <= max.x && pos.z() >= min.y && pos.z() <= max.y)
             {
                 auto& phy = em.getComponent<PhysicsComponent>(*e);
 
-                // // baseheight provisionalmente a 0
+                // baseheight provisionalmente a 0
                 double baseHeight = 0.0;
+                double newHeight;
 
-                // // Calculamos la nueva altura dependiendo del slope
-                // double newHeight = baseHeight + ramp.slope;
+                switch (ramp.type)
+                {
+                case RampType::Normal:
+                {
+                    // Calculamos la nueva altura dependiendo del slope
+                    newHeight = baseHeight + ramp.slope;
 
-                // // Utilizamos el offset para saber la dirección de la rampa,
-                // // si el offset en x es 0, la nueva altura se multiplica por la posición en z
-                // // 
-                // // Queremos que el offset siempre sea el contrario del punto donde empieza la rampa.
-                // // Por ejemplo, si la rampa te mueve hacia arriba por desde un 9x a un 14x,
-                // // el offset será -9x y el slope será positivo.
-                // // Si queremos invertir la rampa, el offset será -14x y el slope será negativo.
-                // // if (offSet.x() == 0.0)
-                // //     newHeight *= (pos.z() + offSet.z());
-                // // else
-                // //     newHeight *= (pos.x() + offSet.x());
+                    // Utilizamos el offset para saber la dirección de la rampa,
+                    // si el offset en x es 0, la nueva altura se multiplica por la posición en z
+                    // 
+                    // Queremos que el offset siempre sea el contrario del punto donde empieza la rampa.
+                    // Por ejemplo, si la rampa te mueve hacia arriba por desde un 9x a un 14x,
+                    // el offset será -9x y el slope será positivo.
+                    // Si queremos invertir la rampa, el offset será -14x y el slope será negativo.
+                    if (offSet.x() == 0.0)
+                        newHeight *= (pos.z() + offSet.z());
+                    else
+                        newHeight *= (pos.x() + offSet.x());
 
-                // // Si queremos las rampas triangulares de godo, revisar algo como :
-                // newHeight *= ((pos.x() + offSet.x()) - (pos.z() + offSet.z()));
+                    break;
+                }
+                case RampType::Triangular:
+                {
+                    // El punto objetivo se encuentra en offset.x, offset.z
+                    vec2d targetPoint = { offSet.x(), offSet.z() };
 
-                // // Añadimos el offset en y
-                // newHeight += offSet.y();
-                // // std::cout << "newHeight: " << newHeight << std::endl;
-                // phy.position.setY(newHeight);
-                // Punto objetivo
-                vec3d targetPoint = { 3.0, 0.0, -22.0 }; // Asegúrate de ajustar la coordenada y según tus necesidades
+                    // Calcula la distancia al punto objetivo
+                    double distanceToTarget = sqrt(pow(pos.x() - targetPoint.x, 2) + pow(pos.z() - targetPoint.y, 2));
 
-                // Calcula la distancia al punto objetivo
-                double distanceToTarget = sqrt(pow(pos.x() - targetPoint.x(), 2) + pow(pos.z() - targetPoint.z(), 2));
+                    // Episilon para evitar divisiones por debajo de cierto valor
+                    double ep = 3;
+                    if (distanceToTarget < ep)
+                        distanceToTarget = ep;
 
-                // Calcula la nueva altura basándote en la distancia al punto objetivo
-                // Puedes ajustar el factor de escala (en este caso, ramp.slope) según tus necesidades
+                    // Calcula la nueva altura basándose en la distancia al punto objetivo
+                    newHeight = baseHeight + (ramp.slope / distanceToTarget);
 
-                // Episilon para evitar divisiones por 0
-                if (distanceToTarget < 3)
-                    distanceToTarget = 3;
+                    break;
+                }
+                default:
+                    break;
+                }
 
-                std::cout << "distanceToTarget: " << distanceToTarget << std::endl;
-                double newHeight = baseHeight + (ramp.slope / distanceToTarget);
-                std::cout << "newHeight1: " << newHeight << std::endl;
-                // Asegúrate de que la nueva altura no sea menor que baseHeight
+                // Nos aseguramos de que la nueva altura no sea menor que baseHeight
                 newHeight = std::max(newHeight, baseHeight);
                 newHeight += offSet.y();
-                std::cout << "newHeight2: " << newHeight << std::endl;
-                // Ajusta la posición y
+
+                // Ajustamos la posición en y con la nueva altura
                 phy.position.setY(newHeight);
                 break;
             }

@@ -203,11 +203,12 @@ void MapManager::generateRamps(EntityManager& em, const rapidjson::Value& rampAr
         vec2d max{ ramp["max"][0].GetDouble(), ramp["max"][1].GetDouble() };
         double slope{ ramp["slope"].GetDouble() };
         vec3d offset{ ramp["offset"][0].GetDouble(), ramp["offset"][1].GetDouble(), ramp["offset"][2].GetDouble() };
+        RampType type{ static_cast<RampType>(ramp["type"].GetUint()) };
 
         // Creamos los componentes
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
         em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = rotationVec });
-        em.addComponent<RampComponent>(entity, RampComponent{ .min = min, .max = max, .slope = slope, .offset = offset });
+        em.addComponent<RampComponent>(entity, RampComponent{ .min = min, .max = max, .slope = slope, .offset = offset, .type = type });
     }
 }
 
