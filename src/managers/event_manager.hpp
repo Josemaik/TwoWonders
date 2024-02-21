@@ -68,7 +68,13 @@ public:
                         auto& chestComp = em.getComponent<ChestComponent>(chest);
 
                         os.addObject(chestComp.content, playerPos);
-                        txti.addText(chestComp.message);
+                        auto& msgs = chestComp.messages;
+                        while (!msgs.empty())
+                        {
+                            txti.addText(msgs.front());
+                            msgs.pop();
+                        }
+
                         li.chestToOpen = li.max;
                         break;
                     }

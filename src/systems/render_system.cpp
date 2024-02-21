@@ -2,6 +2,27 @@
 #include <iomanip>
 #include "../../libs/raygui.h"
 
+void RenderSystem::init()
+{
+    // Tamaño de la fuente
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
+
+    // Alineamiento del texto
+    GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+
+    // Color de la fuente de texto
+    GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, 0x000000ff);
+
+    // Fondo de los botones
+    GuiSetStyle(DEFAULT, BASE_COLOR_NORMAL, 0xAA0099FF);
+
+    // Color de los bordes
+    GuiSetStyle(TEXTBOX, BORDER_COLOR_NORMAL, 0x000000FF);
+
+    // Hacemos que GuiDrawText() pueda tener más de una línea
+    GuiSetStyle(DEFAULT, TEXT_WRAP_MODE, 2);
+}
+
 void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt, Shader& shader)
 {
     shaderPtr = &shader;
@@ -1158,7 +1179,7 @@ void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
     auto& txti = em.getSingleton<TextInfo>();
     auto& textQueue = txti.getTextQueue();
 
-    float boxWidth = 400;
+    float boxWidth = 600;
     float boxHeight = 100;
 
     float posX = static_cast<float>(engine.getScreenWidth() / 2) - boxWidth / 2;
@@ -1167,16 +1188,14 @@ void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
     auto str = textQueue.front();
     auto text = const_cast<char*>(str.c_str());
 
-    // Dibujamos con RayGui
+    // Dibujamos el cuadro de diálogo con RayGui
+    engine.drawRectangle(static_cast<int>(posX), static_cast<int>(posY), static_cast<int>(boxWidth), static_cast<int>(boxHeight), WHITE);
     GuiTextBox({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.size()), false);
-    GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
-    GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
-    GuiSetStyle(TEXTBOX, BACKGROUND_COLOR, 0xAA5588AA);
-
+    // GuiTextBoxMulti({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.size()), false);
     auto& inpi = em.getSingleton<InputInfo>();
     if (inpi.interact)
     {
-        inpi.interact = false;
         txti.popText();
+        inpi.interact = false;
     }
 }
