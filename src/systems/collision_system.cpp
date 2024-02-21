@@ -120,15 +120,29 @@ void CollisionSystem::checkRampCollision(EntityManager& em, std::vector<Entity*>
             {
                 auto& phy = em.getComponent<PhysicsComponent>(*e);
 
-                double baseHeight = phy.scale.y() / 2 - 0.5;
+                // baseheight provisionalmente a 0
+                double baseHeight = 0.0;
+
+                // Calculamos la nueva altura dependiendo del slope
                 double newHeight = baseHeight + ramp.slope;
 
-                // Deltas para calcular la altura
-                if (offSet.x == 0.0)
-                    newHeight *= (pos.z() + offSet.y);
+                // Utilizamos el offset para saber la dirección de la rampa,
+                // si el offset en x es 0, la nueva altura se multiplica por la posición en z
+                // 
+                // Queremos que el offset siempre sea el contrario del punto donde empieza la rampa.
+                // Por ejemplo, si la rampa te mueve hacia arriba por desde un 9x a un 14x,
+                // el offset será -9x y el slope será positivo.
+                if (offSet.x() == 0.0)
+                    newHeight *= (pos.z() + offSet.z());
                 else
-                    newHeight *= (pos.x() + offSet.x);
+                    newHeight *= (pos.x() + offSet.x());
 
+                // Si queremos las rampas triangulares de godo, revisar algo como:
+                // newHeight *= ((pos.x() + offSet.x()) - (pos.z() + offSet.z()));
+
+                // Añadimos el offset en y
+                newHeight += offSet.y();
+                // std::cout << "newHeight: " << newHeight << std::endl;
                 phy.position.setY(newHeight);
                 break;
             }
