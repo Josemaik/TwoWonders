@@ -48,4 +48,5 @@ public:
 
     // Auxiliars
     void printTransformationMatrix();
+    void drawTree(std::string prefix = "", bool isLeft = false);
 };

@@ -1,7 +1,11 @@
 #include "resource_mesh.hpp"
 
 bool Mesh::load(){ 
+
+    // index, vertex, texture
+
     //setupMesh();
+    
     if(isLoaded()){
         std::cout << "Load a mesh" << std::endl;
         return true; 
@@ -10,14 +14,6 @@ bool Mesh::load(){
         std::cout << "Error loading a mesh" << std::endl;
         return false;
     }
-}
-
-void Mesh::rellenar(std::vector<Vertex> vertices, std::vector<u_int16_t> indices, std::vector<Texture> textures){
-    this->vertex = vertices;
-    this->index = indices;
-    this->texture = textures;
-
-    setupMesh();
 }
 
 void Mesh::unload(){ 

@@ -77,7 +77,7 @@ private:
 
         // Load mesh in memory
         if(resultMesh.isLoaded())
-            resultMesh.setupMesh();
+            resultMesh.aux();
 
         return std::make_shared<Mesh>(resultMesh);
     };

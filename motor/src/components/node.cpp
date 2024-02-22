@@ -42,6 +42,8 @@ void Node::traverse(glm::mat4 parentMatrix) {
                 * glm::scale(glm::mat4(1.0f), m_scale);
     }
 
+    std::cout << "Node: " << this->name << std::endl;
+
     // Draw Entity
     if(m_entity)
         m_entity->draw(m_transformationMatrix);
@@ -104,4 +106,13 @@ void Node::printTransformationMatrix() {
         }
         std::cout << std::endl;
     }
+}
+
+void Node::drawTree(std::string prefix, bool isLeft) {
+    std::cout << prefix;
+    std::cout << (isLeft ? "├── " : "└── ");
+    std::cout << name << std::endl;
+    
+    for (size_t i = 0; i < m_children.size(); ++i)
+        m_children[i]->drawTree(prefix + (isLeft ? "│   " : "    "), i != m_children.size() - 1);
 }

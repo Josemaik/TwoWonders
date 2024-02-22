@@ -28,8 +28,6 @@ public:
 
     void draw();
 
-    void rellenar(std::vector<Vertex> vertices, std::vector<u_int16_t> indices, std::vector<Texture> textures);
-
 private:
     // Render data
     std::shared_ptr<GLuint> m_VAO; // Vertex Array Object
