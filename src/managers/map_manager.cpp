@@ -241,10 +241,6 @@ void MapManager::generateDestructibles(EntityManager& em, const rapidjson::Value
             modelPos = { destructible["groundPos"][0].GetDouble(), destructible["groundPos"][2].GetDouble(), -destructible["groundPos"][1].GetDouble() };
 
         r.position = modelPos;
-
-        // auto& modelEntity{ em.newEntity() };
-        // em.addTag<DestructibleTag>(modelEntity);
-        // em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = modelPos, .scale = scale, .color = color, .rotationVec = rotationVec });
     }
 }
 
@@ -323,8 +319,14 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
                 messages.emplace(interactable["message"][j].GetString());
             }
 
+
             r.visible = visible;
-            em.addComponent<ChestComponent>(entity, ChestComponent{ .id = interId, .zone = zone, .dropPosition = { vec3d::zero() }, .content = content, .messages = messages });
+            [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .id = interId, .zone = zone, .dropPosition = { vec3d::zero() }, .content = content, .messages = messages });
+            if (interactable.HasMember("viewpoint"))
+            {
+                vec3d viewPoint{ interactable["viewpoint"][0].GetDouble(), interactable["viewpoint"][2].GetDouble(), -interactable["viewpoint"][1].GetDouble() };
+                cc.viewPoint = viewPoint;
+            }
             break;
         }
         case InteractableType::Spawn:
