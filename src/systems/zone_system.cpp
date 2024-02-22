@@ -220,6 +220,8 @@ void ZoneSystem::checkDungeonSlimes(EntityManager& em, EventManager& evm)
 void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone)
 {
     auto& li = em.getSingleton<LevelInfo>();
+    if (li.playerDetected)
+        return;
     using chestCMP = MP::TypeList<ChestComponent, InteractiveComponent, PhysicsComponent>;
     using chestTag = MP::TypeList<ChestTag>;
 
@@ -257,7 +259,6 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone
                 li.dontLoad.insert(pair);
                 inpi.interact = false;
             }
-
         }
     });
 }
@@ -315,7 +316,6 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
         auto& plfi = em.getSingleton<PlayerInfo>();
         if (inpi.interact && ic.showButton && plfi.hasKey)
         {
-            std::cout << "Abriendo puerta\n";
             li.doorToOpen = e.getID();
             evm.scheduleEvent(Event{ EventCodes::OpenDoor });
         }

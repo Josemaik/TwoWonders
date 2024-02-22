@@ -76,6 +76,8 @@ public:
                         }
 
                         li.chestToOpen = li.max;
+                        if (chestComp.viewPoint != vec3d::zero())
+                            li.viewPoint = chestComp.viewPoint;
                         break;
                     }
                     case EventCodes::SetSpawn:
