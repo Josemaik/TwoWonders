@@ -1155,10 +1155,12 @@ void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
 
     float boxWidth = 600;
     float boxHeight = 100;
-
+    
+    // Centramos la posición del cuadro de texto
     float posX = static_cast<float>(engine.getScreenWidth() / 2) - boxWidth / 2;
     float posY = static_cast<float>(engine.getScreenHeight() / 1.25) - boxHeight / 2;
 
+    // Sacamos el texto en formatos para GuiTextBox
     auto& str = textQueue.front();
     auto text = const_cast<char*>(str.c_str());
 
