@@ -21,7 +21,7 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
             auto& phy = em.getComponent<RenderComponent>(playerEn);
             cameraPos = phy.position + cameraPosSum;
             cameraTar = phy.position;
-            cameraFovy = 70.f;
+            cameraFovy = cameraFovyNormal;
 
             if (li.playerDetected && li.lockedEnemy == li.max)
             {
