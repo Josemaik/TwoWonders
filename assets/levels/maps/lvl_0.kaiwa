@@ -117,7 +117,7 @@
 					"Destroyable":[],
 					"Interactive":[
 						{
-							"position":[-28.0, 31.0, 7.0],
+							"position":[-33.714, 43.494, 7.0],
 							"scale":[5.0, 5.0, 5.0],
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0],
