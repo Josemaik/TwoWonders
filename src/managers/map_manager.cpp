@@ -69,7 +69,6 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
     const rapidjson::Value& objectArray = underworld["Objects"];
     const rapidjson::Value& enemyArray = underworld["Enemies"];
 
-
     generateGround(em, groundArray, j);
 
     generateWalls(em, wallArray);
@@ -121,14 +120,12 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
 
         if (j >= 4)
         {
-            auto& modelEntity = em.newEntity();
-            em.addTag<GroundTag>(modelEntity);
-            em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = groundPos, .scale = groundScale, .color = color, .rotationVec = rotationVec });
-
+            em.addTag<SeparateModelTag>(groundEntity);
+            r.position = groundPos;
             if (j >= 8)
-                em.addTag<Chunk2Tag>(modelEntity);
+                em.addTag<Chunk2Tag>(groundEntity);
             else
-                em.addTag<Chunk1Tag>(modelEntity);
+                em.addTag<Chunk1Tag>(groundEntity);
         }
         else {
             em.addTag<Chunk0Tag>(groundEntity);
@@ -153,14 +150,11 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
 
             // Creamos los componentes de la zona
             em.addComponent<ZoneComponent>(zoneEntity, ZoneComponent{ .zone = static_cast<uint16_t>(j) });
-            auto& r = em.addComponent<RenderComponent>(zoneEntity, RenderComponent{ .position = zonePosition, .scale = zoneScale, .visible = false });
-            auto& p = em.addComponent<PhysicsComponent>(zoneEntity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0 });
-            em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ p.position, r.scale, BehaviorType::ZONE });
+            auto& rz = em.addComponent<RenderComponent>(zoneEntity, RenderComponent{ .position = zonePosition, .scale = zoneScale, .visible = false });
+            auto& pz = em.addComponent<PhysicsComponent>(zoneEntity, PhysicsComponent{ .position = rz.position, .velocity = vec3d::zero(), .scale = rz.scale, .gravity = .0 });
+            em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ pz.position, rz.scale, BehaviorType::ZONE });
             k += 1;
         }
-
-        if (j > 4)
-            em.destroyComponent<RenderComponent>(groundEntity);
     }
 }
 

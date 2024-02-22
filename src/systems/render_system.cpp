@@ -758,11 +758,12 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                         if (ene.hasComponent<RenderComponent>())
                         {
                             auto& ren{ em.getComponent<RenderComponent>(ene) };
-                            if (ren.visible && ene.hasTag<GolemTag>())
+                            auto& phy{ em.getComponent<PhysicsComponent>(ene) };
+                            if (ren.visible && (ene.hasTag<GolemTag>() || ene.hasTag<DestructibleTag>()))
                             {
                                 engine.drawText("ESPACIO",
-                                    static_cast<int>(engine.getWorldToScreenX(ren.position) - 25),
-                                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 9),
+                                    static_cast<int>(engine.getWorldToScreenX(phy.position) - 25),
+                                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 9),
                                     20,
                                     WHITE);
                             }
@@ -911,7 +912,6 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                     20,
                     color);
             }
-
         }
 
         if (debugphy && e.hasComponent<ZoneComponent>())
@@ -1155,7 +1155,7 @@ void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
 
     float boxWidth = 600;
     float boxHeight = 100;
-    
+
     // Centramos la posición del cuadro de texto
     float posX = static_cast<float>(engine.getScreenWidth() / 2) - boxWidth / 2;
     float posY = static_cast<float>(engine.getScreenHeight() / 1.25) - boxHeight / 2;

@@ -491,7 +491,7 @@
 							"scale": [11.5, 10.0, 3.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.4,
-							"life": 6,
+							"life": 4,
 							"type": 0,
 							"element": 1,
 							"arrival_radius": 2.0,
@@ -607,7 +607,7 @@
 				"overworld":{
 					"Ground":[
 						{
-							"position":[99.0, 99.0, 0.0],
+							"position":[99.0, 99.0, -0.1],
 							"scale":[99.0, 99.0, 4.0],
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0]
@@ -645,7 +645,7 @@
 							"rotVector":[0.0, 0.0, 0.0]
 						},
 						{
-							"position":[125.686, 145.69, 12.0],
+							"position":[125.686, 145.69, 7.0],
 							"scale":[45.628, 8.0, 0.0],
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0]
@@ -769,7 +769,7 @@
 							"type": 4,
 							"element": 1,
 							"arrival_radius": 2.0,
-							"detect_radius": 60.0,
+							"detect_radius": 35.0,
 							"attack_radius": 2.5,
 							"tx": 0.0,
 							"tz": 0.0,

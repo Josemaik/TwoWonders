@@ -327,10 +327,10 @@ void ZoneSystem::checkTutorialEnemies(EntityManager& em)
     auto& li = em.getSingleton<LevelInfo>();
     auto& playerPos = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
     using noCMP = MP::TypeList<>;
-    using enemyTag = MP::TypeList<EnemyTag>;
+    using enemyTag = MP::TypeList<EnemyTag, DestructibleTag>;
     li.tutorialEnemies.clear();
 
-    em.forEach<noCMP, enemyTag>([&](Entity& e)
+    em.forEachAny<noCMP, enemyTag>([&](Entity& e)
     {
         auto& phy = em.getComponent<PhysicsComponent>(e);
         double distance = playerPos.distance(phy.position);

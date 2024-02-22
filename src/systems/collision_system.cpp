@@ -326,12 +326,15 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (staticEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<WallTag>())
     {
         if (otherEntPtr->hasTag<WallTag>())
+        {
             std::swap(staticEntPtr, otherEntPtr);
+            std::swap(staticPhy, otherPhy);
+            std::swap(behaviorType1, behaviorType2);
+        }
 
         if (otherEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<DestructibleTag>())
             return;
     }
-
 
     // Nos aseguramos que el suelo siempre esté en staticEntPtr
     if (otherEntPtr->hasTag<GroundTag>() || otherEntPtr->hasTag<WaterTag>())
@@ -360,13 +363,6 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         em.getComponent<ObjectComponent>(*staticEntPtr).effect();
         return;
     }
-    // Si el objeto estático es una escalera
-    // if(staticEntPtr->hasTag<StairTag>() && otherEntPtr->hasTag<PlayerTag>()){
-    //     em.getComponent<PhysicsComponent>(*otherEntPtr).blockXZ = true;
-    //     em.getComponent<PhysicsComponent>(*otherEntPtr).gravity = 0.0;
-    //     return;
-    // }
-
 
     // Si cualquiera de los impactos es con una bala, se baja la vida del otro
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
