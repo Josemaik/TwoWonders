@@ -1,9 +1,13 @@
 #pragma once
 #include <cstdint>
 #include <array>
+#include <limits>
 #include "../Item.hpp"
 
-struct PlayerInfo {
+struct PlayerInfo
+{
+    static constexpr std::size_t max = std::numeric_limits<std::size_t>::max();
+
     uint16_t coins{}, bombs{}, max_bombs{ 8 };
     double max_mana{ 100.0 }, mana{ max_mana };
     int mana_width{};
@@ -12,6 +16,7 @@ struct PlayerInfo {
     std::vector<Item> inventory{};
     std::vector<Spell> spells{};
     Spells currentSpell{};
+    std::size_t selectedItem{ max };
     bool isDead{ false };
     vec3d spawnPoint{};
 
@@ -28,6 +33,13 @@ struct PlayerInfo {
         }
     }
     void addItem(Item item) { inventory.push_back(item); }
+
+    Item& getItem(const std::size_t& id)
+    {
+        auto it = std::find_if(inventory.begin(), inventory.end(), [id](const Item& item) { return item.getID() == id; });
+        return *it;
+    }
+
     void addCoin() { coins += 5; }
     void addKey() { hasKey = true; }
     void add30Coins() { coins += 30; }
