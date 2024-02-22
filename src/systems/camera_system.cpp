@@ -2,6 +2,7 @@
 
 void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
 {
+    // Constantes de los distintos estados de la cámara
     static constexpr vec3d cameraPosSum = { 66.f, 70.f, 66.f };
     static constexpr vec3d cameraPosDetected = { 68.f, 80.f, 62.f };
     static constexpr vec3d cameraPosLocked = { 56.f, 90.f, 56.f };
@@ -27,6 +28,7 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
             {
                 if (!li.enemyPositions.empty())
                 {
+                    // Calcular la posición media de los enemigos
                     double x{}, y{}, z{};
                     for (auto& e : li.enemyPositions)
                     {
@@ -38,7 +40,7 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
                     y /= static_cast<double>(li.enemyPositions.size());
                     z /= static_cast<double>(li.enemyPositions.size());
 
-                    // Calcular el punto que está a un tercio del camino entre la posición del jugador y la posición media de los enemigos
+                    // Calcular el punto que está a un cuarto del camino entre la posición del jugador y la posición media de los enemigos
                     vec3d enemyPos = { x, y, z };
                     vec3d oneFourthPoint = phy.position + (enemyPos - phy.position) / 4.0;
 
@@ -63,10 +65,12 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
     }
     else
     {
+        // Asignamos el punto de vista a la cámara para señalar ahí
         cameraPos = li.viewPoint + cameraPosSum;
         cameraTar = li.viewPoint;
         cameraFovy = cameraFovyCinematic;
 
+        // La cinematica se desactiva cuando pasan 4 segundos
         viewPointTime += dt;
         if (viewPointTime >= viewPointLimit)
         {
@@ -86,22 +90,20 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
             li.transition = false;
         }
         else
-        {
             t = 1.f;
-        }
     }
 
-    // Get current camera position, target and fovy
+    // Pillamos la posición actual de la cámara, el punto de vista y el fovy
     vec3d currentCameraPos = ge.getPositionCamera();
     vec3d currentCameraTarget = ge.getTargetCamera();
     float currentCameraFovy = ge.getFovyCamera();
 
-    // Interpolate between current and new camera position, target and fovy
+    // Interpolamos la posición, el punto de vista y el fovy
     vec3d newCameraPos = currentCameraPos + t * (cameraPos - currentCameraPos);
     vec3d newCameraTarget = currentCameraTarget + t * (cameraTar - currentCameraTarget);
     float newCameraFovy = currentCameraFovy + t * (cameraFovy - currentCameraFovy);
 
-    // Set new camera position, target and fovy
+    // Asignamos la nueva posición, el nuevo punto de vista y el nuevo fovy a la cámara
     ge.setPositionCamera(newCameraPos);
     ge.setTargetCamera(newCameraTarget);
     ge.setFovyCamera(newCameraFovy);
