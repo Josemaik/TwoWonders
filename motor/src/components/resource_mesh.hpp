@@ -12,7 +12,7 @@
 struct Vertex{
     glm::vec3 position;
     glm::vec3 normal;
-    glm::vec3 textCoords;
+    glm::vec2 textCoords;
 };
 
 struct Mesh : public Resource{
@@ -32,9 +32,9 @@ public:
 
 private:
     // Render data
-    std::shared_ptr<GLuint> m_VAO; // Vertex Array Object
-    std::shared_ptr<GLuint> m_VBO; // Vertex Buffer Object
-    std::shared_ptr<GLuint> m_EBO; // Element Buffer Object
+    GLuint m_VAO; // Vertex Array Object
+    GLuint m_VBO; // Vertex Buffer Object
+    GLuint m_EBO; // Element Buffer Object
 
     void setupMesh();
 };

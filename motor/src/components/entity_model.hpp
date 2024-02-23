@@ -13,6 +13,7 @@
 
 struct Model : Entity{
 private:
+    const char* m_name;
     std::vector<std::shared_ptr<Mesh>> m_meshes; 
     bool m_loaded { false };
 

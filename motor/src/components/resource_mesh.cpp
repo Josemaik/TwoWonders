@@ -9,47 +9,39 @@ Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<u_int16_t> 
 
 bool Mesh::load(){ 
 
-    //setupMesh();
+    setupMesh();
 
-    std::cout << "Load a mesh (ID: " << id <<")" << std::endl;
-    return true;
+    //isLoaded() ? std::cout << "Load a mesh (ID: " << id <<")" << std::endl : std::cout << "Error loading a mesh" << std::endl;
     
-    // if(isLoaded()){
-    //     std::cout << "Load a mesh" << std::endl;
-    //     return true; 
-    // }
-    // else{
-    //     std::cout << "Error loading a mesh" << std::endl;
-    //     return false;
-    // }
+    return isLoaded();
 }
 
 void Mesh::unload(){ 
-    //glDeleteBuffers(1, m_VBO.get());
-    //glDeleteBuffers(1, m_EBO.get());
-    //glDeleteVertexArrays(1, m_VAO.get());
-    std::cout << "Unload a mesh (ID: " << id <<")" << std::endl; 
+    glDeleteBuffers(1, &m_VBO);
+    glDeleteBuffers(1, &m_EBO);
+    glDeleteVertexArrays(1, &m_VAO);
+    // std::cout << "Unload a mesh (ID: " << id <<")" << std::endl; 
 }
 
 bool Mesh::isLoaded() const{ 
-    return m_VAO != nullptr && m_VBO != nullptr && m_EBO != nullptr;
+    return m_VAO != 0 && m_VBO != 0 && m_EBO != 0;
 }
 
 void Mesh::setupMesh(){
     // Generate vertex array and buffers
-    glGenVertexArrays(1, m_VAO.get());
-    glGenBuffers(1, m_VBO.get());
-    glGenBuffers(1, m_EBO.get());
+    glGenVertexArrays(1, &m_VAO);
+    glGenBuffers(1, &m_VBO);
+    glGenBuffers(1, &m_EBO);
 
     // Bind vertex array
-    glBindVertexArray(*m_VAO);
+    glBindVertexArray(m_VAO);
 
     // Bind buffer and fill with vertex data
-    glBindBuffer(GL_ARRAY_BUFFER, *m_VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &indices[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
     // Bind buffer and fill with index data
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(u_int16_t), &indices[0], GL_STATIC_DRAW);
 
     // Enable and specify vertex positions

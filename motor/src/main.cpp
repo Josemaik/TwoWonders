@@ -2,46 +2,65 @@
 #include "components/entity.hpp"
 #include "components/entity_model.hpp"
 #include "managers/resource_manager.hpp"
+#include "managers/windows_manager.hpp"
 
 #include <iostream>
 
 std::shared_ptr<Node> createSceneTree();
 std::shared_ptr<Model> loadModel(const char*, std::shared_ptr<Node>, ResourceManager& rm);
 
+GLFWwindow* initWindow();
+
 int main(){
 
     //----- Initialize managers -----//
+    WindowsManager wm;
     ResourceManager rm;
 
     //----- Create scene tree -----//
     auto nScene = createSceneTree();
 
-    //----- Load model -----// 
-    std::cout << "┌──────┐" << std::endl;
-    std::cout << "│ Load │" << std::endl;
-    std::cout << "└──────┘" << std::endl;
-    // USER //
-    // Model model = engine.loadModel("assets/main_character.obj");
-    auto filePath = "assets/main_character.obj";
-    auto eModel = loadModel(filePath, nScene, rm);
+    if(wm.initWindow(800, 600, "Salty Pixel")){
 
-    //----- View tree -----//
-    std::cout << "┌──────┐" << std::endl;
-    std::cout << "│ Tree │" << std::endl;
-    std::cout << "└──────┘" << std::endl;
-    nScene->drawTree();
+        //----- Load model -----// 
+        std::cout << "┌──────┐" << std::endl;
+        std::cout << "│ Load │" << std::endl;
+        std::cout << "└──────┘" << std::endl;
+        auto filePath = "assets/main_character.obj";
+        auto eModel = loadModel(filePath, nScene, rm);
 
+        //----- View tree -----//
+        std::cout << "┌──────┐" << std::endl;
+        std::cout << "│ Tree │" << std::endl;
+        std::cout << "└──────┘" << std::endl;
+        nScene->drawTree();
+
+        // Main loop
+        while(!wm.windowShouldClose()){
+            // Process input and render
+
+            glfwSwapBuffers(wm.window);
+            glfwPollEvents();
+        }
+
+        //----- Unload -----//
+        std::cout << "┌────────┐" << std::endl;
+        std::cout << "│ Unload │" << std::endl;
+        std::cout << "└────────┘" << std::endl;
+        eModel->unload(rm);
+
+        wm.closeWindow();
+    }
+
+    /*
     //----- Draw -----//
     std::cout << "┌──────┐" << std::endl;
     std::cout << "│ Draw │" << std::endl;
     std::cout << "└──────┘" << std::endl;
     nScene->traverse(glm::mat4());
+    */
 
-    //----- Unload -----//
-    std::cout << "┌────────┐" << std::endl;
-    std::cout << "│ Unload │" << std::endl;
-    std::cout << "└────────┘" << std::endl;
-    eModel->unload(rm);
+    return 0;
 }
 
 std::shared_ptr<Node> createSceneTree(){
