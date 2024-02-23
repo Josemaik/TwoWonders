@@ -126,7 +126,7 @@ void Game::run()
         case GameScreen::LOGO:
         {
             // Contador para que pasen X segundos
-            currentTime += deltaTime;
+            currentTime += timeStep;
             if (currentTime > 4.0f) {
                 li.currentScreen = GameScreen::TITLE;
                 currentTime = 0;
@@ -203,8 +203,8 @@ void Game::run()
                     projectile_system.update(em, timeStep);
                     life_system.update(em, object_system, timeStep);
                     sound_system.update();
-                    if (elapsed < timeStep)
-                        camera_system.update(em, engine, timeStep);
+                    // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
+                    camera_system.update(em, engine, timeStep);
                     event_system.update(em, evm, iam, map, object_system);
 
                     if (!li.dead_entities.empty())
@@ -213,10 +213,10 @@ void Game::run()
                         li.dead_entities.clear();
                     }
                 }
-                render_system.update(em, engine, deltaTime);
+                render_system.update(em, engine, timeStep);
             }
             else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText()))
-                render_system.update(em, engine, deltaTime);
+                render_system.update(em, engine, timeStep);
 
             break;
         }
@@ -239,6 +239,8 @@ void Game::run()
         default:
             break;
         }
+        if (elapsed >= timeStep)
+            elapsed = 0; // Para que no se acumule el tiempo
 
         if (engine.windowShouldClose())
             li.gameShouldEnd = true;
