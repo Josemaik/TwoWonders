@@ -18,9 +18,11 @@ struct Vertex{
 struct Mesh : public Resource{
 public:
     // Mesh data
-    std::vector<u_int16_t> index;
-    std::vector<Vertex> vertex;
-    std::vector<Texture> texture;
+    std::vector<Vertex> vertices;
+    std::vector<u_int16_t> indices;
+    std::vector<Texture> textures;
+
+    Mesh(std::size_t, std::vector<Vertex>, std::vector<u_int16_t>, std::vector<Texture>);
 
     bool load() override;
     void unload() override;

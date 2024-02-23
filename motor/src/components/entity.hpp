@@ -1,6 +1,6 @@
 #pragma once
 
-struct Entity : public std::enable_shared_from_this<Entity>{
+struct Entity{
     virtual void draw(glm::mat4) const {};
 };
 

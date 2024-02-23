@@ -2,7 +2,7 @@
 #include <iostream>
 
 struct Resource{
-    std::string name;
+    std::size_t id;
 
     virtual ~Resource() {};
     virtual bool load() = 0;

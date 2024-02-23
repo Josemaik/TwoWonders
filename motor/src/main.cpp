@@ -6,7 +6,7 @@
 #include <iostream>
 
 std::shared_ptr<Node> createSceneTree();
-std::shared_ptr<Model> loadModel(const char*, std::shared_ptr<Node>);
+std::shared_ptr<Model> loadModel(const char*, std::shared_ptr<Node>, ResourceManager& rm);
 
 int main(){
 
@@ -23,7 +23,7 @@ int main(){
     // USER //
     // Model model = engine.loadModel("assets/main_character.obj");
     auto filePath = "assets/main_character.obj";
-    auto eModel = loadModel(filePath, nScene);
+    auto eModel = loadModel(filePath, nScene, rm);
 
     //----- View tree -----//
     std::cout << "┌──────┐" << std::endl;
@@ -37,29 +37,11 @@ int main(){
     std::cout << "└──────┘" << std::endl;
     nScene->traverse(glm::mat4());
 
-    /*
-    for(int i=0; i<scene->mNumMeshes; i++){
-        auto nMesh = std::make_unique<Node>();
-        nMesh->name = "mesh_" + std::to_string(i);
-        nModel->addChild(nMesh.get());
-    }
-    */
-
-    
-    //processNode(scene->mRootNode, scene, rm);
-
-    /*
-    std::cout << scene->mNumMeshes << std::endl;
-
-    for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
-        aiMesh* mesh = scene->mMeshes[scene->mRootNode->mMeshes[i]];
-        // Process mesh
-        auto nMesh = std::make_unique<Node>();
-        nMesh->name = "mesh_" + std::to_string(i) + "_" + nModel->name;
-        std::cout << nMesh->name << std::endl;
-        nModel.get()->addChild(nMesh.get());
-    }
-    */
+    //----- Unload -----//
+    std::cout << "┌────────┐" << std::endl;
+    std::cout << "│ Unload │" << std::endl;
+    std::cout << "└────────┘" << std::endl;
+    eModel->unload(rm);
 }
 
 std::shared_ptr<Node> createSceneTree(){
@@ -84,11 +66,11 @@ std::shared_ptr<Node> createSceneTree(){
     return nScene;
 }
 
-std::shared_ptr<Model> loadModel(const char* filePath, std::shared_ptr<Node> nScene){
+std::shared_ptr<Model> loadModel(const char* filePath, std::shared_ptr<Node> nScene, ResourceManager& rm){
     auto nModel = std::make_unique<Node>();
     nModel->name = filePath;
     auto eModel = std::make_shared<Model>();
-    eModel->load(filePath);
+    eModel->load(filePath, rm);
     if(eModel->isLoaded()){
         nModel->setEntity(eModel);
         nScene->addChild(std::move(nModel));

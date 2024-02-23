@@ -1,26 +1,34 @@
 #include "resource_mesh.hpp"
 
+Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<u_int16_t> indices, std::vector<Texture> textures){
+    this->id = id;
+    this->vertices = vertices;
+    this->indices = indices;
+    this->textures = textures;
+}
+
 bool Mesh::load(){ 
 
-    // index, vertex, texture
-
     //setupMesh();
+
+    std::cout << "Load a mesh (ID: " << id <<")" << std::endl;
+    return true;
     
-    if(isLoaded()){
-        std::cout << "Load a mesh" << std::endl;
-        return true; 
-    }
-    else{
-        std::cout << "Error loading a mesh" << std::endl;
-        return false;
-    }
+    // if(isLoaded()){
+    //     std::cout << "Load a mesh" << std::endl;
+    //     return true; 
+    // }
+    // else{
+    //     std::cout << "Error loading a mesh" << std::endl;
+    //     return false;
+    // }
 }
 
 void Mesh::unload(){ 
-    glDeleteBuffers(1, m_VBO.get());
-    glDeleteBuffers(1, m_EBO.get());
-    glDeleteVertexArrays(1, m_VAO.get());
-    std::cout << "Unload a mesh" << std::endl; 
+    //glDeleteBuffers(1, m_VBO.get());
+    //glDeleteBuffers(1, m_EBO.get());
+    //glDeleteVertexArrays(1, m_VAO.get());
+    std::cout << "Unload a mesh (ID: " << id <<")" << std::endl; 
 }
 
 bool Mesh::isLoaded() const{ 
@@ -38,11 +46,11 @@ void Mesh::setupMesh(){
 
     // Bind buffer and fill with vertex data
     glBindBuffer(GL_ARRAY_BUFFER, *m_VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertex.size() * sizeof(Vertex), &index[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &indices[0], GL_STATIC_DRAW);
 
     // Bind buffer and fill with index data
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, index.size() * sizeof(u_int16_t), &index[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(u_int16_t), &indices[0], GL_STATIC_DRAW);
 
     // Enable and specify vertex positions
     glEnableVertexAttribArray(0);
@@ -59,6 +67,6 @@ void Mesh::setupMesh(){
 }
 
 void Mesh::draw(){ 
-    std::cout << "Draw a mesh" << std::endl; 
+    std::cout << "Draw a mesh (ID: " << id <<")" << std::endl; 
     /* OpenGL */ 
 }
