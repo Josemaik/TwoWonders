@@ -2,7 +2,12 @@
 
 #include <iostream>
 
+// Windows manager
+
 bool WindowsManager::initWindow(int width, int height, const char* title){
+    this->m_width = width;
+    this->m_height = height;
+
     if (!glfwInit()) {
         std::cerr << "Error initializing GLFW" << std::endl;
         return false;
@@ -12,14 +17,19 @@ bool WindowsManager::initWindow(int width, int height, const char* title){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(width, height, title, nullptr, nullptr);
-    if (!window) {
+    m_window = glfwCreateWindow(width, height, title, nullptr, nullptr);
+    if (!m_window) {
         std::cerr << "Error creating window" << std::endl;
         glfwTerminate();
         return false;
     }
 
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(m_window);
+
+    //if(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
+    //    std::cerr << "Error initilizing GLAD" std::endl;
+    //    return false;
+    //}
 
     if (glewInit() != GLEW_OK) {
         std::cerr << "Error initializing GLEW" << std::endl;
@@ -27,16 +37,55 @@ bool WindowsManager::initWindow(int width, int height, const char* title){
         return false;
     }
 
+    if (!glfwExtensionSupported("GL_ARB_vertex_array_object") || !GLEW_VERSION_3_3) {
+        std::cerr << "Error: OpenGL 3.3 and GL_ARB_vertex_array_object are required" << std::endl;
+        return false;
+    }
+
+    glViewport(0, 0, m_width, m_height);
+
+    std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
+
     return true;
 }
 
 void WindowsManager::closeWindow(){
-    if (window) {
-        glfwDestroyWindow(window);
+    if (m_window) {
+        glfwDestroyWindow(m_window);
         glfwTerminate();
     }
 }
 
 bool WindowsManager::windowShouldClose() const{
-    return window && glfwWindowShouldClose(window);
+    return m_window && glfwWindowShouldClose(m_window);
+}
+
+// Render manager
+
+void WindowsManager::beginDrawing(){
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0, m_width, 0, m_height, -1, 1);
+
+    // GLenum error = glGetError();
+    // if (error != GL_NO_ERROR) {
+    //     std::cerr << "Error OpenGL: " << gluErrorString(error) << std::endl;
+    // }
+}
+
+void WindowsManager::endDrawing(){
+    glfwSwapBuffers(m_window);
+    glfwPollEvents();
+}
+
+void WindowsManager::drawPixel(int x, int y, float red, float green, float blue){
+    glBegin(GL_POINTS);
+    glColor3f(red, green, blue);
+    glVertex2i(x, y);
+    glEnd();
+}
+
+void WindowsManager::clearBackground(float red, float green, float blue){
+    glClearColor(red, green, blue, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 }

@@ -9,8 +9,6 @@
 std::shared_ptr<Node> createSceneTree();
 std::shared_ptr<Model> loadModel(const char*, std::shared_ptr<Node>, ResourceManager& rm);
 
-GLFWwindow* initWindow();
-
 int main(){
 
     //----- Initialize managers -----//
@@ -21,7 +19,6 @@ int main(){
     auto nScene = createSceneTree();
 
     if(wm.initWindow(800, 600, "Salty Pixel")){
-
         //----- Load model -----// 
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Load │" << std::endl;
@@ -37,10 +34,12 @@ int main(){
 
         // Main loop
         while(!wm.windowShouldClose()){
-            // Process input and render
+            wm.beginDrawing();
 
-            glfwSwapBuffers(wm.window);
-            glfwPollEvents();
+            wm.clearBackground(1.0f, 1.0f, 1.0f);
+            // wm.drawPixel(400, 300, 256.0f, 256.0f, 256.0f);
+
+            wm.endDrawing();
         }
 
         //----- Unload -----//
