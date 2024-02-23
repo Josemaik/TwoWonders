@@ -13,6 +13,9 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
 
     auto& li = em.getSingleton<LevelInfo>();
 
+    // Velocidad de la transición
+    float t = 0.1f;
+
     if (li.viewPoint == vec3d::zero())
     {
         auto& playerEn = *em.getEntityByID(li.playerID);
@@ -77,10 +80,10 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
             viewPointTime = 0.f;
             li.viewPoint = vec3d::zero();
         }
+
+        t = 0.05f;
     }
 
-    // Velocidad de la transición
-    float t = 0.1f;
     if (li.transition)
     {
         transitionTime += dt;

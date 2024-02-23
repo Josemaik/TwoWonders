@@ -34,6 +34,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt
         ren.setPosition(phy.position);
         ren.setOrientation(phy.orientation);
         ren.setScale(phy.scale);
+        // ren.updateBBox();
     });
 
     // Empezamos el frame
@@ -566,7 +567,7 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
     // AQUI PONDRIA
     em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, ColliderComponent& col, RenderComponent& ren)
     {
-        RayCast ray = engine.getMouseRay(); ray = engine.getMouseRay();
+        RayCast ray = engine.getMouseRay();
         if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                 isSelectedfordebug = !isSelectedfordebug;
