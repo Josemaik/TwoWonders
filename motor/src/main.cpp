@@ -6,6 +6,7 @@
 #include <iostream>
 
 std::shared_ptr<Node> createSceneTree();
+std::shared_ptr<Model> loadModel(const char*, std::shared_ptr<Node>);
 
 int main(){
 
@@ -16,14 +17,25 @@ int main(){
     auto nScene = createSceneTree();
 
     //----- Load model -----// 
+    std::cout << "┌──────┐" << std::endl;
+    std::cout << "│ Load │" << std::endl;
+    std::cout << "└──────┘" << std::endl;
     // USER //
-    //Model model = engine.loadModel("assets/main_character.obj");
-    // Model model;
-    // model.load("assets/main_character.obj", nScene);
+    // Model model = engine.loadModel("assets/main_character.obj");
+    auto filePath = "assets/main_character.obj";
+    auto eModel = loadModel(filePath, nScene);
 
     //----- View tree -----//
-    std::cout << "Tree" << std::endl;
+    std::cout << "┌──────┐" << std::endl;
+    std::cout << "│ Tree │" << std::endl;
+    std::cout << "└──────┘" << std::endl;
     nScene->drawTree();
+
+    //----- Draw -----//
+    std::cout << "┌──────┐" << std::endl;
+    std::cout << "│ Draw │" << std::endl;
+    std::cout << "└──────┘" << std::endl;
+    nScene->traverse(glm::mat4());
 
     /*
     for(int i=0; i<scene->mNumMeshes; i++){
@@ -48,8 +60,6 @@ int main(){
         nModel.get()->addChild(nMesh.get());
     }
     */
-
-    //nScene->traverse(glm::mat4());
 }
 
 std::shared_ptr<Node> createSceneTree(){
@@ -72,4 +82,16 @@ std::shared_ptr<Node> createSceneTree(){
     nScene->addChild(std::move(nCamera));
 
     return nScene;
+}
+
+std::shared_ptr<Model> loadModel(const char* filePath, std::shared_ptr<Node> nScene){
+    auto nModel = std::make_unique<Node>();
+    nModel->name = filePath;
+    auto eModel = std::make_shared<Model>();
+    eModel->load(filePath);
+    if(eModel->isLoaded()){
+        nModel->setEntity(eModel);
+        nScene->addChild(std::move(nModel));
+    }
+    return eModel;
 }

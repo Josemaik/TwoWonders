@@ -34,9 +34,5 @@ private:
     std::shared_ptr<GLuint> m_VBO; // Vertex Buffer Object
     std::shared_ptr<GLuint> m_EBO; // Element Buffer Object
 
-    // GLuint m_VAO;
-    // GLuint m_VBO;
-    // GLuint m_EBO;
-
     void setupMesh();
 };
