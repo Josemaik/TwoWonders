@@ -4,11 +4,16 @@
 
 struct Conection
 {
+    Conection::Conection(){};
     /* data */
     //devuelve el coste que tiene esa conexión
-    // getCost(conection)
+    uint16_t getCost(Conection& conection);
     //devuelve el nodo del que sale esa conexion
-    //getfromnode(conection)
+    uint16_t getfromnode(Conection& conection);
     //devuelve el nodo al cuál llega esa conexión
-    //getToNode(conection)
+    uint16_t getToNode(Conection& conection);
+    private:
+        uint16_t cost{};
+        uint16_t fromNode{};
+        uint16_t toNode{};
 };
