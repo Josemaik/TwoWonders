@@ -23,9 +23,19 @@ void RenderSystem::init()
     GuiSetStyle(DEFAULT, TEXT_WRAP_MODE, 2);
 }
 
-void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt, Shader& shader)
+void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt)
 {
-    shaderPtr = &shader;
+    // if (dt != 0.0)
+    // {
+    //     if (elapsed >= elapsed_limit) {
+    //         elapsed = 0;
+    //     }
+    //     else {
+    //         elapsed += dt;
+    //         return;
+    //     }
+    // }
+
     // Actualizamos la posicion de render del componente de fisicas
     em.forEach<SYSCMPs, SYSTAGs>([](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
     {
@@ -816,7 +826,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             // Datos para la barra para la barra de vida
             int barWidth = 40;
             int barHeight = 4;
-            int barX = static_cast<int>(engine.getWorldToScreenX(r.position)) - 18;
+            int barX = static_cast<int>(engine.getWorldToScreenX(r.position) - 18);
             int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 15);
 
             engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
@@ -1174,5 +1184,7 @@ void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
     {
         txti.popText();
         inpi.interact = false;
+        if (textQueue.empty())
+            txti.waitTime = .8f;
     }
 }

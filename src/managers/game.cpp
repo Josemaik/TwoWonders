@@ -24,6 +24,8 @@ void Game::createEntities(EntityManager& em)
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
         plfi.spawnPoint = { -33.0, 5.5, 30.9 };
+    // -33.0, 5.5, 30.9 - Posición Incial
+    // 77.0, 5.5, -73.9 - Cofre con llave
     //-9.0, 4.0, -50.0
     //26.0, 4.0, -65.0
     //-32.0   4.0  -107.0
@@ -76,7 +78,9 @@ void Game::run()
     float ambientValue[4] = { 3.1f, 3.1f, 3.1f, 20.0f };
     SetShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
 
-    engine.setTargetFPS(30);
+    render_system.setShader(shader);
+
+    engine.setTargetFPS(120);
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     srand((unsigned int)time(NULL));
@@ -104,13 +108,16 @@ void Game::run()
     auto& txti = em.getSingleton<TextInfo>();
 
     // Inicializa una variable donde tener el tiempo entre frames
-    float deltaTime{}, currentTime{};
+    float deltaTime{}, currentTime{}, elapsed{};
+    const float timeStep = 1.0f / 30.0f;  // Actualiza el juego 60 veces por segundo
 
     createSound(em);
     li.sound_system = &sound_system;
+
     while (!li.gameShouldEnd)
     {
         deltaTime = engine.getFrameTime();
+        elapsed += deltaTime;
 
         switch (li.currentScreen)
         {
@@ -181,30 +188,35 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText()))
             {
-                ai_system.update(em, deltaTime);
-                physics_system.update(em, deltaTime);
-                collision_system.update(em);
-                zone_system.update(em, engine, iam, evm, map, deltaTime);
-                lock_system.update(em);
-                shield_system.update(em);
-                object_system.update(em, deltaTime);
-                attack_system.update(em, deltaTime);
-                projectile_system.update(em, deltaTime);
-                life_system.update(em, object_system, deltaTime);
-                sound_system.update();
-                camera_system.update(em, engine, deltaTime);
-                event_system.update(em, evm, iam, map, object_system);
-
-                if (!li.dead_entities.empty())
+                while (elapsed >= timeStep)
                 {
-                    em.destroyEntities(li.dead_entities);
-                    li.dead_entities.clear();
-                }
+                    elapsed -= timeStep;
 
-                render_system.update(em, engine, deltaTime, shader);
+                    ai_system.update(em, timeStep);
+                    physics_system.update(em, timeStep);
+                    collision_system.update(em);
+                    zone_system.update(em, engine, iam, evm, map, timeStep);
+                    lock_system.update(em);
+                    shield_system.update(em);
+                    object_system.update(em, timeStep);
+                    attack_system.update(em, timeStep);
+                    projectile_system.update(em, timeStep);
+                    life_system.update(em, object_system, timeStep);
+                    sound_system.update();
+                    if (elapsed < timeStep)
+                        camera_system.update(em, engine, timeStep);
+                    event_system.update(em, evm, iam, map, object_system);
+
+                    if (!li.dead_entities.empty())
+                    {
+                        em.destroyEntities(li.dead_entities);
+                        li.dead_entities.clear();
+                    }
+                }
+                render_system.update(em, engine, deltaTime);
             }
             else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText()))
-                render_system.update(em, engine, deltaTime, shader);
+                render_system.update(em, engine, deltaTime);
 
             break;
         }
@@ -236,8 +248,8 @@ void Game::run()
     sound_system.clear();
     render_system.unloadModels(em, engine);
 
-    engine.closeWindow();
     UnloadShader(shader);
+    engine.closeWindow();
 }
 
 void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)

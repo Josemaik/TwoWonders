@@ -13,7 +13,7 @@ struct RenderSystem
 
     RenderSystem() { init(); };
 
-    void update(EntityManager& em, GameEngine& engine, double dt, Shader& shader);
+    void update(EntityManager& em, GameEngine& engine, double dt);
 
     void drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawLogoKaiwa(ENGI::GameEngine& engine);
@@ -26,6 +26,7 @@ struct RenderSystem
     void drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawInventory(ENGI::GameEngine& engine, EntityManager& em);
     void drawItemDescription(ENGI::GameEngine& engine, EntityManager& em, Item& item);
+    void setShader(Shader& shader) { shaderPtr = &shader; }
 
     // Funciones double dtprivadas para organizar el codigo
 private:
@@ -48,6 +49,8 @@ private:
     // bool chunk0Charged{ false };
     // bool chunk1Charged{ false };
     Shader* shaderPtr{ nullptr };
+
+    float elapsed{ 0.f }, elapsed_limit{ 0.4f };
 };
 
 #endif // !RENDER_SYSTEM

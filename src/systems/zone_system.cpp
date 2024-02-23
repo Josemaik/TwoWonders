@@ -1,6 +1,6 @@
 #include "zone_system.hpp"
 
-void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, EventManager& evm, MapManager& map, float&) {
+void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, EventManager& evm, MapManager& map, const float&) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, ZoneComponent& zon)
@@ -325,7 +325,9 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
 void ZoneSystem::checkTutorialEnemies(EntityManager& em)
 {
     auto& li = em.getSingleton<LevelInfo>();
-    auto& playerPos = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
+    auto& playerEnt = *em.getEntityByID(li.playerID);
+    auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
+    auto& playerPos = playerPhy.position;
     using noCMP = MP::TypeList<>;
     using enemyTag = MP::TypeList<EnemyTag, DestructibleTag>;
     li.tutorialEnemies.clear();
@@ -340,4 +342,11 @@ void ZoneSystem::checkTutorialEnemies(EntityManager& em)
             li.tutorialEnemies.push_back(e.getID());
         }
     });
+
+    // Si el jugador se choca con el primer golem, se le va a señalar el cofre con el bastón
+    if (!playerEnt.hasComponent<AttackComponent>() && playerPhy.stopped)
+    {
+        li.viewPoint = { -33.714, 7.0, -43.494 };
+        playerPhy.stopped = false;
+    }
 }

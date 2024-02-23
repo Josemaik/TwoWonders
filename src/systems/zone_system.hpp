@@ -13,7 +13,7 @@ struct ZoneSystem
     using SYSCMPs = MP::TypeList<ZoneComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam, EventManager& evm, MapManager& map, float& dt);
+    void update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam, EventManager& evm, MapManager& map, const float& dt);
 
 private:
     void checkChests(EntityManager& em, EventManager& evm, uint16_t zone);
