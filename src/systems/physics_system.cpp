@@ -3,6 +3,14 @@
 
 void PhysicsSystem::update(EntityManager& em, float dt)
 {
+    // if (elapsed >= elapsed_limit) {
+    //     elapsed = 0;
+    // }
+    // else {
+    //     elapsed += dt;
+    //     return;
+    // }
+
     em.forEach<SYSCMPs, SYSTAGs>([dt, &em](Entity& ent, PhysicsComponent& phy)
     {
         // Cuando el jugador se para por un tiempo determinado
@@ -16,27 +24,24 @@ void PhysicsSystem::update(EntityManager& em, float dt)
                 return;
             }
         }
-
+        // Sacamos referencias a la posición y velocidad
         auto& pos = phy.position;
         auto& vel = phy.velocity;
-        // auto& vel_l = phy.v_linear;
-        // auto& vel_a = phy.v_angular;
+
+        // Actualizamos el estado anterior
+        phy.previousState.position = pos;
+        phy.previousState.velocity = vel;
+        phy.previousState.scale = phy.scale;
+        phy.previousState.orientation = phy.orientation;
 
         // Aplicar gravedad y hacer Clamp
-        //if (!phy.unCheckGravity)
         vel.setY(vel.y() - phy.gravity);
 
-        // if(e.hasTag<PlayerTag>() || e.hasTag<HitPlayerTag>()){
+        // Normalizamos la velocidad
         if (std::abs(vel.x()) > phy.max_speed || std::abs(vel.y()) > phy.max_speed || std::abs(vel.z()) > phy.max_speed)
         {
             vel.normalize();
         }
-        // }else{
-        //         //Normalizar la velocidad
-        //         vel.normalize();
-        // }
-        // Player únicamente tiene velocidad linear
-        // if(e.hasTag<PlayerTag>() || e.hasTag<HitPlayerTag>()){
 
         //Stuneo al jugador durante un tiempo provocado por el golpe de un golem
         if (phy.dragActivatedTime) {
@@ -78,35 +83,6 @@ void PhysicsSystem::update(EntityManager& em, float dt)
             }
         }
 
-        // }
-
-        // }else{ //Enemigo tiene aceleracion lineal y velocidad angular
-        //     phy.orientation += dt * vel_a;
-        //     if(phy.orientation > 2*PI) phy.orientation -= 2*PI;
-        //     if(phy.orientation < 0   ) phy.orientation += 2*PI;
-
-        //     vel.setX(vel_l * std::cos(phy.orientation) );
-        //     vel.setZ(vel_l * std::sin(phy.orientation) );
-        //     // e = e0 + v0t + (1/2)at² t = 1 / 30
-        //     // e = vt
-        //     // a = at
-        //     // e = v*t
-        //     pos.setX(pos.x() + (vel.x() * dt) );
-        //     pos.setY(pos.y() + vel.y());
-        //     pos.setZ(pos.z() + (vel.z() * dt) );
-        //     // v = at
-        //     phy.v_linear += phy.a_linear * dt;
-        //     phy.v_angular += phy.a_angular * dt;
-        //     phy.v_linear =  std::clamp(phy.v_linear,  -phy.kMaxVLin, phy.kMaxVLin);
-        //     phy.v_angular = std::clamp(phy.v_angular, -phy.kMaxAAng, phy.kMaxAAng);
-        //     // drag
-        // if(phy.dragactivated){
-        //     auto drag { dt * std::abs(phy.v_linear) * phy.kDrag };
-        //     if ( phy.v_linear > 0 ) phy.v_linear -= drag;
-        //     else                    phy.v_linear += drag;
-        // }
-
-        // }
         // comprobar si están en el suelo
         if (phy.alreadyGrounded)
             phy.alreadyGrounded = false;

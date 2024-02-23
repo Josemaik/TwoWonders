@@ -12,6 +12,13 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
     static constexpr float cameraFovyCinematic = 50.f;
 
     auto& li = em.getSingleton<LevelInfo>();
+    auto& txti = em.getSingleton<TextInfo>();
+
+    // if (txti.waitTime > 0.f)
+    // {
+    //     txti.waitTime -= dt;
+    //     return;
+    // }
 
     // Velocidad de la transición
     float t = 0.1f;

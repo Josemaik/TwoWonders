@@ -70,7 +70,6 @@ void InputSystem::update(EntityManager& em)
     {
         // Resetear la velocidad
         phy.velocity = {};
-        phy.a_linear = phy.v_angular = 0;
         auto& vel = phy.velocity;
 
         // Actualizar la velocidad
