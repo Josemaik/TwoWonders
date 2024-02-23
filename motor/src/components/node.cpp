@@ -11,23 +11,26 @@ Node::Node()
       m_scale(1.0f), 
       m_transformationMatrix(1.0f) {}
 
-int Node::addChild(Node* child) {
-    m_children.push_back(child);
-    child->m_parent = this;
+int Node::addChild(std::unique_ptr<Node> child) {
+    m_children.push_back(std::move(child));
+    m_children.back()->m_parent = this;
     return static_cast<int>(m_children.size() - 1);
 }
 
 int Node::removeChild(Node* child) {
-    auto it = std::find(m_children.begin(), m_children.end(), child);
+    auto it = std::find_if(m_children.begin(), m_children.end(), [child](const auto& uniqueChild) {
+        return uniqueChild.get() == child;
+    });
+
     if (it != m_children.end()) {
         m_children.erase(it);
-        child->m_parent = nullptr;
+        (*it)->m_parent = nullptr;
         return 0;
     }
     return -1;
 }
 
-bool Node::setEntity(Entity* newEntity) {
+bool Node::setEntity(std::shared_ptr<Entity> newEntity) {
     m_entity = newEntity;
     return true;
 }
@@ -50,7 +53,7 @@ void Node::traverse(glm::mat4 parentMatrix) {
 
     // printTransformationMatrix();
 
-    for (Node* child : m_children) {
+    for (auto& child : m_children) {
         if(m_updateMatrix)
             child->m_updateMatrix = true;
         child->traverse(m_transformationMatrix);
@@ -89,7 +92,7 @@ void Node::rotate(glm::vec3 axis, float angle){
 
 // GETTERS
 
-Entity* Node::getEntity() { return m_entity; }
+std::shared_ptr<Entity> Node::getEntity() { return m_entity; }
 Node* Node::getParent() { return m_parent; }
 glm::vec3 Node::getTranslation() { return m_translation;}
 glm::quat Node::getRotation() { return m_rotation; }

@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <memory>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -10,8 +11,8 @@
 // Node
 struct Node{
 private:
-    Entity* m_entity;
-    std::vector<Node*> m_children;
+    std::shared_ptr<Entity> m_entity;
+    std::vector<std::unique_ptr<Node>> m_children;
     Node* m_parent;
     glm::vec3 m_translation;
     glm::quat m_rotation;
@@ -23,10 +24,10 @@ public:
     std::string name;
 
     Node();
-    int addChild(Node* child);
+    int addChild(std::unique_ptr<Node> child);
     // 0 : child erase | -1 : child not found
     int removeChild(Node* child);
-    bool setEntity(Entity* newEntity);
+    bool setEntity(std::shared_ptr<Entity> newEntity);
 
     // Transform
     void traverse(glm::mat4 parentMatrix);
@@ -39,7 +40,7 @@ public:
     void scale(glm::vec3 newScale);
 
     // Getters
-    Entity* getEntity();
+    std::shared_ptr<Entity> getEntity();
     Node* getParent();
     glm::vec3 getTranslation();
     glm::quat getRotation();
