@@ -1,82 +1,97 @@
-// #include "components/node.hpp"
-// #include "components/entity.hpp"
+#include "components/node.hpp"
+#include "components/entity.hpp"
+#include "components/entity_model.hpp"
 #include "managers/resource_manager.hpp"
+#include "managers/windows_manager.hpp"
+
+#include <iostream>
+
+std::shared_ptr<Node> createSceneTree();
+std::shared_ptr<Model> loadModel(const char*, std::shared_ptr<Node>, ResourceManager& rm);
 
 int main(){
 
+    //----- Initialize managers -----//
+    WindowsManager wm;
     ResourceManager rm;
 
-    try{
-        // Mesh
-        Mesh& mesh = rm.loadResource<Mesh>("mesh_id");
-        if(mesh.isLoaded())
-            rm.unloadResource("mesh_id");
+    //----- Create scene tree -----//
+    auto nScene = createSceneTree();
 
-        // Shader
-        Shader& shader = rm.loadResource<Shader>("shader_id");
-        if(shader.isLoaded())
-            rm.unloadResource("shader_id");
+    if(wm.initWindow(800, 600, "Salty Pixel")){
+        //----- Load model -----// 
+        std::cout << "┌──────┐" << std::endl;
+        std::cout << "│ Load │" << std::endl;
+        std::cout << "└──────┘" << std::endl;
+        auto filePath = "assets/main_character.obj";
+        auto eModel = loadModel(filePath, nScene, rm);
 
-    } catch (const std::exception& e){
-        std::cerr << "Error: " << e.what() << std::endl;
+        //----- View tree -----//
+        std::cout << "┌──────┐" << std::endl;
+        std::cout << "│ Tree │" << std::endl;
+        std::cout << "└──────┘" << std::endl;
+        nScene->drawTree();
+
+        // Main loop
+        while(!wm.windowShouldClose()){
+            wm.beginDrawing();
+
+            wm.clearBackground(1.0f, 1.0f, 1.0f);
+            // wm.drawPixel(400, 300, 256.0f, 256.0f, 256.0f);
+
+            wm.endDrawing();
+        }
+
+        //----- Unload -----//
+        std::cout << "┌────────┐" << std::endl;
+        std::cout << "│ Unload │" << std::endl;
+        std::cout << "└────────┘" << std::endl;
+        eModel->unload(rm);
+
+        wm.closeWindow();
     }
 
-    // //---- Crear la estructura del árbol ----
-    // auto nScene = std::make_unique<Node>();
-    // auto nLight = std::make_unique<Node>();
-    // auto nCamera = std::make_unique<Node>();
-    // auto nCarGroup = std::make_unique<Node>();
-    // auto nChassis = std::make_unique<Node>();
-    // auto nWheel1 = std::make_unique<Node>();
-    // auto nWheel2 = std::make_unique<Node>();
-    // auto nWheel3 = std::make_unique<Node>();
-    // auto nWheel4 = std::make_unique<Node>();
-// 
-    // nScene->nodeName = "Scene";
-    // nLight->nodeName = "Light";
-    // nCamera->nodeName = "Camera";
-    // nCarGroup->nodeName = "CarGroup";
-    // nChassis->nodeName = "Chassis";
-    // nWheel1->nodeName = "Wheel1";
-    // nWheel2->nodeName = "Wheel2";
-    // nWheel3->nodeName = "Wheel3";
-    // nWheel4->nodeName = "Wheel4";
-// 
-    // nScene->addChild(nLight.get());
-    // nScene->addChild(nCamera.get());
-    // nScene->addChild(nCarGroup.get());
-    // 
-    // nCarGroup->addChild(nChassis.get());
-    // nCarGroup->addChild(nWheel1.get());
-    // nCarGroup->addChild(nWheel2.get());
-    // nCarGroup->addChild(nWheel3.get());
-    // nCarGroup->addChild(nWheel4.get());
-    // 
-    // //---- Añadir entidades a los nodos ----
-    // auto eLight = std::make_unique<Light>();
-    // auto eCamera = std::make_unique<Camera>();
-// 
-    // auto eMeshChassis = std::make_unique<Mesh>();
-    // auto eMeshWheel1 = std::make_unique<Mesh>();
-    // auto eMeshWheel2 = std::make_unique<Mesh>();
-    // auto eMeshWheel3 = std::make_unique<Mesh>();
-    // auto eMeshWheel4 = std::make_unique<Mesh>();
-// 
-    // nLight->setEntity(eLight.get());
-    // nCamera->setEntity(eCamera.get());
-// 
-    // nChassis->setEntity(eMeshChassis.get());
-    // nChassis->setEntity(eMeshWheel1.get());
-    // nChassis->setEntity(eMeshWheel2.get());
-    // nChassis->setEntity(eMeshWheel3.get());
-    // nChassis->setEntity(eMeshWheel4.get());
-// 
-    // //---- Aplicar transformaciones a nodos
-    // nLight->setTranslation({0, 100, 0});
-    // nCamera->setRotation({1, 0, 0}, 10.0f);
-    // nCamera->translate({0, 0, 200});
-    // nCarGroup->setScale({2, 2, 2});
-// 
-    // //---- Recorrer el árbol (dibujarlo) ----
-    // nScene->traverse(glm::mat4x4());
+    /*
+    //----- Draw -----//
+    std::cout << "┌──────┐" << std::endl;
+    std::cout << "│ Draw │" << std::endl;
+    std::cout << "└──────┘" << std::endl;
+    nScene->traverse(glm::mat4());
+    */
+
+    return 0;
+}
+
+std::shared_ptr<Node> createSceneTree(){
+    //Create scene
+    auto nScene = std::make_unique<Node>();
+    nScene->name = "Scene";
+
+    // Create Light
+    auto nLight = std::make_unique<Node>();
+    nLight->name = "Light";
+    auto eLight = std::make_shared<Light>();
+    nLight->setEntity(eLight);
+    nScene->addChild(std::move(nLight));
+
+    // Create Camera
+    auto nCamera = std::make_unique<Node>();
+    nCamera->name = "Camera";
+    auto eCamera = std::make_shared<Camera>();
+    nCamera->setEntity(eCamera);
+    nScene->addChild(std::move(nCamera));
+
+    return nScene;
+}
+
+std::shared_ptr<Model> loadModel(const char* filePath, std::shared_ptr<Node> nScene, ResourceManager& rm){
+    auto nModel = std::make_unique<Node>();
+    nModel->name = filePath;
+    auto eModel = std::make_shared<Model>();
+    eModel->load(filePath, rm);
+    if(eModel->isLoaded()){
+        nModel->setEntity(eModel);
+        nScene->addChild(std::move(nModel));
+    }
+    return eModel;
 }
