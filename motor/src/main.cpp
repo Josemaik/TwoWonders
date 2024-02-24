@@ -45,6 +45,8 @@ int main(){
             renm.drawTriangle({0.0f, 0.5f}, {-0.5f, -0.5f}, {0.5f, -0.5f}, {1.0f, 0.5f, 0.2f, 1.0f});
             renm.drawPixel({0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
 
+            renm.drawRectangle({0.4f, 0.4f}, {0.2f, 0.2f}, {0.0f, 0.5f, 0.2f, 1.0f});
+
             wm.endDrawing();
         }
 
