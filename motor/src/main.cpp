@@ -3,6 +3,7 @@
 #include "components/entity_model.hpp"
 #include "managers/resource_manager.hpp"
 #include "managers/windows_manager.hpp"
+#include "managers/render_manager.hpp"
 
 #include <iostream>
 
@@ -14,6 +15,7 @@ int main(){
     //----- Initialize managers -----//
     WindowsManager wm;
     ResourceManager rm;
+    RenderManager renm;
 
     //----- Create scene tree -----//
     auto nScene = createSceneTree();
@@ -32,12 +34,15 @@ int main(){
         std::cout << "└──────┘" << std::endl;
         nScene->drawTree();
 
+        //------ Shaders -----//
+        renm.compilingShaders();
+
         // Main loop
         while(!wm.windowShouldClose()){
             wm.beginDrawing();
 
-            wm.clearBackground(1.0f, 1.0f, 1.0f);
-            // wm.drawPixel(400, 300, 256.0f, 256.0f, 256.0f);
+            renm.clearBackground({1.0f, 1.0f, 1.0f, 1.0f});
+            renm.drawTriangle({0.0f, 0.5f}, {-0.5f, -0.5f}, {0.5f, -0.5f}, {1.0f, 0.5f, 0.2f, 1.0f});
 
             wm.endDrawing();
         }
