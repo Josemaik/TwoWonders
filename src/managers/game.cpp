@@ -23,9 +23,9 @@ void Game::createEntities(EntityManager& em)
 {
     // Player
     auto& e{ em.newEntity() };
-    em.addTag<PlayerTag>(e);// -2 -12 63 -71
+    em.addTag<PlayerTag>(e);// -2 -12 63 -71 // -48.0f, 0.0f, -2.0f
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -48.0f, 0.0f, -2.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -2.0f, 0.0f, -12.0f }, .scale = { 1.0f, 1.0f, 1.0f }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
     auto& lis = em.addComponent<ListenerComponent>(e, ListenerComponent{});
     em.addComponent<InputComponent>(e, InputComponent{});
