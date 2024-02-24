@@ -43,6 +43,7 @@ int main(){
 
             renm.clearBackground({1.0f, 1.0f, 1.0f, 1.0f});
             renm.drawTriangle({0.0f, 0.5f}, {-0.5f, -0.5f}, {0.5f, -0.5f}, {1.0f, 0.5f, 0.2f, 1.0f});
+            renm.drawPixel({0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
 
             wm.endDrawing();
         }

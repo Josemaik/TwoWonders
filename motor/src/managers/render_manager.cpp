@@ -4,6 +4,42 @@
 
 // Basic drawing functions
 
+void RenderManager::drawPixel(glm::vec2 pos, glm::vec4 color){
+    // Create and configure VAO, VBO
+    GLuint VAO, VBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    // Define a single vertex for the pixel
+    float vertex[] = { pos.x, pos.y };
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
+
+    // Set up vertex attribute pointers
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
+    // Set the uniform color in the shader
+    GLint colorUniform = glGetUniformLocation(m_shaderProgram, "customColor");
+    glUseProgram(m_shaderProgram);
+    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+
+    // Draw the pixel
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_POINTS, 0, 1);
+    glBindVertexArray(0);
+
+    // Clean up resources
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+}
+
 void RenderManager::drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, glm::vec4 color){
     // Use the program shader
     glUseProgram(m_shaderProgram);
@@ -50,10 +86,6 @@ void RenderManager::drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, glm::
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-    
-}
-
-void RenderManager::drawPixel(int, int, float, float, float){
     
 }
 

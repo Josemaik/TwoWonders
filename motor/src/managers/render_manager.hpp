@@ -18,7 +18,7 @@ public:
 
     // Basic drawing functions
     void clearBackground(glm::vec4 color);
-    void drawPixel(int x, int y, float red, float green, float blue);
+    void drawPixel(glm::vec2 pos, glm::vec4 color);
     void drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, glm::vec4 color);
 
     // Shader
