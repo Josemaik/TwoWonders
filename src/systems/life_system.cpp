@@ -78,16 +78,28 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 bb.subditosData.erase(ent.getID());
             }
 
-            if(ent.hasTag<BossFinalTag>()){
+            if (ent.hasTag<BossFinalTag>()) {
                 // if (!lif.decreaseNextFrame)
                 //     lif.decreaseNextFrame = true;
                 // else
                 //     lif.decreaseNextFrame = false;
-                 auto& bb = em.getSingleton<BlackBoard_t>();
-                 bb.boss_fase++;
+                auto& bb = em.getSingleton<BlackBoard_t>();
+                bb.boss_fase++;
             }
 
             lif.markedForDeletion = true;
+        }
+
+        if (ent.hasTag<PlayerTag>())
+        {
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            if (plfi.increaseLife > 0.0)
+            {
+                lif.life += static_cast<int>(plfi.increaseLife);
+                if (lif.life > lif.maxLife)
+                    lif.life = lif.maxLife;
+                plfi.increaseLife = 0.0;
+            }
         }
 
         if (lif.markedForDeletion && !lif.decreaseNextFrame)

@@ -47,6 +47,8 @@ void Game::createEntities(EntityManager& em)
     lis.addCode(EventCodes::SetSpawn);
     lis.addCode(EventCodes::OpenDoor);
 
+    Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };
+    plfi.addItem(std::make_unique<Potion>(pot));
     // Shield
     // createShield(em, e);
 
