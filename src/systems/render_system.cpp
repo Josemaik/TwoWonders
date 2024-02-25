@@ -502,8 +502,8 @@ void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, So
 
 void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
 {
-    float windowWidth = 330.0f;
-    float windowHeight = 330.0f;
+    float windowWidth = 450.0f;
+    float windowHeight = 450.0f;
     float augment = 55.f;
 
     Rectangle windowRect = {
@@ -514,10 +514,10 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
     };
     DrawRectangleLinesEx(windowRect, 2, BLACK);
     DrawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
-    DrawTextEx(GetFontDefault(), "INVENTARIO", Vector2{ windowRect.x + 50, windowRect.y + 30 }, 40, 1, BLACK);
+    DrawTextEx(GetFontDefault(), "INVENTARIO", Vector2{ windowRect.x + 110, windowRect.y + 20 }, 40, 1, BLACK);
 
     auto& plfi = em.getSingleton<PlayerInfo>();
-    Rectangle btn2Rec = { 300, 400, 200, 50 };
+    Rectangle btn2Rec = { 300, 430, 200, 50 };
 
     if (plfi.selectedItem == plfi.max)
     {
@@ -526,8 +526,8 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
         for (auto& item : plfi.inventory)
         {
             Rectangle btnRec = { 300, posY, 200, 50 };
-            if (GuiButton(btnRec, item.name.c_str()))
-                plfi.selectedItem = item.getID();
+            if (GuiButton(btnRec, item->name.c_str()))
+                plfi.selectedItem = item->getID();
             posY += augment;
         }
 
@@ -541,16 +541,33 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
     else
     {
         // Dibujamos la descripción del objeto seleccionado
-        auto& item = plfi.getItem(plfi.selectedItem);
+        auto& item = *plfi.getItem(plfi.selectedItem);
         auto text = const_cast<char*>(item.description.c_str());
 
         GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_LEFT);
 
         float descWidth = 300.f, descHeight = 150.f;
         float posX = static_cast<float>(engine.getScreenWidth() / 2) - (descWidth / 2.0f);
-        float posY = static_cast<float>(engine.getScreenHeight() / 2) - (descHeight / 2.0f);
+        float posY = static_cast<float>(engine.getScreenHeight() / 2) - (descHeight / 1.25f);
         GuiTextBox({ posX, posY, descWidth, descHeight }, text, static_cast<int>(item.description.size()), false);
         auto& plfi = em.getSingleton<PlayerInfo>();
+
+        std::cout << dynamic_cast<Potion*>(&item) << std::endl;
+
+        if (dynamic_cast<Potion*>(&item) != nullptr)
+        {
+            std::cout << "Es una poción" << std::endl;
+            Rectangle btn1Rec = { 300, 350, 200, 50 };
+            if (GuiButton(btn1Rec, "USAR"))
+            {
+                auto& potion = static_cast<Potion&>(item);
+                plfi.usePotion(potion);
+                plfi.selectedItem = plfi.max;
+                auto& inpi = em.getSingleton<InputInfo>();
+                inpi.inventory = false;
+                GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+            }
+        }
 
         // Boton de volver al inventario
         if (GuiButton(btn2Rec, "VOLVER"))

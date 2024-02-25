@@ -72,7 +72,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             {
                 plfi.addKey();
                 Item key = { "Llave", "Una llave, parece que solo puede abrir una puerta" };
-                plfi.addItem(key);
+                plfi.addItem(std::make_unique<Item>(key));
                 break;
             }
             case ObjectType::Fire_Spell:
@@ -87,13 +87,10 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             }
             case ObjectType::Basic_Staff:
             {
-                Item staff = { "Bastón Básico", "É un bastón" };
-                plfi.addItem(staff);
+                Staff staff("Bastón Básico", "É un bastón", ElementalType::Neutral, 1.0);
+                plfi.addItem(std::make_unique<Staff>(staff));
                 if (!playerEnt->hasComponent<AttackComponent>())
                     em.addComponent<AttackComponent>(*playerEnt, AttackComponent{});
-                // auto& type = em.getComponent<TypeComponent>(*playerEnt);
-                // if (!type.hasType(ElementalType::Fire))
-                //     type.addType(ElementalType::Fire);
                 break;
             }
             default:

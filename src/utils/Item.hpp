@@ -9,6 +9,9 @@ struct Item
     Item(std::string name, std::string description)
         : name{ name }, description{ description }
     { }
+
+    virtual ~Item() = default;
+
     std::string name;
     std::string description;
 
@@ -34,6 +37,8 @@ struct Spell : public Item
         : Item{ name, description }, spell{ spell }, type{ type }, cost{ cost }, damage{ damage }
     { }
 
+    ~Spell() override = default;
+
     bool operator==(const Spell& other) const
     {
         return spell == other.spell;
@@ -51,12 +56,30 @@ struct Spell : public Item
 
 struct Staff : public Item
 {
+    Staff(std::string name, std::string description, ElementalType type, double damage)
+        : Item{ name, description }, type{ type }, damage{ damage }
+    { }
+
+    ~Staff() override = default;
+
     ElementalType type;
     double damage{};
 };
 
+enum struct PotionType : uint8_t
+{
+    Health,
+    Mana,
+};
+
 struct Potion : public Item
 {
-    bool isHealthPotion{ true };
+    Potion(std::string name, std::string description, PotionType type, double value)
+        : Item{ name, description }, type{ type }, value{ value }
+    { }
+
+    ~Potion() override = default;
+
+    PotionType type;
     double value{};
 };
