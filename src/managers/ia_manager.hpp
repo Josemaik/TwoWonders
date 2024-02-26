@@ -25,6 +25,7 @@
 #include "../utils/bt/action_healing.hpp"
 #include "../utils/bt/action_heal_mate.hpp"
 #include "../utils/bt/action_generatesubditos.hpp"
+#include "../utils/bt/action_pendulum.hpp"
 //decision
 #include "../utils/bt/decision_playerdetected.hpp"
 #include "../utils/bt/decision_readyforattack.hpp"

@@ -647,6 +647,11 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         //Escribir arbol de araña
     }
     break;
+    case 5:{
+        em.addTag<AngryBushTag>(e);
+        tree.createNode<BTAction_Pendulum>();
+    }
+    break;
     default:
         break;
     }
