@@ -37,6 +37,7 @@
 #include "../utils/bt/decision_subditosalreadygenerated.hpp"
 #include "../utils/bt/decision_activateorquit_shield.hpp"
 #include "../utils/bt/decision_readyforairattack.hpp"
+#include "../utils/bt/decision_readyforcrusher.hpp"
 struct Ia_man
 {
     using jsonType = const rapidjson::Value&;

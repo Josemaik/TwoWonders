@@ -18,7 +18,7 @@ struct BehaviourTree_t;
 struct AIComponent
 {
     // Type of shoots
-    enum class TypeShoot : uint8_t { OneShootonDir, OneShoottoPlayer, TripleShoot, Melee, SpiderWeb, Air_attack };
+    enum class TypeShoot : uint8_t { OneShootonDir, OneShoottoPlayer, TripleShoot, Melee, SpiderWeb, Air_attack,CrusherAttack};
 
     // TypeShoot currentshoot{};
     // Default velocity

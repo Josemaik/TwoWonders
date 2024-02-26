@@ -502,6 +502,17 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
+    if (behaviorType2 & BehaviorType::AREADAMAGECRUSHER)
+    {
+        auto& bb = em.getSingleton<BlackBoard_t>();
+        if(bb.playerdamagebycrusher==false){
+            em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife(2);
+            bb.playerdamagebycrusher = true;
+        }
+        return;
+    }
+
+
     //Telaraña
     if (behaviorType2 & BehaviorType::SPIDERWEB)
     {

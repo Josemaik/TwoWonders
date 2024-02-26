@@ -18,7 +18,8 @@ enum BehaviorType
     AREADAMAGE = 0x200,
     SPIDERWEB = 0x400,
     WARNINGZONE = 0x800,
-    METEORITE = 0X1000
+    METEORITE = 0X1000,
+    AREADAMAGECRUSHER = 0x2000
 };
 
 struct ColliderComponent

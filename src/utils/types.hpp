@@ -59,6 +59,7 @@ struct DummieTag{};
 struct AngryBushTag{};
 struct AngryBushTag2{};
 struct CrusherTag{};
+struct CrusherAttackTag{};
 struct SubjectTag {};
 struct DestructibleTag {};
 struct ChestTag {};

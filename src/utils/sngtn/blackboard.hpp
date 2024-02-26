@@ -35,6 +35,8 @@ struct BlackBoard_t {
     vec3d boss_position{};
     uint16_t boss_fase{1};
     double countdown_change_fase{8.0}, elapsed_change_fase{1.0};
+    //apisonadora
+    bool playerdamagebycrusher{false};
     //Path
     // Path_t<4> path { vec3d{8.0, 0.0, 4.0} , {3.0,0.0,4.0} , {3.0,0.0,5.0}, {8.0,0.0,5.0} };
     //Actualizar información IA slimes

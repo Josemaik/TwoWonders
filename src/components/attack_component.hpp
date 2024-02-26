@@ -12,7 +12,8 @@ enum AttackType
     AreaAttack = 0x40,
     Spiderweb = 0x80,
     GollemAttack = 0x100,
-    AirAttack = 0x200
+    AirAttack = 0x200,
+    CrusherAttack = 0x400
 };
 
 struct AttackComponent
@@ -28,7 +29,7 @@ struct AttackComponent
     bool warning_created{ false };
     uint16_t air_attack_fases{ 4 };
     bool createAttack{ false };
-    vec3d pos_respawn_air_attack{};
+    vec3d pos_respawn_air_attack{},pos_respawn_crush_attack{};
 
     void attack(AttackType typeAttack) {
         if (elapsed >= countdown) {
