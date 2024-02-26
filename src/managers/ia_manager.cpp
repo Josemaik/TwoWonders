@@ -513,20 +513,20 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     {
         em.addTag<GolemTag>(e);
 
-        // auto* d_a_1 = &tree.createNode<BTDecisionReadyforAttack>();
-        // auto* a_a_1 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee); // fail si disparo succes si no disparo
-        // auto* d_r_1 = &tree.createNode<BTDecisionOnAttackRadius>();
-        // auto* sequence1_1 = &tree.createNode<BTNodeSequence_t>(d_a_1, a_a_1, d_r_1);
+        auto* d_a_1 = &tree.createNode<BTDecisionReadyforAttack>();
+        auto* a_a_1 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee); // fail si disparo succes si no disparo
+        auto* d_r_1 = &tree.createNode<BTDecisionOnAttackRadius>();
+        auto* sequence1_1 = &tree.createNode<BTNodeSequence_t>(d_a_1, a_a_1, d_r_1);
 
-        // auto* d_1_1 = &tree.createNode<BTDecisionPlayerDetected>();
-        // auto* a_s_1 = &tree.createNode<BTAction_Pursue>();
-        // auto* sequence1_2 = &tree.createNode<BTNodeSequence_t>(d_1_1, a_s_1);
+        auto* d_1_1 = &tree.createNode<BTDecisionPlayerDetected>();
+        auto* a_s_1 = &tree.createNode<BTAction_Pursue>();
+        auto* sequence1_2 = &tree.createNode<BTNodeSequence_t>(d_1_1, a_s_1);
 
 
-        // auto* patrol_1 = &tree.createNode<BTAction_Patrol>();
-        // auto* sequence1_3 = &tree.createNode<BTNodeSequence_t>(patrol_1);
+        auto* patrol_1 = &tree.createNode<BTAction_Patrol>();
+        auto* sequence1_3 = &tree.createNode<BTNodeSequence_t>(patrol_1);
 
-        // tree.createNode<BTNodeSelector_t>(sequence1_1, sequence1_2, sequence1_3);
+        tree.createNode<BTNodeSelector_t>(sequence1_1, sequence1_2, sequence1_3);
 
         break;
     }
@@ -534,21 +534,19 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     {
         em.addTag<SnowmanTag>(e);
 
-        // auto* d_a_6 = &tree.createNode<BTDecisionReadyforAttack>();
-        // auto* a_a_6 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer); // fail si disparo succes si no disparo
-        // auto* d_r_6 = &tree.createNode<BTDecisionOnAttackRadius>();
-        // auto* sequence6_1 = &tree.createNode<BTNodeSequence_t>(d_a_6, a_a_6, d_r_6);
+        auto* d_a_6 = &tree.createNode<BTDecisionReadyforAttack>();
+        auto* a_a_6 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer); // fail si disparo succes si no disparo
+        auto* d_r_6 = &tree.createNode<BTDecisionOnAttackRadius>();
+        auto* sequence6_1 = &tree.createNode<BTNodeSequence_t>(d_a_6, a_a_6, d_r_6);
+        
+        auto* d_1_2 = &tree.createNode<BTDecisionPlayerDetected>();
+        auto* a_s_2 = &tree.createNode<BTAction_Seek>();
+        auto* sequence6_2 = &tree.createNode<BTNodeSequence_t>(d_1_2, a_s_2);
+        
+        auto* patrol_6 = &tree.createNode<BTAction_Patrol>();
+        auto* sequence6_3 = &tree.createNode<BTNodeSequence_t>(patrol_6);
 
-
-
-
-        // auto* patrol_6 = &tree.createNode<BTAction_Patrol>();
-        // auto* sequence6_3 = &tree.createNode<BTNodeSequence_t>(patrol_6);
-
-        // tree.createNode<BTNodeSelector_t>(sequence6_1, sequence6_2, sequence6_3);
-
-        tree.createNode<BTAction_Patrol>();
-
+        tree.createNode<BTNodeSelector_t>(sequence6_1, sequence6_2, sequence6_3);
         break;
     }
 
@@ -556,39 +554,37 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     {
         em.addTag<SlimeTag>(e);
 
-        // auto* d_cl_3 = &tree.createNode<BTDecisionCheckLifes>();
+        auto* d_cl_3 = &tree.createNode<BTDecisionCheckLifes>();
 
-        // auto* d_foc3 = &tree.createNode<BTDecisionFleeorCurePartner>();
-        // auto* d_rh3 = &tree.createNode<BTDecisionReadyforHeal>();
-        // auto* a_hm3 = &tree.createNode<BTAction_HealMate>();
-        // auto* sequence3_0_0 = &tree.createNode<BTNodeSequence_t>(d_foc3, d_rh3, a_hm3);
+        auto* d_foc3 = &tree.createNode<BTDecisionFleeorCurePartner>();
+        auto* d_rh3 = &tree.createNode<BTDecisionReadyforHeal>();
+        auto* a_hm3 = &tree.createNode<BTAction_HealMate>();
+        auto* sequence3_0_0 = &tree.createNode<BTNodeSequence_t>(d_foc3, d_rh3, a_hm3);
 
-        // auto* a_f_3 = &tree.createNode<BTAction_Flee>();
-        // auto* a_h_3 = &tree.createNode<BTAction_Healing>();
-        // auto* sequence3_0_1 = &tree.createNode<BTNodeSequence_t>(a_f_3, a_h_3);
+        auto* a_f_3 = &tree.createNode<BTAction_Flee>();
+        auto* a_h_3 = &tree.createNode<BTAction_Healing>();
+        auto* sequence3_0_1 = &tree.createNode<BTNodeSequence_t>(a_f_3, a_h_3);
 
-        // auto* selector3_0 = &tree.createNode<BTNodeSelector_t>(sequence3_0_0, sequence3_0_1);
+        auto* selector3_0 = &tree.createNode<BTNodeSelector_t>(sequence3_0_0, sequence3_0_1);
 
-        // auto* sequence3_0 = &tree.createNode<BTNodeSequence_t>(d_cl_3, selector3_0);
+        auto* sequence3_0 = &tree.createNode<BTNodeSequence_t>(d_cl_3, selector3_0);
 
-        // auto* d_a_3 = &tree.createNode<BTDecisionReadyforAttack>();
-        // auto* a_j_3 = &tree.createNode<BTAction_JumptoPlayer>();
-        // //auto* a_a_3 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee); // fail si disparo succes si no disparo
-        // auto* d_r_3 = &tree.createNode<BTDecisionOnAttackRadius>();
-        // auto* sequence3_2 = &tree.createNode<BTNodeSequence_t>(d_a_3, a_j_3, d_r_3);
+        auto* d_a_3 = &tree.createNode<BTDecisionReadyforAttack>();
+        auto* a_j_3 = &tree.createNode<BTAction_JumptoPlayer>();
+        //auto* a_a_3 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee); // fail si disparo succes si no disparo
+        auto* d_r_3 = &tree.createNode<BTDecisionOnAttackRadius>();
+        auto* sequence3_2 = &tree.createNode<BTNodeSequence_t>(d_a_3, a_j_3, d_r_3);
 
-        // auto* d_1_3 = &tree.createNode<BTDecisionPlayerDetected>();
-        // auto* a_s_3 = &tree.createNode<BTAction_Seek>();
-        // auto* sequence3_3 = &tree.createNode<BTNodeSequence_t>(d_1_3, a_s_3);
-
-
-        // auto* patrol_3 = &tree.createNode<BTAction_Patrol>();
-        // auto* sequence3_4 = &tree.createNode<BTNodeSequence_t>(patrol_3);
+        auto* d_1_3 = &tree.createNode<BTDecisionPlayerDetected>();
+        auto* a_s_3 = &tree.createNode<BTAction_Seek>();
+        auto* sequence3_3 = &tree.createNode<BTNodeSequence_t>(d_1_3, a_s_3);
 
 
-        tree.createNode<BTAction_Patrol>();
+        auto* patrol_3 = &tree.createNode<BTAction_Patrol>();
+        auto* sequence3_4 = &tree.createNode<BTNodeSequence_t>(patrol_3);
 
-        //tree.createNode<BTNodeSelector_t>(sequence3_0, sequence3_2, sequence3_3, sequence3_4);
+
+        tree.createNode<BTNodeSelector_t>(sequence3_0, sequence3_2, sequence3_3, sequence3_4);
         break;
     }
 
@@ -625,31 +621,38 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     case 4:
     {
         em.addTag<SpiderTag>(e);
-        // auto* d_p_h = &tree.createNode<BTDecisionPlayerHunted>();
-        // auto* d_s_1 = &tree.createNode<BTAction_Seek>();
-        // auto* a_a_6 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee);
-        // auto* sequence0 = &tree.createNode<BTNodeSequence_t>(d_p_h, d_s_1, a_a_6);
+        auto* d_p_h = &tree.createNode<BTDecisionPlayerHunted>();
+        auto* d_s_1 = &tree.createNode<BTAction_Seek>();
+        auto* a_a_6 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee);
+        auto* sequence0 = &tree.createNode<BTNodeSequence_t>(d_p_h, d_s_1, a_a_6);
 
-        // auto* d_ra = &tree.createNode<BTDecisionReadyforAttack>();
-        // auto* a_as = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer); // fail si disparo succes si no disparo
-        // auto* d_or = &tree.createNode<BTDecisionOnAttackRadius>();
-        // auto* sequence1 = &tree.createNode<BTNodeSequence_t>(d_ra, a_as, d_or);
+        auto* d_ra = &tree.createNode<BTDecisionReadyforAttack>();
+        auto* a_as = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer); // fail si disparo succes si no disparo
+        auto* d_or = &tree.createNode<BTDecisionOnAttackRadius>();
+        auto* sequence1 = &tree.createNode<BTNodeSequence_t>(d_ra, a_as, d_or);
 
         auto* d_1_6 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* a_s_6 = &tree.createNode<BTAction_Seek>();
-        // auto* sequence2 = &tree.createNode<BTNodeSequence_t>(d_1_6, a_s_6);
+        auto* sequence2 = &tree.createNode<BTNodeSequence_t>(d_1_6, a_s_6);
         tree.createNode<BTNodeSequence_t>(d_1_6, a_s_6);
 
-        // auto* patrol_6 = &tree.createNode<BTAction_Patrol>();
-        // auto* sequence3 = &tree.createNode<BTNodeSequence_t>(patrol_6);
+        auto* patrol_6 = &tree.createNode<BTAction_Patrol>();
+        auto* sequence3 = &tree.createNode<BTNodeSequence_t>(patrol_6);
 
-       // tree.createNode<BTNodeSelector_t>(sequence0, sequence1, sequence2, sequence3);
-        //Escribir arbol de araña
+       tree.createNode<BTNodeSelector_t>(sequence0, sequence1, sequence2, sequence3);
     }
     break;
     case 5:{
         em.addTag<AngryBushTag>(e);
         tree.createNode<BTAction_Pendulum>();
+    }
+    break;
+    case 6: em.addTag<DummieTag>(e); 
+    break;
+    case 7: em.addTag<AngryBushTag2>(e); tree.createNode<BTAction_Patrol>();
+    break;
+    case 8: {
+        em.addTag<CrusherTag>();
     }
     break;
     default:

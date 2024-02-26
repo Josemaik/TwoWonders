@@ -23,12 +23,13 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -33.0, 5.5, 30.9 };
+        plfi.spawnPoint = { 119.0, 3.0, -138.0 };
     // -33.0, 5.5, 30.9 - Posición Incial
     // 77.0, 5.5, -73.9 - Cofre con llave
     //-9.0, 4.0, -50.0
     //26.0, 4.0, -65.0
     //-32.0   4.0  -107.0
+    //-33.0, 5.5, 30.9 
 
 // Player
     auto& e{ em.newEntity() };
