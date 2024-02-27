@@ -236,7 +236,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     pos.setY(pos.y() - 0.7);
                     in = true;
                 }
-                else if (e.hasTag<GolemTag>())
+                else if (e.hasTag<GolemTag>() || e.hasTag<DummyTag>())
                 {
                     // scl = { 0.4, 0.4, 0.4 };
                     pos.setY(pos.y() - 4.0);
@@ -253,6 +253,24 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 {
                     scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
+                    in = true;
+                }
+                else if (e.hasTag<CrusherTag>())
+                {
+                    // scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 1.1);
+                    in = true;
+                }
+                else if (e.hasTag<AngryBushTag>())
+                {
+                    // scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 0.5);
+                    in = true;
+                }
+                else if (e.hasTag<AngryBushTag2>())
+                {
+                    // scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 0.5);
                     in = true;
                 }
                 else if (e.hasTag<DestructibleTag>() || e.hasTag<GroundTag>() || e.hasTag<DoorTag>())
@@ -305,10 +323,13 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
     else if (e.hasTag<GolemTag>())
     {
         r.model = engine.loadModel("assets/models/Golem.obj");
-        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Golem_uv.png");
-        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Golem_texture.png");
-        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+        // Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Golem_uv.png");
+        // Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Golem_texture.png");
+        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        // r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+        loadShaders(r.model);
+
+
     }
     else if (e.hasTag<SpiderTag>())
     {
@@ -376,6 +397,32 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
     {
         r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-barricada.obj");
         // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<AngryBushTag>())
+    {
+        r.model = engine.loadModel("assets/models/Piedra.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<AngryBushTag2>())
+    {
+        r.model = engine.loadModel("assets/models/PiedraV2.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<CrusherTag>())
+    {
+        r.model = engine.loadModel("assets/models/Apisonadora.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<DummyTag>())
+    {
+        r.model = engine.loadModel("assets/models/Golem.obj");
+        // Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Dummy_texture.png");
         // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
 
         loadShaders(r.model);
