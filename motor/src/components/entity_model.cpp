@@ -24,7 +24,7 @@ void Model::unload(ResourceManager& rm){
 }
 
 void Model::draw(glm::mat4) const { 
-    std::cout << "Draw a model" << std::endl; 
+    // std::cout << "Draw a model" << std::endl; 
     for(int i=0; i<static_cast<int>(m_meshes.size()); i++)
         m_meshes[i]->draw();
 };

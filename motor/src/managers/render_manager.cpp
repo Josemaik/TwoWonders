@@ -120,6 +120,10 @@ void RenderManager::compilingShaders(){
     // ------------------------------------
     // Vertex Shader
     // -------------
+    // layout (location = 1) in vec3 aNormal;
+    // layout (location = 2) in vec3 aTextCoord;
+    // out vec2 textCoord;
+    // uniform mat4 mvp; // model * view * projection
     const char* vertexShaderSource = 
         "#version 330 core\n"
         "layout (location = 0) in vec3 aPos;\n"
@@ -141,6 +145,7 @@ void RenderManager::compilingShaders(){
 
     // Fragment Shader
     // ---------------
+    // texture
     const char* fragmentShaderSource = 
         "#version 330 core\n"
         "out vec4 FragColor;\n"
@@ -173,4 +178,10 @@ void RenderManager::compilingShaders(){
     }
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+
+    // Shader mesh
+    /*
+        uniform mat4 rotationMatrix;
+        glGetUniformLocation() -> opengl
+    */
 }

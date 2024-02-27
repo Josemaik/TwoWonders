@@ -59,6 +59,23 @@ void Mesh::setupMesh(){
 }
 
 void Mesh::draw(){ 
-    std::cout << "Draw a mesh (ID: " << id <<")" << std::endl; 
+
+    // matrix model, view and projection
+
+    // light
+
+    // shader
+
+    // std::cout << "Draw a mesh (ID: " << id <<")" << std::endl; 
     /* OpenGL */ 
+
+    // Set the uniform color in the shader
+    // GLuint colorUniform = glGetUniformLocation(m_shaderProgram, "customColor");
+    // glUseProgram(m_shaderProgram);
+    // glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+
+    // Draw the triangle
+    glBindVertexArray(m_VAO);
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }

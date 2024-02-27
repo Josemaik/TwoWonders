@@ -47,6 +47,8 @@ int main(){
 
             renm.drawRectangle({0.4f, 0.4f}, {0.2f, 0.2f}, {0.0f, 0.5f, 0.2f, 1.0f});
 
+            eModel->draw(glm::mat4());
+
             wm.endDrawing();
         }
 
