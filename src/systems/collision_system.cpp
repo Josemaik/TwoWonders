@@ -294,7 +294,8 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         return;
     }
 
-    if (behaviorType2 & BehaviorType::WARNINGZONE || behaviorType1 & BehaviorType::WARNINGZONE)
+    if (behaviorType2 & BehaviorType::WARNINGZONE || behaviorType1 & BehaviorType::WARNINGZONE
+        || behaviorType2 & BehaviorType::AREADAMAGECRUSHER || behaviorType1 & BehaviorType::AREADAMAGECRUSHER)
         return;
 
     // Esto ya es cualquier colisión que no sea de player, paredes, zonas o ataques
@@ -505,13 +506,12 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::AREADAMAGECRUSHER)
     {
         auto& bb = em.getSingleton<BlackBoard_t>();
-        if(bb.playerdamagebycrusher==false){
+        if (bb.playerdamagebycrusher == false) {
             em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife(2);
             bb.playerdamagebycrusher = true;
         }
         return;
     }
-
 
     //Telaraña
     if (behaviorType2 & BehaviorType::SPIDERWEB)
