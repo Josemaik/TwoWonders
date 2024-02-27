@@ -846,6 +846,18 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                     }
                 }
             }
+
+            if (li.num_zone == 2 && elapsed_WASD < elapsed_limit_WASD)
+            {
+                // Escribimos que puede usar WASD para moverse
+                engine.drawText("WASD para moverse",
+                    575,
+                    10,
+                    20,
+                    BLACK);
+
+                elapsed_WASD += 1.0f / 60.0f;
+            }
         }
 
         // Dibujar el precio d elos objetos de la tienda
