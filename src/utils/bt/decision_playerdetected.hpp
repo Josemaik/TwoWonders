@@ -49,20 +49,15 @@ struct BTDecisionPlayerDetected : BTNode_t{
             }
             if(rayintercepted){ // si el obstaculo quita la vision al enemigo
                 ectx.ai.playerdetected = false;
-                return BTNodeStatus_t::fail;
             }else{ // si no hay obstaculos entre player y enemigo lo detecta
                 ectx.ai.playerdetected = true;
                 return BTNodeStatus_t::success;
             }
-        }else{
-            // si el campo de visión no detecta al player
-           ectx.ai.playerdetected = false;
-           return BTNodeStatus_t::fail;
         }
         
         //#### PERCEPCION SENSORIAL - OIDO ################################
         //Calculo la distancia del player al enemigo
-        auto const distance = (ectx.phy.position - getplayerpos(ectx)).length();
+        auto const distance = (ectx.phy.position - getplayerpos(ectx)).lengthSQ();
         //Compruebo si esta dentro del radio de detección por oido
         //podriamos hacer que en un radio x el enemigo entre en un estado
         // de alerta
@@ -71,7 +66,7 @@ struct BTDecisionPlayerDetected : BTNode_t{
         //     //estaado de alerta
         // }
 
-        if( distance < ectx.ai.detect_radius / 2){
+        if( distance < (ectx.ai.detect_radius * ectx.ai.detect_radius) / 2){
             //te escucha
             if(!ectx.ent.hasTag<BossFinalTag>()){
                 ectx.ai.path_initialized = false;
