@@ -9,6 +9,7 @@
 
 std::shared_ptr<Node> createSceneTree();
 std::shared_ptr<Model> loadModel(const char*, std::shared_ptr<Node>, ResourceManager& rm);
+std::shared_ptr<Texture> loadTexture(const char*, ResourceManager&);
 
 int main(){
 
@@ -27,6 +28,9 @@ int main(){
         std::cout << "└──────┘" << std::endl;
         auto filePath = "assets/dummy.obj";
         auto eModel = loadModel(filePath, nScene, rm);
+
+        filePath = "assets/wall.jpg";
+        auto rTexture = loadTexture(filePath, rm); 
 
         //----- View tree -----//
         std::cout << "┌──────┐" << std::endl;
@@ -56,7 +60,7 @@ int main(){
         std::cout << "┌────────┐" << std::endl;
         std::cout << "│ Unload │" << std::endl;
         std::cout << "└────────┘" << std::endl;
-        eModel->unload(rm);
+        rm.unloadAllResources();
 
         wm.closeWindow();
     }
@@ -104,4 +108,12 @@ std::shared_ptr<Model> loadModel(const char* filePath, std::shared_ptr<Node> nSc
         nScene->addChild(std::move(nModel));
     }
     return eModel;
+}
+
+std::shared_ptr<Texture> loadTexture(const char* filePath, ResourceManager& rm){
+    auto texture = rm.loadResource<Texture>();
+
+    texture->load(filePath);
+
+    return texture;
 }

@@ -10,16 +10,6 @@ struct Resource{
     virtual bool isLoaded() const = 0;
 };
 
-// Struct Texture // .png
-struct Texture : public Resource{
-    // int id (glGenTextures)
-    // int width, heigh
-
-    bool load() override { return true; }
-    void unload() override {}
-    bool isLoaded() const override { return true; }
-};
-
 // Struct Material // .mtl
 struct Material : public Resource{
     // coeficientes light

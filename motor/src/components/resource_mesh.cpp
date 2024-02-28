@@ -1,6 +1,6 @@
 #include "resource_mesh.hpp"
 
-Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<u_int16_t> indices, std::vector<Texture> textures){
+Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<u_int16_t> indices, std::vector<std::shared_ptr<Texture>> textures){
     this->id = id;
     this->vertices = vertices;
     this->indices = indices;
@@ -11,16 +11,14 @@ bool Mesh::load(){
 
     setupMesh();
 
-    //isLoaded() ? std::cout << "Load a mesh (ID: " << id <<")" << std::endl : std::cout << "Error loading a mesh" << std::endl;
+    isLoaded() ? std::cout << "   Load a mesh (ID: " << id <<")" << std::endl : std::cout << "Error loading a mesh" << std::endl;
     
     return isLoaded();
 }
 
 void Mesh::unload(){ 
-    glDeleteBuffers(1, &m_VBO);
-    glDeleteBuffers(1, &m_EBO);
     glDeleteVertexArrays(1, &m_VAO);
-    // std::cout << "Unload a mesh (ID: " << id <<")" << std::endl; 
+    std::cout << "Unload a mesh (ID: " << id <<")" << std::endl; 
 }
 
 bool Mesh::isLoaded() const{ 
@@ -56,6 +54,10 @@ void Mesh::setupMesh(){
 
     // Unbind vertex array
     glBindVertexArray(0);
+
+    // Delete buffers
+    glDeleteBuffers(1, &m_VBO);
+    glDeleteBuffers(1, &m_EBO);
 }
 
 void Mesh::draw(){ 
