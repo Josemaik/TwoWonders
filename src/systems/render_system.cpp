@@ -834,7 +834,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                         {
                             auto& ren{ em.getComponent<RenderComponent>(ene) };
                             auto& phy{ em.getComponent<PhysicsComponent>(ene) };
-                            if (ren.visible && (ene.hasTag<GolemTag>() || ene.hasTag<DestructibleTag>()))
+                            if (ren.visible && (ene.hasTag<DummyTag>() || ene.hasTag<DestructibleTag>()))
                             {
                                 engine.drawText("ESPACIO",
                                     static_cast<int>(engine.getWorldToScreenX(phy.position) - 25),
@@ -849,12 +849,13 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             if (li.num_zone == 2 && elapsed_WASD < elapsed_limit_WASD)
             {
+                auto& phy{ em.getComponent<PhysicsComponent>(e) };
                 // Escribimos que puede usar WASD para moverse
                 engine.drawText("WASD para moverse",
-                    575,
-                    10,
+                    static_cast<int>(engine.getWorldToScreenX(phy.position) - 100),
+                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 15),
                     20,
-                    BLACK);
+                    WHITE);
 
                 elapsed_WASD += 1.0f / 60.0f;
             }

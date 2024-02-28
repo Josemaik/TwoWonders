@@ -51,7 +51,7 @@ private:
     Shader* shaderPtr{ nullptr };
 
     float elapsed{ 0.f }, elapsed_limit{ 0.4f };
-    float elapsed_WASD{ 0.f }, elapsed_limit_WASD{ 10.0f };
+    float elapsed_WASD{ 0.f }, elapsed_limit_WASD{ 5.0f };
 };
 
 #endif // !RENDER_SYSTEM

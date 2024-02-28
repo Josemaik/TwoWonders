@@ -347,6 +347,6 @@ void ZoneSystem::checkTutorialEnemies(EntityManager& em)
     if (!playerEnt.hasComponent<AttackComponent>() && playerPhy.stopped)
     {
         li.viewPoint = { -33.714, 7.0, -43.494 };
-        playerPhy.stopped = false;
+        // playerPhy.stopped = false;
     }
 }
