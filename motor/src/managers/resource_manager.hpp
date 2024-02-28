@@ -1,6 +1,5 @@
 #pragma once
 #include "../components/resource.hpp"
-#include "../components/resource_mesh.hpp"
 
 #include <string>
 #include <memory>
@@ -34,6 +33,12 @@ public:
             it->second->unload();
             m_resources.erase(it);
         }
+    }
+
+    void unloadAllResources(){
+        for (auto& pair : m_resources)
+            pair.second->unload();
+        m_resources.clear();
     }
 
 private:
