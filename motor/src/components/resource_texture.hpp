@@ -5,6 +5,8 @@
 
 struct Texture : public Resource{
 public:
+    GLuint texture;
+
     Texture(std::size_t);
 
     bool load() override { return true; };
@@ -15,7 +17,7 @@ public:
     // void draw();
 
 private:
-    GLuint id_texture, texture;
+    GLuint id_texture;
     int width, height, nrChannels;
     bool isLoad { false };
 

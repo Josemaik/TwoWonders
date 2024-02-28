@@ -19,13 +19,3 @@ struct Material : public Resource{
     void unload() override {}
     bool isLoaded() const override { return true; }
 };
-
-// Struct Shader
-struct Shader : public Resource{
-    // int id (glCreateProgram)
-    // setInt, setFloat, setMat4
-
-    bool load() override { return true; }
-    void unload() override {}
-    bool isLoaded() const override { return true; }
-};

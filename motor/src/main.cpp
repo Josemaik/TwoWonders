@@ -4,6 +4,7 @@
 #include "managers/resource_manager.hpp"
 #include "managers/windows_manager.hpp"
 #include "managers/render_manager.hpp"
+#include "components/resource_shader.hpp"
 
 #include <iostream>
 
@@ -32,6 +33,9 @@ int main(){
         filePath = "assets/wall.jpg";
         auto rTexture = loadTexture(filePath, rm); 
 
+        auto rShaderColor = rm.loadResource<Shader>("src/shaders/color.vs", "src/shaders/color.fs");
+        auto rShaderTexture = rm.loadResource<Shader>("src/shaders/texture.vs", "src/shaders/texture.fs");
+
         //----- View tree -----//
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Tree │" << std::endl;
@@ -39,13 +43,19 @@ int main(){
         nScene->drawTree();
 
         //------ Shaders -----//
-        renm.compilingShaders();
+        // renm.compilingShaders();
 
         // Main loop
         while(!wm.windowShouldClose()){
             wm.beginDrawing();
 
             renm.clearBackground({1.0f, 1.0f, 1.0f, 1.0f});
+
+            // glBindTexture(GL_TEXTURE_2D, rTexture->texture);
+
+            // rShaderColor->use();
+            renm.useShader(rShaderColor->id_shader);
+
             renm.drawTriangle({0.0f, 0.5f}, {-0.5f, -0.5f}, {0.5f, -0.5f}, {1.0f, 0.5f, 0.2f, 1.0f});
             renm.drawPixel({0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
 
