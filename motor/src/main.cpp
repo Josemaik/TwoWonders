@@ -25,7 +25,7 @@ int main(){
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Load │" << std::endl;
         std::cout << "└──────┘" << std::endl;
-        auto filePath = "assets/main_character.obj";
+        auto filePath = "assets/dummy.obj";
         auto eModel = loadModel(filePath, nScene, rm);
 
         //----- View tree -----//

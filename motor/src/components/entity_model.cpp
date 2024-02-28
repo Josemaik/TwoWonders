@@ -4,7 +4,7 @@ void Model::load(const char* filePath, ResourceManager& rm){
     // Read file
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs);
-    if(!scene | !scene->mRootNode){
+    if(!scene || !scene->mRootNode){
         std::cerr << "[ERROR ASSIMP] : " << importer.GetErrorString() << std::endl;
         return;
     }
