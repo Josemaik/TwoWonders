@@ -3,6 +3,7 @@
 #include "components/entity_model.hpp"
 #include "managers/resource_manager.hpp"
 #include "managers/windows_manager.hpp"
+#include "managers/render_manager.hpp"
 
 #include <iostream>
 
@@ -14,6 +15,7 @@ int main(){
     //----- Initialize managers -----//
     WindowsManager wm;
     ResourceManager rm;
+    RenderManager renm;
 
     //----- Create scene tree -----//
     auto nScene = createSceneTree();
@@ -23,7 +25,7 @@ int main(){
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Load │" << std::endl;
         std::cout << "└──────┘" << std::endl;
-        auto filePath = "assets/main_character.obj";
+        auto filePath = "assets/dummy.obj";
         auto eModel = loadModel(filePath, nScene, rm);
 
         //----- View tree -----//
@@ -32,12 +34,20 @@ int main(){
         std::cout << "└──────┘" << std::endl;
         nScene->drawTree();
 
+        //------ Shaders -----//
+        renm.compilingShaders();
+
         // Main loop
         while(!wm.windowShouldClose()){
             wm.beginDrawing();
 
-            wm.clearBackground(1.0f, 1.0f, 1.0f);
-            // wm.drawPixel(400, 300, 256.0f, 256.0f, 256.0f);
+            renm.clearBackground({1.0f, 1.0f, 1.0f, 1.0f});
+            renm.drawTriangle({0.0f, 0.5f}, {-0.5f, -0.5f}, {0.5f, -0.5f}, {1.0f, 0.5f, 0.2f, 1.0f});
+            renm.drawPixel({0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
+
+            renm.drawRectangle({0.4f, 0.4f}, {0.2f, 0.2f}, {0.0f, 0.5f, 0.2f, 1.0f});
+
+            eModel->draw(glm::mat4());
 
             wm.endDrawing();
         }

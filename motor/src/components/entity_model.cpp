@@ -4,7 +4,7 @@ void Model::load(const char* filePath, ResourceManager& rm){
     // Read file
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs);
-    if(!scene | !scene->mRootNode){
+    if(!scene || !scene->mRootNode){
         std::cerr << "[ERROR ASSIMP] : " << importer.GetErrorString() << std::endl;
         return;
     }
@@ -24,7 +24,7 @@ void Model::unload(ResourceManager& rm){
 }
 
 void Model::draw(glm::mat4) const { 
-    std::cout << "Draw a model" << std::endl; 
+    // std::cout << "Draw a model" << std::endl; 
     for(int i=0; i<static_cast<int>(m_meshes.size()); i++)
         m_meshes[i]->draw();
 };

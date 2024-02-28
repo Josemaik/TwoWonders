@@ -48,8 +48,8 @@ void Node::traverse(glm::mat4 parentMatrix) {
     std::cout << "Node: " << this->name << std::endl;
 
     // Draw Entity
-    if(m_entity)
-        m_entity->draw(m_transformationMatrix);
+    // if(m_entity)
+    //     m_entity->draw(m_transformationMatrix);
 
     // printTransformationMatrix();
 
