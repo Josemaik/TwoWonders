@@ -762,7 +762,7 @@
 							"scale_to_respawn_attack": 7.0
 						},
 						{
-							"position":[109.0, 3.0, -77.0],
+							"position":[100.0, 3.0, -70.0],
 							"scale": [5.0, 3.0, 5.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.4,
@@ -770,7 +770,7 @@
 							"type": 8,
 							"element": 1,
 							"arrival_radius": 2.0,
-							"detect_radius": 25.0,
+							"detect_radius": 35.0,
 							"attack_radius": 2.5,
 							"tx": 0.0,
 							"tz": 0.0,

@@ -486,9 +486,11 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
     {
         classicCollision(*staticPhy, *otherPhy, minOverlap);
 
-        if (otherEntPtr->hasTag<NoDamageTag>() && !otherEntPtr->hasTag<SpiderTag>())
+        if (otherEntPtr->hasTag<NoDamageTag>() && !otherEntPtr->hasTag<CrusherTag>())
         {
-            staticPhy->position -= 3 * vec3d{ staticPhy->velocity.x(), 0, staticPhy->velocity.z() };
+            vec3d dir = staticPhy->position - em.getComponent<PhysicsComponent>(*otherEntPtr).position;
+            dir.normalize();
+            staticPhy->position += dir * 5;
             staticPhy->stopped = true;
             return;
         }
@@ -509,6 +511,11 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         if (bb.playerdamagebycrusher == false) {
             em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife(2);
             bb.playerdamagebycrusher = true;
+
+            // El jugador se mueve hacia atrás de la posición del crusher
+            vec3d dir = staticPhy->position - em.getComponent<PhysicsComponent>(*otherEntPtr).position;
+            dir.normalize();
+            staticPhy->position += dir * 7;
         }
         return;
     }
