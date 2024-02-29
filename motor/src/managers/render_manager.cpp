@@ -119,11 +119,11 @@ void RenderManager::clearBackground(glm::vec4 color){
 void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, glm::vec4 color){
     // Define vertices and indices
     float vertices[] = {
-        // positions                                                                                                                       // colors           // texture coords
-        normalizeX(pos.x)                                          , normalizeY(pos.y)                                           , 0.0f,   1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth())), normalizeY(pos.y)                                           , 0.0f,   1.0f, 1.0f, 1.0f,   1.0f, 0.0f,
-        normalizeX(pos.x)                                          , normalizeY(pos.y + static_cast<float>(texture->getHeight())), 0.0f,   1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth())), normalizeY(pos.y + static_cast<float>(texture->getHeight())), 0.0f,   1.0f, 1.0f, 1.0f,   1.0f, 1.0f
+        // positions                                                                                                                       // colors                    // texture coords
+        normalizeX(pos.x)                                          , normalizeY(pos.y)                                           , 0.0f,   color.x, color.y, color.z,   0.0f, 0.0f,
+        normalizeX(pos.x + static_cast<float>(texture->getWidth())), normalizeY(pos.y)                                           , 0.0f,   color.x, color.y, color.z,   1.0f, 0.0f,
+        normalizeX(pos.x)                                          , normalizeY(pos.y + static_cast<float>(texture->getHeight())), 0.0f,   color.x, color.y, color.z,   0.0f, 1.0f,
+        normalizeX(pos.x + static_cast<float>(texture->getWidth())), normalizeY(pos.y + static_cast<float>(texture->getHeight())), 0.0f,   color.x, color.y, color.z,   1.0f, 1.0f
     };
 
     GLuint indices[] = { 0, 1, 2, 1, 2, 3};
