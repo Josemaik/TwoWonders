@@ -91,69 +91,57 @@ void InputSystem::update(EntityManager& em)
         //         keysPressed++;
         //     }
         // }else{
-        if (IsKeyDown(in.right)) {
 
-            if (!li.cameraChange)
-            {
-                vel.setX(vel.x() + INP_SPEED);
-                vel.setZ(vel.z() - INP_SPEED);
-            }
-            else
-            {
-                vel.setX(vel.x() + INP_SPEED);
-                vel.setZ(vel.z() + INP_SPEED);
-            }
+        // Código de movimiento
+        if (IsKeyDown(in.right))
+        {
+            vel.setX(vel.x() + INP_SPEED);
+            vel.setZ(vel.z() - INP_SPEED);
 
             keysPressed++;
         }
-        if (IsKeyDown(in.left)) {
-
-            if (!li.cameraChange)
-            {
-                vel.setX(vel.x() - INP_SPEED);
-                vel.setZ(vel.z() + INP_SPEED);
-
-            }
-            else
-            {
-                vel.setX(vel.x() - INP_SPEED);
-                vel.setZ(vel.z() - INP_SPEED);
-            }
+        if (IsKeyDown(in.left))
+        {
+            vel.setX(vel.x() - INP_SPEED);
+            vel.setZ(vel.z() + INP_SPEED);
 
             keysPressed++;
         }
-        if (IsKeyDown(in.up)) {
-
-            if (!li.cameraChange)
-            {
-                vel.setX(vel.x() - INP_SPEED);
-                vel.setZ(vel.z() - INP_SPEED);
-            }
-            else
-            {
-                vel.setX(vel.x() + INP_SPEED);
-                vel.setZ(vel.z() - INP_SPEED);
-            }
+        if (IsKeyDown(in.up))
+        {
+            vel.setX(vel.x() - INP_SPEED);
+            vel.setZ(vel.z() - INP_SPEED);
 
             keysPressed++;
         }
-        if (IsKeyDown(in.down)) {
+        if (IsKeyDown(in.down))
+        {
 
-            if (!li.cameraChange)
-            {
-                vel.setX(vel.x() + INP_SPEED);
-                vel.setZ(vel.z() + INP_SPEED);
-            }
-            else
-            {
-                vel.setX(vel.x() - INP_SPEED);
-                vel.setZ(vel.z() + INP_SPEED);
-            }
+            vel.setX(vel.x() + INP_SPEED);
+            vel.setZ(vel.z() + INP_SPEED);
 
             keysPressed++;
         }
-        // }
 
+        if (IsGamepadAvailable(0))
+        {
+            // Obtén el movimiento del joystick
+            float joystick_x = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * -1;
+            float joystick_y = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
+
+            float deadzone = 0.3f;
+
+            // Deadzone
+            if (joystick_x < deadzone && joystick_x > -deadzone)
+                joystick_x = 0.0f;
+
+            if (joystick_y < deadzone && joystick_y > -deadzone)
+                joystick_y = 0.0f;
+
+            // Ajusta la velocidad basándote en el movimiento del joystick
+            vel.setX(vel.x() + (joystick_y - joystick_x) * INP_SPEED);
+            vel.setZ(vel.z() + (joystick_y + joystick_x) * INP_SPEED);
+        }
 
         if (keysPressed == 2)
         {
@@ -161,51 +149,18 @@ void InputSystem::update(EntityManager& em)
             vel *= INP_SPEED;
         }
 
-        if (IsKeyReleased(in.lockIn))
+        if (IsKeyReleased(in.lockIn) || IsGamepadButtonReleased(0, in.m_lockIn))
             inpi.lockOn = !inpi.lockOn;
 
-
-        // if(IsKeyDown(in.seek) && !bb.tactive){
-        //    // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
-        //     bb.behaviour = SB::Seek;
-        // }
-        // if(IsKeyDown(in.arrive) && !bb.tactive){
-        //    // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
-        //     bb.behaviour = SB::Arrive;
-        // }
-        // if(IsKeyDown(in.Flee) && !bb.tactive){
-        //    // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
-        //     bb.behaviour = SB::Flee;
-        // }
-        // if(IsKeyDown(in.Pursue) && !bb.tactive){
-        //    // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
-        //     bb.behaviour = SB::Pursue;
-        // }
-        // if(IsKeyDown(in.Avoid) && !bb.tactive){
-        //    // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
-        //     bb.behaviour = SB::Avoid;
-        // }
-        // if(IsKeyDown(in.pathfollow) && !bb.tactive){
-        //    // bb = { phy.position.x() , phy.position.z(), true, e.getID() };
-        //     bb.behaviour = SB::followPath;
-        //     bb.tactive = true;
-        // }
-        // if(bb.behaviour != SB::followPath && bb.behaviour != SB::Arrive){
         bb.tx = phy.position.x();
         bb.tz = phy.position.z();
         bb.tactive = true;
         bb.teid = e.getID();
-        // }
-        // if(bb.behaviour == SB::Arrive){
-        //     bb.tx = 0.0;
-        //     bb.tz = 0.0;
-        //     bb.tactive = true;
-        // }
 
         auto& plfi = em.getSingleton<PlayerInfo>();
 
         // Codigo para el ataque
-        if (IsKeyDown(in.space) && e.hasComponent<AttackComponent>())
+        if ((IsKeyDown(in.space) || IsGamepadButtonPressed(0, in.m_space)) && e.hasComponent<AttackComponent>())
             em.getComponent<AttackComponent>(e).attack(AttackType::AttackPlayer);
         else if (plfi.mana < plfi.max_mana)
         {
@@ -215,21 +170,10 @@ void InputSystem::update(EntityManager& em)
                 plfi.mana = plfi.max_mana;
         }
 
-        if (IsKeyPressed(in.interact))
+        if (IsKeyPressed(in.interact) || IsGamepadButtonPressed(0, in.m_interact))
             inpi.interact = true;
-        else if (IsKeyReleased(in.interact))
+        else if (IsKeyReleased(in.interact) || IsGamepadButtonReleased(0, in.m_interact))
             inpi.interact = false;
-
-
-        // if (IsKeyPressed(in.pause) && !inpi.pause && li.currentScreen == GameScreen::GAMEPLAY)
-        // {
-        //     li.currentScreen = GameScreen::PAUSE;
-        //     inpi.pause = true;
-        // }
-        // else if (inpi.pause && IsKeyReleased(in.pause))
-        // {
-        //     inpi.pause = false;
-        // }
 
         // Codigo para la bomba
         if (IsKeyDown(KEY_B) && e.hasComponent<AttackComponent>())
@@ -242,17 +186,6 @@ void InputSystem::update(EntityManager& em)
         // Codigo para curarse // DEBUG
         if (IsKeyDown(KEY_Z) && e.hasComponent<LifeComponent>())
             em.getComponent<LifeComponent>(e).increaseLife();
-
-        // Código pa correr
-        //
-        // if (IsKeyDown(in.space))
-        // {
-        //     if (vel.x() != 0.0f || vel.z() != 0.0f)
-        //     {
-        //         // Esto no funcionará si la velocidad del input es igual a la velocidad máxima del PhysicsSystem
-        //         vel *= (INP_SPEED * 3.5f);
-        //     }
-        // }
 
         // Normalizar la velocidad si se está moviendo en diagonal
         if (vel.x() != 0.0f && vel.z() != 0.0f)

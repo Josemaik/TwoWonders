@@ -25,4 +25,14 @@ struct InputComponent
     int debugPhy{ KEY_F1 };
     int debugIA1{ KEY_F2 };
     int debugIA2{ KEY_F3 };
+
+    // Botones de Mando
+    int m_up{ GAMEPAD_BUTTON_LEFT_FACE_UP };
+    int m_down{ GAMEPAD_BUTTON_LEFT_FACE_DOWN };
+    int m_left{ GAMEPAD_BUTTON_LEFT_FACE_LEFT };
+    int m_right{ GAMEPAD_BUTTON_LEFT_FACE_RIGHT };
+
+    int m_interact{ GAMEPAD_BUTTON_RIGHT_FACE_DOWN };
+    int m_space{ GAMEPAD_BUTTON_RIGHT_FACE_LEFT };
+    int m_lockIn{ GAMEPAD_BUTTON_RIGHT_FACE_RIGHT };
 };
