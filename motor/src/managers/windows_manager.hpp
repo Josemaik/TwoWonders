@@ -16,10 +16,12 @@ private:
     void framebuffer_size_callback();
 
 public:
-    // Windows functions
+    // Window-related functions
     bool initWindow(int width, int height, const char* title);
     void closeWindow();
     bool windowShouldClose() const;
+    int getScreenWidth(){ return m_width; };
+    int getScreenHeight(){ return m_height; };
 
     // Drawing-related functions
     void beginDrawing();

@@ -30,7 +30,7 @@ int main(){
         auto filePath = "assets/dummy.obj";
         auto eModel = loadModel(filePath, nScene, rm);
 
-        filePath = "assets/wall.jpg";
+        filePath = "assets/container.jpg";
         auto rTexture = loadTexture(filePath, rm); 
 
         auto rShaderColor = rm.loadResource<Shader>("src/shaders/color.vs", "src/shaders/color.fs", ShaderType::COLOR);
@@ -51,15 +51,20 @@ int main(){
 
             renm.clearBackground({1.0f, 1.0f, 1.0f, 1.0f});
 
-            // glBindTexture(GL_TEXTURE_2D, rTexture->texture);
-
+            // Draw (color)
             renm.useShader(rShaderColor);
 
-            renm.drawTriangle({0.0f, 0.5f}, {-0.5f, -0.5f}, {0.5f, -0.5f}, {1.0f, 0.5f, 0.2f, 1.0f});
-            renm.drawPixel({0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
-            renm.drawRectangle({0.4f, 0.4f}, {0.2f, 0.2f}, {0.0f, 0.5f, 0.2f, 1.0f});
+            renm.drawTriangle({400.0f, 150.0f}, {200.0f, 450.0f}, {600.0f, 450.0f}, {1.0f, 0.5f, 0.2f, 1.0f});
+            renm.drawPixel({400.0f, 300.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
+            renm.drawRectangle({300.0f, 10.0f}, {140.0f, 20.0f}, {0.0f, 0.5f, 0.2f, 1.0f});
 
-            eModel->draw(glm::mat4());
+            // Draw (texture)
+            renm.useShader(rShaderTexture);
+
+            renm.drawTexture(rTexture, {0.0f, 500.0f}, {1.0f, 1.0f, 1.0f, 1.0f});
+
+            // Draw (model)
+            //eModel->draw(glm::mat4());
 
             wm.endDrawing();
         }

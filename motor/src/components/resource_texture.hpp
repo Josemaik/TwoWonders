@@ -14,6 +14,9 @@ public:
     void unload() override;
     bool isLoaded() const override;
 
+    int getWidth(){ return width; };
+    int getHeight(){ return height; };
+
     // void draw();
 
 private:
