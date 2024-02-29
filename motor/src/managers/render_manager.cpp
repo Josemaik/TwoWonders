@@ -28,8 +28,8 @@ void RenderManager::draw(float vertices[], std::size_t vertSize, GLuint indices[
     glBindVertexArray(0);
 
     // Set the uniform color in the shader
-    GLuint colorUniform = glGetUniformLocation(m_shaderProgram, "customColor");
-    glUseProgram(m_shaderProgram);
+    GLuint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
+    glUseProgram(m_shaderProgram->id_shader);
     glUniform4fv(colorUniform, 1, glm::value_ptr(color));
 
     // Draw the triangle
@@ -67,8 +67,8 @@ void RenderManager::drawPixel(glm::vec2 pos, glm::vec4 color){
     glBindVertexArray(0);
 
     // Set the uniform color in the shader
-    GLint colorUniform = glGetUniformLocation(m_shaderProgram, "customColor");
-    glUseProgram(m_shaderProgram);
+    GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
+    glUseProgram(m_shaderProgram->id_shader);
     glUniform4fv(colorUniform, 1, glm::value_ptr(color));
 
     // Draw the pixel

@@ -10,12 +10,15 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+enum struct ShaderType { COLOR, TEXTURE };
+
 struct Shader : public Resource {
 public:
     GLuint id_shader;
+    ShaderType type;
 
     // reads and build the shader
-    Shader(std::size_t, const char*, const char*);
+    Shader(std::size_t, const char*, const char*, ShaderType);
 
     void use();
 
