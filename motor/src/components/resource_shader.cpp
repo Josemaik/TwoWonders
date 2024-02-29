@@ -1,7 +1,8 @@
 #include "resource_shader.hpp"
 
-Shader::Shader(std::size_t id, const char* vertexPath, const char* fragmentPath){
+Shader::Shader(std::size_t id, const char* vertexPath, const char* fragmentPath, ShaderType type){
     this->id = id;
+    this->type = type;
 
     //----- Retrieve the vertex/fragment source code from filePath -----//
     std::string vertexCode;

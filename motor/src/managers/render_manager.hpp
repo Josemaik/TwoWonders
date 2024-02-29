@@ -1,5 +1,9 @@
 #pragma once
 
+#include "../components/resource_shader.hpp"
+
+#include <memory>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <GL/gl.h>
@@ -10,7 +14,7 @@
 
 struct RenderManager{
 private:
-    GLuint m_shaderProgram;
+    std::shared_ptr<Shader> m_shaderProgram;
     void draw(float vertices[], std::size_t vertSize, GLuint indices[], std::size_t indSize,glm::vec4 color);
 
 public:
@@ -21,5 +25,5 @@ public:
     void drawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 color);
 
     // ChangeShader
-    void useShader(GLuint shader){ m_shaderProgram = shader; };
+    void useShader(std::shared_ptr<Shader> shader){ m_shaderProgram = shader; };
 };
