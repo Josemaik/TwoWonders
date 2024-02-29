@@ -12,7 +12,7 @@ Texture::Texture(std::size_t id){
 bool Texture::load(const char* filePath){
     setupTexture(filePath);
 
-    isLoaded() ? std::cout << "Load -> " << filePath << " (ID: " << id <<") (ID_TEXTURE: " << id_texture <<")" << std::endl : std::cout << "Error loading a texture" << std::endl;
+    isLoaded() ? std::cout << "Load a texture (ID: " << id <<") -> " << filePath << std::endl : std::cout << "Error loading a texture" << std::endl;
 
     return isLoaded();
 }
