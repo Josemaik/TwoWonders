@@ -121,6 +121,10 @@ void ENGI::GameEngine::drawCircle(int posX, int posY, float radius, Color color)
     DrawCircle(posX, posY, radius, color);
 }
 
+void ENGI::GameEngine::drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color) {
+    DrawLine(startPosX, startPosY, endPosX, endPosY, color);
+}
+
 ////// TEXT //////
 
 void ENGI::GameEngine::drawText(const char* text, int posX, int posY, int fontSize, Color color) {
@@ -203,6 +207,87 @@ vec3d ENGI::GameEngine::getUpCamera()
 float ENGI::GameEngine::getFovyCamera()
 {
     return camera.fovy;
+}
+
+////// INPUT HANDLING //////
+
+bool ENGI::GameEngine::isKeyPressed(int key)
+{
+    return IsKeyPressed(key);
+}
+
+bool ENGI::GameEngine::isKeyDown(int key)
+{
+    return IsKeyDown(key);
+}
+
+bool ENGI::GameEngine::isKeyReleased(int key)
+{
+    return IsKeyReleased(key);
+}
+
+bool ENGI::GameEngine::isMouseButtonPressed(int button)
+{
+    return IsMouseButtonPressed(button);
+}
+
+bool ENGI::GameEngine::isMouseButtonDown(int button)
+{
+    return IsMouseButtonDown(button);
+}
+
+bool ENGI::GameEngine::isGamepadAvailable(int gamepad)
+{
+    return IsGamepadAvailable(gamepad);
+}
+
+bool ENGI::GameEngine::isGamepadButtonPressed(int gamepad, int button)
+{
+    return IsGamepadButtonPressed(gamepad, button);
+}
+
+bool ENGI::GameEngine::isGamepadButtonDown(int gamepad, int button)
+{
+    return IsGamepadButtonDown(gamepad, button);
+}
+
+bool ENGI::GameEngine::isGamepadButtonReleased(int gamepad, int button)
+{
+    return IsGamepadButtonReleased(gamepad, button);
+}
+
+float ENGI::GameEngine::getGamepadAxisMovement(int gamepad, int axis)
+{
+    return GetGamepadAxisMovement(gamepad, axis);
+}
+
+////// MOUSE COLLISION //////
+
+bool ENGI::GameEngine::checkCollisionPointRec(Vector2 point, Rectangle rec)
+{
+    return CheckCollisionPointRec(point, rec);
+}
+
+////// SHADERS //////
+
+Shader ENGI::GameEngine::loadShader(const char* vsFileName, const char* fsFileName)
+{
+    return LoadShader(vsFileName, fsFileName);
+}
+
+void ENGI::GameEngine::unloadShader(Shader s)
+{
+    UnloadShader(s);
+}
+
+int ENGI::GameEngine::getShaderLocation(Shader s, const char* uniformName)
+{
+    return GetShaderLocation(s, uniformName);
+}
+
+void ENGI::GameEngine::setShaderValue(Shader s, int uniformLoc, const void* value, int uniformType)
+{
+    SetShaderValue(s, uniformLoc, value, uniformType);
 }
 
 ////// AUX //////

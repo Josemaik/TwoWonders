@@ -70,16 +70,16 @@ void Game::createSound(EntityManager&) {
 void Game::run()
 {
 
-    Shader shader = LoadShader(TextFormat("assets/shaders/lighting.vs", 330),
+    Shader shader = engine.loadShader(TextFormat("assets/shaders/lighting.vs", 330),
         TextFormat("assets/shaders/lighting.fs", 330));
 
     // Get some required shader locations
-    shader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(shader, "viewPos");
+    shader.locs[SHADER_LOC_VECTOR_VIEW] = engine.getShaderLocation(shader, "viewPos");
 
     // Ambient light level (some basic lighting)
-    int ambientLoc = GetShaderLocation(shader, "ambient");
+    int ambientLoc = engine.getShaderLocation(shader, "ambient");
     float ambientValue[4] = { 3.1f, 3.1f, 3.1f, 20.0f };
-    SetShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
+    engine.setShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
 
     render_system.setShader(shader);
 
@@ -167,7 +167,7 @@ void Game::run()
         case GameScreen::STORY:
         {
             // Input del enter para empezar la partida
-            if (input_system.pressEnter())
+            if (input_system.pressEnter(engine))
                 li.currentScreen = GameScreen::GAMEPLAY;
             render_system.drawStory(engine);
 
@@ -186,7 +186,7 @@ void Game::run()
             if (em.getEntities().empty() || li.resetGame)
                 resetGame(em, engine, render_system);
 
-            input_system.update(em);
+            input_system.update(em, engine);
 
             // seleccionar modo de debug ( physics o AI)
             if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText()))
@@ -231,7 +231,7 @@ void Game::run()
         // CODIGO DE LA PANTALLA FINAL
         case GameScreen::ENDING:
         {
-            if (input_system.pressEnter())
+            if (input_system.pressEnter(engine))
                 li.currentScreen = GameScreen::TITLE;
 
             render_system.drawEnding(engine);
@@ -253,7 +253,7 @@ void Game::run()
     sound_system.clear();
     render_system.unloadModels(em, engine);
 
-    UnloadShader(shader);
+    engine.unloadShader(shader);
     engine.closeWindow();
 }
 
@@ -272,4 +272,3 @@ void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
     map.reset(em, 0, iam);
     li.sound_system = &sound_system;
 }
-

@@ -1,6 +1,6 @@
 #include "input_system.hpp"
 
-void InputSystem::update(EntityManager& em)
+void InputSystem::update(EntityManager& em, GameEngine& ge)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
@@ -8,7 +8,7 @@ void InputSystem::update(EntityManager& em)
     auto* playerEn = em.getEntityByID(li.playerID);
 
     // PAUSE
-    if (IsKeyReleased(KEY_ESCAPE) && li.currentScreen == GameScreen::GAMEPLAY)
+    if (ge.isKeyReleased(KEY_ESCAPE) && li.currentScreen == GameScreen::GAMEPLAY)
     {
         inpi.pause = !inpi.pause;
         inpi.debugAI1 = false;
@@ -19,7 +19,7 @@ void InputSystem::update(EntityManager& em)
     }
 
     // INVENTORY
-    if (IsKeyReleased(KEY_I) && li.currentScreen == GameScreen::GAMEPLAY && !inpi.pause)
+    if (ge.isKeyReleased(KEY_I) && li.currentScreen == GameScreen::GAMEPLAY && !inpi.pause)
     {
         inpi.inventory = !inpi.inventory;
         inpi.debugAI1 = false;
@@ -29,7 +29,7 @@ void InputSystem::update(EntityManager& em)
     }
 
     // DEBUG PHYSICS
-    if (IsKeyReleased(KEY_F1))
+    if (ge.isKeyReleased(KEY_F1))
     {
         inpi.debugPhy = !inpi.debugPhy;
         inpi.debugAI1 = false;
@@ -40,7 +40,7 @@ void InputSystem::update(EntityManager& em)
     }
 
     //DEBUG AI - Stop Game
-    if (IsKeyReleased(KEY_F2))
+    if (ge.isKeyReleased(KEY_F2))
     {
         inpi.debugAI1 = !inpi.debugAI1;
         inpi.debugPhy = false;
@@ -51,7 +51,7 @@ void InputSystem::update(EntityManager& em)
     }
 
     //DEBUG AI - Real Time
-    if (IsKeyReleased(KEY_F3))
+    if (ge.isKeyReleased(KEY_F3))
     {
         inpi.debugAI2 = !inpi.debugAI2;
         inpi.debugPhy = false;
@@ -60,7 +60,7 @@ void InputSystem::update(EntityManager& em)
         return;
     }
 
-    if (!playerEn->hasTag<PlayerTag>() && IsKeyReleased(KEY_ENTER))
+    if (!playerEn->hasTag<PlayerTag>() && ge.isKeyReleased(KEY_ENTER))
     {
         li.resetGame = true;
         return;
@@ -75,17 +75,17 @@ void InputSystem::update(EntityManager& em)
         // Actualizar la velocidad
         int keysPressed = 0;
 
-        if (IsKeyDown(in.air_attack) && e.hasComponent<AttackComponent>()) {
+        if (ge.isKeyDown(in.air_attack) && e.hasComponent<AttackComponent>()) {
             em.getComponent<AttackComponent>(e).pos_respawn_air_attack = phy.position;
             em.getComponent<AttackComponent>(e).attack(AttackType::AirAttack);
         }
         // if(phy.blockXZ){
-        //     if (IsKeyDown(in.up)) {
+        //     if (ge.isKeyDown(in.up)) {
         //         vel.setY(vel.y() + INP_SPEED);
         //         in.last_key = in.up;
         //         keysPressed++;
         //     }
-        //     if (IsKeyDown(in.down)) {
+        //     if (ge.isKeyDown(in.down)) {
         //         vel.setY(vel.y() - INP_SPEED);
         //         in.last_key = in.down;
         //         keysPressed++;
@@ -93,28 +93,28 @@ void InputSystem::update(EntityManager& em)
         // }else{
 
         // Código de movimiento
-        if (IsKeyDown(in.right))
+        if (ge.isKeyDown(in.right))
         {
             vel.setX(vel.x() + INP_SPEED);
             vel.setZ(vel.z() - INP_SPEED);
 
             keysPressed++;
         }
-        if (IsKeyDown(in.left))
+        if (ge.isKeyDown(in.left))
         {
             vel.setX(vel.x() - INP_SPEED);
             vel.setZ(vel.z() + INP_SPEED);
 
             keysPressed++;
         }
-        if (IsKeyDown(in.up))
+        if (ge.isKeyDown(in.up))
         {
             vel.setX(vel.x() - INP_SPEED);
             vel.setZ(vel.z() - INP_SPEED);
 
             keysPressed++;
         }
-        if (IsKeyDown(in.down))
+        if (ge.isKeyDown(in.down))
         {
 
             vel.setX(vel.x() + INP_SPEED);
@@ -123,11 +123,11 @@ void InputSystem::update(EntityManager& em)
             keysPressed++;
         }
 
-        if (IsGamepadAvailable(0))
+        if (ge.isGamepadAvailable(0))
         {
             // Obtén el movimiento del joystick
-            float joystick_x = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * -1;
-            float joystick_y = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
+            float joystick_x = ge.getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * -1;
+            float joystick_y = ge.getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
 
             float deadzone = 0.3f;
 
@@ -149,7 +149,7 @@ void InputSystem::update(EntityManager& em)
             vel *= INP_SPEED;
         }
 
-        if (IsKeyReleased(in.lockIn) || IsGamepadButtonReleased(0, in.m_lockIn))
+        if (ge.isKeyReleased(in.lockIn) || ge.isGamepadButtonReleased(0, in.m_lockIn))
             inpi.lockOn = !inpi.lockOn;
 
         bb.tx = phy.position.x();
@@ -160,7 +160,7 @@ void InputSystem::update(EntityManager& em)
         auto& plfi = em.getSingleton<PlayerInfo>();
 
         // Codigo para el ataque
-        if ((IsKeyDown(in.space) || IsGamepadButtonPressed(0, in.m_space)) && e.hasComponent<AttackComponent>())
+        if ((ge.isKeyDown(in.space) || ge.isGamepadButtonPressed(0, in.m_space)) && e.hasComponent<AttackComponent>())
             em.getComponent<AttackComponent>(e).attack(AttackType::AttackPlayer);
         else if (plfi.mana < plfi.max_mana)
         {
@@ -170,21 +170,21 @@ void InputSystem::update(EntityManager& em)
                 plfi.mana = plfi.max_mana;
         }
 
-        if (IsKeyPressed(in.interact) || IsGamepadButtonPressed(0, in.m_interact))
+        if (ge.isKeyPressed(in.interact) || ge.isGamepadButtonPressed(0, in.m_interact))
             inpi.interact = true;
-        else if (IsKeyReleased(in.interact) || IsGamepadButtonReleased(0, in.m_interact))
+        else if (ge.isKeyReleased(in.interact) || ge.isGamepadButtonReleased(0, in.m_interact))
             inpi.interact = false;
 
         // Codigo para la bomba
-        if (IsKeyDown(KEY_B) && e.hasComponent<AttackComponent>())
+        if (ge.isKeyDown(KEY_B) && e.hasComponent<AttackComponent>())
             em.getComponent<AttackComponent>(e).attack(AttackType::Bomb);
 
         // Codigo para cambiar de tipo de ataque
-        if (IsKeyReleased(KEY_Q))
+        if (ge.isKeyReleased(KEY_Q))
             plfi.changeCurrentSpell();
 
         // Codigo para curarse // DEBUG
-        if (IsKeyDown(KEY_Z) && e.hasComponent<LifeComponent>())
+        if (ge.isKeyDown(KEY_Z) && e.hasComponent<LifeComponent>())
             em.getComponent<LifeComponent>(e).increaseLife();
 
         // Normalizar la velocidad si se está moviendo en diagonal
@@ -195,6 +195,6 @@ void InputSystem::update(EntityManager& em)
     });
 }
 
-bool InputSystem::pressEnter() {
-    return IsKeyReleased(KEY_ENTER);
+bool InputSystem::pressEnter(GameEngine& ge) {
+    return ge.isKeyReleased(KEY_ENTER);
 }
