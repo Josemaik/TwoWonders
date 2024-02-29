@@ -25,17 +25,6 @@ void RenderSystem::init()
 
 void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt)
 {
-    // if (dt != 0.0)
-    // {
-    //     if (elapsed >= elapsed_limit) {
-    //         elapsed = 0;
-    //     }
-    //     else {
-    //         elapsed += dt;
-    //         return;
-    //     }
-    // }
-
     // Actualizamos la posicion de render del componente de fisicas
     em.forEach<SYSCMPs, SYSTAGs>([](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
     {
@@ -78,7 +67,7 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
         ss.music_stop();
     }
 
-    if (CheckCollisionPointRec(GetMousePosition(), btn1Rec) || CheckCollisionPointRec(GetMousePosition(), btn2Rec)) {
+    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec)) {
         if (ss.pushed == false)
             ss.sonido_mov();
         ss.pushed = true;
@@ -114,7 +103,7 @@ void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, Soun
         ss.seleccion_menu();
     }
 
-    if (CheckCollisionPointRec(GetMousePosition(), btn1Rec)) {
+    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec)) {
         if (ss.pushed == false)
             ss.sonido_mov();
         ss.pushed = true;
@@ -328,8 +317,6 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
         // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
         // r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
         loadShaders(r.model);
-
-
     }
     else if (e.hasTag<SpiderTag>())
     {
@@ -511,9 +498,9 @@ void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, So
         windowWidth,
         windowHeight
     };
-    DrawRectangleLinesEx(windowRect, 2, BLACK);
-    DrawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
-    DrawTextEx(GetFontDefault(), "PAUSA", Vector2{ windowRect.x + 100, windowRect.y + 40 }, 40, 1, BLACK);
+    engine.drawRectangleLinesEx(windowRect, 2, BLACK);
+    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
+    engine.drawTextEx(GetFontDefault(), "PAUSA", Vector2{ windowRect.x + 100, windowRect.y + 40 }, 40, 1, BLACK);
 
     // Boton de volver al inicio
     Rectangle btn1Rec = { 300, 250, 200, 50 };
@@ -532,7 +519,7 @@ void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, So
         ss.seleccion_menu();
     }
 
-    if (CheckCollisionPointRec(GetMousePosition(), btn1Rec) || CheckCollisionPointRec(GetMousePosition(), btn2Rec)) {
+    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec)) {
         if (ss.pushed == false)
             ss.sonido_mov();
         ss.pushed = true;
@@ -559,9 +546,9 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
         windowWidth,
         windowHeight
     };
-    DrawRectangleLinesEx(windowRect, 2, BLACK);
-    DrawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
-    DrawTextEx(GetFontDefault(), "INVENTARIO", Vector2{ windowRect.x + 110, windowRect.y + 20 }, 40, 1, BLACK);
+    engine.drawRectangleLinesEx(windowRect, 2, BLACK);
+    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
+    engine.drawTextEx(GetFontDefault(), "INVENTARIO", Vector2{ windowRect.x + 110, windowRect.y + 20 }, 40, 1, BLACK);
 
     auto& plfi = em.getSingleton<PlayerInfo>();
     Rectangle btn2Rec = { 300, 430, 200, 50 };
@@ -643,7 +630,7 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
     {
         RayCast ray = engine.getMouseRay();
         if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            if (engine.isMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                 isSelectedfordebug = !isSelectedfordebug;
                 debugsnglt.IA_id_debug = e.getID();
             }
@@ -701,7 +688,7 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
 
     // Dibujar una línea recta debajo del texto
     float lineY = textPosition.y + textSize.y + 5;  // Ajusta la posición de la línea según tus necesidades
-    DrawLine(static_cast<int>(windowRect.x), static_cast<int>(lineY), static_cast<int>(windowRect.x) + static_cast<int>(windowRect.width),
+    engine.drawLine(static_cast<int>(windowRect.x), static_cast<int>(lineY), static_cast<int>(windowRect.x) + static_cast<int>(windowRect.width),
         static_cast<int>(lineY), DARKGRAY);
     // Dibujar el texto "INFO" debajo de la línea
 
@@ -720,7 +707,7 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
         RayCast ray = engine.getMouseRay();
         // Comprobar si el rayo intersecta con el collider
         if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            if (engine.isMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                 isSelected = !isSelected;
                 debugsnglt.IA_id = e.getID();
             }
