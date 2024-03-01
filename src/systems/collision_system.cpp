@@ -378,7 +378,8 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
             }
         }
 
-        li.dead_entities.insert(otherEntPtr->getID());
+        if (!otherEntPtr->hasComponent<ObjectComponent>())
+            li.dead_entities.insert(otherEntPtr->getID());
 
         return;
     }

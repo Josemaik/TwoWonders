@@ -3,6 +3,7 @@
 void ProjectileSystem::update(EntityManager& em, float deltaTime) {
 
     auto& li = em.getSingleton<LevelInfo>();
+    auto& plfi = em.getSingleton<PlayerInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, ProjectileComponent& pro)
     {
@@ -29,5 +30,18 @@ void ProjectileSystem::update(EntityManager& em, float deltaTime) {
                 pro.elapsed = 0.0f;
             }
         }
+
+        if (plfi.currentSpell == Spells::Water1)
+        {
+            // Vemos si el hechizo está en la lista de destrucción
+            if (li.dead_entities.find(e.getID()) != li.dead_entities.end())
+            {
+                auto& phy = em.getComponent<PhysicsComponent>(e);
+                if (phy.position.y() > -20.)
+                    em.addComponent<AttackComponent>(e, AttackComponent{ .type = AttackType::WaterBomb, .damage = 2, .createAttack = true });
+
+            }
+        }
+
     });
 }
