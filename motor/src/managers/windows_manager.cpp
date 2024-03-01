@@ -47,7 +47,7 @@ bool WindowsManager::initWindow(int width, int height, const char* title){
         return false;
     }
 
-    //glViewport(0, 0, m_width, m_height);
+    glViewport(0, 0, m_width, m_height);
     //std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
 
     return true;

@@ -1,5 +1,6 @@
 #pragma once
 #include "resource.hpp"
+#include "resource_texture.hpp"
 
 #include <vector>
 #include <memory>
@@ -15,14 +16,17 @@ struct Vertex{
     glm::vec2 textCoords;
 };
 
+// Forwarding
+struct Texture;
+
 struct Mesh : public Resource{
 public:
     // Mesh data
     std::vector<Vertex> vertices;
     std::vector<u_int16_t> indices;
-    std::vector<Texture> textures;
+    std::vector<std::shared_ptr<Texture>> textures;
 
-    Mesh(std::size_t, std::vector<Vertex>, std::vector<u_int16_t>, std::vector<Texture>);
+    Mesh(std::size_t, std::vector<Vertex>, std::vector<u_int16_t>, std::vector<std::shared_ptr<Texture>>);
 
     bool load() override;
     void unload() override;
