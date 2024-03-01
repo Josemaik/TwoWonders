@@ -406,18 +406,6 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
-    // if (staticEntPtr->hasTag<DoorTag>() && behaviorType2 & BehaviorType::PLAYER)
-    // {
-    //     auto& plfi = em.getSingleton<PlayerInfo>();
-    //     if (plfi.hasKey)
-    //     {
-    //         li.dead_entities.insert(staticEntPtr->getID());
-
-    //         plfi.hasKey = false;
-    //         return;
-    //     }
-    // }
-
     // Colisiones con paredes
     staticCollision(*otherPhy, *staticPhy, minOverlap);
 }

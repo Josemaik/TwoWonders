@@ -14,11 +14,11 @@ void AttackSystem::update(EntityManager& em, float deltaTime) {
 vec3d AttackSystem::getPosMeteorito(uint16_t fase, vec3d posplayer) {
     switch (fase)
     {
-    case 3: return vec3d{ posplayer.x() - 1, posplayer.y() + 5, posplayer.z() };
+    case 3: return vec3d{ posplayer.x() - 5, posplayer.y() + 20, posplayer.z() };
           break;
-    case 2: return vec3d{ posplayer.x() + 1, posplayer.y() + 5, posplayer.z() + 1 };
+    case 2: return vec3d{ posplayer.x() + 5, posplayer.y() + 20, posplayer.z() + 5 };
           break;
-    case 1: return vec3d{ posplayer.x() + 1 ,posplayer.y() + 5, posplayer.z() - 1 };
+    case 1: return vec3d{ posplayer.x() + 5 ,posplayer.y() + 20, posplayer.z() - 5 };
           break;
     default: break;
     }
@@ -61,16 +61,6 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
                 att.createAttack = false;
                 return;
             }
-
-            // if (ent.hasComponent<TypeComponent>())
-            //     att.type = em.getComponent<TypeComponent>(ent).type == ElementalType::Neutral ? AttackType::Melee : AttackType::Ranged;
-            // else
-            //     att.type = AttackType::Ranged;
-
-            // if (ent.hasComponent<LifeComponent>() && em.getComponent<LifeComponent>(ent).vidaMax())
-            //     att.type = AttackType::Ranged;
-            // else
-            //     att.type = AttackType::Melee;
         }
     }
 
@@ -190,7 +180,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
                     att.elapsed_air_attk = 0;
                     attk_available = true;
                     auto& e{ em.newEntity() };
-                    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getPosMeteorito(att.air_attack_fases,att.pos_respawn_air_attack), .scale = { 1.0f, 1.0f, 1.0f }, .color = BROWN });
+                    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getPosMeteorito(att.air_attack_fases, att.pos_respawn_air_attack), .scale = { 3.0f, 3.0f, 3.0f }, .color = BROWN });
                     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
 
                     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::METEORITE });
@@ -342,11 +332,34 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
         break;
     }
     case Spells::FireMeteorites:
-        att.type = AttackType::Ranged;
+    {
+        // Creamos 3 meteoritos en el aire encima del enemigo fijado
+        auto pos = em.getComponent<PhysicsComponent>(ent).position;
+        auto& li = em.getSingleton<LevelInfo>();
+
+        if (li.lockedEnemy != li.max)
+            pos = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.lockedEnemy)).position;
+
+        for (uint16_t i = 1; i < 4; i++)
+        {
+            auto& e{ em.newEntity() };
+            em.addTag<HitPlayerTag>(e);
+            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getPosMeteorito(i, pos), .scale = { 4.0f, 4.0f, 4.0f }, .color = BROWN });
+            auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.02 });
+            em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 1.f });
+            em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Fire });
+            em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, p.scale, BehaviorType::ATK_PLAYER });
+        }
         break;
+    }
     case Spells::IceShield:
-        att.type = AttackType::Ranged;
+    {
+        if (plfi.armor < 3)
+            plfi.armor += 3;
+        else
+            return;
         break;
+    }
     case Spells::WaterDash:
     {
         // El jugador hace un dash hacia adelante

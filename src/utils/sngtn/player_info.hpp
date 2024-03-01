@@ -12,12 +12,12 @@ struct PlayerInfo
     double increaseLife{ 0.0 };
     uint16_t coins{}, bombs{}, max_bombs{ 8 };
     double max_mana{ 100.0 }, mana{ max_mana };
-    int mana_width{};
+    int mana_width{}, armor{};
     bool hasKey{ false };
     bool hasStaff{ false };
     std::vector<std::unique_ptr<Item>> inventory{};
     std::vector<Spell> spells{};
-    Spell currentSpell{ "None", "No spell", Spells::None, 0.0, 0.0 };
+    Spell currentSpell{ "None", "No spell", Spells::None, 0.0, 0 };
     std::size_t selectedItem{ max };
     bool isDead{ false };
     vec3d spawnPoint{};

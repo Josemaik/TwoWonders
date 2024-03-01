@@ -49,8 +49,8 @@ void Game::createEntities(EntityManager& em)
     lis.addCode(EventCodes::OpenDoor);
 
     // Código de añadir un hechizo al jugador
-    Spell spell{ "Fireball", "Shoots a fireball", Spells::WaterDash, 20.0, 2.0 };
-    plfi.addSpell(spell);
+    // Spell spell{ "Fireball", "Shoots a fireball", Spells::FireMeteorites, 20.0, 2 };
+    // plfi.addSpell(spell);
 
     // Código de añadir un objeto poción al inventario
     // Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };

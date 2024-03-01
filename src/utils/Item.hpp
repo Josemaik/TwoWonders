@@ -33,7 +33,7 @@ enum struct Spells : uint8_t
 
 struct Spell : public Item
 {
-    Spell(std::string name, std::string description, Spells spell, double cost, double damage)
+    Spell(std::string name, std::string description, Spells spell, double cost, uint16_t damage)
         : Item{ name, description }, spell{ spell }, cost{ cost }, damage{ damage }
     {
         switch (spell)
@@ -75,7 +75,7 @@ struct Spell : public Item
     Spells spell{};
     ElementalType type{};
     double cost{};
-    double damage{};
+    uint16_t damage{};
 };
 
 struct Staff : public Item
