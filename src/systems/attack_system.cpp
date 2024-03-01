@@ -206,8 +206,8 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         }
     }
                               break;
-    case AttackType::CrusherAttack:{
-        
+    case AttackType::CrusherAttack: {
+
         auto& e{ em.newEntity() };
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = vec3d{att.pos_respawn_crush_attack.x(),
         att.pos_respawn_crush_attack.y(),att.pos_respawn_crush_attack.z()}, .scale = { 15.0f, 0.1f, 15.0f }, .color = GREEN });
@@ -221,7 +221,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::AREADAMAGECRUSHER });
     }
-    break;
+                                  break;
     default:
         break;
     }
@@ -328,7 +328,7 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 3.0f });
+    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
 
