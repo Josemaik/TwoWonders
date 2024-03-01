@@ -48,7 +48,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
 
     const rapidjson::Value& chunks = map["Chunks"];
     int j = 0;
-    std::cout << chunks.Size() << std::endl;
+
     for (rapidjson::SizeType i = 0; i < chunks.Size(); i++)
     {
         std::string chunkName = "Chunk" + std::to_string(i);
