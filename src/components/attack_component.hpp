@@ -15,6 +15,7 @@ enum AttackType
     AirAttack = 0x200,
     CrusherAttack = 0x400,
     WaterBomb = 0x800,
+    FireBall = 0x1000,
 };
 
 struct AttackComponent

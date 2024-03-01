@@ -707,8 +707,8 @@ vec3d Ia_man::getRandomPosAroundBoss(double radio, const vec3d& spawnerPos) {
     // Generar una distancia aleatoria dentro del radio
     double distance = ((double)rand() / RAND_MAX) * radio;
     // Calcular las coordenadas x e y a partir del ángulo y la distancia
-    double random_x = cos(angle) * distance;
-    double random_z = sin(angle) * distance;
+    double random_x = std::cos(angle) * distance;
+    double random_z = std::sin(angle) * distance;
     // Desplazar las coordenadas alrededor del spawner
     double spawn_x = spawnerPos.x();
     double spawn_z = spawnerPos.z();

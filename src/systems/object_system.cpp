@@ -77,7 +77,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             }
             case ObjectType::Fire_Spell:
             {
-                Spell fire_pell("Bola de fuego", "Una bola de destrucción masiva", Spells::Fire1, 15.0, 1.0);
+                Spell fire_pell("Bola de fuego", "Una bola de destrucción masiva", Spells::FireBall, 15.0, 1.0);
 
                 plfi.addSpell(fire_pell);
                 // auto& type = em.getComponent<TypeComponent>(*playerEnt);
