@@ -7,16 +7,26 @@ void ProjectileSystem::update(EntityManager& em, float deltaTime) {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, ProjectileComponent& pro)
     {
         if (pro.checkRange(deltaTime)) {
-            if (e.hasComponent<LifeComponent>()) {
-                em.getComponent<LifeComponent>(e).markedForDeletion = true;
 
-                if (e.hasComponent<ColliderComponent>()) {
-                    if (em.getComponent<ColliderComponent>(e).attackType == AttackType::Spiderweb) {
-                        em.getComponent<LifeComponent>(e).life = 0;
-                    }
+            if (pro.startedFalling)
+            {
+                li.dead_entities.insert(e.getID());
+                return;
+            }
+
+            if (e.hasComponent<ColliderComponent>() && e.hasComponent<LifeComponent>()) {
+                if (em.getComponent<ColliderComponent>(e).attackType == AttackType::Spiderweb) {
+                    em.getComponent<LifeComponent>(e).life = 0;
                 }
-                else
-                    li.dead_entities.insert(e.getID());
+            }
+
+            if (e.hasComponent<PhysicsComponent>())
+            {
+                auto& phy = em.getComponent<PhysicsComponent>(e);
+                phy.gravity = .1f;
+                pro.startedFalling = true;
+                pro.range = 2.0f;
+                pro.elapsed = 0.0f;
             }
         }
     });

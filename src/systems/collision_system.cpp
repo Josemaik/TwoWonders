@@ -352,7 +352,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     }
 
     // Colisiones con el suelo
-    if (staticEntPtr->hasTag<GroundTag>())
+    if (staticEntPtr->hasTag<GroundTag>() && !otherEntPtr->hasTag<HitPlayerTag>())
     {
         groundCollision(*otherPhy, otherPhy->scale, minOverlap);
         return;
@@ -378,8 +378,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
             }
         }
 
-        if (!staticEntPtr->hasTag<WaterTag>())
-            li.dead_entities.insert(otherEntPtr->getID());
+        li.dead_entities.insert(otherEntPtr->getID());
 
         return;
     }

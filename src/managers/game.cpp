@@ -47,8 +47,11 @@ void Game::createEntities(EntityManager& em)
     lis.addCode(EventCodes::SetSpawn);
     lis.addCode(EventCodes::OpenDoor);
 
+    Spell spell{ "Fireball", "Shoots a fireball", Spells::Fire1, ElementalType::Fire, 2.0, 2.0 };
+
     Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };
     plfi.addItem(std::make_unique<Potion>(pot));
+    plfi.addSpell(spell);
     // Shield
     // createShield(em, e);
 
