@@ -42,8 +42,8 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         // Calculamos la velocidad basada en la orientación del jugador
         static const double ATTACK_SPEED = 1.5f;
 
-        double velX = sin(phy.orientation) * ATTACK_SPEED;
-        double velZ = cos(phy.orientation) * ATTACK_SPEED;
+        double velX = std::sin(phy.orientation) * ATTACK_SPEED;
+        double velZ = std::cos(phy.orientation) * ATTACK_SPEED;
 
         // Asignamos la velocidad al ataque
         att.vel = { velX , 0 , velZ };
@@ -232,6 +232,16 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
         break;
     }
+    case AttackType::FireBall:
+    {
+        auto& e{ em.newEntity() };
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 10.0f, 0.1f, 10.0f }, .color = BLUE });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 5.0f });
+        em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Fire });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+        break;
+    }
     default:
         break;
     }
@@ -242,26 +252,33 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
 }
 
 void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, AttackComponent& att, int numShots) {
-    float spread = 0.15f; // Ángulo de dispersión entre los disparos
+    float spread = 0.5f; // Ángulo de dispersión entre los disparos
     vec3d vel = att.vel;
+    int i = 0;
 
-    // Disparo hacia el jugador
-    createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack, 3.0);
+    // Crear los disparos
+    if (numShots % 2 != 0)
+    {
+        // Creamos disparo central
+        createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack, 0.5);
+        i = 1;
+    }
 
-    for (int i = 1; i <= numShots; ++i) {
-        float offset = spread * (static_cast<float>(i) - 0.5f - static_cast<float>(numShots) / 2.f);
+    for (; i < numShots; i++) {
+        // Calcular el ángulo de rotación
+        float rotationAngle = spread * (static_cast<float>(i) - static_cast<float>(numShots) / 2.0f);
 
-        // Restaura la velocidad original
-        att.vel = vel;
+        // Rotar el vector de velocidad
+        vec3d rotatedVel{};
+        rotatedVel.setX(vel.x() * std::cos(rotationAngle) - vel.z() * std::sin(rotationAngle));
+        rotatedVel.setY(vel.y());
+        rotatedVel.setZ(vel.x() * std::sin(rotationAngle) + vel.z() * std::cos(rotationAngle));
 
-        // Aplica el offset en la dirección z
-        att.vel = { att.vel.x(), att.vel.y(), att.vel.z() + offset };
-
-        // Crea el disparo
-        createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack, 3.0);
+        // Crear el ataque
+        att.vel = rotatedVel;
+        createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack, 0.5);
     }
 }
-
 void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack, double const ranged) {
     auto const& phy = em.getComponent<PhysicsComponent>(ent);
 
@@ -271,6 +288,12 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
         tipoElemental = em.getComponent<TypeComponent>(ent).type;
     else
         tipoElemental = ElementalType::Neutral;
+
+    if (ent.hasTag<PlayerTag>())
+    {
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        tipoElemental = plfi.currentSpell == Spells::None ? ElementalType::Neutral : plfi.currentSpell.type;
+    }
 
     // Crear la entidad ataque
     auto& e{ em.newEntity() };
@@ -299,48 +322,76 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
 void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackComponent& att)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
-    ElementalType tipoElemental;
+    ElementalType eleType = ElementalType::Neutral;
 
-    switch (plfi.currentSpell)
+    switch (plfi.currentSpell.spell)
     {
-    case Spells::Fire1:
-        att.type = AttackType::Ranged;
-        tipoElemental = ElementalType::Fire;
+    case Spells::FireBall:
+        eleType = ElementalType::Fire;
         break;
-    case Spells::Ice1:
+    case Spells::IceShards:
+    {
         att.type = AttackType::Ranged;
-        tipoElemental = ElementalType::Ice;
-        break;
-    case Spells::Water1:
-        att.type = AttackType::Ranged;
-        tipoElemental = ElementalType::Water;
-        break;
-    case Spells::Fire2:
-        att.type = AttackType::Ranged;
-        tipoElemental = ElementalType::Fire;
-        break;
-    case Spells::Ice2:
-        att.type = AttackType::Ranged;
-        tipoElemental = ElementalType::Ice;
-        break;
-    case Spells::Water2:
-        att.type = AttackType::Ranged;
-        tipoElemental = ElementalType::Water;
-        break;
-    default:
-        att.type = AttackType::Ranged;
-        tipoElemental = ElementalType::Neutral;
+        // Creamos el hechizo - 3 proyectiles
+        createAttackMultipleShot(em, ent, att, 3);
         break;
     }
-    // Crear la entidad ataque
-    auto& e{ em.newEntity() };
-    em.addTag<HitPlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-    em.addComponent<ProjectileComponent>(e, ProjectileComponent{ });
-    em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
-    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+    case Spells::WaterBomb:
+    {
+        eleType = ElementalType::Water;
+        break;
+    }
+    case Spells::FireMeteorites:
+        att.type = AttackType::Ranged;
+        break;
+    case Spells::IceShield:
+        att.type = AttackType::Ranged;
+        break;
+    case Spells::WaterDash:
+    {
+        // El jugador hace un dash hacia adelante
+        auto& phy = em.getComponent<PhysicsComponent>(ent);
+        auto& ori = phy.orientation;
+
+        vec3d originalPos = phy.position;
+        vec3d posCopy = phy.position;
+        posCopy += { std::sin(ori) * 8.0, 0, std::cos(ori) * 8.0 };
+
+        if (col_sys->checkWallCollision(em, posCopy))
+            posCopy -= { std::sin(ori) * 4.5, 0, std::cos(ori) * 4.5 };
+        phy.position = posCopy;
+
+        // Creamos una capa de agua entre la posición original y la nueva
+        auto distance = (originalPos - posCopy).length();
+        for (double i = 0; i < distance; i += 2)
+        {
+            auto pos = originalPos + (posCopy - originalPos) * (i / distance);
+            auto& e{ em.newEntity() };
+            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = { 2.0f, 0.1f, 2.0f }, .color = BLUE });
+            auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.1 });
+            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 4.0f });
+            em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Water });
+            em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+        }
+        break;
+    }
+    default:
+        att.type = AttackType::Ranged;
+        break;
+    }
+
+    if (eleType != ElementalType::Neutral)
+    {
+        // Creamos el hechizo
+        auto& e{ em.newEntity() };
+        em.addTag<HitPlayerTag>(e);
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
+        em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
+        em.addComponent<ProjectileComponent>(e, ProjectileComponent{});
+        em.addComponent<TypeComponent>(e, TypeComponent{ .type = eleType });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+    }
 
     for (auto& s : plfi.spells)
     {
@@ -353,4 +404,9 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
             break;
         }
     }
+}
+
+void AttackSystem::setCollisionSystem(CollisionSystem* col)
+{
+    col_sys = col;
 }

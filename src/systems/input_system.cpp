@@ -6,8 +6,14 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     auto& inpi = em.getSingleton<InputInfo>();
     auto& bb = em.getSingleton<BlackBoard_t>();
     auto& player = *em.getEntityByID(li.playerID);
-    auto& phy = em.getComponent<PhysicsComponent>(player);
-    auto& in = em.getComponent<InputComponent>(player);
+
+    // Si no hay jugador, no hacemos nada
+    if (!player.hasTag<PlayerTag>())
+    {
+        if (ge.isKeyReleased(KEY_ENTER))
+            li.resetGame = true;
+        return;
+    }
 
     // PAUSE
     if (ge.isKeyReleased(KEY_ESCAPE) && li.currentScreen == GameScreen::GAMEPLAY)
@@ -62,11 +68,9 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         return;
     }
 
-    if (!player.hasTag<PlayerTag>() && ge.isKeyReleased(KEY_ENTER))
-    {
-        li.resetGame = true;
-        return;
-    }
+    // Sacamos las físicas y el input del jugador
+    auto& phy = em.getComponent<PhysicsComponent>(player);
+    auto& in = em.getComponent<InputComponent>(player);
 
     // Resetear la velocidad
     phy.velocity = {};

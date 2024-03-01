@@ -582,8 +582,11 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
             }
             else
             {
-                auto& li = em.getSingleton<LevelInfo>();
-                li.dead_entities.insert(ent1Ptr->getID());
+                if (!ent1Ptr->hasComponent<ObjectComponent>())
+                {
+                    auto& li = em.getSingleton<LevelInfo>();
+                    li.dead_entities.insert(ent1Ptr->getID());
+                }
             }
 
             //Si la bala es lanzada por una araña no quita vida
@@ -690,6 +693,56 @@ bool CollisionSystem::resolveCollision(PhysicsComponent& phy1, PhysicsComponent&
         (pos1.*setPos)((pos1.*getPos)() + overlap);
         return false;
     }
+}
+
+bool CollisionSystem::checkWallCollision(EntityManager& em, vec3d& pos)
+{
+    // Buscamos todas las paredes cercanas a la posición
+    using noCMPs = MP::TypeList<PhysicsComponent, ColliderComponent>;
+    using wallTag = MP::TypeList<WallTag>;
+    bool collision = false;
+
+    // Creamos una caja de colisión de 1x1x1 centrada en la posición
+    BBox box{ pos, {2, 4, 2} };
+
+    em.forEach<noCMPs, wallTag>([&](Entity&, PhysicsComponent& phy, ColliderComponent& col)
+    {
+        if (collision)
+            return;
+
+        auto& bbox = col.boundingBox;
+        if (bbox.intersects(box))
+        {
+            collision = true;
+
+            // Calculamos el mínimo solape entre las dos entidades
+            vec3d minOverlap = BBox::minOverlap(bbox, box);
+
+            // Sacamos cuál sería la posición de la entidad después de la colisión
+            std::cout << pos << std::endl;
+            auto newPos = pos;
+            std::cout << newPos << std::endl;
+            if (minOverlap.x() < minOverlap.y() && minOverlap.x() < minOverlap.z())
+            {
+                if (phy.position.x() < pos.x())
+                    newPos.setX(pos.x() + minOverlap.x());
+                else
+                    newPos.setX(pos.x() - minOverlap.x());
+            }
+            else if (minOverlap.z() < minOverlap.y())
+            {
+                if (phy.position.z() < pos.z())
+                    newPos.setZ(pos.z() + minOverlap.z());
+                else
+                    newPos.setZ(pos.z() - minOverlap.z());
+            }
+
+            pos = newPos;
+        }
+
+    });
+
+    return collision;
 }
 
 // Función para que no se salgan de los bordes, no se usa
