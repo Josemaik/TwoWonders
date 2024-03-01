@@ -878,6 +878,9 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         // Vidas HUD
         if (e.hasTag<EnemyTag>() && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
         {
+            if (e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>())
+                continue;
+
             auto const& r{ em.getComponent<RenderComponent>(e) };
             auto& l{ em.getComponent<LifeComponent>(e) };
 
@@ -891,7 +894,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             int barWidth = 40;
             int barHeight = 4;
             int barX = static_cast<int>(engine.getWorldToScreenX(r.position) - 18);
-            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 15);
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 10);
 
             engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
 

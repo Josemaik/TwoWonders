@@ -476,7 +476,9 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
 
         if (otherEntPtr->hasTag<NoDamageTag>() && !otherEntPtr->hasTag<CrusherTag>())
         {
-            vec3d dir = staticPhy->position - em.getComponent<PhysicsComponent>(*otherEntPtr).position;
+            auto& pos = staticPhy->position;
+            auto& otherPos = otherPhy->position;
+            vec3d dir = { pos.x() - otherPos.x(), 0, pos.z() - otherPos.z() };
             dir.normalize();
             staticPhy->position += dir * 5;
             staticPhy->stopped = true;

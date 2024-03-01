@@ -78,6 +78,15 @@ public:
                         li.chestToOpen = li.max;
                         if (chestComp.viewPoint != vec3d::zero())
                             li.viewPoint = chestComp.viewPoint;
+
+                        if (chestComp.posWall != vec3d::zero())
+                        {
+                            auto& e{ em.newEntity() };
+                            em.addTag<WallTag>(e);
+                            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = chestComp.posWall, .scale = chestComp.scaleWall, .color = DARKBROWN });
+                            auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0 });
+                            em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+                        }
                         break;
                     }
                     case EventCodes::SetSpawn:
