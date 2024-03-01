@@ -168,3 +168,62 @@ void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos,
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
 }
+
+void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float, float scale, glm::vec4 color){
+    // Define vertices and indices
+    float vertices[] = {
+        // positions                                                                                                                                       // colors                    // texture coords
+        normalizeX(pos.x)                                                  , normalizeY(pos.y)                                                   , 0.0f,   color.x, color.y, color.z,   0.0f, 0.0f,
+        normalizeX(pos.x + static_cast<float>(texture->getWidth()) * scale), normalizeY(pos.y)                                                   , 0.0f,   color.x, color.y, color.z,   1.0f, 0.0f,
+        normalizeX(pos.x)                                                  , normalizeY(pos.y + static_cast<float>(texture->getHeight()) * scale), 0.0f,   color.x, color.y, color.z,   0.0f, 1.0f,
+        normalizeX(pos.x + static_cast<float>(texture->getWidth()) * scale), normalizeY(pos.y + static_cast<float>(texture->getHeight()) * scale), 0.0f,   color.x, color.y, color.z,   1.0f, 1.0f
+    };
+
+    GLuint indices[] = { 0, 1, 2, 1, 2, 3};
+
+    // Create and configure VAO, VBO and EBO
+    GLuint VBO, VAO, EBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    // Colors
+    GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
+    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+
+    // Draw Texture
+    glBindTexture(GL_TEXTURE_2D, texture->texture);
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    // Clean up resources
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+}
+
+// Text drawing functions
+
+void drawText(const char*, glm::vec2, int, glm::vec4){
+
+}
