@@ -35,4 +35,8 @@ struct InputComponent
     int m_interact{ GAMEPAD_BUTTON_RIGHT_FACE_DOWN };
     int m_space{ GAMEPAD_BUTTON_RIGHT_FACE_LEFT };
     int m_lockIn{ GAMEPAD_BUTTON_RIGHT_FACE_RIGHT };
+
+    // Joysticks
+    float m_joystickX{ 0 };
+    float m_joystickY{ 0 };
 };

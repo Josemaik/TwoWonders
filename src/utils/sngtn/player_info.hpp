@@ -12,26 +12,26 @@ struct PlayerInfo
     double increaseLife{ 0.0 };
     uint16_t coins{}, bombs{}, max_bombs{ 8 };
     double max_mana{ 100.0 }, mana{ max_mana };
-    int mana_width{};
+    int mana_width{}, armor{};
     bool hasKey{ false };
     bool hasStaff{ false };
     std::vector<std::unique_ptr<Item>> inventory{};
     std::vector<Spell> spells{};
-    Spells currentSpell{};
+    Spell currentSpell{ "None", "No spell", Spells::None, 0.0, 0 };
     std::size_t selectedItem{ max };
     bool isDead{ false };
     vec3d spawnPoint{};
 
-    void addSpell(Spell spell) { spells.push_back(spell); currentSpell = spell.spell; }
+    void addSpell(Spell spell) { spells.push_back(spell); currentSpell = spell; }
     void changeCurrentSpell()
     {
         auto it = std::find(spells.begin(), spells.end(), currentSpell);
         if (it != spells.end())
         {
             if (it + 1 != spells.end())
-                currentSpell = (it + 1)->spell;
+                currentSpell = *(it + 1);
             else
-                currentSpell = spells.front().spell;
+                currentSpell = spells.front();
         }
     }
 

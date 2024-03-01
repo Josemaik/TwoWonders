@@ -52,6 +52,7 @@ struct CollisionSystem
         : octree(0, BBox(vec3d{ 0.0, 0.0, 0.0 }, vec3d{ 600.0, 50.0, 600.0 })) {}
 
     void update(EntityManager& em);
+    bool checkWallCollision(EntityManager& em, vec3d& pos);
 private:
     void checkCollision(EntityManager& em, Octree& boxes, pairsType& checkedPairs);
     void checkRampCollision(EntityManager& em, std::vector<Entity*>& entities);

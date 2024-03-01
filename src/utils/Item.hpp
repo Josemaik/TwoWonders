@@ -23,19 +23,43 @@ private:
 enum struct Spells : uint8_t
 {
     None,
-    Fire1,
-    Fire2,
-    Ice1,
-    Ice2,
-    Water1,
-    Water2,
+    FireBall,
+    FireMeteorites,
+    IceShards,
+    IceShield,
+    WaterBomb,
+    WaterDash,
 };
 
 struct Spell : public Item
 {
-    Spell(std::string name, std::string description, Spells spell, ElementalType type, double cost, double damage)
-        : Item{ name, description }, spell{ spell }, type{ type }, cost{ cost }, damage{ damage }
-    { }
+    Spell(std::string name, std::string description, Spells spell, double cost, uint16_t damage)
+        : Item{ name, description }, spell{ spell }, cost{ cost }, damage{ damage }
+    {
+        switch (spell)
+        {
+        case Spells::FireBall:
+            type = ElementalType::Fire;
+            break;
+        case Spells::FireMeteorites:
+            type = ElementalType::Fire;
+            break;
+        case Spells::IceShards:
+            type = ElementalType::Ice;
+            break;
+        case Spells::IceShield:
+            type = ElementalType::Ice;
+            break;
+        case Spells::WaterBomb:
+            type = ElementalType::Water;
+            break;
+        case Spells::WaterDash:
+            type = ElementalType::Water;
+            break;
+        default:
+            break;
+        }
+    }
 
     ~Spell() override = default;
 
@@ -48,10 +72,10 @@ struct Spell : public Item
     {
         return spell == other;
     }
-    Spells spell;
-    ElementalType type;
+    Spells spell{};
+    ElementalType type{};
     double cost{};
-    double damage{};
+    uint16_t damage{};
 };
 
 struct Staff : public Item

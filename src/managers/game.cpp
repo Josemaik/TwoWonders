@@ -23,9 +23,10 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -33.0, 5.5, 30.9 };
-    // -33.0, 5.5, 30.9 - Posición Incial
-    // 77.0, 5.5, -73.9 - Cofre con llave
+        plfi.spawnPoint = { -33.0, 4.0, 30.9 };
+    // -33.0, 4.0, 30.9 - Posición Incial
+    // 77.0, 4.0, -73.9 - Cofre con llave
+    // -32.0, 4.0, -34.0 - Primer cofre 
     // -9.0, 4.0, -50.0
     // 26.0, 4.0, -65.0
     // -32.0   4.0  -107.0
@@ -47,8 +48,14 @@ void Game::createEntities(EntityManager& em)
     lis.addCode(EventCodes::SetSpawn);
     lis.addCode(EventCodes::OpenDoor);
 
-    Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };
-    plfi.addItem(std::make_unique<Potion>(pot));
+    // Código de añadir un hechizo al jugador
+    // Spell spell{ "Fireball", "Shoots a fireball", Spells::FireMeteorites, 20.0, 2 };
+    // plfi.addSpell(spell);
+
+    // Código de añadir un objeto poción al inventario
+    // Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };
+    // plfi.addItem(std::make_unique<Potion>(pot));
+
     // Shield
     // createShield(em, e);
 
@@ -115,6 +122,7 @@ void Game::run()
 
     createSound(em);
     li.sound_system = &sound_system;
+    attack_system.setCollisionSystem(&collision_system);
 
     while (!li.gameShouldEnd)
     {
@@ -201,8 +209,8 @@ void Game::run()
                     lock_system.update(em);
                     shield_system.update(em);
                     object_system.update(em, timeStep);
-                    attack_system.update(em, timeStep);
                     projectile_system.update(em, timeStep);
+                    attack_system.update(em, timeStep);
                     life_system.update(em, object_system, timeStep);
                     sound_system.update();
                     // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render

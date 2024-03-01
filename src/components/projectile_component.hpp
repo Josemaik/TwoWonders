@@ -1,7 +1,8 @@
 #pragma once
 
 struct ProjectileComponent {
-    float range{ 3.0f }, elapsed{ 0.0f }; // en segundos
+    float range{ .5f }, elapsed{ 0.0f }; // en segundos
+    bool startedFalling{ false };
 
     bool checkRange(float deltaTime) {
         elapsed += deltaTime;

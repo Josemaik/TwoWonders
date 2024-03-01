@@ -20,6 +20,21 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                         sub.activeShield = false;
                 }
             }
+            else if (ent.hasTag<PlayerTag>())
+            {
+                auto& plfi = em.getSingleton<PlayerInfo>();
+                if (plfi.armor > 0)
+                {
+                    lif.life += lif.lifeLost;
+                    plfi.armor -= lif.lifeLost;
+
+                    if (plfi.armor < 0)
+                    {
+                        lif.life += plfi.armor;
+                        plfi.armor = 0;
+                    }
+                }
+            }
 
             lif.lifeLost = 0;
         }
