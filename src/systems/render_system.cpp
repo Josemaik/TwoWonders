@@ -1149,6 +1149,7 @@ void RenderSystem::unloadModels(EntityManager& em, ENGI::GameEngine& engine)
 void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, const Entity& e)
 {
     auto const& l{ em.getComponent<LifeComponent>(e) };
+    auto& plfi = em.getSingleton<PlayerInfo>();
 
     // Datos de la barra de vida
     int barWidth = 40;
@@ -1158,10 +1159,11 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
     int spacing = 4;
 
     // Rectángulo de fondo para la barra de vida
-    engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * l.maxLife + 2, barHeight + 4, DARKGRAY);
+    engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * (l.maxLife + plfi.armor) + 2, barHeight + 4, DARKGRAY);
 
     // Dibujamos cada parte de la barra de vida
-    for (int i = 0; i < l.life; ++i)
+    int i{};
+    for (; i < l.life; ++i)
     {
         // Posición X de cada trozo
         int currentX = barX + i * (barWidth + spacing);
@@ -1169,6 +1171,17 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
         // Dibujamos el rectángulo
         engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
     }
+
+    // Dibujamos la armadura
+    if (plfi.armor > 0)
+        for (; i < l.maxLife + plfi.armor; ++i)
+        {
+            // Posición X de cada trozo
+            int currentX = barX + i * (barWidth + spacing);
+
+            // Dibujamos el rectángulo
+            engine.drawRectangle(currentX, barY, barWidth, barHeight, SKYBLUE);
+        }
 }
 
 void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)

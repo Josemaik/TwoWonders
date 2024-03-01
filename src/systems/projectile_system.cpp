@@ -31,7 +31,7 @@ void ProjectileSystem::update(EntityManager& em, float deltaTime) {
             }
         }
 
-        if (plfi.currentSpell == Spells::WaterBomb || plfi.currentSpell == Spells::FireBall)
+        if (plfi.currentSpell == Spells::WaterBomb || plfi.currentSpell == Spells::FireBall || plfi.currentSpell == Spells::FireMeteorites)
         {
             // Vemos si el hechizo está en la lista de destrucción
             if (li.dead_entities.find(e.getID()) != li.dead_entities.end())
@@ -42,10 +42,10 @@ void ProjectileSystem::update(EntityManager& em, float deltaTime) {
                     auto& phy = em.getComponent<PhysicsComponent>(e);
                     if (phy.position.y() > -20.)
                     {
-                        if (plfi.currentSpell == Spells::FireBall)
-                            em.addComponent<AttackComponent>(e, AttackComponent{ .type = AttackType::FireBall, .damage = 2, .createAttack = true });
+                        if (plfi.currentSpell == Spells::FireBall || plfi.currentSpell == Spells::FireMeteorites)
+                            em.addComponent<AttackComponent>(e, AttackComponent{ .type = AttackType::FireBall, .damage = plfi.currentSpell.damage, .createAttack = true });
                         else
-                            em.addComponent<AttackComponent>(e, AttackComponent{ .type = AttackType::WaterBomb, .damage = 2, .createAttack = true });
+                            em.addComponent<AttackComponent>(e, AttackComponent{ .type = AttackType::WaterBomb, .damage = plfi.currentSpell.damage, .createAttack = true });
                     }
                 }
             }
