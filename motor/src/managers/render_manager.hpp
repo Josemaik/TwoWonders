@@ -30,12 +30,16 @@ public:
     void drawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 color);
 
     // Texture drawing functions
-    void drawTexture(std::shared_ptr<Texture>, glm::vec2 pos, glm::vec4 color);
-    // TODO: drawTextureExtra() --> rotation / scale
+    void drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, glm::vec4 color);
+    // TODO: rotation
+    void drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, glm::vec4 color);
 
     // ChangeShader
     void useShader(std::shared_ptr<Shader> shader){ 
         m_shaderProgram = shader; 
         glUseProgram(m_shaderProgram->id_shader);
     };
+
+    // Text
+    void drawText(const char*, glm::vec2, int, glm::vec4);
 };
