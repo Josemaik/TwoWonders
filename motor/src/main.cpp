@@ -1,6 +1,7 @@
 #include "components/node.hpp"
 #include "components/entity.hpp"
 #include "components/entity_model.hpp"
+#include "components/entity_camera.hpp"
 #include "managers/resource_manager.hpp"
 #include "managers/windows_manager.hpp"
 #include "managers/render_manager.hpp"
@@ -107,7 +108,7 @@ std::shared_ptr<Node> createSceneTree(){
 
     // Create Camera
     auto nCamera = std::make_unique<Node>();
-    nCamera->name = "Camera";
+    nCamera->name = "Main camera";
     auto eCamera = std::make_shared<Camera>();
     nCamera->setEntity(eCamera);
     nScene->addChild(std::move(nCamera));
