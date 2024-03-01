@@ -33,8 +33,8 @@ enum struct Spells : uint8_t
 
 struct Spell : public Item
 {
-    Spell(std::string name, std::string description, Spells spell, ElementalType type, double cost, double damage)
-        : Item{ name, description }, spell{ spell }, type{ type }, cost{ cost }, damage{ damage }
+    Spell(std::string name, std::string description, Spells spell, double cost, double damage)
+        : Item{ name, description }, spell{ spell }, cost{ cost }, damage{ damage }
     { }
 
     ~Spell() override = default;
@@ -49,7 +49,6 @@ struct Spell : public Item
         return spell == other;
     }
     Spells spell;
-    ElementalType type;
     double cost{};
     double damage{};
 };

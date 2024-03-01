@@ -47,7 +47,7 @@ void Game::createEntities(EntityManager& em)
     lis.addCode(EventCodes::SetSpawn);
     lis.addCode(EventCodes::OpenDoor);
 
-    Spell spell{ "Fireball", "Shoots a fireball", Spells::Fire1, ElementalType::Fire, 2.0, 2.0 };
+    Spell spell{ "Fireball", "Shoots a fireball", Spells::Water1, 20.0, 2.0 };
 
     Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };
     plfi.addItem(std::make_unique<Potion>(pot));
@@ -204,8 +204,8 @@ void Game::run()
                     lock_system.update(em);
                     shield_system.update(em);
                     object_system.update(em, timeStep);
-                    attack_system.update(em, timeStep);
                     projectile_system.update(em, timeStep);
+                    attack_system.update(em, timeStep);
                     life_system.update(em, object_system, timeStep);
                     sound_system.update();
                     // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render

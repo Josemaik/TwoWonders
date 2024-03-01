@@ -206,8 +206,8 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         }
     }
                               break;
-    case AttackType::CrusherAttack: {
-
+    case AttackType::CrusherAttack:
+    {
         auto& e{ em.newEntity() };
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = vec3d{att.pos_respawn_crush_attack.x(),
         att.pos_respawn_crush_attack.y(),att.pos_respawn_crush_attack.z()}, .scale = { 15.0f, 0.1f, 15.0f }, .color = GREEN });
@@ -220,8 +220,18 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             tipoElemental = ElementalType::Neutral;
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::AREADAMAGECRUSHER });
+        break;
     }
-                                  break;
+    case AttackType::WaterBomb:
+    {
+        auto& e{ em.newEntity() };
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 10.0f, 0.1f, 10.0f }, .color = BLUE });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 5.0f });
+        em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Water });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+        break;
+    }
     default:
         break;
     }
