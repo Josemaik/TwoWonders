@@ -692,7 +692,9 @@
 							"id": 3,
 							"visible": false,
 							"message": ["¡Encontraste una llave!", "Parece que es de un solo uso..."],
-							"viewpoint": [99.554, 140.935, 7.0]
+							"viewpoint": [99.554, 140.935, 7.0],
+							"posWall": [41.0, 4.0, -136.0],
+							"scaleWall": [5.0, 5.0, 20.0]
 						},
 						{
 							"position":[99.554, 140.935, 7.0],

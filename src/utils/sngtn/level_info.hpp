@@ -58,6 +58,7 @@ struct LevelInfo
   deathSet dead_entities{};
 
   // Variables relacionadas con los eventos
+  vec3d posWall{}, scaleWall{};
   std::size_t chestToOpen{ max };
   std::size_t doorToOpen{ max };
   bool dungeonKeyCreated{ false };

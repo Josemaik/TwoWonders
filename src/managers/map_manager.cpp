@@ -327,6 +327,14 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
                 vec3d viewPoint{ interactable["viewpoint"][0].GetDouble(), interactable["viewpoint"][2].GetDouble(), -interactable["viewpoint"][1].GetDouble() };
                 cc.viewPoint = viewPoint;
             }
+
+            if (interactable.HasMember("posWall"))
+            {
+                vec3d posWall{ interactable["posWall"][0].GetDouble(), interactable["posWall"][1].GetDouble(), interactable["posWall"][2].GetDouble() };
+                vec3d scaleWall{ interactable["scaleWall"][0].GetDouble(), interactable["scaleWall"][1].GetDouble(), interactable["scaleWall"][2].GetDouble() };
+                cc.posWall = posWall;
+                cc.scaleWall = scaleWall;
+            }
             break;
         }
         case InteractableType::Spawn:
