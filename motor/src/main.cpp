@@ -5,7 +5,10 @@
 #include "managers/resource_manager.hpp"
 #include "managers/windows_manager.hpp"
 #include "managers/render_manager.hpp"
+#include "managers/input_manager.hpp"
 #include "components/resource_shader.hpp"
+
+#include "utils/keys.hpp"
 
 #include <iostream>
 
@@ -19,11 +22,17 @@ int main(){
     WindowsManager wm;
     ResourceManager rm;
     RenderManager renm;
+    InputManager im;
 
     //----- Create scene tree -----//
     auto nScene = createSceneTree();
 
     if(wm.initWindow(800, 600, "Salty Pixel")){
+
+        //----- Configure callback -----//
+        glfwSetWindowUserPointer(wm.getWindow(), &im);
+        glfwSetKeyCallback(wm.getWindow(), InputManager::keyCallback);
+
         //----- Load model -----// 
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Load │" << std::endl;
@@ -48,6 +57,9 @@ int main(){
 
         // Main loop
         while(!wm.windowShouldClose()){
+
+            // std::cout << "A: " << im.isKeyPressed(KEY_A) << std::endl;
+
             wm.beginDrawing();
 
             renm.clearBackground({1.0f, 1.0f, 1.0f, 1.0f});
@@ -72,6 +84,9 @@ int main(){
             //eModel->draw(glm::mat4());
 
             wm.endDrawing();
+
+            // Clean Release States
+            im.cleanKeyReleaseStates();
         }
 
         //----- Unload -----//

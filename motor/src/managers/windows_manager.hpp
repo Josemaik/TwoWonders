@@ -22,6 +22,7 @@ public:
     bool windowShouldClose() const;
     int getScreenWidth(){ return m_width; };
     int getScreenHeight(){ return m_height; };
+    GLFWwindow* getWindow(){ return m_window; };
 
     // Drawing-related functions
     void beginDrawing();
