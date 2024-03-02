@@ -62,9 +62,17 @@ int main(){
         // Main loop
         while(!wm.windowShouldClose()){
 
+            // Input Tests
             // std::cout << "A: " << im.isKeyPressed(KEY_A) << std::endl;
-            // std::cout << "A: " << im.isGamePadButtonDown(0, GLFW_GAMEPAD_BUTTON_A) << std::endl;
-            // std::cout << "A: " << im.isGamePadButtonUp(0, GLFW_GAMEPAD_BUTTON_A) << std::endl;
+            // std::cout << "S: " << im.isKeyDown(wm.getWindow(), KEY_S) << std::endl;
+            // std::cout << "D: " << im.isKeyReleased(KEY_D) << std::endl;
+            // std::cout << "W: " << im.isKeyUp(wm.getWindow(), KEY_W) << std::endl;
+            // std::cout << "----" << std::endl;
+            // std::cout << "A: " << im.isGamePadButtonPressed(0, GLFW_GAMEPAD_BUTTON_A) << std::endl;
+            // std::cout << "B: " << im.isGamePadButtonDown(0, GLFW_GAMEPAD_BUTTON_B) << std::endl;
+            // std::cout << "X: " << im.isGamePadButtonReleased(0, GLFW_GAMEPAD_BUTTON_X) << std::endl;
+            // std::cout << "Y: " << im.isGamePadButtonUp(0, GLFW_GAMEPAD_BUTTON_Y) << std::endl;
+            // std::cout << "----" << std::endl;
 
             wm.beginDrawing();
 
@@ -89,9 +97,6 @@ int main(){
             //eModel->draw(glm::mat4());
 
             wm.endDrawing();
-
-            // Clean Release States
-            im.cleanm_keyReleaseStates();
         }
 
         //----- Unload -----//
