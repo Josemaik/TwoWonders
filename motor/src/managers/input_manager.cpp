@@ -1,5 +1,18 @@
 #include "input_manager.hpp"
 
+// Update
+void InputManager::update(){
+    /*
+    int jid = 0;
+    // Update gamepad state
+    GLFWgamepadstate gamepadState;
+    if(glfwGetGamepadState(jid, &gamepadState))
+        m_gamepadStates[jid] = gamepadState;
+    else
+        std::cerr << "Error" << std::endl;
+    */
+}
+
 // Input-related functions: keyboard
 
 bool InputManager::isKeyPressed(int key){
@@ -33,7 +46,7 @@ bool InputManager::isKeyUp(int key){
 void InputManager::keyCallback(GLFWwindow* window, int key, int, int action, int){
     auto* im = static_cast<InputManager*>(glfwGetWindowUserPointer(window));
 
-    std::cout << "Key: " << key << " - Action: " << action << std::endl;
+    // std::cout << "Key: " << key << " - Action: " << action << std::endl;
 
     im->m_keyStates[key] = action;
 
@@ -57,39 +70,30 @@ const char* InputManager::getGamePadName(int gamepad){
     return name ? name : "Uknown";
 }
 
-bool InputManager::isGamePadButtonPressed(int gamepad, int button){
-    int count;
-    auto* buttons =  glfwGetJoystickButtons(gamepad, &count);
-
-    return (button < count) && (buttons[button] == GLFW_PRESS);
+bool InputManager::isGamepadButtonPressed(int gamepad, int button){
+    return true;
 }
 
-bool InputManager::isGamePadButtonDown(int gamepad, int button){
-    int count;
-    auto* buttons =  glfwGetJoystickButtons(gamepad, &count);
-
-    return (button < count) && (buttons[button] == GLFW_PRESS);
+bool InputManager::isGamepadButtonDown(int gamepad, int button){
+    // std::cout << "Gamepad: " << gamepad << " - Button: " << button << std::endl;
+    // std::cout << "State: " << m_gamepadStates[gamepad].buttons[button] << std::endl;
+    return m_gamepadStates[gamepad].buttons[button] == GLFW_PRESS;
 }
 
-bool InputManager::isGamePadButtonReleased(int gamepad, int button){
-    int count;
-    auto* buttons =  glfwGetJoystickButtons(gamepad, &count);
 
-    return (button < count) && (buttons[button] == GLFW_RELEASE);
+bool InputManager::isGamepadButtonReleased(int gamepad, int button){
+    return true;
 }
 
-bool InputManager::isGamePadButtonUp(int gamepad, int button){
-    int count;
-    auto* buttons =  glfwGetJoystickButtons(gamepad, &count);
 
-   return (button >= count) || (buttons[button] == GLFW_RELEASE);
+bool InputManager::isGamepadButtonUp(int gamepad, int button){
+     return m_gamepadStates[gamepad].buttons[button] == GLFW_RELEASE;
 }
 
-void InputManager::joystickCallback(int jid, int event) {
-    InputManager& instance = InputManager::getInstance();
-    instance.gamepadButtonCallback(jid, event);
+int InputManager::getGamepadAxisCount(int gamepad){
+
 }
 
-void InputManager::gamepadButtonCallback(int, int){
-    
+float InputManager::getGamepadAxisMovement(int gamepad, int axis){
+
 }
