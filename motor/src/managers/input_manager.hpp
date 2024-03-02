@@ -7,6 +7,9 @@
 
 struct InputManager{
 public:
+    // Update
+    void update();
+
     // ------------------------ //
     // Input Handling Functions //
     // ------------------------ //
@@ -23,13 +26,12 @@ public:
     // Input-related functions: gamepad
     bool isGamePadAvailable(int gamepad);
     const char* getGamePadName(int gamepad);
-    bool isGamePadButtonPressed(int gamepad, int button);
-    bool isGamePadButtonDown(int gamepad, int button);
-    bool isGamePadButtonReleased(int gamepad, int button);
-    bool isGamePadButtonUp(int gamepad, int button);
-
-    static void joystickCallback(int jid, int event);
-    void gamepadButtonCallback(int jid, int event);
+    bool isGamepadButtonPressed(int gamepad, int button);
+    bool isGamepadButtonDown(int gamepad, int button);
+    bool isGamepadButtonReleased(int gamepad, int button);
+    bool isGamepadButtonUp(int gamepad, int button);
+    int getGamepadAxisCount(int gamepad);
+    float getGamepadAxisMovement(int gamepad, int axis);
 
     // Mouse
 
@@ -39,8 +41,7 @@ private:
     int m_keyReleaseStates[GLFW_KEY_LAST] = { GLFW_RELEASE };
 
     // Button States
-    std::unordered_map<int, std::unordered_map<int, bool>> m_gamepadButtonStates;
-    std::unordered_map<int, std::unordered_map<int, bool>> m_gamepadButtonReleaseStates;
+    GLFWgamepadstate m_gamepadStates[GLFW_JOYSTICK_LAST + 1];
 
     // Instance
     static InputManager& getInstance(){

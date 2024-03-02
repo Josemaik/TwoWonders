@@ -32,11 +32,10 @@ int main(){
         //----- Configure callback -----//
         glfwSetWindowUserPointer(wm.getWindow(), &im);
         glfwSetKeyCallback(wm.getWindow(), InputManager::keyCallback);
-        glfwSetJoystickCallback(InputManager::joystickCallback);
 
         //----- Gamepad -----//
         if(im.isGamePadAvailable(0) == 1)
-            std::cout << "Gamepad: " << im.getGamePadName(1) << std::endl;
+            std::cout << "Gamepad: " << im.getGamePadName(0) << std::endl;
 
         //----- Load model -----// 
         std::cout << "┌──────┐" << std::endl;
@@ -62,17 +61,26 @@ int main(){
         // Main loop
         while(!wm.windowShouldClose()){
 
+            // Input
+            im.update();
+
             // Input Tests
             // std::cout << "A: " << im.isKeyPressed(KEY_A) << std::endl;
             // std::cout << "S: " << im.isKeyDown(wm.getWindow(), KEY_S) << std::endl;
             // std::cout << "D: " << im.isKeyReleased(KEY_D) << std::endl;
             // std::cout << "W: " << im.isKeyUp(wm.getWindow(), KEY_W) << std::endl;
             // std::cout << "----" << std::endl;
-            // std::cout << "A: " << im.isGamePadButtonPressed(0, GLFW_GAMEPAD_BUTTON_A) << std::endl;
-            // std::cout << "B: " << im.isGamePadButtonDown(0, GLFW_GAMEPAD_BUTTON_B) << std::endl;
-            // std::cout << "X: " << im.isGamePadButtonReleased(0, GLFW_GAMEPAD_BUTTON_X) << std::endl;
-            // std::cout << "Y: " << im.isGamePadButtonUp(0, GLFW_GAMEPAD_BUTTON_Y) << std::endl;
+            // std::cout << "A: " << im.isGamepadButtonPressed(0, GLFW_GAMEPAD_BUTTON_A) << std::endl;
+            // std::cout << "B: " << im.isGamepadButtonDown(0, GLFW_GAMEPAD_BUTTON_B) << std::endl;
+            // std::cout << "X: " << im.isGamepadButtonReleased(0, GLFW_GAMEPAD_BUTTON_X) << std::endl;
+            // std::cout << "Y: " << im.isGamepadButtonUp(0, GLFW_GAMEPAD_BUTTON_Y) << std::endl;
             // std::cout << "----" << std::endl;
+
+            // if(im.isGamepadButtonDown(0, GLFW_GAMEPAD_BUTTON_A))
+            //     std::cout << "Estoy pulsando A" << std::endl;
+
+            // if(im.isGamepadButtonUp(0, GLFW_GAMEPAD_BUTTON_B))
+            //     std::cout << "No estoy pulsando B" << std::endl;
 
             wm.beginDrawing();
 
