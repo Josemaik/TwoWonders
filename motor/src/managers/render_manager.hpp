@@ -11,6 +11,7 @@
 #include <GL/glu.h>
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 struct RenderManager{
@@ -31,8 +32,10 @@ public:
 
     // Texture drawing functions
     void drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, glm::vec4 color);
-    // TODO: rotation
     void drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, glm::vec4 color);
+
+    // 3D
+    void drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color);
 
     // ChangeShader
     void useShader(std::shared_ptr<Shader> shader){ 

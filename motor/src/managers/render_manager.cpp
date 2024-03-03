@@ -169,14 +169,14 @@ void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos,
     glDeleteBuffers(1, &EBO);
 }
 
-void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float, float scale, glm::vec4 color){
+void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color){
     // Define vertices and indices
     float vertices[] = {
         // positions                                                                                                                                       // colors                    // texture coords
         normalizeX(pos.x)                                                  , normalizeY(pos.y)                                                   , 0.0f,   color.x, color.y, color.z,   0.0f, 0.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth()) * scale), normalizeY(pos.y)                                                   , 0.0f,   color.x, color.y, color.z,   1.0f, 0.0f,
-        normalizeX(pos.x)                                                  , normalizeY(pos.y + static_cast<float>(texture->getHeight()) * scale), 0.0f,   color.x, color.y, color.z,   0.0f, 1.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth()) * scale), normalizeY(pos.y + static_cast<float>(texture->getHeight()) * scale), 0.0f,   color.x, color.y, color.z,   1.0f, 1.0f
+        normalizeX(pos.x + static_cast<float>(texture->getWidth()))        , normalizeY(pos.y)                                                   , 0.0f,   color.x, color.y, color.z,   1.0f, 0.0f,
+        normalizeX(pos.x)                                                  , normalizeY(pos.y + static_cast<float>(texture->getHeight()))        , 0.0f,   color.x, color.y, color.z,   0.0f, 1.0f,
+        normalizeX(pos.x + static_cast<float>(texture->getWidth()))        , normalizeY(pos.y + static_cast<float>(texture->getHeight()))        , 0.0f,   color.x, color.y, color.z,   1.0f, 1.0f
     };
 
     GLuint indices[] = { 0, 1, 2, 1, 2, 3};
@@ -211,6 +211,14 @@ void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
     glUniform4fv(colorUniform, 1, glm::value_ptr(color));
 
+    // Transform
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(normalizeX(pos.x), normalizeY(pos.y), 0.0f));
+    trans = glm::rotate(trans, glm::radians(rotate), glm::vec3(0.0f, 0.0f, 1.0f));
+    trans = glm::scale(trans, glm::vec3(scale, scale, 1.0f));
+    GLuint transformLoc = glGetUniformLocation(m_shaderProgram->id_shader, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
     // Draw Texture
     glBindTexture(GL_TEXTURE_2D, texture->texture);
     glBindVertexArray(VAO);
@@ -222,8 +230,76 @@ void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2
     glDeleteBuffers(1, &EBO);
 }
 
+// 3D
+void RenderManager::drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float, float, glm::vec4 color){
+    // Define vertices and indices
+    float vertices[] = {
+        // positions                                                                                                                                       // colors                    // texture coords
+        normalizeX(pos.x)                                                  , normalizeY(pos.y)                                                   , 0.0f,   color.x, color.y, color.z,   0.0f, 0.0f,
+        normalizeX(pos.x + static_cast<float>(texture->getWidth()))        , normalizeY(pos.y)                                                   , 0.0f,   color.x, color.y, color.z,   1.0f, 0.0f,
+        normalizeX(pos.x)                                                  , normalizeY(pos.y + static_cast<float>(texture->getHeight()))        , 0.0f,   color.x, color.y, color.z,   0.0f, 1.0f,
+        normalizeX(pos.x + static_cast<float>(texture->getWidth()))        , normalizeY(pos.y + static_cast<float>(texture->getHeight()))        , 0.0f,   color.x, color.y, color.z,   1.0f, 1.0f
+    };
+
+    GLuint indices[] = { 0, 1, 2, 1, 2, 3};
+
+    // Create and configure VAO, VBO and EBO
+    GLuint VBO, VAO, EBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    // Colors
+    GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
+    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+
+    // Transform
+    glm::mat4 model      = glm::mat4(1.0f);
+    glm::mat4 view       = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+    model       = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    view        = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    projection  = glm::perspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
+
+    glm::mat4 trans = projection * view * model;
+
+    GLuint transformLoc = glGetUniformLocation(m_shaderProgram->id_shader, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+    // Draw Texture
+    glBindTexture(GL_TEXTURE_2D, texture->texture);
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    // Clean up resources
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+}
+
+
 // Text drawing functions
 
-void drawText(const char*, glm::vec2, int, glm::vec4){
+void RenderManager::drawText(const char*, glm::vec2, int, glm::vec4){
 
 }
