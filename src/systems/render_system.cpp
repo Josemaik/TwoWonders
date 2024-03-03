@@ -408,9 +408,7 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
     }
     else if (e.hasTag<DummyTag>())
     {
-        r.model = engine.loadModel("assets/models/Golem.obj");
-        // Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Dummy_texture.png");
-        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        r.model = engine.loadModel("assets/models/Dummy.obj");
 
         loadShaders(r.model);
     }
