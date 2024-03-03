@@ -70,7 +70,7 @@ const char* InputManager::getGamePadName(int gamepad){
     return name ? name : "Uknown";
 }
 
-bool InputManager::isGamepadButtonPressed(int gamepad, int button){
+bool InputManager::isGamepadButtonPressed(int, int){
     return true;
 }
 
@@ -81,19 +81,19 @@ bool InputManager::isGamepadButtonDown(int gamepad, int button){
 }
 
 
-bool InputManager::isGamepadButtonReleased(int gamepad, int button){
+bool InputManager::isGamepadButtonReleased(int, int){
     return true;
 }
 
 
 bool InputManager::isGamepadButtonUp(int gamepad, int button){
-     return m_gamepadStates[gamepad].buttons[button] == GLFW_RELEASE;
+    return m_gamepadStates[gamepad].buttons[button] == GLFW_RELEASE;
 }
 
-int InputManager::getGamepadAxisCount(int gamepad){
-
+int InputManager::getGamepadAxisCount(int){
+    return 1;
 }
 
-float InputManager::getGamepadAxisMovement(int gamepad, int axis){
-
+float InputManager::getGamepadAxisMovement(int, int){
+    return 1.0f;
 }

@@ -89,8 +89,8 @@ int main(){
             // Draw (color)
             renm.useShader(rShaderColor);
 
-            renm.drawTriangle({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, {1.0f, 0.5f, 0.2f, 1.0f});
-            renm.drawPixel({400.0f, 300.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
+            //renm.drawTriangle({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, {1.0f, 0.5f, 0.2f, 1.0f});
+            //renm.drawPixel({400.0f, 300.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
 
             // HUD
             renm.drawRectangle({12.0f, 12.0f}, {200.0f, 40.0f}, {0.5f, 0.5f, 0.5f, 1.0f});
@@ -98,9 +98,11 @@ int main(){
 
             // Draw (texture)
             renm.useShader(rShaderTexture);
-            renm.drawTextureExtra(rTexture, {10.0f, 60.0f}, 0.0f, 0.6f, {1.0f, 1.0f, 1.0f, 1.0f});
+            renm.drawTextureExtra(rTexture, {100.0f, 150.0f}, 90.0f, 0.4f, {1.0f, 1.0f, 1.0f, 1.0f});
             // renm.drawTexture(rTexture, {0.0f, 500.0f}, {1.0f, 1.0f, 1.0f, 1.0f});
 
+            // Draw (texture) -> 3D
+            renm.drawTexture3D(rTexture, {100.0f, 150.0f}, 90.0f, 0.4f, {1.0f, 1.0f, 1.0f, 1.0f});
             // Draw (model)
             //eModel->draw(glm::mat4());
 
