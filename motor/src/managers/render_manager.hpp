@@ -2,6 +2,7 @@
 
 #include "../components/resource_shader.hpp"
 #include "../components/resource_texture.hpp"
+#include "../components/entity_camera.hpp"
 
 #include <memory>
 
@@ -17,13 +18,22 @@
 struct RenderManager{
 private:
     std::shared_ptr<Shader> m_shaderProgram;
-    void draw(float vertices[], std::size_t vertSize, GLuint indices[], std::size_t indSize,glm::vec4 color);
 
+    void draw(float vertices[], std::size_t vertSize, GLuint indices[], std::size_t indSize,glm::vec4 color);
     // TODO: 800 / 600 --> getScreenWidth() / getScreenHeight()
     float normalizeX(float x){ return (x / 800.0f) * 2 - 1; };
     float normalizeY(float y){ return -((y / 600.0f) * 2 - 1); };
 
 public:
+    std::shared_ptr<Camera> m_camera;
+    // Drawing
+    void beginMode3D();
+    void endMode3D();
+    void drawGrid(int slices, float spacing);
+
+    // Camera
+    void setCamera(std::shared_ptr<Camera> camera){ m_camera = camera; };
+
     // Basic drawing functions
     void clearBackground(glm::vec4 color);
     void drawPixel(glm::vec2 pos, glm::vec4 color);

@@ -46,6 +46,58 @@ void RenderManager::draw(float vertices[], std::size_t vertSize, GLuint indices[
 
 // public:
 
+// Drawing
+
+void RenderManager::beginMode3D(){
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(m_camera->position.x, m_camera->position.y, m_camera->position.z,
+              m_camera->target.x, m_camera->target.y, m_camera->target.z,
+              m_camera->up.x, m_camera->up.y, m_camera->up.z);
+    
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+}
+
+void RenderManager::endMode3D(){
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+
+void RenderManager::drawGrid(int slices, float spacing){
+    glLineWidth(1.0f);
+
+    glColor3f(0.0f, 0.0f, 0.0f);
+
+    glBegin(GL_LINES);
+
+    // Draw horizontal lines
+    for (int i = -slices / 2; i <= slices / 2; i++) {
+        glVertex3f(-spacing * slices / 2, 0.0f, i * spacing);
+        glVertex3f(spacing * slices / 2, 0.0f, i * spacing);
+    }
+
+    // Draw vertical lines
+    for (int i = -slices / 2; i <= slices / 2; i++) {
+        glVertex3f(i * spacing, -spacing * slices / 2, 0.0f);
+        glVertex3f(i * spacing, spacing * slices / 2, 0.0f);
+    }
+
+    glEnd();
+}
+
+// Basic drawing functions
+
 void RenderManager::drawPixel(glm::vec2 pos, glm::vec4 color){
     // Define a single vertex for the pixel
     float vertex[] = { normalizeX(pos.x), normalizeY(pos.y) };
@@ -172,11 +224,11 @@ void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos,
 void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color){
     // Define vertices and indices
     float vertices[] = {
-        // positions                                                                                                                                       // colors                    // texture coords
-        normalizeX(pos.x)                                                  , normalizeY(pos.y)                                                   , 0.0f,   color.x, color.y, color.z,   0.0f, 0.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth()))        , normalizeY(pos.y)                                                   , 0.0f,   color.x, color.y, color.z,   1.0f, 0.0f,
-        normalizeX(pos.x)                                                  , normalizeY(pos.y + static_cast<float>(texture->getHeight()))        , 0.0f,   color.x, color.y, color.z,   0.0f, 1.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth()))        , normalizeY(pos.y + static_cast<float>(texture->getHeight()))        , 0.0f,   color.x, color.y, color.z,   1.0f, 1.0f
+        // positions                                                                                                                       // colors                    // texture coords
+        normalizeX(pos.x)                                          , normalizeY(pos.y)                                           , 0.0f,   color.x, color.y, color.z,   0.0f, 0.0f,
+        normalizeX(pos.x + static_cast<float>(texture->getWidth())), normalizeY(pos.y)                                           , 0.0f,   color.x, color.y, color.z,   1.0f, 0.0f,
+        normalizeX(pos.x)                                          , normalizeY(pos.y + static_cast<float>(texture->getHeight())), 0.0f,   color.x, color.y, color.z,   0.0f, 1.0f,
+        normalizeX(pos.x + static_cast<float>(texture->getWidth())), normalizeY(pos.y + static_cast<float>(texture->getHeight())), 0.0f,   color.x, color.y, color.z,   1.0f, 1.0f
     };
 
     GLuint indices[] = { 0, 1, 2, 1, 2, 3};
@@ -277,15 +329,20 @@ void RenderManager::drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 po
     glm::mat4 model      = glm::mat4(1.0f);
     glm::mat4 view       = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);
-    model       = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    view        = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+    model       = glm::rotate(model, (float)glfwGetTime() * glm::radians(100.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    view        = m_camera->getViewMatrix();
     projection  = glm::perspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
 
-    glm::mat4 trans = projection * view * model;
+    GLuint modelLoc = glGetUniformLocation(m_shaderProgram->id_shader, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-    GLuint transformLoc = glGetUniformLocation(m_shaderProgram->id_shader, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+    GLuint viewLoc = glGetUniformLocation(m_shaderProgram->id_shader, "view");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
+    GLuint projectionLoc = glGetUniformLocation(m_shaderProgram->id_shader, "projection");
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    
     // Draw Texture
     glBindTexture(GL_TEXTURE_2D, texture->texture);
     glBindVertexArray(VAO);
