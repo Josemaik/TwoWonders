@@ -23,8 +23,10 @@ struct BTAction_Pendulum : BTNode_t {
         }
 
         Steer_t steering = STBH::Arrive(ectx.phy, *ectx.ai.pathIt, ectx.ai.arrival_radius);
+        ectx.phy.max_speed += 0.1;
         if (steering.arrived) {
             ++ectx.ai.pathIt;
+            ectx.phy.max_speed = 0.4;
             ectx.ai.chargeattack = true;
             return BTNodeStatus_t::success;
         }
