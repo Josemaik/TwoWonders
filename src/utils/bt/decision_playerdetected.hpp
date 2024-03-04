@@ -4,11 +4,23 @@
 
 
 struct BTDecisionPlayerDetected : BTNode_t{
+    // Constantes para ángulos de visión
+    const double verticalFOV = 120.0; // Ángulo vertical de visión en grados
+    const double horizontalFOV = 200.0; // Ángulo horizontal de visión en grados
 
     BTDecisionPlayerDetected()  {}
 
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         ectx.ai.bh = "detecting player";
+        //Diferencia de niveles
+        // if(ectx.ent.hasTag<SpiderTag>()){
+        //     if(getplayerpos(ectx).y() > ectx.phy.position.y()){
+        //         std::cout << getplayerpos(ectx).y() << "jiji" <<
+        //         ectx.phy.position.y();
+        //         ectx.ai.playerdetected = false;
+        //         return BTNodeStatus_t::fail;
+        //     }
+        // }
         //########## PERCEPCION SENSORIAL - VISTA ################
         // Calcula la dirección de visión del enemigo utilizando su orientación
         vec3d enemyDirection = vec3d(std::sin(ectx.phy.orientation),0.0, std::cos(ectx.phy.orientation));
@@ -24,26 +36,45 @@ struct BTDecisionPlayerDetected : BTNode_t{
         // Convierte el ángulo de radianes a grados
         double angleDegrees = angle * 180.0 / PI;
         // Comprueba si el ángulo está dentro del rango de visión del enemigo
-        if (angleDegrees < ectx.ai.field_of_view / 2.0) {
+        if (angleDegrees < verticalFOV / 2.0 && std::abs(angleDegrees) < horizontalFOV / 2.0) {
             //Raycast
             bool rayintercepted{false};
+            // vec3d posenemy{};
+            // if(getplayerpos(ectx).y() != 0.0){
+            //     posenemy = {ectx.phy.position.x(),
+            //     getplayerpos(ectx).y(),ectx.phy.position.z()};
+            // }else{
+            //     posenemy = ectx.phy.position;
+            // }
             // Realiza un raycast en la dirección en la que el enemigo está mirando para detectar obstáculos
             RayCast ray = { ectx.phy.position, enemyDirection };
             //Compruebo si la caja de colisión de un obstaculo ha colisionado con el rayo
             for(Entity &ent : ectx.em.getEntities()){
-                if(ent.hasTag<WallTag>()){
-                    auto& col = ectx.em.getComponent<ColliderComponent>(ent);
-                    if(col.boundingBox.intersectsRay(ray.origin,ray.direction)){
-                        // si el rayo intercepta un obstaculo
-                        // calculo distancia del obstaculo al enemigo
-                        auto& phyobs = ectx.em.getComponent<PhysicsComponent>(ent);
-                        vec3d distanceobjene = phyobs.position - ectx.phy.position;
-                         //calculo distancia del player al enemigo
-                        vec3d distancetoplayer = getplayerpos(ectx) - ectx.phy.position;
-                        //Si la distancia del enemigo al obstaculo es menor que al player 
-                        //significa que esta entre ambos
-                        if(distanceobjene.length() < distancetoplayer.length())
-                            rayintercepted = true;
+                if(ent.hasComponent<ColliderComponent>()){
+                    ColliderComponent& col = ectx.em.getComponent<ColliderComponent>(ent);
+                    if(col.behaviorType & BehaviorType::STATIC){
+                        auto& col = ectx.em.getComponent<ColliderComponent>(ent);
+                        if(col.boundingBox.intersectsRay(ray.origin,ray.direction)){
+                            // si el rayo intercepta un obstaculo
+                            // calculo distancia del obstaculo al enemigo
+                            auto& phyobs = ectx.em.getComponent<PhysicsComponent>(ent);
+                            vec3d distanceobjene = phyobs.position - ectx.phy.position;
+                            //calculo distancia del player al enemigo
+                            vec3d distancetoplayer = getplayerpos(ectx) - ectx.phy.position;
+                            //Si la distancia del enemigo al obstaculo es menor que al player 
+                            //significa que esta entre ambos
+                            // if(ectx.ent.hasTag<SnowmanTag>()){
+                            //     std::cout << "disobj: " << distanceobjene.length() << "displa:" <<
+                            //     distancetoplayer.length() << "\n";
+                            //     if(distanceobjene.length() < distancetoplayer.length()){
+                            //         std::cout << "objeto en medio \n";
+                            //     }
+                            // }
+                            if(distanceobjene.length() < distancetoplayer.length()){
+                                rayintercepted = true;
+                                break;
+                            }
+                        }
                     }
                 }
             }

@@ -488,7 +488,7 @@
                 ],
                 "countdown_stop": 0.8,
                 "countdown_shoot": 0.5,
-                "countdown_perception": 6.1,
+                "countdown_perception": 1.0,
                 "scale_to_respawn_attack": 2.0
             }
         ],
