@@ -51,7 +51,7 @@ void RenderManager::draw(float vertices[], std::size_t vertSize, GLuint indices[
 void RenderManager::beginMode3D(){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
+    gluPerspective(glm::radians(m_camera->fovy), (800.0f / 600.0f), 0.1f, 100.0f);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -74,26 +74,23 @@ void RenderManager::endMode3D(){
     glLoadIdentity();
 }
 
-void RenderManager::drawGrid(int slices, float spacing){
-    glLineWidth(1.0f);
-
+void RenderManager::drawGrid(int, float){
+    /*
     glColor3f(0.0f, 0.0f, 0.0f);
-
     glBegin(GL_LINES);
 
-    // Draw horizontal lines
-    for (int i = -slices / 2; i <= slices / 2; i++) {
-        glVertex3f(-spacing * slices / 2, 0.0f, i * spacing);
-        glVertex3f(spacing * slices / 2, 0.0f, i * spacing);
-    }
+    float halfSize = slices * spacing * 0.5f;
 
-    // Draw vertical lines
-    for (int i = -slices / 2; i <= slices / 2; i++) {
-        glVertex3f(i * spacing, -spacing * slices / 2, 0.0f);
-        glVertex3f(i * spacing, spacing * slices / 2, 0.0f);
+    for (int i = -slices; i <= slices; ++i) {
+        glVertex3f(i * spacing, 0.0f, -halfSize);
+        glVertex3f(i * spacing, 0.0f, halfSize);
+
+        glVertex3f(-halfSize, 0.0f, i * spacing);
+        glVertex3f(halfSize, 0.0f, i * spacing);
     }
 
     glEnd();
+    */
 }
 
 // Basic drawing functions
@@ -283,17 +280,23 @@ void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2
 }
 
 // 3D
-void RenderManager::drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float, float, glm::vec4 color){
+void RenderManager::drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float, glm::vec4 color){
+    float nX = normalizeX(pos.x);
+    float nXw = normalizeX(pos.x + static_cast<float>(texture->getWidth()));
+
+    float nY = normalizeY(pos.y);
+    float nYh = normalizeY(pos.y + static_cast<float>(texture->getHeight()));
+
     // Define vertices and indices
     float vertices[] = {
-        // positions                                                                                                                                       // colors                    // texture coords
-        normalizeX(pos.x)                                                  , normalizeY(pos.y)                                                   , 0.0f,   color.x, color.y, color.z,   0.0f, 0.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth()))        , normalizeY(pos.y)                                                   , 0.0f,   color.x, color.y, color.z,   1.0f, 0.0f,
-        normalizeX(pos.x)                                                  , normalizeY(pos.y + static_cast<float>(texture->getHeight()))        , 0.0f,   color.x, color.y, color.z,   0.0f, 1.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth()))        , normalizeY(pos.y + static_cast<float>(texture->getHeight()))        , 0.0f,   color.x, color.y, color.z,   1.0f, 1.0f
+        // positions    // colors                    // texture coords
+        nX , nY , 0.0f,   color.x, color.y, color.z,   0.0f, 0.0f,
+        nXw, nY , 0.0f,   color.x, color.y, color.z,   1.0f, 0.0f,
+        nX , nYh, 0.0f,   color.x, color.y, color.z,   0.0f, 1.0f,
+        nXw, nYh, 0.0f,   color.x, color.y, color.z,   1.0f, 1.0f,
     };
 
-    GLuint indices[] = { 0, 1, 2, 1, 2, 3};
+    GLuint indices[] = { 0, 1, 2, 1, 2, 3 };
 
     // Create and configure VAO, VBO and EBO
     GLuint VBO, VAO, EBO;
@@ -330,7 +333,7 @@ void RenderManager::drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 po
     glm::mat4 view       = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);
 
-    model       = glm::rotate(model, (float)glfwGetTime() * glm::radians(100.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model       = glm::rotate(model, static_cast<float>(glfwGetTime() * glm::radians(rotate)), glm::vec3(0.0f, 1.0f, 0.0f));
     view        = m_camera->getViewMatrix();
     projection  = glm::perspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
 
@@ -354,6 +357,44 @@ void RenderManager::drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 po
     glDeleteBuffers(1, &EBO);
 }
 
+void RenderManager::drawMesh(std::shared_ptr<Mesh> mesh){
+    glBindVertexArray(mesh->getVAO());
+
+    std::cout << "Vertices: " << mesh->vertices.size() << std::endl;
+    std::cout << "Indices: " << mesh->indices.size() << std::endl;
+    std::cout << "--------------" << std::endl;
+
+    // for (std::size_t i = 0; i < mesh->textures.size(); ++i) {
+    //     glActiveTexture(GL_TEXTURE0 + static_cast<GLenum>(i));
+    //     glBindTexture(GL_TEXTURE_2D, mesh->textures[i]->texture);
+    // }
+
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view       = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+
+    GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
+    glm::vec4 color = {1.0f, 0.0f, 0.5f, 1.0f}; 
+    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+
+    model       = glm::translate(model, {0.0f, 0.0f, 0.0f});
+    model       = glm::scale(model, {0.5f, 0.5f, 0.5f});
+    view        = m_camera->getViewMatrix();
+    projection  = glm::perspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
+
+    GLuint modelLoc = glGetUniformLocation(m_shaderProgram->id_shader, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    GLuint viewLoc = glGetUniformLocation(m_shaderProgram->id_shader, "view");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+    GLuint projectionLoc = glGetUniformLocation(m_shaderProgram->id_shader, "projection");
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->indices.size()), GL_UNSIGNED_INT, 0);
+
+    glBindVertexArray(0);
+
+    // glActiveTexture(GL_TEXTURE0);
+}
 
 // Text drawing functions
 

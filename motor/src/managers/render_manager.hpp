@@ -3,6 +3,7 @@
 #include "../components/resource_shader.hpp"
 #include "../components/resource_texture.hpp"
 #include "../components/entity_camera.hpp"
+#include "../components/resource_mesh.hpp"
 
 #include <memory>
 
@@ -46,6 +47,7 @@ public:
 
     // 3D
     void drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color);
+    void drawMesh(std::shared_ptr<Mesh> mesh);
 
     // ChangeShader
     void useShader(std::shared_ptr<Shader> shader){ 
@@ -55,4 +57,9 @@ public:
 
     // Text
     void drawText(const char*, glm::vec2, int, glm::vec4);
+
+    static RenderManager& getInstance(){
+        static RenderManager instance;
+        return instance;
+    }
 };
