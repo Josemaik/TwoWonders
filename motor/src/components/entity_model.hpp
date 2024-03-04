@@ -3,6 +3,7 @@
 #include "entity.hpp"
 #include "resource_mesh.hpp"
 #include "../managers/resource_manager.hpp"
+#include "../managers/render_manager.hpp"
 
 #include <vector>
 #include <glm/glm.hpp>

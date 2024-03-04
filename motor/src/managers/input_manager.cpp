@@ -16,11 +16,7 @@ void InputManager::update(){
 // Input-related functions: keyboard
 
 bool InputManager::isKeyPressed(int key){
-    if(m_keyStates[key] == 1){
-        m_keyStates[key] = GLFW_REPEAT;
-        return true;
-    }
-    return false;
+    return m_keyStates[key];
 }
 
 bool InputManager::isKeyPressedRepeat(int key){

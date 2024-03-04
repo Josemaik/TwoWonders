@@ -34,6 +34,8 @@ public:
 
     void draw();
 
+    GLuint getVAO(){ return m_VAO; };
+
 private:
     // Render data
     GLuint m_VAO; // Vertex Array Object
