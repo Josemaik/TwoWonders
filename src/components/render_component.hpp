@@ -15,9 +15,9 @@ struct RenderComponent
 
     vec3d position{};
     vec3d scale{};
-    double orientation{ 0.0 };
     Color color{};
     bool visible{ true };
+    double orientation{ 0.0 };
     vec3d rotationVec{ 0.0, 0.1, 0.0 };
 
     BBox bbox{};

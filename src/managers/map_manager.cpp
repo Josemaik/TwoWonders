@@ -49,7 +49,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
     const rapidjson::Value& chunks = map["Chunks"];
     int j = 0;
 
-    for (rapidjson::SizeType i = 0; i < chunks.Size(); i++)
+    for (rapidjson::SizeType i = 0; i < chunks.Size() - 2; i++)
     {
         std::string chunkName = "Chunk" + std::to_string(i);
         const rapidjson::Value& chunk = chunks[i][chunkName.c_str()];
@@ -107,20 +107,24 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
 
         // Extraemos los datos del json
         const rapidjson::Value& ground = groundArray[i];
-        vec3d groundPosition{ ground["position"][0].GetDouble(), ground["position"][2].GetDouble(), -ground["position"][1].GetDouble() };
+        vec3d groundPosition{ ground["position"][0].GetDouble(), ground["position"][2].GetDouble(), ground["position"][1].GetDouble() };
         vec3d groundScale{ ground["scale"][0].GetDouble(), ground["scale"][2].GetDouble(), ground["scale"][1].GetDouble() };
         vec3d rotationVec{ ground["rotVector"][0].GetDouble(), ground["rotVector"][2].GetDouble(), ground["rotVector"][1].GetDouble() };
         double orientation{ ground["rotation"].GetDouble() };
+        double rot = orientation * DEGTORAD;
         Color color{ WHITE };
 
+        if (rotationVec.y() < 0)
+            rotationVec.setY(rotationVec.y() * -1);
+
         // Creamos los componentes del suelo
-        auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .rotationVec = rotationVec });
-        auto& p = em.addComponent<PhysicsComponent>(groundEntity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
+        auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .orientation = rot, .rotationVec = rotationVec });
+        auto& p = em.addComponent<PhysicsComponent>(groundEntity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = rot, .rotationVec = r.rotationVec });
         em.addComponent<ColliderComponent>(groundEntity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+        em.addTag<SeparateModelTag>(groundEntity);
 
         if (j >= 4)
         {
-            em.addTag<SeparateModelTag>(groundEntity);
             r.position = groundPos;
             if (j >= 8)
                 em.addTag<Chunk2Tag>(groundEntity);
@@ -129,7 +133,10 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
         }
         else {
             em.addTag<Chunk0Tag>(groundEntity);
-            groundPos = groundPosition;
+            r.position += vec3d{ 3.0, 0, 1.0 };
+            p.position = r.position;
+            groundPosition = r.position;
+            groundPos = r.position;
         }
 
         // Creamos las 4 zonas
@@ -166,15 +173,31 @@ void MapManager::generateWalls(EntityManager& em, const rapidjson::Value& wallAr
         em.addTag<WallTag>(entity);
         // Extraemos los datos del json
         const rapidjson::Value& wall = wallArray[i];
-        vec3d position{ wall["position"][0].GetDouble(), wall["position"][2].GetDouble(), -wall["position"][1].GetDouble() };
+        vec3d position{ wall["position"][1].GetDouble(), wall["position"][2].GetDouble(), -wall["position"][0].GetDouble() };
         vec3d scale{ wall["scale"][0].GetDouble(), wall["scale"][2].GetDouble(), wall["scale"][1].GetDouble() };
         vec3d rotationVec{ wall["rotVector"][0].GetDouble(), wall["rotVector"][2].GetDouble(), wall["rotVector"][1].GetDouble() };
         double orientation{ wall["rotation"].GetDouble() };
         Color color{ LIME };
 
+        if (std::abs(orientation) == 90.0 && std::abs(rotationVec.y()) == 1.0)
+        {
+            double temp = scale.x();
+            scale.setX(scale.z());
+            scale.setZ(temp);
+
+            rotationVec = vec3d::zero();
+        }
+        else if (std::abs(rotationVec.y()) == 2.0)
+        {
+            position.setX(-position.x());
+        }
+
+
+        double rot = orientation * DEGTORAD;
+
         // Creamos los componentes
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color,  .visible = false, .rotationVec = rotationVec });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color,  .visible = false, .orientation = rot, .rotationVec = rotationVec });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = rot, .rotationVec = r.rotationVec });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     }
 }
