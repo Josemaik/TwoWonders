@@ -303,7 +303,12 @@ void RenderSystem::beginFrame(ENGI::GameEngine& engine)
     engine.beginMode3D();
     //engine.drawGrid(50, 1.f);
 }
-
+//dibujar rayo 3d 
+void RenderSystem::drawRay(vec3d origin,vec3d dir){
+    BeginDrawing();
+    DrawLine3D(origin.toRaylib(), (origin + dir * 100).toRaylib(), RED);
+    EndDrawing();
+}
 // Se termina el dibujado
 void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double dt)
 {
@@ -319,7 +324,6 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
     // Visual Debug AI
     if (inpi.debugAI2)
         drawDebuggerInGameIA(engine, em, dt);
-
     engine.endDrawing();
 }
 
@@ -740,6 +744,14 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             //     linfo.segundos = 1000;
             // }
             // linfo.segundos--;
+        }
+        if(bb.launched){
+            // bb.direction+={20.0,0.0,20.0};
+            // bb.position_origin.setY(bb.position_origin.y() + 10);
+            engine.beginMode3D();
+            DrawLine3D(bb.position_origin.toRaylib(),bb.direction.toRaylib(),RED);
+            engine.endMode3D();
+            bb.launched = false;
         }
         // else {
         //     engine.drawText(("ZONA " + std::to_string(linfo.num_zone)).c_str(), 600, 10, 50, RED);

@@ -61,4 +61,8 @@ struct BlackBoard_t {
     std::unordered_map<std::size_t, InfoSub> subditosData;
     std::vector<size_t> idsubditos;
 
+    //ray
+    vec3d position_origin{},direction{};
+    bool launched{false};
+
 };

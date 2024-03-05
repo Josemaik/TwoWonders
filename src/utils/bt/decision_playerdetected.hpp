@@ -12,18 +12,22 @@ struct BTDecisionPlayerDetected : BTNode_t{
 
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         ectx.ai.bh = "detecting player";
+        //Si el player se encuentra en un nivel superior no es detectado por
+        //la IA
         //Diferencia de niveles
-        // if(ectx.ent.hasTag<SpiderTag>()){
-        //     if(getplayerpos(ectx).y() > ectx.phy.position.y()){
-        //         std::cout << getplayerpos(ectx).y() << "jiji" <<
-        //         ectx.phy.position.y();
-        //         ectx.ai.playerdetected = false;
-        //         return BTNodeStatus_t::fail;
-        //     }
-        // }
+        if(ectx.ent.hasTag<SpiderTag>()){
+            if(getplayerpos(ectx).y() - ectx.phy.position.y() > 1.0){
+                if(getplayerpos(ectx).y() > ectx.phy.position.y()){ 
+                    // std::cout << getplayerpos(ectx).y() << "jiji" <<
+                    // ectx.phy.position.y();
+                    ectx.ai.playerdetected = false;
+                    return BTNodeStatus_t::fail;
+                }
+            }
+        }
         //########## PERCEPCION SENSORIAL - VISTA ################
         // Calcula la dirección de visión del enemigo utilizando su orientación
-        vec3d enemyDirection = vec3d(std::sin(ectx.phy.orientation),0.0, std::cos(ectx.phy.orientation));
+        vec3d enemyDirection = vec3d(std::sin(ectx.phy.orientation) *180.0 / PI,0.0, std::cos(ectx.phy.orientation) *180.0 / PI);
         // Vector que apunta desde el enemigo al jugador
         vec3d toPlayer = getplayerpos(ectx) - ectx.phy.position;
         //normalizamos vectores
@@ -34,20 +38,25 @@ struct BTDecisionPlayerDetected : BTNode_t{
         // Calcula el ángulo entre la dirección de visión del enemigo y la dirección hacia el jugador
         double angle = std::acos(dotProduct);
         // Convierte el ángulo de radianes a grados
-        double angleDegrees = angle * 180.0 / PI;
+        double angleDegrees = angle * 180 / PI;
         // Comprueba si el ángulo está dentro del rango de visión del enemigo
         if (angleDegrees < verticalFOV / 2.0 && std::abs(angleDegrees) < horizontalFOV / 2.0) {
             //Raycast
             bool rayintercepted{false};
-            // vec3d posenemy{};
-            // if(getplayerpos(ectx).y() != 0.0){
-            //     posenemy = {ectx.phy.position.x(),
-            //     getplayerpos(ectx).y(),ectx.phy.position.z()};
-            // }else{
-            //     posenemy = ectx.phy.position;
-            // }
             // Realiza un raycast en la dirección en la que el enemigo está mirando para detectar obstáculos
-            RayCast ray = { ectx.phy.position, enemyDirection };
+            //std::sin(ectx.phy.orientation) *180.0 / PI,1.0, std::cos(ectx.phy.orientation) *180.0 / PI
+            RayCast ray = { ectx.phy.position, vec3d{getplayerpos(ectx) - ectx.phy.position}};
+
+            // dibujado de raycast
+            // if(ectx.ent.hasTag<SnowmanTag>()){
+                //std::cout << "Origin: " << ray.origin << "\n";
+                 auto& bb = ectx.em.getSingleton<BlackBoard_t>();
+                //  ray.origin.setY(ray.origin.y() + 3);
+                 bb.position_origin = ray.origin;
+                 bb.direction = ray.direction;
+                 bb.launched = true;
+            // }
+            // }
             //Compruebo si la caja de colisión de un obstaculo ha colisionado con el rayo
             for(Entity &ent : ectx.em.getEntities()){
                 if(ent.hasComponent<ColliderComponent>()){
@@ -61,7 +70,7 @@ struct BTDecisionPlayerDetected : BTNode_t{
                             vec3d distanceobjene = phyobs.position - ectx.phy.position;
                             //calculo distancia del player al enemigo
                             vec3d distancetoplayer = getplayerpos(ectx) - ectx.phy.position;
-                            //Si la distancia del enemigo al obstaculo es menor que al player 
+                            //Si la distancia del enemigo al obstaculo es menor que al player
                             //significa que esta entre ambos
                             // if(ectx.ent.hasTag<SnowmanTag>()){
                             //     std::cout << "disobj: " << distanceobjene.length() << "displa:" <<
@@ -85,7 +94,7 @@ struct BTDecisionPlayerDetected : BTNode_t{
                 return BTNodeStatus_t::success;
             }
         }
-        
+
         //#### PERCEPCION SENSORIAL - OIDO ################################
         //Calculo la distancia del player al enemigo
         auto const distance = (ectx.phy.position - getplayerpos(ectx)).lengthSQ();
@@ -107,7 +116,7 @@ struct BTDecisionPlayerDetected : BTNode_t{
         }else{
             ectx.ai.playerdetected = false;
         }
-        
+
         return BTNodeStatus_t::fail;
     }
 
