@@ -18,6 +18,8 @@ std::shared_ptr<Texture> loadTexture(const char*, ResourceManager&);
 
 int main(){
 
+    // Patron Dirty //
+
     //----- Initialize managers -----//
     WindowsManager wm;
     ResourceManager rm;
