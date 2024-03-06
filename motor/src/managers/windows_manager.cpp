@@ -75,6 +75,8 @@ void WindowsManager::beginDrawing(){
     glLoadIdentity();
     glOrtho(0, m_width, 0, m_height, -1, 1);
 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     // GLenum error = glGetError();
     // if (error != GL_NO_ERROR) {
     //     std::cerr << "Error OpenGL: " << gluErrorString(error) << std::endl;

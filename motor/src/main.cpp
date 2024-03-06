@@ -71,30 +71,20 @@ int main(){
             // std::cout << "Pos Y: " << renm.m_camera->position.y << std::endl;
             // std::cout << "Pos Z: " << renm.m_camera->position.z << std::endl;
 
-            if(im.isKeyPressed(KEY_A)){
+            if(im.isKeyPressed(KEY_A))
                 renm.m_camera->position.x -= 0.1f;
-                renm.m_camera->target.x   -= 0.1f;
-            }
-            if(im.isKeyPressed(KEY_D)){
+            if(im.isKeyPressed(KEY_D))
                 renm.m_camera->position.x += 0.1f;
-                renm.m_camera->target.x   += 0.1f;
-            }
-            if(im.isKeyPressed(KEY_W)){
+            if(im.isKeyPressed(KEY_W))
                 renm.m_camera->position.z -= 0.1f;
-                renm.m_camera->target.z   -= 0.1f;
-            }
-            if(im.isKeyPressed(KEY_S)){
+            if(im.isKeyPressed(KEY_S))
                 renm.m_camera->position.z += 0.1f;
-                renm.m_camera->target.z   += 0.1f;
-            }
 
-            if(im.isKeyPressed(KEY_SPACE)){
+            if(im.isKeyPressed(KEY_SPACE))
                 renm.m_camera->position.y += 0.1f;
-            }
 
-            if(im.isKeyPressed(GLFW_KEY_LEFT_SHIFT)){
+            if(im.isKeyPressed(GLFW_KEY_LEFT_SHIFT))
                 renm.m_camera->position.y -= 0.1f;
-            }
 
             // Input Tests
             // std::cout << "A: " << im.isKeyPressed(KEY_A) << std::endl;
@@ -118,8 +108,7 @@ int main(){
 
             renm.clearBackground({1.0f, 1.0f, 1.0f, 1.0f});
 
-            //renm.beginMode3D();
-
+            renm.beginMode3D();
 
             // Draw (texture) -> 3D
             renm.useShader(rShaderTexture3D);
@@ -127,10 +116,22 @@ int main(){
             // Draw (model)
             // eModel->draw(glm::mat4());
 
-            renm.drawPlane({0.0f, 0.0f, 0.0f}, {4.0f, 4.0f}, {1.0f, 0.5f, 0.5f, 1.0f});
+            renm.drawPoint3D({0.0f, 0.0f, 0.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
+            renm.drawPoint3D({0.0f, 1.0f, 0.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
+            renm.drawPoint3D({0.0f, -1.0f, 0.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
+            renm.drawLine3D({0.0f, 1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 0.0f, 1.0f});
+
+            renm.drawLine3D({-1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, -1.0f}, {1.0f, 1.0f, 0.0f, 1.0f});
+
+            renm.drawPoint3D({1.0f, 0.0f, -1.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
+            renm.drawPoint3D({1.0f, 1.0f, -1.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
+            
+            renm.drawLine3D({1.0f, 0.0f, -1.0f}, {1.0f, 1.0f, -1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}); 
+
+            renm.drawPlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, {1.0f, 0.5f, 0.5f, 1.0f});
             renm.drawGrid(10, 1.0f, {0.5f, 0.5f, 0.5f, 0.0f});
 
-            //renm.endMode3D();
+            renm.endMode3D();
 
             // Draw (color)
             renm.useShader(rShaderColor);

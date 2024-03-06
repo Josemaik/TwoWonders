@@ -27,6 +27,7 @@ private:
 
 public:
     std::shared_ptr<Camera> m_camera;
+    
     // Drawing
     void beginMode3D();
     void endMode3D();
@@ -47,11 +48,11 @@ public:
     void drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, glm::vec4 color);
 
     // Basic geometric 3D shapes drawing functions
+    void drawPoint3D(glm::vec3 position, float pointSize, glm::vec4 color);
+    void drawLine3D(glm::vec3 startPos, glm::vec3 endPos, glm::vec4 color);
     void drawGrid(int slices, float spacing, glm::vec4 color);
     void drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 color); // XZ
     // TODO
-    void drawPoint3D();
-    void drawline3D();
     void drawCube();
     void drawCubeWires();
     void drawSphere();
