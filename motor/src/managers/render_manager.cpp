@@ -49,29 +49,14 @@ void RenderManager::draw(float vertices[], std::size_t vertSize, GLuint indices[
 // Drawing
 
 void RenderManager::beginMode3D(){
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(glm::radians(m_camera->fovy), (800.0f / 600.0f), 0.1f, 100.0f);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt(m_camera->position.x, m_camera->position.y, m_camera->position.z,
-              m_camera->target.x, m_camera->target.y, m_camera->target.z,
-              m_camera->up.x, m_camera->up.y, m_camera->up.z);
-    
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
 }
 
 void RenderManager::endMode3D(){
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
+    //glPopMatrix();
+    //glPopAttrib();
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    glDisable(GL_DEPTH_TEST);
 }
 
 // Basic drawing functions
@@ -340,7 +325,106 @@ void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2
 
 // Basic geometric 3D shapes drawing functions
 
-void RenderManager::drawGrid(int slices, float spacing, glm::vec4 color) {
+void RenderManager::drawPoint3D(glm::vec3 position, float pointSize, glm::vec4 color){
+    // Define vertices for the point
+    float vertices[] = {
+        position.x, position.y, position.z,
+        color.x, color.y, color.z,
+    };
+
+    // Create and configure VAO, VBO
+    GLuint VBO, VAO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // Colors
+    GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
+    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+
+    // Transform
+    glm::mat4 model      = glm::mat4(1.0f);
+    glm::mat4 view       = m_camera->getViewMatrix();
+    glm::mat4 projection = m_camera->getProjectionMatrix(800.0f, 600.0f);
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+    // Draw the point
+    glPointSize(pointSize);
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_POINTS, 0, 1);
+    glPointSize(1.0f);
+
+    // Clean up resources
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+}
+
+void RenderManager::drawLine3D(glm::vec3 startPos, glm::vec3 endPos, glm::vec4 color){
+    // Define vertices for the line
+    float vertices[] = {
+        startPos.x, startPos.y, startPos.z,
+        color.x, color.y, color.z,
+
+        endPos.x, endPos.y, endPos.z,
+        color.x, color.y, color.z,
+    };
+
+    // Create and configure VAO, VBO
+    GLuint VBO, VAO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // Colors
+    GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
+    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+
+    // Transform
+    glm::mat4 model      = glm::mat4(1.0f);
+    glm::mat4 view       = m_camera->getViewMatrix();
+    glm::mat4 projection = m_camera->getProjectionMatrix(800.0f, 600.0f);
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+    // Draw the line
+    glLineWidth(2.0f);
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_LINES, 0, 2);
+    glLineWidth(1.0f);
+
+    // Clean up resources
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+}
+
+void RenderManager::drawGrid(int slices, float spacing, glm::vec4 color){
     // Define vertices for the grid
     std::vector<float> vertices;
     float halfSize = static_cast<float>(slices) * spacing * 0.5f;
@@ -385,16 +469,10 @@ void RenderManager::drawGrid(int slices, float spacing, glm::vec4 color) {
     // Transform
     glm::mat4 model      = glm::mat4(1.0f);
     glm::mat4 view       = m_camera->getViewMatrix();
-    glm::mat4 projection = glm::perspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
-
-    GLuint modelLoc = glGetUniformLocation(m_shaderProgram->id_shader, "model");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-    GLuint viewLoc = glGetUniformLocation(m_shaderProgram->id_shader, "view");
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-    GLuint projectionLoc = glGetUniformLocation(m_shaderProgram->id_shader, "projection");
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    glm::mat4 projection = m_camera->getProjectionMatrix(800.0f, 600.0f);
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     // Draw the grid
     glBindVertexArray(VAO);
@@ -405,7 +483,7 @@ void RenderManager::drawGrid(int slices, float spacing, glm::vec4 color) {
     glDeleteBuffers(1, &VBO);
 }
 
-void RenderManager::drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 color) {
+void RenderManager::drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 color){
     // Calculate half size for convenience
     glm::vec2 halfSize = size * 0.5f;
 
@@ -448,20 +526,11 @@ void RenderManager::drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 col
 
     // Transform
     glm::mat4 model      = glm::mat4(1.0f);
-    glm::mat4 view       = glm::mat4(1.0f);
-    glm::mat4 projection = glm::mat4(1.0f);
-
-    view        = m_camera->getViewMatrix();
-    projection  = glm::perspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
-
-    GLuint modelLoc = glGetUniformLocation(m_shaderProgram->id_shader, "model");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-    GLuint viewLoc = glGetUniformLocation(m_shaderProgram->id_shader, "view");
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-    GLuint projectionLoc = glGetUniformLocation(m_shaderProgram->id_shader, "projection");
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    glm::mat4 view       = m_camera->getViewMatrix();
+    glm::mat4 projection = m_camera->getProjectionMatrix(800.0f, 600.0f);
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     // Draw the plane
     glBindVertexArray(VAO);
