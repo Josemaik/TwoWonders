@@ -74,25 +74,6 @@ void RenderManager::endMode3D(){
     glLoadIdentity();
 }
 
-void RenderManager::drawGrid(int, float){
-    /*
-    glColor3f(0.0f, 0.0f, 0.0f);
-    glBegin(GL_LINES);
-
-    float halfSize = slices * spacing * 0.5f;
-
-    for (int i = -slices; i <= slices; ++i) {
-        glVertex3f(i * spacing, 0.0f, -halfSize);
-        glVertex3f(i * spacing, 0.0f, halfSize);
-
-        glVertex3f(-halfSize, 0.0f, i * spacing);
-        glVertex3f(halfSize, 0.0f, i * spacing);
-    }
-
-    glEnd();
-    */
-}
-
 // Basic drawing functions
 
 void RenderManager::clearBackground(glm::vec4 color){
@@ -357,13 +338,149 @@ void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2
     glDeleteBuffers(1, &EBO);
 }
 
-// 3D
-void RenderManager::drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float, glm::vec4 color){
-    float nX = normalizeX(pos.x);
-    float nXw = normalizeX(pos.x + static_cast<float>(texture->getWidth()));
+// Basic geometric 3D shapes drawing functions
 
-    float nY = normalizeY(pos.y);
-    float nYh = normalizeY(pos.y + static_cast<float>(texture->getHeight()));
+void RenderManager::drawGrid(int slices, float spacing, glm::vec4 color) {
+    // Define vertices for the grid
+    std::vector<float> vertices;
+    float halfSize = static_cast<float>(slices) * spacing * 0.5f;
+    for (int i = 0; i < slices + 1; ++i) {
+        float x = static_cast<float>(i) * spacing - halfSize;
+        vertices.push_back(x); vertices.push_back(0.0f); vertices.push_back(-halfSize);
+        vertices.push_back(color.x); vertices.push_back(color.y); vertices.push_back(color.z);
+
+        vertices.push_back(x); vertices.push_back(0.0f); vertices.push_back(halfSize);
+        vertices.push_back(color.x); vertices.push_back(color.y); vertices.push_back(color.z);
+
+        float z = static_cast<float>(i) * spacing - halfSize;
+        vertices.push_back(-halfSize); vertices.push_back(0.0f); vertices.push_back(z);
+        vertices.push_back(color.x); vertices.push_back(color.y); vertices.push_back(color.z);
+
+        vertices.push_back(halfSize); vertices.push_back(0.0f); vertices.push_back(z);
+        vertices.push_back(color.x); vertices.push_back(color.y); vertices.push_back(color.z);
+    }
+
+    // Create and configure VAO, VBO
+    GLuint VBO, VAO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // Colors
+    GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
+    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+
+    // Transform
+    glm::mat4 model      = glm::mat4(1.0f);
+    glm::mat4 view       = m_camera->getViewMatrix();
+    glm::mat4 projection = glm::perspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
+
+    GLuint modelLoc = glGetUniformLocation(m_shaderProgram->id_shader, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+    GLuint viewLoc = glGetUniformLocation(m_shaderProgram->id_shader, "view");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+    GLuint projectionLoc = glGetUniformLocation(m_shaderProgram->id_shader, "projection");
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+    // Draw the grid
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(vertices.size() / 6));
+
+    // Clean up resources
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+}
+
+void RenderManager::drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 color) {
+    // Calculate half size for convenience
+    glm::vec2 halfSize = size * 0.5f;
+
+    // Define vertices and indices for the plane
+    float vertices[] = {
+        // positions                                                     // colors
+        centerPos.x - halfSize.x, centerPos.y, centerPos.z - halfSize.y, color.x, color.y, color.z,
+        centerPos.x + halfSize.x, centerPos.y, centerPos.z - halfSize.y, color.x, color.y, color.z,
+        centerPos.x - halfSize.x, centerPos.y, centerPos.z + halfSize.y, color.x, color.y, color.z,
+        centerPos.x + halfSize.x, centerPos.y, centerPos.z + halfSize.y, color.x, color.y, color.z,
+    };
+
+    GLuint indices[] = { 0, 1, 2, 1, 2, 3 };
+
+    // Create and configure VAO, VBO, and EBO
+    GLuint VBO, VAO, EBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // Colors
+    GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
+    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+
+    // Transform
+    glm::mat4 model      = glm::mat4(1.0f);
+    glm::mat4 view       = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+
+    view        = m_camera->getViewMatrix();
+    projection  = glm::perspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
+
+    GLuint modelLoc = glGetUniformLocation(m_shaderProgram->id_shader, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+    GLuint viewLoc = glGetUniformLocation(m_shaderProgram->id_shader, "view");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+    GLuint projectionLoc = glGetUniformLocation(m_shaderProgram->id_shader, "projection");
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+    // Draw the plane
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    // Clean up resources
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+}
+
+// EXPERIMENTAL
+
+void RenderManager::drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color){
+    float nX = pos.x - static_cast<float>(texture->getHeight() / 2) * scale;
+    float nXw = pos.x + static_cast<float>(texture->getHeight() / 2) * scale;
+
+    float nY = pos.y + static_cast<float>(texture->getWidth() / 2) * scale;
+    float nYh = pos.y - static_cast<float>(texture->getWidth() / 2) * scale;
 
     // Define vertices and indices
     float vertices[] = {

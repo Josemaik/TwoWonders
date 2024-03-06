@@ -120,31 +120,33 @@ int main(){
 
             //renm.beginMode3D();
 
-            renm.drawGrid(10, 1.0f);
 
             // Draw (texture) -> 3D
             renm.useShader(rShaderTexture3D);
-            renm.drawTexture3D(rTexture2, {400.0f, 300.0f}, 50.0f, 0.5f, {1.0f, 1.0f, 1.0f, 1.0f});
+            // renm.drawTexture3D(rTexture2, {0.0f, 0.0f}, 50.0f, 0.01f, {1.0f, 1.0f, 1.0f, 1.0f});
             // Draw (model)
             // eModel->draw(glm::mat4());
+
+            renm.drawPlane({0.0f, 0.0f, 0.0f}, {4.0f, 4.0f}, {1.0f, 0.5f, 0.5f, 1.0f});
+            renm.drawGrid(10, 1.0f, {0.5f, 0.5f, 0.5f, 0.0f});
 
             //renm.endMode3D();
 
             // Draw (color)
             renm.useShader(rShaderColor);
 
-            renm.drawTriangle({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, {1.0f, 0.5f, 0.2f, 1.0f});
-            renm.drawLine({0.0f, 0.0f}, {500.0f, 200.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
-            renm.drawPixel({400.0f, 300.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
-            renm.drawCircle({100.0f, 300.0f}, 60.0f, 20, {1.0f, 1.0f, 0.0f, 1.0f});
+            //renm.drawTriangle({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, {1.0f, 0.5f, 0.2f, 1.0f});
+            //renm.drawLine({0.0f, 0.0f}, {500.0f, 200.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
+            //renm.drawPixel({400.0f, 300.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
+            //renm.drawCircle({100.0f, 300.0f}, 60.0f, 20, {1.0f, 1.0f, 0.0f, 1.0f});
 
             // HUD
             renm.drawRectangle({12.0f, 12.0f}, {200.0f, 40.0f}, {0.5f, 0.5f, 0.5f, 1.0f});
             renm.drawRectangle({10.0f, 10.0f}, {200.0f, 40.0f}, {0.7f, 0.7f, 0.7f, 1.0f});
 
             // Draw (texture)
-            renm.useShader(rShaderTexture);
-            renm.drawTextureExtra(rTexture, {100.0f, 150.0f}, 120.0f, 0.3f, {1.0f, 1.0f, 1.0f, 1.0f});
+            // renm.useShader(rShaderTexture);
+            // renm.drawTextureExtra(rTexture, {100.0f, 150.0f}, 120.0f, 0.3f, {1.0f, 1.0f, 1.0f, 1.0f});
             // renm.drawTexture(rTexture, {0.0f, 500.0f}, {1.0f, 1.0f, 1.0f, 1.0f});
 
             wm.endDrawing();
