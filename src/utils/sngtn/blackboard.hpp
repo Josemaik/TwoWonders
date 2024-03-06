@@ -64,5 +64,7 @@ struct BlackBoard_t {
     //ray
     vec3d position_origin{},direction{};
     bool launched{false};
-
+    //cone
+    vec3d pos_enemy{};
+    double horizontalFOV{},VerticalFOV{},orientation_enemy{};
 };

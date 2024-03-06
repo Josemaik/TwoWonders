@@ -51,6 +51,13 @@ void AISystem::update(EntityManager& em, float dt)
         if (e.hasTag<BossFinalTag>()) {
             bb.updateInfoBoss(phy.position);
         }
+        //visual debug cone
+        if(e.hasTag<SpiderTag>()){
+            bb.pos_enemy = phy.position;
+            bb.orientation_enemy = phy.orientation;
+            bb.horizontalFOV = 200.0;
+            bb.VerticalFOV = 80.0;
+        }
 
         if (!isDetected && ai.playerdetected)
         {

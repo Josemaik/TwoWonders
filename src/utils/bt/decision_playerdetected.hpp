@@ -5,7 +5,7 @@
 
 struct BTDecisionPlayerDetected : BTNode_t{
     // Constantes para ángulos de visión
-    const double verticalFOV = 120.0; // Ángulo vertical de visión en grados
+    const double verticalFOV = 80.0; // Ángulo vertical de visión en grados
     const double horizontalFOV = 200.0; // Ángulo horizontal de visión en grados
 
     BTDecisionPlayerDetected()  {}
@@ -27,7 +27,8 @@ struct BTDecisionPlayerDetected : BTNode_t{
         }
         //########## PERCEPCION SENSORIAL - VISTA ################
         // Calcula la dirección de visión del enemigo utilizando su orientación
-        vec3d enemyDirection = vec3d(std::sin(ectx.phy.orientation) *180.0 / PI,0.0, std::cos(ectx.phy.orientation) *180.0 / PI);
+        //double orientation_grados = ectx.phy.orientation * 180.0 / M_PI;
+        vec3d enemyDirection = vec3d(std::sin(ectx.phy.orientation),0.0, std::cos(ectx.phy.orientation));
         // Vector que apunta desde el enemigo al jugador
         vec3d toPlayer = getplayerpos(ectx) - ectx.phy.position;
         //normalizamos vectores
@@ -39,29 +40,30 @@ struct BTDecisionPlayerDetected : BTNode_t{
         double angle = std::acos(dotProduct);
         // Convierte el ángulo de radianes a grados
         double angleDegrees = angle * 180 / PI;
+        // std::cout << "Grados: " << angleDegrees << "\n";
+        // std::cout << "Vertical: " << verticalFOV/2.0 << "\n";
         // Comprueba si el ángulo está dentro del rango de visión del enemigo
         if (angleDegrees < verticalFOV / 2.0 && std::abs(angleDegrees) < horizontalFOV / 2.0) {
             //Raycast
             bool rayintercepted{false};
             // Realiza un raycast en la dirección en la que el enemigo está mirando para detectar obstáculos
             //std::sin(ectx.phy.orientation) *180.0 / PI,1.0, std::cos(ectx.phy.orientation) *180.0 / PI
-            RayCast ray = { ectx.phy.position, vec3d{getplayerpos(ectx) - ectx.phy.position}};
+            RayCast ray = { ectx.phy.position, vec3d{getplayerpos(ectx)}};
 
             // dibujado de raycast
-            // if(ectx.ent.hasTag<SnowmanTag>()){
-                //std::cout << "Origin: " << ray.origin << "\n";
-                 auto& bb = ectx.em.getSingleton<BlackBoard_t>();
-                //  ray.origin.setY(ray.origin.y() + 3);
-                 bb.position_origin = ray.origin;
-                 bb.direction = ray.direction;
-                 bb.launched = true;
-            // }
-            // }
+            auto& bb = ectx.em.getSingleton<BlackBoard_t>();
+            bb.position_origin = ray.origin;
+            bb.direction = ray.direction;
+            bb.launched = true;
+
+            
             //Compruebo si la caja de colisión de un obstaculo ha colisionado con el rayo
             for(Entity &ent : ectx.em.getEntities()){
                 if(ent.hasComponent<ColliderComponent>()){
-                    ColliderComponent& col = ectx.em.getComponent<ColliderComponent>(ent);
-                    if(col.behaviorType & BehaviorType::STATIC){
+                    // ColliderComponent& col = ectx.em.getComponent<ColliderComponent>(ent);
+                    //RenderComponent& ren = ectx.em.getComponent<RenderComponent>(ent);
+                    // col.behaviorType & BehaviorType::STATIC 
+                    if(ent.hasTag<WallTag>()){
                         auto& col = ectx.em.getComponent<ColliderComponent>(ent);
                         if(col.boundingBox.intersectsRay(ray.origin,ray.direction)){
                             // si el rayo intercepta un obstaculo
@@ -79,6 +81,7 @@ struct BTDecisionPlayerDetected : BTNode_t{
                             //         std::cout << "objeto en medio \n";
                             //     }
                             // }
+                           // std::cout << ent.getID() << "\n";
                             if(distanceobjene.length() < distancetoplayer.length()){
                                 rayintercepted = true;
                                 break;
@@ -97,7 +100,7 @@ struct BTDecisionPlayerDetected : BTNode_t{
 
         //#### PERCEPCION SENSORIAL - OIDO ################################
         //Calculo la distancia del player al enemigo
-        auto const distance = (ectx.phy.position - getplayerpos(ectx)).lengthSQ();
+       // auto const distance = (ectx.phy.position - getplayerpos(ectx)).lengthSQ();
         //Compruebo si esta dentro del radio de detección por oido
         //podriamos hacer que en un radio x el enemigo entre en un estado
         // de alerta
@@ -106,16 +109,16 @@ struct BTDecisionPlayerDetected : BTNode_t{
         //     //estaado de alerta
         // }
 
-        if( distance < (ectx.ai.detect_radius * ectx.ai.detect_radius) / 2){
-            //te escucha
-            if(!ectx.ent.hasTag<BossFinalTag>()){
-                ectx.ai.path_initialized = false;
-            }
-            ectx.ai.playerdetected = true;
-            return BTNodeStatus_t::success;
-        }else{
-            ectx.ai.playerdetected = false;
-        }
+        // if( distance < (ectx.ai.detect_radius * ectx.ai.detect_radius) / 2){
+        //     //te escucha
+        //     if(!ectx.ent.hasTag<BossFinalTag>()){
+        //         ectx.ai.path_initialized = false;
+        //     }
+        //     ectx.ai.playerdetected = true;
+        //     return BTNodeStatus_t::success;
+        // }else{
+        //     ectx.ai.playerdetected = false;
+        // }
 
         return BTNodeStatus_t::fail;
     }
