@@ -67,10 +67,6 @@ int main(){
             // Input
             im.update();
 
-            // std::cout << "Pos X: " << renm.m_camera->position.x << std::endl;
-            // std::cout << "Pos Y: " << renm.m_camera->position.y << std::endl;
-            // std::cout << "Pos Z: " << renm.m_camera->position.z << std::endl;
-
             if(im.isKeyPressed(KEY_A))
                 renm.m_camera->position.x -= 0.1f;
             if(im.isKeyPressed(KEY_D))
@@ -86,29 +82,12 @@ int main(){
             if(im.isKeyPressed(GLFW_KEY_LEFT_SHIFT))
                 renm.m_camera->position.y -= 0.1f;
 
-            // Input Tests
-            // std::cout << "A: " << im.isKeyPressed(KEY_A) << std::endl;
-            // std::cout << "S: " << im.isKeyDown(wm.getWindow(), KEY_S) << std::endl;
-            // std::cout << "D: " << im.isKeyReleased(KEY_D) << std::endl;
-            // std::cout << "W: " << im.isKeyUp(wm.getWindow(), KEY_W) << std::endl;
-            // std::cout << "----" << std::endl;
-            // std::cout << "A: " << im.isGamepadButtonPressed(0, GLFW_GAMEPAD_BUTTON_A) << std::endl;
-            // std::cout << "B: " << im.isGamepadButtonDown(0, GLFW_GAMEPAD_BUTTON_B) << std::endl;
-            // std::cout << "X: " << im.isGamepadButtonReleased(0, GLFW_GAMEPAD_BUTTON_X) << std::endl;
-            // std::cout << "Y: " << im.isGamepadButtonUp(0, GLFW_GAMEPAD_BUTTON_Y) << std::endl;
-            // std::cout << "----" << std::endl;
-
-            // if(im.isGamepadButtonDown(0, GLFW_GAMEPAD_BUTTON_A))
-            //     std::cout << "Estoy pulsando A" << std::endl;
-
-            // if(im.isGamepadButtonUp(0, GLFW_GAMEPAD_BUTTON_B))
-            //     std::cout << "No estoy pulsando B" << std::endl;
-
+            // Drawing
             wm.beginDrawing();
 
-            renm.clearBackground({1.0f, 1.0f, 1.0f, 1.0f});
-
             renm.beginMode3D();
+
+            renm.clearBackground({1.0f, 1.0f, 1.0f, 1.0f});
 
             // Draw (texture) -> 3D
             renm.useShader(rShaderTexture3D);
@@ -119,17 +98,18 @@ int main(){
             renm.drawPoint3D({0.0f, 0.0f, 0.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
             renm.drawPoint3D({0.0f, 1.0f, 0.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
             renm.drawPoint3D({0.0f, -1.0f, 0.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
-            renm.drawLine3D({0.0f, 1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 0.0f, 1.0f});
-
-            renm.drawLine3D({-1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, -1.0f}, {1.0f, 1.0f, 0.0f, 1.0f});
-
             renm.drawPoint3D({1.0f, 0.0f, -1.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
             renm.drawPoint3D({1.0f, 1.0f, -1.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
-            
-            renm.drawLine3D({1.0f, 0.0f, -1.0f}, {1.0f, 1.0f, -1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}); 
+
+            renm.drawLine3D({0.0f, 1.0f, 0.0f}, 1.0f, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 0.0f, 1.0f});
+            renm.drawLine3D({-1.0f, 0.0f, 1.0f}, 1.0f, {1.0f, 1.0f, -1.0f}, {1.0f, 1.0f, 0.0f, 1.0f});
+            renm.drawLine3D({1.0f, 0.0f, -1.0f}, 1.0f, {1.0f, 1.0f, -1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}); 
 
             renm.drawPlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, {1.0f, 0.5f, 0.5f, 1.0f});
             renm.drawGrid(10, 1.0f, {0.5f, 0.5f, 0.5f, 0.0f});
+
+            renm.drawCube({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
+            renm.drawCubeWires({-3.0f, 2.0f, 0.0f}, {1.0f, 1.0f, 3.0f}, {0.5f, 0.0f, 0.5f, 1.0f});
 
             renm.endMode3D();
 

@@ -63,7 +63,7 @@ void RenderManager::endMode3D(){
 
 void RenderManager::clearBackground(glm::vec4 color){
     glClearColor(color.x, color.y, color.z, color.w);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void RenderManager::drawPixel(glm::vec2 pos, glm::vec4 color){
@@ -373,14 +373,11 @@ void RenderManager::drawPoint3D(glm::vec3 position, float pointSize, glm::vec4 c
     glDeleteBuffers(1, &VBO);
 }
 
-void RenderManager::drawLine3D(glm::vec3 startPos, glm::vec3 endPos, glm::vec4 color){
+void RenderManager::drawLine3D(glm::vec3 startPos, float lineSize, glm::vec3 endPos, glm::vec4 color){
     // Define vertices for the line
     float vertices[] = {
-        startPos.x, startPos.y, startPos.z,
-        color.x, color.y, color.z,
-
-        endPos.x, endPos.y, endPos.z,
-        color.x, color.y, color.z,
+        startPos.x, startPos.y, startPos.z, color.x, color.y, color.z,
+        endPos.x, endPos.y, endPos.z, color.x, color.y, color.z,
     };
 
     // Create and configure VAO, VBO
@@ -414,7 +411,7 @@ void RenderManager::drawLine3D(glm::vec3 startPos, glm::vec3 endPos, glm::vec4 c
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     // Draw the line
-    glLineWidth(2.0f);
+    glLineWidth(lineSize);
     glBindVertexArray(VAO);
     glDrawArrays(GL_LINES, 0, 2);
     glLineWidth(1.0f);
@@ -535,6 +532,149 @@ void RenderManager::drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 col
     // Draw the plane
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    // Clean up resources
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+}
+
+void RenderManager::drawCube(glm::vec3 position, glm::vec3 size, glm::vec4 color){
+    // Define vertices and indices for the plane
+    float halfSizeX = size.x / 2.0f;
+    float halfSizeY = size.y / 2.0f;
+    float halfSizeZ = size.z / 2.0f;
+
+    float vertices[] = {
+        // positions                        // colors
+        -halfSizeX, -halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
+         halfSizeX, -halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
+         halfSizeX,  halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
+        -halfSizeX,  halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
+        -halfSizeX, -halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
+         halfSizeX, -halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
+         halfSizeX,  halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
+        -halfSizeX,  halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
+    };
+    GLuint indices[] = {
+        0, 1, 2, 2, 3, 0,
+        4, 5, 6, 6, 7, 4,
+        0, 1, 5, 5, 4, 0,
+        1, 2, 6, 6, 5, 1,
+        2, 3, 7, 7, 6, 2,
+        3, 0, 4, 4, 7, 3 
+    };
+
+    // Create and configure VAO, VBO, and EBO
+    GLuint VBO, VAO, EBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // Configurar atributos de vértice
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
+
+    // Set the uniform color in the shader
+    GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
+    glUseProgram(m_shaderProgram->id_shader);
+    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+
+    // Configure model transformation
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, position);
+    
+    GLuint modelLoc = glGetUniformLocation(m_shaderProgram->id_shader, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+    // Draw wirefram cube
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
+    // Clean up resources
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+}
+
+void RenderManager::drawCubeWires(glm::vec3 position, glm::vec3 size, glm::vec4 color){
+    // Define vertices and indices for the wireframe cube
+    float halfSizeX = size.x / 2.0f;
+    float halfSizeY = size.y / 2.0f;
+    float halfSizeZ = size.z / 2.0f;
+
+    float vertices[] = {
+        // positions                        // colors
+        -halfSizeX, -halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
+         halfSizeX, -halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
+         halfSizeX,  halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
+        -halfSizeX,  halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
+        -halfSizeX, -halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
+         halfSizeX, -halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
+         halfSizeX,  halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
+        -halfSizeX,  halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
+    };
+
+    GLuint indices[] = {
+        0, 1, 1, 2, 2, 3, 3, 0,
+        4, 5, 5, 6, 6, 7, 7, 4,
+        0, 4, 1, 5, 2, 6, 3, 7
+    };
+
+    // Create and configure VAO, VBO, and EBO
+    GLuint VBO, VAO, EBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // Set up vertex attribute pointers
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
+
+    // Set wireframe mode
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    // Configure model transformation
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+
+    // Set model matrix in the shader
+    GLuint modelLoc = glGetUniformLocation(m_shaderProgram->id_shader, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+    // Draw the wireframe cube
+    glBindVertexArray(VAO);
+    glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
+    // Reset to fill mode
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     // Clean up resources
     glDeleteVertexArrays(1, &VAO);
