@@ -17,7 +17,10 @@ bool Mesh::load(){
 }
 
 void Mesh::unload(){ 
+    // Delete buffers
     glDeleteVertexArrays(1, &m_VAO);
+    glDeleteBuffers(1, &m_VBO);
+    glDeleteBuffers(1, &m_EBO);
     std::cout << "Unload a mesh (ID: " << id <<")" << std::endl; 
 }
 
@@ -54,10 +57,6 @@ void Mesh::setupMesh(){
 
     // Unbind vertex array
     glBindVertexArray(0);
-
-    // Delete buffers
-    glDeleteBuffers(1, &m_VBO);
-    glDeleteBuffers(1, &m_EBO);
 }
 
 void Mesh::draw(){ 

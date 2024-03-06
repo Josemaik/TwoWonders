@@ -24,11 +24,9 @@ void Model::unload(ResourceManager& rm){
 }
 
 void Model::draw(glm::mat4) const { 
-    RenderManager& renderManager = RenderManager::getInstance();
     // std::cout << "Draw a model" << std::endl; 
     for(int i=0; i<static_cast<int>(m_meshes.size()); i++)
-        renderManager.drawMesh(m_meshes[i]);
-    // m_meshes[i]->draw();
+        m_meshes[i]->draw();
 };
 
 // PRIVATE

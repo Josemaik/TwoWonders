@@ -53,9 +53,8 @@ public:
     void drawGrid(int slices, float spacing, glm::vec4 color);
     void drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 color); // XZ
     void drawCube(glm::vec3 position, glm::vec3 size, glm::vec4 color);
-    // TODO
     void drawCubeWires(glm::vec3 position, glm::vec3 size, glm::vec4 color);
-    void drawSphere();
+    // TODO
     void drawMesh(std::shared_ptr<Mesh> mesh);
     void drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color);
 
