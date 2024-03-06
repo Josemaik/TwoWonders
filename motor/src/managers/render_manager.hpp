@@ -30,7 +30,6 @@ public:
     // Drawing
     void beginMode3D();
     void endMode3D();
-    void drawGrid(int slices, float spacing);
 
     // Camera
     void setCamera(std::shared_ptr<Camera> camera){ m_camera = camera; };
@@ -38,16 +37,30 @@ public:
     // Basic drawing functions
     void clearBackground(glm::vec4 color);
     void drawPixel(glm::vec2 pos, glm::vec4 color);
+    void drawLine(glm::vec2 startPos, glm::vec2 endPos, glm::vec4 color);
     void drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, glm::vec4 color);
     void drawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 color);
+    void drawCircle(glm::vec2 pos, float radius, int segments, glm::vec4 color);
 
     // Texture drawing functions
     void drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, glm::vec4 color);
     void drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, glm::vec4 color);
 
-    // 3D
+    // Basic geometric 3D shapes drawing functions
     void drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color);
+    // TODO
+    void drawline3D();
+    void drawPoint3D();
+    void drawCube();
+    void drawCubeWires();
+    void drawSphere();
+    void drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 color); // XZ
+    void drawGrid(int slices, float spacing);
     void drawMesh(std::shared_ptr<Mesh> mesh);
+
+    // Mesh generation functions
+    // TODO
+    std::shared_ptr<Mesh> genMeshCube();
 
     // ChangeShader
     void useShader(std::shared_ptr<Shader> shader){ 
