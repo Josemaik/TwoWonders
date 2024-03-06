@@ -95,6 +95,11 @@ void RenderManager::drawGrid(int, float){
 
 // Basic drawing functions
 
+void RenderManager::clearBackground(glm::vec4 color){
+    glClearColor(color.x, color.y, color.z, color.w);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
 void RenderManager::drawPixel(glm::vec2 pos, glm::vec4 color){
     // Define a single vertex for the pixel
     float vertex[] = { normalizeX(pos.x), normalizeY(pos.y) };
@@ -131,6 +136,43 @@ void RenderManager::drawPixel(glm::vec2 pos, glm::vec4 color){
     glDeleteBuffers(1, &VBO);
 }
 
+void RenderManager::drawLine(glm::vec2 startPos, glm::vec2 endPos, glm::vec4 color){
+    // Define the vertices for the line
+    float vertices[] = {
+        normalizeX(startPos.x), normalizeY(startPos.y),
+        normalizeX(endPos.x)  , normalizeY(endPos.y)
+    };
+
+    // Create and configure VAO, VBO
+    GLuint VAO, VBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // Set up vertex attribute pointers
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
+    // Set the uniform color in the shader
+    GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
+    glUseProgram(m_shaderProgram->id_shader);
+    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+
+    // Draw the line
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_LINES, 0, 2);
+    glBindVertexArray(0);
+
+    // Clean up resources
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+}
+
 void RenderManager::drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, glm::vec4 color){
     // Define vertices and indices
     float vertices[] = {
@@ -158,9 +200,45 @@ void RenderManager::drawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 color
     draw(vertices, 12, indices, 6, color);
 }
 
-void RenderManager::clearBackground(glm::vec4 color){
-    glClearColor(color.x, color.y, color.z, color.w);
-    glClear(GL_COLOR_BUFFER_BIT);
+void RenderManager::drawCircle(glm::vec2 pos, float radius, int segments, glm::vec4 color){
+    // Calculate vertices for the circle
+    int vertexCount = segments * 2;
+    std::vector<float> vertices(vertexCount);
+
+    for (int i = 0; i < vertexCount; i += 2) {
+        float theta = static_cast<float>((i / 2) * (2.0f * M_PI / segments));
+        vertices[i] = normalizeX(pos.x + radius * std::cos(theta));
+        vertices[i + 1] = normalizeY(pos.y + radius * std::sin(theta));
+    }
+
+    // Create and configure VAO, VBO
+    GLuint VAO, VBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexCount, vertices.data(), GL_STATIC_DRAW);
+
+    // Set up vertex attribute pointers
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
+    // Set the uniform color in the shader
+    GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
+    glUseProgram(m_shaderProgram->id_shader);
+    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+
+    // Draw the circle
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, segments);
+    glBindVertexArray(0);
+
+    // Clean up resources
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
 }
 
 // Texture drawing functions
