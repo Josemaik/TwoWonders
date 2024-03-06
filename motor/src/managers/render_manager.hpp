@@ -47,16 +47,16 @@ public:
     void drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, glm::vec4 color);
 
     // Basic geometric 3D shapes drawing functions
-    void drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color);
+    void drawGrid(int slices, float spacing, glm::vec4 color);
+    void drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 color); // XZ
     // TODO
-    void drawline3D();
     void drawPoint3D();
+    void drawline3D();
     void drawCube();
     void drawCubeWires();
     void drawSphere();
-    void drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 color); // XZ
-    void drawGrid(int slices, float spacing);
     void drawMesh(std::shared_ptr<Mesh> mesh);
+    void drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color);
 
     // Mesh generation functions
     // TODO
