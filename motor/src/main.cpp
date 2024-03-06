@@ -1,3 +1,30 @@
+#include "darkmoon.hpp"
+
+int main(){
+    DarkMoonEngine engine;
+
+    if(engine.InitWindow(800, 600, "DarkMoon Engine")){
+
+        while(!engine.WindowShouldClose()){
+
+            // logic
+
+            engine.BeginDrawing();
+
+            engine.ClearBackground({1.0f, 1.0f, 1.0f, 1.0f});
+
+            // draw
+
+            engine.EndDrawing();
+        }
+
+        engine.CloseWindow();
+    }
+
+    return 0;
+}
+
+/*
 #include "components/node.hpp"
 #include "components/entity.hpp"
 #include "components/entity_model.hpp"
@@ -142,13 +169,11 @@ int main(){
         wm.closeWindow();
     }
 
-    /*
     //----- Draw -----//
-    std::cout << "┌──────┐" << std::endl;
-    std::cout << "│ Draw │" << std::endl;
-    std::cout << "└──────┘" << std::endl;
-    nScene->traverse(glm::mat4());
-    */
+    // std::cout << "┌──────┐" << std::endl;
+    // std::cout << "│ Draw │" << std::endl;
+    // std::cout << "└──────┘" << std::endl;
+    // nScene->traverse(glm::mat4());
 
     return 0;
 }
@@ -196,3 +221,4 @@ std::shared_ptr<Texture> loadTexture(const char* filePath, ResourceManager& rm){
 
     return texture;
 }
+*/
