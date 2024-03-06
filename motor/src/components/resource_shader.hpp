@@ -10,7 +10,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-enum struct ShaderType { COLOR, TEXTURE };
+enum struct ShaderType { COLOR, TEXTURE, TEXTURE3D };
 
 struct Shader : public Resource {
 public:

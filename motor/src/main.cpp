@@ -12,20 +12,22 @@
 
 #include <iostream>
 
-std::shared_ptr<Node> createSceneTree();
+std::shared_ptr<Node> createSceneTree(RenderManager&);
 std::shared_ptr<Model> loadModel(const char*, std::shared_ptr<Node>, ResourceManager& rm);
 std::shared_ptr<Texture> loadTexture(const char*, ResourceManager&);
 
 int main(){
 
+    // Patron Dirty //
+
     //----- Initialize managers -----//
     WindowsManager wm;
     ResourceManager rm;
-    RenderManager renm;
+    RenderManager& renm = RenderManager::getInstance();
     InputManager im;
 
     //----- Create scene tree -----//
-    auto nScene = createSceneTree();
+    auto nScene = createSceneTree(renm);
 
     if(wm.initWindow(800, 600, "Salty Pixel")){
 
@@ -45,12 +47,13 @@ int main(){
         auto eModel = loadModel(filePath, nScene, rm);
 
         //------ Textures -----//
-        filePath = "assets/container.jpg";
-        auto rTexture = loadTexture(filePath, rm); 
+        auto rTexture = loadTexture("assets/container.jpg", rm); 
+        auto rTexture2 = loadTexture("assets/koromaru.png", rm); 
 
         //------ Shaders -----//
         auto rShaderColor = rm.loadResource<Shader>("src/shaders/color.vs", "src/shaders/color.fs", ShaderType::COLOR);
         auto rShaderTexture = rm.loadResource<Shader>("src/shaders/texture.vs", "src/shaders/texture.fs", ShaderType::TEXTURE);
+        auto rShaderTexture3D = rm.loadResource<Shader>("src/shaders/texture3D.vs", "src/shaders/texture3D.fs", ShaderType::TEXTURE3D);
 
         //----- View tree -----//
         std::cout << "┌──────┐" << std::endl;
@@ -64,45 +67,68 @@ int main(){
             // Input
             im.update();
 
-            // Input Tests
-            // std::cout << "A: " << im.isKeyPressed(KEY_A) << std::endl;
-            // std::cout << "S: " << im.isKeyDown(wm.getWindow(), KEY_S) << std::endl;
-            // std::cout << "D: " << im.isKeyReleased(KEY_D) << std::endl;
-            // std::cout << "W: " << im.isKeyUp(wm.getWindow(), KEY_W) << std::endl;
-            // std::cout << "----" << std::endl;
-            // std::cout << "A: " << im.isGamepadButtonPressed(0, GLFW_GAMEPAD_BUTTON_A) << std::endl;
-            // std::cout << "B: " << im.isGamepadButtonDown(0, GLFW_GAMEPAD_BUTTON_B) << std::endl;
-            // std::cout << "X: " << im.isGamepadButtonReleased(0, GLFW_GAMEPAD_BUTTON_X) << std::endl;
-            // std::cout << "Y: " << im.isGamepadButtonUp(0, GLFW_GAMEPAD_BUTTON_Y) << std::endl;
-            // std::cout << "----" << std::endl;
+            if(im.isKeyPressed(KEY_A))
+                renm.m_camera->position.x -= 0.1f;
+            if(im.isKeyPressed(KEY_D))
+                renm.m_camera->position.x += 0.1f;
+            if(im.isKeyPressed(KEY_W))
+                renm.m_camera->position.z -= 0.1f;
+            if(im.isKeyPressed(KEY_S))
+                renm.m_camera->position.z += 0.1f;
 
-            // if(im.isGamepadButtonDown(0, GLFW_GAMEPAD_BUTTON_A))
-            //     std::cout << "Estoy pulsando A" << std::endl;
+            if(im.isKeyPressed(KEY_SPACE))
+                renm.m_camera->position.y += 0.1f;
 
-            // if(im.isGamepadButtonUp(0, GLFW_GAMEPAD_BUTTON_B))
-            //     std::cout << "No estoy pulsando B" << std::endl;
+            if(im.isKeyPressed(GLFW_KEY_LEFT_SHIFT))
+                renm.m_camera->position.y -= 0.1f;
 
+            // Drawing
             wm.beginDrawing();
 
+            renm.beginMode3D();
+
             renm.clearBackground({1.0f, 1.0f, 1.0f, 1.0f});
+
+            // Draw (texture) -> 3D
+            renm.useShader(rShaderTexture3D);
+            // renm.drawTexture3D(rTexture2, {0.0f, 0.0f}, 50.0f, 0.01f, {1.0f, 1.0f, 1.0f, 1.0f});
+            // Draw (model)
+            // eModel->draw(glm::mat4());
+
+            renm.drawPoint3D({0.0f, 0.0f, 0.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
+            renm.drawPoint3D({0.0f, 1.0f, 0.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
+            renm.drawPoint3D({0.0f, -1.0f, 0.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
+            renm.drawPoint3D({1.0f, 0.0f, -1.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
+            renm.drawPoint3D({1.0f, 1.0f, -1.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
+
+            renm.drawLine3D({0.0f, 1.0f, 0.0f}, 1.0f, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 0.0f, 1.0f});
+            renm.drawLine3D({-1.0f, 0.0f, 1.0f}, 1.0f, {1.0f, 1.0f, -1.0f}, {1.0f, 1.0f, 0.0f, 1.0f});
+            renm.drawLine3D({1.0f, 0.0f, -1.0f}, 1.0f, {1.0f, 1.0f, -1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}); 
+
+            renm.drawPlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, {1.0f, 0.5f, 0.5f, 1.0f});
+            renm.drawGrid(10, 1.0f, {0.5f, 0.5f, 0.5f, 0.0f});
+
+            renm.drawCube({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
+            renm.drawCubeWires({-3.0f, 2.0f, 0.0f}, {1.0f, 1.0f, 3.0f}, {0.5f, 0.0f, 0.5f, 1.0f});
+
+            renm.endMode3D();
 
             // Draw (color)
             renm.useShader(rShaderColor);
 
-            renm.drawTriangle({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, {1.0f, 0.5f, 0.2f, 1.0f});
-            renm.drawPixel({400.0f, 300.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
+            //renm.drawTriangle({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, {1.0f, 0.5f, 0.2f, 1.0f});
+            //renm.drawLine({0.0f, 0.0f}, {500.0f, 200.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
+            //renm.drawPixel({400.0f, 300.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
+            //renm.drawCircle({100.0f, 300.0f}, 60.0f, 20, {1.0f, 1.0f, 0.0f, 1.0f});
 
             // HUD
             renm.drawRectangle({12.0f, 12.0f}, {200.0f, 40.0f}, {0.5f, 0.5f, 0.5f, 1.0f});
             renm.drawRectangle({10.0f, 10.0f}, {200.0f, 40.0f}, {0.7f, 0.7f, 0.7f, 1.0f});
 
             // Draw (texture)
-            renm.useShader(rShaderTexture);
-            renm.drawTextureExtra(rTexture, {10.0f, 60.0f}, 0.0f, 0.6f, {1.0f, 1.0f, 1.0f, 1.0f});
+            // renm.useShader(rShaderTexture);
+            // renm.drawTextureExtra(rTexture, {100.0f, 150.0f}, 120.0f, 0.3f, {1.0f, 1.0f, 1.0f, 1.0f});
             // renm.drawTexture(rTexture, {0.0f, 500.0f}, {1.0f, 1.0f, 1.0f, 1.0f});
-
-            // Draw (model)
-            //eModel->draw(glm::mat4());
 
             wm.endDrawing();
         }
@@ -127,7 +153,7 @@ int main(){
     return 0;
 }
 
-std::shared_ptr<Node> createSceneTree(){
+std::shared_ptr<Node> createSceneTree(RenderManager& renm){
     //Create scene
     auto nScene = std::make_unique<Node>();
     nScene->name = "Scene";
@@ -145,6 +171,8 @@ std::shared_ptr<Node> createSceneTree(){
     auto eCamera = std::make_shared<Camera>();
     nCamera->setEntity(eCamera);
     nScene->addChild(std::move(nCamera));
+    // Assigns Camera to RenderManager
+    renm.setCamera(eCamera);
 
     return nScene;
 }
