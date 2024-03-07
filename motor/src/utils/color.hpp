@@ -8,5 +8,5 @@ struct Color {
 };
 
 // Custom engine color palette
-// #define WHITE   (Color) { 255, 255, 255, 255 }
-// #define BLACK   (Color) {   0,   0,   0, 255 }
+#define WHITE   Color { 255, 255, 255, 255 }
+#define BLACK   Color {   0,   0,   0, 255 }

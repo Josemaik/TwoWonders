@@ -6,19 +6,24 @@ int main(){
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
         while(!engine.WindowShouldClose()){
-            // Logic
+            // ----- //
+            // Logic //
+            // ----- //
 
             if(engine.IsKeyPressed(KEY_Q))
                 engine.SetWindowSize(1024, 800);
             if(engine.IsKeyPressed(KEY_W))
                 engine.SetWindowSize(800, 600);
 
+            // ------- //
             // Drawing //
+            // ------- //
+
             engine.BeginDrawing();
-            engine.ClearBackground({255, 255, 255, 255});
+            engine.ClearBackground(WHITE);
 
             engine.DrawPixel(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, {0, 0, 0, 255});
-            engine.DrawPixelV({20.0f, 40.0f}, {0, 0, 0, 255});
+            engine.DrawPixelV({20.0f, 40.0f}, BLACK);
 
             engine.DrawLine(0, 0, engine.GetScreenWidth(), engine.GetScreenHeight(), {255, 0, 0, 255});
             engine.DrawLineV({0, 0}, {100.0f, 20.0f}, {255, 0, 255, 255});
