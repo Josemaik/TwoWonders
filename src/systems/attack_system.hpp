@@ -2,6 +2,7 @@
 #ifndef ATTACK_SYSTEM
 #define ATTACK_SYSTEM
 #include "../utils/types.hpp"
+#include "collision_system.hpp"
 
 struct AttackSystem
 {
@@ -10,14 +11,18 @@ struct AttackSystem
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em, float deltaTime);
-
+    void setCollisionSystem(CollisionSystem* col_sys);
 private:
-    void createAttack(EntityManager& em, Entity& e, AttackComponent& att,float dt);
-    vec3d getPosMeteorito(uint16_t fase,vec3d posplayer);
+    void createAttack(EntityManager& em, Entity& e, AttackComponent& att, float dt);
+    vec3d getPosMeteorito(uint16_t fase, vec3d posplayer);
+
     void createAttackRangedOrMelee(EntityManager& em, Entity& e, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack, double const ranged);
     void createAttackMultipleShot(EntityManager& em, Entity& ent, AttackComponent& att, int numShots);
+    void createSpellAttack(EntityManager& em, Entity& e, AttackComponent& att);
 
     static constexpr double MANA_CUT = 15.0f;
+
+    CollisionSystem* col_sys{ nullptr };
 };
 
 #endif // !ATTACK_SYSTEM

@@ -3,29 +3,45 @@
 
 void PhysicsSystem::update(EntityManager& em, float dt)
 {
+    // if (elapsed >= elapsed_limit) {
+    //     elapsed = 0;
+    // }
+    // else {
+    //     elapsed += dt;
+    //     return;
+    // }
+
     em.forEach<SYSCMPs, SYSTAGs>([dt, &em](Entity& ent, PhysicsComponent& phy)
     {
+        // Cuando el jugador se para por un tiempo determinado
+        if (phy.stopped) {
+            if (phy.elapsed_stopped >= phy.countdown_stopped) {
+                phy.elapsed_stopped = 0;
+                phy.stopped = false;
+            }
+            else {
+                phy.plusdeltatime(dt, phy.elapsed_stopped);
+                return;
+            }
+        }
+        // Sacamos referencias a la posición y velocidad
         auto& pos = phy.position;
         auto& vel = phy.velocity;
-        // auto& vel_l = phy.v_linear;
-        // auto& vel_a = phy.v_angular;
+
+        // Actualizamos el estado anterior
+        phy.previousState.position = pos;
+        phy.previousState.velocity = vel;
+        phy.previousState.scale = phy.scale;
+        phy.previousState.orientation = phy.orientation;
 
         // Aplicar gravedad y hacer Clamp
-        //if (!phy.unCheckGravity)
         vel.setY(vel.y() - phy.gravity);
 
-        // if(e.hasTag<PlayerTag>() || e.hasTag<HitPlayerTag>()){
+        // Normalizamos la velocidad
         if (std::abs(vel.x()) > phy.max_speed || std::abs(vel.y()) > phy.max_speed || std::abs(vel.z()) > phy.max_speed)
         {
             vel.normalize();
-            vel *= phy.max_speed;
         }
-        // }else{
-        //         //Normalizar la velocidad
-        //         vel.normalize();
-        // }
-        // Player únicamente tiene velocidad linear
-        // if(e.hasTag<PlayerTag>() || e.hasTag<HitPlayerTag>()){
 
         //Stuneo al jugador durante un tiempo provocado por el golpe de un golem
         if (phy.dragActivatedTime) {
@@ -36,6 +52,7 @@ void PhysicsSystem::update(EntityManager& em, float dt)
             }
             phy.plusdeltatime(dt, phy.elapsed_stunned);
         }
+
         //Stunear o RAlentizar al player
         if (phy.dragActivated) {
             phy.dragActivated = false;
@@ -98,7 +115,7 @@ void PhysicsSystem::update(EntityManager& em, float dt)
         //     else                    phy.v_linear += drag;
         // }
 
-        // }
+
         // comprobar si están en el suelo
         if (phy.alreadyGrounded)
             phy.alreadyGrounded = false;

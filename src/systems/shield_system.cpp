@@ -9,7 +9,7 @@ void ShieldSystem::update(EntityManager& em) {
 
         if (shi.activeShield)
         {
-            if(shi.createdby == EntitieswithShield::Player){
+            if (shi.createdby == EntitieswithShield::Player) {
                 // Recuperamos el player
                 auto& li = em.getSingleton<LevelInfo>();
                 auto* playerEn = em.getEntityByID(li.playerID);
@@ -30,8 +30,8 @@ void ShieldSystem::update(EntityManager& em) {
                         static const double SHIELD_DISTANCE = 0.75;
 
                         // Calculamos el desplazamiento basado en la orientación del jugador
-                        double offsetX = sin(p.orientation) * SHIELD_DISTANCE;
-                        double offsetZ = cos(p.orientation) * SHIELD_DISTANCE;
+                        double offsetX = std::sin(p.orientation) * SHIELD_DISTANCE;
+                        double offsetZ = std::cos(p.orientation) * SHIELD_DISTANCE;
 
                         // Aplicamos el desplazamiento al escudo
                         p.position += { offsetX, 0.0f, offsetZ };
@@ -42,15 +42,15 @@ void ShieldSystem::update(EntityManager& em) {
                     }
                 }
             }
-            if(shi.createdby == EntitieswithShield::Subdito){
+            if (shi.createdby == EntitieswithShield::Subdito) {
                 // each shield is updated with subdit position and orientation
                 //if shields are not activated, each shield is marked for deletion
-                bool subassociated{false};
+                bool subassociated{ false };
                 auto& bb = em.getSingleton<BlackBoard_t>();
-                for(const auto& idsub : bb.idsubditos){
-                    if(idsub == shi.id_subdito){
+                for (const auto& idsub : bb.idsubditos) {
+                    if (idsub == shi.id_subdito) {
                         subassociated = true;
-                        if((*em.getEntityByID(idsub)).hasComponent<PhysicsComponent>()){
+                        if ((*em.getEntityByID(idsub)).hasComponent<PhysicsComponent>()) {
                             auto& phy_pl = em.getComponent<PhysicsComponent>(*em.getEntityByID(idsub));
                             auto& p = em.getComponent<PhysicsComponent>(ent);
                             auto& r = em.getComponent<RenderComponent>(ent);
@@ -65,17 +65,18 @@ void ShieldSystem::update(EntityManager& em) {
 
                             p.position += { offsetX, 0.0f, offsetZ };
                             if (offsetX == 0.75 || offsetX == -0.75)
-                                    r.scale = { 1.0f, 1.0f, 1.0f };
+                                r.scale = { 1.0f, 1.0f, 1.0f };
                             else
-                                    r.scale = { 2.0f, 1.0f, 0.25f };
-                            }
+                                r.scale = { 2.0f, 1.0f, 0.25f };
+                        }
                     }
                 }
-                if(subassociated == false || !bb.activate_shield){
+                if (subassociated == false || !bb.activate_shield) {
                     em.getComponent<LifeComponent>(ent).markedForDeletion = true;
                 }
             }
-        }else{
+        }
+        else {
             // Se elimina shi.shield
             //em.destroyEntity(ent.getID());
         }

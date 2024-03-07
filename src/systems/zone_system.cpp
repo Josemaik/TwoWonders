@@ -1,6 +1,6 @@
 #include "zone_system.hpp"
 
-void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, EventManager& evm, MapManager& map,float& dt) {
+void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, EventManager& evm, MapManager& map, const float&) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, ZoneComponent& zon)
@@ -121,33 +121,69 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     // Cosas que hacer en cada zona
     switch (li.num_zone)
     {
-    case 5:
+    case 0:
     {
         checkChests(em, evm, li.num_zone);
         break;
     }
+    case 4:
+    {
+        checkChests(em, evm, li.num_zone);
+        // checkDoors(em, evm);
+        checkTutorialEnemies(em);
+        break;
+    }
+    case 5:
+    {
+        // checkDoors(em, evm);
+        checkTutorialEnemies(em);
+
+        break;
+    }
+    case 6:
+    {
+        // checkSpawns(em, evm);
+        checkTutorialEnemies(em);
+
+        break;
+    }
+    case 7:
+    {
+        checkTutorialEnemies(em);
+        break;
+    }
+    case 8:
+    {
+        checkDoors(em, evm);
+        break;
+    }
+    case 9:
+    {
+        checkDoors(em, evm);
+        break;
+    }
     case 10:
     {
-        checkDungeonSlimes(em, evm);
+        checkChests(em, evm, li.num_zone);
         break;
     }
     case 11:
     {
-        auto& bb = em.getSingleton<BlackBoard_t>();
-        if (bb.create_subdito) {
-            iam.createSubdito(em, 3.0);
-            bb.create_subdito = false;
-        }
-        if(bb.boss_fase == 2){
-            if(bb.elapsed_change_fase >= bb.countdown_change_fase){
-                mapType maptype{};
-                maptype = map.loadMap("assets/levels/mazmorra_level.json");
-                iam.createBossFinalFase2(em,maptype);
-                bb.boss_fase++;
-            }else{
-                bb.elapsed_change_fase+=dt;
-            }
-        }
+        // auto& bb = em.getSingleton<BlackBoard_t>();
+        // if (bb.create_subdito) {
+        //     iam.createSubdito(em, 3.0);
+        //     bb.create_subdito = false;
+        // }
+        // if(bb.boss_fase == 2){
+        //     if(bb.elapsed_change_fase >= bb.countdown_change_fase){
+        //         mapType maptype{};
+        //         maptype = map.loadMap("assets/levels/mazmorra_level.json");
+        //         iam.createBossFinalFase2(em,maptype);
+        //         bb.boss_fase++;
+        //     }else{
+        //         bb.elapsed_change_fase+=dt;
+        //     }
+        // }
 
         break;
     }
@@ -184,10 +220,12 @@ void ZoneSystem::checkDungeonSlimes(EntityManager& em, EventManager& evm)
 void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone)
 {
     auto& li = em.getSingleton<LevelInfo>();
-    using chestCMP = MP::TypeList<ChestComponent, PhysicsComponent>;
-    using noTag = MP::TypeList<>;
+    if (li.playerDetected)
+        return;
+    using chestCMP = MP::TypeList<ChestComponent, InteractiveComponent, PhysicsComponent>;
+    using chestTag = MP::TypeList<ChestTag>;
 
-    em.forEach<chestCMP, noTag>([&](Entity& e, ChestComponent& ch, PhysicsComponent& phy)
+    em.forEach<chestCMP, chestTag>([&](Entity& e, ChestComponent& ch, InteractiveComponent& ic, PhysicsComponent& phy)
     {
         if (ch.zone == zone)
         {
@@ -204,24 +242,108 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone
             double distance = playerPos.distance(phy.position);
 
             // Si el cofre se encuentra a menos de 2 unidades de distancia del se muestra el mensaje de abrir cofre
-            if (distance < 2.0 && !ch.isOpen && !ch.showButton)
-                ch.showButton = true;
+            if (distance < 5.5 && !ch.isOpen && !ic.showButton)
+                ic.showButton = true;
 
-            else if (distance > 2.0 && ch.showButton)
-                ch.showButton = false;
-
+            else if (distance > 5.5 && ic.showButton)
+                ic.showButton = false;
 
             auto& inpi = em.getSingleton<InputInfo>();
 
-            if (inpi.interact && ch.showButton && !ch.isOpen)
+            if (inpi.interact && ic.showButton && !ch.isOpen)
             {
                 ch.isOpen = true;
-                ch.showButton = false;
+                ic.showButton = false;
                 li.chestToOpen = e.getID();
                 evm.scheduleEvent(Event{ EventCodes::OpenChest });
                 li.dontLoad.insert(pair);
+                inpi.interact = false;
             }
-
         }
     });
+}
+
+void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    using CMPs = MP::TypeList<InteractiveComponent, PhysicsComponent>;
+    using spawnTag = MP::TypeList<SpawnTag>;
+
+    em.forEach<CMPs, spawnTag>([&](Entity&, InteractiveComponent& ic, PhysicsComponent& phy)
+    {
+        auto& playerEnt = *em.getEntityByID(li.playerID);
+        auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
+        auto& playerPos = playerPhy.position;
+
+        double distance = playerPos.distance(phy.position);
+
+        if (distance < 4.5 && !ic.showButton && !li.playerDetected)
+            ic.showButton = true;
+
+        else if (distance > 4.5 && ic.showButton)
+            ic.showButton = false;
+
+        auto& inpi = em.getSingleton<InputInfo>();
+
+        if (inpi.interact && ic.showButton && !li.playerDetected)
+        {
+            evm.scheduleEvent(Event{ EventCodes::SetSpawn });
+        }
+    });
+}
+
+void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    using CMPs = MP::TypeList<InteractiveComponent, PhysicsComponent>;
+    using doorTag = MP::TypeList<DoorTag>;
+
+    em.forEach<CMPs, doorTag>([&](Entity& e, InteractiveComponent& ic, PhysicsComponent& phy)
+    {
+        auto& playerEnt = *em.getEntityByID(li.playerID);
+        auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
+        auto& playerPos = playerPhy.position;
+
+        double distance = playerPos.distance(phy.position);
+
+        if (distance < 4.5 && !ic.showButton)
+            ic.showButton = true;
+
+        else if (distance > 4.5 && ic.showButton)
+            ic.showButton = false;
+
+        auto& inpi = em.getSingleton<InputInfo>();
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        if (inpi.interact && ic.showButton && plfi.hasKey)
+        {
+            li.doorToOpen = e.getID();
+            evm.scheduleEvent(Event{ EventCodes::OpenDoor });
+        }
+    });
+}
+
+void ZoneSystem::checkTutorialEnemies(EntityManager& em)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& playerEnt = *em.getEntityByID(li.playerID);
+    auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
+    auto& playerPos = playerPhy.position;
+    using noCMP = MP::TypeList<>;
+    using enemyTag = MP::TypeList<EnemyTag, DestructibleTag>;
+    li.tutorialEnemies.clear();
+
+    em.forEachAny<noCMP, enemyTag>([&](Entity& e)
+    {
+        auto& phy = em.getComponent<PhysicsComponent>(e);
+        double distance = playerPos.distance(phy.position);
+
+        if (distance < 15.0)
+        {
+            li.tutorialEnemies.push_back(e.getID());
+        }
+    });
+
+    // Si el jugador se choca con el primer golem, se le va a señalar el cofre con el bastón
+    if (!playerEnt.hasComponent<AttackComponent>() && playerPhy.stopped)
+        li.viewPoint = { -33.714, 7.0, -43.494 };
 }

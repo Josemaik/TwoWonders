@@ -2,13 +2,38 @@
 #include <iomanip>
 #include "../../libs/raygui.h"
 
+void RenderSystem::init()
+{
+    // Tamaño de la fuente
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
+
+    // Alineamiento del texto
+    GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+
+    // Color de la fuente de texto
+    GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, 0x000000ff);
+
+    // Fondo de los botones
+    GuiSetStyle(DEFAULT, BASE_COLOR_NORMAL, 0xAA0099FF);
+
+    // Color de los bordes
+    GuiSetStyle(TEXTBOX, BORDER_COLOR_NORMAL, 0x000000FF);
+
+    // Hacemos que GuiDrawText() pueda tener más de una línea
+    GuiSetStyle(DEFAULT, TEXT_WRAP_MODE, 2);
+}
+
 void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt)
 {
     // Actualizamos la posicion de render del componente de fisicas
-    em.forEach<SYSCMPs, SYSTAGs>([](Entity&, PhysicsComponent& phy, RenderComponent& ren)
+    em.forEach<SYSCMPs, SYSTAGs>([](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
     {
+        if (e.hasTag<SeparateModelTag>())
+            return;
         ren.setPosition(phy.position);
         ren.setOrientation(phy.orientation);
+        ren.setScale(phy.scale);
+        // ren.updateBBox();
     });
 
     // Empezamos el frame
@@ -42,7 +67,7 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
         ss.music_stop();
     }
 
-    if (CheckCollisionPointRec(GetMousePosition(), btn1Rec) || CheckCollisionPointRec(GetMousePosition(), btn2Rec)) {
+    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec)) {
         if (ss.pushed == false)
             ss.sonido_mov();
         ss.pushed = true;
@@ -78,7 +103,7 @@ void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, Soun
         ss.seleccion_menu();
     }
 
-    if (CheckCollisionPointRec(GetMousePosition(), btn1Rec)) {
+    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec)) {
         if (ss.pushed == false)
             ss.sonido_mov();
         ss.pushed = true;
@@ -142,15 +167,15 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     colorEntidad = GRAY;
                     break;
 
-                case ElementalType::Agua:
+                case ElementalType::Water:
                     colorEntidad = BLUE;
                     break;
 
-                case ElementalType::Fuego:
+                case ElementalType::Fire:
                     colorEntidad = RED;
                     break;
 
-                case ElementalType::Hielo:
+                case ElementalType::Ice:
                     colorEntidad = SKYBLUE;
                     break;
 
@@ -173,117 +198,82 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 vec3d pos = { r.position.x(), r.position.y(), r.position.z() };
                 // Solo generamos la malla si no existe
                 if (!r.meshLoaded)
-                {
-                    if (e.hasTag<PlayerTag>())
-                    {
-                        r.model = LoadModel("assets/models/main_character.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/main_character_uv_V2.png");
-                        Texture2D t = LoadTexture("assets/models/textures/main_character_texture_V2.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                    }
-                    else if (e.hasTag<SlimeTag>())
-                    {
-                        r.model = LoadModel("assets/models/Slime.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Slime_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Slime_texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                    }
-                    else if (e.hasTag<SnowmanTag>())
-                    {
-                        r.model = LoadModel("assets/models/snowman.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/snowman_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/snowman_texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                    }
-                    else if (e.hasTag<GolemTag>())
-                    {
-                        r.model = LoadModel("assets/models/Golem.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Golem_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Golem_texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                    }
-                    else if (e.hasTag<SpiderTag>())
-                    {
-                        r.model = LoadModel("assets/models/Spider.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Spider_UV.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Spider_texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                    }
-                    else if (e.hasTag<BossFinalTag>())
-                    {
-                        r.model = LoadModel("assets/models/Boss.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Boss_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Boss_texture.png");
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                    }
-                    else if (e.hasTag<SubjectTag>())
-                    {
-                        r.model = LoadModel("assets/models/Boss_sub_1.obj");
-                        Texture2D t0 = LoadTexture("assets/models/textures/Boss_sub_1_uv.png");
-                        Texture2D t = LoadTexture("assets/models/textures/Boss_sub_1_texture.png");
+                    loadModels(e, engine, r);
 
-                        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-                        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-                    }
-                    else
-                    {
-                        r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
-                        r.model = engine.loadModelFromMesh(r.mesh);
-                    }
-                    r.meshLoaded = true;
-                }
-
+                bool in{ false };
                 if (e.hasTag<PlayerTag>())
                 {
-                    scl = { 0.33, 0.33, 0.33 };
-                    pos.setY(pos.y() - .5);
+                    // scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 1.8);
+                    in = true;
                 }
                 else if (e.hasTag<SlimeTag>())
                 {
-                    scl = { 0.33, 0.33, 0.33 };
+                    //scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - .6);
+                    in = true;
                 }
                 else if (e.hasTag<SnowmanTag>())
                 {
-                    scl = { 0.33, 0.33, 0.33 };
+                    // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
+                    in = true;
                 }
                 else if (e.hasTag<SpiderTag>())
                 {
-                    scl = { 0.33, 0.33, 0.33 };
+                    // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 0.7);
+                    in = true;
                 }
-                else if (e.hasTag<GolemTag>())
+                else if (e.hasTag<GolemTag>() || e.hasTag<DummyTag>())
                 {
-                    scl = { 0.4, 0.4, 0.4 };
-                    pos.setY(pos.y() - 1.1);
+                    // scl = { 0.4, 0.4, 0.4 };
+                    pos.setY(pos.y() - 4.0);
+                    in = true;
                 }
                 else if (e.hasTag<BossFinalTag>())
                 {
                     scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
                     colorEntidad = { 125, 125, 125, 255 };
+                    in = true;
                 }
                 else if (e.hasTag<SubjectTag>())
                 {
                     scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
+                    in = true;
                 }
-
+                else if (e.hasTag<CrusherTag>())
+                {
+                    // scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 1.1);
+                    in = true;
+                }
+                else if (e.hasTag<AngryBushTag>())
+                {
+                    // scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 0.5);
+                    in = true;
+                }
+                else if (e.hasTag<AngryBushTag2>())
+                {
+                    // scl = { 0.33, 0.33, 0.33 };
+                    pos.setY(pos.y() - 0.5);
+                    in = true;
+                }
+                else if (e.hasTag<DestructibleTag>() || e.hasTag<GroundTag>() || e.hasTag<DoorTag>())
+                {
+                    in = true;
+                }
 
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
                 engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
 
-                if (!e.hasTag<PlayerTag>() && !e.hasTag<SlimeTag>() && !e.hasTag<SnowmanTag>() && !e.hasTag<GolemTag>() && !e.hasTag<SpiderTag>() && !e.hasTag<BossFinalTag>() && !e.hasTag<SubjectTag>())
+                if (!in)
                 {
                     int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
-                    if (orientationInDegreesInt % 90 == 0)
+                    if (orientationInDegreesInt % 90 == 0 && std::abs(orientationInDegreesInt) != 270 && std::abs(orientationInDegreesInt) != 90)
                         engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
                     else
                         engine.drawModelWires(r.model, pos, r.rotationVec, orientationInDegrees, scl, BLACK);
@@ -291,6 +281,152 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
             }
         }
     });
+}
+
+void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderComponent& r)
+{
+    if (e.hasTag<PlayerTag>())
+    {
+        r.model = engine.loadModel("assets/models/main_character.obj");
+        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/main_character_uv_V2.png");
+        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/main_character_texture_V2.png");
+        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+    }
+    else if (e.hasTag<SlimeTag>())
+    {
+        r.model = engine.loadModel("assets/models/Slime.obj");
+        // Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Slime_uv.png");
+        // Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Slime_texture.png");
+        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        // r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+    }
+    else if (e.hasTag<SnowmanTag>())
+    {
+        r.model = engine.loadModel("assets/models/snowman.obj");
+        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/snowman_uv.png");
+        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/snowman_texture.png");
+        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+    }
+    else if (e.hasTag<GolemTag>())
+    {
+        r.model = engine.loadModel("assets/models/Golem.obj");
+        // Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Golem_uv.png");
+        // Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Golem_texture.png");
+        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        // r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<SpiderTag>())
+    {
+        r.model = engine.loadModel("assets/models/Spider.obj");
+        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Spider_UV.png");
+        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Spider_texture.png");
+        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+    }
+    else if (e.hasTag<BossFinalTag>())
+    {
+        r.model = engine.loadModel("assets/models/Boss.obj");
+        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Boss_uv.png");
+        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Boss_texture.png");
+        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+    }
+    else if (e.hasTag<SubjectTag>())
+    {
+        r.model = engine.loadModel("assets/models/Boss_sub_1.obj");
+        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Boss_sub_1_uv.png");
+        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Boss_sub_1_texture.png");
+
+        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+    }
+    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk0Tag>())
+    {
+        // Primero se carga este modelo
+        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_0.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk1Tag>())
+    {
+        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_1.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk2Tag>())
+    {
+        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_2.obj");
+        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<ChestTag>())
+    {
+        r.model = engine.loadModel("assets/models/Cofre.obj");
+        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<DestructibleTag>())
+    {
+        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-troncos.obj");
+        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<DoorTag>())
+    {
+        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-barricada.obj");
+        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
+        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<AngryBushTag>())
+    {
+        r.model = engine.loadModel("assets/models/Piedra.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<AngryBushTag2>())
+    {
+        r.model = engine.loadModel("assets/models/PiedraV2.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<CrusherTag>())
+    {
+        r.model = engine.loadModel("assets/models/Apisonadora.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<DummyTag>())
+    {
+        r.model = engine.loadModel("assets/models/Dummy.obj");
+
+        loadShaders(r.model);
+    }
+    else
+    {
+        r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
+        r.model = engine.loadModelFromMesh(r.mesh);
+    }
+    r.meshLoaded = true;
+}
+
+void RenderSystem::loadShaders(Model& model)
+{
+    for (int i = 0; i < model.materialCount; i++)
+    {
+        model.materials[i].shader = *shaderPtr;
+    }
+
 }
 
 // Empieza el dibujado y se limpia la pantalla
@@ -314,38 +450,178 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
 {
     engine.endMode3D();
 
+    auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
+    auto& txti = em.getSingleton<TextInfo>();
 
     drawHUD(em, engine, inpi.debugPhy);
+
+    if (txti.hasText())
+        drawTextBox(engine, em);
+
+    if (inpi.pause && li.sound_system != nullptr)
+        drawPauseMenu(engine, em, *li.sound_system);
+    else if (inpi.pause && li.sound_system == nullptr)
+        inpi.pause = false;
+
+    else if (inpi.inventory)
+        drawInventory(engine, em);
+
     // Si se pulsa F2 se activa editor  de parámetros In-game
-    if (inpi.debugAI1) {
+    else if (inpi.debugAI1)
         drawEditorInGameIA(engine, em);
-    }
+
     // Visual Debug AI
-    if (inpi.debugAI2)
+    else if (inpi.debugAI2)
         drawDebuggerInGameIA(engine, em, dt);
     engine.endDrawing();
 }
 
 //Dibuja Slider en función de los parámetros
-double SelectValue(double value, float posx, float posy, float height, float width, const char* text, float min_value, float max_value) {
+double SelectValue(ENGI::GameEngine& engine, double value, float posx, float posy, float height, float width, const char* text, float min_value, float max_value) {
     // pasamos a float el valor
     float floatvalue = static_cast<float>(value);
     // dibujamos el slider para modificar su valor
     int new_detect_radius = GuiSliderBar(Rectangle(posx, posy, height, width), text, NULL, &floatvalue, min_value, max_value);
     new_detect_radius = new_detect_radius + 1;
-    DrawText(std::to_string(floatvalue).c_str(), 220, static_cast<int>(posy + 5.0f), 20, BLUE);
+    engine.drawText(std::to_string(floatvalue).c_str(), 220, static_cast<int>(posy + 5.0f), 20, BLUE);
     // seteamos el nuevo valor
     return static_cast<double>(floatvalue);
 }
+
+void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss)
+{
+    float windowWidth = 330.0f;
+    float windowHeight = 330.0f;
+
+    Rectangle windowRect = {
+        static_cast<float>(engine.getScreenWidth()) / 2.0f - windowWidth / 2.0f,
+        static_cast<float>(engine.getScreenHeight()) / 2.0f - windowHeight / 2.0f,
+        windowWidth,
+        windowHeight
+    };
+    engine.drawRectangleLinesEx(windowRect, 2, BLACK);
+    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
+    engine.drawTextEx(GetFontDefault(), "PAUSA", Vector2{ windowRect.x + 100, windowRect.y + 40 }, 40, 1, BLACK);
+
+    // Boton de volver al inicio
+    Rectangle btn1Rec = { 300, 250, 200, 50 };
+    Rectangle btn2Rec = { 300, 320, 200, 50 };
+    Rectangle btn3Rec = { 300, 390, 200, 50 };
+    auto& li = em.getSingleton<LevelInfo>();
+
+    if (GuiButton(btn1Rec, "CONTINUAR")) {
+        auto& inpi = em.getSingleton<InputInfo>();
+        inpi.pause = false;
+        ss.seleccion_menu();
+    }
+
+    if (GuiButton(btn2Rec, "VOLVER AL INICIO")) {
+        li.currentScreen = GameScreen::TITLE;
+        ss.seleccion_menu();
+    }
+
+    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec)) {
+        if (ss.pushed == false)
+            ss.sonido_mov();
+        ss.pushed = true;
+    }
+    else
+        ss.pushed = false;
+
+    if (GuiButton(btn3Rec, "SALIR")) {
+        auto& li = em.getSingleton<LevelInfo>();
+        li.gameShouldEnd = true;
+        return;
+    }
+}
+
+void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
+{
+    float windowWidth = 450.0f;
+    float windowHeight = 450.0f;
+    float augment = 55.f;
+
+    Rectangle windowRect = {
+        static_cast<float>(engine.getScreenWidth()) / 2.0f - windowWidth / 2.0f,
+        static_cast<float>(engine.getScreenHeight()) / 2.0f - windowHeight / 2.0f,
+        windowWidth,
+        windowHeight
+    };
+    engine.drawRectangleLinesEx(windowRect, 2, BLACK);
+    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
+    engine.drawTextEx(GetFontDefault(), "INVENTARIO", Vector2{ windowRect.x + 110, windowRect.y + 20 }, 40, 1, BLACK);
+
+    auto& plfi = em.getSingleton<PlayerInfo>();
+    Rectangle btn2Rec = { 300, 430, 200, 50 };
+
+    if (plfi.selectedItem == plfi.max)
+    {
+        float posY = 250.f;
+
+        for (auto& item : plfi.inventory)
+        {
+            Rectangle btnRec = { 300, posY, 200, 50 };
+            if (GuiButton(btnRec, item->name.c_str()))
+                plfi.selectedItem = item->getID();
+            posY += augment;
+        }
+
+        // Botón de volver al juego
+        if (GuiButton(btn2Rec, "VOLVER"))
+        {
+            auto& inpi = em.getSingleton<InputInfo>();
+            inpi.inventory = false;
+        }
+    }
+    else
+    {
+        // Dibujamos la descripción del objeto seleccionado
+        auto& item = *plfi.getItem(plfi.selectedItem);
+        auto text = const_cast<char*>(item.description.c_str());
+
+        GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_LEFT);
+
+        float descWidth = 300.f, descHeight = 150.f;
+        float posX = static_cast<float>(engine.getScreenWidth() / 2) - (descWidth / 2.0f);
+        float posY = static_cast<float>(engine.getScreenHeight() / 2) - (descHeight / 1.25f);
+        GuiTextBox({ posX, posY, descWidth, descHeight }, text, static_cast<int>(item.description.size()), false);
+        auto& plfi = em.getSingleton<PlayerInfo>();
+
+        std::cout << dynamic_cast<Potion*>(&item) << std::endl;
+
+        if (dynamic_cast<Potion*>(&item) != nullptr)
+        {
+            std::cout << "Es una poción" << std::endl;
+            Rectangle btn1Rec = { 300, 350, 200, 50 };
+            if (GuiButton(btn1Rec, "USAR"))
+            {
+                auto& potion = static_cast<Potion&>(item);
+                plfi.usePotion(potion);
+                plfi.selectedItem = plfi.max;
+                auto& inpi = em.getSingleton<InputInfo>();
+                inpi.inventory = false;
+                GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+            }
+        }
+
+        // Boton de volver al inventario
+        if (GuiButton(btn2Rec, "VOLVER"))
+        {
+            plfi.selectedItem = plfi.max;
+            GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+        }
+    }
+}
+
 //Debugger visual in-game
 void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt) {
     // engine.beginDrawing();
     Rectangle windowRect = { 470, 80, 330, 230 };
-    DrawRectangleLinesEx(windowRect, 2, DARKGRAY);
-    DrawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
+    engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
+    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
     Vector2 textPositionInfo = { 480, 90 };
-    DrawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
+    engine.drawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
     auto& debugsnglt = em.getSingleton<Debug_t>();
 
     using SYSCMPss = MP::TypeList<AIComponent, ColliderComponent, RenderComponent>;
@@ -354,9 +630,9 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
     // AQUI PONDRIA
     em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, ColliderComponent& col, RenderComponent& ren)
     {
-        RayCast ray = engine.getMouseRay(); ray = engine.getMouseRay();
+        RayCast ray = engine.getMouseRay();
         if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            if (engine.isMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                 isSelectedfordebug = !isSelectedfordebug;
                 debugsnglt.IA_id_debug = e.getID();
             }
@@ -366,7 +642,7 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
             engine.beginMode3D();
             engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
             engine.endMode3D();
-            DrawText("Node active:", 480, 110, 20, BLACK);
+            engine.drawText("Node active:", 480, 110, 20, BLACK);
             if (debugsnglt.elapsed >= debugsnglt.countdown) {
                 debugsnglt.elapsed = 0;
                 debugsnglt.text = aic.bh;
@@ -410,6 +686,7 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
     //  engine.endDrawing();
 }
 
+
 // Dentro de tu clase BTDecisionPlayerDetected, podrías tener un método para dibujar el cono de visión
 void RenderSystem::drawVisionCone(vec3d pos_enemy, double orientation, double horizontalFOV) {
     // Calcula las direcciones de las líneas del cono
@@ -435,25 +712,25 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
 
     // Dibujar un rectángulo que simula una ventana
     Rectangle windowRect = { 0, 100, 340, 550 };
-    DrawRectangleLinesEx(windowRect, 2, DARKGRAY);
-    DrawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
+    engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
+    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
 
     // Dibujar el texto "debugger IA" en el centro de la ventana
     Vector2 textSize = MeasureTextEx(GetFontDefault(), "Debugger IA", 20, 1);
     Vector2 textPosition = { windowRect.x + 20,
                              windowRect.y + 10 };
 
-    DrawTextEx(GetFontDefault(), "Editor IA", textPosition, 20, 1, DARKBLUE);
+    engine.drawTextEx(GetFontDefault(), "Editor IA", textPosition, 20, 1, DARKBLUE);
 
     // Dibujar una línea recta debajo del texto
     float lineY = textPosition.y + textSize.y + 5;  // Ajusta la posición de la línea según tus necesidades
-    DrawLine(static_cast<int>(windowRect.x), static_cast<int>(lineY), static_cast<int>(windowRect.x) + static_cast<int>(windowRect.width),
+    engine.drawLine(static_cast<int>(windowRect.x), static_cast<int>(lineY), static_cast<int>(windowRect.x) + static_cast<int>(windowRect.width),
         static_cast<int>(lineY), DARKGRAY);
     // Dibujar el texto "INFO" debajo de la línea
 
     Vector2 textPositionParameters = { windowRect.x + 5, 150 };
 
-    DrawTextEx(GetFontDefault(), "PARÁMETROS", textPositionParameters, 20, 1, RED);
+    engine.drawTextEx(GetFontDefault(), "PARÁMETROS", textPositionParameters, 20, 1, RED);
 
     auto& debugsnglt = em.getSingleton<Debug_t>();
 
@@ -466,7 +743,7 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
         RayCast ray = engine.getMouseRay();
         // Comprobar si el rayo intersecta con el collider
         if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            if (engine.isMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                 isSelected = !isSelected;
                 debugsnglt.IA_id = e.getID();
             }
@@ -483,22 +760,22 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
             // si se seleccionada una entidad se muestra el Editor de parámetros
             if (isSelected) {
                 // ID DE LA ENTIDAD SELECCIONADA
-                DrawText("EID:", 5, 170, 20, BLACK);
-                DrawText(std::to_string(debugsnglt.IA_id).c_str(), 55, 170, 20, DARKGRAY);
+                engine.drawText("EID:", 5, 170, 20, BLACK);
+                engine.drawText(std::to_string(debugsnglt.IA_id).c_str(), 55, 170, 20, DARKGRAY);
                 //Detect Radius
-                aic.detect_radius = SelectValue(aic.detect_radius, 85.0, 200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
+                aic.detect_radius = SelectValue(engine, aic.detect_radius, 85.0, 200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
                 // Attack Radius
-                aic.attack_radius = SelectValue(aic.attack_radius, 85.0, 240.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
+                aic.attack_radius = SelectValue(engine, aic.attack_radius, 85.0, 240.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
                 // Arrival Radius
-                aic.arrival_radius = SelectValue(aic.arrival_radius, 85.0, 280.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
+                aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 85.0, 280.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
                 // Max Speed
-                phy.max_speed = SelectValue(phy.max_speed, 85.0, 320.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
+                phy.max_speed = SelectValue(engine, phy.max_speed, 85.0, 320.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
                 //COuntdown Perception
-                aic.countdown_perception = SelectValue(aic.countdown_perception, 85.0, 360.0, 120.0, 30.0, "Perception", 0.0, 10.0);
+                aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 85.0, 360.0, 120.0, 30.0, "Perception", 0.0, 10.0);
                 //Countdown Shoot
-                aic.countdown_shoot = SelectValue(aic.countdown_shoot, 85.0, 400.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
+                aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 85.0, 400.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
                 //Countdown stop
-                aic.countdown_stop = SelectValue(aic.countdown_stop, 85.0, 440.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
+                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 85.0, 440.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
             }
         }
     });
@@ -515,10 +792,12 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
     }
     else if (!playerEn->hasTag<PlayerTag>()) { drawDeath(engine); return; }
 
+    if (debugphy)
+        pointedEntity = std::numeric_limits<std::size_t>::max();
+
     // Visualizar las vidas del player
     for (auto const& e : em.getEntities())
     {
-
         if (e.hasTag<PlayerTag>())
         {
             // Dibujar background HUD
@@ -559,12 +838,49 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
                 if (t.type == ElementalType::Neutral)
                     engine.drawText("Neutral", 17, 50, 18, WHITE);
-                else if (t.type == ElementalType::Agua)
+                else if (t.type == ElementalType::Water)
                     engine.drawText("Agua", 17, 50, 18, BLUE);
-                else if (t.type == ElementalType::Fuego)
+                else if (t.type == ElementalType::Fire)
                     engine.drawText("Fuego", 17, 50, 18, RED);
                 else
                     engine.drawText("Hielo", 17, 50, 18, SKYBLUE);
+            }
+
+            if (li.mapID == 0 && e.hasComponent<AttackComponent>())
+            {
+                if (!li.tutorialEnemies.empty())
+                {
+                    for (auto& enemy : li.tutorialEnemies)
+                    {
+                        auto& ene = *em.getEntityByID(enemy);
+                        if (ene.hasComponent<RenderComponent>())
+                        {
+                            auto& ren{ em.getComponent<RenderComponent>(ene) };
+                            auto& phy{ em.getComponent<PhysicsComponent>(ene) };
+                            if (ren.visible && (ene.hasTag<DummyTag>() || ene.hasTag<DestructibleTag>()))
+                            {
+                                engine.drawText("ESPACIO",
+                                    static_cast<int>(engine.getWorldToScreenX(phy.position) - 25),
+                                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 9),
+                                    20,
+                                    WHITE);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (li.num_zone == 2 && elapsed_WASD < elapsed_limit_WASD)
+            {
+                auto& phy{ em.getComponent<PhysicsComponent>(e) };
+                // Escribimos que puede usar WASD para moverse
+                engine.drawText("WASD para moverse",
+                    static_cast<int>(engine.getWorldToScreenX(phy.position) - 100),
+                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 15),
+                    20,
+                    WHITE);
+
+                elapsed_WASD += 1.0f / 60.0f;
             }
         }
 
@@ -598,6 +914,9 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         // Vidas HUD
         if (e.hasTag<EnemyTag>() && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
         {
+            if (e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>())
+                continue;
+
             auto const& r{ em.getComponent<RenderComponent>(e) };
             auto& l{ em.getComponent<LifeComponent>(e) };
 
@@ -610,8 +929,8 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             // Datos para la barra para la barra de vida
             int barWidth = 40;
             int barHeight = 4;
-            int barX = static_cast<int>(engine.getWorldToScreenX(r.position)) - 18;
-            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 35);
+            int barX = static_cast<int>(engine.getWorldToScreenX(r.position) - 18);
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 10);
 
             engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
 
@@ -653,17 +972,17 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
 
-        if (e.hasComponent<ChestComponent>() && e.hasComponent<RenderComponent>())
+        if (e.hasComponent<InteractiveComponent>() && e.hasComponent<RenderComponent>())
         {
             auto& ren{ em.getComponent<RenderComponent>(e) };
-            auto& chest{ em.getComponent<ChestComponent>(e) };
-            if (chest.showButton)
+            auto& inter{ em.getComponent<InteractiveComponent>(e) };
+            if (inter.showButton)
             {
                 engine.drawText("E",
                     static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
-                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 50),
+                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 9),
                     20,
-                    BLACK);
+                    WHITE);
             }
         }
 
@@ -674,7 +993,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             engine.drawText(std::to_string(l.life).c_str(),
                 static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 8.0),
                 20,
                 BLACK);
 
@@ -690,12 +1009,12 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                     tipo = "Neutral";
                     color = BLACK;
                 }
-                else if (t.type == ElementalType::Agua)
+                else if (t.type == ElementalType::Water)
                 {
                     tipo = "Agua";
                     color = BLUE;
                 }
-                else if (t.type == ElementalType::Fuego)
+                else if (t.type == ElementalType::Fire)
                 {
                     tipo = "Fuego";
                     color = RED;
@@ -707,10 +1026,21 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                     20,
                     color);
             }
-
         }
 
-        if (debugphy && e.hasComponent<ColliderComponent>())
+        if (debugphy && e.hasComponent<ZoneComponent>())
+        {
+            auto& ren{ em.getComponent<RenderComponent>(e) };
+            auto& z{ em.getComponent<ZoneComponent>(e) };
+
+            engine.drawText(std::to_string(z.zone).c_str(),
+                static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
+                static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 50),
+                20,
+                BLACK);
+        }
+
+        if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
         {
             auto& col{ em.getComponent<ColliderComponent>(e) };
 
@@ -727,10 +1057,6 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 BLUE);
             engine.endMode3D();
 
-        }
-
-        if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
-        {
             auto& phy = em.getComponent<PhysicsComponent>(e);
 
             RayCast ray = engine.getMouseRay();
@@ -741,7 +1067,25 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             auto& ren = em.getComponent<RenderComponent>(e);
             // Comprobar si el rayo intersecta con el collider
             if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::ZONE))
+
             {
+                pointedEntity = e.getID();
+
+                auto& col{ em.getComponent<ColliderComponent>(e) };
+
+                // Calcular la posición y el tamaño de la bounding box
+                vec3d boxPosition = (col.boundingBox.min + col.boundingBox.max) / 2;
+                vec3d boxSize = col.boundingBox.max - col.boundingBox.min;
+
+                // Dibujar la bounding box
+                engine.beginMode3D();
+                engine.drawCubeWires(boxPosition,
+                    static_cast<float>(boxSize.x()),
+                    static_cast<float>(boxSize.y()),
+                    static_cast<float>(boxSize.z()),
+                    BLUE);
+                engine.endMode3D();
+
                 // Dibujar el HUD de debug
                 engine.drawRectangle(0, 60, 150, 240, WHITE);
                 engine.drawText("Posición", 10, 70, 20, BLACK);
@@ -766,22 +1110,23 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
         // Dibujar zona para mostrar ejemplo de uso del eventmanager
-        auto& linfo = em.getSingleton<LevelInfo>();
-        auto& bb = em.getSingleton<BlackBoard_t>();
-        if (linfo.num_zone == 11) {
-            if (bb.boss_fase == 1) {
-                engine.drawText("FASE 1", 500, 10, 70, RED);
-            }
-            else {
-                engine.drawText("FASE 2", 500, 10, 70, ORANGE);
-            }
 
-            // if (linfo.segundos == 0) {
-            //     linfo.drawzone = false;
-            //     linfo.segundos = 1000;
-            // }
-            // linfo.segundos--;
-        }
+        // auto& linfo = em.getSingleton<LevelInfo>();
+        // auto& bb = em.getSingleton<BlackBoard_t>();
+        // if (linfo.num_zone == 11) {
+        //     if (bb.boss_fase == 1) {
+        //         engine.drawText("FASE 1", 500, 10, 70, RED);
+        //     }
+        //     else {
+        //         engine.drawText("FASE 2", 500, 10, 70, ORANGE);
+        //     }
+
+        //     // if (linfo.segundos == 0) {
+        //     //     linfo.drawzone = false;
+        //     //     linfo.segundos = 1000;
+        //     // }
+        //     // linfo.segundos--;
+        // }
         // else {
         //     engine.drawText(("ZONA " + std::to_string(linfo.num_zone)).c_str(), 600, 10, 50, RED);
         // }
@@ -836,7 +1181,8 @@ void RenderSystem::drawDeath(ENGI::GameEngine& engine)
 
 void RenderSystem::unloadModels(EntityManager& em, ENGI::GameEngine& engine)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, PhysicsComponent&, RenderComponent& ren)
+    using SYSCMPs = MP::TypeList<RenderComponent>;
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, RenderComponent& ren)
     {
         // engine.unloadMesh(ren.mesh);
         engine.unloadModel(ren.model);
@@ -847,6 +1193,7 @@ void RenderSystem::unloadModels(EntityManager& em, ENGI::GameEngine& engine)
 void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, const Entity& e)
 {
     auto const& l{ em.getComponent<LifeComponent>(e) };
+    auto& plfi = em.getSingleton<PlayerInfo>();
 
     // Datos de la barra de vida
     int barWidth = 40;
@@ -856,10 +1203,11 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
     int spacing = 4;
 
     // Rectángulo de fondo para la barra de vida
-    engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * l.maxLife + 2, barHeight + 4, DARKGRAY);
+    engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * (l.maxLife + plfi.armor) + 2, barHeight + 4, DARKGRAY);
 
     // Dibujamos cada parte de la barra de vida
-    for (int i = 0; i < l.life; ++i)
+    int i{};
+    for (; i < l.life; ++i)
     {
         // Posición X de cada trozo
         int currentX = barX + i * (barWidth + spacing);
@@ -867,6 +1215,17 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
         // Dibujamos el rectángulo
         engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
     }
+
+    // Dibujamos la armadura
+    if (plfi.armor > 0)
+        for (; i < l.maxLife + plfi.armor; ++i)
+        {
+            // Posición X de cada trozo
+            int currentX = barX + i * (barWidth + spacing);
+
+            // Dibujamos el rectángulo
+            engine.drawRectangle(currentX, barY, barWidth, barHeight, SKYBLUE);
+        }
 }
 
 void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
@@ -919,4 +1278,34 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
     engine.drawRectangle(barX + 3, barY + 3, manaWidth, barHeight - 6, SKYBLUE);
 
     plfi.mana_width = manaWidth;
+}
+
+void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
+{
+    auto& txti = em.getSingleton<TextInfo>();
+    auto& textQueue = txti.getTextQueue();
+
+    float boxWidth = 600;
+    float boxHeight = 100;
+
+    // Centramos la posición del cuadro de texto
+    float posX = static_cast<float>(engine.getScreenWidth() / 2) - boxWidth / 2;
+    float posY = static_cast<float>(engine.getScreenHeight() / 1.25) - boxHeight / 2;
+
+    // Sacamos el texto en formatos para GuiTextBox
+    auto& str = textQueue.front();
+    auto text = const_cast<char*>(str.c_str());
+
+    // Dibujamos el cuadro de diálogo con RayGui
+    engine.drawRectangle(static_cast<int>(posX), static_cast<int>(posY), static_cast<int>(boxWidth), static_cast<int>(boxHeight), WHITE);
+    GuiTextBox({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.size()), false);
+
+    auto& inpi = em.getSingleton<InputInfo>();
+    if (inpi.interact)
+    {
+        txti.popText();
+        inpi.interact = false;
+        if (textQueue.empty())
+            txti.waitTime = .8f;
+    }
 }

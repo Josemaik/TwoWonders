@@ -37,6 +37,7 @@ void AISystem::update(EntityManager& em, float dt)
     bb.idsubditos.clear();
 
     em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, RenderComponent& ren, AIComponent& ai, LifeComponent& lc)
+
     {
         //percibir el entorno
         perception(bb, ai, dt);

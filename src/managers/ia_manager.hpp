@@ -25,6 +25,7 @@
 #include "../utils/bt/action_healing.hpp"
 #include "../utils/bt/action_heal_mate.hpp"
 #include "../utils/bt/action_generatesubditos.hpp"
+#include "../utils/bt/action_pendulum.hpp"
 //decision
 #include "../utils/bt/decision_playerdetected.hpp"
 #include "../utils/bt/decision_readyforattack.hpp"
@@ -36,6 +37,7 @@
 #include "../utils/bt/decision_subditosalreadygenerated.hpp"
 #include "../utils/bt/decision_activateorquit_shield.hpp"
 #include "../utils/bt/decision_readyforairattack.hpp"
+#include "../utils/bt/decision_readyforcrusher.hpp"
 struct Ia_man
 {
     using jsonType = const rapidjson::Value&;

@@ -6,7 +6,7 @@ void Game::createShield(EntityManager& em, Entity& ent)
 {
     auto& e{ em.newEntity() };
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = DARKBROWN });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
     em.addComponent<ShieldComponent>(e, ShieldComponent{ .createdby = EntitieswithShield::Player });
 }
@@ -15,33 +15,53 @@ void Game::createEnding(EntityManager& em)
 {
     auto& e{ em.newEntity() };
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = {83.0f, 1.0f, -87.0f}, .scale = {1.0f, 1.0f, 1.0f}, .color = WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .gravity = 0 });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
 }
 
 void Game::createEntities(EntityManager& em)
 {
-    // Player
-    auto& e{ em.newEntity() };
-    em.addTag<PlayerTag>(e);// -2 -12 63 -71 // -48.0f, 0.0f, -2.0f
+    auto& plfi = em.getSingleton<PlayerInfo>();
+    if (plfi.spawnPoint == vec3d::zero())
+        plfi.spawnPoint = { -33.0, 4.0, 30.9 };
+    // -33.0, 4.0, 30.9 - Posición Incial
+    // 77.0, 4.0, -73.9 - Cofre con llave
+    // -32.0, 4.0, -34.0 - Primer cofre 
+    // -9.0, 4.0, -50.0
+    // 26.0, 4.0, -65.0
+    // -32.0   4.0  -107.0
 
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -2.0f, 0.0f, -12.0f }, .scale = { 1.0f, 3.0f, 1.0f }, .color = WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { r.position }, .velocity = { .1f, .0f, .0f } });
+// Player
+    auto& e{ em.newEntity() };
+
+    em.addTag<PlayerTag>(e);// -2 -12 63 -71
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, });
+
     auto& lis = em.addComponent<ListenerComponent>(e, ListenerComponent{});
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<TypeComponent>(e, TypeComponent{});
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
     lis.addCode(EventCodes::OpenChest);
+    lis.addCode(EventCodes::SetSpawn);
+    lis.addCode(EventCodes::OpenDoor);
+
+    // Código de añadir un hechizo al jugador
+    // Spell spell{ "Fireball", "Shoots a fireball", Spells::FireMeteorites, 20.0, 2 };
+    // plfi.addSpell(spell);
+
+    // Código de añadir un objeto poción al inventario
+    // Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };
+    // plfi.addItem(std::make_unique<Potion>(pot));
 
     // Shield
-    createShield(em, e);
+    // createShield(em, e);
 
     // Ending
-    createEnding(em);
+    // createEnding(em);
 
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
@@ -56,7 +76,21 @@ void Game::createSound(EntityManager&) {
 
 void Game::run()
 {
-    engine.setTargetFPS(30);
+
+    Shader shader = engine.loadShader(TextFormat("assets/shaders/lighting.vs", 330),
+        TextFormat("assets/shaders/lighting.fs", 330));
+
+    // Get some required shader locations
+    shader.locs[SHADER_LOC_VECTOR_VIEW] = engine.getShaderLocation(shader, "viewPos");
+
+    // Ambient light level (some basic lighting)
+    int ambientLoc = engine.getShaderLocation(shader, "ambient");
+    float ambientValue[4] = { 3.1f, 3.1f, 3.1f, 20.0f };
+    engine.setShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
+
+    render_system.setShader(shader);
+
+    engine.setTargetFPS(120);
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     srand((unsigned int)time(NULL));
@@ -81,15 +115,20 @@ void Game::run()
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
+    auto& txti = em.getSingleton<TextInfo>();
 
     // Inicializa una variable donde tener el tiempo entre frames
-    float deltaTime{}, currentTime{};
+    float deltaTime{}, currentTime{}, elapsed{};
+    const float timeStep = 1.0f / 30.0f;  // Actualiza el juego 60 veces por segundo
 
     createSound(em);
+    li.sound_system = &sound_system;
+    attack_system.setCollisionSystem(&collision_system);
 
-    while (!engine.windowShouldClose())
+    while (!li.gameShouldEnd)
     {
         deltaTime = engine.getFrameTime();
+        elapsed += deltaTime;
 
         switch (li.currentScreen)
         {
@@ -98,7 +137,7 @@ void Game::run()
         case GameScreen::LOGO:
         {
             // Contador para que pasen X segundos
-            currentTime += deltaTime;
+            currentTime += timeStep;
             if (currentTime > 4.0f) {
                 li.currentScreen = GameScreen::TITLE;
                 currentTime = 0;
@@ -125,11 +164,18 @@ void Game::run()
             break;
         }
 
+        // CODIGO DE LA PANTALLA DE PAUSA
+        case GameScreen::PAUSE:
+        {
+            render_system.drawPauseMenu(engine, em, sound_system);
+            break;
+        }
+
         // CODIGO DE LA PANTALLA DE HISTORIA
         case GameScreen::STORY:
         {
             // Input del enter para empezar la partida
-            if (input_system.pressEnter())
+            if (input_system.pressEnter(engine))
                 li.currentScreen = GameScreen::GAMEPLAY;
             render_system.drawStory(engine);
 
@@ -148,35 +194,40 @@ void Game::run()
             if (em.getEntities().empty() || li.resetGame)
                 resetGame(em, engine, render_system);
 
-            input_system.update(em);
+            input_system.update(em, engine);
 
             // seleccionar modo de debug ( physics o AI)
-            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1))
+            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText()))
             {
-                ai_system.update(em, deltaTime);
-                physics_system.update(em, deltaTime);
-                collision_system.update(em);
-                zone_system.update(em, engine, iam, evm, map,deltaTime);
-                lock_system.update(em);
-                shield_system.update(em);
-                object_system.update(em, deltaTime);
-                attack_system.update(em, deltaTime);
-                projectile_system.update(em, deltaTime);
-                life_system.update(em, object_system, deltaTime);
-                sound_system.update();
-                camera_system.update(em, engine, deltaTime);
-                event_system.update(evm, object_system, em);
-
-                if (!li.dead_entities.empty())
+                while (elapsed >= timeStep)
                 {
-                    em.destroyEntities(li.dead_entities);
-                    li.dead_entities.clear();
-                }
+                    elapsed -= timeStep;
 
-                render_system.update(em, engine, deltaTime);
+                    ai_system.update(em, timeStep);
+                    physics_system.update(em, timeStep);
+                    collision_system.update(em);
+                    zone_system.update(em, engine, iam, evm, map, timeStep);
+                    lock_system.update(em);
+                    shield_system.update(em);
+                    object_system.update(em, timeStep);
+                    projectile_system.update(em, timeStep);
+                    attack_system.update(em, timeStep);
+                    life_system.update(em, object_system, timeStep);
+                    sound_system.update();
+                    // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
+                    camera_system.update(em, engine, timeStep);
+                    event_system.update(em, evm, iam, map, object_system);
+
+                    if (!li.dead_entities.empty())
+                    {
+                        em.destroyEntities(li.dead_entities);
+                        li.dead_entities.clear();
+                    }
+                }
+                render_system.update(em, engine, timeStep);
             }
-            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1))
-                render_system.update(em, engine, deltaTime);
+            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText()))
+                render_system.update(em, engine, timeStep);
 
             break;
         }
@@ -188,7 +239,7 @@ void Game::run()
         // CODIGO DE LA PANTALLA FINAL
         case GameScreen::ENDING:
         {
-            if (input_system.pressEnter())
+            if (input_system.pressEnter(engine))
                 li.currentScreen = GameScreen::TITLE;
 
             render_system.drawEnding(engine);
@@ -199,29 +250,33 @@ void Game::run()
         default:
             break;
         }
+        if (elapsed >= timeStep)
+            elapsed = 0; // Para que no se acumule el tiempo
+
+        if (engine.windowShouldClose())
+            li.gameShouldEnd = true;
     }
 
     //liberar bancos
     sound_system.clear();
     render_system.unloadModels(em, engine);
 
+    engine.unloadShader(shader);
     engine.closeWindow();
 }
-
 
 void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
 {
     auto& li = em.getSingleton<LevelInfo>();
-    auto& plfi = em.getSingleton<PlayerInfo>();
     auto& bb = em.getSingleton<BlackBoard_t>();
 
     em.destroyAll();
     bb.subditosData.clear();
     rs.unloadModels(em, engine);
     li.reset();
-    plfi.reset();
+    // plfi.reset();
     lock_system.reset();
     createEntities(em);
     map.reset(em, 0, iam);
+    li.sound_system = &sound_system;
 }
-

@@ -40,12 +40,18 @@ namespace ENGI {
         void drawCubeWires(vec3d pos, float width, float height, float lenght, Color color);
         void drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
         void drawModelWires(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
+        void drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color);
+
+        // Rectangle
         void drawRectangle(int posX, int posY, int width, int height, Color color);
+        void drawRectangleLinesEx(Rectangle rec, float lineThick, Color color);
+        void drawRectangleRec(Rectangle rec, Color color);
         void drawTexture(Texture2D texture, int posX, int posY, Color tint);
         void drawCircle(int posX, int posY, float radius, Color color);
 
         // Text
         void drawText(const char* text, int posX, int posY, int fontSize, Color color);
+        void drawTextEx(Font font, const char* text, Vector2 position, float fontSize, float spacing, Color tint);
 
         // Window
         void initWindow(int width, int height, const char* title);
@@ -65,9 +71,32 @@ namespace ENGI {
         vec3d getUpCamera();
         float getFovyCamera();
 
+        // Input Handling
+        bool isKeyPressed(int key);
+        bool isKeyDown(int key);
+        bool isKeyReleased(int key);
+        bool isMouseButtonPressed(int button);
+        bool isMouseButtonDown(int button);
+        bool isGamepadAvailable(int gamepad);
+        bool isGamepadButtonPressed(int gamepad, int button);
+        bool isGamepadButtonDown(int gamepad, int button);
+        bool isGamepadButtonReleased(int gamepad, int button);
+        float getGamepadAxisMovement(int gamepad, int axis);
+
+        // Mouse collision
+        bool checkCollisionPointRec(Vector2 point, Rectangle rec);
+
+        // Shaders
+        Shader loadShader(const char* vsFileName, const char* fsFileName);
+        void unloadShader(Shader s);
+        int getShaderLocation(Shader s, const char* uniformName);
+        void setShaderValue(Shader s, int uniformLoc, const void* value, int uniformType);
+
         // Aux
         Mesh genMeshCube(float width, float height, float lenght);
         Model loadModelFromMesh(Mesh m);
+        Model loadModel(const char* filename);
+        Texture2D loadTexture(const char* filename);
         void unloadMesh(Mesh m);
         void unloadModel(Model m);
         float getWorldToScreenX(vec3d pos);

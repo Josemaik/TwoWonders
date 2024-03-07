@@ -166,12 +166,12 @@ struct vec3D
         return max;
     }
 
-    double max() const {
-        return std::max({ x_, y_, z_ });
+    DataT max() const {
+        return std::max(std::max(x_, y_), z_);
     }
 
-    double min() const {
-        return std::min({ x_, y_, z_ });
+    DataT min() const {
+        return std::min(std::min(x_, y_), z_);
     }
 
     static constexpr vec3D abs(const vec3D& a)

@@ -5,7 +5,8 @@
 
 struct BTActionShoot : BTNode_t{
     using type_value = AIComponent::TypeShoot;
-    BTActionShoot(type_value t) : shoot{t} {}
+    BTActionShoot(type_value t, vec3d p) : shoot{t}, pos{p} {}
+
     //   BTDecisionAlternative( a = false) : alternative{a}  {}
     // Obtener la distancia del enemigo con respecto al player
     [[nodiscard]]vec3d getPlayerDistance(EntityContext_t& ectx) const noexcept {
@@ -65,6 +66,11 @@ struct BTActionShoot : BTNode_t{
                     return BTNodeStatus_t::fail;
                 }
                     break;
+                case AIComponent::TypeShoot::CrusherAttack:{
+                    att.pos_respawn_crush_attack = pos;
+                    att.attack(AttackType::CrusherAttack);
+                    return BTNodeStatus_t::fail;
+                }
                 default:
                     break;
                 }
@@ -82,4 +88,5 @@ struct BTActionShoot : BTNode_t{
     }
 private:
    type_value shoot;
+   vec3d pos;
 };

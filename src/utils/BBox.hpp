@@ -47,6 +47,7 @@ struct BBox
         return tNear <= tFar && tFar >= 0;
     }
 
+
      vec3d getintersectsRay(vec3d& rayOrigin, vec3d& rayDirection) const {
         vec3d t1 = (min - rayOrigin) / rayDirection;
         vec3d t2 = (max - rayOrigin) / rayDirection;
@@ -79,3 +80,21 @@ struct BBox
 //             // No intersection
 //             return false;
 //         }
+
+    vec3d getPositiveVertex(const vec3d& normal) const {
+        vec3d res = min;
+        if (normal.x() >= 0) res.setX(max.x());
+        if (normal.y() >= 0) res.setY(max.y());
+        if (normal.z() >= 0) res.setZ(max.z());
+        return res;
+    }
+
+    vec3d getNegativeVertex(const vec3d& normal) const {
+        vec3d res = max;
+        if (normal.x() >= 0) res.setX(min.x());
+        if (normal.y() >= 0) res.setY(min.y());
+        if (normal.z() >= 0) res.setZ(min.z());
+        return res;
+    }
+};
+

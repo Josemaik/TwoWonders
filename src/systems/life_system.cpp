@@ -20,6 +20,21 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                         sub.activeShield = false;
                 }
             }
+            else if (ent.hasTag<PlayerTag>())
+            {
+                auto& plfi = em.getSingleton<PlayerInfo>();
+                if (plfi.armor > 0)
+                {
+                    lif.life += lif.lifeLost;
+                    plfi.armor -= lif.lifeLost;
+
+                    if (plfi.armor < 0)
+                    {
+                        lif.life += plfi.armor;
+                        plfi.armor = 0;
+                    }
+                }
+            }
 
             lif.lifeLost = 0;
         }
@@ -52,7 +67,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 else
                     lif.decreaseNextFrame = false;
 
-                em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
+                //em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
             }
 
             //Si es una bala
@@ -78,46 +93,52 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 bb.subditosData.erase(ent.getID());
             }
 
-            if(ent.hasTag<BossFinalTag>()){
+            if (ent.hasTag<BossFinalTag>()) {
                 // if (!lif.decreaseNextFrame)
                 //     lif.decreaseNextFrame = true;
                 // else
                 //     lif.decreaseNextFrame = false;
-                 auto& bb = em.getSingleton<BlackBoard_t>();
-                 bb.boss_fase++;
+                auto& bb = em.getSingleton<BlackBoard_t>();
+                bb.boss_fase++;
             }
 
             lif.markedForDeletion = true;
         }
 
+        if (ent.hasTag<PlayerTag>())
+        {
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            if (plfi.increaseLife > 0.0)
+            {
+                lif.life += static_cast<int>(plfi.increaseLife);
+                if (lif.life > lif.maxLife)
+                    lif.life = lif.maxLife;
+                plfi.increaseLife = 0.0;
+            }
+        }
+
         if (lif.markedForDeletion && !lif.decreaseNextFrame)
             li.dead_entities.insert(ent.getID());
-
     });
 }
 
 // Se podra crear objetos: vida, bomba, moneda o nada
 void LifeSystem::createObject(EntityManager&, ObjectSystem& os, vec3d pos) {
     int random_value = std::rand();
-    if (random_value % 5 > 0) {
+    if (random_value % 4 > 0) {
         ObjectType tipo_nuevo_objeto{};
         Color color_nuevo_objeto{};
-        if (random_value % 5 == 1)
-        {
-            tipo_nuevo_objeto = ObjectType::Bomb;
-            color_nuevo_objeto = GRAY;
-        }
-        else if (random_value % 5 == 2)
+        if (random_value % 4 == 1)
         {
             tipo_nuevo_objeto = ObjectType::Coin;
             color_nuevo_objeto = YELLOW;
         }
-        else if (random_value % 5 == 3)
+        else if (random_value % 4 == 2)
         {
             tipo_nuevo_objeto = ObjectType::Life;
             color_nuevo_objeto = RED;
         }
-        else if (random_value % 5 == 4)
+        else if (random_value % 4 == 3)
         {
             tipo_nuevo_objeto = ObjectType::Mana_Potion;
             color_nuevo_objeto = SKYBLUE;

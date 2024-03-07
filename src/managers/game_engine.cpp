@@ -18,6 +18,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     ENGI::GameEngine::imageResize(&logo_kaiwa_games, width_, static_cast<int>(height_ / 2)); // 2.49
     texture_logo_kaiwa_games = ENGI::GameEngine::loadTextureFromImage(logo_kaiwa_games);
     ENGI::GameEngine::unloadImage(logo_kaiwa_games);
+    SetExitKey(KEY_F8);
 }
 
 ////// IMAGE AND TEXTURE //////
@@ -50,53 +51,43 @@ float ENGI::GameEngine::getFrameTime() {
 
 ////// DRAWING //////
 
-void ENGI::GameEngine::beginDrawing()
-{
+void ENGI::GameEngine::beginDrawing() {
     BeginDrawing();
 }
 
-void ENGI::GameEngine::clearBackground(Color color)
-{
+void ENGI::GameEngine::clearBackground(Color color) {
     ClearBackground(color);
 }
 
-void ENGI::GameEngine::drawGrid(int slices, float spacing)
-{
+void ENGI::GameEngine::drawGrid(int slices, float spacing) {
     DrawGrid(slices, spacing);
 }
 
-void ENGI::GameEngine::endDrawing()
-{
+void ENGI::GameEngine::endDrawing() {
     EndDrawing();
 }
 
-void ENGI::GameEngine::beginMode3D()
-{
+void ENGI::GameEngine::beginMode3D() {
     BeginMode3D(camera);
 }
 
-void ENGI::GameEngine::endMode3D()
-{
+void ENGI::GameEngine::endMode3D() {
     EndMode3D();
 }
 
-void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color)
-{
+void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color) {
     DrawLine3D(startPos.toRaylib(), endPos.toRaylib(), color);
 }
 
-void ENGI::GameEngine::drawCube(vec3d pos, float width, float height, float lenght, Color color)
-{
+void ENGI::GameEngine::drawCube(vec3d pos, float width, float height, float lenght, Color color) {
     DrawCube(pos.toRaylib(), width, height, lenght, color);
 }
 
-void ENGI::GameEngine::drawCubeWires(vec3d pos, float width, float height, float lenght, Color color)
-{
+void ENGI::GameEngine::drawCubeWires(vec3d pos, float width, float height, float lenght, Color color) {
     DrawCubeWires(pos.toRaylib(), width, height, lenght, color);
 }
 
-void ENGI::GameEngine::drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint)
-{
+void ENGI::GameEngine::drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint) {
     // Matriz de transformación (incluyendo escalado)
     // Matrix transform = MatrixScale(scale.x, scale.y, scale.z);
 
@@ -106,13 +97,20 @@ void ENGI::GameEngine::drawModel(Model model, vec3d position, vec3d rotationAxis
     DrawModelEx(model, position.toRaylib(), rotationAxis.toRaylib(), rotationAngle, scale.toRaylib(), tint);
 }
 
-void ENGI::GameEngine::drawModelWires(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint)
-{
+void ENGI::GameEngine::drawModelWires(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint) {
     DrawModelWiresEx(model, position.toRaylib(), rotationAxis.toRaylib(), rotationAngle, scale.toRaylib(), tint);
 }
 
 void ENGI::GameEngine::drawRectangle(int posX, int posY, int width, int height, Color color) {
     DrawRectangle(posX, posY, width, height, color);
+}
+
+void ENGI::GameEngine::drawRectangleLinesEx(Rectangle rec, float lineThick, Color color) {
+    DrawRectangleLinesEx(rec, lineThick, color);
+}
+
+void ENGI::GameEngine::drawRectangleRec(Rectangle rec, Color color) {
+    DrawRectangleRec(rec, color);
 }
 
 void ENGI::GameEngine::drawTexture(Texture2D texture, int posX, int posY, Color tint) {
@@ -123,10 +121,18 @@ void ENGI::GameEngine::drawCircle(int posX, int posY, float radius, Color color)
     DrawCircle(posX, posY, radius, color);
 }
 
+void ENGI::GameEngine::drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color) {
+    DrawLine(startPosX, startPosY, endPosX, endPosY, color);
+}
+
 ////// TEXT //////
 
 void ENGI::GameEngine::drawText(const char* text, int posX, int posY, int fontSize, Color color) {
     DrawText(text, posX, posY, fontSize, color);
+}
+
+void ENGI::GameEngine::drawTextEx(Font font, const char* text, Vector2 position, float fontSize, float spacing, Color tint) {
+    DrawTextEx(font, text, position, fontSize, spacing, tint);
 }
 
 ////// WINDOW //////
@@ -203,6 +209,87 @@ float ENGI::GameEngine::getFovyCamera()
     return camera.fovy;
 }
 
+////// INPUT HANDLING //////
+
+bool ENGI::GameEngine::isKeyPressed(int key)
+{
+    return IsKeyPressed(key);
+}
+
+bool ENGI::GameEngine::isKeyDown(int key)
+{
+    return IsKeyDown(key);
+}
+
+bool ENGI::GameEngine::isKeyReleased(int key)
+{
+    return IsKeyReleased(key);
+}
+
+bool ENGI::GameEngine::isMouseButtonPressed(int button)
+{
+    return IsMouseButtonPressed(button);
+}
+
+bool ENGI::GameEngine::isMouseButtonDown(int button)
+{
+    return IsMouseButtonDown(button);
+}
+
+bool ENGI::GameEngine::isGamepadAvailable(int gamepad)
+{
+    return IsGamepadAvailable(gamepad);
+}
+
+bool ENGI::GameEngine::isGamepadButtonPressed(int gamepad, int button)
+{
+    return IsGamepadButtonPressed(gamepad, button);
+}
+
+bool ENGI::GameEngine::isGamepadButtonDown(int gamepad, int button)
+{
+    return IsGamepadButtonDown(gamepad, button);
+}
+
+bool ENGI::GameEngine::isGamepadButtonReleased(int gamepad, int button)
+{
+    return IsGamepadButtonReleased(gamepad, button);
+}
+
+float ENGI::GameEngine::getGamepadAxisMovement(int gamepad, int axis)
+{
+    return GetGamepadAxisMovement(gamepad, axis);
+}
+
+////// MOUSE COLLISION //////
+
+bool ENGI::GameEngine::checkCollisionPointRec(Vector2 point, Rectangle rec)
+{
+    return CheckCollisionPointRec(point, rec);
+}
+
+////// SHADERS //////
+
+Shader ENGI::GameEngine::loadShader(const char* vsFileName, const char* fsFileName)
+{
+    return LoadShader(vsFileName, fsFileName);
+}
+
+void ENGI::GameEngine::unloadShader(Shader s)
+{
+    UnloadShader(s);
+}
+
+int ENGI::GameEngine::getShaderLocation(Shader s, const char* uniformName)
+{
+    return GetShaderLocation(s, uniformName);
+}
+
+void ENGI::GameEngine::setShaderValue(Shader s, int uniformLoc, const void* value, int uniformType)
+{
+    SetShaderValue(s, uniformLoc, value, uniformType);
+}
+
 ////// AUX //////
 
 Mesh ENGI::GameEngine::genMeshCube(float width, float height, float lenght)
@@ -213,6 +300,16 @@ Mesh ENGI::GameEngine::genMeshCube(float width, float height, float lenght)
 Model ENGI::GameEngine::loadModelFromMesh(Mesh m)
 {
     return LoadModelFromMesh(m);
+}
+
+Model ENGI::GameEngine::loadModel(const char* filename)
+{
+    return LoadModel(filename);
+}
+
+Texture2D ENGI::GameEngine::loadTexture(const char* filename)
+{
+    return LoadTexture(filename);
 }
 
 void ENGI::GameEngine::unloadMesh(Mesh m)

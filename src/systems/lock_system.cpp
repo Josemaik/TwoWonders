@@ -20,7 +20,7 @@ void LockSystem::update(EntityManager& em)
             double distance = playerPos.distance(pos);
 
             // Si el enemigo se encuentra a menos de 10 unidades de distancia del jugador se inserta en el set
-            if (distance < 10.0)
+            if (distance < 25.0)
                 enemies.push_back({ e.getID(), distance });
 
         });
