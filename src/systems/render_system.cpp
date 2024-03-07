@@ -1063,7 +1063,6 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             std::cout << ray.origin << " " << ray.direction << std::endl;
 
-            auto& col = em.getComponent<ColliderComponent>(e);
             auto& ren = em.getComponent<RenderComponent>(e);
             // Comprobar si el rayo intersecta con el collider
             if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::ZONE))

@@ -69,7 +69,7 @@ struct BBox
             return vec3d{};
         }
     }
-};
+
 //  if (tNear <= tFar && tFar >= 0) {
 //             // Calculating intersection point
 //             vec3d intersection = rayOrigin + rayDirection * tNear;
