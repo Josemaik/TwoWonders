@@ -2,6 +2,7 @@
 
 #include "../components/resource_shader.hpp"
 #include "../components/resource_texture.hpp"
+#include "../components/resource_font.hpp"
 #include "../components/entity_camera.hpp"
 #include "../components/resource_mesh.hpp"
 
@@ -21,6 +22,7 @@
 struct RenderManager{
 private:
     std::shared_ptr<Shader> m_shaderProgram;
+    std::shared_ptr<Font> m_defaultFont;
     int m_width, m_height;
 
     void draw(float vertices[], std::size_t vertSize, GLuint indices[], std::size_t indSize,glm::vec4 color);
@@ -74,7 +76,7 @@ public:
     };
 
     // Text
-    void drawText(const char*, glm::vec2, int, glm::vec4);
+    void drawText(const char* text, glm::vec2 pos, int fontSize, Color color);
 
     static RenderManager& getInstance(){
         static RenderManager instance;
@@ -90,4 +92,5 @@ public:
             static_cast<float>(color.a) / 255.0f
         );
     }
+    void setDefaultFont(std::shared_ptr<Font> font){ m_defaultFont = font; };
 };

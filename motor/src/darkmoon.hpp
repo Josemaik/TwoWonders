@@ -87,10 +87,27 @@ public:
     // Check if a key is not being pressed
     bool IsKeyUp(int key);
 
-    // ----- LOAD ----- //
+    // ----------------------------- //
+    // Loading / Unloading functions //
+    // ----------------------------- //
+
+    // Load font from file into GPU memory
+    std::shared_ptr<Font> LoadFont(const char* filePath);
+    // Load texture from file into GPU memory
+    std::shared_ptr<Texture> LoadTexture(const char* filePath);
+    // Load shader from file into GPU memory
+    std::shared_ptr<Shader> LoadShader(const char* vsFilePath, const char* fsFilePath);
+    // TODO //
     // Model
-    // Texture
     // Shader
+
+    // ---------------------- //
+    // Text drawing functions //
+    // ---------------------- //
+
+    // Draw text (using default font)
+    // TODO
+    void DrawText(const char* text, int posX, int posY, int fontSize, Color color);
     
 private:
     // Root node 

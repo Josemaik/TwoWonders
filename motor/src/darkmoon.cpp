@@ -39,17 +39,19 @@ bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
         glfwSetWindowUserPointer(m_windowsManager.getWindow(), &m_inputManager);
         glfwSetKeyCallback(m_windowsManager.getWindow(), InputManager::keyCallback);
 
-        //------ Shaders -----//
+        //----- Shaders -----//
         std::cout << "┌─────────┐" << std::endl;
         std::cout << "│ Shaders │" << std::endl;
         std::cout << "└─────────┘" << std::endl;
-        m_shaderColor = m_resourceManager.loadResource<Shader>("src/shaders/color.vs", "src/shaders/color.fs", ShaderType::COLOR);
-        auto rShaderTexture = m_resourceManager.loadResource<Shader>("src/shaders/texture.vs", "src/shaders/texture.fs", ShaderType::TEXTURE);
-        auto rShaderTexture3D = m_resourceManager.loadResource<Shader>("src/shaders/texture3D.vs", "src/shaders/texture3D.fs", ShaderType::TEXTURE3D);
+        m_shaderColor = LoadShader("src/shaders/color.vs", "src/shaders/color.fs");
+        auto rShaderTexture = LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");
+        auto rShaderTexture3D = LoadShader("src/shaders/texture3D.vs", "src/shaders/texture3D.fs");
+
+        //----- Font -----//
+        m_renderManager.setDefaultFont(LoadFont("assets/fonts/roboto.ttf"));
 
         return true;
     }
-
 
     return false;
 }
@@ -198,4 +200,38 @@ bool DarkMoonEngine::IsKeyReleased(int key){
 // Check if a key is not being pressed
 bool DarkMoonEngine::IsKeyUp(int key){
     return m_inputManager.isKeyUp(key);
+}
+
+// ----------------------------- //
+// Loading / Unloading functions //
+// ----------------------------- //
+
+// Load font from file into GPU memory
+std::shared_ptr<Font> DarkMoonEngine::LoadFont(const char* filePath){
+    auto font = m_resourceManager.loadResource<Font>();
+    font->load(filePath);
+
+    return font;
+}
+
+// Load texture from file into GPU memory
+std::shared_ptr<Texture> DarkMoonEngine::LoadTexture(const char* filePath){
+    auto texture = m_resourceManager.loadResource<Texture>();
+    texture->load(filePath);
+
+    return texture;
+}
+
+// Load shader from file into GPU memory
+std::shared_ptr<Shader> DarkMoonEngine::LoadShader(const char* vsFilePath, const char* fsFilePath){
+    return m_resourceManager.loadResource<Shader>(vsFilePath, fsFilePath, ShaderType::COLOR);
+}
+
+// ---------------------- //
+// Text drawing functions //
+// ---------------------- //
+
+// Draw text (using default font)
+void DarkMoonEngine::DrawText(const char* text, int posX, int posY, int fontSize, Color color){
+    m_renderManager.drawText(text, {posX, posY}, fontSize, color);
 }

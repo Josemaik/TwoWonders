@@ -5,6 +5,14 @@ int main(){
 
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
+        // ---- //
+        // Load //
+        // ---- //
+
+        // auto font = engine.LoadFont("assets/fonts/roboto.ttf");
+        // auto shader = engine.LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");
+        auto texture = engine.LoadTexture("assets/koromaru.png");
+
         while(!engine.WindowShouldClose()){
             // ----- //
             // Logic //
@@ -21,6 +29,8 @@ int main(){
 
             engine.BeginDrawing();
             engine.ClearBackground(WHITE);
+
+            // engine.DrawText("Hola", 0, 0, 24, BLACK);
 
             /* PRUEBAS
             engine.DrawPixel(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, {0, 0, 0, 255});
@@ -65,15 +75,6 @@ std::shared_ptr<Texture> loadTexture(const char*, ResourceManager&);
         std::cout << "└──────┘" << std::endl;
         auto filePath = "assets/dummy.obj";
         auto eModel = loadModel(filePath, nScene, rm);
-
-        //------ Textures -----//
-        auto rTexture = loadTexture("assets/container.jpg", rm); 
-        auto rTexture2 = loadTexture("assets/koromaru.png", rm); 
-
-        //------ Shaders -----//
-        auto rShaderColor = rm.loadResource<Shader>("src/shaders/color.vs", "src/shaders/color.fs", ShaderType::COLOR);
-        auto rShaderTexture = rm.loadResource<Shader>("src/shaders/texture.vs", "src/shaders/texture.fs", ShaderType::TEXTURE);
-        auto rShaderTexture3D = rm.loadResource<Shader>("src/shaders/texture3D.vs", "src/shaders/texture3D.fs", ShaderType::TEXTURE3D);
 
             // Input
             im.update();
@@ -143,13 +144,5 @@ std::shared_ptr<Model> loadModel(const char* filePath, std::shared_ptr<Node> nSc
         nScene->addChild(std::move(nModel));
     }
     return eModel;
-}
-
-std::shared_ptr<Texture> loadTexture(const char* filePath, ResourceManager& rm){
-    auto texture = rm.loadResource<Texture>();
-
-    texture->load(filePath);
-
-    return texture;
 }
 */
