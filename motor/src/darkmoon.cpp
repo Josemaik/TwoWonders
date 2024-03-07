@@ -120,6 +120,16 @@ void DarkMoonEngine::DrawPixelV(glm::vec2 pos, Color color){
     m_renderManager.drawPixel(pos, color);
 }
 
+// Draw a line
+void DarkMoonEngine::DrawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color){
+    m_renderManager.drawLine({startPosX, startPosY}, {endPosX, endPosY}, color);
+}
+
+// Draw a line (vector version)
+void DarkMoonEngine::DrawLineV(glm::vec2 startPos, glm::vec2 endPos, Color color){
+    m_renderManager.drawLine(startPos, endPos, color);
+}
+
 
 // --------------------------------- //
 // Input-related functions: keyboard //

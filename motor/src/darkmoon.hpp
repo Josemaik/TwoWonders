@@ -53,6 +53,10 @@ public:
     void DrawPixel(int posX, int posY, Color color);
     // Draw a pixel (vector version)
     void DrawPixelV(glm::vec2 pos, Color color);
+    // Draw a line
+    void DrawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color);
+    // Draw a line (vector version)
+    void DrawLineV(glm::vec2 startPos, glm::vec2 endPos, Color color);
 
     // ----- TODO ----- //
     // Line / LineV

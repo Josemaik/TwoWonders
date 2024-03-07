@@ -18,7 +18,10 @@ int main(){
             engine.ClearBackground({255, 255, 255, 255});
 
             engine.DrawPixel(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, {0, 0, 0, 255});
-            engine.DrawPixelV({20.0f, 20.0f}, {0, 0, 0, 255});
+            engine.DrawPixelV({20.0f, 40.0f}, {0, 0, 0, 255});
+
+            engine.DrawLine(0, 0, engine.GetScreenWidth(), engine.GetScreenHeight(), {255, 0, 0, 255});
+            engine.DrawLineV({0, 0}, {100.0f, 20.0f}, {255, 0, 255, 255});
 
             engine.EndDrawing();
         }
