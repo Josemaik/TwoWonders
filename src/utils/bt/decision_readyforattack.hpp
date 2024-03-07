@@ -19,7 +19,8 @@ struct BTDecisionReadyforAttack : BTNode_t{
         auto const distance = (ectx.phy.position - plphy.position).lengthSQ();
         //Compruebo si esta dentro del radio de ataque y se acabo el culldown
         //ectx.phy.orientated_before = false;
-        if(distance < (ectx.ai.attack_radius * ectx.ai.attack_radius)){
+        if(ectx.ai.playerdetected){
+            if(distance < (ectx.ai.attack_radius * ectx.ai.attack_radius)){
             ectx.ai.on_attack_radius = true;
 
             //Oriento hacia el jugador
@@ -54,20 +55,10 @@ struct BTDecisionReadyforAttack : BTNode_t{
                 ectx.ai.plusdeltatime(ectx.deltatime,ectx.ai.elapsed_shoot);
                 return BTNodeStatus_t::success;
             }
-        }else{
-             return BTNodeStatus_t::fail;
+            }else{
+                return BTNodeStatus_t::fail;
+            }
         }
-        //decremento tiempo culldown
-
-        //go to next node
-
-
+        return BTNodeStatus_t::fail;
     }
-
-private:
-    void adjustAnglePiMinusPi(double& angle){
-                while      ( angle >  PI ) angle -= 2*PI;
-                while      ( angle < -PI ) angle += 2*PI;
-    }
-//     bool alternative { false };
 };

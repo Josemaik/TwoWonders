@@ -439,7 +439,12 @@ void RenderSystem::beginFrame(ENGI::GameEngine& engine)
     engine.beginMode3D();
     //engine.drawGrid(50, 1.f);
 }
-
+//dibujar rayo 3d 
+void RenderSystem::drawRay(vec3d origin, vec3d dir) {
+    BeginDrawing();
+    DrawLine3D(origin.toRaylib(), (origin + dir * 100).toRaylib(), RED);
+    EndDrawing();
+}
 // Se termina el dibujado
 void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double dt)
 {
@@ -469,7 +474,6 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
     // Visual Debug AI
     else if (inpi.debugAI2)
         drawDebuggerInGameIA(engine, em, dt);
-
     engine.endDrawing();
 }
 
@@ -646,26 +650,60 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
             else {
                 debugsnglt.plusdeltatime(dt, debugsnglt.elapsed);
             }
-            engine.drawTextEx(GetFontDefault(), debugsnglt.text, Vector2{ 610,110 }, 20, 1, DARKGRAY);
-            engine.drawText("TEID:", 480, 130, 20, BLACK);
-            engine.drawTextEx(GetFontDefault(), std::to_string(aic.teid).c_str(), Vector2{ 550,130 }, 20, 1, DARKGRAY);
-            engine.drawText("TX:", 480, 150, 20, BLACK);
-            engine.drawTextEx(GetFontDefault(), std::to_string(aic.tx).c_str(), Vector2{ 520,150 }, 20, 1, DARKGRAY);
-            engine.drawText("TZ:", 480, 170, 20, BLACK);
-            engine.drawTextEx(GetFontDefault(), std::to_string(aic.tz).c_str(), Vector2{ 520,170 }, 20, 1, DARKGRAY);
-            engine.drawText("Culldown:", 480, 190, 20, BLACK);
-            engine.drawTextEx(GetFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), Vector2{ 590,190 }, 20, 1, DARKGRAY);
-            engine.drawText("Player Detected?:", 480, 210, 20, BLACK);
-            engine.drawTextEx(GetFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", Vector2{ 680,210 }, 20, 1, RED);
-            engine.drawText("Player hunted?:", 480, 230, 20, BLACK);
-            engine.drawTextEx(GetFontDefault(), (bb.playerhunted == 0) ? "No" : "Sí", Vector2{ 680,230 }, 20, 1, RED);
-            engine.drawText("Subditos alive:", 480, 250, 20, BLACK);
-            engine.drawTextEx(GetFontDefault(), std::to_string(bb.subditosData.size()).c_str(), Vector2{ 680,250 }, 20, 1, RED);
-            engine.drawText("Subditos id alive:", 480, 270, 20, BLACK);
-            engine.drawTextEx(GetFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), Vector2{ 680,270 }, 20, 1, RED);
+            DrawTextEx(GetFontDefault(), debugsnglt.text, Vector2{ 610,110 }, 20, 1, DARKGRAY);
+            DrawText("TEID:", 480, 130, 20, BLACK);
+            DrawTextEx(GetFontDefault(), std::to_string(aic.teid).c_str(), Vector2{ 550,130 }, 20, 1, DARKGRAY);
+            DrawText("TX:", 480, 150, 20, BLACK);
+            DrawTextEx(GetFontDefault(), std::to_string(aic.tx).c_str(), Vector2{ 520,150 }, 20, 1, DARKGRAY);
+            DrawText("TZ:", 480, 170, 20, BLACK);
+            DrawTextEx(GetFontDefault(), std::to_string(aic.tz).c_str(), Vector2{ 520,170 }, 20, 1, DARKGRAY);
+            DrawText("Culldown:", 480, 190, 20, BLACK);
+            DrawTextEx(GetFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), Vector2{ 590,190 }, 20, 1, DARKGRAY);
+            DrawText("Player Detected?:", 480, 210, 20, BLACK);
+            DrawTextEx(GetFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", Vector2{ 680,210 }, 20, 1, RED);
+            DrawText("Player hunted?:", 480, 230, 20, BLACK);
+            DrawTextEx(GetFontDefault(), (bb.playerhunted == 0) ? "No" : "Sí", Vector2{ 680,230 }, 20, 1, RED);
+            DrawText("Subditos alive:", 480, 250, 20, BLACK);
+            DrawTextEx(GetFontDefault(), std::to_string(bb.subditosData.size()).c_str(), Vector2{ 680,250 }, 20, 1, RED);
+            DrawText("Subditos id alive:", 480, 270, 20, BLACK);
+            DrawTextEx(GetFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), Vector2{ 680,270 }, 20, 1, RED);
+
+            engine.beginMode3D();
+            //raycast
+            if (bb.launched) {
+                // engine.beginMode3D();
+
+                auto dir = bb.direction * 100;
+                DrawLine3D(bb.position_origin.toRaylib(), dir.toRaylib(), BLUE);
+                // engine.endMode3D();
+                bb.launched = false;
+            }
+            //Cone
+            drawVisionCone(bb.pos_enemy, bb.orientation_enemy, bb.horizontalFOV);
+            engine.endMode3D();
         }
     });
     //  engine.endDrawing();
+}
+
+
+// Dentro de tu clase BTDecisionPlayerDetected, podrías tener un método para dibujar el cono de visión
+void RenderSystem::drawVisionCone(vec3d pos_enemy, double orientation, double horizontalFOV) {
+    // Calcula las direcciones de las líneas del cono
+    Vector3 direction1 = { static_cast<float>(std::sin(orientation - horizontalFOV / 2.0)), 0.0f, static_cast<float>(std::cos(orientation - horizontalFOV / 2.0)) };
+    Vector3 direction2 = { static_cast<float>(std::sin(orientation + horizontalFOV / 2.0)), 0.0f, static_cast<float>(std::cos(orientation + horizontalFOV / 2.0)) };
+
+    // Calcula los puntos de inicio de las líneas
+    Vector3 start1 = pos_enemy.toRaylib();
+    Vector3 start2 = pos_enemy.toRaylib();
+
+    // Calcula los puntos finales de las líneas (multiplica por una distancia adecuada para hacerlas visibles)
+    Vector3 end1 = { start1.x + direction1.x * 10.0f, start1.y + direction1.y * 10.0f, start1.z + direction1.z * 10.0f };
+    Vector3 end2 = { start2.x + direction2.x * 10.0f, start2.y + direction2.y * 10.0f, start2.z + direction2.z * 10.0f };
+
+    // Dibuja las líneas
+    DrawLine3D(start1, end1, RED);
+    DrawLine3D(start2, end2, RED);
 }
 
 //Editor In-Game
@@ -1023,9 +1061,13 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             RayCast ray = engine.getMouseRay();
 
+            std::cout << ray.origin << " " << ray.direction << std::endl;
+
+            auto& col = em.getComponent<ColliderComponent>(e);
             auto& ren = em.getComponent<RenderComponent>(e);
             // Comprobar si el rayo intersecta con el collider
-            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::ZONE) && pointedEntity != li.playerID)
+            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::ZONE))
+
             {
                 pointedEntity = e.getID();
 
@@ -1068,6 +1110,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
         // Dibujar zona para mostrar ejemplo de uso del eventmanager
+
         // auto& linfo = em.getSingleton<LevelInfo>();
         // auto& bb = em.getSingleton<BlackBoard_t>();
         // if (linfo.num_zone == 11) {
@@ -1089,15 +1132,15 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         // }
 
         // Dibujar el ID de las entidades // DEBUG
-        // if (debug)
-        // {
-        //     auto const& r{ em.getComponent<RenderComponent>(e) };
-        //     engine.drawText(std::to_string(e.getID()).c_str(),
-        //         static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-        //         static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
-        //         20,
-        //         BLACK);
-        // // }
+        if (debugphy)
+        {
+            auto const& r{ em.getComponent<RenderComponent>(e) };
+            engine.drawText(std::to_string(e.getID()).c_str(),
+                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+                20,
+                BLACK);
+        }
     }
 
     std::size_t enemyID = li.max;

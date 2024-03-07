@@ -47,6 +47,40 @@ struct BBox
         return tNear <= tFar && tFar >= 0;
     }
 
+
+     vec3d getintersectsRay(vec3d& rayOrigin, vec3d& rayDirection) const {
+        vec3d t1 = (min - rayOrigin) / rayDirection;
+        vec3d t2 = (max - rayOrigin) / rayDirection;
+
+        vec3d tmin = vec3d::min(t1, t2);
+        vec3d tmax = vec3d::max(t1, t2);
+
+        double tNear = tmin.max();
+        double tFar = tmax.min();
+
+        if (tNear <= tFar && tFar >= 0) {
+            // Calculating intersection point
+            vec3d intersection = rayOrigin + rayDirection * tNear;
+            // Store intersection point in blackboard
+            //std::cout << "PIx: " << intersection.x() <<"PIy: "<<intersection.y() <<"PIz: "<< intersection.z() << "\n";
+            return intersection;
+        } else {
+            // No intersection
+            return vec3d{};
+        }
+    }
+};
+//  if (tNear <= tFar && tFar >= 0) {
+//             // Calculating intersection point
+//             vec3d intersection = rayOrigin + rayDirection * tNear;
+//             // Store intersection point in blackboard
+//             std::cout << "PIx: " << intersection.x() <<"PIy: "<<intersection.y() <<"PIz: "<< intersection.z() << "\n";
+//             return true;
+//         } else {
+//             // No intersection
+//             return false;
+//         }
+
     vec3d getPositiveVertex(const vec3d& normal) const {
         vec3d res = min;
         if (normal.x() >= 0) res.setX(max.x());
@@ -63,3 +97,4 @@ struct BBox
         return res;
     }
 };
+

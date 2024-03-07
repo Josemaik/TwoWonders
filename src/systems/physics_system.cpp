@@ -75,13 +75,46 @@ void PhysicsSystem::update(EntityManager& em, float dt)
 
         //Orientamos a enemigos hacia el player si están parados
         if (ent.hasTag<SpiderTag>() || ent.hasTag<SnowmanTag>()) {
-            if (vel.x() == 0 && vel.z() == 0) {
-                auto& bb = em.getSingleton<BlackBoard_t>();
-                vec3d targetpos{ bb.tx,0.0,bb.tz };
-                vec3d direction = targetpos - phy.position;
-                phy.orientation = std::atan2(direction.x(), direction.z());
+            if (ent.hasComponent<AIComponent>())
+            {
+                auto& ia = em.getComponent<AIComponent>(ent);
+                if (ia.playerdetected) {
+                    auto& bb = em.getSingleton<BlackBoard_t>();
+                    vec3d targetpos{ bb.tx,0.0,bb.tz };
+                    vec3d direction = targetpos - phy.position;
+                    phy.orientation = std::atan2(direction.x(), direction.z());
+                }
             }
         }
+
+        // }
+
+        // }else{ //Enemigo tiene aceleracion lineal y velocidad angular
+        //     phy.orientation += dt * vel_a;
+        //     if(phy.orientation > 2*PI) phy.orientation -= 2*PI;
+        //     if(phy.orientation < 0   ) phy.orientation += 2*PI;
+
+        //     vel.setX(vel_l * std::cos(phy.orientation) );
+        //     vel.setZ(vel_l * std::sin(phy.orientation) );
+        //     // e = e0 + v0t + (1/2)at² t = 1 / 30
+        //     // e = vt
+        //     // a = at
+        //     // e = v*t
+        //     pos.setX(pos.x() + (vel.x() * dt) );
+        //     pos.setY(pos.y() + vel.y());
+        //     pos.setZ(pos.z() + (vel.z() * dt) );
+        //     // v = at
+        //     phy.v_linear += phy.a_linear * dt;
+        //     phy.v_angular += phy.a_angular * dt;
+        //     phy.v_linear =  std::clamp(phy.v_linear,  -phy.kMaxVLin, phy.kMaxVLin);
+        //     phy.v_angular = std::clamp(phy.v_angular, -phy.kMaxAAng, phy.kMaxAAng);
+        //     // drag
+        // if(phy.dragactivated){
+        //     auto drag { dt * std::abs(phy.v_linear) * phy.kDrag };
+        //     if ( phy.v_linear > 0 ) phy.v_linear -= drag;
+        //     else                    phy.v_linear += drag;
+        // }
+
 
         // comprobar si están en el suelo
         if (phy.alreadyGrounded)

@@ -33,6 +33,7 @@ void Game::createEntities(EntityManager& em)
 
 // Player
     auto& e{ em.newEntity() };
+
     em.addTag<PlayerTag>(e);// -2 -12 63 -71
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, });

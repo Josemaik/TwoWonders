@@ -23,6 +23,8 @@ struct RenderSystem
     void unloadModels(EntityManager& em, ENGI::GameEngine& engine);
     void drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& em);
     void drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt);
+    void drawRay(vec3d origin,vec3d end);
+    void drawVisionCone(vec3d pos_enemy,double orientation,double horizontalFOV);
     void drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawInventory(ENGI::GameEngine& engine, EntityManager& em);
     void drawItemDescription(ENGI::GameEngine& engine, EntityManager& em, Item& item);

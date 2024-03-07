@@ -85,6 +85,11 @@ Steer_t STBH::Seek(PhysicsComponent const& phy, vec3d const& target) {
         // auto acceleration { phy.kMaxVLin / (1 + angular_velocity_size) };
         steering.v_x = std::clamp((target.x() - phy.position.x()), -phy.max_speed, phy.max_speed);
         steering.v_z = std::clamp((target.z() - phy.position.z()), -phy.max_speed, phy.max_speed);
+
+        // Cambiamos la orientación del objeto para que mire hacia el objetivo
+        vec3d dir = target - phy.position;
+        steering.orientation = atan2(dir.x(), dir.z());
+
         // steering.v_x = std::clamp(distance.x(), -phy.max_speed, phy.max_speed);
         // steering.v_z = std::clamp(distance.z(), -phy.max_speed, phy.max_speed);
         return steering;
