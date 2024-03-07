@@ -6,14 +6,15 @@ int main(){
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
         while(!engine.WindowShouldClose()){
+            // Logic
 
-            // logic
 
+
+            // Drawing //
             engine.BeginDrawing();
-
             engine.ClearBackground({1.0f, 1.0f, 1.0f, 1.0f});
 
-            // draw
+
 
             engine.EndDrawing();
         }

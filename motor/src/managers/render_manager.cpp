@@ -357,7 +357,7 @@ void RenderManager::drawPoint3D(glm::vec3 position, float pointSize, glm::vec4 c
     // Transform
     glm::mat4 model      = glm::mat4(1.0f);
     glm::mat4 view       = m_camera->getViewMatrix();
-    glm::mat4 projection = m_camera->getProjectionMatrix(800.0f, 600.0f);
+    glm::mat4 projection = m_camera->getProjectionMatrix(m_width, m_height);
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -405,7 +405,7 @@ void RenderManager::drawLine3D(glm::vec3 startPos, float lineSize, glm::vec3 end
     // Transform
     glm::mat4 model      = glm::mat4(1.0f);
     glm::mat4 view       = m_camera->getViewMatrix();
-    glm::mat4 projection = m_camera->getProjectionMatrix(800.0f, 600.0f);
+    glm::mat4 projection = m_camera->getProjectionMatrix(m_width, m_height);
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -466,7 +466,7 @@ void RenderManager::drawGrid(int slices, float spacing, glm::vec4 color){
     // Transform
     glm::mat4 model      = glm::mat4(1.0f);
     glm::mat4 view       = m_camera->getViewMatrix();
-    glm::mat4 projection = m_camera->getProjectionMatrix(800.0f, 600.0f);
+    glm::mat4 projection = m_camera->getProjectionMatrix(m_width, m_height);
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -524,7 +524,7 @@ void RenderManager::drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 col
     // Transform
     glm::mat4 model      = glm::mat4(1.0f);
     glm::mat4 view       = m_camera->getViewMatrix();
-    glm::mat4 projection = m_camera->getProjectionMatrix(800.0f, 600.0f);
+    glm::mat4 projection = m_camera->getProjectionMatrix(m_width, m_height);
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -739,7 +739,7 @@ void RenderManager::drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 po
 
     model       = glm::rotate(model, static_cast<float>(glfwGetTime() * glm::radians(rotate)), glm::vec3(0.0f, 1.0f, 0.0f));
     view        = m_camera->getViewMatrix();
-    projection  = glm::perspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
+    projection  = glm::perspective(glm::radians(95.0f), (static_cast<float>(m_width) / static_cast<float>(m_height)), 0.1f, 100.0f);
 
     GLuint modelLoc = glGetUniformLocation(m_shaderProgram->id_shader, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -784,7 +784,7 @@ void RenderManager::drawMesh(std::shared_ptr<Mesh> mesh){
     model       = glm::translate(model, {0.0f, 0.0f, 0.0f});
     model       = glm::scale(model, {0.5f, 0.5f, 0.5f});
     view        = m_camera->getViewMatrix();
-    projection  = glm::perspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
+    projection  = glm::perspective(glm::radians(95.0f), (static_cast<float>(m_width) / static_cast<float>(m_height)), 0.1f, 100.0f);
 
     GLuint modelLoc = glGetUniformLocation(m_shaderProgram->id_shader, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));

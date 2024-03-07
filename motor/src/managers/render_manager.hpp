@@ -19,14 +19,17 @@
 struct RenderManager{
 private:
     std::shared_ptr<Shader> m_shaderProgram;
+    int m_width, m_height;
 
     void draw(float vertices[], std::size_t vertSize, GLuint indices[], std::size_t indSize,glm::vec4 color);
-    // TODO: 800 / 600 --> getScreenWidth() / getScreenHeight()
-    float normalizeX(float x){ return (x / 800.0f) * 2 - 1; };
-    float normalizeY(float y){ return -((y / 600.0f) * 2 - 1); };
+    float normalizeX(float x){ return (x / static_cast<float>(m_width)) * 2 - 1; };
+    float normalizeY(float y){ return -((y / static_cast<float>(m_height)) * 2 - 1); };
 
 public:
     std::shared_ptr<Camera> m_camera;
+
+    // Screen width and height
+    void setWidthHeight(int width, int height){ m_width = width; m_height = height; };
 
     // Drawing
     void beginMode3D();
