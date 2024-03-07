@@ -150,6 +150,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
         //     ectx.ai.playerdetected = false;
         // }
 
+        ectx.ai.playerdetected = false;
         return BTNodeStatus_t::fail;
     }
 
