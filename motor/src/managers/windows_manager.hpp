@@ -23,6 +23,7 @@ public:
     int getScreenWidth(){ return m_width; };
     int getScreenHeight(){ return m_height; };
     GLFWwindow* getWindow(){ return m_window; };
+    void setWindowSize(int width, int height);
 
     // Drawing-related functions
     void beginDrawing();

@@ -6,7 +6,7 @@
 
 // Initialize window and OpenGL context
 bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
-    m_renderManager.setWidthHeight(width, height);
+    m_renderManager.setWindowSize(width, height);
 
     //Create scene
     m_rootNode = std::make_unique<Node>();
@@ -69,6 +69,23 @@ void DarkMoonEngine::CloseWindow(){
 bool DarkMoonEngine::WindowShouldClose(){
     return m_windowsManager.windowShouldClose();
 }
+
+// Set window dimensions
+void DarkMoonEngine::SetWindowSize(int width, int height){
+    m_renderManager.setWindowSize(width, height);
+    m_windowsManager.setWindowSize(width, height);
+}
+
+// Get current screen width
+int DarkMoonEngine::GetScreenWidth(){
+    return m_windowsManager.getScreenWidth();
+}
+
+// Get current screen height
+int DarkMoonEngine::GetScreenHeight(){
+    return m_windowsManager.getScreenHeight();
+}
+
 
 // ------------------------- //
 // Drawing-related functions //

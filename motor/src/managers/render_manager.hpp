@@ -29,7 +29,7 @@ public:
     std::shared_ptr<Camera> m_camera;
 
     // Screen width and height
-    void setWidthHeight(int width, int height){ m_width = width; m_height = height; };
+    void setWindowSize(int width, int height){ m_width = width; m_height = height; };
 
     // Drawing
     void beginMode3D();

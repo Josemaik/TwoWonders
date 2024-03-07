@@ -27,6 +27,12 @@ public:
     void CloseWindow();
     // Check if application should close
     bool WindowShouldClose();
+    // Set window dimensions
+    void SetWindowSize(int width, int height);
+    // Get current screen width
+    int GetScreenWidth();
+    // Get current screen height
+    int GetScreenHeight();
 
     // ------------------------- //
     // Drawing-related functions //

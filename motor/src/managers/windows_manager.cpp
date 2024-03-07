@@ -68,6 +68,15 @@ bool WindowsManager::windowShouldClose() const{
     return m_window && glfwWindowShouldClose(m_window);
 }
 
+void WindowsManager::setWindowSize(int width, int height){
+    if(m_window){
+        m_width = width;
+        m_height = height;
+        glfwSetWindowSize(m_window, m_width, m_height);
+        framebuffer_size_callback();
+    }
+}
+
 // Drawing-related functions
 
 void WindowsManager::beginDrawing(){
