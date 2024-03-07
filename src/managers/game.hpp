@@ -25,8 +25,8 @@
 
 struct Game
 {
-    static constexpr uint16_t SCREEN_WIDTH{ 800 };
-    static constexpr uint16_t SCREEN_HEIGHT{ 600 };
+    static constexpr uint16_t SCREEN_WIDTH{ 1280 };
+    static constexpr uint16_t SCREEN_HEIGHT{ 720 };
 
     Game() = default;
     ~Game() = default;

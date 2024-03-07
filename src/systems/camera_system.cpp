@@ -3,9 +3,9 @@
 void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
 {
     // Constantes de los distintos estados de la cámara
-    static constexpr vec3d cameraPosSum = { 66.f, 70.f, 66.f };
-    static constexpr vec3d cameraPosDetected = { 68.f, 80.f, 62.f };
-    static constexpr vec3d cameraPosLocked = { 56.f, 90.f, 56.f };
+    static constexpr vec3d cameraPosSum = { -66.f, 70.f, -66.f };
+    static constexpr vec3d cameraPosDetected = { -68.f, 80.f, -62.f };
+    static constexpr vec3d cameraPosLocked = { -56.f, 90.f, -56.f };
     static constexpr float cameraFovyNormal = 70.f;
     static constexpr float cameraFovyDetected = 60.f;
     static constexpr float cameraFovyLocked = 55.f;

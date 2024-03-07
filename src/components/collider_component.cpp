@@ -1,7 +1,8 @@
 #include "collider_component.hpp"
 
-void ColliderComponent::updateBox(vec3d pos, vec3d scale, double gravity, double orientation)
+void ColliderComponent::updateBox(vec3d pos, vec3d scale, double gravity, double orientation, vec3d& rotationVec)
 {
+    orientation *= std::abs(rotationVec.y());
     float orientationInDegrees = static_cast<float>(orientation * (180.0f / M_PI));
     int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
 

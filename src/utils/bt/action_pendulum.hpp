@@ -7,30 +7,37 @@ struct BTAction_Pendulum : BTNode_t {
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         if (!ectx.ai.tactive) return BTNodeStatus_t::fail;
         ectx.ai.bh = "penduling";
-        if (!ectx.ai.path_initialized) {
-            ectx.ai.pathIt = ectx.ai.path.begin();
-            ectx.ai.path_initialized = true;
-        }
-        if(ectx.ai.chargeattack){
+        if (ectx.ent.hasComponent<AngryBushComponent>()) {
+            auto& abc = ectx.em.getComponent<AngryBushComponent>(ectx.ent);
+
+            if (abc.chargeAttack && !abc.move) {
                 ectx.phy.velocity = vec3d{};
                 if (ectx.ai.elapsed_stop >= ectx.ai.countdown_stop) {
                     ectx.ai.elapsed_stop = 0;
-                    ectx.ai.chargeattack = false;
-                }else{
-                    ectx.ai.plusdeltatime(ectx.deltatime,ectx.ai.elapsed_stop);
+                    abc.chargeAttack = false;
+                    abc.move = true;
+                    abc.vel = -abc.vel;
+                    ectx.phy.max_speed = abc.max_speed;
                 }
-                 return BTNodeStatus_t::success;
-        }
+                else {
+                    ectx.ai.plusdeltatime(ectx.deltatime, ectx.ai.elapsed_stop);
+                }
+            }
 
-        Steer_t steering = STBH::Arrive(ectx.phy, *ectx.ai.pathIt, ectx.ai.arrival_radius);
-        ectx.phy.max_speed += 0.1;
-        if (steering.arrived) {
-            ++ectx.ai.pathIt;
-            ectx.phy.max_speed = 0.4;
-            ectx.ai.chargeattack = true;
+            if (abc.move) {
+                if (abc.dir == vec3d::zero() && abc.vel == vec3d::zero()) {
+                    abc.dir = ectx.ai.path.m_waypoints[0];
+                    abc.vel = (abc.dir - ectx.phy.position).normalize();
+                }
+
+                ectx.phy.velocity = { abc.vel.x() * ectx.phy.max_speed, 0.0, abc.vel.z() * ectx.phy.max_speed };
+                ectx.phy.max_speed += 0.1;
+                return BTNodeStatus_t::success;
+            }
+
             return BTNodeStatus_t::success;
         }
-        ectx.phy.velocity = vec3d{ steering.v_x,0.0,steering.v_z };
+
         return BTNodeStatus_t::success;
     }
 };

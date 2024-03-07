@@ -832,7 +832,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 }
             }
 
-            if (li.num_zone == 2 && elapsed_WASD < elapsed_limit_WASD)
+            if (li.num_zone == 1 && elapsed_WASD < elapsed_limit_WASD)
             {
                 auto& phy{ em.getComponent<PhysicsComponent>(e) };
                 // Escribimos que puede usar WASD para moverse
@@ -874,11 +874,9 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         }
 
         // Vidas HUD
-        if (e.hasTag<EnemyTag>() && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
+        if (e.hasTag<EnemyTag>() && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible &&
+            !(e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>()))
         {
-            if (e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>())
-                continue;
-
             auto const& r{ em.getComponent<RenderComponent>(e) };
             auto& l{ em.getComponent<LifeComponent>(e) };
 
@@ -1025,7 +1023,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             auto& ren = em.getComponent<RenderComponent>(e);
             // Comprobar si el rayo intersecta con el collider
-            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::ZONE) && pointedEntity != li.playerID)
+            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE) && pointedEntity != li.playerID)
             {
                 pointedEntity = e.getID();
 
@@ -1041,30 +1039,41 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                     static_cast<float>(boxSize.x()),
                     static_cast<float>(boxSize.y()),
                     static_cast<float>(boxSize.z()),
-                    BLUE);
+                    PURPLE);
                 engine.endMode3D();
-
-                // Dibujar el HUD de debug
-                engine.drawRectangle(0, 60, 150, 240, WHITE);
-                engine.drawText("Posición", 10, 70, 20, BLACK);
-                std::string posX = "X: " + std::to_string(static_cast<int>(phy.position.x()));
-                engine.drawText(posX.c_str(), 10, 95, 20, BLACK);
-                std::string posY = "Y: " + std::to_string(static_cast<int>(phy.position.y()));
-                engine.drawText(posY.c_str(), 10, 120, 20, BLACK);
-                std::string posZ = "Z: " + std::to_string(static_cast<int>(phy.position.z()));
-                engine.drawText(posZ.c_str(), 10, 145, 20, BLACK);
-
-                engine.drawText("Velocidad", 10, 175, 20, BLACK);
-                std::string velX = "X: " + std::to_string(phy.velocity.x());
-                engine.drawText(velX.c_str(), 10, 200, 20, BLACK);
-                std::string velY = "Y: " + std::to_string(phy.velocity.y());
-                engine.drawText(velY.c_str(), 10, 225, 20, BLACK);
-                std::string velZ = "Z: " + std::to_string(phy.velocity.z());
-                engine.drawText(velZ.c_str(), 10, 250, 20, BLACK);
 
                 engine.beginMode3D();
                 engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
                 engine.endMode3D();
+
+                // Dibujar el HUD de debug
+                engine.drawRectangle(0, 65, 150, 360, WHITE);
+                engine.drawText("Posición", 10, 70, 20, BLACK);
+                std::string posX = "X: " + std::to_string(phy.position.x());
+                engine.drawText(posX.c_str(), 10, 95, 20, BLACK);
+                std::string posY = "Y: " + std::to_string(phy.position.y());
+                engine.drawText(posY.c_str(), 10, 120, 20, BLACK);
+                std::string posZ = "Z: " + std::to_string(phy.position.z());
+                engine.drawText(posZ.c_str(), 10, 145, 20, BLACK);
+
+                engine.drawText("Escala", 10, 175, 20, BLACK);
+                std::string sclX = "X: " + std::to_string(phy.scale.x());
+                engine.drawText(sclX.c_str(), 10, 200, 20, BLACK);
+                std::string sclY = "Y: " + std::to_string(phy.scale.y());
+                engine.drawText(sclY.c_str(), 10, 225, 20, BLACK);
+                std::string sclZ = "Z: " + std::to_string(phy.scale.z());
+                engine.drawText(sclZ.c_str(), 10, 250, 20, BLACK);
+
+                engine.drawText("Velocidad", 10, 280, 20, BLACK);
+                std::string velX = "X: " + std::to_string(phy.velocity.x());
+                engine.drawText(velX.c_str(), 10, 305, 20, BLACK);
+                std::string velY = "Y: " + std::to_string(phy.velocity.y());
+                engine.drawText(velY.c_str(), 10, 330, 20, BLACK);
+                std::string velZ = "Z: " + std::to_string(phy.velocity.z());
+                engine.drawText(velZ.c_str(), 10, 355, 20, BLACK);
+
+                std::string id = "ID: " + std::to_string(e.getID());
+                engine.drawText(id.c_str(), 10, 385, 20, BLACK);
             }
         }
         // Dibujar zona para mostrar ejemplo de uso del eventmanager
