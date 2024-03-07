@@ -304,7 +304,7 @@ void RenderSystem::beginFrame(ENGI::GameEngine& engine)
     //engine.drawGrid(50, 1.f);
 }
 //dibujar rayo 3d 
-void RenderSystem::drawRay(vec3d origin,vec3d dir){
+void RenderSystem::drawRay(vec3d origin, vec3d dir) {
     BeginDrawing();
     DrawLine3D(origin.toRaylib(), (origin + dir * 100).toRaylib(), RED);
     EndDrawing();
@@ -391,17 +391,19 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
             DrawTextEx(GetFontDefault(), std::to_string(bb.subditosData.size()).c_str(), Vector2{ 680,250 }, 20, 1, RED);
             DrawText("Subditos id alive:", 480, 270, 20, BLACK);
             DrawTextEx(GetFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), Vector2{ 680,270 }, 20, 1, RED);
-            
+
             engine.beginMode3D();
             //raycast
-            if(bb.launched){
+            if (bb.launched) {
                 // engine.beginMode3D();
-                DrawLine3D(bb.position_origin.toRaylib(),bb.direction.toRaylib(),BLUE);
+
+                auto dir = bb.direction * 100;
+                DrawLine3D(bb.position_origin.toRaylib(), dir.toRaylib(), BLUE);
                 // engine.endMode3D();
                 bb.launched = false;
             }
             //Cone
-            drawVisionCone(bb.pos_enemy,bb.orientation_enemy,bb.horizontalFOV);
+            drawVisionCone(bb.pos_enemy, bb.orientation_enemy, bb.horizontalFOV);
             engine.endMode3D();
         }
     });
@@ -409,8 +411,8 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
 }
 
 // Dentro de tu clase BTDecisionPlayerDetected, podrías tener un método para dibujar el cono de visión
-void RenderSystem::drawVisionCone(vec3d pos_enemy,double orientation,double horizontalFOV) {
-     // Calcula las direcciones de las líneas del cono
+void RenderSystem::drawVisionCone(vec3d pos_enemy, double orientation, double horizontalFOV) {
+    // Calcula las direcciones de las líneas del cono
     Vector3 direction1 = { static_cast<float>(std::sin(orientation - horizontalFOV / 2.0)), 0.0f, static_cast<float>(std::cos(orientation - horizontalFOV / 2.0)) };
     Vector3 direction2 = { static_cast<float>(std::sin(orientation + horizontalFOV / 2.0)), 0.0f, static_cast<float>(std::cos(orientation + horizontalFOV / 2.0)) };
 
@@ -733,6 +735,8 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             RayCast ray = engine.getMouseRay();
 
+            std::cout << ray.origin << " " << ray.direction << std::endl;
+
             auto& col = em.getComponent<ColliderComponent>(e);
             auto& ren = em.getComponent<RenderComponent>(e);
             // Comprobar si el rayo intersecta con el collider
@@ -765,12 +769,13 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         auto& linfo = em.getSingleton<LevelInfo>();
         auto& bb = em.getSingleton<BlackBoard_t>();
         if (linfo.num_zone == 11) {
-            if(bb.boss_fase == 1){
+            if (bb.boss_fase == 1) {
                 engine.drawText("FASE 1", 500, 10, 70, RED);
-            }else{
+            }
+            else {
                 engine.drawText("FASE 2", 500, 10, 70, ORANGE);
             }
-            
+
             // if (linfo.segundos == 0) {
             //     linfo.drawzone = false;
             //     linfo.segundos = 1000;

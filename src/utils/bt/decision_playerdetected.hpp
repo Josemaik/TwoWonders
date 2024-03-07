@@ -3,12 +3,12 @@
 #include <utils/vec3D.hpp>
 
 
-struct BTDecisionPlayerDetected : BTNode_t{
+struct BTDecisionPlayerDetected : BTNode_t {
     // Constantes para ángulos de visión
     const double verticalFOV = 100.0; // Ángulo vertical de visión en grados
     const double horizontalFOV = 200.0; // Ángulo horizontal de visión en grados
 
-    BTDecisionPlayerDetected()  {}
+    BTDecisionPlayerDetected() {}
 
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         ectx.ai.bh = "detecting player";
@@ -28,7 +28,7 @@ struct BTDecisionPlayerDetected : BTNode_t{
         //########## PERCEPCION SENSORIAL - VISTA ################
         // Calcula la dirección de visión del enemigo utilizando su orientación
         //double orientation_grados = ectx.phy.orientation * 180.0 / M_PI;
-        vec3d enemyDirection = vec3d(std::sin(ectx.phy.orientation),0.0, std::cos(ectx.phy.orientation));
+        vec3d enemyDirection = vec3d(std::sin(ectx.phy.orientation), 0.0, std::cos(ectx.phy.orientation));
         // Vector que apunta desde el enemigo al jugador
         vec3d toPlayer = getplayerpos(ectx) - ectx.phy.position;
         //normalizamos vectores
@@ -49,7 +49,11 @@ struct BTDecisionPlayerDetected : BTNode_t{
             vec3d intersection_wall{}, intersection_player{};
             // Realiza un raycast en la dirección en la que el enemigo está mirando para detectar obstáculos
             //std::sin(ectx.phy.orientation) *180.0 / PI,1.0, std::cos(ectx.phy.orientation) *180.0 / PI
-            RayCast ray = { ectx.phy.position,  getplayerpos(ectx)};
+            // std::cout << getplayerpos(ectx).normalized() << "a\n";
+            // std::cout << getplayerpos(ectx).normalized().length() << "a\n";
+            // vec3d dir = vec3d(std::sin(ectx.phy.orientation) * 180.0 / PI, getplayerpos(ectx).y(), std::cos(ectx.phy.orientation) * 180.0 / PI).normalize();
+            vec3d dir = (getplayerpos(ectx) - ectx.phy.position).normalize();
+            RayCast ray = { ectx.phy.position,  dir };
 
             // dibujado de raycast
             auto& bb = ectx.em.getSingleton<BlackBoard_t>();
@@ -57,35 +61,32 @@ struct BTDecisionPlayerDetected : BTNode_t{
             bb.direction = ray.direction;
             bb.launched = true;
 
+            auto& bbox = getplayercollider(ectx).boundingBox;
+
             //Calculo punto de intersección con player
-            if(getplayercollider(ectx).boundingBox.intersectsRay(ray.origin,ray.direction)){
-                intersection_player = getplayercollider(ectx).boundingBox.getintersectsRay(ray.origin,ray.direction);
+            if (bbox.intersectsRay(ray.origin, ray.direction)) {
+                intersection_player = bbox.getintersectsRay(ray.origin, ray.direction);
             }
-            
-            // if(intersection_player.x() != 0 && intersection_player.z() != 0){
-            //     std::cout << "sino";
-            // }
-            
-           
+
             //Compruebo si la caja de colisión de un obstaculo ha colisionado con el rayo
-            for(Entity &ent : ectx.em.getEntities()){
-                if(ent.hasComponent<ColliderComponent>()){
+            for (Entity& ent : ectx.em.getEntities()) {
+                if (ent.hasComponent<ColliderComponent>()) {
                     // ColliderComponent& col = ectx.em.getComponent<ColliderComponent>(ent);
                     //RenderComponent& ren = ectx.em.getComponent<RenderComponent>(ent);
                     // col.behaviorType & BehaviorType::STATIC 
-                    if(ent.hasTag<WallTag>()){
+                    if (ent.hasTag<WallTag>()) {
                         auto& col = ectx.em.getComponent<ColliderComponent>(ent);
-                        if(col.boundingBox.intersectsRay(ray.origin,ray.direction)){
-                            intersection_wall = col.boundingBox.getintersectsRay(ray.origin,ray.direction);
+                        if (col.boundingBox.intersectsRay(ray.origin, ray.direction)) {
+                            intersection_wall = col.boundingBox.getintersectsRay(ray.origin, ray.direction);
                             break;
                         }
-                        
+
                         // if(intersection_wall.x() != 0 && intersection_wall.z() != 0){
                         //     break;
                         // }
                             // si el rayo intercepta un obstaculo
                             // calculo distancia del obstaculo al enemigo
-                            
+
                         //     auto& phyobs = ectx.em.getComponent<PhysicsComponent>(ent);
                         //     vec3d distanceobjene = phyobs.position - ectx.phy.position;
                         //     //calculo distancia del player al enemigo
@@ -110,11 +111,12 @@ struct BTDecisionPlayerDetected : BTNode_t{
             //distancias a los puntos de intersección
             // vec3d distancetoplayer = intersection_player - ectx.phy.position;
             // vec3d distancetoobject = intersection_wall - ectx.phy.position;
-            if(intersection_wall.distance(ectx.phy.position) < intersection_player.distance(ectx.phy.position)){
+            if (intersection_wall.distance(ectx.phy.position) < intersection_player.distance(ectx.phy.position)) {
                 //Rayo interceptado por wall
                 ectx.ai.playerdetected = false;
                 return BTNodeStatus_t::fail;
-            }else{
+            }
+            else {
                 ectx.ai.playerdetected = true;
                 return BTNodeStatus_t::success;
             }
@@ -152,7 +154,7 @@ struct BTDecisionPlayerDetected : BTNode_t{
     }
 
 private:
-    vec3d getplayerpos(EntityContext_t& ectx){
+    vec3d getplayerpos(EntityContext_t& ectx) {
         auto& li = ectx.em.getSingleton<LevelInfo>();
         auto* playerEn = ectx.em.getEntityByID(li.playerID);
         if (not playerEn) return vec3d{}; // No hay player
@@ -160,7 +162,8 @@ private:
         auto& plphy = ectx.em.getComponent<PhysicsComponent>(*playerEn);
         return plphy.position;
     };
-    ColliderComponent& getplayercollider(EntityContext_t& ectx){
+
+    ColliderComponent& getplayercollider(EntityContext_t& ectx) {
         auto& li = ectx.em.getSingleton<LevelInfo>();
         auto* playerEn = ectx.em.getEntityByID(li.playerID);
         //if (not playerEn) return ColliderComponent{}; // No hay player
