@@ -23,13 +23,15 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -33.0, 4.0, 30.9 };
+        plfi.spawnPoint = { -25.0, 4.0, -25.0 };
     // -33.0, 4.0, 30.9 - Posición Incial
     // 77.0, 4.0, -73.9 - Cofre con llave
     // -32.0, 4.0, -34.0 - Primer cofre 
     // -9.0, 4.0, -50.0
     // 26.0, 4.0, -65.0
     // -32.0   4.0  -107.0
+    // 35.0, 4.0, -25.0
+    // 25.0, 4.0, -25.0
 
 // Player
     auto& e{ em.newEntity() };
@@ -194,9 +196,10 @@ void Game::run()
                 resetGame(em, engine, render_system);
 
             input_system.update(em, engine);
+            bool debugs = inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();
 
             // seleccionar modo de debug ( physics o AI)
-            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText()))
+            if (!li.resetGame && !debugs)
             {
                 while (elapsed >= timeStep)
                 {
@@ -225,7 +228,7 @@ void Game::run()
                 }
                 render_system.update(em, engine, timeStep);
             }
-            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText()))
+            else if ((!li.resetGame) && debugs)
                 render_system.update(em, engine, timeStep);
 
             break;

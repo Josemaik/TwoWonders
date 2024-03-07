@@ -644,6 +644,8 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     break;
     case 5: {
         em.addTag<AngryBushTag>(e);
+        auto& abc = em.addComponent<AngryBushComponent>(e);
+        abc.max_speed = wp.max_speed;
         tree.createNode<BTAction_Pendulum>();
     }
           break;

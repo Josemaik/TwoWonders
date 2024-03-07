@@ -21,7 +21,7 @@ void CollisionSystem::update(EntityManager& em)
 
         // Actualizar bounding box
         auto& scl = phy.scale;
-        col.updateBox(pos, scl, phy.gravity, phy.orientation);
+        col.updateBox(pos, scl, phy.gravity, phy.orientation, phy.rotationVec);
 
         // Insertar en el Octree
         octree.insert(e, col);
@@ -410,13 +410,20 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     staticCollision(*otherPhy, *staticPhy, minOverlap);
 }
 
-void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3d& minOverlap)
+void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& ent, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3d& minOverlap)
 {
     // Determine which axis had the minimum overlap
     if (minOverlap.z() < minOverlap.x())
-        resolveEnemyDirection(em, entity2, staticPhy, otherPhy, minOverlap.z(), true);
+        resolveEnemyDirection(em, ent, staticPhy, otherPhy, minOverlap.z(), true);
     else if (minOverlap.x() < minOverlap.z())
-        resolveEnemyDirection(em, entity2, staticPhy, otherPhy, minOverlap.x(), false);
+        resolveEnemyDirection(em, ent, staticPhy, otherPhy, minOverlap.x(), false);
+
+    if (ent.hasComponent<AngryBushComponent>())
+    {
+        auto& ab = em.getComponent<AngryBushComponent>(ent);
+        ab.chargeAttack = true;
+        ab.move = false;
+    }
 }
 
 void CollisionSystem::resolveEnemyDirection(EntityManager&, Entity&, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, double overlap, bool isZAxis)

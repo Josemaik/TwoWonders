@@ -87,30 +87,30 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     // Código de movimiento
     if (ge.isKeyDown(in.right))
     {
-        vel.setX(vel.x() + INP_SPEED);
-        vel.setZ(vel.z() - INP_SPEED);
-
-        keysPressed++;
-    }
-    if (ge.isKeyDown(in.left))
-    {
         vel.setX(vel.x() - INP_SPEED);
         vel.setZ(vel.z() + INP_SPEED);
 
         keysPressed++;
     }
+    if (ge.isKeyDown(in.left))
+    {
+        vel.setX(vel.x() + INP_SPEED);
+        vel.setZ(vel.z() - INP_SPEED);
+
+        keysPressed++;
+    }
     if (ge.isKeyDown(in.up))
     {
-        vel.setX(vel.x() - INP_SPEED);
-        vel.setZ(vel.z() - INP_SPEED);
+        vel.setX(vel.x() + INP_SPEED);
+        vel.setZ(vel.z() + INP_SPEED);
 
         keysPressed++;
     }
     if (ge.isKeyDown(in.down))
     {
 
-        vel.setX(vel.x() + INP_SPEED);
-        vel.setZ(vel.z() + INP_SPEED);
+        vel.setX(vel.x() - INP_SPEED);
+        vel.setZ(vel.z() - INP_SPEED);
 
         keysPressed++;
     }
