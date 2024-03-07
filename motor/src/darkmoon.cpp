@@ -43,7 +43,7 @@ bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
         std::cout << "┌─────────┐" << std::endl;
         std::cout << "│ Shaders │" << std::endl;
         std::cout << "└─────────┘" << std::endl;
-        auto rShaderColor = m_resourceManager.loadResource<Shader>("src/shaders/color.vs", "src/shaders/color.fs", ShaderType::COLOR);
+        m_shaderColor = m_resourceManager.loadResource<Shader>("src/shaders/color.vs", "src/shaders/color.fs", ShaderType::COLOR);
         auto rShaderTexture = m_resourceManager.loadResource<Shader>("src/shaders/texture.vs", "src/shaders/texture.fs", ShaderType::TEXTURE);
         auto rShaderTexture3D = m_resourceManager.loadResource<Shader>("src/shaders/texture3D.vs", "src/shaders/texture3D.fs", ShaderType::TEXTURE3D);
 
@@ -92,16 +92,60 @@ int DarkMoonEngine::GetScreenHeight(){
 // ------------------------- //
 
 // Set background color
-void DarkMoonEngine::ClearBackground(glm::vec4 color){
+void DarkMoonEngine::ClearBackground(Color color){
     m_renderManager.clearBackground(color);
 }
 
 // Setup canvas to start drawing
 void DarkMoonEngine::BeginDrawing(){
     m_windowsManager.beginDrawing();
+    m_renderManager.useShader(m_shaderColor);
 }
 
 // End canvas drawing and swap buffers
 void DarkMoonEngine::EndDrawing(){
     m_windowsManager.endDrawing();
+}
+
+// ------------------------------ //
+// Basic shapes drawing functions //
+// ------------------------------ //
+// Draw a pixel
+void DarkMoonEngine::DrawPixel(int posX, int posY, Color color){
+    m_renderManager.drawPixel({posX, posY}, color);
+}
+
+// Draw a pixel (vector version)
+void DarkMoonEngine::DrawPixelV(glm::vec2 pos, Color color){
+    m_renderManager.drawPixel(pos, color);
+}
+
+
+// --------------------------------- //
+// Input-related functions: keyboard //
+// --------------------------------- //
+
+// Check if a key has been pressed once
+bool DarkMoonEngine::IsKeyPressed(int key){
+    return m_inputManager.isKeyPressed(key);
+}
+
+// Check if a key has been pressed again
+bool DarkMoonEngine::IsKeyPressedRepeat(int key){
+    return m_inputManager.isKeyPressedRepeat(key);
+}
+
+// Check if a key is being pressed
+bool DarkMoonEngine::IsKeyDown(int key){
+    return m_inputManager.isKeyDown(key);
+}
+
+// Check if a key has not been released once
+bool DarkMoonEngine::IsKeyReleased(int key){
+    return m_inputManager.isKeyReleased(key);
+}
+
+// Check if a key is not being pressed
+bool DarkMoonEngine::IsKeyUp(int key){
+    return m_inputManager.isKeyUp(key);
 }

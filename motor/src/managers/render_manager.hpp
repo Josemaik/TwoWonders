@@ -5,6 +5,8 @@
 #include "../components/entity_camera.hpp"
 #include "../components/resource_mesh.hpp"
 
+#include "../utils/color.hpp"
+
 #include <memory>
 
 #include <GL/glew.h>
@@ -39,12 +41,12 @@ public:
     void setCamera(std::shared_ptr<Camera> camera){ m_camera = camera; };
 
     // Basic drawing functions
-    void clearBackground(glm::vec4 color);
-    void drawPixel(glm::vec2 pos, glm::vec4 color);
-    void drawLine(glm::vec2 startPos, glm::vec2 endPos, glm::vec4 color);
-    void drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, glm::vec4 color);
-    void drawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 color);
-    void drawCircle(glm::vec2 pos, float radius, int segments, glm::vec4 color);
+    void clearBackground(Color color);
+    void drawPixel(glm::vec2 pos, Color color);
+    void drawLine(glm::vec2 startPos, glm::vec2 endPos, Color color);
+    void drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, Color color);
+    void drawRectangle(glm::vec2 pos, glm::vec2 size, Color color);
+    void drawCircle(glm::vec2 pos, float radius, int segments, Color color);
 
     // Texture drawing functions
     void drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, glm::vec4 color);
@@ -77,5 +79,15 @@ public:
     static RenderManager& getInstance(){
         static RenderManager instance;
         return instance;
+    }
+
+    // Auxiliars
+    glm::vec4 normalizeColor(const Color& color) {
+        return glm::vec4(
+            static_cast<float>(color.r) / 255.0f,
+            static_cast<float>(color.g) / 255.0f,
+            static_cast<float>(color.b) / 255.0f,
+            static_cast<float>(color.a) / 255.0f
+        );
     }
 };

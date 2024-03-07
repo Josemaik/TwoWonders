@@ -11,6 +11,7 @@
 #include "components/resource_shader.hpp"
 
 #include "utils/keys.hpp"
+#include "utils/color.hpp"
 
 struct DarkMoonEngine{
 public:
@@ -39,12 +40,46 @@ public:
     // ------------------------- //
 
     // Set background color
-    void ClearBackground(glm::vec4 color);
+    void ClearBackground(Color color);
     // Setup canvas to start drawing
     void BeginDrawing();
     // End canvas drawing and swap buffers
     void EndDrawing();
 
+    // ------------------------------ //
+    // Basic shapes drawing functions //
+    // ------------------------------ //
+    // Draw a pixel
+    void DrawPixel(int posX, int posY, Color color);
+    // Draw a pixel (vector version)
+    void DrawPixelV(glm::vec2 pos, Color color);
+
+    // ----- TODO ----- //
+    // Line / LineV
+    // Circle / CircleV
+    // Rectangle / RectangleV
+    // Triangle / TriangleV
+
+
+    // --------------------------------- //
+    // Input-related functions: keyboard //
+    // --------------------------------- //
+
+    // Check if a key has been pressed once
+    bool IsKeyPressed(int key);
+    // Check if a key has been pressed again
+    bool IsKeyPressedRepeat(int key);
+    // Check if a key is being pressed
+    bool IsKeyDown(int key);
+    // Check if a key has not been released once
+    bool IsKeyReleased(int key);
+    // Check if a key is not being pressed
+    bool IsKeyUp(int key);
+
+    // ----- LOAD ----- //
+    // Model
+    // Texture
+    // Shader
     
 private:
     // Root node 
@@ -55,4 +90,7 @@ private:
     RenderManager m_renderManager;
     WindowsManager m_windowsManager;
     ResourceManager m_resourceManager;
+
+    // Shaders
+    std::shared_ptr<Shader> m_shaderColor;
 };

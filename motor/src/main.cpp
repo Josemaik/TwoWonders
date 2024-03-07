@@ -8,13 +8,17 @@ int main(){
         while(!engine.WindowShouldClose()){
             // Logic
 
-
+            if(engine.IsKeyPressed(KEY_Q))
+                engine.SetWindowSize(1024, 800);
+            if(engine.IsKeyPressed(KEY_W))
+                engine.SetWindowSize(800, 600);
 
             // Drawing //
             engine.BeginDrawing();
-            engine.ClearBackground({1.0f, 1.0f, 1.0f, 1.0f});
+            engine.ClearBackground({255, 255, 255, 255});
 
-
+            engine.DrawPixel(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, {0, 0, 0, 255});
+            engine.DrawPixelV({20.0f, 20.0f}, {0, 0, 0, 255});
 
             engine.EndDrawing();
         }
@@ -26,42 +30,10 @@ int main(){
 }
 
 /*
-#include "components/node.hpp"
-#include "components/entity.hpp"
-#include "components/entity_model.hpp"
-#include "components/entity_camera.hpp"
-#include "managers/resource_manager.hpp"
-#include "managers/windows_manager.hpp"
-#include "managers/render_manager.hpp"
-#include "managers/input_manager.hpp"
-#include "components/resource_shader.hpp"
-
-#include "utils/keys.hpp"
-
-#include <iostream>
-
-std::shared_ptr<Node> createSceneTree(RenderManager&);
 std::shared_ptr<Model> loadModel(const char*, std::shared_ptr<Node>, ResourceManager& rm);
 std::shared_ptr<Texture> loadTexture(const char*, ResourceManager&);
 
-int main(){
-
     // Patron Dirty //
-
-    //----- Initialize managers -----//
-    WindowsManager wm;
-    ResourceManager rm;
-    RenderManager& renm = RenderManager::getInstance();
-    InputManager im;
-
-    //----- Create scene tree -----//
-    auto nScene = createSceneTree(renm);
-
-    if(wm.initWindow(800, 600, "Salty Pixel")){
-
-        //----- Configure callback -----//
-        glfwSetWindowUserPointer(wm.getWindow(), &im);
-        glfwSetKeyCallback(wm.getWindow(), InputManager::keyCallback);
 
         //----- Gamepad -----//
         if(im.isGamePadAvailable(0) == 1)
@@ -83,39 +55,10 @@ int main(){
         auto rShaderTexture = rm.loadResource<Shader>("src/shaders/texture.vs", "src/shaders/texture.fs", ShaderType::TEXTURE);
         auto rShaderTexture3D = rm.loadResource<Shader>("src/shaders/texture3D.vs", "src/shaders/texture3D.fs", ShaderType::TEXTURE3D);
 
-        //----- View tree -----//
-        std::cout << "┌──────┐" << std::endl;
-        std::cout << "│ Tree │" << std::endl;
-        std::cout << "└──────┘" << std::endl;
-        nScene->drawTree();
-
-        // Main loop
-        while(!wm.windowShouldClose()){
-
             // Input
             im.update();
 
-            if(im.isKeyPressed(KEY_A))
-                renm.m_camera->position.x -= 0.1f;
-            if(im.isKeyPressed(KEY_D))
-                renm.m_camera->position.x += 0.1f;
-            if(im.isKeyPressed(KEY_W))
-                renm.m_camera->position.z -= 0.1f;
-            if(im.isKeyPressed(KEY_S))
-                renm.m_camera->position.z += 0.1f;
-
-            if(im.isKeyPressed(KEY_SPACE))
-                renm.m_camera->position.y += 0.1f;
-
-            if(im.isKeyPressed(GLFW_KEY_LEFT_SHIFT))
-                renm.m_camera->position.y -= 0.1f;
-
-            // Drawing
-            wm.beginDrawing();
-
             renm.beginMode3D();
-
-            renm.clearBackground({1.0f, 1.0f, 1.0f, 1.0f});
 
             // Draw (texture) -> 3D
             renm.useShader(rShaderTexture3D);
@@ -158,16 +101,7 @@ int main(){
             // renm.drawTextureExtra(rTexture, {100.0f, 150.0f}, 120.0f, 0.3f, {1.0f, 1.0f, 1.0f, 1.0f});
             // renm.drawTexture(rTexture, {0.0f, 500.0f}, {1.0f, 1.0f, 1.0f, 1.0f});
 
-            wm.endDrawing();
         }
-
-        //----- Unload -----//
-        std::cout << "┌────────┐" << std::endl;
-        std::cout << "│ Unload │" << std::endl;
-        std::cout << "└────────┘" << std::endl;
-        rm.unloadAllResources();
-
-        wm.closeWindow();
     }
 
     //----- Draw -----//
@@ -177,30 +111,6 @@ int main(){
     // nScene->traverse(glm::mat4());
 
     return 0;
-}
-
-std::shared_ptr<Node> createSceneTree(RenderManager& renm){
-    //Create scene
-    auto nScene = std::make_unique<Node>();
-    nScene->name = "Scene";
-
-    // Create Light
-    auto nLight = std::make_unique<Node>();
-    nLight->name = "Light";
-    auto eLight = std::make_shared<Light>();
-    nLight->setEntity(eLight);
-    nScene->addChild(std::move(nLight));
-
-    // Create Camera
-    auto nCamera = std::make_unique<Node>();
-    nCamera->name = "Main camera";
-    auto eCamera = std::make_shared<Camera>();
-    nCamera->setEntity(eCamera);
-    nScene->addChild(std::move(nCamera));
-    // Assigns Camera to RenderManager
-    renm.setCamera(eCamera);
-
-    return nScene;
 }
 
 std::shared_ptr<Model> loadModel(const char* filePath, std::shared_ptr<Node> nScene, ResourceManager& rm){

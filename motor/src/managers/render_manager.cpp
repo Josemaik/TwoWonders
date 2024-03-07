@@ -61,12 +61,12 @@ void RenderManager::endMode3D(){
 
 // Basic drawing functions
 
-void RenderManager::clearBackground(glm::vec4 color){
-    glClearColor(color.x, color.y, color.z, color.w);
+void RenderManager::clearBackground(Color color){
+    glClearColor(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void RenderManager::drawPixel(glm::vec2 pos, glm::vec4 color){
+void RenderManager::drawPixel(glm::vec2 pos, Color color){
     // Define a single vertex for the pixel
     float vertex[] = { normalizeX(pos.x), normalizeY(pos.y) };
 
@@ -90,7 +90,7 @@ void RenderManager::drawPixel(glm::vec2 pos, glm::vec4 color){
     // Set the uniform color in the shader
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
     glUseProgram(m_shaderProgram->id_shader);
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(normalizeColor(color)));
 
     // Draw the pixel
     glBindVertexArray(VAO);
@@ -102,7 +102,7 @@ void RenderManager::drawPixel(glm::vec2 pos, glm::vec4 color){
     glDeleteBuffers(1, &VBO);
 }
 
-void RenderManager::drawLine(glm::vec2 startPos, glm::vec2 endPos, glm::vec4 color){
+void RenderManager::drawLine(glm::vec2 startPos, glm::vec2 endPos, Color color){
     // Define the vertices for the line
     float vertices[] = {
         normalizeX(startPos.x), normalizeY(startPos.y),
@@ -127,7 +127,7 @@ void RenderManager::drawLine(glm::vec2 startPos, glm::vec2 endPos, glm::vec4 col
     // Set the uniform color in the shader
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
     glUseProgram(m_shaderProgram->id_shader);
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(normalizeColor(color)));
 
     // Draw the line
     glBindVertexArray(VAO);
@@ -139,7 +139,7 @@ void RenderManager::drawLine(glm::vec2 startPos, glm::vec2 endPos, glm::vec4 col
     glDeleteBuffers(1, &VBO);
 }
 
-void RenderManager::drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, glm::vec4 color){
+void RenderManager::drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, Color color){
     // Define vertices and indices
     float vertices[] = {
         normalizeX(v1.x), normalizeY(v1.y), 0.0f,
@@ -149,10 +149,10 @@ void RenderManager::drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, glm::
     GLuint indices[] = { 0, 1, 2};
 
     // Draw triangle
-    draw(vertices, 9, indices, 3, color);
+    draw(vertices, 9, indices, 3, normalizeColor(color));
 }
 
-void RenderManager::drawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 color){
+void RenderManager::drawRectangle(glm::vec2 pos, glm::vec2 size, Color color){
     // Define vertices and indices
     float vertices[] = {
         normalizeX(pos.x)         , normalizeY(pos.y)         , 0.0f,
@@ -163,10 +163,10 @@ void RenderManager::drawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 color
     GLuint indices[] = { 0, 1, 2, 1, 2, 3};
 
     // Draw rectangle
-    draw(vertices, 12, indices, 6, color);
+    draw(vertices, 12, indices, 6, normalizeColor(color));
 }
 
-void RenderManager::drawCircle(glm::vec2 pos, float radius, int segments, glm::vec4 color){
+void RenderManager::drawCircle(glm::vec2 pos, float radius, int segments, Color color){
     // Calculate vertices for the circle
     int vertexCount = segments * 2;
     std::vector<float> vertices(vertexCount);
@@ -195,7 +195,7 @@ void RenderManager::drawCircle(glm::vec2 pos, float radius, int segments, glm::v
     // Set the uniform color in the shader
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
     glUseProgram(m_shaderProgram->id_shader);
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(normalizeColor(color)));
 
     // Draw the circle
     glBindVertexArray(VAO);

@@ -28,4 +28,11 @@ public:
     // Drawing-related functions
     void beginDrawing();
     void endDrawing();
+
+    // Timing-related functions
+    // TODO
+    void setTargetFPS(int fps);
+    float getFrameTime();
+    double getTime();
+    int getFPS();
 };
