@@ -22,11 +22,23 @@ int main(){
             engine.BeginDrawing();
             engine.ClearBackground(WHITE);
 
+            /* PRUEBAS
             engine.DrawPixel(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, {0, 0, 0, 255});
             engine.DrawPixelV({20.0f, 40.0f}, BLACK);
 
             engine.DrawLine(0, 0, engine.GetScreenWidth(), engine.GetScreenHeight(), {255, 0, 0, 255});
             engine.DrawLineV({0, 0}, {100.0f, 20.0f}, {255, 0, 255, 255});
+
+            engine.DrawTriangle({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, {255, 128, 50, 255});
+            engine.DrawTriangleLines({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, BLACK);
+
+            engine.DrawRectangle(12, 12, 200, 40, {128, 128, 128, 255});     
+            engine.DrawRectangleV({10, 10}, {200, 40}, {180, 180, 180, 255});
+            engine.DrawRectangleLines({10, 10}, {200, 40}, BLACK);
+
+            engine.DrawCircle(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, 30.0f, 20, {100, 0, 0, 255});
+            engine.DrawCircleV({engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2}, 20.0f, 20, {255, 100, 0, 255});
+            */
 
             engine.EndDrawing();
         }
