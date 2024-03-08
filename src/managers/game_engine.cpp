@@ -18,6 +18,31 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     ENGI::GameEngine::imageResize(&logo_kaiwa_games, width_, static_cast<int>(height_ / 2)); // 2.49
     texture_logo_kaiwa_games = ENGI::GameEngine::loadTextureFromImage(logo_kaiwa_games);
     ENGI::GameEngine::unloadImage(logo_kaiwa_games);
+
+    // Corazones HUD
+    Image heart = ENGI::GameEngine::loadImage("assets/HUD/corazon.png");
+    ENGI::GameEngine::imageResize(&heart, 40, 35);
+    texture_heart = ENGI::GameEngine::loadTextureFromImage(heart);
+    ENGI::GameEngine::unloadImage(heart);
+
+    // Mago Happy HUD
+    Image happy = ENGI::GameEngine::loadImage("assets/HUD/mago_happy.png");
+    ENGI::GameEngine::imageResize(&happy, 112, 97);
+    texture_mago_happy = ENGI::GameEngine::loadTextureFromImage(happy);
+    ENGI::GameEngine::unloadImage(happy);
+
+    // Barra de maná HUD
+    Image mana = ENGI::GameEngine::loadImage("assets/HUD/mana_bar.png");
+    ENGI::GameEngine::imageResize(&mana, 209, 20);
+    texture_mana = ENGI::GameEngine::loadTextureFromImage(mana);
+    ENGI::GameEngine::unloadImage(mana);
+
+    // Destellos HUD
+    Image destellos = ENGI::GameEngine::loadImage("assets/HUD/destellos.png");
+    ENGI::GameEngine::imageResize(&destellos, 154, 58);
+    texture_destellos = ENGI::GameEngine::loadTextureFromImage(destellos);
+    ENGI::GameEngine::unloadImage(destellos);
+
     SetExitKey(KEY_F8);
 }
 

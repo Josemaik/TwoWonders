@@ -1011,7 +1011,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                             if (ren.visible && (ene.hasTag<DummyTag>() || ene.hasTag<DestructibleTag>()))
                             {
                                 std::string text = "ESPACIO";
-                                int offsetX = 25;
+                                float offsetX = 25.f;
                                 if (engine.isGamepadAvailable(0))
                                 {
                                     offsetX = 0;
@@ -1404,13 +1404,16 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
 
     // Datos de la barra de vida
     int barWidth = 40;
-    int barHeight = 20;
-    int barX = 10;
-    int barY = 10;
-    int spacing = 4;
+    // int barHeight = 20;
+    int barX = 155;
+    int barY = 30;
+    int spacing = 10;
 
     // Rectángulo de fondo para la barra de vida
-    engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * (l.maxLife + plfi.armor) + 2, barHeight + 4, DARKGRAY);
+    // engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * (l.maxLife + plfi.armor) + 2, barHeight + 4, DARKGRAY);
+
+    // Dibujamos cara del maguito
+    engine.drawTexture(engine.texture_mago_happy, 25, 20, { 255, 255, 255, 255 });
 
     // Dibujamos cada parte de la barra de vida
     int i{};
@@ -1419,8 +1422,9 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
         // Posición X de cada trozo
         int currentX = barX + i * (barWidth + spacing);
 
-        // Dibujamos el rectángulo
-        engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
+        // Dibujamos el corazón
+        // engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
+        engine.drawTexture(engine.texture_heart, currentX, barY, { 255, 255, 255, 255 });
     }
 
     // Dibujamos la armadura
@@ -1430,23 +1434,22 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
             // Posición X de cada trozo
             int currentX = barX + i * (barWidth + spacing);
 
-            // Dibujamos el rectángulo
-            engine.drawRectangle(currentX, barY, barWidth, barHeight, SKYBLUE);
+            // Dibujamos el corazón
+            engine.drawTexture(engine.texture_heart, currentX, barY, SKYBLUE);
         }
 }
 
 void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
 {
-    // Barra para las monedas monedas
-    engine.drawRectangle(engine.getScreenWidth() - 200, engine.getScreenHeight() - 100, 100, 20, DARKGRAY);
-
+    // Barra para los destellos
+    engine.drawTexture(engine.texture_destellos, engine.getScreenWidth() - 153, engine.getScreenHeight() - 130, { 255, 255, 255, 255 });
     auto const& plfi{ em.getSingleton<PlayerInfo>() };
     std::string info_text = std::to_string(plfi.coins);
 
-    int posX = engine.getScreenWidth() - 115;
-    int posY = engine.getScreenHeight() - 99;
+    int posX = engine.getScreenWidth() - 35;
+    int posY = engine.getScreenHeight() - 114;
 
-    // Sacamos el número de dígitos que tiene el número de monedas
+    // Sacamos el número de dígitos que tiene el número de destellos
     int num_digits = 0;
     int temp = plfi.coins;
     while (temp > 0)
@@ -1455,11 +1458,11 @@ void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
         num_digits++;
 
         if (num_digits > 1)
-            posX -= 10;
+            posX -= 16;
     }
 
-
-    engine.drawText(info_text.c_str(), posX, posY, 18, YELLOW);
+    // Dibujamos el número de destellos
+    engine.drawText(info_text.c_str(), posX, posY, 28, YELLOW);
 }
 
 void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
@@ -1471,11 +1474,12 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
 
     // Datos para la barra para el maná
     int barWidth = static_cast<int>(plfi.max_mana) * 2;
-    int barHeight = 20;
-    int barX = 7;
-    int barY = 30;
+    // int barHeight = 20;
+    int barX = 155;
+    int barY = 80;
 
-    engine.drawRectangle(barX, barY, barWidth + 6, barHeight, DARKGRAY);
+    // Ponemos la textura de la barra de maná
+    engine.drawTexture(engine.texture_mana, barX, barY, { 255, 255, 255, 255 });
 
     int manaWidth = static_cast<int>(static_cast<float>(barWidth) * (static_cast<float>(plfi.mana) / static_cast<float>(plfi.max_mana)));
 
@@ -1483,8 +1487,12 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
     if (plfi.mana != plfi.max_mana)
         manaWidth = plfi.mana_width + static_cast<int>((static_cast<float>(manaWidth) - static_cast<float>(plfi.mana_width)) * 0.175f);
 
+    // Idea para el movimiento de la barra
+    // Dos capas, la barra primero y luego el borde
+    // Entre medias algo que tape la barra dependiendo de la cantidad de maná en la barra.
+
     // Dibujamos la barra de maná
-    engine.drawRectangle(barX + 3, barY + 3, manaWidth, barHeight - 6, SKYBLUE);
+    // engine.drawRectangle(barX + 3, barY + 3, manaWidth, barHeight - 6, SKYBLUE);
 
     plfi.mana_width = manaWidth;
 }
