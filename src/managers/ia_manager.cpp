@@ -630,10 +630,11 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* a_a_6 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee, vec3d{});
         auto* sequence0 = &tree.createNode<BTNodeSequence_t>(d_p_h, d_s_1, a_a_6);
 
+        auto* d_1_7 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* d_ra = &tree.createNode<BTDecisionReadyforAttack>();
         auto* a_as = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer, vec3d{}); // fail si disparo succes si no disparo
         auto* d_or = &tree.createNode<BTDecisionOnAttackRadius>();
-        auto* sequence1 = &tree.createNode<BTNodeSequence_t>(d_ra, a_as, d_or);
+        auto* sequence1 = &tree.createNode<BTNodeSequence_t>(d_1_7,d_ra, a_as, d_or);
 
         auto* d_1_6 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* a_s_6 = &tree.createNode<BTAction_Seek>();

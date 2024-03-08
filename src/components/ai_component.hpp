@@ -58,6 +58,7 @@ struct AIComponent
     double attack_radius{ 6.0 };
     bool on_attack_radius{ false };
     bool playerdetected{ false };
+    double field_of_view{100};
     //Ataque
     bool ready_attack{ false };
     // data for steering behaviour

@@ -18,6 +18,7 @@ struct BTAction_Seek : BTNode_t {
         Steer_t steering = STBH::Seek(ectx.phy, { ectx.ai.tx,0.0,ectx.ai.tz });
 
         ectx.phy.velocity = vec3d{ steering.v_x, 0.0, steering.v_z };
+        ectx.phy.orientation = steering.orientation;
         return BTNodeStatus_t::success;
     }
 };
