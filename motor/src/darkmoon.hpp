@@ -44,6 +44,10 @@ public:
     void BeginDrawing();
     // End canvas drawing and swap buffers
     void EndDrawing();
+    // Begin 3D mode
+    void BeginMode3D();
+    // Ends 3D mode
+    void EndMode3D();
 
     // ------------------------------ //
     // Basic shapes drawing functions //
@@ -83,6 +87,12 @@ public:
     // Draw a texture with extended parameters
     void DrawTextureEx(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, Color tint);
 
+    // ------------------------------------------- //
+    // Basic geometric 3D shapes drawing functions //
+    // ------------------------------------------- //
+
+    // 
+
     // --------------------------------- //
     // Input-related functions: keyboard //
     // --------------------------------- //
@@ -110,7 +120,6 @@ public:
     std::shared_ptr<Shader> LoadShader(const char* vsFilePath, const char* fsFilePath);
     // TODO //
     // Model
-    // Shader
 
     // ---------------------- //
     // Text drawing functions //
@@ -131,5 +140,5 @@ private:
     ResourceManager m_resourceManager;
 
     // Shaders
-    std::shared_ptr<Shader> m_shaderColor, m_shaderTexture;
+    std::shared_ptr<Shader> m_shaderColor, m_shaderTexture, m_shader3D;
 };

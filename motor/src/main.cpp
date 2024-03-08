@@ -33,7 +33,21 @@ int main(){
             engine.BeginDrawing();
             engine.ClearBackground(WHITE);
 
+            // 3D
+
+            engine.BeginMode3D();
+
+
+
+            engine.EndMode3D();
+
+            // 2D
+
             // engine.DrawText("Hola", 0, 0, 24, BLACK);
+            
+            engine.DrawRectangle(12, 12, 200, 40, {128, 128, 128, 255});     
+            engine.DrawRectangleV({10, 10}, {200, 40}, {180, 180, 180, 255});
+            engine.DrawRectangleLines({10, 10}, {200, 40}, BLACK);
 
             /* PRUEBAS
             engine.DrawPixel(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, {0, 0, 0, 255});
@@ -42,9 +56,6 @@ int main(){
             engine.DrawTriangle({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, {255, 128, 50, 255});
             engine.DrawTriangleLines({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, BLACK);
 
-            engine.DrawRectangle(12, 12, 200, 40, {128, 128, 128, 255});     
-            engine.DrawRectangleV({10, 10}, {200, 40}, {180, 180, 180, 255});
-            engine.DrawRectangleLines({10, 10}, {200, 40}, BLACK);
 
             engine.DrawCircle(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, 30.0f, 20, {100, 0, 0, 255});
             engine.DrawCircleV({engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2}, 20.0f, 20, {255, 100, 0, 255});
@@ -67,7 +78,6 @@ int main(){
 
 /*
 std::shared_ptr<Model> loadModel(const char*, std::shared_ptr<Node>, ResourceManager& rm);
-std::shared_ptr<Texture> loadTexture(const char*, ResourceManager&);
 
     // Patron Dirty //
 
@@ -76,19 +86,12 @@ std::shared_ptr<Texture> loadTexture(const char*, ResourceManager&);
             std::cout << "Gamepad: " << im.getGamePadName(0) << std::endl;
 
         //----- Load model -----// 
-        std::cout << "┌──────┐" << std::endl;
-        std::cout << "│ Load │" << std::endl;
-        std::cout << "└──────┘" << std::endl;
         auto filePath = "assets/dummy.obj";
         auto eModel = loadModel(filePath, nScene, rm);
 
             // Input
             im.update();
 
-            renm.beginMode3D();
-
-            // Draw (texture) -> 3D
-            renm.useShader(rShaderTexture3D);
             // renm.drawTexture3D(rTexture2, {0.0f, 0.0f}, 50.0f, 0.01f, {1.0f, 1.0f, 1.0f, 1.0f});
             // Draw (model)
             // eModel->draw(glm::mat4());
@@ -110,15 +113,6 @@ std::shared_ptr<Texture> loadTexture(const char*, ResourceManager&);
             renm.drawCubeWires({-3.0f, 2.0f, 0.0f}, {1.0f, 1.0f, 3.0f}, {0.5f, 0.0f, 0.5f, 1.0f});
 
             renm.endMode3D();
-
-            // Draw (color)
-            renm.useShader(rShaderColor);
-
-            // Draw (texture)
-            // renm.useShader(rShaderTexture);
-            // renm.drawTextureExtra(rTexture, {100.0f, 150.0f}, 120.0f, 0.3f, {1.0f, 1.0f, 1.0f, 1.0f});
-            // renm.drawTexture(rTexture, {0.0f, 500.0f}, {1.0f, 1.0f, 1.0f, 1.0f});
-
         }
     }
 

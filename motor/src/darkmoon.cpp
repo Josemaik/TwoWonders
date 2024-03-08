@@ -45,7 +45,7 @@ bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
         std::cout << "└─────────┘" << std::endl;
         m_shaderColor = LoadShader("src/shaders/color.vs", "src/shaders/color.fs");
         m_shaderTexture = LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");
-        auto rShaderTexture3D = LoadShader("src/shaders/texture3D.vs", "src/shaders/texture3D.fs");
+        m_shader3D = LoadShader("src/shaders/3D.vs", "src/shaders/3D.fs");
 
         //----- Font -----//
         m_renderManager.setDefaultFont(LoadFont("assets/fonts/roboto.ttf"));
@@ -107,6 +107,18 @@ void DarkMoonEngine::BeginDrawing(){
 // End canvas drawing and swap buffers
 void DarkMoonEngine::EndDrawing(){
     m_windowsManager.endDrawing();
+}
+
+// Begin 3D mode
+void DarkMoonEngine::BeginMode3D(){
+    m_renderManager.beginMode3D();
+    m_renderManager.useShader(m_shader3D);
+}
+
+// Ends 3D mode
+void DarkMoonEngine::EndMode3D(){
+    m_renderManager.endMode3D();
+    m_renderManager.useShader(m_shaderColor);
 }
 
 // ------------------------------ //
@@ -196,7 +208,6 @@ void DarkMoonEngine::DrawTextureEx(std::shared_ptr<Texture> texture, glm::vec2 p
     m_renderManager.drawTextureExtra(texture, pos, rotation, scale, tint);
     m_renderManager.useShader(m_shaderColor);
 }
-
 
 // --------------------------------- //
 // Input-related functions: keyboard //
