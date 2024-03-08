@@ -692,7 +692,7 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
     }
     else if (e.hasTag<DoorTag>())
     {
-        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-barricada.obj");
+        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/Barricada_cambio_lvl.obj");
 
         loadShaders(r.model);
     }
@@ -1134,19 +1134,33 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
 
-        if (e.hasComponent<InteractiveComponent>() && e.hasComponent<RenderComponent>())
+        if (e.hasComponent<InteractiveComponent>() && (e.hasComponent<RenderComponent>() || e.hasComponent<PhysicsComponent>()))
         {
-            auto& ren{ em.getComponent<RenderComponent>(e) };
             auto& inter{ em.getComponent<InteractiveComponent>(e) };
             if (inter.showButton)
             {
+                vec3d pos{};
+                double sclY{};
+                if (e.hasTag<SeparateModelTag>())
+                {
+                    auto phy = em.getComponent<PhysicsComponent>(e);
+                    pos = phy.position;
+                    sclY = phy.scale.y();
+                }
+                else
+                {
+                    auto& ren = em.getComponent<RenderComponent>(e);
+                    pos = ren.position;
+                    sclY = ren.scale.y();
+                }
+
                 std::string button = "E";
                 if (engine.isGamepadAvailable(0))
                     button = "A";
 
                 engine.drawText(button.c_str(),
-                    static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
-                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 9),
+                    static_cast<int>(engine.getWorldToScreenX(pos) - 5),
+                    static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9),
                     20,
                     WHITE);
             }
@@ -1228,7 +1242,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             RayCast ray = engine.getMouseRay();
 
             auto& ren = em.getComponent<RenderComponent>(e);
-            bool notStatic = !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE);
+            bool notStatic = !(col.behaviorType & BehaviorType::ZONE);
             // Comprobar si el rayo intersecta con el collider
             if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && notStatic && pointedEntity != li.playerID)
             {

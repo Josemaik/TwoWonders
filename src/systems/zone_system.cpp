@@ -295,7 +295,7 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
         if (distance < range && !ic.showButton && plfi.hasKey)
             ic.showButton = true;
 
-        else if (distance > range && ic.showButton)
+        else if ((distance > range && ic.showButton) || !plfi.hasKey)
             ic.showButton = false;
 
         if (inpi.interact && ic.showButton && plfi.hasKey)

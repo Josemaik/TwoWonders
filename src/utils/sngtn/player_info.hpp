@@ -13,7 +13,7 @@ struct PlayerInfo
     uint16_t coins{}, bombs{}, max_bombs{ 8 };
     double max_mana{ 100.0 }, mana{ max_mana };
     int mana_width{}, armor{};
-    bool hasKey{ false };
+    bool hasKey{ true };
     bool hasStaff{ false };
     std::vector<std::unique_ptr<Item>> inventory{};
     std::vector<Spell> spells{};
