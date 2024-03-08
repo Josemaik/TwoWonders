@@ -504,10 +504,6 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
     else if (e.hasTag<GolemTag>())
     {
         r.model = engine.loadModel("assets/models/Golem.obj");
-        // Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Golem_uv.png");
-        // Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Golem_texture.png");
-        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-        // r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
         loadShaders(r.model);
     }
     else if (e.hasTag<SpiderTag>())
@@ -537,7 +533,6 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
     }
     else if (e.hasTag<GroundTag>() && e.hasTag<Chunk0Tag>())
     {
-        // Primero se carga este modelo
         r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_0.obj");
 
         loadShaders(r.model);
@@ -551,32 +546,21 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
     else if (e.hasTag<GroundTag>() && e.hasTag<Chunk2Tag>())
     {
         r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_2.obj");
-        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
-        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-
         loadShaders(r.model);
     }
     else if (e.hasTag<ChestTag>())
     {
         r.model = engine.loadModel("assets/models/Cofre.obj");
-        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
-        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-
         loadShaders(r.model);
     }
     else if (e.hasTag<DestructibleTag>())
     {
         r.model = engine.loadModel("assets/models/Troncos.obj");
-        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
-        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-
         loadShaders(r.model);
     }
     else if (e.hasTag<DoorTag>())
     {
         r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-barricada.obj");
-        // Texture2D t = engine.loadTexture("levels/Zona_0-Bosque/lvl_0-texture.png");
-        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
 
         loadShaders(r.model);
     }
@@ -601,6 +585,12 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
     else if (e.hasTag<DummyTag>())
     {
         r.model = engine.loadModel("assets/models/Dummy.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<BarricadeTag>())
+    {
+        r.model = engine.loadModel("assets/models/Barricada.obj");
 
         loadShaders(r.model);
     }
@@ -1089,8 +1079,9 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             RayCast ray = engine.getMouseRay();
 
             auto& ren = em.getComponent<RenderComponent>(e);
+            bool notStatic = !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE);
             // Comprobar si el rayo intersecta con el collider
-            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE) && pointedEntity != li.playerID)
+            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && notStatic && pointedEntity != li.playerID)
             {
                 pointedEntity = e.getID();
 

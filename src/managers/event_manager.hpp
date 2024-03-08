@@ -11,11 +11,14 @@
 //Eventos
 enum EventCodes : uint16_t
 {
+    NoEvent,
     SpawnKey,
     SpawnDungeonKey,
     OpenChest,
     SetSpawn,
     OpenDoor,
+    SpawnWallLevel0,
+    ViewPointCave
 };
 
 struct Event {
@@ -48,6 +51,8 @@ public:
                 {
                     switch (event.code)
                     {
+                    case EventCodes::NoEvent:
+                        break;
                     case EventCodes::SpawnKey:
                         break;
 
@@ -65,10 +70,10 @@ public:
                         auto& txti = em.getSingleton<TextInfo>();
                         auto& playerPos = em.getComponent<PhysicsComponent>(e).position;
                         auto& chest = *em.getEntityByID(li.chestToOpen);
-                        auto& chestComp = em.getComponent<ChestComponent>(chest);
+                        auto& cc = em.getComponent<ChestComponent>(chest);
 
-                        os.addObject(chestComp.content, playerPos);
-                        auto& msgs = chestComp.messages;
+                        os.addObject(cc.content, playerPos);
+                        auto& msgs = cc.messages;
                         while (!msgs.empty())
                         {
                             txti.addText(msgs.front());
@@ -76,17 +81,18 @@ public:
                         }
 
                         li.chestToOpen = li.max;
-                        if (chestComp.viewPoint != vec3d::zero())
-                            li.viewPoint = chestComp.viewPoint;
 
-                        if (chestComp.posWall != vec3d::zero())
+                        if (chest.hasComponent<DispatcherComponent>())
                         {
-                            auto& e{ em.newEntity() };
-                            em.addTag<WallTag>(e);
-                            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = chestComp.posWall, .scale = chestComp.scaleWall, .color = DARKBROWN });
-                            auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0 });
-                            em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+                            auto& dc = em.getComponent<DispatcherComponent>(chest);
+                            auto& lc = em.getComponent<ListenerComponent>(e);
+                            for (std::size_t i = 0; i < dc.eventCodes.size(); i++)
+                            {
+                                scheduleEvent(Event{ static_cast<EventCodes>(dc.eventCodes[i]) });
+                                lc.addCode(static_cast<EventCodes>(dc.eventCodes[i]));
+                            }
                         }
+
                         break;
                     }
                     case EventCodes::SetSpawn:
@@ -109,6 +115,22 @@ public:
 
                         plfi.hasKey = false;
                         li.dead_entities.insert(li.doorToOpen);
+                        break;
+                    }
+                    case EventCodes::SpawnWallLevel0:
+                    {
+                        auto& e{ em.newEntity() };
+                        em.addTag<BarricadeTag>(e);
+                        em.addTag<WallTag>(e);
+                        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -37.852, 7.0, 139.238 }, .scale = { 19.127, 10.0, 15.979 }, .color = DARKBROWN, .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, 1.0, 0.0 } });
+                        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0, .orientation = r.orientation, .rotationVec = r.rotationVec });
+                        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, p.scale, BehaviorType::STATIC });
+                        break;
+                    }
+                    case EventCodes::ViewPointCave:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        li.viewPoint = { -100.554, 4.935, 145.0 };
                         break;
                     }
                     }

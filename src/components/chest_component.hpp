@@ -8,7 +8,7 @@ struct ChestComponent
     uint16_t zone{};
     bool isOpen{ false };
 
-    vec3d dropPosition{}, viewPoint{}, posWall{}, scaleWall{};
+    vec3d dropPosition{};
     ObjectType content{ ObjectType::None };
     std::queue<std::string> messages{};
 };
