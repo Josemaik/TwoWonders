@@ -496,16 +496,16 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     em.addTag<EnemyTag>(e);
 
     auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = position, .scale = scale, .color = color,.orientation = rot,.rotationVec = rotationVec });
-    auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation=rot,.rotationVec=rotationVec, .max_speed = max_speed });
+    auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.rotationVec = rotationVec, .max_speed = max_speed });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
     auto& wl = em.addComponent<LifeComponent>(e, LifeComponent{ .life = life });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = element });
 
-    if (json.HasMember("orientation"))
-    {
-        double orientation = json["orientation"].GetDouble();
-        wp.orientation = orientation;
-    }
+    // if (json.HasMember("orientation"))
+    // {
+    //     double orientation = json["orientation"].GetDouble();
+    //     wp.orientation = orientation;
+    // }
 
     // Creamos el arbol de comportamiento
     vec_t.push_back(std::make_unique<BehaviourTree_t>());
