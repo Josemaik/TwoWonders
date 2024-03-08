@@ -298,11 +298,17 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
 {
     float windowWidth = 450.0f;
     float windowHeight = 450.0f;
+    float buttonWidth = 200.0f;
+    float buttonHeight = 50.0f;
+    float posButtonX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2);
+    float posButtonY = static_cast<float>(engine.getScreenHeight() / 2) - (buttonHeight / 2);
+    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (windowWidth / 2);
+    float posY = static_cast<float>(engine.getScreenHeight() / 2) - (windowHeight / 2);
     float augment = 55.f;
 
     Rectangle windowRect = {
-        static_cast<float>(engine.getScreenWidth()) / 2.0f - windowWidth / 2.0f,
-        static_cast<float>(engine.getScreenHeight()) / 2.0f - windowHeight / 2.0f,
+        posX,
+        posY,
         windowWidth,
         windowHeight
     };
@@ -311,23 +317,51 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
     engine.drawTextEx(GetFontDefault(), "INVENTARIO", Vector2{ windowRect.x + 110, windowRect.y + 20 }, 40, 1, BLACK);
 
     auto& plfi = em.getSingleton<PlayerInfo>();
-    Rectangle btn2Rec = { 300, 430, 200, 50 };
+    auto& inpi = em.getSingleton<InputInfo>();
+
+    auto& currentButton = inpi.currentButton;
 
     if (plfi.selectedItem == plfi.max)
     {
-        float posY = 250.f;
-
+        // Get the gamepad input
+        if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) {
+            // Press the currently selected button
+            if (currentButton < plfi.inventory.size()) {
+                // Select an item from the inventory
+                plfi.selectedItem = plfi.inventory[currentButton]->getID();
+                currentButton = 0;
+                return;
+            }
+            else {
+                // "VOLVER" button
+                auto& inpi = em.getSingleton<InputInfo>();
+                inpi.inventory = false;
+            }
+        }
+        else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
+            // Move the selection up
+            currentButton = (currentButton > 0) ? currentButton - 1 : plfi.inventory.size();
+        }
+        else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
+            // Move the selection down
+            currentButton = (currentButton < plfi.inventory.size()) ? currentButton + 1 : 0;
+        }
+        int buttonIndex = 0;
         for (auto& item : plfi.inventory)
         {
-            Rectangle btnRec = { 300, posY, 200, 50 };
-            if (GuiButton(btnRec, item->name.c_str()))
+            Rectangle btnRec = { posButtonX, posButtonY + 50, buttonWidth, buttonHeight };
+            if (GuiButton(btnRec, (buttonIndex == currentButton) ? ("[" + item->name + "]").c_str() : item->name.c_str())) {
                 plfi.selectedItem = item->getID();
-            posY += augment;
+                currentButton = 0;
+                return;
+            }
+            posButtonY += augment;
+            buttonIndex++;
         }
 
         // Botón de volver al juego
-        if (GuiButton(btn2Rec, "VOLVER"))
-        {
+        Rectangle btn2Rec = { posButtonX, posButtonY + 70, buttonWidth, buttonHeight };
+        if (GuiButton(btn2Rec, (currentButton == plfi.inventory.size()) ? "[VOLVER]" : "VOLVER")) {
             auto& inpi = em.getSingleton<InputInfo>();
             inpi.inventory = false;
         }
@@ -341,19 +375,42 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
         GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_LEFT);
 
         float descWidth = 300.f, descHeight = 150.f;
-        float posX = static_cast<float>(engine.getScreenWidth() / 2) - (descWidth / 2.0f);
-        float posY = static_cast<float>(engine.getScreenHeight() / 2) - (descHeight / 1.25f);
-        GuiTextBox({ posX, posY, descWidth, descHeight }, text, static_cast<int>(item.description.size()), false);
-        auto& plfi = em.getSingleton<PlayerInfo>();
+        float posDescX = static_cast<float>(engine.getScreenWidth() / 2) - (descWidth / 2.0f);
+        float posDescY = static_cast<float>(engine.getScreenHeight() / 2) - (descHeight / 1.25f);
+        GuiTextBox({ posDescX, posDescY, descWidth, descHeight }, text, static_cast<int>(item.description.size()), false);
 
-        std::cout << dynamic_cast<Potion*>(&item) << std::endl;
+        if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) {
+            // Press the currently selected button
+            switch (currentButton) {
+            case 0: // "USAR"
+                if (dynamic_cast<Potion*>(&item) != nullptr) {
+                    auto& potion = static_cast<Potion&>(item);
+                    plfi.usePotion(potion);
+                    plfi.selectedItem = plfi.max;
+                    auto& inpi = em.getSingleton<InputInfo>();
+                    inpi.inventory = false;
+                    GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+                    return;
+                }
+                break;
+            case 1: // "VOLVER"
+                plfi.selectedItem = plfi.max;
+                GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+                break;
+            }
+        }
+        else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
+            // Move the selection up
+            currentButton = (currentButton > 0) ? currentButton - 1 : 1;
+        }
+        else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
+            // Move the selection down
+            currentButton = (currentButton < 1) ? currentButton + 1 : 0;
+        }
 
-        if (dynamic_cast<Potion*>(&item) != nullptr)
-        {
-            std::cout << "Es una poción" << std::endl;
-            Rectangle btn1Rec = { 300, 350, 200, 50 };
-            if (GuiButton(btn1Rec, "USAR"))
-            {
+        if (dynamic_cast<Potion*>(&item) != nullptr) {
+            Rectangle btn1Rec = { posButtonX, posButtonY + 100, buttonWidth, buttonHeight };
+            if (GuiButton(btn1Rec, (currentButton == 0) ? "[USAR]" : "USAR")) {
                 auto& potion = static_cast<Potion&>(item);
                 plfi.usePotion(potion);
                 plfi.selectedItem = plfi.max;
@@ -364,8 +421,8 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
         }
 
         // Boton de volver al inventario
-        if (GuiButton(btn2Rec, "VOLVER"))
-        {
+        Rectangle btn2Rec = { posButtonX, posButtonY + 170, buttonWidth, buttonHeight };
+        if (GuiButton(btn2Rec, (currentButton == 1) ? "[VOLVER]" : "VOLVER")) {
             plfi.selectedItem = plfi.max;
             GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
         }
@@ -511,12 +568,12 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 else if (e.hasTag<AngryBushTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
-                    pos.setY(pos.y() - 0.5);
+                    // pos.setY(pos.y() - 0.5);
                     in = true;
                 }
                 else if (e.hasTag<AngryBushTag2>())
                 {
-                    pos.setY(pos.y() - 0.5);
+                    //pos.setY(pos.y() - 0.5);
                     in = true;
                 }
                 else if (e.hasTag<ChestTag>())
@@ -953,7 +1010,11 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                             auto& phy{ em.getComponent<PhysicsComponent>(ene) };
                             if (ren.visible && (ene.hasTag<DummyTag>() || ene.hasTag<DestructibleTag>()))
                             {
-                                engine.drawText("ESPACIO",
+                                std::string text = "ESPACIO";
+                                if (engine.isGamepadAvailable(0))
+                                    text = "X";
+
+                                engine.drawText(text.c_str(),
                                     static_cast<int>(engine.getWorldToScreenX(phy.position) - 25),
                                     static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 9),
                                     20,
@@ -968,7 +1029,12 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             {
                 auto& phy{ em.getComponent<PhysicsComponent>(e) };
                 // Escribimos que puede usar WASD para moverse
-                engine.drawText("WASD para moverse",
+
+                std::string text = "WASD para moverse";
+                if (engine.isGamepadAvailable(0))
+                    text = "Stick izquierdo para moverse";
+
+                engine.drawText(text.c_str(),
                     static_cast<int>(engine.getWorldToScreenX(phy.position) - 100),
                     static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 15),
                     20,
@@ -1070,7 +1136,11 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             auto& inter{ em.getComponent<InteractiveComponent>(e) };
             if (inter.showButton)
             {
-                engine.drawText("E",
+                std::string button = "E";
+                if (engine.isGamepadAvailable(0))
+                    button = "A";
+
+                engine.drawText(button.c_str(),
                     static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
                     static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 9),
                     20,
@@ -1274,8 +1344,28 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 void RenderSystem::drawDeath(ENGI::GameEngine& engine)
 {
     engine.drawRectangle(0, 0, engine.getScreenWidth(), engine.getScreenHeight(), Fade(BLACK, 0.5f));
-    engine.drawText("HAS MUERTO", 250, 250, 40, RED);
-    engine.drawText("[ENTER] para volver a jugar", 165, 300, 30, RED);
+
+    // Valores de la caja de texto
+    float boxWidth = 300.f;
+    float boxWidth2 = 500.f;
+    float boxHeight = 100.f;
+    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth / 2.f);
+    float posX2 = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth2 / 2.f);
+    float posY = static_cast<float>(engine.getScreenHeight() / 2) - (boxHeight / 2.f);
+
+    // Tamaño de la fuente
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 40);
+
+    // Color de la fuente de texto
+    GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, 0xFF0000ff);
+
+    GuiLabelButton(Rectangle{ posX, posY, boxWidth, boxHeight }, "HAS MUERTO");
+    // engine.drawText("HAS MUERTO", 250, 250, 40, RED);
+    std::string text = "[ENTER] para volver a jugar";
+    if (engine.isGamepadAvailable(0))
+        text = "Pulsa [A] para volver a jugar";
+    GuiLabelButton(Rectangle{ posX2, posY + 50, boxWidth2, boxHeight }, text.c_str());
+    init();
 }
 
 void RenderSystem::unloadModels(EntityManager& em, ENGI::GameEngine& engine)

@@ -333,7 +333,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
             std::swap(behaviorType1, behaviorType2);
         }
 
-        if (otherEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<DestructibleTag>())
+        if (otherEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<DestructibleTag>() || otherEntPtr->hasTag<CrusherTag>())
             return;
     }
 
@@ -491,6 +491,9 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
             staticPhy->stopped = true;
             return;
         }
+        else if (otherEntPtr->hasTag<CrusherTag>())
+            return;
+
         enemyCollision(em, *staticEntPtr);
         return;
     }
