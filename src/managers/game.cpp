@@ -23,19 +23,15 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 32.0, 4.0, 43.0 };
+        plfi.spawnPoint = { -33.0, 4.0, 30.9 };
     // -33.0, 4.0, 30.9 - Posición Incial
-    // 77.0, 4.0, -73.9 - Cofre con llave
     // 32.0, 4.0, 43.0 - Primer cofre
-    // -9.0, 4.0, -50.0
-    // 26.0, 4.0, -65.0
-    // -32.0   4.0  -107.0
-    // 35.0, 4.0, -25.0
-    // 25.0, 4.0, -25.0
+    // -72.0, 4.0, 72.9 - Cofre con llave
+    // -116.0, 4.0, 111.0 - Apisonadora
 
 // Player
     auto& e{ em.newEntity() };
-    em.addTag<PlayerTag>(e);// -2 -12 63 -71
+    em.addTag<PlayerTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, });
 

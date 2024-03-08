@@ -153,39 +153,19 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
         checkTutorialEnemies(em);
         break;
     }
-    case 8:
-    {
-        checkDoors(em, evm);
-        break;
-    }
     case 9:
-    {
-        checkDoors(em, evm);
-        break;
-    }
-    case 10:
     {
         checkChests(em, evm, li.num_zone);
         break;
     }
+    case 10:
+    {
+        checkDoors(em, evm);
+        break;
+    }
     case 11:
     {
-        // auto& bb = em.getSingleton<BlackBoard_t>();
-        // if (bb.create_subdito) {
-        //     iam.createSubdito(em, 3.0);
-        //     bb.create_subdito = false;
-        // }
-        // if(bb.boss_fase == 2){
-        //     if(bb.elapsed_change_fase >= bb.countdown_change_fase){
-        //         mapType maptype{};
-        //         maptype = map.loadMap("assets/levels/mazmorra_level.json");
-        //         iam.createBossFinalFase2(em,maptype);
-        //         bb.boss_fase++;
-        //     }else{
-        //         bb.elapsed_change_fase+=dt;
-        //     }
-        // }
-
+        checkDoors(em, evm);
         break;
     }
     case 12:
@@ -241,12 +221,13 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone
             auto& playerPos = playerPhy.position;
 
             double distance = playerPos.distance(phy.position);
+            double range = 7.5;
 
             // Si el cofre se encuentra a menos de 2 unidades de distancia del se muestra el mensaje de abrir cofre
-            if (distance < 7.5 && !ch.isOpen && !ic.showButton)
+            if (distance < range && !ch.isOpen && !ic.showButton)
                 ic.showButton = true;
 
-            else if (distance > 7.5 && ic.showButton)
+            else if (distance > range && ic.showButton)
                 ic.showButton = false;
 
             auto& inpi = em.getSingleton<InputInfo>();
@@ -277,11 +258,11 @@ void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
         auto& playerPos = playerPhy.position;
 
         double distance = playerPos.distance(phy.position);
-
-        if (distance < 4.5 && !ic.showButton && !li.playerDetected)
+        double range = 4.5;
+        if (distance < range && !ic.showButton && !li.playerDetected)
             ic.showButton = true;
 
-        else if (distance > 4.5 && ic.showButton)
+        else if (distance > range && ic.showButton)
             ic.showButton = false;
 
         auto& inpi = em.getSingleton<InputInfo>();
@@ -306,11 +287,12 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
         auto& playerPos = playerPhy.position;
 
         double distance = playerPos.distance(phy.position);
+        double range = 7.5;
 
-        if (distance < 4.5 && !ic.showButton)
+        if (distance < range && !ic.showButton)
             ic.showButton = true;
 
-        else if (distance > 4.5 && ic.showButton)
+        else if (distance > range && ic.showButton)
             ic.showButton = false;
 
         auto& inpi = em.getSingleton<InputInfo>();

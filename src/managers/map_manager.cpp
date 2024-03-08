@@ -267,7 +267,7 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         // Creamos los componentes
         auto& entity = em.newEntity();
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .orientation = rot, .rotationVec = rotationVec });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .orientation = rot, .rotationVec = r.rotationVec });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = 0, .orientation = rot, .rotationVec = r.rotationVec });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
         em.addComponent<InteractiveComponent>(entity);
 
@@ -276,6 +276,7 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         case InteractableType::Chest:
         {
             em.addTag<ChestTag>(entity);
+            em.addTag<WallTag>(entity);
             uint16_t zone = static_cast<uint16_t>(interactable["zone"].GetUint());
             ObjectType content{ static_cast<ObjectType>(interactable["content"].GetInt()) };
             uint8_t interId = static_cast<uint8_t>(interactable["id"].GetUint());
@@ -287,30 +288,27 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
             }
 
             [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .id = interId, .zone = zone, .dropPosition = { vec3d::zero() }, .content = content, .messages = messages });
-            if (interactable.HasMember("viewpoint"))
-            {
-                vec3d viewPoint{ interactable["viewpoint"][0].GetDouble(), interactable["viewpoint"][2].GetDouble(), -interactable["viewpoint"][1].GetDouble() };
-                cc.viewPoint = viewPoint;
-            }
-
-            if (interactable.HasMember("posWall"))
-            {
-                vec3d posWall{ interactable["posWall"][0].GetDouble(), interactable["posWall"][1].GetDouble(), interactable["posWall"][2].GetDouble() };
-                vec3d scaleWall{ interactable["scaleWall"][0].GetDouble(), interactable["scaleWall"][1].GetDouble(), interactable["scaleWall"][2].GetDouble() };
-                cc.posWall = posWall;
-                cc.scaleWall = scaleWall;
-            }
 
             if (interactable.HasMember("offsetZ"))
             {
                 r.offset = interactable["offsetZ"].GetDouble();
             }
+
+            if (interactable.HasMember("events"))
+            {
+                auto& dc = em.addComponent<DispatcherComponent>(entity);
+                for (rapidjson::SizeType j = 0; j < interactable["events"].Size(); j++)
+                {
+                    dc.eventCodes.push_back(interactable["events"][j].GetInt());
+                }
+            }
+
             break;
         }
         case InteractableType::Destructible:
         {
             em.addTag<DestructibleTag>(entity);
-
+            em.addTag<WallTag>(entity);
             int life{ interactable["life"].GetInt() };
             em.addComponent<LifeComponent>(entity, LifeComponent{ .life = life });
             auto& d = em.addComponent<DestructibleComponent>(entity);
@@ -332,16 +330,10 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         case InteractableType::Door:
         {
             em.addTag<DoorTag>(entity);
-            em.addTag<SeparateModelTag>(entity);
-            r.position = groundPos;
-            r.color = DARKBROWN;
+            em.addTag<WallTag>(entity);
             break;
         }
         case InteractableType::Level:
-        {
-            // ???
-        }
-        case InteractableType::NonDestructible:
         {
             // ???
         }
