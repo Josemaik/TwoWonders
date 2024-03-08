@@ -459,6 +459,8 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
 {
     // Extraemos los datos del json
     vec3d position = { json["position"][0].GetDouble(), json["position"][1].GetDouble(), json["position"][2].GetDouble() };
+    vec3d rotationVec{ json["rotVector"][1].GetDouble(), json["rotVector"][2].GetDouble(), json["rotVector"][0].GetDouble() };
+    double orientation{ json["rotation"].GetDouble() };
     vec3d scale = { json["scale"][0].GetDouble(), json["scale"][1].GetDouble(), json["scale"][2].GetDouble() };
     Color color = { static_cast<u_char>(json["color"][0].GetUint()), static_cast<u_char>(json["color"][1].GetUint()), static_cast<u_char>(json["color"][2].GetUint()), static_cast<u_char>(json["color"][3].GetUint()) };
     double max_speed = json["max_speed"].GetDouble();
@@ -487,12 +489,14 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     double countdown_perception = json["countdown_perception"].GetDouble();
     double scale_to_respawn_attack = json["scale_to_respawn_attack"].GetDouble();
 
+    double rot = orientation * DEGTORAD;
+
     // Creamos el enemigo
     auto& e{ em.newEntity() };
     em.addTag<EnemyTag>(e);
 
-    auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = position, .scale = scale, .color = color });
-    auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .scale = wr.scale, .max_speed = max_speed });
+    auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = position, .scale = scale, .color = color,.orientation = rot,.rotationVec = rotationVec });
+    auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation=rot,.rotationVec=rotationVec, .max_speed = max_speed });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
     auto& wl = em.addComponent<LifeComponent>(e, LifeComponent{ .life = life });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = element });

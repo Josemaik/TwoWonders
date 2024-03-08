@@ -327,6 +327,6 @@ void ZoneSystem::checkTutorialEnemies(EntityManager& em)
     });
 
     // Si el jugador se choca con el primer golem, se le va a señalar el cofre con el bastón
-    if (!playerEnt.hasComponent<AttackComponent>() && playerPhy.stopped)
-        li.viewPoint = { -33.714, 7.0, -43.494 };
+    // if (!playerEnt.hasComponent<AttackComponent>() && playerPhy.stopped)
+    //     li.viewPoint = { -33.714, 7.0, -43.494 };
 }
