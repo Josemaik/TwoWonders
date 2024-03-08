@@ -64,7 +64,6 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
     const rapidjson::Value& wallArray = overworld["Walls"];
     const rapidjson::Value& rampArray = overworld["Ramps"];
     const rapidjson::Value& interactablesArray = overworld["Interactive"];
-    const rapidjson::Value& destructibleArray = overworld["Destroyable"];
     const rapidjson::Value& underworld = chunk[1]["underworld"];
     const rapidjson::Value& objectArray = underworld["Objects"];
     const rapidjson::Value& enemyArray = underworld["Enemies"];
@@ -74,8 +73,6 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
     generateWalls(em, wallArray);
 
     generateRamps(em, rampArray);
-
-    generateDestructibles(em, destructibleArray);
 
     generateObjects(em, objectArray, mapID);
 
@@ -107,20 +104,21 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
 
         // Extraemos los datos del json
         const rapidjson::Value& ground = groundArray[i];
-        vec3d groundPosition{ ground["position"][0].GetDouble(), ground["position"][2].GetDouble(), -ground["position"][1].GetDouble() };
+        vec3d groundPosition{ ground["position"][1].GetDouble(), ground["position"][2].GetDouble(), ground["position"][0].GetDouble() };
         vec3d groundScale{ ground["scale"][0].GetDouble(), ground["scale"][2].GetDouble(), ground["scale"][1].GetDouble() };
         vec3d rotationVec{ ground["rotVector"][0].GetDouble(), ground["rotVector"][2].GetDouble(), ground["rotVector"][1].GetDouble() };
         double orientation{ ground["rotation"].GetDouble() };
+        double rot = orientation * DEGTORAD;
         Color color{ WHITE };
 
         // Creamos los componentes del suelo
-        auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .rotationVec = rotationVec });
-        auto& p = em.addComponent<PhysicsComponent>(groundEntity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
+        auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .orientation = rot, .rotationVec = rotationVec });
+        auto& p = em.addComponent<PhysicsComponent>(groundEntity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = rot, .rotationVec = r.rotationVec });
         em.addComponent<ColliderComponent>(groundEntity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+        em.addTag<SeparateModelTag>(groundEntity);
 
         if (j >= 4)
         {
-            em.addTag<SeparateModelTag>(groundEntity);
             r.position = groundPos;
             if (j >= 8)
                 em.addTag<Chunk2Tag>(groundEntity);
@@ -129,7 +127,10 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
         }
         else {
             em.addTag<Chunk0Tag>(groundEntity);
-            groundPos = groundPosition;
+            // r.position -= {-0.847, 0.0, 4.767};
+            r.position = vec3d::zero();
+            // r.position.setX(groundPosition.x());
+            groundPos = r.position;
         }
 
         // Creamos las 4 zonas
@@ -166,15 +167,17 @@ void MapManager::generateWalls(EntityManager& em, const rapidjson::Value& wallAr
         em.addTag<WallTag>(entity);
         // Extraemos los datos del json
         const rapidjson::Value& wall = wallArray[i];
-        vec3d position{ wall["position"][0].GetDouble(), wall["position"][2].GetDouble(), -wall["position"][1].GetDouble() };
-        vec3d scale{ wall["scale"][0].GetDouble(), wall["scale"][2].GetDouble(), wall["scale"][1].GetDouble() };
-        vec3d rotationVec{ wall["rotVector"][0].GetDouble(), wall["rotVector"][2].GetDouble(), wall["rotVector"][1].GetDouble() };
+        vec3d position{ wall["position"][1].GetDouble(), wall["position"][2].GetDouble(), wall["position"][0].GetDouble() };
+        vec3d scale{ wall["scale"][1].GetDouble(), wall["scale"][2].GetDouble(), wall["scale"][0].GetDouble() };
+        vec3d rotationVec{ wall["rotVector"][1].GetDouble(), wall["rotVector"][2].GetDouble(), wall["rotVector"][0].GetDouble() };
         double orientation{ wall["rotation"].GetDouble() };
         Color color{ LIME };
 
+        double rot = orientation * DEGTORAD;
+
         // Creamos los componentes
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color,  .visible = false, .rotationVec = rotationVec });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color,  .visible = false, .orientation = rot, .rotationVec = rotationVec });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = rot, .rotationVec = r.rotationVec });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
     }
 }
@@ -203,44 +206,6 @@ void MapManager::generateRamps(EntityManager& em, const rapidjson::Value& rampAr
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
         em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = rotationVec });
         em.addComponent<RampComponent>(entity, RampComponent{ .min = min, .max = max, .slope = slope, .offset = offset, .type = type });
-    }
-}
-
-void MapManager::generateDestructibles(EntityManager& em, const rapidjson::Value& destructibleArray)
-{
-    for (rapidjson::SizeType i = 0; i < destructibleArray.Size(); i++)
-    {
-        auto& entity = em.newEntity();
-        em.addTag<DestructibleTag>(entity);
-        em.addTag<SeparateModelTag>(entity);
-
-        // Extraemos los datos del json
-        const rapidjson::Value& destructible = destructibleArray[i];
-        vec3d position{ destructible["position"][0].GetDouble(), destructible["position"][2].GetDouble(), -destructible["position"][1].GetDouble() };
-        vec3d scale{ destructible["scale"][0].GetDouble(), destructible["scale"][2].GetDouble(), destructible["scale"][1].GetDouble() };
-        vec3d rotationVec{ destructible["rotVector"][0].GetDouble(), destructible["rotVector"][2].GetDouble(), destructible["rotVector"][1].GetDouble() };
-        double orientation{ destructible["rotation"].GetDouble() };
-        Color color{ BROWN };
-        int life{ destructible["life"].GetInt() };
-
-        // Creamos los componentes
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-        em.addComponent<LifeComponent>(entity, LifeComponent{ .life = life });
-        auto& d = em.addComponent<DestructibleComponent>(entity);
-
-        for (rapidjson::SizeType j = 0; j < destructible["weaknesses"].Size(); j++)
-        {
-            auto& weakness = destructible["weaknesses"][j];
-            d.addWeakness(static_cast<ElementalType>(weakness.GetInt()));
-        }
-
-        vec3d modelPos{ groundPos };
-        if (destructible.HasMember("groundPos"))
-            modelPos = { destructible["groundPos"][0].GetDouble(), destructible["groundPos"][2].GetDouble(), -destructible["groundPos"][1].GetDouble() };
-
-        r.position = modelPos;
     }
 }
 
@@ -290,17 +255,19 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         const rapidjson::Value& interactable = interactablesArray[i];
 
         // Extraemos los datos del json
-        vec3d position{ interactable["position"][0].GetDouble(), interactable["position"][2].GetDouble(), -interactable["position"][1].GetDouble() };
-        vec3d scale{ interactable["scale"][0].GetDouble(), interactable["scale"][2].GetDouble(), interactable["scale"][1].GetDouble() };
-        vec3d rotationVec{ interactable["rotVector"][0].GetDouble(), interactable["rotVector"][2].GetDouble(), interactable["rotVector"][1].GetDouble() };
+        vec3d position{ interactable["position"][1].GetDouble(), interactable["position"][2].GetDouble(), interactable["position"][0].GetDouble() };
+        vec3d scale{ interactable["scale"][1].GetDouble(), interactable["scale"][2].GetDouble(), interactable["scale"][0].GetDouble() };
+        vec3d rotationVec{ interactable["rotVector"][1].GetDouble(), interactable["rotVector"][2].GetDouble(), interactable["rotVector"][0].GetDouble() };
         double orientation{ interactable["rotation"].GetDouble() };
         Color color{ LIGHTGRAY };
         InteractableType type{ static_cast<InteractableType>(interactable["type"].GetInt()) };
 
+        double rot = orientation * DEGTORAD;
+
         // Creamos los componentes
         auto& entity = em.newEntity();
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
-        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .orientation = orientation * DEGTORAD, .rotationVec = r.rotationVec });
+        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .orientation = rot, .rotationVec = rotationVec });
+        auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = 0, .orientation = rot, .rotationVec = r.rotationVec });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
         em.addComponent<InteractiveComponent>(entity);
 
@@ -309,46 +276,71 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         case InteractableType::Chest:
         {
             em.addTag<ChestTag>(entity);
+            em.addTag<WallTag>(entity);
             uint16_t zone = static_cast<uint16_t>(interactable["zone"].GetUint());
             ObjectType content{ static_cast<ObjectType>(interactable["content"].GetInt()) };
             uint8_t interId = static_cast<uint8_t>(interactable["id"].GetUint());
-            bool visible = interactable["visible"].GetBool();
+
             std::queue<std::string> messages;
             for (rapidjson::SizeType j = 0; j < interactable["message"].Size(); j++)
             {
                 messages.emplace(interactable["message"][j].GetString());
             }
 
-
-            r.visible = visible;
             [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .id = interId, .zone = zone, .dropPosition = { vec3d::zero() }, .content = content, .messages = messages });
-            if (interactable.HasMember("viewpoint"))
+
+            if (interactable.HasMember("offsetZ"))
             {
-                vec3d viewPoint{ interactable["viewpoint"][0].GetDouble(), interactable["viewpoint"][2].GetDouble(), -interactable["viewpoint"][1].GetDouble() };
-                cc.viewPoint = viewPoint;
+                r.offset = interactable["offsetZ"].GetDouble();
             }
 
-            if (interactable.HasMember("posWall"))
+            if (interactable.HasMember("events"))
             {
-                vec3d posWall{ interactable["posWall"][0].GetDouble(), interactable["posWall"][1].GetDouble(), interactable["posWall"][2].GetDouble() };
-                vec3d scaleWall{ interactable["scaleWall"][0].GetDouble(), interactable["scaleWall"][1].GetDouble(), interactable["scaleWall"][2].GetDouble() };
-                cc.posWall = posWall;
-                cc.scaleWall = scaleWall;
+                auto& dc = em.addComponent<DispatcherComponent>(entity);
+                for (rapidjson::SizeType j = 0; j < interactable["events"].Size(); j++)
+                {
+                    dc.eventCodes.push_back(interactable["events"][j].GetInt());
+                }
             }
+
             break;
         }
-        case InteractableType::Spawn:
+        case InteractableType::Destructible:
         {
-            em.addTag<SpawnTag>(entity);
-            r.color = ORANGE;
+            em.addTag<DestructibleTag>(entity);
+            em.addTag<WallTag>(entity);
+            int life{ interactable["life"].GetInt() };
+            em.addComponent<LifeComponent>(entity, LifeComponent{ .life = life });
+            auto& d = em.addComponent<DestructibleComponent>(entity);
+
+            for (rapidjson::SizeType j = 0; j < interactable["weaknesses"].Size(); j++)
+            {
+                auto& weakness = interactable["weaknesses"][j];
+                d.addWeakness(static_cast<ElementalType>(weakness.GetInt()));
+            }
+
+            if (interactable.HasMember("offsetZ"))
+            {
+                r.offset = interactable["offsetZ"].GetDouble();
+            }
+
+            em.destroyComponent<InteractiveComponent>(entity);
             break;
         }
         case InteractableType::Door:
         {
             em.addTag<DoorTag>(entity);
-            em.addTag<SeparateModelTag>(entity);
-            r.position = groundPos;
-            r.color = DARKBROWN;
+            em.addTag<WallTag>(entity);
+            break;
+        }
+        case InteractableType::Level:
+        {
+            // ???
+        }
+        case InteractableType::Spawn:
+        {
+            em.addTag<SpawnTag>(entity);
+            r.color = ORANGE;
             break;
         }
         }
@@ -381,14 +373,14 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
         generateEnemies(em, enemyArray, iam);
     }
 
-    for (rapidjson::SizeType i = 0; i < chunks.Size(); i++)
-    {
-        std::string chunkName = "Chunk" + std::to_string(i);
-        const rapidjson::Value& chunk = chunks[i][chunkName.c_str()];
-        const rapidjson::Value& destructibleArray = chunk[0]["overworld"]["Destroyables"];
+    // for (rapidjson::SizeType i = 0; i < chunks.Size(); i++)
+    // {
+    //     std::string chunkName = "Chunk" + std::to_string(i);
+    //     const rapidjson::Value& chunk = chunks[i][chunkName.c_str()];
+    //     const rapidjson::Value& destructibleArray = chunk[0]["overworld"]["Destroyables"];
 
-        generateDestructibles(em, destructibleArray);
-    }
+    //     generateDestructibles(em, destructibleArray);
+    // }
 }
 
 // template<>

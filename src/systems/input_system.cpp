@@ -87,30 +87,30 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     // Código de movimiento
     if (ge.isKeyDown(in.right))
     {
-        vel.setX(vel.x() + INP_SPEED);
-        vel.setZ(vel.z() - INP_SPEED);
-
-        keysPressed++;
-    }
-    if (ge.isKeyDown(in.left))
-    {
         vel.setX(vel.x() - INP_SPEED);
         vel.setZ(vel.z() + INP_SPEED);
 
         keysPressed++;
     }
+    if (ge.isKeyDown(in.left))
+    {
+        vel.setX(vel.x() + INP_SPEED);
+        vel.setZ(vel.z() - INP_SPEED);
+
+        keysPressed++;
+    }
     if (ge.isKeyDown(in.up))
     {
-        vel.setX(vel.x() - INP_SPEED);
-        vel.setZ(vel.z() - INP_SPEED);
+        vel.setX(vel.x() + INP_SPEED);
+        vel.setZ(vel.z() + INP_SPEED);
 
         keysPressed++;
     }
     if (ge.isKeyDown(in.down))
     {
 
-        vel.setX(vel.x() + INP_SPEED);
-        vel.setZ(vel.z() + INP_SPEED);
+        vel.setX(vel.x() - INP_SPEED);
+        vel.setZ(vel.z() - INP_SPEED);
 
         keysPressed++;
     }
@@ -137,8 +137,8 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         // Ajusta la velocidad basándose en el movimiento del joystick
         float speed = (std::abs(joystick_x) > slowzone || std::abs(joystick_y) > slowzone) ? INP_SPEED : INP_SPEED / 4;
 
-        vel.setX(vel.x() + (joystick_y - joystick_x) * speed);
-        vel.setZ(vel.z() + (joystick_y + joystick_x) * speed);
+        vel.setX(vel.x() + (-joystick_y + joystick_x) * speed);
+        vel.setZ(vel.z() + (-joystick_y - joystick_x) * speed);
 
         if (in.m_joystickX != 0 && in.m_joystickY != 0)
             vel.normalize();

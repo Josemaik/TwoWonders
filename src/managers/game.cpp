@@ -23,17 +23,15 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -33.0, 4.0, 30.9 };
-    // -33.0, 4.0, 30.9 - Posición Incial
-    // 77.0, 4.0, -73.9 - Cofre con llave
-    // -32.0, 4.0, -34.0 - Primer cofre 
-    // -9.0, 4.0, -50.0
-    // 26.0, 4.0, -65.0
-    // -32.0   4.0  -107.0
+        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
+    // 33.0, 4.0, -25.9 - Posición Incial
+    // 32.0, 4.0, 43.0 - Primer cofre
+    // -72.0, 4.0, 72.9 - Cofre con llave
+    // -116.0, 4.0, 111.0 - Apisonadora
 
 // Player
     auto& e{ em.newEntity() };
-    em.addTag<PlayerTag>(e);// -2 -12 63 -71
+    em.addTag<PlayerTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, });
 
@@ -75,7 +73,6 @@ void Game::createSound(EntityManager&) {
 
 void Game::run()
 {
-
     Shader shader = engine.loadShader(TextFormat("assets/shaders/lighting.vs", 330),
         TextFormat("assets/shaders/lighting.fs", 330));
 
@@ -194,9 +191,10 @@ void Game::run()
                 resetGame(em, engine, render_system);
 
             input_system.update(em, engine);
+            bool debugs = inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();
 
             // seleccionar modo de debug ( physics o AI)
-            if (!li.resetGame && !(inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText()))
+            if (!li.resetGame && !debugs)
             {
                 while (elapsed >= timeStep)
                 {
@@ -225,7 +223,7 @@ void Game::run()
                 }
                 render_system.update(em, engine, timeStep);
             }
-            else if ((!li.resetGame) && (inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText()))
+            else if ((!li.resetGame) && debugs)
                 render_system.update(em, engine, timeStep);
 
             break;

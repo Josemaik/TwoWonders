@@ -494,7 +494,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = position, .scale = scale, .color = color });
     auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .scale = wr.scale, .max_speed = max_speed });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = life });
+    auto& wl = em.addComponent<LifeComponent>(e, LifeComponent{ .life = life });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = element });
 
     if (json.HasMember("orientation"))
@@ -644,6 +644,9 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     break;
     case 5: {
         em.addTag<AngryBushTag>(e);
+        auto& abc = em.addComponent<AngryBushComponent>(e);
+        abc.max_speed = wp.max_speed;
+        wl.invulnerable = true;
         tree.createNode<BTAction_Pendulum>();
     }
           break;

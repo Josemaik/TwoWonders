@@ -44,7 +44,7 @@ private:
     void drawTextBox(ENGI::GameEngine& engine, EntityManager& em);
 
     bool isSelected{ false };
-    bool isSelectedfordebug{ false };
+    bool isSelectedfordebug{ false }, fullScreen{ false };
     std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
     // bool chunk0Charged{ false };
     // bool chunk1Charged{ false };

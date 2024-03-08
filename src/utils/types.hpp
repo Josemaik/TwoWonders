@@ -14,6 +14,8 @@
 #include "../components/destructible_component.hpp"
 #include "../components/interactive_component.hpp"
 #include "../components/subject_component.hpp"
+#include "../components/angrybush_component.hpp"
+#include "../components/dispatcher_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
 #include "../components/projectile_component.hpp"
@@ -69,10 +71,11 @@ struct Chunk1Tag {};
 struct Chunk2Tag {};
 struct NoDamageTag {};
 struct SeparateModelTag {};
+struct BarricadeTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
-using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, RampComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, ZoneComponent, ShieldComponent, TypeComponent, ChestComponent, ListenerComponent, DestructibleComponent, InteractiveComponent, SubjectComponent>;
-using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, WallTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag, GolemTag, SpiderTag, BossFinalTag, SubjectTag, DestructibleTag, ChestTag, SpawnTag, Chunk0Tag, Chunk1Tag, Chunk2Tag, NoDamageTag, SeparateModelTag, DummyTag, AngryBushTag, AngryBushTag2, CrusherTag>;
+using CL = MP::TypeList<PhysicsComponent, RenderComponent, InputComponent, LifeComponent, ColliderComponent, RampComponent, AIComponent, AttackComponent, ProjectileComponent, ObjectComponent, ZoneComponent, ShieldComponent, TypeComponent, ChestComponent, ListenerComponent, DestructibleComponent, InteractiveComponent, SubjectComponent, AngryBushComponent, DispatcherComponent>;
+using TL = MP::TypeList<PlayerTag, EnemyTag, HitPlayerTag, GroundTag, WaterTag, WallTag, ObjectTag, ZoneTag, DoorTag, RampTag, SlimeTag, SnowmanTag, GolemTag, SpiderTag, BossFinalTag, SubjectTag, DestructibleTag, ChestTag, SpawnTag, Chunk0Tag, Chunk1Tag, Chunk2Tag, NoDamageTag, SeparateModelTag, DummyTag, AngryBushTag, AngryBushTag2, CrusherTag, BarricadeTag>;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
