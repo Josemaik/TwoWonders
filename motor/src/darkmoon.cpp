@@ -44,7 +44,7 @@ bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
         std::cout << "│ Shaders │" << std::endl;
         std::cout << "└─────────┘" << std::endl;
         m_shaderColor = LoadShader("src/shaders/color.vs", "src/shaders/color.fs");
-        auto rShaderTexture = LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");
+        m_shaderTexture = LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");
         auto rShaderTexture3D = LoadShader("src/shaders/texture3D.vs", "src/shaders/texture3D.fs");
 
         //----- Font -----//
@@ -170,6 +170,31 @@ void DarkMoonEngine::DrawCircle(int centerX, int centerY, float radius, int segm
 // Draw a color-filled circle (vector version)
 void DarkMoonEngine::DrawCircleV(glm::vec2 pos, float radius, int segments, Color color){
     m_renderManager.drawCircle(pos, radius, segments, color);
+}
+
+// ------------------------- //
+// Texture drawing functions //
+// ------------------------- //
+
+// Draw a texture
+void DarkMoonEngine::DrawTexture(std::shared_ptr<Texture> texture, int posX, int posY, Color tint){
+    m_renderManager.useShader(m_shaderTexture);
+    m_renderManager.drawTexture(texture, {posX, posY}, tint);
+    m_renderManager.useShader(m_shaderColor);
+}
+
+// Draw a texture (vector version)
+void DarkMoonEngine::DrawTextureV(std::shared_ptr<Texture> texture, glm::vec2 pos, Color tint){
+    m_renderManager.useShader(m_shaderTexture);
+    m_renderManager.drawTexture(texture, pos, tint);
+    m_renderManager.useShader(m_shaderColor);
+}
+
+// Draw a texture with extended parameters
+void DarkMoonEngine::DrawTextureEx(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, Color tint){
+    m_renderManager.useShader(m_shaderTexture);
+    m_renderManager.drawTextureExtra(texture, pos, rotation, scale, tint);
+    m_renderManager.useShader(m_shaderColor);
 }
 
 

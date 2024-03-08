@@ -209,14 +209,18 @@ void RenderManager::drawCircle(glm::vec2 pos, float radius, int segments, Color 
 
 // Texture drawing functions
 
-void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, glm::vec4 color){
+void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, Color color){
+    auto nColor = normalizeColor(color);
+    float halfWidth = static_cast<float>(texture->getWidth()) / 2.0f;
+    float halfHeight = static_cast<float>(texture->getHeight()) / 2.0f;
+
     // Define vertices and indices
     float vertices[] = {
         // positions                                                                                                                       // colors                    // texture coords
-        normalizeX(pos.x)                                          , normalizeY(pos.y)                                           , 0.0f,   color.x, color.y, color.z,   0.0f, 0.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth())), normalizeY(pos.y)                                           , 0.0f,   color.x, color.y, color.z,   1.0f, 0.0f,
-        normalizeX(pos.x)                                          , normalizeY(pos.y + static_cast<float>(texture->getHeight())), 0.0f,   color.x, color.y, color.z,   0.0f, 1.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth())), normalizeY(pos.y + static_cast<float>(texture->getHeight())), 0.0f,   color.x, color.y, color.z,   1.0f, 1.0f
+        normalizeX(pos.x - halfWidth), normalizeY(pos.y - halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   0.0f, 0.0f,
+        normalizeX(pos.x + halfWidth), normalizeY(pos.y - halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   1.0f, 0.0f,
+        normalizeX(pos.x - halfWidth), normalizeY(pos.y + halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   0.0f, 1.0f,
+        normalizeX(pos.x + halfWidth), normalizeY(pos.y + halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   1.0f, 1.0f
     };
 
     GLuint indices[] = { 0, 1, 2, 1, 2, 3};
@@ -249,7 +253,7 @@ void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos,
 
     // Colors
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(normalizeColor(color)));
 
     // Draw Texture
     glBindTexture(GL_TEXTURE_2D, texture->texture);
@@ -262,14 +266,18 @@ void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos,
     glDeleteBuffers(1, &EBO);
 }
 
-void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color){
+void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, Color color){
+    auto nColor = normalizeColor(color);
+    float halfWidth = static_cast<float>(texture->getWidth()) / 2.0f;
+    float halfHeight = static_cast<float>(texture->getHeight()) / 2.0f;
+
     // Define vertices and indices
     float vertices[] = {
-        // positions                                                                                                                       // colors                    // texture coords
-        normalizeX(pos.x)                                          , normalizeY(pos.y)                                           , 0.0f,   color.x, color.y, color.z,   0.0f, 0.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth())), normalizeY(pos.y)                                           , 0.0f,   color.x, color.y, color.z,   1.0f, 0.0f,
-        normalizeX(pos.x)                                          , normalizeY(pos.y + static_cast<float>(texture->getHeight())), 0.0f,   color.x, color.y, color.z,   0.0f, 1.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth())), normalizeY(pos.y + static_cast<float>(texture->getHeight())), 0.0f,   color.x, color.y, color.z,   1.0f, 1.0f
+        // positions                                                           // colors                    // texture coords
+        normalizeX(pos.x - halfWidth), normalizeY(pos.y - halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   0.0f, 0.0f,
+        normalizeX(pos.x + halfWidth), normalizeY(pos.y - halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   1.0f, 0.0f,
+        normalizeX(pos.x - halfWidth), normalizeY(pos.y + halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   0.0f, 1.0f,
+        normalizeX(pos.x + halfWidth), normalizeY(pos.y + halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   1.0f, 1.0f
     };
 
     GLuint indices[] = { 0, 1, 2, 1, 2, 3};
@@ -302,7 +310,7 @@ void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2
 
     // Colors
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(normalizeColor(color)));
 
     // Transform
     glm::mat4 trans = glm::mat4(1.0f);

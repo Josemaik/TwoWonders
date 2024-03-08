@@ -12,16 +12,19 @@ int main(){
         // auto font = engine.LoadFont("assets/fonts/roboto.ttf");
         // auto shader = engine.LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");
         auto texture = engine.LoadTexture("assets/koromaru.png");
+        auto texture2 = engine.LoadTexture("assets/wall.jpg");
 
         while(!engine.WindowShouldClose()){
             // ----- //
             // Logic //
             // ----- //
 
+            /* PRUEBAS
             if(engine.IsKeyPressed(KEY_Q))
-                engine.SetWindowSize(1024, 800);
+                engine.SetWindowSize(engine.GetScreenWidth() + 10, engine.GetScreenHeight() + 10);
             if(engine.IsKeyPressed(KEY_W))
-                engine.SetWindowSize(800, 600);
+                engine.SetWindowSize(engine.GetScreenWidth() - 10, engine.GetScreenHeight() - 10);
+            */
 
             // ------- //
             // Drawing //
@@ -36,9 +39,6 @@ int main(){
             engine.DrawPixel(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, {0, 0, 0, 255});
             engine.DrawPixelV({20.0f, 40.0f}, BLACK);
 
-            engine.DrawLine(0, 0, engine.GetScreenWidth(), engine.GetScreenHeight(), {255, 0, 0, 255});
-            engine.DrawLineV({0, 0}, {100.0f, 20.0f}, {255, 0, 255, 255});
-
             engine.DrawTriangle({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, {255, 128, 50, 255});
             engine.DrawTriangleLines({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, BLACK);
 
@@ -48,6 +48,12 @@ int main(){
 
             engine.DrawCircle(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, 30.0f, 20, {100, 0, 0, 255});
             engine.DrawCircleV({engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2}, 20.0f, 20, {255, 100, 0, 255});
+
+            engine.DrawTextureV(texture2, {engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2}, WHITE);
+            engine.DrawTextureEx(texture, {engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2}, 0.0f, 0.2f, WHITE);
+
+            engine.DrawLine(0, 0, engine.GetScreenWidth(), engine.GetScreenHeight(), {140, 140, 140, 255});
+            engine.DrawLine(0, engine.GetScreenHeight(), engine.GetScreenWidth(), 0, {140, 140, 140, 255});
             */
 
             engine.EndDrawing();
@@ -107,15 +113,6 @@ std::shared_ptr<Texture> loadTexture(const char*, ResourceManager&);
 
             // Draw (color)
             renm.useShader(rShaderColor);
-
-            //renm.drawTriangle({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, {1.0f, 0.5f, 0.2f, 1.0f});
-            //renm.drawLine({0.0f, 0.0f}, {500.0f, 200.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
-            //renm.drawPixel({400.0f, 300.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
-            //renm.drawCircle({100.0f, 300.0f}, 60.0f, 20, {1.0f, 1.0f, 0.0f, 1.0f});
-
-            // HUD
-            renm.drawRectangle({12.0f, 12.0f}, {200.0f, 40.0f}, {0.5f, 0.5f, 0.5f, 1.0f});
-            renm.drawRectangle({10.0f, 10.0f}, {200.0f, 40.0f}, {0.7f, 0.7f, 0.7f, 1.0f});
 
             // Draw (texture)
             // renm.useShader(rShaderTexture);

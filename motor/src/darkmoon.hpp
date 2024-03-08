@@ -72,6 +72,17 @@ public:
     // Draw a color-filled circle (vector version)
     void DrawCircleV(glm::vec2 pos, float radius, int segments, Color color);
 
+    // ------------------------- //
+    // Texture drawing functions //
+    // ------------------------- //
+
+    // Draw a texture
+    void DrawTexture(std::shared_ptr<Texture> texture, int posX, int posY, Color tint);
+    // Draw a texture (vector version)
+    void DrawTextureV(std::shared_ptr<Texture> texture, glm::vec2 pos, Color tint);
+    // Draw a texture with extended parameters
+    void DrawTextureEx(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, Color tint);
+
     // --------------------------------- //
     // Input-related functions: keyboard //
     // --------------------------------- //
@@ -120,5 +131,5 @@ private:
     ResourceManager m_resourceManager;
 
     // Shaders
-    std::shared_ptr<Shader> m_shaderColor;
+    std::shared_ptr<Shader> m_shaderColor, m_shaderTexture;
 };

@@ -51,8 +51,8 @@ public:
     void drawCircle(glm::vec2 pos, float radius, int segments, Color color);
 
     // Texture drawing functions
-    void drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, glm::vec4 color);
-    void drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, glm::vec4 color);
+    void drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, Color color);
+    void drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, Color color);
 
     // Basic geometric 3D shapes drawing functions
     void drawPoint3D(glm::vec3 position, float pointSize, glm::vec4 color);
