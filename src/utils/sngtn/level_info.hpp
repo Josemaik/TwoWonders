@@ -80,6 +80,7 @@ struct LevelInfo
 
   // Estado del juego
   GameScreen currentScreen = GameScreen::GAMEPLAY;
+  GameScreen previousScreen = GameScreen::LOGO;
 
   void reset()
   {

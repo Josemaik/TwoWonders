@@ -590,6 +590,9 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
             if (!balalaunchedbyspider)
             {
                 auto& li = em.getComponent<LifeComponent>(*ent2Ptr);
+
+                if (li.invulnerable)
+                    return;
                 // Comprobar el tipo de la bala y el enemigo/player
                 if ((typeBala == ElementalType::Fire && typeEnemyPlayer == ElementalType::Ice) ||
                     (typeBala == ElementalType::Ice && typeEnemyPlayer == ElementalType::Water) ||
