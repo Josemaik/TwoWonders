@@ -23,7 +23,7 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -116.0, 4.0, 111.0 };
+        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
     // -72.0, 4.0, 72.9 - Cofre con llave
@@ -51,8 +51,8 @@ void Game::createEntities(EntityManager& em)
     // plfi.addSpell(spell);
 
     // Código de añadir un objeto poción al inventario
-    Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };
-    plfi.addItem(std::make_unique<Potion>(pot));
+    // Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };
+    // plfi.addItem(std::make_unique<Potion>(pot));
 
     // Shield
     // createShield(em, e);
