@@ -10,7 +10,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     // Si no hay jugador, no hacemos nada
     if (!player.hasTag<PlayerTag>())
     {
-        if (ge.isKeyReleased(KEY_ENTER))
+        if (ge.isKeyReleased(KEY_ENTER) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN))
             li.resetGame = true;
         return;
     }
