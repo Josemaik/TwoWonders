@@ -65,7 +65,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
 
             //Calculo punto de intersección con player
             if (bbox.intersectsRay(ray.origin, ray.direction)) {
-                intersection_player = bbox.getintersectsRay(ray.origin, ray.direction);
+                bbox.intersectsRay(ray.origin, ray.direction,intersection_player);
             }
 
             //Compruebo si la caja de colisión de un obstaculo ha colisionado con el rayo
@@ -77,7 +77,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
                     if (ent.hasTag<WallTag>()) {
                         auto& col = ectx.em.getComponent<ColliderComponent>(ent);
                         if (col.boundingBox.intersectsRay(ray.origin, ray.direction)) {
-                            intersection_wall = col.boundingBox.getintersectsRay(ray.origin, ray.direction);
+                            col.boundingBox.intersectsRay(ray.origin, ray.direction,intersection_wall);
                             break;
                         }
 
