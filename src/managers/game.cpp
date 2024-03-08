@@ -24,6 +24,7 @@ void Game::createEntities(EntityManager& em)
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
         plfi.spawnPoint = { -125, 4.0, 138.68 };
+    //-125, 4.0, 138.68 - `pos chunck 3
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
     // -72.0, 4.0, 72.9 - Cofre con llave
