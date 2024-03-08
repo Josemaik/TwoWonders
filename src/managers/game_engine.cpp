@@ -156,6 +156,18 @@ int ENGI::GameEngine::getScreenHeight()
     return GetScreenHeight();
 }
 
+void ENGI::GameEngine::setWindowSize(int width, int height)
+{
+    if (IsWindowFullscreen())
+        ToggleFullscreen();
+    SetWindowSize(width, height);
+}
+
+void ENGI::GameEngine::setWindowFullScreen()
+{
+    ToggleFullscreen();
+}
+
 ////// CAMERA //////
 
 void ENGI::GameEngine::setPositionCamera(vec3d pos)

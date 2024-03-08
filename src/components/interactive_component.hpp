@@ -4,8 +4,11 @@
 enum struct InteractableType : uint8_t
 {
     Chest = 1,
-    Spawn = 2,
-    Door = 3
+    Destructible = 2,
+    Door = 3,
+    Level = 4,
+    NonDestructible = 5,
+    Spawn = 6,
 };
 
 struct InteractiveComponent

@@ -19,7 +19,7 @@ struct RenderComponent
     bool visible{ true };
     double orientation{ 0.0 };
     vec3d rotationVec{ 0.0, 0.1, 0.0 };
-
+    double offset{};
     BBox bbox{};
 
     Model model{};

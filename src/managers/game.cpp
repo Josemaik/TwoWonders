@@ -23,10 +23,10 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -25.0, 4.0, -25.0 };
+        plfi.spawnPoint = { 32.0, 4.0, 43.0 };
     // -33.0, 4.0, 30.9 - Posición Incial
     // 77.0, 4.0, -73.9 - Cofre con llave
-    // -32.0, 4.0, -34.0 - Primer cofre 
+    // 32.0, 4.0, 43.0 - Primer cofre
     // -9.0, 4.0, -50.0
     // 26.0, 4.0, -65.0
     // -32.0   4.0  -107.0
@@ -77,7 +77,6 @@ void Game::createSound(EntityManager&) {
 
 void Game::run()
 {
-
     Shader shader = engine.loadShader(TextFormat("assets/shaders/lighting.vs", 330),
         TextFormat("assets/shaders/lighting.fs", 330));
 

@@ -59,6 +59,8 @@ namespace ENGI {
         bool windowShouldClose();
         int getScreenWidth();
         int getScreenHeight();
+        void setWindowSize(int width, int height);
+        void setWindowFullScreen();
 
         // Camera
         void setPositionCamera(vec3d pos);

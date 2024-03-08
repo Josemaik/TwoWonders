@@ -121,7 +121,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     // Cosas que hacer en cada zona
     switch (li.num_zone)
     {
-    case 0:
+    case 3:
     {
         checkChests(em, evm, li.num_zone);
         break;
@@ -149,6 +149,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     }
     case 7:
     {
+        checkChests(em, evm, li.num_zone);
         checkTutorialEnemies(em);
         break;
     }
@@ -242,10 +243,10 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone
             double distance = playerPos.distance(phy.position);
 
             // Si el cofre se encuentra a menos de 2 unidades de distancia del se muestra el mensaje de abrir cofre
-            if (distance < 5.5 && !ch.isOpen && !ic.showButton)
+            if (distance < 7.5 && !ch.isOpen && !ic.showButton)
                 ic.showButton = true;
 
-            else if (distance > 5.5 && ic.showButton)
+            else if (distance > 7.5 && ic.showButton)
                 ic.showButton = false;
 
             auto& inpi = em.getSingleton<InputInfo>();
