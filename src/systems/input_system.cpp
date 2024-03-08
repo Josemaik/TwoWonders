@@ -16,7 +16,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     }
 
     // PAUSE
-    if (ge.isKeyReleased(KEY_ESCAPE) && li.currentScreen == GameScreen::GAMEPLAY)
+    if ((ge.isKeyReleased(KEY_ESCAPE) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_MIDDLE_RIGHT)) && li.currentScreen == GameScreen::GAMEPLAY)
     {
         inpi.pause = !inpi.pause;
         inpi.debugAI1 = false;
@@ -196,5 +196,5 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
 }
 
 bool InputSystem::pressEnter(GameEngine& ge) {
-    return ge.isKeyReleased(KEY_ENTER);
+    return ge.isKeyReleased(KEY_ENTER) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN);
 }

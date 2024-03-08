@@ -14,7 +14,7 @@ void RenderSystem::init()
     GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, 0x000000ff);
 
     // Fondo de los botones
-    GuiSetStyle(DEFAULT, BASE_COLOR_NORMAL, 0xAA0099FF);
+    GuiSetStyle(DEFAULT, BASE_COLOR_NORMAL, 0xD6A8E6FF);
 
     // Color de los bordes
     GuiSetStyle(TEXTBOX, BORDER_COLOR_NORMAL, 0x000000FF);
@@ -55,13 +55,49 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
         static_cast<int>(engine.getScreenHeight() / 2.5 - engine.texture_logo_two_wonders.height / 2),
         WHITE);
 
+    // Datos de los botones
+    float buttonWidth = 200.0f;
+    float buttonHeight = 50.0f;
+    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2.f);
+    float posY = static_cast<float>(engine.getScreenHeight() / 1.25) - (buttonHeight / 2.f);
+
     // Funcionalidad de botones
-    Rectangle btn1Rec = { 300, 450, 200, 50 };
-    Rectangle btn2Rec = { 300, 520, 200, 50 };
+    Rectangle btn1Rec = { posX, posY, buttonWidth, buttonHeight };
+    Rectangle btn2Rec = { posX, posY + 70, buttonWidth, buttonHeight };
 
     auto& li = em.getSingleton<LevelInfo>();
+    auto& inpi = em.getSingleton<InputInfo>();
 
-    if (GuiButton(btn1Rec, "JUGAR")) {
+    // Define the current button selection
+    auto& currentButton = inpi.currentButton;
+
+    // Get the gamepad input
+    if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) { // A on Xbox, X on PlayStation
+        // Press the currently selected button
+        switch (currentButton) {
+        case 0: // "JUGAR"
+            li.currentScreen = GameScreen::STORY;
+            ss.seleccion_menu();
+            ss.music_stop();
+            break;
+        case 1: // "CONFIGURACION"
+            li.currentScreen = GameScreen::OPTIONS;
+            li.previousScreen = GameScreen::TITLE;
+            ss.seleccion_menu();
+            break;
+        }
+    }
+    else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) { // D-Pad Up
+        // Move the selection up
+        currentButton = (currentButton > 0) ? currentButton - 1 : 1;
+    }
+    else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) { // D-Pad Down
+        // Move the selection down
+        currentButton = (currentButton < 1) ? currentButton + 1 : 0;
+    }
+
+    // Draw the buttons
+    if (GuiButton(btn1Rec, (currentButton == 0) ? "[JUGAR]" : "JUGAR")) {
         li.currentScreen = GameScreen::STORY;
         ss.seleccion_menu();
         ss.music_stop();
@@ -75,11 +111,12 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
     else
         ss.pushed = false;
 
-    if (GuiButton(btn2Rec, "CONFIGURACION")) {
+    if (GuiButton(btn2Rec, (currentButton == 1) ? "[CONFIGURACION]" : "CONFIGURACION")) {
         li.currentScreen = GameScreen::OPTIONS;
         li.previousScreen = GameScreen::TITLE;
         ss.seleccion_menu();
     }
+
     engine.endDrawing();
 }
 
@@ -186,36 +223,74 @@ void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, So
     Rectangle btn4Rec = { posX, posY + 210, buttonWidth, buttonHeight };
 
     auto& li = em.getSingleton<LevelInfo>();
+    auto& inpi = em.getSingleton<InputInfo>();
 
-    if (GuiButton(btn1Rec, "CONTINUAR")) {
-        auto& inpi = em.getSingleton<InputInfo>();
-        inpi.pause = false;
-        ss.seleccion_menu();
+    // Define the current button selection
+    auto& currentButton = inpi.currentButton;
+
+    // Get the gamepad input
+    if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)
+        || inpi.mouseClick) {
+        // Press the currently selected button
+        switch (currentButton) {
+        case 0: // "CONTINUAR"
+        {
+            inpi.pause = false;
+            ss.seleccion_menu();
+            break;
+        }
+        case 1: // "OPCIONES"
+        {
+            li.currentScreen = GameScreen::OPTIONS;
+            li.previousScreen = GameScreen::GAMEPLAY;
+            ss.seleccion_menu();
+            break;
+        }
+        case 2: // "VOLVER AL INICIO"
+        {
+            li.currentScreen = GameScreen::TITLE;
+            ss.seleccion_menu();
+            break;
+        }
+        case 3: // "SALIR"
+        {
+            li.gameShouldEnd = true;
+            return;
+        }
+        }
+
+        currentButton = 0;
+        inpi.mouseClick = false;
+    }
+    else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) { // D-Pad Up
+        // Move the selection up
+        currentButton = (currentButton > 0) ? currentButton - 1 : 3;
+    }
+    else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) { // D-Pad Down
+        // Move the selection down
+        currentButton = (currentButton < 3) ? currentButton + 1 : 0;
     }
 
-    if (GuiButton(btn2Rec, "OPCIONES")) {
-        li.currentScreen = GameScreen::OPTIONS;
-        li.previousScreen = GameScreen::GAMEPLAY;
-        ss.seleccion_menu();
+    // Draw the buttons
+    if (GuiButton(btn1Rec, (currentButton == 0) ? "[CONTINUAR]" : "CONTINUAR"))
+    {
+        currentButton = 0;
+        inpi.mouseClick = true;
     }
-
-    if (GuiButton(btn3Rec, "VOLVER AL INICIO")) {
-        li.currentScreen = GameScreen::TITLE;
-        ss.seleccion_menu();
+    if (GuiButton(btn2Rec, (currentButton == 1) ? "[OPCIONES]" : "OPCIONES"))
+    {
+        currentButton = 1;
+        inpi.mouseClick = true;
     }
-
-    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec)) {
-        if (ss.pushed == false)
-            ss.sonido_mov();
-        ss.pushed = true;
+    if (GuiButton(btn3Rec, (currentButton == 2) ? "[VOLVER AL INICIO]" : "VOLVER AL INICIO"))
+    {
+        currentButton = 2;
+        inpi.mouseClick = true;
     }
-    else
-        ss.pushed = false;
-
-    if (GuiButton(btn4Rec, "SALIR")) {
-        auto& li = em.getSingleton<LevelInfo>();
-        li.gameShouldEnd = true;
-        return;
+    if (GuiButton(btn4Rec, (currentButton == 3) ? "[SALIR]" : "SALIR"))
+    {
+        currentButton = 3;
+        inpi.mouseClick = true;
     }
 }
 

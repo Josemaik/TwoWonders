@@ -22,4 +22,8 @@ struct InputInfo
     // Teclas de mecánicas
     bool lockOn{ false };
     bool interact{ false };
+
+    // Menú
+    int currentButton{ 0 };
+    bool mouseClick{ false };
 };
