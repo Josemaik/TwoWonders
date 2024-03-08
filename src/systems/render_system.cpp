@@ -326,7 +326,7 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
         // Get the gamepad input
         if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) {
             // Press the currently selected button
-            if (currentButton < plfi.inventory.size()) {
+            if (static_cast<std::size_t>(currentButton) < plfi.inventory.size()) {
                 // Select an item from the inventory
                 plfi.selectedItem = plfi.inventory[currentButton]->getID();
                 currentButton = 0;
@@ -340,11 +340,11 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
         }
         else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
             // Move the selection up
-            currentButton = (currentButton > 0) ? currentButton - 1 : plfi.inventory.size();
+            currentButton = (currentButton > 0) ? currentButton - 1 : static_cast<int>(plfi.inventory.size());
         }
         else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
             // Move the selection down
-            currentButton = (currentButton < plfi.inventory.size()) ? currentButton + 1 : 0;
+            currentButton = (currentButton < static_cast<int>(plfi.inventory.size())) ? currentButton + 1 : 0;
         }
         int buttonIndex = 0;
         for (auto& item : plfi.inventory)
@@ -361,7 +361,7 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
 
         // Botón de volver al juego
         Rectangle btn2Rec = { posButtonX, posButtonY + 70, buttonWidth, buttonHeight };
-        if (GuiButton(btn2Rec, (currentButton == plfi.inventory.size()) ? "[VOLVER]" : "VOLVER")) {
+        if (GuiButton(btn2Rec, (currentButton == static_cast<int>(plfi.inventory.size())) ? "[VOLVER]" : "VOLVER")) {
             auto& inpi = em.getSingleton<InputInfo>();
             inpi.inventory = false;
         }
@@ -1011,12 +1011,16 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                             if (ren.visible && (ene.hasTag<DummyTag>() || ene.hasTag<DestructibleTag>()))
                             {
                                 std::string text = "ESPACIO";
+                                int offsetX = 25;
                                 if (engine.isGamepadAvailable(0))
+                                {
+                                    offsetX = 0;
                                     text = "X";
+                                }
 
                                 engine.drawText(text.c_str(),
-                                    static_cast<int>(engine.getWorldToScreenX(phy.position) - 25),
-                                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 9),
+                                    static_cast<int>(engine.getWorldToScreenX(phy.position) - offsetX),
+                                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 28),
                                     20,
                                     WHITE);
                             }
@@ -1088,7 +1092,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             int barWidth = 40;
             int barHeight = 4;
             int barX = static_cast<int>(engine.getWorldToScreenX(r.position) - 18);
-            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 10);
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 30);
 
             engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
 
