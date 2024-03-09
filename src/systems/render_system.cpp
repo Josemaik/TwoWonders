@@ -453,13 +453,29 @@ void RenderSystem::drawEnding(ENGI::GameEngine& engine) {
 void RenderSystem::drawStory(ENGI::GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
-    engine.drawText("Busca la espada en la cueva", 45, 200, 40, BLACK);
-    engine.drawText("Extermina al dragón de la mazmorra", 45, 250, 40, BLACK);
-    engine.drawText("(Ana quería historia)", 45, 300, 40, BLACK);
-    engine.drawText("PRESS [ENTER] TO PLAY ",
-        engine.getScreenWidth() / 2 - 200,
-        engine.getScreenHeight() - 50, 30,
-        BLACK);
+    float boxWidth = 700.f;
+    float boxHeight = 400.f;
+    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth / 2);
+    float posY = static_cast<float>(engine.getScreenHeight() / 2.5) - (boxHeight / 2);
+
+    Rectangle boxRect = { posX, posY, boxWidth, boxHeight };
+
+    // Tamaño de la fuente
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 40);
+
+    // Alineamiento del texto
+    GuiSetStyle(LABEL, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+
+    GuiLabel(boxRect, "Busca la espada en la cueva");
+    GuiLabel({ posX, posY + 50, boxWidth, boxHeight }, "Extermina al dragón de la mazmorra");
+    GuiLabel({ posX, posY + 100, boxWidth, boxHeight }, "(Ana quería historia)");
+
+    std::string text = "PRESS [ENTER] TO PLAY";
+    if (engine.isGamepadAvailable(0))
+        text = "PRESS [A] TO PLAY";
+    GuiLabel({ posX, posY + 250, boxWidth, boxHeight }, text.c_str());
+
+    init();
     engine.endDrawing();
 }
 
