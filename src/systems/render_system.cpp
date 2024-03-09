@@ -1039,8 +1039,8 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                     text = "Stick izquierdo para moverse";
 
                 engine.drawText(text.c_str(),
-                    static_cast<int>(engine.getWorldToScreenX(phy.position) - 100),
-                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 15),
+                    static_cast<int>(engine.getWorldToScreenX(phy.position) - 120),
+                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 25),
                     20,
                     WHITE);
 
