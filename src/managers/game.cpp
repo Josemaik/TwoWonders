@@ -26,6 +26,7 @@ void Game::createEntities(EntityManager& em)
         plfi.spawnPoint = { 33.0, 4.0, -25.9 };
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
+    // 32.0, 4.0, 130.0 - Segundo cofre
     // -72.0, 4.0, 72.9 - Cofre con llave
     // -116.0, 4.0, 111.0 - Apisonadora
 

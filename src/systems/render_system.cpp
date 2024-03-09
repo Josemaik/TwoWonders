@@ -1028,6 +1028,10 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                             {
                                 std::string text = "ESPACIO";
                                 float offsetX = 25.f;
+                                double multiplier = 28.0;
+
+                                if (ene.hasTag<DestructibleTag>())
+                                    multiplier = 5.0;
                                 if (engine.isGamepadAvailable(0))
                                 {
                                     offsetX = 0;
@@ -1036,7 +1040,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
                                 engine.drawText(text.c_str(),
                                     static_cast<int>(engine.getWorldToScreenX(phy.position) - offsetX),
-                                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 28),
+                                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * multiplier),
                                     20,
                                     WHITE);
                             }
