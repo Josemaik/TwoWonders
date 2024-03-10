@@ -120,6 +120,8 @@ public:
 
     // Load model from file into GPU memory
     std::shared_ptr<Model> LoadModel(const char* filePath);
+    // Load model from generated mesh ?
+
     // Unload model data from CPU and GPU
     void UnloadModel(std::shared_ptr<Model> model);
     // Draw a model (with texture if set)
@@ -130,6 +132,20 @@ public:
     void DrawModelWires(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
     // Draw a model wires with extended parameters
     void DrawModelWiresExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
+
+    // ---------------------------------------- //
+    // Mesh management and generation functions //
+    // ---------------------------------------- //
+
+    // TODO
+    // Generate cuboid mesh
+    std::shared_ptr<Mesh> GenerateMeshCube(float width, float height, float length);
+    // Unload mesh data from CPU and GPU
+    void UnloadMesh(std::shared_ptr<Mesh> mesh);
+    // Draw mesh ?
+
+
+    // MATERIAL
 
     // --------------------------------- //
     // Input-related functions: keyboard //
