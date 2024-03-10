@@ -1,5 +1,5 @@
 #pragma once
-#include "../components/resource.hpp"
+#include "../resources/resource.hpp"
 
 #include <string>
 #include <memory>

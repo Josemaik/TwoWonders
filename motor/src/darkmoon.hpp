@@ -8,7 +8,7 @@
 #include "managers/windows_manager.hpp"
 #include "managers/render_manager.hpp"
 #include "managers/input_manager.hpp"
-#include "components/resource_shader.hpp"
+#include "resources/resource_shader.hpp"
 
 #include "utils/keys.hpp"
 

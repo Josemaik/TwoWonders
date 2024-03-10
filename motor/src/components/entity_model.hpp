@@ -1,7 +1,7 @@
 #pragma once
 #include "node.hpp"
 #include "entity.hpp"
-#include "resource_mesh.hpp"
+#include "../resources/resource_mesh.hpp"
 #include "../managers/resource_manager.hpp"
 
 #include <vector>

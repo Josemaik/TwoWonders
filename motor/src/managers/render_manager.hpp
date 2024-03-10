@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../components/resource_shader.hpp"
-#include "../components/resource_texture.hpp"
-#include "../components/resource_font.hpp"
+#include "../resources/resource_shader.hpp"
+#include "../resources/resource_texture.hpp"
+#include "../resources/resource_font.hpp"
+#include "../resources/resource_mesh.hpp"
 #include "../components/entity_camera.hpp"
 #include "../components/entity_model.hpp"
-#include "../components/resource_mesh.hpp"
 
 #include "../utils/color.hpp"
 
