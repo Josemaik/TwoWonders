@@ -62,16 +62,19 @@ public:
     void drawPlane(glm::vec3 centerPos, glm::vec2 size, Color color); // XZ
     void drawCube(glm::vec3 position, glm::vec3 size, Color color);
     void drawCubeWires(glm::vec3 position, glm::vec3 size, Color color);
-    // TODO
-    void drawMesh(std::shared_ptr<Mesh> mesh);
-    void drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color);
 
+    // Model drawing functions
     void drawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
     void drawModelExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
+    void drawModelWires(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
+    void drawModelWiresExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
 
     // Mesh generation functions
     // TODO
     std::shared_ptr<Mesh> genMeshCube();
+    // Out
+    void drawMesh(std::shared_ptr<Mesh> mesh);
+    void drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color);
 
     // ChangeShader
     void useShader(std::shared_ptr<Shader> shader){ 

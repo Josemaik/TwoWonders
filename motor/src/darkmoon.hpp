@@ -122,6 +122,10 @@ public:
     void DrawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
     // Draw a model with extended parameters
     void DrawModelExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
+    // Draw a model wires (with textures if set)
+    void DrawModelWires(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
+    // Draw a model wires with extended parameters
+    void DrawModelWiresExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
 
     // --------------------------------- //
     // Input-related functions: keyboard //

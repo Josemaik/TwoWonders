@@ -5,6 +5,11 @@ int main(){
 
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
+        // Auxiliars
+
+        glm::vec3 positionCharacter = {0.0f, 0.0f, 0.0f};
+        float angleCharacter = 180.0f;
+
         // ------ //
         // Camera //
         // ------ //
@@ -17,6 +22,7 @@ int main(){
         // ---- //
         // Load //
         // ---- //
+
 
         // auto font = engine.LoadFont("assets/fonts/roboto.ttf");
         // auto shader = engine.LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");
@@ -31,30 +37,32 @@ int main(){
             // ----- //
 
             if(engine.IsKeyPressed(KEY_A)){
-                camera->target.x   -= 0.1f;
-                camera->position.x -= 0.1f;
+                positionCharacter.x -= 0.1f;
+                camera->position.x  -= 0.1f;
+                angleCharacter       = 270.0f;
             }
             if(engine.IsKeyPressed(KEY_D)){
-                camera->target.x   += 0.1f;
-                camera->position.x += 0.1f;
+                positionCharacter.x += 0.1f;
+                camera->position.x  += 0.1f;
+                angleCharacter       = 90.0f;
             }
             if(engine.IsKeyPressed(KEY_W)){
-                camera->target.z   -= 0.1f;
-                camera->position.z -= 0.1f;
+                positionCharacter.z -= 0.1f;
+                camera->position.z  -= 0.1f;
+                angleCharacter       = 180.0f;
             }
             if(engine.IsKeyPressed(KEY_S)){
-                camera->target.z   += 0.1f;
-                camera->position.z += 0.1f;
+                positionCharacter.z += 0.1f;
+                camera->position.z  += 0.1f;
+                angleCharacter       = 0.0f;
             }
 
-            if(engine.IsKeyPressed(GLFW_KEY_LEFT_SHIFT)){
-                camera->target.y   -= 0.1f;
+            if(engine.IsKeyPressed(GLFW_KEY_LEFT_SHIFT))
                 camera->position.y -= 0.1f;
-            }
-            if(engine.IsKeyPressed(KEY_SPACE)){
-                camera->target.y   += 0.1f;
+            if(engine.IsKeyPressed(KEY_SPACE))
                 camera->position.y += 0.1f;
-            }
+
+            camera->target = positionCharacter;
 
             // ------- //
             // Drawing //
@@ -67,7 +75,6 @@ int main(){
 
             engine.BeginMode3D();
 
-            /* PRUEBA
             engine.DrawPoint3DExtra({0.0f, 0.0f, 0.0f}, 5.0f, BLACK);
             engine.DrawPoint3DExtra({0.0f, 1.0f, 0.0f}, 5.0f, BLACK);
             engine.DrawPoint3DExtra({0.0f, -1.0f, 0.0f}, 5.0f, BLACK);
@@ -78,16 +85,17 @@ int main(){
             engine.DrawLine3D({-1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, -1.0f}, 1.0f, {255, 255, 0, 255});
             engine.DrawLine3D({1.0f, 0.0f, -1.0f}, {1.0f, 1.0f, -1.0f}, 1.0f, {255, 255, 0, 255}); 
 
+            engine.DrawGrid(10, 1.0f, {140, 140, 140, 255});
             engine.DrawPlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, {255, 128, 128, 255});
+
             engine.DrawCubeV({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, {255, 0, 0, 255});
             engine.DrawCubeWiresV({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, BLACK);
             engine.DrawCubeWiresV({-3.0f, 2.0f, 0.0f}, {1.0f, 1.0f, 3.0f}, {128, 0, 128, 255});
-            */
-
-            engine.DrawGrid(10, 1.0f, {140, 140, 140, 255});
-
+            
             //engine.DrawModel(model, {0.0f, 0.0f, 0.0f}, 0.2f, {255, 0, 0, 255});
-            engine.DrawModelExtra(model, {0.0f, 0.0f, 0.0f}, 0.2f, {0.0f, 1.0f, 0.0f}, 0.0f, {100, 100, 100, 255});
+            //engine.DrawModelWires(model, {0.0f, 0.0f, 0.0f}, 0.2f, BLACK);
+            engine.DrawModelExtra(model, positionCharacter, 0.2f, {0.0f, 1.0f, 0.0f}, angleCharacter, {100, 100, 100, 255});
+            engine.DrawModelWiresExtra(model, positionCharacter, 0.2f, {0.0f, 1.0f, 0.0f}, angleCharacter, BLACK);
 
             engine.EndMode3D();
 

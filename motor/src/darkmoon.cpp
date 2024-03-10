@@ -289,6 +289,16 @@ void DarkMoonEngine::DrawModelExtra(std::shared_ptr<Model> model, glm::vec3 posi
     m_renderManager.drawModelExtra(model, position, scale, rotationAxis, rotationAngle, tint);
 }
 
+// Draw a model wires (with textures if set)
+void DarkMoonEngine::DrawModelWires(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint){
+    m_renderManager.drawModelWires(model, position, scale, tint);
+}
+
+// Draw a model wires with extended parameters
+void DarkMoonEngine::DrawModelWiresExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
+    m_renderManager.drawModelWiresExtra(model, position, scale, rotationAxis, rotationAngle, tint);
+}
+
 
 // --------------------------------- //
 // Input-related functions: keyboard //
