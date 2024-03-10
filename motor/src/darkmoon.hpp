@@ -120,6 +120,8 @@ public:
 
     // Load model from file into GPU memory
     std::shared_ptr<Model> LoadModel(const char* filePath);
+    // Unload model data from CPU and GPU
+    void UnloadModel(std::shared_ptr<Model> model);
     // Draw a model (with texture if set)
     void DrawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
     // Draw a model with extended parameters

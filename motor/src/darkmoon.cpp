@@ -284,6 +284,11 @@ std::shared_ptr<Model> DarkMoonEngine::LoadModel(const char* filePath){
     return eModel;
 }
 
+// Unload model data from CPU and GPU
+void DarkMoonEngine::UnloadModel(std::shared_ptr<Model> model){
+    model->unload(m_resourceManager);
+}
+
 // Draw a model (with texture if set)
 void DarkMoonEngine::DrawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint){
     m_renderManager.drawModel(model, position, scale, tint);
