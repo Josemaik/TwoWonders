@@ -72,9 +72,6 @@ public:
     // Mesh generation functions
     // TODO
     std::shared_ptr<Mesh> genMeshCube();
-    // Out
-    void drawMesh(std::shared_ptr<Mesh> mesh);
-    void drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color);
 
     // ChangeShader
     void useShader(std::shared_ptr<Shader> shader){ 

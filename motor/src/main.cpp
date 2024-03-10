@@ -23,13 +23,16 @@ int main(){
         // Load //
         // ---- //
 
-
         // auto font = engine.LoadFont("assets/fonts/roboto.ttf");
         // auto shader = engine.LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");
         auto texture = engine.LoadTexture("assets/koromaru.png");
         auto texture2 = engine.LoadTexture("assets/wall.jpg");
 
         auto model = engine.LoadModel("assets/main_character.obj");
+
+        // ------ //
+        // Unload //
+        // ------ //
 
         //engine.UnloadTexture(texture);
         //engine.UnloadModel(model);
@@ -138,34 +141,20 @@ int main(){
 }
 
 /*
-std::shared_ptr<Model> loadModel(const char*, std::shared_ptr<Node>, ResourceManager& rm);
-
     // Patron Dirty //
 
         //----- Gamepad -----//
         if(im.isGamePadAvailable(0) == 1)
             std::cout << "Gamepad: " << im.getGamePadName(0) << std::endl;
 
-        //----- Load model -----// 
-        auto filePath = "assets/dummy.obj";
-        auto eModel = loadModel(filePath, nScene, rm);
-
             // Input
             im.update();
 
             // renm.drawTexture3D(rTexture2, {0.0f, 0.0f}, 50.0f, 0.01f, {1.0f, 1.0f, 1.0f, 1.0f});
-            // Draw (model)
-            // eModel->draw(glm::mat4());
-
-        }
-    }
 
     //----- Draw -----//
     // std::cout << "┌──────┐" << std::endl;
     // std::cout << "│ Draw │" << std::endl;
     // std::cout << "└──────┘" << std::endl;
     // nScene->traverse(glm::mat4());
-
-    return 0;
-}
 */
