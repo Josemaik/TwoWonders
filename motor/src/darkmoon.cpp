@@ -192,6 +192,11 @@ std::shared_ptr<Texture> DarkMoonEngine::LoadTexture(const char* filePath){
     return texture;
 }
 
+// Unload texture data from CPU and GPU
+void DarkMoonEngine::UnloadTexture(std::shared_ptr<Texture> texture){
+    m_resourceManager.unloadResource(texture->id);
+}
+
 // Draw a texture
 void DarkMoonEngine::DrawTexture(std::shared_ptr<Texture> texture, int posX, int posY, Color tint){
     m_renderManager.useShader(m_shaderTexture);

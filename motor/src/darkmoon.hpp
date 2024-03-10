@@ -82,6 +82,8 @@ public:
 
     // Load texture from file into GPU memory
     std::shared_ptr<Texture> LoadTexture(const char* filePath);
+    // Unload texture data from CPU and GPU
+    void UnloadTexture(std::shared_ptr<Texture> texture);
     // Draw a texture
     void DrawTexture(std::shared_ptr<Texture> texture, int posX, int posY, Color tint);
     // Draw a texture (vector version)

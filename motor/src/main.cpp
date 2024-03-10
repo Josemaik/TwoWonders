@@ -31,6 +31,8 @@ int main(){
 
         auto model = engine.LoadModel("assets/main_character.obj");
 
+        //engine.UnloadTexture(texture);
+
         while(!engine.WindowShouldClose()){
             // ----- //
             // Logic //
