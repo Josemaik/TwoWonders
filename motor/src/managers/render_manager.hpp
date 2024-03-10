@@ -2,8 +2,12 @@
 
 #include "../components/resource_shader.hpp"
 #include "../components/resource_texture.hpp"
+#include "../components/resource_font.hpp"
 #include "../components/entity_camera.hpp"
+#include "../components/entity_model.hpp"
 #include "../components/resource_mesh.hpp"
+
+#include "../utils/color.hpp"
 
 #include <memory>
 
@@ -19,14 +23,18 @@
 struct RenderManager{
 private:
     std::shared_ptr<Shader> m_shaderProgram;
+    std::shared_ptr<Font> m_defaultFont;
+    int m_width, m_height;
 
     void draw(float vertices[], std::size_t vertSize, GLuint indices[], std::size_t indSize,glm::vec4 color);
-    // TODO: 800 / 600 --> getScreenWidth() / getScreenHeight()
-    float normalizeX(float x){ return (x / 800.0f) * 2 - 1; };
-    float normalizeY(float y){ return -((y / 600.0f) * 2 - 1); };
+    float normalizeX(float x){ return (x / static_cast<float>(m_width)) * 2 - 1; };
+    float normalizeY(float y){ return -((y / static_cast<float>(m_height)) * 2 - 1); };
 
 public:
     std::shared_ptr<Camera> m_camera;
+
+    // Screen width and height
+    void setWindowSize(int width, int height){ m_width = width; m_height = height; };
 
     // Drawing
     void beginMode3D();
@@ -36,27 +44,30 @@ public:
     void setCamera(std::shared_ptr<Camera> camera){ m_camera = camera; };
 
     // Basic drawing functions
-    void clearBackground(glm::vec4 color);
-    void drawPixel(glm::vec2 pos, glm::vec4 color);
-    void drawLine(glm::vec2 startPos, glm::vec2 endPos, glm::vec4 color);
-    void drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, glm::vec4 color);
-    void drawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 color);
-    void drawCircle(glm::vec2 pos, float radius, int segments, glm::vec4 color);
+    void clearBackground(Color color);
+    void drawPixel(glm::vec2 pos, Color color);
+    void drawLine(glm::vec2 startPos, glm::vec2 endPos, Color color);
+    void drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, Color color);
+    void drawRectangle(glm::vec2 pos, glm::vec2 size, Color color);
+    void drawCircle(glm::vec2 pos, float radius, int segments, Color color);
 
     // Texture drawing functions
-    void drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, glm::vec4 color);
-    void drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, glm::vec4 color);
+    void drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, Color color);
+    void drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, Color color);
 
     // Basic geometric 3D shapes drawing functions
-    void drawPoint3D(glm::vec3 position, float pointSize, glm::vec4 color);
-    void drawLine3D(glm::vec3 startPos, float lineSize, glm::vec3 endPos, glm::vec4 color);
-    void drawGrid(int slices, float spacing, glm::vec4 color);
-    void drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 color); // XZ
-    void drawCube(glm::vec3 position, glm::vec3 size, glm::vec4 color);
-    void drawCubeWires(glm::vec3 position, glm::vec3 size, glm::vec4 color);
-    // TODO
-    void drawMesh(std::shared_ptr<Mesh> mesh);
-    void drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color);
+    void drawPoint3D(glm::vec3 position, float pointSize, Color color);
+    void drawLine3D(glm::vec3 startPos, glm::vec3 endPos, float lineSize, Color color);
+    void drawGrid(int slices, float spacing, Color color);
+    void drawPlane(glm::vec3 centerPos, glm::vec2 size, Color color); // XZ
+    void drawCube(glm::vec3 position, glm::vec3 size, Color color);
+    void drawCubeWires(glm::vec3 position, glm::vec3 size, Color color);
+
+    // Model drawing functions
+    void drawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
+    void drawModelExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
+    void drawModelWires(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
+    void drawModelWiresExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
 
     // Mesh generation functions
     // TODO
@@ -69,10 +80,21 @@ public:
     };
 
     // Text
-    void drawText(const char*, glm::vec2, int, glm::vec4);
+    void drawText(const char* text, glm::vec2 pos, int fontSize, Color color);
 
     static RenderManager& getInstance(){
         static RenderManager instance;
         return instance;
     }
+
+    // Auxiliars
+    glm::vec4 normalizeColor(const Color& color) {
+        return glm::vec4(
+            static_cast<float>(color.r) / 255.0f,
+            static_cast<float>(color.g) / 255.0f,
+            static_cast<float>(color.b) / 255.0f,
+            static_cast<float>(color.a) / 255.0f
+        );
+    }
+    void setDefaultFont(std::shared_ptr<Font> font){ m_defaultFont = font; };
 };

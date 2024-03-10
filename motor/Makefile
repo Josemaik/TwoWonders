@@ -1,9 +1,9 @@
 APP		   := Motor
 CCACHE 	   := ccache
 CC         := g++-12
-CCFLAGS    := -std=c++2b -g -Wall -Wpedantic -Wextra -Wconversion
+CCFLAGS    := -std=c++2b -g -Wall -Wpedantic -Wextra -Wconversion -I/usr/include/freetype2
 
-LIBS 	   := -lglfw -lGLEW -lGLU -lGL -lm -lassimp
+LIBS 	   := -lglfw -lGLEW -lGLU -lGL -lm -lassimp -lfreetype
 
 SANITIZE   := -fsanitize=address,undefined
 

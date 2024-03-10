@@ -30,7 +30,7 @@ public:
 
     // Returns the view matrix
     glm::mat4 getViewMatrix(){
-        return glm::lookAt(position, position + front, up);
+        return glm::lookAt(position, target, up);
     }
 
     // Return the projection matrix
