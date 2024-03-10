@@ -20,13 +20,9 @@ bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
     m_rootNode->addChild(std::move(nLight));
 
     // Create Camera
-    auto nCamera = std::make_unique<Node>();
-    nCamera->name = "Main camera";
-    auto eCamera = std::make_shared<Camera>();
-    nCamera->setEntity(eCamera);
-    m_rootNode->addChild(std::move(nCamera));
+    auto eCamera = CreateCamera("Main camera");
     // Assigns Camera to RenderManager
-    m_renderManager.setCamera(eCamera);
+    UseCamera(eCamera);
 
     //----- View tree -----//
     std::cout << "┌──────┐" << std::endl;
@@ -87,7 +83,6 @@ int DarkMoonEngine::GetScreenWidth(){
 int DarkMoonEngine::GetScreenHeight(){
     return m_windowsManager.getScreenHeight();
 }
-
 
 // ------------------------- //
 // Drawing-related functions //
@@ -311,6 +306,27 @@ std::shared_ptr<Texture> DarkMoonEngine::LoadTexture(const char* filePath){
 // Load shader from file into GPU memory
 std::shared_ptr<Shader> DarkMoonEngine::LoadShader(const char* vsFilePath, const char* fsFilePath){
     return m_resourceManager.loadResource<Shader>(vsFilePath, fsFilePath, ShaderType::COLOR);
+}
+
+// ------ //
+// Camera //
+// ------ //
+
+// Create camera
+std::shared_ptr<Camera> DarkMoonEngine::CreateCamera(const char* name){
+    auto nCamera = std::make_unique<Node>();
+    nCamera->name = name;
+    auto eCamera = std::make_shared<Camera>();
+    nCamera->setEntity(eCamera);
+    m_rootNode->addChild(std::move(nCamera));
+
+    return eCamera;
+}
+
+// Use camera
+void DarkMoonEngine::UseCamera(std::shared_ptr<Camera> newCamera){
+    // Assigns Camera to RenderManager
+    m_renderManager.setCamera(newCamera);
 }
 
 // ---------------------- //

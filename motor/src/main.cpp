@@ -5,6 +5,13 @@ int main(){
 
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
+        // ------ //
+        // Camera //
+        // ------ //
+
+        auto camera = engine.CreateCamera("Main");
+        engine.UseCamera(camera);
+
         // ---- //
         // Load //
         // ---- //
@@ -19,12 +26,19 @@ int main(){
             // Logic //
             // ----- //
 
-            /* PRUEBAS
-            if(engine.IsKeyPressed(KEY_Q))
-                engine.SetWindowSize(engine.GetScreenWidth() + 10, engine.GetScreenHeight() + 10);
+            if(engine.IsKeyPressed(KEY_A))
+                camera->position.x -= 0.1f;
+            if(engine.IsKeyPressed(KEY_D))
+                camera->position.x += 0.1f;
             if(engine.IsKeyPressed(KEY_W))
-                engine.SetWindowSize(engine.GetScreenWidth() - 10, engine.GetScreenHeight() - 10);
-            */
+                camera->position.z -= 0.1f;
+            if(engine.IsKeyPressed(KEY_S))
+                camera->position.z += 0.1f;
+
+            if(engine.IsKeyPressed(GLFW_KEY_LEFT_SHIFT))
+                camera->position.y -= 0.1f;
+            if(engine.IsKeyPressed(KEY_SPACE))
+                camera->position.y += 0.1f;
 
             // ------- //
             // Drawing //
@@ -47,11 +61,12 @@ int main(){
             engine.DrawLine3D({-1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, -1.0f}, 1.0f, {255, 255, 0, 255});
             engine.DrawLine3D({1.0f, 0.0f, -1.0f}, {1.0f, 1.0f, -1.0f}, 1.0f, {255, 255, 0, 255}); 
 
-            engine.DrawPlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, {255, 0, 0, 255});
+            engine.DrawPlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, {255, 128, 128, 255});
             engine.DrawGrid(10, 1.0f, {140, 140, 140, 255});
 
-            //engine.DrawCube({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
-            //engine.DrawCubeWires({-3.0f, 2.0f, 0.0f}, {1.0f, 1.0f, 3.0f}, {0.5f, 0.0f, 0.5f, 1.0f});
+            engine.DrawCubeV({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, {255, 0, 0, 255});
+            engine.DrawCubeWiresV({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, BLACK);
+            engine.DrawCubeWiresV({-3.0f, 2.0f, 0.0f}, {1.0f, 1.0f, 3.0f}, {128, 0, 128, 255});
 
             engine.EndMode3D();
 
@@ -61,10 +76,7 @@ int main(){
 
             engine.DrawRectangle(12, 12, 200, 40, {128, 128, 128, 255});     
             engine.DrawRectangleV({10, 10}, {200, 40}, {180, 180, 180, 255});
-            engine.DrawRectangleLines({10, 10}, {200, 40}, BLACK); 
-
-            engine.DrawRectangle(10, 60, 200, 40, {255, 0, 0, 255});     
-
+            engine.DrawRectangleLines({10, 10}, {200, 40}, BLACK);    
 
             /* PRUEBAS
             engine.DrawPixel(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, {0, 0, 0, 255});
@@ -113,23 +125,6 @@ std::shared_ptr<Model> loadModel(const char*, std::shared_ptr<Node>, ResourceMan
             // Draw (model)
             // eModel->draw(glm::mat4());
 
-            renm.drawPoint3D({0.0f, 0.0f, 0.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
-            renm.drawPoint3D({0.0f, 1.0f, 0.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
-            renm.drawPoint3D({0.0f, -1.0f, 0.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
-            renm.drawPoint3D({1.0f, 0.0f, -1.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
-            renm.drawPoint3D({1.0f, 1.0f, -1.0f}, 5.0f, {0.0f, 0.0f, 0.0f, 1.0f});
-
-            renm.drawLine3D({0.0f, 1.0f, 0.0f}, 1.0f, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 0.0f, 1.0f});
-            renm.drawLine3D({-1.0f, 0.0f, 1.0f}, 1.0f, {1.0f, 1.0f, -1.0f}, {1.0f, 1.0f, 0.0f, 1.0f});
-            renm.drawLine3D({1.0f, 0.0f, -1.0f}, 1.0f, {1.0f, 1.0f, -1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}); 
-
-            renm.drawPlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, {1.0f, 0.5f, 0.5f, 1.0f});
-            renm.drawGrid(10, 1.0f, {0.5f, 0.5f, 0.5f, 0.0f});
-
-            renm.drawCube({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
-            renm.drawCubeWires({-3.0f, 2.0f, 0.0f}, {1.0f, 1.0f, 3.0f}, {0.5f, 0.0f, 0.5f, 1.0f});
-
-            renm.endMode3D();
         }
     }
 

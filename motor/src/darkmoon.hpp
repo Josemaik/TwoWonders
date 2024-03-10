@@ -138,6 +138,15 @@ public:
     // TODO //
     // Model
 
+    // ------ //
+    // Camera //
+    // ------ //
+    
+    // Create camera
+    std::shared_ptr<Camera> CreateCamera(const char* name);
+    // Use camera
+    void UseCamera(std::shared_ptr<Camera> newCamera);
+
     // ---------------------- //
     // Text drawing functions //
     // ---------------------- //
