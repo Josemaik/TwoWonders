@@ -613,12 +613,15 @@ void RenderManager::drawCube(glm::vec3 position, glm::vec3 size, Color color){
     glUseProgram(m_shaderProgram->id_shader);
     glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
-    // Configure model transformation
+    // Transform
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);
+    glm::mat4 view       = m_camera->getViewMatrix();
+    glm::mat4 projection = m_camera->getProjectionMatrix(m_width, m_height);
     
-    GLuint modelLoc = glGetUniformLocation(m_shaderProgram->id_shader, "model");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     // Draw wirefram cube
     glBindVertexArray(VAO);
@@ -702,6 +705,44 @@ void RenderManager::drawCubeWires(glm::vec3 position, glm::vec3 size, Color colo
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
+}
+
+// Model 3D
+
+void RenderManager::drawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint){
+    drawModelExtra(model, position, scale, {0.0f, 0.0f, 0.0f}, 0.0f, tint);
+}
+
+void RenderManager::drawModelExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
+    if(!model || !model->isLoaded())
+        return;
+
+    // Set the uniform color in the shader
+    GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
+    glUseProgram(m_shaderProgram->id_shader);
+    glUniform4fv(colorUniform, 1, glm::value_ptr(normalizeColor(tint)));
+
+    // Transform
+    glm::mat4 modelM = glm::mat4(1.0f);
+    modelM = glm::translate(modelM, position);
+    if (glm::length(rotationAngle) > 0.0f)
+        modelM = glm::rotate(modelM, glm::radians(rotationAngle), rotationAxis);
+    modelM = glm::scale(modelM, glm::vec3(scale));
+
+    glm::mat4 view       = m_camera->getViewMatrix();
+    glm::mat4 projection = m_camera->getProjectionMatrix(m_width, m_height);
+    
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(modelM));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+    // Draw meshes
+    for (const auto& mesh : model->getMeshes()) {
+        GLuint VAO = mesh->getVAO();
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->getNumIndices()), GL_UNSIGNED_SHORT, 0);
+        glBindVertexArray(0);
+    }
 }
 
 // EXPERIMENTAL

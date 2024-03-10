@@ -12,6 +12,8 @@ int main(){
         auto camera = engine.CreateCamera("Main");
         engine.UseCamera(camera);
 
+        // camera->cameraProjection = CameraProjection::CAMERA_ORTHOGRAPHIC;
+
         // ---- //
         // Load //
         // ---- //
@@ -21,24 +23,38 @@ int main(){
         auto texture = engine.LoadTexture("assets/koromaru.png");
         auto texture2 = engine.LoadTexture("assets/wall.jpg");
 
+        auto model = engine.LoadModel("assets/main_character.obj");
+
         while(!engine.WindowShouldClose()){
             // ----- //
             // Logic //
             // ----- //
 
-            if(engine.IsKeyPressed(KEY_A))
+            if(engine.IsKeyPressed(KEY_A)){
+                camera->target.x   -= 0.1f;
                 camera->position.x -= 0.1f;
-            if(engine.IsKeyPressed(KEY_D))
+            }
+            if(engine.IsKeyPressed(KEY_D)){
+                camera->target.x   += 0.1f;
                 camera->position.x += 0.1f;
-            if(engine.IsKeyPressed(KEY_W))
+            }
+            if(engine.IsKeyPressed(KEY_W)){
+                camera->target.z   -= 0.1f;
                 camera->position.z -= 0.1f;
-            if(engine.IsKeyPressed(KEY_S))
+            }
+            if(engine.IsKeyPressed(KEY_S)){
+                camera->target.z   += 0.1f;
                 camera->position.z += 0.1f;
+            }
 
-            if(engine.IsKeyPressed(GLFW_KEY_LEFT_SHIFT))
+            if(engine.IsKeyPressed(GLFW_KEY_LEFT_SHIFT)){
+                camera->target.y   -= 0.1f;
                 camera->position.y -= 0.1f;
-            if(engine.IsKeyPressed(KEY_SPACE))
+            }
+            if(engine.IsKeyPressed(KEY_SPACE)){
+                camera->target.y   += 0.1f;
                 camera->position.y += 0.1f;
+            }
 
             // ------- //
             // Drawing //
@@ -51,6 +67,7 @@ int main(){
 
             engine.BeginMode3D();
 
+            /* PRUEBA
             engine.DrawPoint3DExtra({0.0f, 0.0f, 0.0f}, 5.0f, BLACK);
             engine.DrawPoint3DExtra({0.0f, 1.0f, 0.0f}, 5.0f, BLACK);
             engine.DrawPoint3DExtra({0.0f, -1.0f, 0.0f}, 5.0f, BLACK);
@@ -62,11 +79,15 @@ int main(){
             engine.DrawLine3D({1.0f, 0.0f, -1.0f}, {1.0f, 1.0f, -1.0f}, 1.0f, {255, 255, 0, 255}); 
 
             engine.DrawPlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, {255, 128, 128, 255});
-            engine.DrawGrid(10, 1.0f, {140, 140, 140, 255});
-
             engine.DrawCubeV({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, {255, 0, 0, 255});
             engine.DrawCubeWiresV({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, BLACK);
             engine.DrawCubeWiresV({-3.0f, 2.0f, 0.0f}, {1.0f, 1.0f, 3.0f}, {128, 0, 128, 255});
+            */
+
+            engine.DrawGrid(10, 1.0f, {140, 140, 140, 255});
+
+            //engine.DrawModel(model, {0.0f, 0.0f, 0.0f}, 0.2f, {255, 0, 0, 255});
+            engine.DrawModelExtra(model, {0.0f, 0.0f, 0.0f}, 0.2f, {0.0f, 1.0f, 0.0f}, 0.0f, {100, 100, 100, 255});
 
             engine.EndMode3D();
 
@@ -135,17 +156,5 @@ std::shared_ptr<Model> loadModel(const char*, std::shared_ptr<Node>, ResourceMan
     // nScene->traverse(glm::mat4());
 
     return 0;
-}
-
-std::shared_ptr<Model> loadModel(const char* filePath, std::shared_ptr<Node> nScene, ResourceManager& rm){
-    auto nModel = std::make_unique<Node>();
-    nModel->name = filePath;
-    auto eModel = std::make_shared<Model>();
-    eModel->load(filePath, rm);
-    if(eModel->isLoaded()){
-        nModel->setEntity(eModel);
-        nScene->addChild(std::move(nModel));
-    }
-    return eModel;
 }
 */

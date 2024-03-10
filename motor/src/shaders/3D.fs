@@ -5,7 +5,9 @@ in vec3 ourColor;
 in vec2 TextCoord;
 uniform sampler2D texture1;
 
+uniform vec4 customColor;
+
 void main()
 {
-   FragColor = vec4(ourColor, 1.0);
+   FragColor = customColor;
 }

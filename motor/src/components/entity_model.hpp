@@ -26,4 +26,6 @@ public:
     void draw(glm::mat4) const override;
 
     bool isLoaded(){ return m_loaded; };
+
+    const std::vector<std::shared_ptr<Mesh>>& getMeshes() const { return m_meshes; };
 };

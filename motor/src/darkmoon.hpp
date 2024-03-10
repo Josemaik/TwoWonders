@@ -76,10 +76,12 @@ public:
     // Draw a color-filled circle (vector version)
     void DrawCircleV(glm::vec2 pos, float radius, int segments, Color color);
 
-    // ------------------------- //
-    // Texture drawing functions //
-    // ------------------------- //
+    // ------------------------------------- //
+    // Texture Loading and Drawing functions //
+    // ------------------------------------- //
 
+    // Load texture from file into GPU memory
+    std::shared_ptr<Texture> LoadTexture(const char* filePath);
     // Draw a texture
     void DrawTexture(std::shared_ptr<Texture> texture, int posX, int posY, Color tint);
     // Draw a texture (vector version)
@@ -110,6 +112,17 @@ public:
     // Draw a cube wires (vector version)
     void DrawCubeWiresV(glm::vec3 position, glm::vec3 size, Color color);
 
+    // -------------------------------------- //
+    // Model 3D Loading and Drawing functions //
+    // -------------------------------------- //
+
+    // Load model from file into GPU memory
+    std::shared_ptr<Model> LoadModel(const char* filePath);
+    // Draw a model (with texture if set)
+    void DrawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
+    // Draw a model with extended parameters
+    void DrawModelExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
+
     // --------------------------------- //
     // Input-related functions: keyboard //
     // --------------------------------- //
@@ -131,12 +144,8 @@ public:
 
     // Load font from file into GPU memory
     std::shared_ptr<Font> LoadFont(const char* filePath);
-    // Load texture from file into GPU memory
-    std::shared_ptr<Texture> LoadTexture(const char* filePath);
     // Load shader from file into GPU memory
     std::shared_ptr<Shader> LoadShader(const char* vsFilePath, const char* fsFilePath);
-    // TODO //
-    // Model
 
     // ------ //
     // Camera //

@@ -35,6 +35,7 @@ public:
     void draw();
 
     GLuint getVAO(){ return m_VAO; };
+    std::size_t getNumIndices() const { return indices.size(); };
 
 private:
     // Render data

@@ -4,6 +4,7 @@
 #include "../components/resource_texture.hpp"
 #include "../components/resource_font.hpp"
 #include "../components/entity_camera.hpp"
+#include "../components/entity_model.hpp"
 #include "../components/resource_mesh.hpp"
 
 #include "../utils/color.hpp"
@@ -64,6 +65,9 @@ public:
     // TODO
     void drawMesh(std::shared_ptr<Mesh> mesh);
     void drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color);
+
+    void drawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
+    void drawModelExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
 
     // Mesh generation functions
     // TODO

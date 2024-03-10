@@ -119,6 +119,7 @@ void DarkMoonEngine::EndMode3D(){
 // ------------------------------ //
 // Basic shapes drawing functions //
 // ------------------------------ //
+
 // Draw a pixel
 void DarkMoonEngine::DrawPixel(int posX, int posY, Color color){
     m_renderManager.drawPixel({posX, posY}, color);
@@ -182,6 +183,14 @@ void DarkMoonEngine::DrawCircleV(glm::vec2 pos, float radius, int segments, Colo
 // ------------------------- //
 // Texture drawing functions //
 // ------------------------- //
+
+// Load texture from file into GPU memory
+std::shared_ptr<Texture> DarkMoonEngine::LoadTexture(const char* filePath){
+    auto texture = m_resourceManager.loadResource<Texture>();
+    texture->load(filePath);
+
+    return texture;
+}
 
 // Draw a texture
 void DarkMoonEngine::DrawTexture(std::shared_ptr<Texture> texture, int posX, int posY, Color tint){
@@ -253,6 +262,33 @@ void DarkMoonEngine::DrawCubeWiresV(glm::vec3 position, glm::vec3 size, Color co
     m_renderManager.drawCubeWires(position, size, color);
 }
 
+// -------------------------------------- //
+// Model 3D Loading and Drawing functions //
+// -------------------------------------- //
+
+// Load model from file into GPU memory
+std::shared_ptr<Model> DarkMoonEngine::LoadModel(const char* filePath){
+    auto nModel = std::make_unique<Node>();
+    nModel->name = filePath;
+    auto eModel = std::make_shared<Model>();
+    eModel->load(filePath, m_resourceManager);
+    if(eModel->isLoaded()){
+        nModel->setEntity(eModel);
+        m_rootNode->addChild(std::move(nModel));
+    }
+    return eModel;
+}
+
+// Draw a model (with texture if set)
+void DarkMoonEngine::DrawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint){
+    m_renderManager.drawModel(model, position, scale, tint);
+}
+
+// Draw a model with extended parameters
+void DarkMoonEngine::DrawModelExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
+    m_renderManager.drawModelExtra(model, position, scale, rotationAxis, rotationAngle, tint);
+}
+
 
 // --------------------------------- //
 // Input-related functions: keyboard //
@@ -293,14 +329,6 @@ std::shared_ptr<Font> DarkMoonEngine::LoadFont(const char* filePath){
     font->load(filePath);
 
     return font;
-}
-
-// Load texture from file into GPU memory
-std::shared_ptr<Texture> DarkMoonEngine::LoadTexture(const char* filePath){
-    auto texture = m_resourceManager.loadResource<Texture>();
-    texture->load(filePath);
-
-    return texture;
 }
 
 // Load shader from file into GPU memory
