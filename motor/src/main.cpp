@@ -37,17 +37,34 @@ int main(){
 
             engine.BeginMode3D();
 
+            engine.DrawPoint3DExtra({0.0f, 0.0f, 0.0f}, 5.0f, BLACK);
+            engine.DrawPoint3DExtra({0.0f, 1.0f, 0.0f}, 5.0f, BLACK);
+            engine.DrawPoint3DExtra({0.0f, -1.0f, 0.0f}, 5.0f, BLACK);
+            engine.DrawPoint3DExtra({1.0f, 0.0f, -1.0f}, 5.0f, BLACK);
+            engine.DrawPoint3DExtra({1.0f, 1.0f, -1.0f}, 5.0f, BLACK);
 
+            engine.DrawLine3D({0.0f, 1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, 1.0f, {255, 255, 0, 255});
+            engine.DrawLine3D({-1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, -1.0f}, 1.0f, {255, 255, 0, 255});
+            engine.DrawLine3D({1.0f, 0.0f, -1.0f}, {1.0f, 1.0f, -1.0f}, 1.0f, {255, 255, 0, 255}); 
+
+            engine.DrawPlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, {255, 0, 0, 255});
+            engine.DrawGrid(10, 1.0f, {140, 140, 140, 255});
+
+            //engine.DrawCube({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
+            //engine.DrawCubeWires({-3.0f, 2.0f, 0.0f}, {1.0f, 1.0f, 3.0f}, {0.5f, 0.0f, 0.5f, 1.0f});
 
             engine.EndMode3D();
 
             // 2D
 
             // engine.DrawText("Hola", 0, 0, 24, BLACK);
-            
+
             engine.DrawRectangle(12, 12, 200, 40, {128, 128, 128, 255});     
             engine.DrawRectangleV({10, 10}, {200, 40}, {180, 180, 180, 255});
-            engine.DrawRectangleLines({10, 10}, {200, 40}, BLACK);
+            engine.DrawRectangleLines({10, 10}, {200, 40}, BLACK); 
+
+            engine.DrawRectangle(10, 60, 200, 40, {255, 0, 0, 255});     
+
 
             /* PRUEBAS
             engine.DrawPixel(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, {0, 0, 0, 255});

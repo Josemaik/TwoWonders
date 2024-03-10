@@ -209,6 +209,56 @@ void DarkMoonEngine::DrawTextureEx(std::shared_ptr<Texture> texture, glm::vec2 p
     m_renderManager.useShader(m_shaderColor);
 }
 
+// ------------------------------------------- //
+// Basic geometric 3D shapes drawing functions //
+// ------------------------------------------- //
+
+// Draw a point in 3D space
+void DarkMoonEngine::DrawPoint3D(glm::vec3 pos, Color color){
+    m_renderManager.drawPoint3D(pos, 1.0f, color);
+}
+
+// Draw a point in 3D space with extended parameters
+void DarkMoonEngine::DrawPoint3DExtra(glm::vec3 pos, float pointSize, Color color){
+    m_renderManager.drawPoint3D(pos, pointSize, color);
+}
+
+// Draw a line in 3D space
+void DarkMoonEngine::DrawLine3D(glm::vec3 startPos, glm::vec3 endPos, float lineSize, Color color){
+    m_renderManager.drawLine3D(startPos, endPos, lineSize, color);
+}
+
+// Draw a grid (centered at (0, 0, 0))
+void DarkMoonEngine::DrawGrid(int slices, float spacing, Color color){
+    m_renderManager.drawGrid(slices, spacing, color);
+}
+
+// Draw a plane XZ
+void DarkMoonEngine::DrawPlane(glm::vec3 centerPos, glm::vec2 size, Color color){
+    m_renderManager.drawPlane(centerPos, size, color);
+}
+
+// Draw a cube
+void DarkMoonEngine::DrawCube(glm::vec3 position, float width, float height, float length, Color color){
+    m_renderManager.drawCube(position, {width, height, length}, color);
+}
+
+// Draw a cube (vector version)
+void DarkMoonEngine::DrawCubeV(glm::vec3 position, glm::vec3 size, Color color){
+    m_renderManager.drawCube(position, size, color);
+}
+
+// Draw a cube wires
+void DarkMoonEngine::DrawCubeWires(glm::vec3 position, float width, float height, float length, Color color){
+    m_renderManager.drawCubeWires(position, {width, height, length}, color);
+}
+
+// Draw a cube wires (vector version)
+void DarkMoonEngine::DrawCubeWiresV(glm::vec3 position, glm::vec3 size, Color color){
+    m_renderManager.drawCubeWires(position, size, color);
+}
+
+
 // --------------------------------- //
 // Input-related functions: keyboard //
 // --------------------------------- //

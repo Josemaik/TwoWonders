@@ -91,7 +91,24 @@ public:
     // Basic geometric 3D shapes drawing functions //
     // ------------------------------------------- //
 
-    // 
+    // Draw a point in 3D space
+    void DrawPoint3D(glm::vec3 pos, Color color);
+    // Draw a point in 3D space with extended parameters
+    void DrawPoint3DExtra(glm::vec3 pos, float pointSize, Color color);
+    // Draw a line in 3D space
+    void DrawLine3D(glm::vec3 startPos, glm::vec3 endPos, float lineSize, Color color);
+    // Draw a grid (centered at (0, 0, 0))
+    void DrawGrid(int slices, float spacing, Color color);
+    // Draw a plane XZ
+    void DrawPlane(glm::vec3 centerPos, glm::vec2 size, Color color);
+    // Draw a cube
+    void DrawCube(glm::vec3 position, float width, float height, float length, Color color);
+    // Draw a cube (vector version)
+    void DrawCubeV(glm::vec3 position, glm::vec3 size, Color color);
+    // Draw a cube wires
+    void DrawCubeWires(glm::vec3 position, float width, float height, float length, Color color);
+    // Draw a cube wires (vector version)
+    void DrawCubeWiresV(glm::vec3 position, glm::vec3 size, Color color);
 
     // --------------------------------- //
     // Input-related functions: keyboard //

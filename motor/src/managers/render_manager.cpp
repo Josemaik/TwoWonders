@@ -216,7 +216,7 @@ void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos,
 
     // Define vertices and indices
     float vertices[] = {
-        // positions                                                                                                                       // colors                    // texture coords
+        // positions                                                           // colors                       // texture coords
         normalizeX(pos.x - halfWidth), normalizeY(pos.y - halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   0.0f, 0.0f,
         normalizeX(pos.x + halfWidth), normalizeY(pos.y - halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   1.0f, 0.0f,
         normalizeX(pos.x - halfWidth), normalizeY(pos.y + halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   0.0f, 1.0f,
@@ -333,11 +333,13 @@ void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2
 
 // Basic geometric 3D shapes drawing functions
 
-void RenderManager::drawPoint3D(glm::vec3 position, float pointSize, glm::vec4 color){
+void RenderManager::drawPoint3D(glm::vec3 position, float pointSize, Color color){
+    auto nColor = normalizeColor(color);
+
     // Define vertices for the point
     float vertices[] = {
         position.x, position.y, position.z,
-        color.x, color.y, color.z,
+        nColor.x, nColor.y, nColor.z,
     };
 
     // Create and configure VAO, VBO
@@ -360,7 +362,7 @@ void RenderManager::drawPoint3D(glm::vec3 position, float pointSize, glm::vec4 c
 
     // Colors
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
     // Transform
     glm::mat4 model      = glm::mat4(1.0f);
@@ -381,11 +383,13 @@ void RenderManager::drawPoint3D(glm::vec3 position, float pointSize, glm::vec4 c
     glDeleteBuffers(1, &VBO);
 }
 
-void RenderManager::drawLine3D(glm::vec3 startPos, float lineSize, glm::vec3 endPos, glm::vec4 color){
+void RenderManager::drawLine3D(glm::vec3 startPos, glm::vec3 endPos, float lineSize, Color color){
+    auto nColor = normalizeColor(color);
+
     // Define vertices for the line
     float vertices[] = {
-        startPos.x, startPos.y, startPos.z, color.x, color.y, color.z,
-        endPos.x, endPos.y, endPos.z, color.x, color.y, color.z,
+        startPos.x, startPos.y, startPos.z, nColor.x, nColor.y, nColor.z,
+        endPos.x, endPos.y, endPos.z, nColor.x, nColor.y, nColor.z,
     };
 
     // Create and configure VAO, VBO
@@ -408,7 +412,7 @@ void RenderManager::drawLine3D(glm::vec3 startPos, float lineSize, glm::vec3 end
 
     // Colors
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
     // Transform
     glm::mat4 model      = glm::mat4(1.0f);
@@ -429,24 +433,26 @@ void RenderManager::drawLine3D(glm::vec3 startPos, float lineSize, glm::vec3 end
     glDeleteBuffers(1, &VBO);
 }
 
-void RenderManager::drawGrid(int slices, float spacing, glm::vec4 color){
+void RenderManager::drawGrid(int slices, float spacing, Color color){
+    auto nColor = normalizeColor(color);
+
     // Define vertices for the grid
     std::vector<float> vertices;
     float halfSize = static_cast<float>(slices) * spacing * 0.5f;
     for (int i = 0; i < slices + 1; ++i) {
         float x = static_cast<float>(i) * spacing - halfSize;
         vertices.push_back(x); vertices.push_back(0.0f); vertices.push_back(-halfSize);
-        vertices.push_back(color.x); vertices.push_back(color.y); vertices.push_back(color.z);
+        vertices.push_back(nColor.x); vertices.push_back(nColor.y); vertices.push_back(nColor.z);
 
         vertices.push_back(x); vertices.push_back(0.0f); vertices.push_back(halfSize);
-        vertices.push_back(color.x); vertices.push_back(color.y); vertices.push_back(color.z);
+        vertices.push_back(nColor.x); vertices.push_back(nColor.y); vertices.push_back(nColor.z);
 
         float z = static_cast<float>(i) * spacing - halfSize;
         vertices.push_back(-halfSize); vertices.push_back(0.0f); vertices.push_back(z);
-        vertices.push_back(color.x); vertices.push_back(color.y); vertices.push_back(color.z);
+        vertices.push_back(nColor.x); vertices.push_back(nColor.y); vertices.push_back(nColor.z);
 
         vertices.push_back(halfSize); vertices.push_back(0.0f); vertices.push_back(z);
-        vertices.push_back(color.x); vertices.push_back(color.y); vertices.push_back(color.z);
+        vertices.push_back(nColor.x); vertices.push_back(nColor.y); vertices.push_back(nColor.z);
     }
 
     // Create and configure VAO, VBO
@@ -469,7 +475,7 @@ void RenderManager::drawGrid(int slices, float spacing, glm::vec4 color){
 
     // Colors
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
     // Transform
     glm::mat4 model      = glm::mat4(1.0f);
@@ -488,17 +494,21 @@ void RenderManager::drawGrid(int slices, float spacing, glm::vec4 color){
     glDeleteBuffers(1, &VBO);
 }
 
-void RenderManager::drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 color){
+void RenderManager::drawPlane(glm::vec3 centerPos, glm::vec2 size, Color color){
+    //std::cout << static_cast<float>(color.r) << " - " << static_cast<float>(color.g) << " - " << static_cast<float>(color.b) << " - " << static_cast<float>(color.a) << std::endl;
+    auto nColor = normalizeColor(color);
+    //std::cout << nColor.x << " - " << nColor.y << " - " << nColor.z << " - " << nColor.w << std::endl;
+
     // Calculate half size for convenience
     glm::vec2 halfSize = size * 0.5f;
 
     // Define vertices and indices for the plane
     float vertices[] = {
-        // positions                                                     // colors
-        centerPos.x - halfSize.x, centerPos.y, centerPos.z - halfSize.y, color.x, color.y, color.z,
-        centerPos.x + halfSize.x, centerPos.y, centerPos.z - halfSize.y, color.x, color.y, color.z,
-        centerPos.x - halfSize.x, centerPos.y, centerPos.z + halfSize.y, color.x, color.y, color.z,
-        centerPos.x + halfSize.x, centerPos.y, centerPos.z + halfSize.y, color.x, color.y, color.z,
+        // positions                                                       // colors
+        centerPos.x - halfSize.x, centerPos.y, centerPos.z - halfSize.y,   nColor.x, nColor.y, nColor.z,
+        centerPos.x + halfSize.x, centerPos.y, centerPos.z - halfSize.y,   nColor.x, nColor.y, nColor.z,
+        centerPos.x - halfSize.x, centerPos.y, centerPos.z + halfSize.y,   nColor.x, nColor.y, nColor.z,
+        centerPos.x + halfSize.x, centerPos.y, centerPos.z + halfSize.y,   nColor.x, nColor.y, nColor.z,
     };
 
     GLuint indices[] = { 0, 1, 2, 1, 2, 3 };
@@ -527,7 +537,7 @@ void RenderManager::drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 col
 
     // Colors
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
     // Transform
     glm::mat4 model      = glm::mat4(1.0f);
@@ -547,7 +557,9 @@ void RenderManager::drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 col
     glDeleteBuffers(1, &EBO);
 }
 
-void RenderManager::drawCube(glm::vec3 position, glm::vec3 size, glm::vec4 color){
+void RenderManager::drawCube(glm::vec3 position, glm::vec3 size, Color color){
+    auto nColor = normalizeColor(color);
+
     // Define vertices and indices for the plane
     float halfSizeX = size.x / 2.0f;
     float halfSizeY = size.y / 2.0f;
@@ -555,14 +567,14 @@ void RenderManager::drawCube(glm::vec3 position, glm::vec3 size, glm::vec4 color
 
     float vertices[] = {
         // positions                        // colors
-        -halfSizeX, -halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-         halfSizeX, -halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-         halfSizeX,  halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-        -halfSizeX,  halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-        -halfSizeX, -halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
-         halfSizeX, -halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
-         halfSizeX,  halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
-        -halfSizeX,  halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
+        -halfSizeX, -halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX, -halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX,  halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+        -halfSizeX,  halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+        -halfSizeX, -halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX, -halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX,  halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
+        -halfSizeX,  halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
     };
     GLuint indices[] = {
         0, 1, 2, 2, 3, 0,
@@ -599,7 +611,7 @@ void RenderManager::drawCube(glm::vec3 position, glm::vec3 size, glm::vec4 color
     // Set the uniform color in the shader
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
     glUseProgram(m_shaderProgram->id_shader);
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
     // Configure model transformation
     glm::mat4 model = glm::mat4(1.0f);
@@ -619,7 +631,9 @@ void RenderManager::drawCube(glm::vec3 position, glm::vec3 size, glm::vec4 color
     glDeleteBuffers(1, &EBO);
 }
 
-void RenderManager::drawCubeWires(glm::vec3 position, glm::vec3 size, glm::vec4 color){
+void RenderManager::drawCubeWires(glm::vec3 position, glm::vec3 size, Color color){
+    auto nColor = normalizeColor(color);
+
     // Define vertices and indices for the wireframe cube
     float halfSizeX = size.x / 2.0f;
     float halfSizeY = size.y / 2.0f;
@@ -627,14 +641,14 @@ void RenderManager::drawCubeWires(glm::vec3 position, glm::vec3 size, glm::vec4 
 
     float vertices[] = {
         // positions                        // colors
-        -halfSizeX, -halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-         halfSizeX, -halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-         halfSizeX,  halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-        -halfSizeX,  halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-        -halfSizeX, -halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
-         halfSizeX, -halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
-         halfSizeX,  halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
-        -halfSizeX,  halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
+        -halfSizeX, -halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX, -halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX,  halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+        -halfSizeX,  halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+        -halfSizeX, -halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX, -halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX,  halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
+        -halfSizeX,  halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
     };
 
     GLuint indices[] = {
