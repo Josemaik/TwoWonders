@@ -331,6 +331,8 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         {
             em.addTag<DoorTag>(entity);
             em.addTag<WallTag>(entity);
+            em.addTag<SeparateModelTag>(entity);
+            r.position = vec3d::zero();
             break;
         }
         case InteractableType::Level:

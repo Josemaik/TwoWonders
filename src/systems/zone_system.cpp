@@ -289,14 +289,15 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
         double distance = playerPos.distance(phy.position);
         double range = 7.5;
 
-        if (distance < range && !ic.showButton)
-            ic.showButton = true;
-
-        else if (distance > range && ic.showButton)
-            ic.showButton = false;
-
         auto& inpi = em.getSingleton<InputInfo>();
         auto& plfi = em.getSingleton<PlayerInfo>();
+
+        if (distance < range && !ic.showButton && plfi.hasKey)
+            ic.showButton = true;
+
+        else if ((distance > range && ic.showButton) || !plfi.hasKey)
+            ic.showButton = false;
+
         if (inpi.interact && ic.showButton && plfi.hasKey)
         {
             li.doorToOpen = e.getID();

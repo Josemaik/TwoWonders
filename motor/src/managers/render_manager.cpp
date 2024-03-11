@@ -61,12 +61,12 @@ void RenderManager::endMode3D(){
 
 // Basic drawing functions
 
-void RenderManager::clearBackground(glm::vec4 color){
-    glClearColor(color.x, color.y, color.z, color.w);
+void RenderManager::clearBackground(Color color){
+    glClearColor(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void RenderManager::drawPixel(glm::vec2 pos, glm::vec4 color){
+void RenderManager::drawPixel(glm::vec2 pos, Color color){
     // Define a single vertex for the pixel
     float vertex[] = { normalizeX(pos.x), normalizeY(pos.y) };
 
@@ -90,7 +90,7 @@ void RenderManager::drawPixel(glm::vec2 pos, glm::vec4 color){
     // Set the uniform color in the shader
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
     glUseProgram(m_shaderProgram->id_shader);
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(normalizeColor(color)));
 
     // Draw the pixel
     glBindVertexArray(VAO);
@@ -102,7 +102,7 @@ void RenderManager::drawPixel(glm::vec2 pos, glm::vec4 color){
     glDeleteBuffers(1, &VBO);
 }
 
-void RenderManager::drawLine(glm::vec2 startPos, glm::vec2 endPos, glm::vec4 color){
+void RenderManager::drawLine(glm::vec2 startPos, glm::vec2 endPos, Color color){
     // Define the vertices for the line
     float vertices[] = {
         normalizeX(startPos.x), normalizeY(startPos.y),
@@ -127,7 +127,7 @@ void RenderManager::drawLine(glm::vec2 startPos, glm::vec2 endPos, glm::vec4 col
     // Set the uniform color in the shader
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
     glUseProgram(m_shaderProgram->id_shader);
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(normalizeColor(color)));
 
     // Draw the line
     glBindVertexArray(VAO);
@@ -139,7 +139,7 @@ void RenderManager::drawLine(glm::vec2 startPos, glm::vec2 endPos, glm::vec4 col
     glDeleteBuffers(1, &VBO);
 }
 
-void RenderManager::drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, glm::vec4 color){
+void RenderManager::drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, Color color){
     // Define vertices and indices
     float vertices[] = {
         normalizeX(v1.x), normalizeY(v1.y), 0.0f,
@@ -149,10 +149,10 @@ void RenderManager::drawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, glm::
     GLuint indices[] = { 0, 1, 2};
 
     // Draw triangle
-    draw(vertices, 9, indices, 3, color);
+    draw(vertices, 9, indices, 3, normalizeColor(color));
 }
 
-void RenderManager::drawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 color){
+void RenderManager::drawRectangle(glm::vec2 pos, glm::vec2 size, Color color){
     // Define vertices and indices
     float vertices[] = {
         normalizeX(pos.x)         , normalizeY(pos.y)         , 0.0f,
@@ -163,10 +163,10 @@ void RenderManager::drawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 color
     GLuint indices[] = { 0, 1, 2, 1, 2, 3};
 
     // Draw rectangle
-    draw(vertices, 12, indices, 6, color);
+    draw(vertices, 12, indices, 6, normalizeColor(color));
 }
 
-void RenderManager::drawCircle(glm::vec2 pos, float radius, int segments, glm::vec4 color){
+void RenderManager::drawCircle(glm::vec2 pos, float radius, int segments, Color color){
     // Calculate vertices for the circle
     int vertexCount = segments * 2;
     std::vector<float> vertices(vertexCount);
@@ -195,7 +195,7 @@ void RenderManager::drawCircle(glm::vec2 pos, float radius, int segments, glm::v
     // Set the uniform color in the shader
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
     glUseProgram(m_shaderProgram->id_shader);
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(normalizeColor(color)));
 
     // Draw the circle
     glBindVertexArray(VAO);
@@ -209,14 +209,18 @@ void RenderManager::drawCircle(glm::vec2 pos, float radius, int segments, glm::v
 
 // Texture drawing functions
 
-void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, glm::vec4 color){
+void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, Color color){
+    auto nColor = normalizeColor(color);
+    float halfWidth = static_cast<float>(texture->getWidth()) / 2.0f;
+    float halfHeight = static_cast<float>(texture->getHeight()) / 2.0f;
+
     // Define vertices and indices
     float vertices[] = {
-        // positions                                                                                                                       // colors                    // texture coords
-        normalizeX(pos.x)                                          , normalizeY(pos.y)                                           , 0.0f,   color.x, color.y, color.z,   0.0f, 0.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth())), normalizeY(pos.y)                                           , 0.0f,   color.x, color.y, color.z,   1.0f, 0.0f,
-        normalizeX(pos.x)                                          , normalizeY(pos.y + static_cast<float>(texture->getHeight())), 0.0f,   color.x, color.y, color.z,   0.0f, 1.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth())), normalizeY(pos.y + static_cast<float>(texture->getHeight())), 0.0f,   color.x, color.y, color.z,   1.0f, 1.0f
+        // positions                                                           // colors                       // texture coords
+        normalizeX(pos.x - halfWidth), normalizeY(pos.y - halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   0.0f, 0.0f,
+        normalizeX(pos.x + halfWidth), normalizeY(pos.y - halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   1.0f, 0.0f,
+        normalizeX(pos.x - halfWidth), normalizeY(pos.y + halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   0.0f, 1.0f,
+        normalizeX(pos.x + halfWidth), normalizeY(pos.y + halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   1.0f, 1.0f
     };
 
     GLuint indices[] = { 0, 1, 2, 1, 2, 3};
@@ -249,7 +253,7 @@ void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos,
 
     // Colors
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(normalizeColor(color)));
 
     // Draw Texture
     glBindTexture(GL_TEXTURE_2D, texture->texture);
@@ -262,14 +266,18 @@ void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos,
     glDeleteBuffers(1, &EBO);
 }
 
-void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color){
+void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, Color color){
+    auto nColor = normalizeColor(color);
+    float halfWidth = static_cast<float>(texture->getWidth()) / 2.0f;
+    float halfHeight = static_cast<float>(texture->getHeight()) / 2.0f;
+
     // Define vertices and indices
     float vertices[] = {
-        // positions                                                                                                                       // colors                    // texture coords
-        normalizeX(pos.x)                                          , normalizeY(pos.y)                                           , 0.0f,   color.x, color.y, color.z,   0.0f, 0.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth())), normalizeY(pos.y)                                           , 0.0f,   color.x, color.y, color.z,   1.0f, 0.0f,
-        normalizeX(pos.x)                                          , normalizeY(pos.y + static_cast<float>(texture->getHeight())), 0.0f,   color.x, color.y, color.z,   0.0f, 1.0f,
-        normalizeX(pos.x + static_cast<float>(texture->getWidth())), normalizeY(pos.y + static_cast<float>(texture->getHeight())), 0.0f,   color.x, color.y, color.z,   1.0f, 1.0f
+        // positions                                                           // colors                    // texture coords
+        normalizeX(pos.x - halfWidth), normalizeY(pos.y - halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   0.0f, 0.0f,
+        normalizeX(pos.x + halfWidth), normalizeY(pos.y - halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   1.0f, 0.0f,
+        normalizeX(pos.x - halfWidth), normalizeY(pos.y + halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   0.0f, 1.0f,
+        normalizeX(pos.x + halfWidth), normalizeY(pos.y + halfHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   1.0f, 1.0f
     };
 
     GLuint indices[] = { 0, 1, 2, 1, 2, 3};
@@ -302,7 +310,7 @@ void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2
 
     // Colors
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(normalizeColor(color)));
 
     // Transform
     glm::mat4 trans = glm::mat4(1.0f);
@@ -325,11 +333,13 @@ void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2
 
 // Basic geometric 3D shapes drawing functions
 
-void RenderManager::drawPoint3D(glm::vec3 position, float pointSize, glm::vec4 color){
+void RenderManager::drawPoint3D(glm::vec3 position, float pointSize, Color color){
+    auto nColor = normalizeColor(color);
+
     // Define vertices for the point
     float vertices[] = {
         position.x, position.y, position.z,
-        color.x, color.y, color.z,
+        nColor.x, nColor.y, nColor.z,
     };
 
     // Create and configure VAO, VBO
@@ -352,12 +362,12 @@ void RenderManager::drawPoint3D(glm::vec3 position, float pointSize, glm::vec4 c
 
     // Colors
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
     // Transform
     glm::mat4 model      = glm::mat4(1.0f);
     glm::mat4 view       = m_camera->getViewMatrix();
-    glm::mat4 projection = m_camera->getProjectionMatrix(800.0f, 600.0f);
+    glm::mat4 projection = m_camera->getProjectionMatrix(m_width, m_height);
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -373,11 +383,13 @@ void RenderManager::drawPoint3D(glm::vec3 position, float pointSize, glm::vec4 c
     glDeleteBuffers(1, &VBO);
 }
 
-void RenderManager::drawLine3D(glm::vec3 startPos, float lineSize, glm::vec3 endPos, glm::vec4 color){
+void RenderManager::drawLine3D(glm::vec3 startPos, glm::vec3 endPos, float lineSize, Color color){
+    auto nColor = normalizeColor(color);
+
     // Define vertices for the line
     float vertices[] = {
-        startPos.x, startPos.y, startPos.z, color.x, color.y, color.z,
-        endPos.x, endPos.y, endPos.z, color.x, color.y, color.z,
+        startPos.x, startPos.y, startPos.z, nColor.x, nColor.y, nColor.z,
+        endPos.x, endPos.y, endPos.z, nColor.x, nColor.y, nColor.z,
     };
 
     // Create and configure VAO, VBO
@@ -400,12 +412,12 @@ void RenderManager::drawLine3D(glm::vec3 startPos, float lineSize, glm::vec3 end
 
     // Colors
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
     // Transform
     glm::mat4 model      = glm::mat4(1.0f);
     glm::mat4 view       = m_camera->getViewMatrix();
-    glm::mat4 projection = m_camera->getProjectionMatrix(800.0f, 600.0f);
+    glm::mat4 projection = m_camera->getProjectionMatrix(m_width, m_height);
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -421,24 +433,26 @@ void RenderManager::drawLine3D(glm::vec3 startPos, float lineSize, glm::vec3 end
     glDeleteBuffers(1, &VBO);
 }
 
-void RenderManager::drawGrid(int slices, float spacing, glm::vec4 color){
+void RenderManager::drawGrid(int slices, float spacing, Color color){
+    auto nColor = normalizeColor(color);
+
     // Define vertices for the grid
     std::vector<float> vertices;
     float halfSize = static_cast<float>(slices) * spacing * 0.5f;
     for (int i = 0; i < slices + 1; ++i) {
         float x = static_cast<float>(i) * spacing - halfSize;
         vertices.push_back(x); vertices.push_back(0.0f); vertices.push_back(-halfSize);
-        vertices.push_back(color.x); vertices.push_back(color.y); vertices.push_back(color.z);
+        vertices.push_back(nColor.x); vertices.push_back(nColor.y); vertices.push_back(nColor.z);
 
         vertices.push_back(x); vertices.push_back(0.0f); vertices.push_back(halfSize);
-        vertices.push_back(color.x); vertices.push_back(color.y); vertices.push_back(color.z);
+        vertices.push_back(nColor.x); vertices.push_back(nColor.y); vertices.push_back(nColor.z);
 
         float z = static_cast<float>(i) * spacing - halfSize;
         vertices.push_back(-halfSize); vertices.push_back(0.0f); vertices.push_back(z);
-        vertices.push_back(color.x); vertices.push_back(color.y); vertices.push_back(color.z);
+        vertices.push_back(nColor.x); vertices.push_back(nColor.y); vertices.push_back(nColor.z);
 
         vertices.push_back(halfSize); vertices.push_back(0.0f); vertices.push_back(z);
-        vertices.push_back(color.x); vertices.push_back(color.y); vertices.push_back(color.z);
+        vertices.push_back(nColor.x); vertices.push_back(nColor.y); vertices.push_back(nColor.z);
     }
 
     // Create and configure VAO, VBO
@@ -461,12 +475,12 @@ void RenderManager::drawGrid(int slices, float spacing, glm::vec4 color){
 
     // Colors
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
     // Transform
     glm::mat4 model      = glm::mat4(1.0f);
     glm::mat4 view       = m_camera->getViewMatrix();
-    glm::mat4 projection = m_camera->getProjectionMatrix(800.0f, 600.0f);
+    glm::mat4 projection = m_camera->getProjectionMatrix(m_width, m_height);
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -480,17 +494,21 @@ void RenderManager::drawGrid(int slices, float spacing, glm::vec4 color){
     glDeleteBuffers(1, &VBO);
 }
 
-void RenderManager::drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 color){
+void RenderManager::drawPlane(glm::vec3 centerPos, glm::vec2 size, Color color){
+    //std::cout << static_cast<float>(color.r) << " - " << static_cast<float>(color.g) << " - " << static_cast<float>(color.b) << " - " << static_cast<float>(color.a) << std::endl;
+    auto nColor = normalizeColor(color);
+    //std::cout << nColor.x << " - " << nColor.y << " - " << nColor.z << " - " << nColor.w << std::endl;
+
     // Calculate half size for convenience
     glm::vec2 halfSize = size * 0.5f;
 
     // Define vertices and indices for the plane
     float vertices[] = {
-        // positions                                                     // colors
-        centerPos.x - halfSize.x, centerPos.y, centerPos.z - halfSize.y, color.x, color.y, color.z,
-        centerPos.x + halfSize.x, centerPos.y, centerPos.z - halfSize.y, color.x, color.y, color.z,
-        centerPos.x - halfSize.x, centerPos.y, centerPos.z + halfSize.y, color.x, color.y, color.z,
-        centerPos.x + halfSize.x, centerPos.y, centerPos.z + halfSize.y, color.x, color.y, color.z,
+        // positions                                                       // colors
+        centerPos.x - halfSize.x, centerPos.y, centerPos.z - halfSize.y,   nColor.x, nColor.y, nColor.z,
+        centerPos.x + halfSize.x, centerPos.y, centerPos.z - halfSize.y,   nColor.x, nColor.y, nColor.z,
+        centerPos.x - halfSize.x, centerPos.y, centerPos.z + halfSize.y,   nColor.x, nColor.y, nColor.z,
+        centerPos.x + halfSize.x, centerPos.y, centerPos.z + halfSize.y,   nColor.x, nColor.y, nColor.z,
     };
 
     GLuint indices[] = { 0, 1, 2, 1, 2, 3 };
@@ -519,12 +537,12 @@ void RenderManager::drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 col
 
     // Colors
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
     // Transform
     glm::mat4 model      = glm::mat4(1.0f);
     glm::mat4 view       = m_camera->getViewMatrix();
-    glm::mat4 projection = m_camera->getProjectionMatrix(800.0f, 600.0f);
+    glm::mat4 projection = m_camera->getProjectionMatrix(m_width, m_height);
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -539,7 +557,9 @@ void RenderManager::drawPlane(glm::vec3 centerPos, glm::vec2 size, glm::vec4 col
     glDeleteBuffers(1, &EBO);
 }
 
-void RenderManager::drawCube(glm::vec3 position, glm::vec3 size, glm::vec4 color){
+void RenderManager::drawCube(glm::vec3 position, glm::vec3 size, Color color){
+    auto nColor = normalizeColor(color);
+
     // Define vertices and indices for the plane
     float halfSizeX = size.x / 2.0f;
     float halfSizeY = size.y / 2.0f;
@@ -547,14 +567,14 @@ void RenderManager::drawCube(glm::vec3 position, glm::vec3 size, glm::vec4 color
 
     float vertices[] = {
         // positions                        // colors
-        -halfSizeX, -halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-         halfSizeX, -halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-         halfSizeX,  halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-        -halfSizeX,  halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-        -halfSizeX, -halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
-         halfSizeX, -halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
-         halfSizeX,  halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
-        -halfSizeX,  halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
+        -halfSizeX, -halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX, -halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX,  halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+        -halfSizeX,  halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+        -halfSizeX, -halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX, -halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX,  halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
+        -halfSizeX,  halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
     };
     GLuint indices[] = {
         0, 1, 2, 2, 3, 0,
@@ -591,14 +611,17 @@ void RenderManager::drawCube(glm::vec3 position, glm::vec3 size, glm::vec4 color
     // Set the uniform color in the shader
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
     glUseProgram(m_shaderProgram->id_shader);
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
-    // Configure model transformation
+    // Transform
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);
+    glm::mat4 view       = m_camera->getViewMatrix();
+    glm::mat4 projection = m_camera->getProjectionMatrix(m_width, m_height);
     
-    GLuint modelLoc = glGetUniformLocation(m_shaderProgram->id_shader, "model");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     // Draw wirefram cube
     glBindVertexArray(VAO);
@@ -611,7 +634,9 @@ void RenderManager::drawCube(glm::vec3 position, glm::vec3 size, glm::vec4 color
     glDeleteBuffers(1, &EBO);
 }
 
-void RenderManager::drawCubeWires(glm::vec3 position, glm::vec3 size, glm::vec4 color){
+void RenderManager::drawCubeWires(glm::vec3 position, glm::vec3 size, Color color){
+    auto nColor = normalizeColor(color);
+
     // Define vertices and indices for the wireframe cube
     float halfSizeX = size.x / 2.0f;
     float halfSizeY = size.y / 2.0f;
@@ -619,14 +644,14 @@ void RenderManager::drawCubeWires(glm::vec3 position, glm::vec3 size, glm::vec4 
 
     float vertices[] = {
         // positions                        // colors
-        -halfSizeX, -halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-         halfSizeX, -halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-         halfSizeX,  halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-        -halfSizeX,  halfSizeY, halfSizeZ,  color.x, color.y, color.z, color.w,
-        -halfSizeX, -halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
-         halfSizeX, -halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
-         halfSizeX,  halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
-        -halfSizeX,  halfSizeY, -halfSizeZ, color.x, color.y, color.z, color.w,
+        -halfSizeX, -halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX, -halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX,  halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+        -halfSizeX,  halfSizeY, halfSizeZ,  nColor.x, nColor.y, nColor.z, nColor.w,
+        -halfSizeX, -halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX, -halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
+         halfSizeX,  halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
+        -halfSizeX,  halfSizeY, -halfSizeZ, nColor.x, nColor.y, nColor.z, nColor.w,
     };
 
     GLuint indices[] = {
@@ -682,126 +707,110 @@ void RenderManager::drawCubeWires(glm::vec3 position, glm::vec3 size, glm::vec4 
     glDeleteBuffers(1, &EBO);
 }
 
-// EXPERIMENTAL
+// Model 3D
 
-void RenderManager::drawTexture3D(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, glm::vec4 color){
-    float nX = pos.x - static_cast<float>(texture->getHeight() / 2) * scale;
-    float nXw = pos.x + static_cast<float>(texture->getHeight() / 2) * scale;
-
-    float nY = pos.y + static_cast<float>(texture->getWidth() / 2) * scale;
-    float nYh = pos.y - static_cast<float>(texture->getWidth() / 2) * scale;
-
-    // Define vertices and indices
-    float vertices[] = {
-        // positions    // colors                    // texture coords
-        nX , nY , 0.0f,   color.x, color.y, color.z,   0.0f, 0.0f,
-        nXw, nY , 0.0f,   color.x, color.y, color.z,   1.0f, 0.0f,
-        nX , nYh, 0.0f,   color.x, color.y, color.z,   0.0f, 1.0f,
-        nXw, nYh, 0.0f,   color.x, color.y, color.z,   1.0f, 1.0f,
-    };
-
-    GLuint indices[] = { 0, 1, 2, 1, 2, 3 };
-
-    // Create and configure VAO, VBO and EBO
-    GLuint VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    // texture coord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    // Colors
-    GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
-
-    // Transform
-    glm::mat4 model      = glm::mat4(1.0f);
-    glm::mat4 view       = glm::mat4(1.0f);
-    glm::mat4 projection = glm::mat4(1.0f);
-
-    model       = glm::rotate(model, static_cast<float>(glfwGetTime() * glm::radians(rotate)), glm::vec3(0.0f, 1.0f, 0.0f));
-    view        = m_camera->getViewMatrix();
-    projection  = glm::perspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
-
-    GLuint modelLoc = glGetUniformLocation(m_shaderProgram->id_shader, "model");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-    GLuint viewLoc = glGetUniformLocation(m_shaderProgram->id_shader, "view");
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-    GLuint projectionLoc = glGetUniformLocation(m_shaderProgram->id_shader, "projection");
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-    
-    // Draw Texture
-    glBindTexture(GL_TEXTURE_2D, texture->texture);
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-    // Clean up resources
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
+void RenderManager::drawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint){
+    drawModelExtra(model, position, scale, {0.0f, 0.0f, 0.0f}, 0.0f, tint);
 }
 
-void RenderManager::drawMesh(std::shared_ptr<Mesh> mesh){
-    glBindVertexArray(mesh->getVAO());
+void RenderManager::drawModelExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
+    if(!model || !model->isLoaded())
+        return;
 
-    std::cout << "Vertices: " << mesh->vertices.size() << std::endl;
-    std::cout << "Indices: " << mesh->indices.size() << std::endl;
-    std::cout << "--------------" << std::endl;
-
-    // for (std::size_t i = 0; i < mesh->textures.size(); ++i) {
-    //     glActiveTexture(GL_TEXTURE0 + static_cast<GLenum>(i));
-    //     glBindTexture(GL_TEXTURE_2D, mesh->textures[i]->texture);
-    // }
-
-    glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 view       = glm::mat4(1.0f);
-    glm::mat4 projection = glm::mat4(1.0f);
-
+    // Set the uniform color in the shader
     GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
-    glm::vec4 color = {1.0f, 0.0f, 0.5f, 1.0f}; 
-    glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    glUseProgram(m_shaderProgram->id_shader);
+    glUniform4fv(colorUniform, 1, glm::value_ptr(normalizeColor(tint)));
 
-    model       = glm::translate(model, {0.0f, 0.0f, 0.0f});
-    model       = glm::scale(model, {0.5f, 0.5f, 0.5f});
-    view        = m_camera->getViewMatrix();
-    projection  = glm::perspective(glm::radians(95.0f), (800.0f / 600.0f), 0.1f, 100.0f);
+    // Transform
+    glm::mat4 modelM = glm::mat4(1.0f);
+    modelM = glm::translate(modelM, position);
+    if (glm::length(rotationAngle) > 0.0f)
+        modelM = glm::rotate(modelM, glm::radians(rotationAngle), rotationAxis);
+    modelM = glm::scale(modelM, glm::vec3(scale));
 
-    GLuint modelLoc = glGetUniformLocation(m_shaderProgram->id_shader, "model");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    GLuint viewLoc = glGetUniformLocation(m_shaderProgram->id_shader, "view");
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-    GLuint projectionLoc = glGetUniformLocation(m_shaderProgram->id_shader, "projection");
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    glm::mat4 view       = m_camera->getViewMatrix();
+    glm::mat4 projection = m_camera->getProjectionMatrix(m_width, m_height);
+    
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(modelM));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->indices.size()), GL_UNSIGNED_INT, 0);
+    // Draw meshes
+    for (const auto& mesh : model->getMeshes()) {
+        GLuint VAO = mesh->getVAO();
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->getNumIndices()), GL_UNSIGNED_SHORT, 0);
+        glBindVertexArray(0);
+    }
+}
 
-    glBindVertexArray(0);
+void RenderManager::drawModelWires(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint){
+    drawModelWiresExtra(model, position, scale, {0.0f, 0.0f, 0.0f}, 0.0f, tint);
+}
 
-    // glActiveTexture(GL_TEXTURE0);
+void RenderManager::drawModelWiresExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
+    if(!model || !model->isLoaded())
+    return;
+
+    // Set the uniform color in the shader
+    GLint colorUniform = glGetUniformLocation(m_shaderProgram->id_shader, "customColor");
+    glUseProgram(m_shaderProgram->id_shader);
+    glUniform4fv(colorUniform, 1, glm::value_ptr(normalizeColor(tint)));
+
+    // Transform
+    glm::mat4 modelM = glm::mat4(1.0f);
+    modelM = glm::translate(modelM, position);
+    if (glm::length(rotationAngle) > 0.0f)
+        modelM = glm::rotate(modelM, glm::radians(rotationAngle), rotationAxis);
+    modelM = glm::scale(modelM, glm::vec3(scale));
+
+    glm::mat4 view       = m_camera->getViewMatrix();
+    glm::mat4 projection = m_camera->getProjectionMatrix(m_width, m_height);
+    
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(modelM));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+    // Draw wires
+    for (const auto& mesh : model->getMeshes()) {
+        GLuint VAO = mesh->getVAO();
+        glBindVertexArray(VAO);
+        glDrawElements(GL_LINES, static_cast<GLsizei>(mesh->getNumIndices()), GL_UNSIGNED_SHORT, 0);
+        glBindVertexArray(0);
+    }
 }
 
 // Text drawing functions
 
-void RenderManager::drawText(const char*, glm::vec2, int, glm::vec4){
+void RenderManager::drawText(const char*, glm::vec2, int, Color){
+    /*
+    // Set font size
+    FT_Set_Pixel_Sizes(m_defaultFont->getFace(), 0, fontSize);
 
+    // Set pen position
+    FT_Vector pen;
+    pen.x = pos.x * 64;
+    pen.y = pos.y * 64;
+
+    // Loop through each character in the text
+    for (const char* c = text; *c; ++c) {
+        // Load the glyph
+        if (!FT_Load_Char(m_defaultFont->getFace(), *c, FT_LOAD_RENDER)) {
+            FT_GlyphSlot glyphSlot = m_defaultFont->getFace()->glyph;
+
+            glRasterPos2i(pen.x, pen.y);
+            glColor4f(color.r, color.g, color.b, color.a);
+            glDrawPixels(glyphSlot->bitmap.width, 
+                         glyphSlot->bitmap.rows, 
+                         GL_RED, GL_UNSIGNED_BYTE, 
+                         glyphSlot->bitmap.buffer);
+
+            // Move the pen to the next position
+            pen.x += glyphSlot->advance.x >> 6;
+            pen.y += glyphSlot->advance.y >> 6;
+        }else
+            std::cerr << "Error loading character: " << *c << std::endl;
+    }
+    */
 }

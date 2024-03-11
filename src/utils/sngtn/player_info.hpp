@@ -11,9 +11,10 @@ struct PlayerInfo
 
     double increaseLife{ 0.0 };
     uint16_t coins{}, bombs{}, max_bombs{ 8 };
+    float elapsed_limit_coins{ 5.0f }, elapsed_coins{ elapsed_limit_coins };
     double max_mana{ 100.0 }, mana{ max_mana };
     int mana_width{}, armor{};
-    bool hasKey{ false };
+    bool hasKey{ true };
     bool hasStaff{ false };
     std::vector<std::unique_ptr<Item>> inventory{};
     std::vector<Spell> spells{};
@@ -51,9 +52,12 @@ struct PlayerInfo
         return it->get();
     }
 
-    void addCoin() { coins += 5; }
+    void addCoin(uint16_t add)
+    {
+        coins += add;
+        elapsed_coins = 0.0f;
+    }
     void addKey() { hasKey = true; }
-    void add30Coins() { coins += 30; }
     void addBomb() {
         if (bombs < max_bombs)
             bombs += 3;

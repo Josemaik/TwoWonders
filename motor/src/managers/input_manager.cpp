@@ -44,12 +44,14 @@ void InputManager::keyCallback(GLFWwindow* window, int key, int, int action, int
 
     // std::cout << "Key: " << key << " - Action: " << action << std::endl;
 
-    im->m_keyStates[key] = action;
+    if(key >= 0){
+        im->m_keyStates[key] = action;
 
-    if(action == GLFW_RELEASE)
-        im->m_keyReleaseStates[key] = true;
-    else
-        im->m_keyReleaseStates[key] = false;
+        if(action == GLFW_RELEASE)
+            im->m_keyReleaseStates[key] = true;
+        else
+            im->m_keyReleaseStates[key] = false;
+    }
 
     // if(im)
     //     im->m_keyStates[key] = action < ;

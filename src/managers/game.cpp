@@ -23,12 +23,13 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -125, 4.0, 138.68 };
-    //-125, 4.0, 138.68 - `pos chunck 3
+        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
+    // 32.0, 4.0, 130.0 - Segundo cofre
     // -72.0, 4.0, 72.9 - Cofre con llave
     // -116.0, 4.0, 111.0 - Apisonadora
+    //-125, 4.0, 138.68 - `pos chunck 3
 
 // Player
     auto& e{ em.newEntity() };
@@ -116,7 +117,6 @@ void Game::run()
 
     // Inicializa una variable donde tener el tiempo entre frames
     float deltaTime{}, currentTime{}, elapsed{};
-    const float timeStep = 1.0f / 30.0f;  // Actualiza el juego 60 veces por segundo
 
     createSound(em);
     li.sound_system = &sound_system;

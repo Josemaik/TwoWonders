@@ -298,11 +298,17 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
 {
     float windowWidth = 450.0f;
     float windowHeight = 450.0f;
+    float buttonWidth = 200.0f;
+    float buttonHeight = 50.0f;
+    float posButtonX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2);
+    float posButtonY = static_cast<float>(engine.getScreenHeight() / 2) - (buttonHeight / 2);
+    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (windowWidth / 2);
+    float posY = static_cast<float>(engine.getScreenHeight() / 2) - (windowHeight / 2);
     float augment = 55.f;
 
     Rectangle windowRect = {
-        static_cast<float>(engine.getScreenWidth()) / 2.0f - windowWidth / 2.0f,
-        static_cast<float>(engine.getScreenHeight()) / 2.0f - windowHeight / 2.0f,
+        posX,
+        posY,
         windowWidth,
         windowHeight
     };
@@ -311,23 +317,51 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
     engine.drawTextEx(GetFontDefault(), "INVENTARIO", Vector2{ windowRect.x + 110, windowRect.y + 20 }, 40, 1, BLACK);
 
     auto& plfi = em.getSingleton<PlayerInfo>();
-    Rectangle btn2Rec = { 300, 430, 200, 50 };
+    auto& inpi = em.getSingleton<InputInfo>();
+
+    auto& currentButton = inpi.currentButton;
 
     if (plfi.selectedItem == plfi.max)
     {
-        float posY = 250.f;
-
+        // Get the gamepad input
+        if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) {
+            // Press the currently selected button
+            if (static_cast<std::size_t>(currentButton) < plfi.inventory.size()) {
+                // Select an item from the inventory
+                plfi.selectedItem = plfi.inventory[currentButton]->getID();
+                currentButton = 0;
+                return;
+            }
+            else {
+                // "VOLVER" button
+                auto& inpi = em.getSingleton<InputInfo>();
+                inpi.inventory = false;
+            }
+        }
+        else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
+            // Move the selection up
+            currentButton = (currentButton > 0) ? currentButton - 1 : static_cast<int>(plfi.inventory.size());
+        }
+        else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
+            // Move the selection down
+            currentButton = (currentButton < static_cast<int>(plfi.inventory.size())) ? currentButton + 1 : 0;
+        }
+        int buttonIndex = 0;
         for (auto& item : plfi.inventory)
         {
-            Rectangle btnRec = { 300, posY, 200, 50 };
-            if (GuiButton(btnRec, item->name.c_str()))
+            Rectangle btnRec = { posButtonX, posButtonY + 50, buttonWidth, buttonHeight };
+            if (GuiButton(btnRec, (buttonIndex == currentButton) ? ("[" + item->name + "]").c_str() : item->name.c_str())) {
                 plfi.selectedItem = item->getID();
-            posY += augment;
+                currentButton = 0;
+                return;
+            }
+            posButtonY += augment;
+            buttonIndex++;
         }
 
         // Botón de volver al juego
-        if (GuiButton(btn2Rec, "VOLVER"))
-        {
+        Rectangle btn2Rec = { posButtonX, posButtonY + 70, buttonWidth, buttonHeight };
+        if (GuiButton(btn2Rec, (currentButton == static_cast<int>(plfi.inventory.size())) ? "[VOLVER]" : "VOLVER")) {
             auto& inpi = em.getSingleton<InputInfo>();
             inpi.inventory = false;
         }
@@ -341,19 +375,42 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
         GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_LEFT);
 
         float descWidth = 300.f, descHeight = 150.f;
-        float posX = static_cast<float>(engine.getScreenWidth() / 2) - (descWidth / 2.0f);
-        float posY = static_cast<float>(engine.getScreenHeight() / 2) - (descHeight / 1.25f);
-        GuiTextBox({ posX, posY, descWidth, descHeight }, text, static_cast<int>(item.description.size()), false);
-        auto& plfi = em.getSingleton<PlayerInfo>();
+        float posDescX = static_cast<float>(engine.getScreenWidth() / 2) - (descWidth / 2.0f);
+        float posDescY = static_cast<float>(engine.getScreenHeight() / 2) - (descHeight / 1.25f);
+        GuiTextBox({ posDescX, posDescY, descWidth, descHeight }, text, static_cast<int>(item.description.size()), false);
 
-        std::cout << dynamic_cast<Potion*>(&item) << std::endl;
+        if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) {
+            // Press the currently selected button
+            switch (currentButton) {
+            case 0: // "USAR"
+                if (dynamic_cast<Potion*>(&item) != nullptr) {
+                    auto& potion = static_cast<Potion&>(item);
+                    plfi.usePotion(potion);
+                    plfi.selectedItem = plfi.max;
+                    auto& inpi = em.getSingleton<InputInfo>();
+                    inpi.inventory = false;
+                    GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+                    return;
+                }
+                break;
+            case 1: // "VOLVER"
+                plfi.selectedItem = plfi.max;
+                GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+                break;
+            }
+        }
+        else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
+            // Move the selection up
+            currentButton = (currentButton > 0) ? currentButton - 1 : 1;
+        }
+        else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
+            // Move the selection down
+            currentButton = (currentButton < 1) ? currentButton + 1 : 0;
+        }
 
-        if (dynamic_cast<Potion*>(&item) != nullptr)
-        {
-            std::cout << "Es una poción" << std::endl;
-            Rectangle btn1Rec = { 300, 350, 200, 50 };
-            if (GuiButton(btn1Rec, "USAR"))
-            {
+        if (dynamic_cast<Potion*>(&item) != nullptr) {
+            Rectangle btn1Rec = { posButtonX, posButtonY + 100, buttonWidth, buttonHeight };
+            if (GuiButton(btn1Rec, (currentButton == 0) ? "[USAR]" : "USAR")) {
                 auto& potion = static_cast<Potion&>(item);
                 plfi.usePotion(potion);
                 plfi.selectedItem = plfi.max;
@@ -364,8 +421,8 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
         }
 
         // Boton de volver al inventario
-        if (GuiButton(btn2Rec, "VOLVER"))
-        {
+        Rectangle btn2Rec = { posButtonX, posButtonY + 170, buttonWidth, buttonHeight };
+        if (GuiButton(btn2Rec, (currentButton == 1) ? "[VOLVER]" : "VOLVER")) {
             plfi.selectedItem = plfi.max;
             GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
         }
@@ -396,13 +453,29 @@ void RenderSystem::drawEnding(ENGI::GameEngine& engine) {
 void RenderSystem::drawStory(ENGI::GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
-    engine.drawText("Busca la espada en la cueva", 45, 200, 40, BLACK);
-    engine.drawText("Extermina al dragón de la mazmorra", 45, 250, 40, BLACK);
-    engine.drawText("(Ana quería historia)", 45, 300, 40, BLACK);
-    engine.drawText("PRESS [ENTER] TO PLAY ",
-        engine.getScreenWidth() / 2 - 200,
-        engine.getScreenHeight() - 50, 30,
-        BLACK);
+    float boxWidth = 700.f;
+    float boxHeight = 400.f;
+    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth / 2);
+    float posY = static_cast<float>(engine.getScreenHeight() / 2.5) - (boxHeight / 2);
+
+    Rectangle boxRect = { posX, posY, boxWidth, boxHeight };
+
+    // Tamaño de la fuente
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 40);
+
+    // Alineamiento del texto
+    GuiSetStyle(LABEL, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+
+    GuiLabel(boxRect, "Busca la espada en la cueva");
+    GuiLabel({ posX, posY + 50, boxWidth, boxHeight }, "Extermina al dragón de la mazmorra");
+    GuiLabel({ posX, posY + 100, boxWidth, boxHeight }, "(Ana quería historia)");
+
+    std::string text = "PRESS [ENTER] TO PLAY";
+    if (engine.isGamepadAvailable(0))
+        text = "PRESS [A] TO PLAY";
+    GuiLabel({ posX, posY + 250, boxWidth, boxHeight }, text.c_str());
+
+    init();
     engine.endDrawing();
 }
 
@@ -511,12 +584,12 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 else if (e.hasTag<AngryBushTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
-                    pos.setY(pos.y() - 0.5);
+                    // pos.setY(pos.y() - 0.5);
                     in = true;
                 }
                 else if (e.hasTag<AngryBushTag2>())
                 {
-                    pos.setY(pos.y() - 0.5);
+                    //pos.setY(pos.y() - 0.5);
                     in = true;
                 }
                 else if (e.hasTag<ChestTag>())
@@ -635,7 +708,7 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
     }
     else if (e.hasTag<DoorTag>())
     {
-        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-barricada.obj");
+        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/Barricada_cambio_lvl.obj");
 
         loadShaders(r.model);
     }
@@ -991,9 +1064,21 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                             auto& phy{ em.getComponent<PhysicsComponent>(ene) };
                             if (ren.visible && (ene.hasTag<DummyTag>() || ene.hasTag<DestructibleTag>()))
                             {
-                                engine.drawText("ESPACIO",
-                                    static_cast<int>(engine.getWorldToScreenX(phy.position) - 25),
-                                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 9),
+                                std::string text = "ESPACIO";
+                                float offsetX = 25.f;
+                                double multiplier = 28.0;
+
+                                if (ene.hasTag<DestructibleTag>())
+                                    multiplier = 5.0;
+                                if (engine.isGamepadAvailable(0))
+                                {
+                                    offsetX = 0;
+                                    text = "X";
+                                }
+
+                                engine.drawText(text.c_str(),
+                                    static_cast<int>(engine.getWorldToScreenX(phy.position) - offsetX),
+                                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * multiplier),
                                     20,
                                     WHITE);
                             }
@@ -1006,9 +1091,14 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             {
                 auto& phy{ em.getComponent<PhysicsComponent>(e) };
                 // Escribimos que puede usar WASD para moverse
-                engine.drawText("WASD para moverse",
-                    static_cast<int>(engine.getWorldToScreenX(phy.position) - 100),
-                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 15),
+
+                std::string text = "WASD para moverse";
+                if (engine.isGamepadAvailable(0))
+                    text = "Stick izquierdo para moverse";
+
+                engine.drawText(text.c_str(),
+                    static_cast<int>(engine.getWorldToScreenX(phy.position) - 120),
+                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 25),
                     20,
                     WHITE);
 
@@ -1060,7 +1150,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             int barWidth = 40;
             int barHeight = 4;
             int barX = static_cast<int>(engine.getWorldToScreenX(r.position) - 18);
-            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 10);
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 30);
 
             engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
 
@@ -1121,15 +1211,34 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
 
-        if (e.hasComponent<InteractiveComponent>() && e.hasComponent<RenderComponent>())
+
+        if (e.hasComponent<InteractiveComponent>() && (e.hasComponent<RenderComponent>() || e.hasComponent<PhysicsComponent>()))
         {
-            auto& ren{ em.getComponent<RenderComponent>(e) };
             auto& inter{ em.getComponent<InteractiveComponent>(e) };
             if (inter.showButton)
             {
-                engine.drawText("E",
-                    static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
-                    static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 9),
+                vec3d pos{};
+                double sclY{};
+                if (e.hasTag<SeparateModelTag>())
+                {
+                    auto phy = em.getComponent<PhysicsComponent>(e);
+                    pos = phy.position;
+                    sclY = phy.scale.y();
+                }
+                else
+                {
+                    auto& ren = em.getComponent<RenderComponent>(e);
+                    pos = ren.position;
+                    sclY = ren.scale.y();
+                }
+
+                std::string button = "E";
+                if (engine.isGamepadAvailable(0))
+                    button = "A";
+
+                engine.drawText(button.c_str(),
+                    static_cast<int>(engine.getWorldToScreenX(pos) - 5),
+                    static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9),
                     20,
                     WHITE);
             }
@@ -1213,7 +1322,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             //std::cout << ray.origin << " " << ray.direction << std::endl;
 
             auto& ren = em.getComponent<RenderComponent>(e);
-            bool notStatic = !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE);
+            bool notStatic = !(col.behaviorType & BehaviorType::ZONE);
             // Comprobar si el rayo intersecta con el collider
 
             if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && notStatic && pointedEntity != li.playerID)
@@ -1335,8 +1444,28 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 void RenderSystem::drawDeath(ENGI::GameEngine& engine)
 {
     engine.drawRectangle(0, 0, engine.getScreenWidth(), engine.getScreenHeight(), Fade(BLACK, 0.5f));
-    engine.drawText("HAS MUERTO", 250, 250, 40, RED);
-    engine.drawText("[ENTER] para volver a jugar", 165, 300, 30, RED);
+
+    // Valores de la caja de texto
+    float boxWidth = 300.f;
+    float boxWidth2 = 500.f;
+    float boxHeight = 100.f;
+    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth / 2.f);
+    float posX2 = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth2 / 2.f);
+    float posY = static_cast<float>(engine.getScreenHeight() / 2) - (boxHeight / 2.f);
+
+    // Tamaño de la fuente
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 40);
+
+    // Color de la fuente de texto
+    GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, 0xFF0000ff);
+
+    GuiLabelButton(Rectangle{ posX, posY, boxWidth, boxHeight }, "HAS MUERTO");
+    // engine.drawText("HAS MUERTO", 250, 250, 40, RED);
+    std::string text = "[ENTER] para volver a jugar";
+    if (engine.isGamepadAvailable(0))
+        text = "Pulsa [A] para volver a jugar";
+    GuiLabelButton(Rectangle{ posX2, posY + 50, boxWidth2, boxHeight }, text.c_str());
+    init();
 }
 
 void RenderSystem::unloadModels(EntityManager& em, ENGI::GameEngine& engine)
@@ -1357,13 +1486,16 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
 
     // Datos de la barra de vida
     int barWidth = 40;
-    int barHeight = 20;
-    int barX = 10;
-    int barY = 10;
-    int spacing = 4;
+    // int barHeight = 20;
+    int barX = 155;
+    int barY = 30;
+    int spacing = 10;
 
     // Rectángulo de fondo para la barra de vida
-    engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * (l.maxLife + plfi.armor) + 2, barHeight + 4, DARKGRAY);
+    // engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * (l.maxLife + plfi.armor) + 2, barHeight + 4, DARKGRAY);
+
+    // Dibujamos cara del maguito
+    engine.drawTexture(engine.texture_mago_happy, 25, 20, { 255, 255, 255, 255 });
 
     // Dibujamos cada parte de la barra de vida
     int i{};
@@ -1372,8 +1504,9 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
         // Posición X de cada trozo
         int currentX = barX + i * (barWidth + spacing);
 
-        // Dibujamos el rectángulo
-        engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
+        // Dibujamos el corazón
+        // engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
+        engine.drawTexture(engine.texture_heart, currentX, barY, { 255, 255, 255, 255 });
     }
 
     // Dibujamos la armadura
@@ -1383,23 +1516,41 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
             // Posición X de cada trozo
             int currentX = barX + i * (barWidth + spacing);
 
-            // Dibujamos el rectángulo
-            engine.drawRectangle(currentX, barY, barWidth, barHeight, SKYBLUE);
+            // Dibujamos el corazón
+            engine.drawTexture(engine.texture_heart, currentX, barY, SKYBLUE);
         }
 }
 
 void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
 {
-    // Barra para las monedas monedas
-    engine.drawRectangle(engine.getScreenWidth() - 200, engine.getScreenHeight() - 100, 100, 20, DARKGRAY);
+    auto& plfi{ em.getSingleton<PlayerInfo>() };
+    const float multip = 3.5f;
+    if (plfi.elapsed_coins < plfi.elapsed_limit_coins)
+    {
+        elapsed_CoinBar += timeStep60 * multip;
+        if (elapsed_CoinBar > elapsed_limit_CoinBar) elapsed_CoinBar = elapsed_limit_CoinBar;
 
-    auto const& plfi{ em.getSingleton<PlayerInfo>() };
+        plfi.elapsed_coins += timeStep60;
+    }
+    else
+    {
+        elapsed_CoinBar -= timeStep60 * multip;
+        if (elapsed_CoinBar < 0) elapsed_CoinBar = 0;
+    }
+
+    float div = elapsed_CoinBar / elapsed_limit_CoinBar;
+
+    // Interpolación
+    coinBarX = static_cast<int>((1.f - div) * static_cast<float>(engine.getScreenWidth()) + div * static_cast<float>(engine.getScreenWidth() - 153));
+
+    // Barra para los destellos
+    engine.drawTexture(engine.texture_destellos, coinBarX, engine.getScreenHeight() - 130, { 255, 255, 255, 255 });
     std::string info_text = std::to_string(plfi.coins);
 
-    int posX = engine.getScreenWidth() - 115;
-    int posY = engine.getScreenHeight() - 99;
+    coinNumberX = static_cast<int>((1.f - div) * (static_cast<float>(engine.getScreenWidth()) + 118) + div * static_cast<float>(engine.getScreenWidth() - 35));
+    int posY = engine.getScreenHeight() - 114;
 
-    // Sacamos el número de dígitos que tiene el número de monedas
+    // Sacamos el número de dígitos que tiene el número de destellos
     int num_digits = 0;
     int temp = plfi.coins;
     while (temp > 0)
@@ -1408,11 +1559,12 @@ void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
         num_digits++;
 
         if (num_digits > 1)
-            posX -= 10;
+            coinNumberX -= 16;
     }
 
-
-    engine.drawText(info_text.c_str(), posX, posY, 18, YELLOW);
+    // Dibujamos el número de destellos
+    if (elapsed_CoinBar > 0)
+        engine.drawText(info_text.c_str(), coinNumberX, posY, 28, YELLOW);
 }
 
 void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
@@ -1424,11 +1576,12 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
 
     // Datos para la barra para el maná
     int barWidth = static_cast<int>(plfi.max_mana) * 2;
-    int barHeight = 20;
-    int barX = 7;
-    int barY = 30;
+    // int barHeight = 20;
+    int barX = 155;
+    int barY = 80;
 
-    engine.drawRectangle(barX, barY, barWidth + 6, barHeight, DARKGRAY);
+    // Ponemos la textura de la barra de maná
+    engine.drawTexture(engine.texture_mana, barX, barY, { 255, 255, 255, 255 });
 
     int manaWidth = static_cast<int>(static_cast<float>(barWidth) * (static_cast<float>(plfi.mana) / static_cast<float>(plfi.max_mana)));
 
@@ -1436,8 +1589,12 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
     if (plfi.mana != plfi.max_mana)
         manaWidth = plfi.mana_width + static_cast<int>((static_cast<float>(manaWidth) - static_cast<float>(plfi.mana_width)) * 0.175f);
 
+    // Idea para el movimiento de la barra
+    // Dos capas, la barra primero y luego el borde
+    // Entre medias algo que tape la barra dependiendo de la cantidad de maná en la barra.
+
     // Dibujamos la barra de maná
-    engine.drawRectangle(barX + 3, barY + 3, manaWidth, barHeight - 6, SKYBLUE);
+    // engine.drawRectangle(barX + 3, barY + 3, manaWidth, barHeight - 6, SKYBLUE);
 
     plfi.mana_width = manaWidth;
 }

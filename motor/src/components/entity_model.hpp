@@ -3,7 +3,6 @@
 #include "entity.hpp"
 #include "resource_mesh.hpp"
 #include "../managers/resource_manager.hpp"
-#include "../managers/render_manager.hpp"
 
 #include <vector>
 #include <glm/glm.hpp>
@@ -27,4 +26,6 @@ public:
     void draw(glm::mat4) const override;
 
     bool isLoaded(){ return m_loaded; };
+
+    const std::vector<std::shared_ptr<Mesh>>& getMeshes() const { return m_meshes; };
 };
