@@ -1102,6 +1102,25 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             }
         }
 
+        //Alert state
+        if(e.hasTag<EnemyTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>()){
+            auto &aic = em.getComponent<AIComponent>(e);
+            if(aic.alert_state){
+                auto& r = em.getComponent<RenderComponent>(e);
+                int barX = static_cast<int>(engine.getWorldToScreenX(r.position));
+                int barY = static_cast<int>(engine.getWorldToScreenY(r.position));
+                // Obtén las coordenadas del triángulo
+                Vector2 point1 = {barX, barY - 120};
+                Vector2 point2 = {barX - 30, barY - 50 };
+                Vector2 point3 = {barX + 30, barY - 50};
+        
+                // Dibuja el triángulo
+                DrawTriangle(point1, point2, point3, BLACK);
+                // Dibuja el signo de exclamación dentro del triángulo
+                engine.drawText("!", barX - 2, barY - 100, 50, YELLOW);
+            }
+        }
+
         if (e.hasComponent<InteractiveComponent>() && e.hasComponent<RenderComponent>())
         {
             auto& ren{ em.getComponent<RenderComponent>(e) };
@@ -1191,7 +1210,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             RayCast ray = engine.getMouseRay();
 
-            std::cout << ray.origin << " " << ray.direction << std::endl;
+            //std::cout << ray.origin << " " << ray.direction << std::endl;
 
             auto& ren = em.getComponent<RenderComponent>(e);
             bool notStatic = !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE);

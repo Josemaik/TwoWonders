@@ -59,6 +59,8 @@ struct AIComponent
     bool on_attack_radius{ false };
     bool playerdetected{ false };
     double field_of_view{100};
+    //Estado de alerta
+    bool alert_state{false};
     //Ataque
     bool ready_attack{ false };
     // data for steering behaviour
