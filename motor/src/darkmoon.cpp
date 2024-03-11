@@ -34,6 +34,7 @@ bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
         //----- Configure callback -----//
         glfwSetWindowUserPointer(m_windowsManager.getWindow(), &m_inputManager);
         glfwSetKeyCallback(m_windowsManager.getWindow(), InputManager::keyCallback);
+        glfwSetMouseButtonCallback(m_windowsManager.getWindow(), InputManager::mouseButtonCallback);
 
         //----- Shaders -----//
         std::cout << "┌─────────┐" << std::endl;
@@ -309,7 +310,6 @@ void DarkMoonEngine::DrawModelWiresExtra(std::shared_ptr<Model> model, glm::vec3
     m_renderManager.drawModelWiresExtra(model, position, scale, rotationAxis, rotationAngle, tint);
 }
 
-
 // --------------------------------- //
 // Input-related functions: keyboard //
 // --------------------------------- //
@@ -337,6 +337,45 @@ bool DarkMoonEngine::IsKeyReleased(int key){
 // Check if a key is not being pressed
 bool DarkMoonEngine::IsKeyUp(int key){
     return m_inputManager.isKeyUp(key);
+}
+
+// ------------------------------ //
+// Input-related functions: mouse //
+// ------------------------------ //
+
+// Check if a mouse button has been pressed once
+bool DarkMoonEngine::IsMouseButtonPressed(int button){
+    return m_inputManager.isMouseButtonPressed(button);
+}
+
+// Check if a mouse button is being pressed
+bool DarkMoonEngine::IsMouseButtonDown(int button){
+    return m_inputManager.isMouseButtonDown(button);
+}
+
+// Check if a mouse button has been released once
+bool DarkMoonEngine::IsMouseButtonReleased(int button){
+    return m_inputManager.isMouseButtonReleased(button);
+}
+
+// Check if a mouse button is mot being pressed
+bool DarkMoonEngine::IsMouseButtonUp(int button){
+    return m_inputManager.isMouseButtonUp(button);
+}
+
+// Get mouse position X
+int DarkMoonEngine::GetMouseX(){
+    return m_inputManager.getMouseX(m_windowsManager.getWindow());
+}
+
+// Get mouse position Y
+int DarkMoonEngine::GetMouseY(){
+    return m_inputManager.getMouseY(m_windowsManager.getWindow());
+}
+
+// Set mouse position XY
+void DarkMoonEngine::SetMousePosition(int x, int y){
+    m_inputManager.setMousePosition(m_windowsManager.getWindow(), x, y);
 }
 
 // ----------------------------- //

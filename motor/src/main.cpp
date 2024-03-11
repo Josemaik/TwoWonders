@@ -42,6 +42,18 @@ int main(){
             // Logic //
             // ----- //
 
+            //std::cout << "X: " << engine.GetMouseX() << " - Y: " << engine.GetMouseY() << std::endl;
+            // if(engine.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
+            //     std::cout << "Boton izquierdo apretado" << std::endl;
+            // if(engine.IsMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
+            //     std::cout << "Boton izquierdo mantenido" << std::endl;
+            // if(engine.IsMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT))
+            //     std::cout << "Boton izquierdo levantado" << std::endl;
+            // if(engine.IsMouseButtonUp(GLFW_MOUSE_BUTTON_LEFT))
+            //    std::cout << "Boton izquierdo levantando" << std::endl;
+
+            // engine.SetMousePosition(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2);
+
             if(engine.IsKeyPressed(KEY_A)){
                 positionCharacter.x -= 0.1f;
                 camera->position.x  -= 0.1f;

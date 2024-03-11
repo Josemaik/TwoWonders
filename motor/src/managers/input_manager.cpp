@@ -95,3 +95,57 @@ int InputManager::getGamepadAxisCount(int){
 float InputManager::getGamepadAxisMovement(int, int){
     return 1.0f;
 }
+
+ // Input-related functions: mouse
+bool InputManager::isMouseButtonPressed(int button){
+    return m_mouseButtonStates[button];
+}
+
+bool InputManager::isMouseButtonDown(int button){
+    return m_mouseButtonStates[button];
+}
+
+bool InputManager::isMouseButtonReleased(int button){
+    if(m_mouseButtonReleaseStates[button]){
+        m_mouseButtonReleaseStates[button] = false;
+        return true;
+    }
+    return false;
+}
+
+bool InputManager::isMouseButtonUp(int button){
+    return m_mouseButtonStates[button] == GLFW_RELEASE;
+}
+
+int InputManager::getMouseX(GLFWwindow* window){
+    double posX, posY;
+    glfwGetCursorPos(window, &posX, &posY);
+    return static_cast<int>(posX);
+}
+
+int InputManager::getMouseY(GLFWwindow* window){
+    double posX, posY;
+    glfwGetCursorPos(window, &posX, &posY);
+    return static_cast<int>(posY);
+}
+
+// glm::vec2 InputManager::getMousePosition(){
+// 
+// }
+
+void InputManager::setMousePosition(GLFWwindow* window, int x, int y){
+    glfwSetCursorPos(window, x, y);
+}
+
+void InputManager::mouseButtonCallback(GLFWwindow* window, int button, int action, int){
+    auto* im = static_cast<InputManager*>(glfwGetWindowUserPointer(window));
+
+    if(button >= 0){
+        im->m_mouseButtonStates[button] = action;
+
+        if(action == GLFW_RELEASE)
+            im->m_mouseButtonReleaseStates[button] = true;
+        else
+            im->m_mouseButtonReleaseStates[button] = false;
+    }
+}

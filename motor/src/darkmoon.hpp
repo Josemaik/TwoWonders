@@ -162,6 +162,27 @@ public:
     // Check if a key is not being pressed
     bool IsKeyUp(int key);
 
+    // MANDO
+
+    // ------------------------------ //
+    // Input-related functions: mouse //
+    // ------------------------------ //
+
+    // Check if a mouse button has been pressed once
+    bool IsMouseButtonPressed(int button);
+    // Check if a mouse button is being pressed
+    bool IsMouseButtonDown(int button);
+    // Check if a mouse button has been released once
+    bool IsMouseButtonReleased(int button);
+    // Check if a mouse button is mot being pressed
+    bool IsMouseButtonUp(int button);
+    // Get mouse position X
+    int GetMouseX();
+    // Get mouse position Y
+    int GetMouseY();
+    // Set mouse position XY
+    void SetMousePosition(int x, int y);
+
     // ----------------------------- //
     // Loading / Unloading functions //
     // ----------------------------- //
