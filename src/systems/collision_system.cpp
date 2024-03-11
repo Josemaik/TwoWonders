@@ -483,12 +483,7 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
 
         if (otherEntPtr->hasTag<NoDamageTag>() && !otherEntPtr->hasTag<CrusherTag>())
         {
-            auto& pos = staticPhy->position;
-            auto& otherPos = otherPhy->position;
-            vec3d dir = { pos.x() - otherPos.x(), 0, pos.z() - otherPos.z() };
-            dir.normalize();
-            staticPhy->velocity = dir * 7;
-            staticPhy->stopped = true;
+            resolvePlayerDirection(*staticPhy, *otherPhy);
             return;
         }
         else if (otherEntPtr->hasTag<CrusherTag>())
@@ -513,9 +508,7 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
             bb.playerdamagebycrusher = true;
 
             // El jugador se mueve hacia atrás de la posición del crusher
-            vec3d dir = staticPhy->position - em.getComponent<PhysicsComponent>(*otherEntPtr).position;
-            dir.normalize();
-            staticPhy->position += dir * 7;
+            resolvePlayerDirection(*staticPhy, *otherPhy);
         }
         return;
     }
@@ -538,6 +531,16 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         li.dead_entities.insert(otherEntPtr->getID());
         return;
     }
+}
+
+void CollisionSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, PhysicsComponent& enemyPhy)
+{
+    auto& pos = playerPhy.position;
+    auto& otherPos = enemyPhy.position;
+    vec3d dir = { pos.x() - otherPos.x(), 0, pos.z() - otherPos.z() };
+    dir.normalize();
+    playerPhy.velocity = dir * 7;
+    playerPhy.stopped = true;
 }
 
 void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& atkPl2, bool& atkEn1, bool& atkEn2, Entity& entity1, Entity& entity2)
