@@ -17,6 +17,7 @@ public:
     }
 
     template<typename T, typename... Args> std::shared_ptr<T> loadResource(Args&&... args){
+        // if resource in memory, dont load
         nextID++;
         auto resource = std::make_shared<T>(nextID, std::forward<Args>(args)...);
         if(resource->load()){
