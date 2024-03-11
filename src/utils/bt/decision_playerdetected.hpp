@@ -5,8 +5,8 @@
 
 struct BTDecisionPlayerDetected : BTNode_t {
     // Constantes para ángulos de visión
-    const double verticalFOV = 100.0; // Ángulo vertical de visión en grados
-    const double horizontalFOV = 200.0; // Ángulo horizontal de visión en grados
+    const double verticalFOV = 80.0; // Ángulo vertical de visión en grados
+    const double horizontalFOV = 170.0; // Ángulo horizontal de visión en grados
 
     BTDecisionPlayerDetected() {}
 
@@ -25,61 +25,90 @@ struct BTDecisionPlayerDetected : BTNode_t {
         // //         }
         // //     }
         // // }
-        // //########## PERCEPCION SENSORIAL - VISTA ################
-        // //Calcula la dirección de visión del enemigo utilizando su orientación
-        // //double orientation_grados = ectx.phy.orientation * 180.0 / M_PI;
-        // vec3d enemyDirection = vec3d(std::sin(ectx.phy.orientation), 0.0, std::cos(ectx.phy.orientation));
-        // // Vector que apunta desde el enemigo al jugador
-        // vec3d toPlayer = getplayerpos(ectx) - ectx.phy.position;
-        // //normalizamos vectores
-        // enemyDirection.normalize();
-        // toPlayer.normalize();
-        // //producto escalar
-        // double dotProduct = enemyDirection.dotProduct(toPlayer);
-        // // Calcula el ángulo entre la dirección de visión del enemigo y la dirección hacia el jugador
-        // double angle = std::acos(dotProduct);
-        // // Convierte el ángulo de radianes a grados
-        // double angleDegrees = angle * 180 / PI;
+        //#### PERCEPCION SENSORIAL - OIDO ################################
+        //Calculo la distancia del player al enemigo
+    //    auto const distance = (ectx.phy.position - getplayerpos(ectx)).lengthSQ();
+    //     //     //Compruebo si esta dentro del radio de detección por oido
+    //     //     //podriamos hacer que en un radio x el enemigo entre en un estado
+    //     //     // de alerta
+
+    //     //si te metes en el radio de escucha, pasa a estado de sospecha
+    //     if(distance < (ectx.ai.detect_radius * ectx.ai.detect_radius) && !ectx.ai.playerdetected){
+    //         //estado de alerta
+    //         //dibujar icono alerta encima de enemigo
+    //         ectx.ai.alert_state = true;
+    //     }
+        
+    //     // Si superas la mitad de ese radio te detecta directamente
+    //     if( distance < (ectx.ai.detect_radius * ectx.ai.detect_radius) / 4){
+    //         ectx.ai.alert_state = false;
+    //         //te escucha
+    //         if(!ectx.ent.hasTag<BossFinalTag>()){
+    //             ectx.ai.path_initialized = false;
+    //         }
+    //         ectx.ai.playerdetected = true;
+    //         return BTNodeStatus_t::success;
+    //     }else{
+    //         ectx.ai.playerdetected = false;
+    //     }
+
+        //########## PERCEPCION SENSORIAL - VISTA ################
+        //Calcula la dirección de visión del enemigo utilizando su orientación
+        //double orientation_grados = ectx.phy.orientation * 180.0 / M_PI;
+        vec3d enemyDirection = vec3d(std::sin(ectx.phy.orientation), 0.0, std::cos(ectx.phy.orientation));
+        // Vector que apunta desde el enemigo al jugador
+        vec3d toPlayer = getplayerpos(ectx) - ectx.phy.position;
+        //normalizamos vectores
+        enemyDirection.normalize();
+        toPlayer.normalize();
+        //producto escalar
+        double dotProduct = enemyDirection.dotProduct(toPlayer);
+        // Calcula el ángulo entre la dirección de visión del enemigo y la dirección hacia el jugador
+        double angle = std::acos(dotProduct);
+        // Convierte el ángulo de radianes a grados
+        double angleDegrees = angle * 180 / PI;
         // // std::cout << "Grados: " << angleDegrees << "\n";
         // // std::cout << "Vertical: " << verticalFOV/2.0 << "\n";
         // // Comprueba si el ángulo está dentro del rango de visión del enemigo
-        // if (angleDegrees < verticalFOV / 2.0 && std::abs(angleDegrees) < horizontalFOV / 2.0) {
-        //     //Raycast
-        //     // bool rayintercepted{false};
-        //     vec3d intersection_wall{}, intersection_player{};
-        //     // Realiza un raycast en la dirección en la que el enemigo está mirando para detectar obstáculos
-        //     //std::sin(ectx.phy.orientation) *180.0 / PI,1.0, std::cos(ectx.phy.orientation) *180.0 / PI
-        //     // std::cout << getplayerpos(ectx).normalized() << "a\n";
-        //     // std::cout << getplayerpos(ectx).normalized().length() << "a\n";
-        //     // vec3d dir = vec3d(std::sin(ectx.phy.orientation) * 180.0 / PI, getplayerpos(ectx).y(), std::cos(ectx.phy.orientation) * 180.0 / PI).normalize();
-        //     vec3d dir = (getplayerpos(ectx) - ectx.phy.position).normalize();
-        //     RayCast ray = { ectx.phy.position,  dir };
+        if (angleDegrees < verticalFOV / 2.0 && std::abs(angleDegrees) < horizontalFOV / 2.0) {
+            //Raycast
+            // bool rayintercepted{false};
+            vec3d intersection_wall{}, intersection_player{};
+            // Realiza un raycast en la dirección en la que el enemigo está mirando para detectar obstáculos
+            //std::sin(ectx.phy.orientation) *180.0 / PI,1.0, std::cos(ectx.phy.orientation) *180.0 / PI
+            // std::cout << getplayerpos(ectx).normalized() << "a\n";
+            // std::cout << getplayerpos(ectx).normalized().length() << "a\n";
+            // vec3d dir = vec3d(std::sin(ectx.phy.orientation) * 180.0 / PI, getplayerpos(ectx).y(), std::cos(ectx.phy.orientation) * 180.0 / PI).normalize();
+            vec3d dir = getplayerpos(ectx) - ectx.phy.position;
+            RayCast ray = { ectx.phy.position,  dir };
 
         //     // dibujado de raycast
-        //     auto& bb = ectx.em.getSingleton<BlackBoard_t>();
-        //     bb.position_origin = ray.origin;
-        //     bb.direction = ray.direction;
-        //     bb.launched = true;
+            auto& bb = ectx.em.getSingleton<BlackBoard_t>();
+            bb.position_origin = ray.origin;
+            bb.direction = ray.direction;
+            bb.launched = true;
 
-        //     auto& bbox = getplayercollider(ectx).boundingBox;
+            auto& bbox = getplayercollider(ectx).boundingBox;
 
-        //     //Calculo punto de intersección con player
-        //     if (bbox.intersectsRay(ray.origin, ray.direction)) {
-        //         bbox.intersectsRay(ray.origin, ray.direction,intersection_player);
-        //     }
+            //Calculo punto de intersección con player
+            if (bbox.intersectsRay(ray.origin, ray.direction)) {
+                bbox.intersectsRay(ray.origin, ray.direction,intersection_player);
+            }
 
         //     //Compruebo si la caja de colisión de un obstaculo ha colisionado con el rayo
-        //     for (Entity& ent : ectx.em.getEntities()) {
-        //         if (ent.hasComponent<ColliderComponent>()) {
-        //             // ColliderComponent& col = ectx.em.getComponent<ColliderComponent>(ent);
-        //             //RenderComponent& ren = ectx.em.getComponent<RenderComponent>(ent);
-        //             // col.behaviorType & BehaviorType::STATIC 
-        //             if (ent.hasTag<WallTag>()) {
-        //                 auto& col = ectx.em.getComponent<ColliderComponent>(ent);
-        //                 if (col.boundingBox.intersectsRay(ray.origin, ray.direction)) {
-        //                     col.boundingBox.intersectsRay(ray.origin, ray.direction,intersection_wall);
-        //                     break;
-        //                 }
+            for (Entity& ent : ectx.em.getEntities()) {
+                if (ent.hasComponent<ColliderComponent>()) {
+                    // ColliderComponent& col = ectx.em.getComponent<ColliderComponent>(ent);
+                    //RenderComponent& ren = ectx.em.getComponent<RenderComponent>(ent);
+                    // col.behaviorType & BehaviorType::STATIC 
+                    if (ent.hasTag<WallTag>()) {
+                        auto& col = ectx.em.getComponent<ColliderComponent>(ent);
+                        if (col.boundingBox.intersectsRay(ray.origin, ray.direction)) {
+                            col.boundingBox.intersectsRay(ray.origin, ray.direction,intersection_wall);
+                            if(intersection_wall.distance(ectx.phy.position) < 10.0){
+                                break;
+                            }
+                        }
 
         // //                 // if(intersection_wall.x() != 0 && intersection_wall.z() != 0){
         // //                 //     break;
@@ -105,65 +134,42 @@ struct BTDecisionPlayerDetected : BTNode_t {
         // //                 //         rayintercepted = true;
         // //                 //         break;
         // //                 //     }
-        //             }
-        //         }
-        //     }
+                    }
+                }
+            }
             //distancias a los puntos de intersección
             // vec3d distancetoplayer = intersection_player - ectx.phy.position;
             // vec3d distancetoobject = intersection_wall - ectx.phy.position;
             //comprobamos las distancias a los puntos de intersección
-            // if (intersection_wall.distance(ectx.phy.position) < intersection_player.distance(ectx.phy.position)) {
-            //     //Hay un obstáculo enmedio
-            //     ectx.ai.playerdetected = false;
-            //     return BTNodeStatus_t::fail;
-            // }
-            // else {
-            //     // Si te sales del cono de visión
-            //     if(intersection_player.distance(ectx.phy.position) > ectx.ai.detect_radius){
-            //         ectx.ai.playerdetected = false;
-            //         return BTNodeStatus_t::fail;
-            //     }else{
-            //         ectx.ai.playerdetected = true;
-            //         return BTNodeStatus_t::success;
-            //     }
-            // }
+            std::cout << "disW: " << intersection_wall.distance(ectx.phy.position) << 
+            "disP: " << intersection_player.distance(ectx.phy.position) << "\n";
+            if (intersection_wall.distance(ectx.phy.position) < intersection_player.distance(ectx.phy.position)) {
+                //Hay un obstáculo enmedio
+                ectx.ai.playerdetected = false;
+                return BTNodeStatus_t::fail;
+            }
+            else {
+                // Si te sales del cono de visión
+                if(intersection_player.distance(ectx.phy.position) > ectx.ai.detect_radius){
+                    ectx.ai.playerdetected = false;
+                    return BTNodeStatus_t::fail;
+                }else{
+                    ectx.ai.alert_state = false;
+                    ectx.ai.playerdetected = true;
+                    return BTNodeStatus_t::success;
+                }
+            }
         //     // if(rayintercepted){ // si el obstaculo quita la vision al enemigo
         //     //     ectx.ai.playerdetected = false;
         //     // }else{ // si no hay obstaculos entre player y enemigo lo detecta
         //     //     ectx.ai.playerdetected = true;
         //     //     return BTNodeStatus_t::success;
         // //     // }
-        // }
-
-        //#### PERCEPCION SENSORIAL - OIDO ################################
-        //Calculo la distancia del player al enemigo
-       auto const distance = (ectx.phy.position - getplayerpos(ectx)).lengthSQ();
-    //     //Compruebo si esta dentro del radio de detección por oido
-    //     //podriamos hacer que en un radio x el enemigo entre en un estado
-    //     // de alerta
-
-        //si te metes en el radio de escucha, pasa a estado de sospecha
-        if(distance < (ectx.ai.detect_radius * ectx.ai.detect_radius) && !ectx.ai.playerdetected){
-            //estado de alerta
-            //dibujar icono alerta encima de enemigo
-            ectx.ai.alert_state = true;
-            return BTNodeStatus_t::fail;
         }
+
         
-        // Si superas la mitad de ese radio te detecta directamente
-        if( distance < (ectx.ai.detect_radius * ectx.ai.detect_radius) / 2){
-            ectx.ai.alert_state = false;
-            //te escucha
-            if(!ectx.ent.hasTag<BossFinalTag>()){
-                ectx.ai.path_initialized = false;
-            }
-            ectx.ai.playerdetected = true;
-            return BTNodeStatus_t::success;
-        }else{
-            ectx.ai.playerdetected = false;
-        }
 
-        ectx.ai.alert_state = false;
+        // ectx.ai.alert_state = false;
         ectx.ai.playerdetected = false;
         return BTNodeStatus_t::fail;
     }
