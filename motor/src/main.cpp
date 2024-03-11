@@ -8,7 +8,7 @@ int main(){
         // Auxiliars
 
         glm::vec3 positionCharacter = {0.0f, 0.0f, 0.0f};
-        float angleCharacter = 180.0f;
+        float angleCharacter = 0.0f;
 
         // ------ //
         // Camera //
@@ -28,7 +28,7 @@ int main(){
         auto texture = engine.LoadTexture("assets/koromaru.png");
         auto texture2 = engine.LoadTexture("assets/wall.jpg");
 
-        auto model = engine.LoadModel("assets/main_character.obj");
+        auto model = engine.LoadModel("assets/Dummy.obj");
 
         // ------ //
         // Unload //
@@ -112,8 +112,8 @@ int main(){
             
             //engine.DrawModel(model, {0.0f, 0.0f, 0.0f}, 0.2f, {255, 0, 0, 255});
             //engine.DrawModelWires(model, {0.0f, 0.0f, 0.0f}, 0.2f, BLACK);
-            engine.DrawModelExtra(model, positionCharacter, 0.2f, {0.0f, 1.0f, 0.0f}, angleCharacter, {100, 100, 100, 255});
-            engine.DrawModelWiresExtra(model, positionCharacter, 0.2f, {0.0f, 1.0f, 0.0f}, angleCharacter, BLACK);
+            engine.DrawModelExtra(model, positionCharacter, 0.15f, {0.0f, 1.0f, 0.0f}, angleCharacter, {100, 100, 100, 255});
+            engine.DrawModelWiresExtra(model, positionCharacter, 0.15f, {0.0f, 1.0f, 0.0f}, angleCharacter, BLACK);
 
             engine.EndMode3D();
 
