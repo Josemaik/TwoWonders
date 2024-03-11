@@ -43,7 +43,7 @@ struct PhysicsComponent
     double elapsed_stunned{ 1.0 };
 
     bool stopped{ false };
-    double countdown_stopped{ 0.5 }; // seconds
+    double countdown_stopped{ 0.7 };
     double elapsed_stopped{ 0.0 };
 
     void plusdeltatime(double deltaTime, double& elapsed) { elapsed += deltaTime; };

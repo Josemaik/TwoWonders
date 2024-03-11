@@ -487,7 +487,7 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
             auto& otherPos = otherPhy->position;
             vec3d dir = { pos.x() - otherPos.x(), 0, pos.z() - otherPos.z() };
             dir.normalize();
-            staticPhy->position += dir * 5;
+            staticPhy->velocity = dir * 7;
             staticPhy->stopped = true;
             return;
         }

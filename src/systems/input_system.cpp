@@ -70,6 +70,9 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
 
     // Sacamos las físicas y el input del jugador
     auto& phy = em.getComponent<PhysicsComponent>(player);
+    if (phy.stopped)
+        return;
+
     auto& in = em.getComponent<InputComponent>(player);
 
     // Resetear la velocidad

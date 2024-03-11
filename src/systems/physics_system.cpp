@@ -14,15 +14,16 @@ void PhysicsSystem::update(EntityManager& em, float dt)
     em.forEach<SYSCMPs, SYSTAGs>([dt, &em](Entity& ent, PhysicsComponent& phy)
     {
         // Cuando el jugador se para por un tiempo determinado
-        if (phy.stopped) {
-            if (phy.elapsed_stopped >= phy.countdown_stopped) {
+        if (phy.stopped)
+        {
+            if (phy.elapsed_stopped >= phy.countdown_stopped)
+            {
                 phy.elapsed_stopped = 0;
                 phy.stopped = false;
-            }
-            else {
-                phy.plusdeltatime(dt, phy.elapsed_stopped);
                 return;
             }
+            else
+                phy.plusdeltatime(dt, phy.elapsed_stopped);
         }
         // Sacamos referencias a la posición y velocidad
         auto& pos = phy.position;
@@ -68,8 +69,8 @@ void PhysicsSystem::update(EntityManager& em, float dt)
         pos.setX((pos.x() + vel.x()));
         pos.setY((pos.y() + vel.y()));
         pos.setZ((pos.z() + vel.z()));
-        // if(!phy.orientated_before){
-        if (vel.x() != 0 || vel.z() != 0) {
+
+        if (!phy.stopped && (vel.x() != 0 || vel.z() != 0)) {
             phy.orientation = std::atan2(vel.x(), vel.z());
         }
 
