@@ -29,6 +29,7 @@ void Game::createEntities(EntityManager& em)
     // 32.0, 4.0, 130.0 - Segundo cofre
     // -72.0, 4.0, 72.9 - Cofre con llave
     // -116.0, 4.0, 111.0 - Apisonadora
+    //-125, 4.0, 138.68 - `pos chunck 3
 
 // Player
     auto& e{ em.newEntity() };

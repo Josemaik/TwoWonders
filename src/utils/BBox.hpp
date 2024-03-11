@@ -47,6 +47,7 @@ struct BBox
         return tNear <= tFar && tFar >= 0;
     }
 
+
     // Función para comprobar si un rayo intersecta y además devuelve el punto de intersección
     bool intersectsRay(vec3d& rayOrigin, vec3d& rayDirection, vec3d& intersectionPoint) const {
         vec3d t1 = (min - rayOrigin) / rayDirection;
@@ -64,7 +65,6 @@ struct BBox
         }
         return false;
     }
-
     vec3d getPositiveVertex(const vec3d& normal) const {
         vec3d res = min;
         if (normal.x() >= 0) res.setX(max.x());
@@ -81,3 +81,4 @@ struct BBox
         return res;
     }
 };
+

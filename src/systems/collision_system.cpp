@@ -725,9 +725,9 @@ bool CollisionSystem::checkWallCollision(EntityManager& em, vec3d& pos)
             vec3d minOverlap = BBox::minOverlap(bbox, box);
 
             // Sacamos cuál sería la posición de la entidad después de la colisión
-            std::cout << pos << std::endl;
+            //std::cout << pos << std::endl;
             auto newPos = pos;
-            std::cout << newPos << std::endl;
+            //std::cout << newPos << std::endl;
             if (minOverlap.x() < minOverlap.y() && minOverlap.x() < minOverlap.z())
             {
                 if (phy.position.x() < pos.x())
