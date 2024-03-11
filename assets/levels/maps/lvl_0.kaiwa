@@ -863,7 +863,7 @@
 							"type": 4,
 							"element": 1,
 							"arrival_radius": 2.0,
-							"detect_radius": 50.0,
+							"detect_radius": 40.0,
 							"attack_radius": 2.5,
 							"tx": 0.0,
 							"tz": 0.0,
