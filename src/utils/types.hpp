@@ -37,6 +37,8 @@
 
 // Constants
 static constexpr float DEGTORAD = static_cast<float>(M_PI / 180.0);
+static constexpr float timeStep = 1.0f / 30.0f;  // Actualiza el juego 30 veces por segundo
+static constexpr float timeStep60 = 1.0f / 60.0f;  // Actualiza el juego 60 veces por segundo
 
 // Forward Declarations
 namespace ENGI { struct GameEngine; }

@@ -43,11 +43,11 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 break;
 
             case ObjectType::Coin:
-                plfi.addCoin();
+                plfi.addCoin(5);
                 break;
 
             case ObjectType::Coin30:
-                plfi.add30Coins();
+                plfi.addCoin(30);
                 break;
 
             case ObjectType::ShopItem_Bomb:
