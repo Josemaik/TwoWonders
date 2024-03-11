@@ -1193,7 +1193,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         }
 
         //Alert state
-        if(e.hasTag<EnemyTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>()){
+        if(e.hasTag<EnemyTag>() && !e.hasTag<CrusherTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>()){
             auto &aic = em.getComponent<AIComponent>(e);
             if(aic.alert_state){
                 auto& r = em.getComponent<RenderComponent>(e);
