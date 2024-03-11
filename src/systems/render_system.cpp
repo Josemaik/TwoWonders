@@ -1441,12 +1441,31 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
 
 void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
 {
+    auto& plfi{ em.getSingleton<PlayerInfo>() };
+    const float multip = 3.5f;
+    if (plfi.elapsed_coins < plfi.elapsed_limit_coins)
+    {
+        elapsed_CoinBar += timeStep60 * multip;
+        if (elapsed_CoinBar > elapsed_limit_CoinBar) elapsed_CoinBar = elapsed_limit_CoinBar;
+
+        plfi.elapsed_coins += timeStep60;
+    }
+    else
+    {
+        elapsed_CoinBar -= timeStep60 * multip;
+        if (elapsed_CoinBar < 0) elapsed_CoinBar = 0;
+    }
+
+    float div = elapsed_CoinBar / elapsed_limit_CoinBar;
+
+    // Interpolación
+    coinBarX = static_cast<int>((1.f - div) * static_cast<float>(engine.getScreenWidth()) + div * static_cast<float>(engine.getScreenWidth() - 153));
+
     // Barra para los destellos
-    engine.drawTexture(engine.texture_destellos, engine.getScreenWidth() - 153, engine.getScreenHeight() - 130, { 255, 255, 255, 255 });
-    auto const& plfi{ em.getSingleton<PlayerInfo>() };
+    engine.drawTexture(engine.texture_destellos, coinBarX, engine.getScreenHeight() - 130, { 255, 255, 255, 255 });
     std::string info_text = std::to_string(plfi.coins);
 
-    int posX = engine.getScreenWidth() - 35;
+    coinNumberX = static_cast<int>((1.f - div) * (static_cast<float>(engine.getScreenWidth()) + 118) + div * static_cast<float>(engine.getScreenWidth() - 35));
     int posY = engine.getScreenHeight() - 114;
 
     // Sacamos el número de dígitos que tiene el número de destellos
@@ -1458,11 +1477,12 @@ void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
         num_digits++;
 
         if (num_digits > 1)
-            posX -= 16;
+            coinNumberX -= 16;
     }
 
     // Dibujamos el número de destellos
-    engine.drawText(info_text.c_str(), posX, posY, 28, YELLOW);
+    if (elapsed_CoinBar > 0)
+        engine.drawText(info_text.c_str(), coinNumberX, posY, 28, YELLOW);
 }
 
 void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)

@@ -115,7 +115,6 @@ void Game::run()
 
     // Inicializa una variable donde tener el tiempo entre frames
     float deltaTime{}, currentTime{}, elapsed{};
-    const float timeStep = 1.0f / 30.0f;  // Actualiza el juego 60 veces por segundo
 
     createSound(em);
     li.sound_system = &sound_system;
