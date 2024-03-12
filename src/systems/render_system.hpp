@@ -57,6 +57,8 @@ private:
     float elapsed_CoinBar{ 0.f }, elapsed_limit_CoinBar{ 5.0f };
 
     int coinBarX{}, coinNumberX{};
+
+    float endangle{0.0f};
 };
 
 #endif // !RENDER_SYSTEM

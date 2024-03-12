@@ -872,6 +872,8 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
             DrawTextEx(GetFontDefault(), std::to_string(bb.subditosData.size()).c_str(), Vector2{ 680,250 }, 20, 1, RED);
             DrawText("Subditos id alive:", 480, 270, 20, BLACK);
             DrawTextEx(GetFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), Vector2{ 680,270 }, 20, 1, RED);
+             DrawText("Alert state:", 480, 290, 20, BLACK);
+            DrawTextEx(GetFontDefault(), (aic.alert_state == 0) ? "No" : "Sí", Vector2{ 680,290 }, 20, 1, RED);
 
             engine.beginMode3D();
             //raycast
@@ -1195,21 +1197,40 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         //Alert state
         if(e.hasTag<EnemyTag>() && !e.hasTag<CrusherTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>()){
             auto &aic = em.getComponent<AIComponent>(e);
-            if(aic.alert_state){
-                auto& r = em.getComponent<RenderComponent>(e);
-                float barX = engine.getWorldToScreenX(r.position);
-                float barY = engine.getWorldToScreenY(r.position);
-                // Obtén las coordenadas del triángulo
-                Vector2 point1 = {barX, barY - 120.0f};
-                Vector2 point2 = {barX - 30.0f, barY - 50.0f };
-                Vector2 point3 = {barX + 30.0f, barY - 50.0f};
-        
-                // Dibuja el triángulo
-                DrawTriangle(point1, point2, point3, BLACK);
-                // Dibuja el signo de exclamación dentro del triángulo
-                engine.drawText("!", static_cast<int>(barX - 2), static_cast<int>(barY - 100), 50, YELLOW);
+            // if(aic.playerdetected){
+            //     //dibujar icono alerta
+            //     //emepezar contador para borrar
+            // }
+
+            //Si no estas detectado pero entras en radio de
+            auto& r = em.getComponent<RenderComponent>(e);
+            float barX = engine.getWorldToScreenX(r.position);
+            float barY = engine.getWorldToScreenY(r.position);
+            // // Obtén las coordenadas del triángulo
+            //Vector2 point1 = {barX, barY - 120.0f};
+            // Vector2 point2 = {barX - 30.0f, barY - 50.0f };
+            // Vector2 point3 = {barX + 30.0f, barY - 50.0f};
+            Vector2 center = {barX, barY-120.0f};
+            if(aic.alert_state){    
+                endangle -= 0.5f;
+                //std::cout << endangle << "\n";
+                if(endangle <= -360.0f){
+                    endangle = 0.0f;
+                    aic.playerdetected = true;
+                }
+                DrawCircleSector(center,30.0f,0.0f,endangle,30,RED);
+                // // Dibuja el triángulo
+                // DrawTriangle(point1, point2, point3, BLACK);
+                // // Dibuja el signo de exclamación dentro del triángulo
+                // engine.drawText("!", static_cast<int>(barX - 2), static_cast<int>(barY - 100), 50, YELLOW);
+            }else{
+                if(endangle != 0.0f && endangle <= -30.0f){
+                    endangle += 0.5f;
+                }
             }
         }
+
+        //Icon detected
 
 
         if (e.hasComponent<InteractiveComponent>() && (e.hasComponent<RenderComponent>() || e.hasComponent<PhysicsComponent>()))

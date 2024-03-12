@@ -15,10 +15,10 @@ struct BTDecisionPlayerDetected : BTNode_t {
         ectx.ai.bh = "detecting player";
         //#### PERCEPCION SENSORIAL - OIDO ################################
         //Calculo la distancia del player al enemigo
-       auto const distance = (ectx.phy.position - getplayerpos(ectx)).lengthSQ();
-
+       auto const distance = (ectx.phy.position - getplayerpos(ectx)).length();
+        auto const radius = (ectx.ai.detect_radius * ectx.ai.detect_radius);
         //si te metes en el radio de escucha, pasa a estado de sospecha
-        if(distance < (ectx.ai.detect_radius * ectx.ai.detect_radius) && !ectx.ai.playerdetected){
+        if(distance < radius && !ectx.ai.playerdetected){
             //estado de alerta
             //dibujar icono alerta encima de enemigo
             ectx.ai.alert_state = true;
