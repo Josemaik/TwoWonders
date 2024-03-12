@@ -15,7 +15,7 @@ public:
 
     // Camera Attributes
     glm::vec3 position { 0.0f, 2.0f, 3.0f };
-    glm::vec3 target {0.0f, 0.0f, 0.0f };
+    glm::vec3 target { 0.0f, 0.0f, 0.0f };
     glm::vec3 up { 0.0f, 1.0f, 0.0f };
 
     glm::vec3 direction;
@@ -30,7 +30,7 @@ public:
 
     // Returns the view matrix
     glm::mat4 getViewMatrix(){
-        return glm::lookAt(position, target, up);
+        return glm::lookAt(position, position + front /* target ? */, up);
     }
 
     // Return the projection matrix

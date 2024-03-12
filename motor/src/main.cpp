@@ -75,12 +75,19 @@ int main(){
                 angleCharacter       = 0.0f;
             }
 
+            if(engine.IsKeyPressed(KEY_UP))
+                camera->fovy    -= 1.0f;
+            if(engine.IsKeyPressed(KEY_DOWN))
+                camera->fovy    += 1.0f;
+
             if(engine.IsKeyPressed(GLFW_KEY_LEFT_SHIFT))
                 camera->position.y -= 0.1f;
             if(engine.IsKeyPressed(KEY_SPACE))
                 camera->position.y += 0.1f;
 
             camera->target = positionCharacter;
+
+            camera->updateCameraVectors();
 
             // ------- //
             // Drawing //
@@ -104,15 +111,15 @@ int main(){
             engine.DrawLine3D({1.0f, 0.0f, -1.0f}, {1.0f, 1.0f, -1.0f}, 1.0f, {255, 255, 0, 255}); 
 
             engine.DrawGrid(10, 1.0f, {140, 140, 140, 255});
-            engine.DrawPlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, {255, 128, 128, 255});
+            engine.DrawPlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, PINK);
 
-            engine.DrawCubeV({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, {255, 0, 0, 255});
-            engine.DrawCubeWiresV({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, BLACK);
-            engine.DrawCubeWiresV({-3.0f, 2.0f, 0.0f}, {1.0f, 1.0f, 3.0f}, {128, 0, 128, 255});
+            engine.DrawCubeV({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, AQUA_DARK);
+            // engine.DrawCubeWiresV({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, BLACK);
+            // engine.DrawCubeWiresV({-3.0f, 2.0f, 0.0f}, {1.0f, 1.0f, 3.0f}, RED);
             
             //engine.DrawModel(model, {0.0f, 0.0f, 0.0f}, 0.2f, {255, 0, 0, 255});
             //engine.DrawModelWires(model, {0.0f, 0.0f, 0.0f}, 0.2f, BLACK);
-            engine.DrawModelExtra(model, positionCharacter, 0.15f, {0.0f, 1.0f, 0.0f}, angleCharacter, {100, 100, 100, 255});
+            engine.DrawModelExtra(model, positionCharacter, 0.15f, {0.0f, 1.0f, 0.0f}, angleCharacter, GRAY);
             engine.DrawModelWiresExtra(model, positionCharacter, 0.15f, {0.0f, 1.0f, 0.0f}, angleCharacter, BLACK);
 
             engine.EndMode3D();

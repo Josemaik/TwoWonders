@@ -10,10 +10,11 @@ struct Color {
 // Custom engine color palette (UI Two Wonders)
 #define WHITE            Color { 255, 255, 255, 255 }
 #define BLACK            Color {   0,   0,   0, 255 }
+#define GRAY             Color { 100, 100, 100, 255 }
 
-#define ACUA             Color { 108, 198, 215, 255 }
-#define ACUA_LIGHT       Color { 154, 222, 235, 255 }
-#define ACUA_DARK        Color {  40, 141, 160, 255 }
+#define AQUA             Color { 108, 198, 215, 255 }
+#define AQUA_LIGHT       Color { 154, 222, 235, 255 }
+#define AQUA_DARK        Color {  40, 141, 160, 255 }
 
 #define BLUE             Color { 121, 145, 221, 255 }
 #define BLUE_LIGHT       Color { 164, 181, 238, 255 }
