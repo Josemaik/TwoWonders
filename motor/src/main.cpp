@@ -51,6 +51,9 @@ int main(){
 
             //std::cout << engine.GetGamepadAxisMovement(0, 0) << std::endl;
 
+            //if(engine.IsGamepadButtonReleased(0, GLFW_GAMEPAD_BUTTON_A))
+            //    std::cout << "Boton levantado" << std::endl;
+
             //std::cout << "X: " << engine.GetMouseX() << " - Y: " << engine.GetMouseY() << std::endl;
             // if(engine.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
             //     std::cout << "Boton izquierdo apretado" << std::endl;
@@ -63,22 +66,22 @@ int main(){
 
             // engine.SetMousePosition(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2);
 
-            if(engine.IsKeyPressed(KEY_A)){
+            if(engine.IsKeyPressed(KEY_A) || engine.IsGamepadButtonPressed(0, GLFW_GAMEPAD_BUTTON_DPAD_LEFT)){
                 positionCharacter.x -= 0.1f;
                 camera->position.x  -= 0.1f;
                 angleCharacter       = 270.0f;
             }
-            if(engine.IsKeyPressed(KEY_D)){
+            if(engine.IsKeyPressed(KEY_D) || engine.IsGamepadButtonPressed(0, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT)){
                 positionCharacter.x += 0.1f;
                 camera->position.x  += 0.1f;
                 angleCharacter       = 90.0f;
             }
-            if(engine.IsKeyPressed(KEY_W)){
+            if(engine.IsKeyPressed(KEY_W) || engine.IsGamepadButtonPressed(0, GLFW_GAMEPAD_BUTTON_DPAD_UP)){
                 positionCharacter.z -= 0.1f;
                 camera->position.z  -= 0.1f;
                 angleCharacter       = 180.0f;
             }
-            if(engine.IsKeyPressed(KEY_S)){
+            if(engine.IsKeyPressed(KEY_S) || engine.IsGamepadButtonPressed(0, GLFW_GAMEPAD_BUTTON_DPAD_DOWN)){
                 positionCharacter.z += 0.1f;
                 camera->position.z  += 0.1f;
                 angleCharacter       = 0.0f;

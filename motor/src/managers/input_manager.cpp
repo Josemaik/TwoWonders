@@ -1,17 +1,5 @@
 #include "input_manager.hpp"
 
-// Update
-
-void InputManager::update(){
-    int jid = 0;
-    // Update gamepad state
-    GLFWgamepadstate gamepadState;
-    if(glfwGetGamepadState(jid, &gamepadState))
-        m_gamepadStates[jid] = gamepadState;
-    // else
-    //     std::cerr << "Error" << std::endl;
-}
-
 // Input-related functions: keyboard
 
 bool InputManager::isKeyPressed(int key){
@@ -77,7 +65,13 @@ bool InputManager::isGamepadButtonDown(int gamepad, int button){
 
 // TODO
 bool InputManager::isGamepadButtonReleased(int, int){
-    return true;
+    /*
+    if(m_gamepadReleaseStates[gamepad].buttons[button] == 1){
+        m_gamepadReleaseStates[gamepad].buttons[button] = 0;
+        return true;
+    }
+    */
+    return false;
 }
 
 bool InputManager::isGamepadButtonUp(int gamepad, int button){
@@ -93,6 +87,30 @@ int InputManager::getGamepadAxisCount(int gamepad){
 float InputManager::getGamepadAxisMovement(int gamepad, int axis){
     return m_gamepadStates[gamepad].axes[axis];
 }
+
+// Update
+
+void InputManager::update(){
+    int jid = 0;
+    // Update gamepad state
+    GLFWgamepadstate gamepadState;
+    if(glfwGetGamepadState(jid, &gamepadState)){
+        m_gamepadStates[jid] = gamepadState;
+        // m_gamepadReleaseStates[jid] = gamepadState;
+
+        /*
+        for(int i=0; i<GLFW_JOYSTICK_LAST+1; i++){
+            if(m_gamepadReleaseStates[jid].buttons[i] == 0)
+                m_gamepadReleaseStates[jid].buttons[i] = 1;
+            else
+                m_gamepadReleaseStates[jid].buttons[i] = 2;
+        }
+        */
+    }
+    // else
+    //     std::cerr << "Error" << std::endl;
+}
+
 
  // Input-related functions: mouse
 bool InputManager::isMouseButtonPressed(int button){
