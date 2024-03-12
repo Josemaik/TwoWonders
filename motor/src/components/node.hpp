@@ -12,7 +12,7 @@
 struct Node{
 private:
     std::shared_ptr<Entity> m_entity;
-    std::vector<std::unique_ptr<Node>> m_children;
+    std::vector<std::shared_ptr<Node>> m_children;
     Node* m_parent;
     glm::vec3 m_translation;
     glm::quat m_rotation;
@@ -24,9 +24,9 @@ public:
     std::string name;
 
     Node();
-    int addChild(std::unique_ptr<Node> child);
+    int addChild(std::shared_ptr<Node> child);
     // 0 : child erase | -1 : child not found
-    int removeChild(Node* child);
+    int removeChild(std::shared_ptr<Node> child);
     bool setEntity(std::shared_ptr<Entity> newEntity);
 
     // Transform

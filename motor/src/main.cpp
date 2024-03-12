@@ -17,11 +17,18 @@ int main(){
         glm::vec3 positionCharacter = {0.0f, 0.0f, 0.0f};
         float angleCharacter = 0.0f;
 
+        // ---- //
+        // Node //
+        // ---- //
+
+        auto nodoEspecial = engine.CreateNode("Yema");
+        engine.GetRootNode()->addChild(nodoEspecial);
+
         // ------ //
         // Camera //
         // ------ //
 
-        auto camera = engine.CreateCamera("Main");
+        auto camera = engine.CreateCamera("Camera");
         engine.UseCamera(camera);
 
         // camera->cameraProjection = CameraProjection::CAMERA_ORTHOGRAPHIC;
@@ -36,6 +43,11 @@ int main(){
         auto texture2 = engine.LoadTexture("assets/wall.jpg");
 
         auto model = engine.LoadModel("assets/Dummy.obj");
+
+        std::cout << "┌──────┐" << std::endl;
+        std::cout << "│ Tree │" << std::endl;
+        std::cout << "└──────┘" << std::endl;
+        engine.GetRootNode()->drawTree();
 
         // ------ //
         // Unload //

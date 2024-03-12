@@ -1,5 +1,23 @@
 #include "darkmoon.hpp"
 
+// ---------------------- //
+// Node-related functions //
+// ---------------------- //
+
+// Create node in scene tree
+std::shared_ptr<Node> DarkMoonEngine::CreateNode(const char* nodeName){
+    auto node = std::make_shared<Node>();
+    node->name = nodeName;
+
+    return node;
+}
+
+// Get root node
+std::shared_ptr<Node> DarkMoonEngine::GetRootNode(){
+    return m_rootNode;
+}
+
+
 // ------------------------ //
 // Window-related functions //
 // ------------------------ //
@@ -9,26 +27,24 @@ bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
     m_renderManager.setWindowSize(width, height);
 
     //Create scene
-    m_rootNode = std::make_unique<Node>();
-    m_rootNode->name = "Scene";
+    m_rootNode = CreateNode("Scene");
 
     // Create Light
-    auto nLight = std::make_unique<Node>();
-    nLight->name = "Light";
+    auto nLight = CreateNode("Default Light");
     auto eLight = std::make_shared<Light>();
     nLight->setEntity(eLight);
-    m_rootNode->addChild(std::move(nLight));
+    m_rootNode->addChild(nLight);
 
     // Create Camera
-    auto eCamera = CreateCamera("Main camera");
+    auto eCamera = CreateCamera("Default Camera");
     // Assigns Camera to RenderManager
     UseCamera(eCamera);
 
     //----- View tree -----//
-    std::cout << "┌──────┐" << std::endl;
-    std::cout << "│ Tree │" << std::endl;
-    std::cout << "└──────┘" << std::endl;
-    m_rootNode->drawTree();
+    // std::cout << "┌──────┐" << std::endl;
+    // std::cout << "│ Tree │" << std::endl;
+    // std::cout << "└──────┘" << std::endl;
+    // m_rootNode->drawTree();
 
     if(m_windowsManager.initWindow(width, height, title)){
         //----- Configure callback -----//
@@ -276,7 +292,7 @@ void DarkMoonEngine::DrawCubeWiresV(glm::vec3 position, glm::vec3 size, Color co
 
 // Load model from file into GPU memory
 std::shared_ptr<Model> DarkMoonEngine::LoadModel(const char* filePath){
-    auto nModel = std::make_unique<Node>();
+    auto nModel = std::make_shared<Node>();
     nModel->name = filePath;
     auto eModel = std::make_shared<Model>();
     eModel->load(filePath, m_resourceManager);
@@ -448,11 +464,10 @@ std::shared_ptr<Shader> DarkMoonEngine::LoadShader(const char* vsFilePath, const
 
 // Create camera
 std::shared_ptr<Camera> DarkMoonEngine::CreateCamera(const char* name){
-    auto nCamera = std::make_unique<Node>();
-    nCamera->name = name;
+    auto nCamera = CreateNode(name);
     auto eCamera = std::make_shared<Camera>();
     nCamera->setEntity(eCamera);
-    m_rootNode->addChild(std::move(nCamera));
+    m_rootNode->addChild(nCamera);
 
     return eCamera;
 }

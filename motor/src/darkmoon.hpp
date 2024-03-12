@@ -19,6 +19,20 @@ public:
 
     // TODO
     // NODE
+    // CreateNode
+    // AddChild
+    // RemoveChild
+    // SetEntity
+    // GetRootNode
+    
+    // ---------------------- //
+    // Node-related functions //
+    // ---------------------- //
+
+    // Create node in scene tree
+    std::shared_ptr<Node> CreateNode(const char* nodeName);
+    // Get root node
+    std::shared_ptr<Node> GetRootNode();
 
     // ------------------------ //
     // Window-related functions //
@@ -235,7 +249,7 @@ public:
     
 private:
     // Root node 
-    std::unique_ptr<Node> m_rootNode;
+    std::shared_ptr<Node> m_rootNode;
 
     // Managers
     InputManager m_inputManager;

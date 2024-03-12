@@ -11,13 +11,14 @@ Node::Node()
       m_scale(1.0f), 
       m_transformationMatrix(1.0f) {}
 
-int Node::addChild(std::unique_ptr<Node> child) {
-    m_children.push_back(std::move(child));
+int Node::addChild(std::shared_ptr<Node> child) {
+    m_children.push_back(child);
     m_children.back()->m_parent = this;
     return static_cast<int>(m_children.size() - 1);
 }
 
-int Node::removeChild(Node* child) {
+int Node::removeChild(std::shared_ptr<Node>) {
+    /* TODO
     auto it = std::find_if(m_children.begin(), m_children.end(), [child](const auto& uniqueChild) {
         return uniqueChild.get() == child;
     });
@@ -27,6 +28,7 @@ int Node::removeChild(Node* child) {
         (*it)->m_parent = nullptr;
         return 0;
     }
+    */
     return -1;
 }
 
