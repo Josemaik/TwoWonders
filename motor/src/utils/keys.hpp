@@ -2,6 +2,8 @@
 
 #include <GLFW/glfw3.h>
 
+// TODO: keys extra
+
 // Key codes for alphanumeric keys
 #define KEY_B         GLFW_KEY_B
 #define KEY_A         GLFW_KEY_A
@@ -75,3 +77,6 @@
 #define KEY_F23       GLFW_KEY_F23
 #define KEY_F24       GLFW_KEY_F24
 #define KEY_F25       GLFW_KEY_F25
+
+// Key codes for gamepad buttons // TODO
+#define GAMEPAD_AXIS_LAST         GLFW_GAMEPAD_AXIS_LAST

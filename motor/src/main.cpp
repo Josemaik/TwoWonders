@@ -7,6 +7,13 @@ int main(){
 
         // Auxiliars
 
+        // if(im.isGamePadAvailable(0) == 1)
+        //     std::cout << "Gamepad: " << im.getGamePadName(0) << std::endl;
+        // 
+
+        if(engine.IsGamepadAvailable(0))
+            std::cout << "Gamepad: " << engine.GetGamepadName(0) << std::endl;
+
         glm::vec3 positionCharacter = {0.0f, 0.0f, 0.0f};
         float angleCharacter = 0.0f;
 
@@ -41,6 +48,9 @@ int main(){
             // ----- //
             // Logic //
             // ----- //
+
+            //if(engine.IsGamepadButtonDown(0, GLFW_GAMEPAD_BUTTON_A))
+            //    std::cout << "Boton apretado" << std::endl;
 
             //std::cout << "X: " << engine.GetMouseX() << " - Y: " << engine.GetMouseY() << std::endl;
             // if(engine.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))

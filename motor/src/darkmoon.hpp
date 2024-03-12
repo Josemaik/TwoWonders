@@ -177,7 +177,7 @@ public:
     bool IsMouseButtonDown(int button);
     // Check if a mouse button has been released once
     bool IsMouseButtonReleased(int button);
-    // Check if a mouse button is mot being pressed
+    // Check if a mouse button is not being pressed
     bool IsMouseButtonUp(int button);
     // Get mouse position X
     int GetMouseX();
@@ -185,6 +185,27 @@ public:
     int GetMouseY();
     // Set mouse position XY
     void SetMousePosition(int x, int y);
+
+    // -------------------------------- //
+    // Input-related functions: gamepad //
+    // -------------------------------- //
+
+    // Check if gamepad is available
+    bool IsGamepadAvailable(int gamepad);
+    // Get gamepad internal name id
+    const char* GetGamepadName(int gamepad);
+    // Check is a gamepad button has been pressed once
+    bool IsGamepadButtonPressed(int gamepad, int button);
+    // Check is a gamepad button is being pressed
+    bool IsGamepadButtonDown(int gamepad, int button);
+    // Check is a gamepad button has been released once
+    bool IsGamepadButtonReleased(int gamepad, int button);
+    // Check is a gamepad button is not being pressed
+    bool IsGamepadButtonUp(int gamepad, int button);
+    // Get gamepad axis count for a gamepad
+    int GetGamepadAxisCount(int gamepad);
+    // Get axis movement value for a gamepad axis
+    float GetGamepadAxisMovement(int gamepad, int axis);
 
     // ----------------------------- //
     // Loading / Unloading functions //

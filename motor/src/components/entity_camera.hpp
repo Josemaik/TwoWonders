@@ -29,6 +29,7 @@ public:
     }
 
     // Returns the view matrix
+    // TODO
     glm::mat4 getViewMatrix(){
         return glm::lookAt(position, position + front /* target ? */, up);
     }
@@ -37,7 +38,7 @@ public:
     glm::mat4 getProjectionMatrix(int screenWidth, int screenHeight) const {
         if (cameraProjection == CameraProjection::CAMERA_PERSPECTIVE) {
             return glm::perspective(glm::radians(fovy), static_cast<float>(screenWidth) / static_cast<float>(screenHeight), 0.1f, 100.0f);
-        } else if (cameraProjection == CameraProjection::CAMERA_ORTHOGRAPHIC) {
+        } else if (cameraProjection == CameraProjection::CAMERA_ORTHOGRAPHIC) { // TODO
             // Ajusta estos valores según tus necesidades
             float left = -1.0f;
             float right = 1.0f;

@@ -1,16 +1,16 @@
 #include "input_manager.hpp"
 
 // Update
+
+// TODO: callback
 void InputManager::update(){
-    /*
     int jid = 0;
     // Update gamepad state
     GLFWgamepadstate gamepadState;
     if(glfwGetGamepadState(jid, &gamepadState))
         m_gamepadStates[jid] = gamepadState;
-    else
-        std::cerr << "Error" << std::endl;
-    */
+    // else
+    //     std::cerr << "Error" << std::endl;
 }
 
 // Input-related functions: keyboard
@@ -68,6 +68,7 @@ const char* InputManager::getGamePadName(int gamepad){
     return name ? name : "Uknown";
 }
 
+// TODO
 bool InputManager::isGamepadButtonPressed(int, int){
     return true;
 }
@@ -78,20 +79,22 @@ bool InputManager::isGamepadButtonDown(int gamepad, int button){
     return m_gamepadStates[gamepad].buttons[button] == GLFW_PRESS;
 }
 
-
+// TODO
 bool InputManager::isGamepadButtonReleased(int, int){
     return true;
 }
 
-
+// TODO
 bool InputManager::isGamepadButtonUp(int gamepad, int button){
     return m_gamepadStates[gamepad].buttons[button] == GLFW_RELEASE;
 }
 
+// TODO
 int InputManager::getGamepadAxisCount(int){
     return 1;
 }
 
+// TODO
 float InputManager::getGamepadAxisMovement(int, int){
     return 1.0f;
 }

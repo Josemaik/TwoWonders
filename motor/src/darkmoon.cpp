@@ -98,6 +98,8 @@ void DarkMoonEngine::ClearBackground(Color color){
 void DarkMoonEngine::BeginDrawing(){
     m_windowsManager.beginDrawing();
     m_renderManager.useShader(m_shaderColor);
+
+    m_inputManager.update();
 }
 
 // End canvas drawing and swap buffers
@@ -377,6 +379,51 @@ int DarkMoonEngine::GetMouseY(){
 void DarkMoonEngine::SetMousePosition(int x, int y){
     m_inputManager.setMousePosition(m_windowsManager.getWindow(), x, y);
 }
+
+// -------------------------------- //
+// Input-related functions: gamepad //
+// -------------------------------- //
+
+// Check if gamepad is available
+bool DarkMoonEngine::IsGamepadAvailable(int gamepad){
+    return m_inputManager.isGamePadAvailable(gamepad);
+}
+
+// Get gamepad internal name id
+const char* DarkMoonEngine::GetGamepadName(int gamepad){
+    return m_inputManager.getGamePadName(gamepad);
+}
+
+// Check is a gamepad button has been pressed once
+bool DarkMoonEngine::IsGamepadButtonPressed(int gamepad, int button){
+    return m_inputManager.isGamepadButtonPressed(gamepad, button);
+}
+
+// Check is a gamepad button is being pressed
+bool DarkMoonEngine::IsGamepadButtonDown(int gamepad, int button){
+    return m_inputManager.isGamepadButtonDown(gamepad, button);
+}
+
+// Check is a gamepad button has been released once
+bool DarkMoonEngine::IsGamepadButtonReleased(int gamepad, int button){
+    return m_inputManager.isGamepadButtonReleased(gamepad, button);
+}
+
+// Check is a gamepad button is not being pressed
+bool DarkMoonEngine::IsGamepadButtonUp(int gamepad, int button){
+    return m_inputManager.isGamepadButtonUp(gamepad, button);
+}
+
+// Get gamepad axis count for a gamepad
+int DarkMoonEngine::GetGamepadAxisCount(int gamepad){
+    return m_inputManager.getGamepadAxisCount(gamepad);
+}
+
+// Get axis movement value for a gamepad axis
+float DarkMoonEngine::GetGamepadAxisMovement(int gamepad, int axis){
+    return m_inputManager.getGamepadAxisMovement(gamepad, axis);
+}
+
 
 // ----------------------------- //
 // Loading / Unloading functions //
