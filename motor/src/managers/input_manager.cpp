@@ -2,7 +2,6 @@
 
 // Update
 
-// TODO: callback
 void InputManager::update(){
     int jid = 0;
     // Update gamepad state
@@ -68,14 +67,11 @@ const char* InputManager::getGamePadName(int gamepad){
     return name ? name : "Uknown";
 }
 
-// TODO
-bool InputManager::isGamepadButtonPressed(int, int){
-    return true;
+bool InputManager::isGamepadButtonPressed(int gamepad, int button){
+    return m_gamepadStates[gamepad].buttons[button] == GLFW_PRESS;
 }
 
 bool InputManager::isGamepadButtonDown(int gamepad, int button){
-    // std::cout << "Gamepad: " << gamepad << " - Button: " << button << std::endl;
-    // std::cout << "State: " << m_gamepadStates[gamepad].buttons[button] << std::endl;
     return m_gamepadStates[gamepad].buttons[button] == GLFW_PRESS;
 }
 
@@ -84,19 +80,18 @@ bool InputManager::isGamepadButtonReleased(int, int){
     return true;
 }
 
-// TODO
 bool InputManager::isGamepadButtonUp(int gamepad, int button){
     return m_gamepadStates[gamepad].buttons[button] == GLFW_RELEASE;
 }
 
-// TODO
-int InputManager::getGamepadAxisCount(int){
-    return 1;
+int InputManager::getGamepadAxisCount(int gamepad){
+    int axes;
+    glfwGetJoystickAxes(gamepad, &axes);
+    return axes;
 }
 
-// TODO
-float InputManager::getGamepadAxisMovement(int, int){
-    return 1.0f;
+float InputManager::getGamepadAxisMovement(int gamepad, int axis){
+    return m_gamepadStates[gamepad].axes[axis];
 }
 
  // Input-related functions: mouse

@@ -49,8 +49,7 @@ int main(){
             // Logic //
             // ----- //
 
-            //if(engine.IsGamepadButtonDown(0, GLFW_GAMEPAD_BUTTON_A))
-            //    std::cout << "Boton apretado" << std::endl;
+            //std::cout << engine.GetGamepadAxisMovement(0, 0) << std::endl;
 
             //std::cout << "X: " << engine.GetMouseX() << " - Y: " << engine.GetMouseY() << std::endl;
             // if(engine.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
