@@ -1,6 +1,6 @@
 #include "render_system.hpp"
 #include <iomanip>
-#define RAYGUI_IMPLEMENTATION
+//#define RAYGUI_IMPLEMENTATION
 #include "../../libs/raygui.h"
 
 void RenderSystem::init()
@@ -1194,17 +1194,17 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         }
 
         //Alert state
-        if(e.hasTag<EnemyTag>() && !e.hasTag<CrusherTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>()){
-            auto &aic = em.getComponent<AIComponent>(e);
-            if(aic.alert_state){
+        if (e.hasTag<EnemyTag>() && !e.hasTag<CrusherTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>()) {
+            auto& aic = em.getComponent<AIComponent>(e);
+            if (aic.alert_state) {
                 auto& r = em.getComponent<RenderComponent>(e);
                 float barX = engine.getWorldToScreenX(r.position);
                 float barY = engine.getWorldToScreenY(r.position);
                 // Obtén las coordenadas del triángulo
-                Vector2 point1 = {barX, barY - 120.0f};
-                Vector2 point2 = {barX - 30.0f, barY - 50.0f };
-                Vector2 point3 = {barX + 30.0f, barY - 50.0f};
-        
+                Vector2 point1 = { barX, barY - 120.0f };
+                Vector2 point2 = { barX - 30.0f, barY - 50.0f };
+                Vector2 point3 = { barX + 30.0f, barY - 50.0f };
+
                 // Dibuja el triángulo
                 DrawTriangle(point1, point2, point3, BLACK);
                 // Dibuja el signo de exclamación dentro del triángulo

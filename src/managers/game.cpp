@@ -118,14 +118,13 @@ void Game::run()
     // Inicializa una variable donde tener el tiempo entre frames
     float deltaTime{}, currentTime{}, elapsed{};
 
-    createSound(em);
+    // createSound(em);
     li.sound_system = &sound_system;
     attack_system.setCollisionSystem(&collision_system);
 
     while (!li.gameShouldEnd)
     {
-        deltaTime = engine.getFrameTime();
-        elapsed += deltaTime;
+        elapsed += engine.getFrameTime();
 
         switch (li.currentScreen)
         {
@@ -147,7 +146,7 @@ void Game::run()
         case GameScreen::TITLE:
         {
             if (sound_system.music_started == false) {
-                SoundSystem_playMusicMenu(&sound_system);
+                // SoundSystem_playMusicMenu(&sound_system);
                 sound_system.music_started = true;
             }
             render_system.drawLogoGame(engine, em, sound_system);
@@ -211,7 +210,7 @@ void Game::run()
                     projectile_system.update(em, timeStep);
                     attack_system.update(em, timeStep);
                     life_system.update(em, object_system, timeStep);
-                    SoundSystem_update(&sound_system);
+                    // SoundSystem_update(&sound_system);
                     // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     camera_system.update(em, engine, timeStep);
                     event_system.update(em, evm, iam, map, object_system);
@@ -256,7 +255,7 @@ void Game::run()
     }
 
     //liberar bancos
-    SoundSystem_clear(&sound_system);
+    // SoundSystem_clear(&sound_system);
     render_system.unloadModels(em, engine);
 
     engine.unloadShader(shader);
