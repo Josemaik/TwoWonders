@@ -16,7 +16,7 @@
 #include "../systems/zone_system.hpp"
 #include "../systems/shield_system.hpp"
 #include "../systems/event_system.hpp"
-#include "../systems/sound_system.h"
+#include "../systems/sound_system.hpp"
 #include "../systems/camera_system.hpp"
 #include "../systems/lock_system.hpp"
 #include "game_engine.hpp"

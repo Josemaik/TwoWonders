@@ -78,13 +78,13 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
         switch (currentButton) {
         case 0: // "JUGAR"
             li.currentScreen = GameScreen::STORY;
-            SoundSystem_seleccion_menu(&ss);
-            SoundSystem_music_stop(&ss);
+            ss.seleccion_menu();
+            ss.music_stop();
             break;
         case 1: // "CONFIGURACION"
             li.currentScreen = GameScreen::OPTIONS;
             li.previousScreen = GameScreen::TITLE;
-            SoundSystem_seleccion_menu(&ss);
+            ss.seleccion_menu();
             break;
         }
     }
@@ -100,13 +100,13 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
     // Draw the buttons
     if (GuiButton(btn1Rec, (currentButton == 0) ? "[JUGAR]" : "JUGAR")) {
         li.currentScreen = GameScreen::STORY;
-        SoundSystem_seleccion_menu(&ss);
-        SoundSystem_music_stop(&ss);
+        ss.seleccion_menu();
+        ss.music_stop();
     }
 
     if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec)) {
         if (ss.pushed == false)
-            SoundSystem_sonido_mov(&ss);
+            ss.sonido_mov();
         ss.pushed = true;
     }
     else
@@ -115,7 +115,7 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
     if (GuiButton(btn2Rec, (currentButton == 1) ? "[CONFIGURACION]" : "CONFIGURACION")) {
         li.currentScreen = GameScreen::OPTIONS;
         li.previousScreen = GameScreen::TITLE;
-        SoundSystem_seleccion_menu(&ss);
+        ss.seleccion_menu();
     }
 
     engine.endDrawing();
@@ -156,7 +156,7 @@ void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, Soun
 
     if (GuiButton(btn1Rec, "VOLVER")) {
         li.currentScreen = li.previousScreen;
-        SoundSystem_seleccion_menu(&ss);
+        ss.seleccion_menu();
     }
 
     if (GuiButton(btn2Rec, "800x600"))
@@ -188,7 +188,7 @@ void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, Soun
 
     if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec)) {
         if (ss.pushed == false)
-            SoundSystem_sonido_mov(&ss);
+            ss.sonido_mov();
         ss.pushed = true;
     }
     else
@@ -237,20 +237,20 @@ void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, So
         case 0: // "CONTINUAR"
         {
             inpi.pause = false;
-            SoundSystem_seleccion_menu(&ss);
+            ss.seleccion_menu();
             break;
         }
         case 1: // "OPCIONES"
         {
             li.currentScreen = GameScreen::OPTIONS;
             li.previousScreen = GameScreen::GAMEPLAY;
-            SoundSystem_seleccion_menu(&ss);
+            ss.seleccion_menu();
             break;
         }
         case 2: // "VOLVER AL INICIO"
         {
             li.currentScreen = GameScreen::TITLE;
-            SoundSystem_seleccion_menu(&ss);
+            ss.seleccion_menu();
             break;
         }
         case 3: // "SALIR"

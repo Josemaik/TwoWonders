@@ -3,7 +3,7 @@
 #define RENDER_SYSTEM
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
-#include "../systems/sound_system.h"
+#include "../systems/sound_system.hpp"
 
 struct RenderSystem
 {

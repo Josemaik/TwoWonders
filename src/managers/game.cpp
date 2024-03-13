@@ -23,7 +23,7 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
+        plfi.spawnPoint = { 32.0, 4.0, 130.0 };
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
     // 32.0, 4.0, 130.0 - Segundo cofre
@@ -68,7 +68,7 @@ void Game::createEntities(EntityManager& em)
 
 //inicializar bancos
 void Game::createSound(EntityManager&) {
-    SoundSystem_initBanks(&sound_system, "assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Music.bank");
+    sound_system.initBanks("assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Music.bank");
     //sound_system.createEventInstance();
     //sound_system.play();
 }
@@ -118,7 +118,7 @@ void Game::run()
     // Inicializa una variable donde tener el tiempo entre frames
     float currentTime{}, elapsed{};
 
-    // createSound(em);
+    createSound(em);
     li.sound_system = &sound_system;
     attack_system.setCollisionSystem(&collision_system);
 
@@ -146,7 +146,7 @@ void Game::run()
         case GameScreen::TITLE:
         {
             if (sound_system.music_started == false) {
-                // SoundSystem_playMusicMenu(&sound_system);
+                sound_system.playMusicMenu();
                 sound_system.music_started = true;
             }
             render_system.drawLogoGame(engine, em, sound_system);
@@ -210,7 +210,7 @@ void Game::run()
                     projectile_system.update(em, timeStep);
                     attack_system.update(em, timeStep);
                     life_system.update(em, object_system, timeStep);
-                    // SoundSystem_update(&sound_system);
+                    sound_system.update();
                     // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     camera_system.update(em, engine, timeStep);
                     event_system.update(em, evm, iam, map, object_system);
@@ -255,7 +255,7 @@ void Game::run()
     }
 
     //liberar bancos
-    // SoundSystem_clear(&sound_system);
+    sound_system.clear();
     render_system.unloadModels(em, engine);
 
     engine.unloadShader(shader);

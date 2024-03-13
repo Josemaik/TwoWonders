@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <limits>
 #include "utils/types.hpp"
-#include "../../systems/sound_system.h"
+#include "../../systems/sound_system.hpp"
 
 // Enum que representa el estado del juego
 enum struct GameScreen { LOGO, TITLE, STORY, GAMEPLAY, /*DEAD,*/ OPTIONS, ENDING, PAUSE };
