@@ -7,6 +7,8 @@
 #include "../components/entity_camera.hpp"
 #include "../components/entity_model.hpp"
 
+#include "resource_manager.hpp"
+
 #include "../utils/color.hpp"
 
 #include <memory>
@@ -27,8 +29,6 @@ private:
     int m_width, m_height;
 
     void draw(float vertices[], std::size_t vertSize, GLuint indices[], std::size_t indSize,glm::vec4 color);
-    float normalizeX(float x){ return (x / static_cast<float>(m_width)) * 2 - 1; };
-    float normalizeY(float y){ return -((y / static_cast<float>(m_height)) * 2 - 1); };
 
 public:
     Camera* m_camera;
@@ -74,10 +74,14 @@ public:
     // Mesh* genMeshCube();
 
     // ChangeShader
-    void useShader(Shader* shader){ 
-        m_shaderProgram = shader; 
+    void useShader(Shader* shader){
+        m_shaderProgram = shader;
         glUseProgram(m_shaderProgram->id_shader);
     };
+
+    Shader* getShader(){
+        return m_shaderProgram;
+    }
 
     // Text
     void drawText(const char* text, glm::vec2 pos, int fontSize, Color color);
@@ -96,5 +100,7 @@ public:
             static_cast<float>(color.a) / 255.0f
         );
     }
+    float normalizeX(float x){ return (x / static_cast<float>(m_width)) * 2 - 1; };
+    float normalizeY(float y){ return -((y / static_cast<float>(m_height)) * 2 - 1); };
     void setDefaultFont(Font* font){ m_defaultFont = font; };
 };

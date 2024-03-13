@@ -1,5 +1,21 @@
 #include "darkmoon.hpp"
 
+DarkMoonEngine::DarkMoonEngine(){
+    //Create scene
+    m_rootNode = CreateNode("Scene");
+
+    // Create Default Light
+    auto nLight = CreateNode("Default Light");
+    auto eLight = std::make_unique<Light>();
+    nLight->setEntity(std::move(eLight));
+    m_rootNode->addChild(std::move(nLight));
+
+    // Create Default Camera
+    auto eCamera = CreateCamera("Default Camera");
+    // Assigns Camera to RenderManager
+    UseCamera(eCamera);
+}
+
 // ---------------------- //
 // Node-related functions //
 // ---------------------- //
@@ -25,36 +41,17 @@ Node* DarkMoonEngine::GetRootNode(){
 bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
     m_renderManager.setWindowSize(width, height);
 
-    //Create scene
-    m_rootNode = CreateNode("Scene");
-
-    // Create Light
-    auto nLight = CreateNode("Default Light");
-    auto eLight = std::make_unique<Light>();
-    nLight->setEntity(std::move(eLight));
-    m_rootNode->addChild(std::move(nLight));
-
-    // Create Camera
-    auto eCamera = CreateCamera("Default Camera");
-    // Assigns Camera to RenderManager
-    UseCamera(eCamera);
-
-    //----- View tree -----//
-    // std::cout << "┌──────┐" << std::endl;
-    // std::cout << "│ Tree │" << std::endl;
-    // std::cout << "└──────┘" << std::endl;
-    // m_rootNode->drawTree();
-
     if(m_windowsManager.initWindow(width, height, title)){
         //----- Configure callback -----//
         glfwSetWindowUserPointer(m_windowsManager.getWindow(), &m_inputManager);
         glfwSetKeyCallback(m_windowsManager.getWindow(), InputManager::keyCallback);
         glfwSetMouseButtonCallback(m_windowsManager.getWindow(), InputManager::mouseButtonCallback);
 
+        std::cout << "┌──────┐" << std::endl;
+        std::cout << "│ Load │" << std::endl;
+        std::cout << "└──────┘" << std::endl;
+        
         //----- Shaders -----//
-        std::cout << "┌─────────┐" << std::endl;
-        std::cout << "│ Shaders │" << std::endl;
-        std::cout << "└─────────┘" << std::endl;
         m_shaderColor = LoadShader("src/shaders/color.vs", "src/shaders/color.fs");
         m_shaderTexture = LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");
         m_shader3D = LoadShader("src/shaders/3D.vs", "src/shaders/3D.fs");
@@ -71,12 +68,6 @@ bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
 // Close window and unload OpenGL context
 void DarkMoonEngine::CloseWindow(){
     m_windowsManager.closeWindow();
-
-    //----- Unload -----//
-    std::cout << "┌────────┐" << std::endl;
-    std::cout << "│ Unload │" << std::endl;
-    std::cout << "└────────┘" << std::endl;
-    m_resourceManager.unloadAllResources();
 }
 
 // Check if application should close

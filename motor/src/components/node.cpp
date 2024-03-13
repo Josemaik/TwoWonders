@@ -42,13 +42,13 @@ void Node::traverse(glm::mat4 parentMatrix) {
                 * glm::scale(glm::mat4(1.0f), m_scale);
     }
 
-    std::cout << "Node: " << this->name << std::endl;
-
     // Draw Entity
-    // if(m_entity)
-    //     m_entity->draw(m_transformationMatrix);
-
-    // printTransformationMatrix();
+    if(m_entity)
+        m_entity->draw(m_transformationMatrix);
+    
+    //std::cout << "Node: " << this->name << std::endl;
+    //printTransformationMatrix();
+    //std::cout << "Node: " << this->name << " --> entidad" << std::endl;
 
     for (auto& child : m_children) {
         if(m_updateMatrix)
@@ -79,7 +79,7 @@ void Node::setTransformationMatrix(glm::mat4 newMatrix) {
 }
 
 void Node::translate(glm::vec3 newTranslate){ setTranslation(m_translation + newTranslate); }
-void Node::scale(glm::vec3 newScale){ setScale(m_scale + newScale); }
+void Node::scale(glm::vec3 newScale){ setScale(m_scale * newScale); }
 
 void Node::rotate(glm::vec3 axis, float angle){ 
     auto additionalRotation = glm::angleAxis(glm::radians(angle), glm::normalize(axis));

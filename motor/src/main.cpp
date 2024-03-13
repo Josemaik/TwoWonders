@@ -1,5 +1,71 @@
 #include "darkmoon.hpp"
 
+Node* createHUD(DarkMoonEngine& engine){
+    // HUD
+    auto nodeHUD = engine.CreateNode("HUD");
+    auto p_nodeHUD = nodeHUD.get();
+
+    // Rectangulo Naranja Oscuro
+    auto nodeRec1  = engine.CreateNode("Rectangulo naranja oscuro");
+    auto rectangle = std::make_unique<Rectangle>(glm::vec2(12.0f, 12.0f), glm::vec2(200.0f, 40.0f), ORANGE_DARK);
+    auto p_nodeRec1 = nodeRec1.get();
+    p_nodeRec1->translate({12.0f, 12.0f, 0.0f});
+    nodeRec1->setEntity(std::move(rectangle));
+    nodeHUD->addChild(std::move(nodeRec1));
+
+    // Rectangulo Naranja
+    auto nodeRec2  = engine.CreateNode("Rectangulo naranja");
+    auto rectangle2 = std::make_unique<Rectangle>(glm::vec2(10.0f, 10.0f), glm::vec2(200.0f, 40.0f), ORANGE);
+    auto p_nodeRec2 = nodeRec2.get();
+    p_nodeRec2->translate({10.0f, 10.0f, 0.0f});
+    nodeRec2->setEntity(std::move(rectangle2));
+    nodeHUD->addChild(std::move(nodeRec2));
+
+    engine.GetRootNode()->addChild(std::move(nodeHUD));
+
+    return p_nodeHUD;
+}
+
+int main(){
+    DarkMoonEngine engine;
+
+    auto p_nodeHUD = createHUD(engine);
+
+    std::cout << "┌──────┐" << std::endl;
+    std::cout << "│ Tree │" << std::endl;
+    std::cout << "└──────┘" << std::endl;
+    engine.GetRootNode()->drawTree();
+
+    if(engine.InitWindow(800, 600, "DarkMoon Engine")){
+        while(!engine.WindowShouldClose()){
+
+            // --- //
+            // HUD //
+            // --- //
+
+            if(engine.IsKeyPressed(KEY_A))
+                p_nodeHUD->translate({ -1.0f,  0.0f, 0.0f});
+            if(engine.IsKeyPressed(KEY_D))
+                p_nodeHUD->translate({  1.0f,  0.0f, 0.0f});
+            if(engine.IsKeyPressed(KEY_S))
+                p_nodeHUD->translate({  0.0f,  1.0f, 0.0f});
+            if(engine.IsKeyPressed(KEY_W))
+                p_nodeHUD->translate({  0.0f, -1.0f, 0.0f});
+
+            engine.BeginDrawing();
+
+            engine.ClearBackground(WHITE);
+            engine.GetRootNode()->traverse(glm::mat4());
+
+            engine.EndDrawing();
+        }
+    }
+
+    return 0;
+}
+/*
+#include "darkmoon.hpp"
+
 int main(){
     DarkMoonEngine engine;
 
@@ -156,7 +222,6 @@ int main(){
             engine.DrawRectangleV({10, 10}, {200, 40}, {180, 180, 180, 255});
             engine.DrawRectangleLines({10, 10}, {200, 40}, BLACK);    
 
-            /* PRUEBAS
             engine.DrawPixel(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, {0, 0, 0, 255});
             engine.DrawPixelV({20.0f, 40.0f}, BLACK);
 
@@ -171,7 +236,7 @@ int main(){
 
             engine.DrawLine(0, 0, engine.GetScreenWidth(), engine.GetScreenHeight(), {140, 140, 140, 255});
             engine.DrawLine(0, engine.GetScreenHeight(), engine.GetScreenWidth(), 0, {140, 140, 140, 255});
-            */
+            
 
             engine.EndDrawing();
         }
@@ -181,7 +246,7 @@ int main(){
 
     return 0;
 }
-
+*/
 /*
     // Patron Dirty //
 

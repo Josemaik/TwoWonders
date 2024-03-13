@@ -23,7 +23,7 @@ private:
 public:
     void load(const char* filePath, ResourceManager& rm);
     void unload(ResourceManager& rm);
-    void draw(glm::mat4) const override;
+    void draw(glm::mat4) override;
 
     bool isLoaded(){ return m_loaded; };
 

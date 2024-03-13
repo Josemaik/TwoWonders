@@ -9,7 +9,18 @@
 struct ResourceManager{
 public:
 
-    inline static std::size_t nextID{ 0 };
+    static ResourceManager& getInstance(){
+        static ResourceManager instance;
+        return instance;
+    }
+
+    ~ResourceManager(){ 
+        std::cout << "┌────────┐" << std::endl;
+        std::cout << "│ Unload │" << std::endl;
+        std::cout << "└────────┘" << std::endl;
+        
+        unloadAllResources(); 
+    };
 
     template<typename T> 
     T* getResource(const std::size_t& id){
@@ -49,5 +60,8 @@ public:
     }
 
 private:
+    ResourceManager() = default;
+
+    inline static std::size_t nextID{ 0 };
     std::unordered_map<std::size_t, std::unique_ptr<Resource>> m_resources;  
 };

@@ -23,7 +23,7 @@ void Model::unload(ResourceManager& rm){
         rm.unloadResource(m_meshes[i]->id);
 }
 
-void Model::draw(glm::mat4) const { 
+void Model::draw(glm::mat4) { 
     // std::cout << "Draw a model" << std::endl; 
     for(int i=0; i<static_cast<int>(m_meshes.size()); i++)
         m_meshes[i]->draw();

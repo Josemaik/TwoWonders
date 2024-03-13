@@ -60,5 +60,5 @@ public:
         //front = -direction;
     }
 
-    void draw(glm::mat4) const override {};
+    void draw(glm::mat4) override {};
 };

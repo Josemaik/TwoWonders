@@ -4,6 +4,7 @@
 #include "components/entity.hpp"
 #include "components/entity_model.hpp"
 #include "components/entity_camera.hpp"
+#include "components/entity_rectangle.hpp"
 #include "managers/resource_manager.hpp"
 #include "managers/windows_manager.hpp"
 #include "managers/render_manager.hpp"
@@ -14,17 +15,9 @@
 
 struct DarkMoonEngine{
 public:
-    DarkMoonEngine(){};
+    DarkMoonEngine();
     ~DarkMoonEngine(){};
 
-    // TODO
-    // NODE
-    // CreateNode
-    // AddChild
-    // RemoveChild
-    // SetEntity
-    // GetRootNode
-    
     // ---------------------- //
     // Node-related functions //
     // ---------------------- //
@@ -253,9 +246,9 @@ private:
 
     // Managers
     InputManager m_inputManager;
-    RenderManager m_renderManager;
+    RenderManager& m_renderManager = RenderManager::getInstance();
     WindowsManager m_windowsManager;
-    ResourceManager m_resourceManager;
+    ResourceManager& m_resourceManager = ResourceManager::getInstance();
 
     // Shaders
     Shader* m_shaderColor;
