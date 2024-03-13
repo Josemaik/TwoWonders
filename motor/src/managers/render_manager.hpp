@@ -22,8 +22,8 @@
 
 struct RenderManager{
 private:
-    std::shared_ptr<Shader> m_shaderProgram;
-    std::shared_ptr<Font> m_defaultFont;
+    Shader* m_shaderProgram;
+    Font* m_defaultFont;
     int m_width, m_height;
 
     void draw(float vertices[], std::size_t vertSize, GLuint indices[], std::size_t indSize,glm::vec4 color);
@@ -31,7 +31,7 @@ private:
     float normalizeY(float y){ return -((y / static_cast<float>(m_height)) * 2 - 1); };
 
 public:
-    std::shared_ptr<Camera> m_camera;
+    Camera* m_camera;
 
     // Screen width and height
     void setWindowSize(int width, int height){ m_width = width; m_height = height; };
@@ -41,7 +41,7 @@ public:
     void endMode3D();
 
     // Camera
-    void setCamera(std::shared_ptr<Camera> camera){ m_camera = camera; };
+    void setCamera(Camera* camera){ m_camera = camera; };
 
     // Basic drawing functions
     void clearBackground(Color color);
@@ -52,8 +52,8 @@ public:
     void drawCircle(glm::vec2 pos, float radius, int segments, Color color);
 
     // Texture drawing functions
-    void drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, Color color);
-    void drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, Color color);
+    void drawTexture(Texture* texture, glm::vec2 pos, Color color);
+    void drawTextureExtra(Texture* texture, glm::vec2 pos, float rotation, float scale, Color color);
 
     // Basic geometric 3D shapes drawing functions
     void drawPoint3D(glm::vec3 position, float pointSize, Color color);
@@ -64,17 +64,17 @@ public:
     void drawCubeWires(glm::vec3 position, glm::vec3 size, Color color);
 
     // Model drawing functions
-    void drawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
-    void drawModelExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
-    void drawModelWires(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
-    void drawModelWiresExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
+    void drawModel(Model* model, glm::vec3 position, float scale, Color tint);
+    void drawModelExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
+    void drawModelWires(Model* model, glm::vec3 position, float scale, Color tint);
+    void drawModelWiresExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
 
     // Mesh generation functions
     // TODO
-    std::shared_ptr<Mesh> genMeshCube();
+    // Mesh* genMeshCube();
 
     // ChangeShader
-    void useShader(std::shared_ptr<Shader> shader){ 
+    void useShader(Shader* shader){ 
         m_shaderProgram = shader; 
         glUseProgram(m_shaderProgram->id_shader);
     };
@@ -96,5 +96,5 @@ public:
             static_cast<float>(color.a) / 255.0f
         );
     }
-    void setDefaultFont(std::shared_ptr<Font> font){ m_defaultFont = font; };
+    void setDefaultFont(Font* font){ m_defaultFont = font; };
 };

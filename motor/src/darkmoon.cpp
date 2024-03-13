@@ -5,18 +5,17 @@
 // ---------------------- //
 
 // Create node in scene tree
-std::shared_ptr<Node> DarkMoonEngine::CreateNode(const char* nodeName){
-    auto node = std::make_shared<Node>();
+std::unique_ptr<Node> DarkMoonEngine::CreateNode(const char* nodeName){
+    auto node = std::make_unique<Node>();
     node->name = nodeName;
 
     return node;
 }
 
 // Get root node
-std::shared_ptr<Node> DarkMoonEngine::GetRootNode(){
-    return m_rootNode;
+Node* DarkMoonEngine::GetRootNode(){
+    return m_rootNode.get();
 }
-
 
 // ------------------------ //
 // Window-related functions //
@@ -31,9 +30,9 @@ bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
 
     // Create Light
     auto nLight = CreateNode("Default Light");
-    auto eLight = std::make_shared<Light>();
-    nLight->setEntity(eLight);
-    m_rootNode->addChild(nLight);
+    auto eLight = std::make_unique<Light>();
+    nLight->setEntity(std::move(eLight));
+    m_rootNode->addChild(std::move(nLight));
 
     // Create Camera
     auto eCamera = CreateCamera("Default Camera");
@@ -204,7 +203,7 @@ void DarkMoonEngine::DrawCircleV(glm::vec2 pos, float radius, int segments, Colo
 // ------------------------- //
 
 // Load texture from file into GPU memory
-std::shared_ptr<Texture> DarkMoonEngine::LoadTexture(const char* filePath){
+Texture* DarkMoonEngine::LoadTexture(const char* filePath){
     auto texture = m_resourceManager.loadResource<Texture>();
     texture->load(filePath);
 
@@ -212,26 +211,26 @@ std::shared_ptr<Texture> DarkMoonEngine::LoadTexture(const char* filePath){
 }
 
 // Unload texture data from CPU and GPU
-void DarkMoonEngine::UnloadTexture(std::shared_ptr<Texture> texture){
+void DarkMoonEngine::UnloadTexture(Texture* texture){
     m_resourceManager.unloadResource(texture->id);
 }
 
 // Draw a texture
-void DarkMoonEngine::DrawTexture(std::shared_ptr<Texture> texture, int posX, int posY, Color tint){
+void DarkMoonEngine::DrawTexture(Texture* texture, int posX, int posY, Color tint){
     m_renderManager.useShader(m_shaderTexture);
     m_renderManager.drawTexture(texture, {posX, posY}, tint);
     m_renderManager.useShader(m_shaderColor);
 }
 
 // Draw a texture (vector version)
-void DarkMoonEngine::DrawTextureV(std::shared_ptr<Texture> texture, glm::vec2 pos, Color tint){
+void DarkMoonEngine::DrawTextureV(Texture* texture, glm::vec2 pos, Color tint){
     m_renderManager.useShader(m_shaderTexture);
     m_renderManager.drawTexture(texture, pos, tint);
     m_renderManager.useShader(m_shaderColor);
 }
 
 // Draw a texture with extended parameters
-void DarkMoonEngine::DrawTextureEx(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, Color tint){
+void DarkMoonEngine::DrawTextureEx(Texture* texture, glm::vec2 pos, float rotation, float scale, Color tint){
     m_renderManager.useShader(m_shaderTexture);
     m_renderManager.drawTextureExtra(texture, pos, rotation, scale, tint);
     m_renderManager.useShader(m_shaderColor);
@@ -291,40 +290,41 @@ void DarkMoonEngine::DrawCubeWiresV(glm::vec3 position, glm::vec3 size, Color co
 // -------------------------------------- //
 
 // Load model from file into GPU memory
-std::shared_ptr<Model> DarkMoonEngine::LoadModel(const char* filePath){
-    auto nModel = std::make_shared<Node>();
+Model* DarkMoonEngine::LoadModel(const char* filePath){
+    auto nModel = std::make_unique<Node>();
     nModel->name = filePath;
-    auto eModel = std::make_shared<Model>();
+    auto eModel = std::make_unique<Model>();
+    auto rawPtr = eModel.get();
     eModel->load(filePath, m_resourceManager);
     if(eModel->isLoaded()){
-        nModel->setEntity(eModel);
+        nModel->setEntity(std::move(eModel));
         m_rootNode->addChild(std::move(nModel));
     }
-    return eModel;
+    return rawPtr;
 }
 
 // Unload model data from CPU and GPU
-void DarkMoonEngine::UnloadModel(std::shared_ptr<Model> model){
+void DarkMoonEngine::UnloadModel(Model* model){
     model->unload(m_resourceManager);
 }
 
 // Draw a model (with texture if set)
-void DarkMoonEngine::DrawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint){
+void DarkMoonEngine::DrawModel(Model* model, glm::vec3 position, float scale, Color tint){
     m_renderManager.drawModel(model, position, scale, tint);
 }
 
 // Draw a model with extended parameters
-void DarkMoonEngine::DrawModelExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
+void DarkMoonEngine::DrawModelExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
     m_renderManager.drawModelExtra(model, position, scale, rotationAxis, rotationAngle, tint);
 }
 
 // Draw a model wires (with textures if set)
-void DarkMoonEngine::DrawModelWires(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint){
+void DarkMoonEngine::DrawModelWires(Model* model, glm::vec3 position, float scale, Color tint){
     m_renderManager.drawModelWires(model, position, scale, tint);
 }
 
 // Draw a model wires with extended parameters
-void DarkMoonEngine::DrawModelWiresExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
+void DarkMoonEngine::DrawModelWiresExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
     m_renderManager.drawModelWiresExtra(model, position, scale, rotationAxis, rotationAngle, tint);
 }
 
@@ -446,7 +446,7 @@ float DarkMoonEngine::GetGamepadAxisMovement(int gamepad, int axis){
 // ----------------------------- //
 
 // Load font from file into GPU memory
-std::shared_ptr<Font> DarkMoonEngine::LoadFont(const char* filePath){
+Font* DarkMoonEngine::LoadFont(const char* filePath){
     auto font = m_resourceManager.loadResource<Font>();
     font->load(filePath);
 
@@ -454,7 +454,7 @@ std::shared_ptr<Font> DarkMoonEngine::LoadFont(const char* filePath){
 }
 
 // Load shader from file into GPU memory
-std::shared_ptr<Shader> DarkMoonEngine::LoadShader(const char* vsFilePath, const char* fsFilePath){
+Shader* DarkMoonEngine::LoadShader(const char* vsFilePath, const char* fsFilePath){
     return m_resourceManager.loadResource<Shader>(vsFilePath, fsFilePath, ShaderType::COLOR);
 }
 
@@ -463,17 +463,18 @@ std::shared_ptr<Shader> DarkMoonEngine::LoadShader(const char* vsFilePath, const
 // ------ //
 
 // Create camera
-std::shared_ptr<Camera> DarkMoonEngine::CreateCamera(const char* name){
+Camera* DarkMoonEngine::CreateCamera(const char* name){
     auto nCamera = CreateNode(name);
-    auto eCamera = std::make_shared<Camera>();
-    nCamera->setEntity(eCamera);
-    m_rootNode->addChild(nCamera);
+    auto eCamera = std::make_unique<Camera>();
+    auto rawPtr = eCamera.get();
+    nCamera->setEntity(std::move(eCamera));
+    m_rootNode->addChild(std::move(nCamera));
 
-    return eCamera;
+    return rawPtr;
 }
 
 // Use camera
-void DarkMoonEngine::UseCamera(std::shared_ptr<Camera> newCamera){
+void DarkMoonEngine::UseCamera(Camera* newCamera){
     // Assigns Camera to RenderManager
     m_renderManager.setCamera(newCamera);
 }

@@ -18,6 +18,7 @@ public:
     ShaderType type;
 
     // reads and build the shader
+    Shader();
     Shader(std::size_t, const char*, const char*, ShaderType);
 
     void use();

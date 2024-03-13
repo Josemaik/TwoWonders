@@ -19,5 +19,5 @@ private:
     glm::vec3 m_diffuseColor;
     glm::vec3 m_specularColor;
     float m_shininess;
-    std::vector<std::shared_ptr<Texture>> m_textures;
+    std::vector<Texture*> m_textures;
 };

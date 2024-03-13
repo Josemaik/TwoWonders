@@ -30,9 +30,9 @@ public:
     // ---------------------- //
 
     // Create node in scene tree
-    std::shared_ptr<Node> CreateNode(const char* nodeName);
+    std::unique_ptr<Node> CreateNode(const char* nodeName);
     // Get root node
-    std::shared_ptr<Node> GetRootNode();
+    Node* GetRootNode();
 
     // ------------------------ //
     // Window-related functions //
@@ -98,15 +98,15 @@ public:
     // ------------------------------------- //
 
     // Load texture from file into GPU memory
-    std::shared_ptr<Texture> LoadTexture(const char* filePath);
+    Texture* LoadTexture(const char* filePath);
     // Unload texture data from CPU and GPU
-    void UnloadTexture(std::shared_ptr<Texture> texture);
+    void UnloadTexture(Texture* texture);
     // Draw a texture
-    void DrawTexture(std::shared_ptr<Texture> texture, int posX, int posY, Color tint);
+    void DrawTexture(Texture* texture, int posX, int posY, Color tint);
     // Draw a texture (vector version)
-    void DrawTextureV(std::shared_ptr<Texture> texture, glm::vec2 pos, Color tint);
+    void DrawTextureV(Texture* texture, glm::vec2 pos, Color tint);
     // Draw a texture with extended parameters
-    void DrawTextureEx(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, Color tint);
+    void DrawTextureEx(Texture* texture, glm::vec2 pos, float rotation, float scale, Color tint);
 
     // ------------------------------------------- //
     // Basic geometric 3D shapes drawing functions //
@@ -136,19 +136,19 @@ public:
     // -------------------------------------- //
 
     // Load model from file into GPU memory
-    std::shared_ptr<Model> LoadModel(const char* filePath);
+    Model* LoadModel(const char* filePath);
     // Load model from generated mesh ?
 
     // Unload model data from CPU and GPU
-    void UnloadModel(std::shared_ptr<Model> model);
+    void UnloadModel(Model* model);
     // Draw a model (with texture if set)
-    void DrawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
+    void DrawModel(Model* model, glm::vec3 position, float scale, Color tint);
     // Draw a model with extended parameters
-    void DrawModelExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
+    void DrawModelExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
     // Draw a model wires (with textures if set)
-    void DrawModelWires(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
+    void DrawModelWires(Model* model, glm::vec3 position, float scale, Color tint);
     // Draw a model wires with extended parameters
-    void DrawModelWiresExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
+    void DrawModelWiresExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
 
     // ---------------------------------------- //
     // Mesh management and generation functions //
@@ -156,9 +156,9 @@ public:
 
     // TODO
     // Generate cuboid mesh
-    std::shared_ptr<Mesh> GenerateMeshCube(float width, float height, float length);
+    Mesh* GenerateMeshCube(float width, float height, float length);
     // Unload mesh data from CPU and GPU
-    void UnloadMesh(std::shared_ptr<Mesh> mesh);
+    void UnloadMesh(Mesh* mesh);
     // Draw mesh ?
 
 
@@ -226,18 +226,18 @@ public:
     // ----------------------------- //
 
     // Load font from file into GPU memory
-    std::shared_ptr<Font> LoadFont(const char* filePath);
+    Font* LoadFont(const char* filePath);
     // Load shader from file into GPU memory
-    std::shared_ptr<Shader> LoadShader(const char* vsFilePath, const char* fsFilePath);
+    Shader* LoadShader(const char* vsFilePath, const char* fsFilePath);
 
     // ------ //
     // Camera //
     // ------ //
     
     // Create camera
-    std::shared_ptr<Camera> CreateCamera(const char* name);
+    Camera* CreateCamera(const char* name);
     // Use camera
-    void UseCamera(std::shared_ptr<Camera> newCamera);
+    void UseCamera(Camera* newCamera);
 
     // ---------------------- //
     // Text drawing functions //
@@ -249,7 +249,7 @@ public:
     
 private:
     // Root node 
-    std::shared_ptr<Node> m_rootNode;
+    std::unique_ptr<Node> m_rootNode;
 
     // Managers
     InputManager m_inputManager;
@@ -258,5 +258,7 @@ private:
     ResourceManager m_resourceManager;
 
     // Shaders
-    std::shared_ptr<Shader> m_shaderColor, m_shaderTexture, m_shader3D;
+    Shader* m_shaderColor;
+    Shader* m_shaderTexture;
+    Shader* m_shader3D;
 };

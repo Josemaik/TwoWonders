@@ -1,6 +1,6 @@
 #include "resource_mesh.hpp"
 
-Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<u_int16_t> indices, std::vector<std::shared_ptr<Texture>> textures){
+Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<u_int16_t> indices, std::vector<Texture*> textures){
     this->id = id;
     this->vertices = vertices;
     this->indices = indices;

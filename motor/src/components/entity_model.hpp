@@ -14,7 +14,7 @@
 struct Model : Entity{
 private:
     const char* m_name;
-    std::vector<std::shared_ptr<Mesh>> m_meshes; 
+    std::vector<Mesh*> m_meshes; 
     bool m_loaded { false };
 
     void processNode(aiNode*, const aiScene*, ResourceManager& rm);
@@ -27,5 +27,5 @@ public:
 
     bool isLoaded(){ return m_loaded; };
 
-    const std::vector<std::shared_ptr<Mesh>>& getMeshes() const { return m_meshes; };
+    const std::vector<Mesh*>& getMeshes() const { return m_meshes; };
 };

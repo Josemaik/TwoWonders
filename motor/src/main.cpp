@@ -22,7 +22,7 @@ int main(){
         // ---- //
 
         auto nodoEspecial = engine.CreateNode("Yema");
-        engine.GetRootNode()->addChild(nodoEspecial);
+        engine.GetRootNode()->addChild(std::move(nodoEspecial));
 
         // ------ //
         // Camera //
@@ -39,8 +39,8 @@ int main(){
 
         // auto font = engine.LoadFont("assets/fonts/roboto.ttf");
         // auto shader = engine.LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");
-        auto texture = engine.LoadTexture("assets/koromaru.png");
-        auto texture2 = engine.LoadTexture("assets/wall.jpg");
+        // auto texture = engine.LoadTexture("assets/koromaru.png");
+        // auto texture2 = engine.LoadTexture("assets/wall.jpg");
 
         auto model = engine.LoadModel("assets/Dummy.obj");
 

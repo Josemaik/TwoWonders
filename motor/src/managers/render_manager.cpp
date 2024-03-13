@@ -209,7 +209,7 @@ void RenderManager::drawCircle(glm::vec2 pos, float radius, int segments, Color 
 
 // Texture drawing functions
 
-void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos, Color color){
+void RenderManager::drawTexture(Texture* texture, glm::vec2 pos, Color color){
     auto nColor = normalizeColor(color);
     float halfWidth = static_cast<float>(texture->getWidth()) / 2.0f;
     float halfHeight = static_cast<float>(texture->getHeight()) / 2.0f;
@@ -266,7 +266,7 @@ void RenderManager::drawTexture(std::shared_ptr<Texture> texture, glm::vec2 pos,
     glDeleteBuffers(1, &EBO);
 }
 
-void RenderManager::drawTextureExtra(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotate, float scale, Color color){
+void RenderManager::drawTextureExtra(Texture* texture, glm::vec2 pos, float rotate, float scale, Color color){
     auto nColor = normalizeColor(color);
     float halfWidth = static_cast<float>(texture->getWidth()) / 2.0f;
     float halfHeight = static_cast<float>(texture->getHeight()) / 2.0f;
@@ -709,11 +709,11 @@ void RenderManager::drawCubeWires(glm::vec3 position, glm::vec3 size, Color colo
 
 // Model 3D
 
-void RenderManager::drawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint){
+void RenderManager::drawModel(Model* model, glm::vec3 position, float scale, Color tint){
     drawModelExtra(model, position, scale, {0.0f, 0.0f, 0.0f}, 0.0f, tint);
 }
 
-void RenderManager::drawModelExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
+void RenderManager::drawModelExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
     if(!model || !model->isLoaded())
         return;
 
@@ -745,11 +745,11 @@ void RenderManager::drawModelExtra(std::shared_ptr<Model> model, glm::vec3 posit
     }
 }
 
-void RenderManager::drawModelWires(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint){
+void RenderManager::drawModelWires(Model* model, glm::vec3 position, float scale, Color tint){
     drawModelWiresExtra(model, position, scale, {0.0f, 0.0f, 0.0f}, 0.0f, tint);
 }
 
-void RenderManager::drawModelWiresExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
+void RenderManager::drawModelWiresExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
     if(!model || !model->isLoaded())
     return;
 

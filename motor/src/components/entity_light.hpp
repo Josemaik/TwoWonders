@@ -13,5 +13,5 @@ private:
     glm::vec3 m_specular;
 
 public:
-
+    Light() : m_position(0.0f, 0.0f, 0.0f) {};
 };
