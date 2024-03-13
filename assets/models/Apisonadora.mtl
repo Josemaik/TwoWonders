@@ -1,7 +1,7 @@
 # Blender 4.0.2 MTL File: 'Apisonadora.blend'
 # www.blender.org
 
-newmtl Apisonadora
+newmtl Apisonadora.001
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
@@ -11,7 +11,7 @@ d 1.000000
 illum 2
 map_Kd textures/entity_textures/Apisonadora-texture.png
 
-newmtl Apisonadora_Metal
+newmtl Apisonadora_Metal.001
 Ns 490.000000
 Ka 0.800000 0.800000 0.800000
 Ks 0.500000 0.500000 0.500000

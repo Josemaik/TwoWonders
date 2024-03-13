@@ -14,7 +14,7 @@ struct PlayerInfo
     float elapsed_limit_coins{ 5.0f }, elapsed_coins{ elapsed_limit_coins };
     double max_mana{ 100.0 }, mana{ max_mana };
     int mana_width{}, armor{};
-    bool hasKey{ true };
+    bool hasKey{ false };
     bool hasStaff{ false };
     std::vector<std::unique_ptr<Item>> inventory{};
     std::vector<Spell> spells{};

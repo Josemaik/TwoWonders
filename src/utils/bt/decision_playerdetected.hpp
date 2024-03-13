@@ -64,7 +64,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
         // Calcula el ángulo entre la dirección de visión del enemigo y la dirección hacia el jugador
         double angle = std::acos(dotProduct);
         // Convierte el ángulo de radianes a grados
-        double angleDegrees = angle * 180 / PI;
+        double angleDegrees = angle * 180 / K_PI;
         //Comprueba si el ángulo está dentro del rango de visión del enemigo
         if (angleDegrees < verticalFOV / 2.0 && std::abs(angleDegrees) < horizontalFOV / 2.0) {
             //Raycast

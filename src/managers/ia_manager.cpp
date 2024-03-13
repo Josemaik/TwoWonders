@@ -462,7 +462,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     vec3d rotationVec{ json["rotVector"][1].GetDouble(), json["rotVector"][2].GetDouble(), json["rotVector"][0].GetDouble() };
     double orientation{ json["rotation"].GetDouble() };
     vec3d scale = { json["scale"][0].GetDouble(), json["scale"][1].GetDouble(), json["scale"][2].GetDouble() };
-    Color color = { static_cast<u_char>(json["color"][0].GetUint()), static_cast<u_char>(json["color"][1].GetUint()), static_cast<u_char>(json["color"][2].GetUint()), static_cast<u_char>(json["color"][3].GetUint()) };
+    Color color = { static_cast<unsigned char>(json["color"][0].GetUint()), static_cast<unsigned char>(json["color"][1].GetUint()), static_cast<unsigned char>(json["color"][2].GetUint()), static_cast<unsigned char>(json["color"][3].GetUint()) };
     double max_speed = json["max_speed"].GetDouble();
     int life = json["life"].GetInt();
     int type = json["type"].GetInt();
@@ -711,7 +711,7 @@ void Ia_man::createBossFinalFase2(EntityManager& em, const mapType& map) {
 //Generación de subditos
 vec3d Ia_man::getRandomPosAroundBoss(double radio, const vec3d& spawnerPos) {
     // Generar un ángulo aleatorio en radianes
-    double angle = ((double)rand() / RAND_MAX) * 2 * M_PI;
+    double angle = ((double)rand() / RAND_MAX) * 2 * K_PI;
     // Generar una distancia aleatoria dentro del radio
     double distance = ((double)rand() / RAND_MAX) * radio;
     // Calcular las coordenadas x e y a partir del ángulo y la distancia

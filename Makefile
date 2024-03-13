@@ -1,37 +1,43 @@
-APP		   := TwoWonders
-CCACHE 	   := ccache
-CC         := g++-12
-CCFLAGS    := -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
+APP		   	:= TwoWonders
+CC         	:= g++
+CCFLAGS    	:= -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
 
-LIBS       := -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so
-
-SANITIZE   := -fsanitize=address,undefined
+ifeq ($(OS),Windows_NT)
+	CCACHE 	   	:=
+    LIBS 	   	:= -L./ libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll -lwinmm -lgdi32
+	SANITIZE   	:=
+	LIBS_COPY  	:= libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll libs/libstdc++-6.dll libs/libgcc_s_seh-1.dll libs/libwinpthread-1.dll
+else
+	CCACHE 	   	:= ccache
+    LIBS := -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so
+	SANITIZE   	:= -fsanitize=address,undefined
+	LIBS_COPY  	:= /usr/lib/libraylib.so.420 libs/raygui.so fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13
+endif
 
 # agregar g++ | clang++
 
-MKDIR      := mkdir -p
-SRC  	   := src
-OBJ  	   := obj
-RELEASE    := release
-ASSETS     := assets
-LIBS_DIR   := libs
-LIBS_COPY  := /usr/lib/libraylib.so.420 libs/raygui.so fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13 /usr/lib/libasan.so.8 /usr/lib/libubsan.so.1
+MKDIR      	:= mkdir -p
+SRC  	   	:= src
+OBJ  	   	:= obj
+RELEASE    	:= release
+ASSETS     	:= assets
+LIBS_DIR   	:= libs
 
-ALLCPP     := $(shell find $(SRC) -type f -iname *.cpp)
-ALLCPPOBJ  := $(patsubst %.cpp,%.o,$(ALLCPP))
-SUBDIRS    := $(shell find $(SRC) -type d)
-OBJSUBDIRS := $(patsubst $(SRC)%,$(OBJ)%,$(SUBDIRS))
+ALLCPP     	:= $(shell find $(SRC) -type f -iname *.cpp)
+ALLCPPOBJ  	:= $(patsubst %.cpp,%.o,$(ALLCPP))
+SUBDIRS    	:= $(shell find $(SRC) -type d)
+OBJSUBDIRS 	:= $(patsubst $(SRC)%,$(OBJ)%,$(SUBDIRS))
 
-DATE       := $(shell date +'%d-%m-%y')
-ZIP_NAME   := $(APP)_$(RELEASE)_$(DATE).zip
+DATE       	:= $(shell date +'%d-%m-%y')
+ZIP_NAME   	:= $(APP)_$(RELEASE)_$(DATE).zip
 
 # Variables si es make release
-#ifeq ($(filter release,$(MAKECMDGOALS)),release)
-#    SANITIZE :=
-#    CCFLAGS  += -O3 -DNDEBUG
-#else
-#    CCFLAGS  += -g
-#endif
+ifeq ($(filter release,$(MAKECMDGOALS)),release)
+    SANITIZE :=
+    CCFLAGS  += -O3 -DNDEBUG
+else
+    CCFLAGS  += -g
+endif
 
 # Regla principal (enlazado de los .o)
 $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
@@ -46,8 +52,12 @@ $(RELEASE) : $(APP) $(ASSETS)
 	$(MKDIR) $(RELEASE)
 	cp $(APP) $(RELEASE)/
 	cp -r $(ASSETS) $(RELEASE)/
+ifeq ($(OS),Windows_NT)
+	cp $(LIBS_COPY) $(RELEASE)/
+else
 	$(MKDIR) $(RELEASE)/$(LIBS_DIR)
 	cp $(LIBS_COPY) $(RELEASE)/$(LIBS_DIR)
+endif
 	zip -r $(ZIP_NAME) $(RELEASE)/
 
 # Reglas auxiliares que crean carpetas
