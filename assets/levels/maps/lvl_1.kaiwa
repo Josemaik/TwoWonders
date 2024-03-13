@@ -1,0 +1,931 @@
+{
+	"id": 1,
+	"Chunks": [
+	{
+		"Chunk0": [
+			{
+				"overworld":{
+					"Ground":[
+						{
+							"position":[4.767, -32.347, 6.5],
+							"scale":[36.0, 99.0, 9.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[-13.233, 17.153, 15.5],
+							"scale":[63.0, 63.0, 9.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[36.267, 17.153, 6.5],
+							"scale":[63.0, 36.0, 9.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						}
+					],
+					"Walls":[
+						{
+							"position":[-38.233, -48.847, 16.593],
+							"scale":[3.0, 7.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[-18.233, -48.847, 16.593],
+							"scale":[3.0, 7.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[19.767, -48.847, 16.593],
+							"scale":[3.0, 69.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[36.267, 47.153, 16.593],
+							"scale":[3.0, 36.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						},
+						{
+							"position":[-43.233, -32.347, 16.593],
+							"scale":[3.0, 36.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						},
+						{
+							"position":[16.767, -1.847, 32.0],
+							"scale":[3.0, 25.0, 24.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						},
+						{
+							"position":[16.767, 36.153, 32.0],
+							"scale":[3.0, 25.0, 24.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						},
+						{
+							"position":[-13.233, -12.847, 32.0],
+							"scale":[3.0, 63.0, 24.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						},
+						{
+							"position":[-13.233, 47.153, 32.0],
+							"scale":[3.0, 63.0, 24.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						},
+						{
+							"position":[-43.233, 17.153, 32.0],
+							"scale":[3.0, 63.0, 24.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						}
+					],
+					"Ramps":[],
+					"Interactive":[
+						{
+							"type":1,
+							"offsetZ":[8.542438507080078],
+							"position":[-15.356, 25.648, 25.742],
+							"scale":[7.101, 6.494, 10.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0],
+							"zone": 3,
+							"content": 19,
+							"id": 0,
+							"visible": false,
+							"message": [
+								"¡Encontraste un bastón mágico!", 
+								"Pero no conoces ningún hechizo...",
+								"...aún así podría servir como palo azotador."
+							]
+						}
+					]
+				}
+			},
+			{
+				"underworld":{
+					"Spawns":[],
+					"Enemies": [],
+					"Objects": []
+				}
+			}
+		],
+		"Chunk1": [
+
+			{
+				"overworld":{
+					"Ground":[
+						{
+							"position":[-28.233, -63.847, 0.0],
+							"scale":[27.0, 33.0, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[-29.393, -113.347, 0.0],
+							"scale":[72.0, 30.681, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[20.107, -134.548, 0.0],
+							"scale":[29.597, 68.319, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[20.107, -80.44, -0.0],
+							"scale":[6.186, 68.319, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[5.421, -90.846, -0.0],
+							"scale":[14.626, 25.016, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[37.402, -90.846, -0.0],
+							"scale":[14.626, 25.016, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[-6.113, -101.641, -0.0],
+							"scale":[22.288, 15.879, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[21.3, -101.641, -0.0],
+							"scale":[22.288, 25.016, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[5.421, -112.437, -0.0],
+							"scale":[14.626, 25.016, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[37.402, -112.437, -0.0],
+							"scale":[14.626, 25.016, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[53.281, -101.641, -0.0],
+							"scale":[22.288, 25.016, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[69.383, -117.936, -0.0],
+							"scale":[25.624, 25.016, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						}
+					],
+					"Walls":[
+						{
+							"position":[30.767, -123.847, 8.0],
+							"scale":[3.0, 7.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[50.767, -123.847, 8.0],
+							"scale":[3.0, 7.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[-38.233, -123.847, 8.0],
+							"scale":[3.0, 7.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[-18.233, -123.847, 8.0],
+							"scale":[3.0, 7.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[-13.233, -135.847, 8.0],
+							"scale":[3.0, 27.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						},
+						{
+							"position":[-13.233, -65.347, 8.0],
+							"scale":[3.0, 30.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						},
+						{
+							"position":[19.767, -78.847, 8.0],
+							"scale":[3.0, 69.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[6.267, -123.847, 8.0],
+							"scale":[3.0, 42.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[4.767, -147.847, 8.0],
+							"scale":[3.0, 99.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[52.767, -135.847, 8.0],
+							"scale":[3.0, 27.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						},
+						{
+							"position":[-43.233, -99.847, 8.0],
+							"scale":[3.0, 99.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						}
+					],
+					"Ramps":[
+					],
+					"jajaRamps": [
+						{
+							"min":[-35.333, -59.539, 1.808],
+							"max":[-35.333, -59.539, 1.808],
+							"offset":["no lo entiendo, sorry"],
+							"slope":["no lo entiendo, sorry"]
+						}
+					],
+					"Interactive":[
+						{
+							"type":1,
+							"offsetZ":[7.834025681018829],
+							"position":[-28.264, -136.503, 7.0],
+							"scale":[7.101, 6.494, 10.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0],
+							"zone": 3,
+							"content": 19,
+							"id": 0,
+							"visible": false,
+							"message": [
+								"¡Encontraste un bastón mágico!", 
+								"Pero no conoces ningún hechizo...",
+								"...aún así podría servir como palo azotador."
+							]
+						},
+						{
+							"type":1,
+							"offsetZ":[7.834025681018829],
+							"position":[-4.443, -136.347, 7.0],
+							"scale":[7.101, 6.494, 10.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0],
+							"zone": 3,
+							"content": 19,
+							"id": 0,
+							"visible": false,
+							"message": [
+								"¡Encontraste un bastón mágico!", 
+								"Pero no conoces ningún hechizo...",
+								"...aún así podría servir como palo azotador."
+							]
+						}
+					]
+				}
+			},
+			{
+				"underworld":{
+					"Spawns":[],
+					"Enemies": [],
+					"Objects": []
+				}
+			}
+		],
+		"Chunk2": [
+
+			{
+				"overworld":{
+					"Ground":[
+						{
+							"position":[110.26, -18.847, 0.0],
+							"scale":[63.0, 14.013, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[135.267, -18.847, 0.0],
+							"scale":[19.0, 36.0, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[103.767, 30.653, 6.5],
+							"scale":[36.0, 99.0, 9.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[68.153, -18.847, 0.0],
+							"scale":[63.0, 27.773, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[92.646, 4.119, 0.0],
+							"scale":[17.068, 21.214, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[96.129, -13.38, 0.0],
+							"scale":[17.931, 14.249, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[92.646, -38.276, 0.0],
+							"scale":[17.931, 21.214, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[89.164, -20.345, 0.0],
+							"scale":[17.931, 14.249, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						}
+					],
+					"Walls":[
+						{
+							"position":[66.767, 14.153, 16.593],
+							"scale":[3.0, 25.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						},
+						{
+							"position":[104.767, 14.153, 16.593],
+							"scale":[3.0, 25.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						},
+						{
+							"position":[133.767, 14.153, 16.593],
+							"scale":[3.0, 39.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						},
+						{
+							"position":[133.767, -26.847, 8.0],
+							"scale":[3.0, 39.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						},
+						{
+							"position":[133.767, -10.847, 8.0],
+							"scale":[3.0, 39.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						},
+						{
+							"position":[115.767, -37.847, 8.0],
+							"scale":[3.0, 25.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[85.767, -48.847, 8.0],
+							"scale":[3.0, 63.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						},
+						{
+							"position":[115.767, 0.153, 8.0],
+							"scale":[3.0, 25.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[55.767, 42.903, 16.593],
+							"scale":[3.0, 11.5, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[55.767, 18.403, 16.593],
+							"scale":[3.0, 11.5, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[55.767, -18.847, 12.593],
+							"scale":[3.0, 63.0, 28.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[103.767, 47.153, 16.593],
+							"scale":[3.0, 99.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						}
+					],
+					"Ramps":[
+		
+					],
+					"jajaRamps":[
+						{
+							"min":[78.867, 3.461, 1.808],
+							"max":[78.867, 3.461, 1.808],
+							"offset":["no lo entiendo, sorry"],
+							"slope":["no lo entiendo, sorry"]
+						}
+					],
+					"Interactive":[
+						{
+							"type":3,
+							"offsetZ":[-3.9888267517089844],
+							"position":[55.767, 30.653, 16.593],
+							"scale":[3.0, 13.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						},
+						{
+							"type":1,
+							"offsetZ":[3.5444633960723877],
+							"position":[107.057, 5.331, 7.0],
+							"scale":[7.101, 6.494, 10.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0],
+							"zone": 3,
+							"content": 19,
+							"id": 0,
+							"visible": false,
+							"message": [
+								"¡Encontraste un bastón mágico!", 
+								"Pero no conoces ningún hechizo...",
+								"...aún así podría servir como palo azotador."
+							]
+						},
+						{
+							"type":3,
+							"offsetZ":[-4.036504745483398],
+							"position":[85.767, 14.153, 16.593],
+							"scale":[3.0, 13.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						}
+					]
+				}
+			},
+			{
+				"underworld":{
+					"Spawns":[],
+					"Enemies": [],
+					"Objects": []
+				}
+			}
+		],
+		"Chunk3": [
+
+			{
+				"overworld":{
+					"Ground":[
+						{
+							"position":[135.267, -128.347, 0.0],
+							"scale":[42.0, 36.0, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[71.562, -80.44, -0.0],
+							"scale":[6.186, 34.59, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[71.562, -143.53, 0.0],
+							"scale":[11.634, 34.59, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[103.062, -113.347, 0.0],
+							"scale":[72.0, 28.41, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[81.125, -128.731, 0.0],
+							"scale":[17.963, 15.463, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[60.347, -128.731, -0.0],
+							"scale":[17.963, 12.161, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[80.805, -101.641, -0.0],
+							"scale":[22.288, 16.102, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[69.383, -90.846, -0.0],
+							"scale":[14.626, 25.016, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						}
+					],
+					"Walls":[
+						{
+							"position":[115.767, -93.847, 8.0],
+							"scale":[3.0, 33.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						},
+						{
+							"position":[135.267, -108.847, 8.0],
+							"scale":[3.0, 36.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[103.767, -147.847, 8.0],
+							"scale":[3.0, 99.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[85.767, -78.847, 8.0],
+							"scale":[3.0, 63.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						}
+					],
+					"Ramps":[],
+					"Interactive":[]
+				}
+			},
+			{
+				"underworld":{
+					"Spawns":[],
+					"Enemies": [],
+					"Objects": []
+				}
+			}
+		],
+		"Chunk4": [
+			{
+				"overworld":{
+					"Ground":[
+						{
+							"position":[234.267, -32.347, 0.0],
+							"scale":[36.0, 36.0, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[171.267, -8.848, 0.0],
+							"scale":[43.003, 36.0, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[202.767, 30.653, 6.5],
+							"scale":[36.0, 66.0, 9.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[234.267, -2.347, 6.5],
+							"scale":[29.618, 36.0, 9.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[171.267, -43.831, 0.0],
+							"scale":[13.032, 36.0, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[182.086, -33.832, 0.0],
+							"scale":[6.965, 14.361, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[160.604, -33.832, 0.0],
+							"scale":[6.965, 14.674, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[234.267, 34.035, 6.5],
+							"scale":[29.417, 36.0, 9.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[218.906, 15.745, 6.5],
+							"scale":[6.983, 5.279, 9.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[234.154, 15.745, 6.5],
+							"scale":[6.983, 11.286, 9.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[249.401, 15.745, 6.5],
+							"scale":[6.983, 5.279, 9.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						}
+					],
+					"Walls":[
+						{
+							"position":[246.517, -15.847, 16.593],
+							"scale":[3.0, 11.5, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -3.0]
+						},
+						{
+							"position":[222.017, -15.847, 16.593],
+							"scale":[3.0, 11.5, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -3.0]
+						},
+						{
+							"position":[187.767, -18.847, 8.0],
+							"scale":[3.0, 63.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[154.767, -37.847, 8.0],
+							"scale":[3.0, 25.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[217.767, -0.847, 16.593],
+							"scale":[3.0, 33.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[217.767, -33.847, 8.0],
+							"scale":[3.0, 33.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[217.767, 42.903, 16.593],
+							"scale":[3.0, 11.5, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[217.767, 18.403, 16.593],
+							"scale":[3.0, 11.5, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[186.267, 14.153, 16.593],
+							"scale":[3.0, 66.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						},
+						{
+							"position":[154.767, 0.153, 8.0],
+							"scale":[3.0, 25.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[250.767, 15.653, 16.593],
+							"scale":[3.0, 66.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						},
+						{
+							"position":[202.767, 47.153, 16.593],
+							"scale":[3.0, 99.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						},
+						{
+							"position":[250.767, -33.847, 8.0],
+							"scale":[3.0, 33.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						}
+					],
+					"Ramps":[
+					],
+					"jajaRamps":[
+						{
+							"min":[227.167, -26.539, 1.808],
+							"max":[227.167, -26.539, 1.808],
+							"offset":["no lo entiendo, sorry"],
+							"slope":["no lo entiendo, sorry"]
+						}
+					],
+					"Interactive":[
+						{
+							"type":3,
+							"offsetZ":[-4.036502838134766],
+							"position":[234.267, -15.847, 16.593],
+							"scale":[3.0, 13.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"type":1,
+							"offsetZ":[3.472766876220703],
+							"position":[242.837, 39.577, 16.0],
+							"scale":[7.101, 6.494, 10.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0],
+							"zone": 3,
+							"content": 19,
+							"id": 0,
+							"visible": false,
+							"message": [
+								"¡Encontraste un bastón mágico!", 
+								"Pero no conoces ningún hechizo...",
+								"...aún así podría servir como palo azotador."
+							]
+						}
+					]
+				}
+			},
+			{
+				"underworld":{
+					"Spawns":[],
+					"Enemies": [],
+					"Objects": []
+				}
+			}
+		],
+		"Chunk5": [
+			{
+				"overworld":{
+					"Ground":[
+						{
+							"position":[220.767, -131.347, 0.0],
+							"scale":[63.0, 36.0, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						},
+						{
+							"position":[234.267, -81.847, 0.0],
+							"scale":[63.0, 36.0, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"position":[171.267, -99.847, 0.0],
+							"scale":[99.0, 36.0, 4.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						}
+					],
+					"Walls":[
+						{
+							"position":[202.767, -147.847, 8.0],
+							"scale":[3.0, 99.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						},
+						{
+							"position":[187.767, -132.847, 8.0],
+							"scale":[3.0, 33.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						},
+						{
+							"position":[217.767, -99.847, 8.0],
+							"scale":[3.0, 33.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						},
+						{
+							"position":[202.767, -114.847, 8.0],
+							"scale":[3.0, 33.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 1.0]
+						},
+						{
+							"position":[246.517, -84.847, 8.0],
+							"scale":[3.0, 11.5, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -3.0]
+						},
+						{
+							"position":[222.017, -84.847, 8.0],
+							"scale":[3.0, 11.5, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -3.0]
+						},
+						{
+							"position":[217.767, -68.347, 8.0],
+							"scale":[3.0, 36.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[187.767, -83.347, 8.0],
+							"scale":[3.0, 66.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[154.767, -80.347, 8.0],
+							"scale":[3.0, 60.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -2.0]
+						},
+						{
+							"position":[250.767, -99.847, 8.0],
+							"scale":[3.0, 99.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						}
+					],
+					"Ramps":[],
+					"Interactive":[
+						{
+							"type":3,
+							"offsetZ":[-3.126291275024414],
+							"position":[234.267, -84.847, 8.0],
+							"scale":[3.0, 13.0, 20.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, -1.0]
+						},
+						{
+							"type":1,
+							"offsetZ":[3.5444633960723877],
+							"position":[235.773, -135.229, 7.0],
+							"scale":[7.101, 6.494, 10.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						},
+						{
+							"type":1,
+							"offsetZ":[7.834025681018829],
+							"position":[173.213, -100.562, 7.0],
+							"scale":[7.101, 6.494, 10.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						}
+					],
+					"commentaries":
+					[
+						{
+							"type":4,
+							"offsetZ":[],
+							"position":[203.231, -130.974, 7.0],
+							"scale":[15.732, 14.386, 10.0],
+							"rotation": 90.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						}
+					]
+				}
+			},
+			{
+				"underworld":{
+					"Spawns":[],
+					"Enemies": [],
+					"Objects": []
+				}
+			}
+		]
+	}
+	]
+}

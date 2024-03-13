@@ -530,7 +530,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 vec3d pos = { r.position.x(), r.position.y(), r.position.z() };
                 // Solo generamos la malla si no existe
                 if (!r.meshLoaded)
-                    loadModels(e, engine, r);
+                    loadModels(e, engine, em, r);
 
                 bool in{ false };
                 if (e.hasTag<PlayerTag>())
@@ -624,8 +624,10 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
     });
 }
 
-void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderComponent& r)
+void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, EntityManager& em, RenderComponent& r)
 {
+    auto& li = em.getSingleton<LevelInfo>();
+
     if (e.hasTag<PlayerTag>())
     {
         r.model = engine.loadModel("assets/models/main_character.obj");
@@ -680,21 +682,103 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
     }
-    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk0Tag>())
+    else if (e.hasTag<Chunk0Tag>())
     {
-        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_0.obj");
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_0.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_0.obj");
+            break;
+        }
 
         loadShaders(r.model);
     }
-    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk1Tag>())
+    else if (e.hasTag<Chunk1Tag>())
     {
-        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_1.obj");
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_1.obj");
+            break;
 
+        case 1:
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_1.obj");
+            break;
+        }
         loadShaders(r.model);
     }
-    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk2Tag>())
+    else if (e.hasTag<Chunk2Tag>())
     {
-        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_2.obj");
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_2.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_2.obj");
+            break;
+        }
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<Chunk3Tag>())
+    {
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_3.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_3.obj");
+            break;
+        }
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<Chunk4Tag>())
+    {
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_4.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_4.obj");
+            break;
+        }
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<Chunk5Tag>())
+    {
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_5.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_5.obj");
+            break;
+        }
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<Chunk6Tag>())
+    {
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_6.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_6.obj");
+            break;
+        }
         loadShaders(r.model);
     }
     else if (e.hasTag<ChestTag>())

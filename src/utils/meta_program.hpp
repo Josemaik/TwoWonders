@@ -151,7 +151,7 @@ namespace MP
         template <typename... Ts>
         consteval static mask_type mask() noexcept
         {
-            return (0 | ... | (1 << id<Ts>()));
+            return (0 | ... | (1LL << id<Ts>()));
         }
     };
 

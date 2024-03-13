@@ -23,7 +23,7 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
+        plfi.spawnPoint = { 32.0, 4.0, 43.0 };
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
     // 32.0, 4.0, 130.0 - Segundo cofre
@@ -35,7 +35,7 @@ void Game::createEntities(EntityManager& em)
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0 });
 
     auto& lis = em.addComponent<ListenerComponent>(e, ListenerComponent{});
     em.addComponent<InputComponent>(e, InputComponent{});
@@ -266,12 +266,13 @@ void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto& bb = em.getSingleton<BlackBoard_t>();
+    auto& plfi = em.getSingleton<PlayerInfo>();
 
     em.destroyAll();
     bb.subditosData.clear();
     rs.unloadModels(em, engine);
     li.reset();
-    // plfi.reset();
+    plfi.reset();
     lock_system.reset();
     createEntities(em);
     map.reset(em, 0, iam);

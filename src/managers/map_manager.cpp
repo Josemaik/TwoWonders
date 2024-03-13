@@ -16,7 +16,7 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
 
     case 1:
         li.mapID = 1;
-        map = loadMap("assets/levels/mazmorra_level.json");
+        map = loadMap("assets/levels/maps/lvl_1.kaiwa");
         break;
 
     case 2:
@@ -53,11 +53,11 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
     {
         std::string chunkName = "Chunk" + std::to_string(i);
         const rapidjson::Value& chunk = chunks[i][chunkName.c_str()];
-        generateChunkFromJSON(em, chunk, iam, mapID, j);
+        generateChunkFromJSON(em, chunk, iam, mapID, i, j);
     }
 }
 
-void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value& chunk, Ia_man& iam, uint8_t mapID, int& j)
+void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value& chunk, Ia_man& iam, uint8_t mapID, rapidjson::SizeType& i, int& j)
 {
     const rapidjson::Value& overworld = chunk[0]["overworld"];
     const rapidjson::Value& groundArray = overworld["Ground"];
@@ -67,6 +67,8 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
     const rapidjson::Value& underworld = chunk[1]["underworld"];
     const rapidjson::Value& objectArray = underworld["Objects"];
     const rapidjson::Value& enemyArray = underworld["Enemies"];
+
+    generateChunkModel(em, i);
 
     generateGround(em, groundArray, j);
 
@@ -95,8 +97,44 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
     // }
 }
 
+void MapManager::generateChunkModel(EntityManager& em, rapidjson::SizeType& i)
+{
+
+    // Creamos la entidad modelo del chunk
+    auto& modelEntity{ em.newEntity() };
+
+    // Asignamos etiquetas al número del chunk
+    switch (i)
+    {
+    case 0:
+        em.addTag<Chunk0Tag>(modelEntity);
+        break;
+    case 1:
+        em.addTag<Chunk1Tag>(modelEntity);
+        break;
+    case 2:
+        em.addTag<Chunk2Tag>(modelEntity);
+        break;
+    case 3:
+        em.addTag<Chunk3Tag>(modelEntity);
+        break;
+    case 4:
+        em.addTag<Chunk4Tag>(modelEntity);
+        break;
+    case 5:
+        em.addTag<Chunk5Tag>(modelEntity);
+        break;
+    case 6:
+        em.addTag<Chunk6Tag>(modelEntity);
+        break;
+    }
+    em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = vec3d::zero(), .scale = vec3d::zero(), .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, -1.0, 0.0 } });
+}
+
 void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groundArray, int& j)
 {
+    vec2d min{}, max{};
+    double minHeigth = 0.0;
     for (rapidjson::SizeType i = 0; i < groundArray.Size(); i++)
     {
         auto& groundEntity = em.newEntity();
@@ -111,51 +149,64 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
         double rot = orientation * DEGTORAD;
         Color color{ WHITE };
 
+        // Sacamos los máximos y los mínimos
+        if (i == 0)
+        {
+            min.x = groundPosition.x() - groundScale.x() / 2;
+            min.y = groundPosition.z() - groundScale.z() / 2;
+
+            max.x = groundPosition.x() + groundScale.x() / 2;
+            max.y = groundPosition.z() + groundScale.z() / 2;
+
+            minHeigth = groundPosition.y();
+        }
+        else
+        {
+            if (min.x > groundPosition.x() - groundScale.x() / 2)
+                min.x = groundPosition.x() - groundScale.x() / 2;
+            if (min.y > groundPosition.z() - groundScale.z() / 2)
+                min.y = groundPosition.z() - groundScale.z() / 2;
+
+            if (max.x < groundPosition.x() + groundScale.x() / 2)
+                max.x = groundPosition.x() + groundScale.x() / 2;
+            if (max.y < groundPosition.z() + groundScale.z() / 2)
+                max.y = groundPosition.z() + groundScale.z() / 2;
+
+            if (minHeigth > groundPosition.y())
+                minHeigth = groundPosition.y();
+        }
+
         // Creamos los componentes del suelo
-        auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .orientation = rot, .rotationVec = rotationVec });
+        auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .visible = false, .orientation = rot, .rotationVec = rotationVec });
         auto& p = em.addComponent<PhysicsComponent>(groundEntity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = rot, .rotationVec = r.rotationVec });
         em.addComponent<ColliderComponent>(groundEntity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
         em.addTag<SeparateModelTag>(groundEntity);
+    }
 
-        if (j >= 4)
-        {
-            r.position = groundPos;
-            if (j >= 8)
-                em.addTag<Chunk2Tag>(groundEntity);
-            else
-                em.addTag<Chunk1Tag>(groundEntity);
-        }
-        else {
-            em.addTag<Chunk0Tag>(groundEntity);
-            // r.position -= {-0.847, 0.0, 4.767};
-            r.position = vec3d::zero();
-            // r.position.setX(groundPosition.x());
-            groundPos = r.position;
-        }
+    // Sacamos la posición del centro del chunk
+    vec3d center = { (min.x + max.x) / 2, minHeigth, (min.y + max.y) / 2 };
 
-        // Creamos las 4 zonas
-        vec3d zoneScale = groundScale / 2; // Dividimos la escala del suelo por 2
-        zoneScale.setY(2); // Elevamos la zona en 2 unidades en y
-        int k = 0;
-        int limit = j + 4;
-        for (; j < limit; j++)
-        {
-            auto& zoneEntity = em.newEntity();
-            em.addTag<ZoneTag>(zoneEntity);
+    // Creamos 4 zonas para el chunk
+    vec3d zoneScale = { (max.x - min.x) / 2, 20, (max.y - min.y) / 2 };
+    int k = 0;
+    int limit = j + 4;
+    for (; j < limit; j++)
+    {
+        auto& zoneEntity = em.newEntity();
+        em.addTag<ZoneTag>(zoneEntity);
 
-            // Ajustamos la posición de la zona
-            vec3d zonePosition = groundPosition;
-            zonePosition.setX(groundPosition.x() + (k % 2 - 0.5) * zoneScale.x());
-            zonePosition.setZ(groundPosition.z() + (k / 2 - 0.5) * zoneScale.z());
-            zonePosition.setY(groundPosition.y() + 2); // Elevamos la zona en 2 unidades en y
+        // Ajustamos la posición de la zona
+        vec3d zonePosition = center;
+        zonePosition.setX(center.x() + (k % 2 - 0.5) * zoneScale.x());
+        zonePosition.setZ(center.z() + (k / 2 - 0.5) * zoneScale.z());
+        zonePosition.setY(center.y() + 2); // Elevamos la zona en 2 unidades en y
 
-            // Creamos los componentes de la zona
-            em.addComponent<ZoneComponent>(zoneEntity, ZoneComponent{ .zone = static_cast<uint16_t>(j) });
-            auto& rz = em.addComponent<RenderComponent>(zoneEntity, RenderComponent{ .position = zonePosition, .scale = zoneScale, .visible = false });
-            auto& pz = em.addComponent<PhysicsComponent>(zoneEntity, PhysicsComponent{ .position = rz.position, .velocity = vec3d::zero(), .scale = rz.scale, .gravity = .0 });
-            em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ pz.position, rz.scale, BehaviorType::ZONE });
-            k += 1;
-        }
+        // Creamos los componentes de la zona
+        em.addComponent<ZoneComponent>(zoneEntity, ZoneComponent{ .zone = static_cast<uint16_t>(j) });
+        auto& rz = em.addComponent<RenderComponent>(zoneEntity, RenderComponent{ .position = zonePosition, .scale = zoneScale, .visible = false });
+        auto& pz = em.addComponent<PhysicsComponent>(zoneEntity, PhysicsComponent{ .position = rz.position, .velocity = vec3d::zero(), .scale = rz.scale, .gravity = .0 });
+        em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ pz.position, rz.scale, BehaviorType::ZONE });
+        k += 1;
     }
 }
 
@@ -291,7 +342,7 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
 
             if (interactable.HasMember("offsetZ"))
             {
-                r.offset = interactable["offsetZ"].GetDouble();
+                r.offset = interactable["offsetZ"][0].GetDouble();
             }
 
             if (interactable.HasMember("events"))
@@ -321,7 +372,7 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
 
             if (interactable.HasMember("offsetZ"))
             {
-                r.offset = interactable["offsetZ"].GetDouble();
+                r.offset = interactable["offsetZ"][0].GetDouble();
             }
 
             em.destroyComponent<InteractiveComponent>(entity);

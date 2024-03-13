@@ -20,12 +20,13 @@ struct MapManager
         // Luego, resetea cada parte
         (resetTag<Tags>(em), ...);
     }
-  
-  private:
+
+private:
     mapType loadMap(const std::string& path);
     void destroyMap(EntityManager& em);
     void generateMapFromJSON(EntityManager& em, const mapType& map, Ia_man& iam);
-    void generateChunkFromJSON(EntityManager& em, const rapidjson::Value& chunk, Ia_man& iam, uint8_t mapID, int& j);
+    void generateChunkFromJSON(EntityManager& em, const rapidjson::Value& chunk, Ia_man& iam, uint8_t mapID, rapidjson::SizeType& i, int& j);
+    void generateChunkModel(EntityManager& em, rapidjson::SizeType& i);
     void generateGround(EntityManager& em, const rapidjson::Value& groundArray, int& j);
     void generateWalls(EntityManager& em, const rapidjson::Value& wallArray);
     void generateRamps(EntityManager& em, const rapidjson::Value& rampArray);

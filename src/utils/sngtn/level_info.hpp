@@ -69,7 +69,7 @@ struct LevelInfo
 
   // Variables de zona y el nivel
   uint16_t num_zone{};
-  uint8_t mapID{ 0 };
+  uint8_t mapID{ 1 };
 
   // Para estado de pausa y cerrar el juego
   SoundSystem* sound_system{ nullptr };

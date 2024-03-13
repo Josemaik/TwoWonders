@@ -539,7 +539,7 @@ void CollisionSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, Physic
     auto& otherPos = enemyPhy.position;
     vec3d dir = { pos.x() - otherPos.x(), 0, pos.z() - otherPos.z() };
     dir.normalize();
-    playerPhy.velocity = dir * 7;
+    playerPhy.velocity = dir;
     playerPhy.stopped = true;
 }
 

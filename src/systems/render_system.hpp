@@ -23,8 +23,8 @@ struct RenderSystem
     void unloadModels(EntityManager& em, ENGI::GameEngine& engine);
     void drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& em);
     void drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt);
-    void drawRay(vec3d origin,vec3d end);
-    void drawVisionCone(vec3d pos_enemy,double orientation,double horizontalFOV);
+    void drawRay(vec3d origin, vec3d end);
+    void drawVisionCone(vec3d pos_enemy, double orientation, double horizontalFOV);
     void drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawInventory(ENGI::GameEngine& engine, EntityManager& em);
     void drawItemDescription(ENGI::GameEngine& engine, EntityManager& em, Item& item);
@@ -41,7 +41,7 @@ private:
     void drawCoinBar(ENGI::GameEngine& engine, EntityManager& em);
     void drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, const Entity& e);
     void drawManaBar(ENGI::GameEngine& engine, EntityManager& em);
-    void loadModels(Entity& e, ENGI::GameEngine& engine, RenderComponent& r);
+    void loadModels(Entity& e, ENGI::GameEngine& engine, EntityManager& em, RenderComponent& r);
     void loadShaders(Model& model);
     void drawTextBox(ENGI::GameEngine& engine, EntityManager& em);
 
