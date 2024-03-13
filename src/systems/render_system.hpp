@@ -36,6 +36,7 @@ private:
     void beginFrame(ENGI::GameEngine& engine);
     void endFrame(ENGI::GameEngine& engine, EntityManager& em, double dt);
     void drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy);
+    void drawAlerts_IA(EntityManager& em, ENGI::GameEngine& engine,double dt);
     void drawEntities(EntityManager& em, ENGI::GameEngine& engine);
     void drawDeath(ENGI::GameEngine& engine);
     void drawCoinBar(ENGI::GameEngine& engine, EntityManager& em);
@@ -57,8 +58,6 @@ private:
     float elapsed_CoinBar{ 0.f }, elapsed_limit_CoinBar{ 5.0f };
 
     int coinBarX{}, coinNumberX{};
-
-    float endangle{0.0f};
 };
 
 #endif // !RENDER_SYSTEM
