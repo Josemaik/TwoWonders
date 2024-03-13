@@ -1,34 +1,36 @@
-APP		   := TwoWonders
-CCACHE 	   := 
-CC         := g++
-CCFLAGS    := -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
+APP		   	:= TwoWonders
+CCACHE 	  	:= ccache
+CC         	:= g++
+CCFLAGS    	:= -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
 
 ifeq ($(OS),Windows_NT)
-    LIBS := -L./ libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll -lwinmm -lgdi32
-	SANITIZE   :=
-	LIBS_COPY  := libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll libs/libstdc++-6.dll libs/libgcc_s_seh-1.dll libs/libwinpthread-1.dll
+	CCACHE 	   	:=
+    LIBS 	   	:= -L./ libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll -lwinmm -lgdi32
+	SANITIZE   	:=
+	LIBS_COPY  	:= libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll libs/libstdc++-6.dll libs/libgcc_s_seh-1.dll libs/libwinpthread-1.dll
 else
+	CCACHE 	   	:= ccache
     LIBS := -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so
-	SANITIZE   := -fsanitize=address,undefined
-	LIBS_COPY  := /usr/lib/libraylib.so.420 libs/raygui.so fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13
+	SANITIZE   	:= -fsanitize=address,undefined
+	LIBS_COPY  	:= /usr/lib/libraylib.so.420 libs/raygui.so fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13
 endif
 
 # agregar g++ | clang++
 
-MKDIR      := mkdir -p
-SRC  	   := src
-OBJ  	   := obj
-RELEASE    := release
-ASSETS     := assets
-LIBS_DIR   := libs
+MKDIR      	:= mkdir -p
+SRC  	   	:= src
+OBJ  	   	:= obj
+RELEASE    	:= release
+ASSETS     	:= assets
+LIBS_DIR   	:= libs
 
-ALLCPP     := $(shell find $(SRC) -type f -iname *.cpp)
-ALLCPPOBJ  := $(patsubst %.cpp,%.o,$(ALLCPP))
-SUBDIRS    := $(shell find $(SRC) -type d)
-OBJSUBDIRS := $(patsubst $(SRC)%,$(OBJ)%,$(SUBDIRS))
+ALLCPP     	:= $(shell find $(SRC) -type f -iname *.cpp)
+ALLCPPOBJ  	:= $(patsubst %.cpp,%.o,$(ALLCPP))
+SUBDIRS    	:= $(shell find $(SRC) -type d)
+OBJSUBDIRS 	:= $(patsubst $(SRC)%,$(OBJ)%,$(SUBDIRS))
 
-DATE       := $(shell date +'%d-%m-%y')
-ZIP_NAME   := $(APP)_$(RELEASE)_$(DATE).zip
+DATE       	:= $(shell date +'%d-%m-%y')
+ZIP_NAME   	:= $(APP)_$(RELEASE)_$(DATE).zip
 
 # Variables si es make release
 ifeq ($(filter release,$(MAKECMDGOALS)),release)
