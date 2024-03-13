@@ -1,5 +1,4 @@
 APP		   	:= TwoWonders
-CCACHE 	  	:= ccache
 CC         	:= g++
 CCFLAGS    	:= -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
 
