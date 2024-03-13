@@ -4,7 +4,7 @@ CC         := g++
 CCFLAGS    := -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
 
 #LIBS       := -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so
-LIBS       := -L./libs libs/libraylib.a -L./ fmod.dll fmodstudio.dll -lwinmm -lgdi32
+LIBS       := -L./ raylib.dll raygui.dll fmod.dll fmodstudio.dll -lwinmm -lgdi32
 
 SANITIZE   := 
 
