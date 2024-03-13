@@ -10,8 +10,8 @@ double calculatePointDistance(vec3d const& target, vec3d const& origin) {
 }
 
 // void adjustAnglePiMinusPi(double& angle){
-//       while      ( angle >  PI ) angle -= 2*PI;
-//       while      ( angle < -PI ) angle += 2*PI;
+//       while      ( angle >  K_PI ) angle -= 2*K_PI;
+//       while      ( angle < -K_PI ) angle += 2*K_PI;
 // }
 
 // Steer_t velocity_match(PhysicsComponent const& phy,double const target_v, double const time2arrive) {
@@ -37,7 +37,7 @@ double calculatePointDistance(vec3d const& target, vec3d const& origin) {
 //         auto distx { target.x() - phy.position.x() };
 //         auto distz { target.z() - phy.position.z() };
 //         auto target_orientation { std::atan2(distz,distx) };
-//         if( target_orientation < 0 ) target_orientation += 2*PI;
+//         if( target_orientation < 0 ) target_orientation += 2*K_PI;
 
 //         // Align and Set angular velocity 
 //         auto angular_distance = target_orientation - phy.orientation;

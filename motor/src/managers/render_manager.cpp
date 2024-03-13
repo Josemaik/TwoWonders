@@ -172,7 +172,7 @@ void RenderManager::drawCircle(glm::vec2 pos, float radius, int segments, Color 
     std::vector<float> vertices(vertexCount);
 
     for (int i = 0; i < vertexCount; i += 2) {
-        float theta = static_cast<float>((i / 2) * (2.0f * M_PI / segments));
+        float theta = static_cast<float>((i / 2) * (2.0f * K_PI / segments));
         vertices[i] = normalizeX(pos.x + radius * std::cos(theta));
         vertices[i + 1] = normalizeY(pos.y + radius * std::sin(theta));
     }

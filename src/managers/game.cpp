@@ -68,7 +68,7 @@ void Game::createEntities(EntityManager& em)
 
 //inicializar bancos
 void Game::createSound(EntityManager&) {
-    sound_system.initBanks("assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Music.bank");
+    SoundSystem_initBanks(&sound_system, "assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Music.bank");
     //sound_system.createEventInstance();
     //sound_system.play();
 }
@@ -147,7 +147,7 @@ void Game::run()
         case GameScreen::TITLE:
         {
             if (sound_system.music_started == false) {
-                sound_system.playMusicMenu();
+                SoundSystem_playMusicMenu(&sound_system);
                 sound_system.music_started = true;
             }
             render_system.drawLogoGame(engine, em, sound_system);
@@ -211,7 +211,7 @@ void Game::run()
                     projectile_system.update(em, timeStep);
                     attack_system.update(em, timeStep);
                     life_system.update(em, object_system, timeStep);
-                    sound_system.update();
+                    SoundSystem_update(&sound_system);
                     // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     camera_system.update(em, engine, timeStep);
                     event_system.update(em, evm, iam, map, object_system);
@@ -256,7 +256,7 @@ void Game::run()
     }
 
     //liberar bancos
-    sound_system.clear();
+    SoundSystem_clear(&sound_system);
     render_system.unloadModels(em, engine);
 
     engine.unloadShader(shader);
