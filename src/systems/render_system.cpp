@@ -739,7 +739,7 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
     }
     else if (e.hasTag<BarricadeTag>())
     {
-        r.model = engine.loadModel("assets/models/Barricada.obj");
+        r.model = engine.loadModel("assets/models/Barricada_arboles.obj");
 
         loadShaders(r.model);
     }
