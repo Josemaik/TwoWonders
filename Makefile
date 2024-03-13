@@ -3,10 +3,15 @@ CCACHE 	   :=
 CC         := g++
 CCFLAGS    := -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
 
-#LIBS       := -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so
-LIBS       := -L./ raylib.dll raygui.dll fmod.dll fmodstudio.dll -lwinmm -lgdi32
-
-SANITIZE   := 
+ifeq ($(OS),Windows_NT)
+    LIBS := -L./ libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll -lwinmm -lgdi32
+	SANITIZE   :=
+	LIBS_COPY  := libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll libs/libstdc++-6.dll libs/libgcc_s_seh-1.dll libs/libwinpthread-1.dll
+else
+    LIBS := -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so
+	SANITIZE   := -fsanitize=address,undefined
+	LIBS_COPY  := /usr/lib/libraylib.so.420 libs/raygui.so fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13
+endif
 
 # agregar g++ | clang++
 
@@ -16,12 +21,9 @@ OBJ  	   := obj
 RELEASE    := release
 ASSETS     := assets
 LIBS_DIR   := libs
-LIBS_COPY  := /usr/lib/libraylib.so.420 libs/raygui.so fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13
 
 ALLCPP     := $(shell find $(SRC) -type f -iname *.cpp)
 ALLCPPOBJ  := $(patsubst %.cpp,%.o,$(ALLCPP))
-ALLC 	   := $(shell find $(SRC) -type f -iname *.c)
-ALLCOBJ    := $(patsubst %.c,%.o,$(ALLC))
 SUBDIRS    := $(shell find $(SRC) -type d)
 OBJSUBDIRS := $(patsubst $(SRC)%,$(OBJ)%,$(SUBDIRS))
 
@@ -37,23 +39,24 @@ else
 endif
 
 # Regla principal (enlazado de los .o)
-$(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ) $(ALLCOBJ)
-	$(CCACHE) $(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCOBJ)) $(LIBS) $(SANITIZE) -Wl,-rpath=libs -Wl,-rpath,./fmodlibs
+$(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
+	$(CCACHE) $(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE) -Wl,-rpath=libs -Wl,-rpath,./fmodlibs
 
 # Regla que compila los .cpp
 %.o : %.cpp
 	$(CCACHE) $(CC) -o $(patsubst $(SRC)%,$(OBJ)%,$@) -c $^ $(CCFLAGS) $(SANITIZE)
-
-%.o : %.c
-	$(CCACHE) $(CC) -o $(patsubst $(SRC)%,$(OBJ)%,$@) -c $(CCFLAGS) $^
 
 # Regla que crea una release
 $(RELEASE) : $(APP) $(ASSETS)
 	$(MKDIR) $(RELEASE)
 	cp $(APP) $(RELEASE)/
 	cp -r $(ASSETS) $(RELEASE)/
+ifeq ($(OS),Windows_NT)
+	cp $(LIBS_COPY) $(RELEASE)/
+else
 	$(MKDIR) $(RELEASE)/$(LIBS_DIR)
 	cp $(LIBS_COPY) $(RELEASE)/$(LIBS_DIR)
+endif
 	zip -r $(ZIP_NAME) $(RELEASE)/
 
 # Reglas auxiliares que crean carpetas
