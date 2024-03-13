@@ -727,7 +727,7 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
     }
     else if (e.hasTag<CrusherTag>())
     {
-        r.model = engine.loadModel("assets/models/Apisonadora.obj");
+        // r.model = engine.loadModel("assets/models/Apisonadora.obj");
 
         loadShaders(r.model);
     }
