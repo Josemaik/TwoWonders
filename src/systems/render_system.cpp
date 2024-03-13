@@ -1378,9 +1378,9 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             engine.drawText(std::to_string(z.zone).c_str(),
                 static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 50),
+                static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 5),
                 20,
-                BLACK);
+                RED);
         }
 
         if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())

@@ -23,7 +23,7 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 32.0, 4.0, 43.0 };
+        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
     // 32.0, 4.0, 130.0 - Segundo cofre
@@ -191,7 +191,7 @@ void Game::run()
                 resetGame(em, engine, render_system);
 
             input_system.update(em, engine);
-            bool debugs = inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();
+            bool debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();
 
             // seleccionar modo de debug ( physics o AI)
             if (!li.resetGame && !debugs)
@@ -275,6 +275,6 @@ void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
     plfi.reset();
     lock_system.reset();
     createEntities(em);
-    map.reset(em, 0, iam);
+    map.reset(em, li.mapID, iam);
     li.sound_system = &sound_system;
 }

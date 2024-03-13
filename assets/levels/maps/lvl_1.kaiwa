@@ -116,7 +116,9 @@
 					"Objects": []
 				}
 			}
-		],
+		]
+	},
+	{
 		"Chunk1": [
 
 			{
@@ -318,7 +320,9 @@
 					"Objects": []
 				}
 			}
-		],
+		]
+	},
+	{
 		"Chunk2": [
 
 			{
@@ -502,7 +506,9 @@
 					"Objects": []
 				}
 			}
-		],
+		]
+	},
+	{
 		"Chunk3": [
 
 			{
@@ -594,7 +600,9 @@
 					"Objects": []
 				}
 			}
-		],
+		]
+	},
+	{
 		"Chunk4": [
 			{
 				"overworld":{
@@ -792,7 +800,9 @@
 					"Objects": []
 				}
 			}
-		],
+		]
+	},
+	{
 		"Chunk5": [
 			{
 				"overworld":{
@@ -894,7 +904,16 @@
 							"position":[235.773, -135.229, 7.0],
 							"scale":[7.101, 6.494, 10.0],
 							"rotation": 90.0,
-							"rotVector":[0.0, 0.0, 0.0]
+							"rotVector":[0.0, 0.0, 0.0],
+							"zone": 3,
+							"content": 19,
+							"id": 0,
+							"visible": false,
+							"message": [
+								"¡Encontraste un bastón mágico!", 
+								"Pero no conoces ningún hechizo...",
+								"...aún así podría servir como palo azotador."
+							]
 						},
 						{
 							"type":1,
@@ -902,7 +921,16 @@
 							"position":[173.213, -100.562, 7.0],
 							"scale":[7.101, 6.494, 10.0],
 							"rotation": 90.0,
-							"rotVector":[0.0, 0.0, 0.0]
+							"rotVector":[0.0, 0.0, 0.0],
+							"zone": 3,
+							"content": 19,
+							"id": 0,
+							"visible": false,
+							"message": [
+								"¡Encontraste un bastón mágico!", 
+								"Pero no conoces ningún hechizo...",
+								"...aún así podría servir como palo azotador."
+							]
 						}
 					],
 					"commentaries":

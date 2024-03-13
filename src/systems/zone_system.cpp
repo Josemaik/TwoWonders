@@ -33,81 +33,81 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
 
                         // SWORD //
 
-                    case 14: // TP a la cueva de la espada
-                        map.reset(em, 2, iam);
-                        li.transition = true;
+                    // case 14: // TP a la cueva de la espada
+                    //     map.reset(em, 2, iam);
+                    //     li.transition = true;
 
-                        p.position.setX(49.0);
-                        p.position.setZ(85.0);
-                        break;
+                    //     p.position.setX(49.0);
+                    //     p.position.setZ(85.0);
+                    //     break;
 
-                    case 15: // TP desde la cueva de la espada
-                        map.reset(em, 0, iam);
-                        li.transition = true;
+                    // case 15: // TP desde la cueva de la espada
+                    //     map.reset(em, 0, iam);
+                    //     li.transition = true;
 
-                        p.position.setX(-5.0);
-                        p.position.setZ(-4.5);
-                        break;
+                    //     p.position.setX(-5.0);
+                    //     p.position.setZ(-4.5);
+                    //     break;
 
-                        // COINS //
+                    //     // COINS //
 
-                    case 16: // TP a la cueva de las monedas
-                        map.reset(em, 2, iam);
-                        li.transition = true;
+                    // case 16: // TP a la cueva de las monedas
+                    //     map.reset(em, 2, iam);
+                    //     li.transition = true;
 
-                        p.position.setX(71.0);
-                        p.position.setZ(85.0);
-                        break;
+                    //     p.position.setX(71.0);
+                    //     p.position.setZ(85.0);
+                    //     break;
 
-                    case 17: // TP desde la cueva de las monedas
-                        map.reset(em, 0, iam);
-                        li.transition = true;
+                    // case 17: // TP desde la cueva de las monedas
+                    //     map.reset(em, 0, iam);
+                    //     li.transition = true;
 
-                        p.position.setX(3.0);
-                        p.position.setZ(-20.0);
-                        break;
+                    //     p.position.setX(3.0);
+                    //     p.position.setZ(-20.0);
+                    //     break;
 
-                        // SHOP //
+                    //     // SHOP //
 
-                    case 18: // TP a la cueva de la tienda
-                        map.reset(em, 2, iam);
-                        li.transition = true;
+                    // case 18: // TP a la cueva de la tienda
+                    //     map.reset(em, 2, iam);
+                    //     li.transition = true;
 
-                        p.position.setX(93.0);
-                        p.position.setY(0.0);
-                        p.position.setZ(85.0);
-                        break;
+                    //     p.position.setX(93.0);
+                    //     p.position.setY(0.0);
+                    //     p.position.setZ(85.0);
+                    //     break;
 
-                    case 19: // TP desde la cueva de la tienda
-                        map.reset(em, 0, iam);
-                        li.transition = true;
+                    // case 19: // TP desde la cueva de la tienda
+                    //     map.reset(em, 0, iam);
+                    //     li.transition = true;
 
-                        p.position.setX(-17.0);
-                        p.position.setY(2.0);
-                        p.position.setZ(-20.0);
-                        break;
+                    //     p.position.setX(-17.0);
+                    //     p.position.setY(2.0);
+                    //     p.position.setZ(-20.0);
+                    //     break;
 
-                        // MAZMORRA //
+                    //     // MAZMORRA //
 
-                    case 20: // TP a la cueva de la mazmorra
-                        li.cameraChange = true;
+                    // case 20: // TP a la cueva de la mazmorra
+                    //     li.cameraChange = true;
 
-                        map.reset(em, 1, iam);
-                        li.transition = true;
+                    //     map.reset(em, 1, iam);
+                    //     li.transition = true;
 
-                        p.position.setX(61.0);
-                        p.position.setZ(-65.0);
-                        break;
+                    //     p.position.setX(61.0);
+                    //     p.position.setZ(-65.0);
+                    //     break;
 
-                    case 21: // TP desde la cueva de la mazmorra
-                        li.cameraChange = false;
+                    // case 21: // TP desde la cueva de la mazmorra
+                    //     li.cameraChange = false;
 
-                        map.reset(em, 0, iam);
-                        li.transition = true;
+                    //     map.reset(em, 0, iam);
+                    //     li.transition = true;
 
-                        p.position.setX(-50.0);
-                        p.position.setZ(-3.5);
-                        break;
+                    //     p.position.setX(-50.0);
+                    //     p.position.setZ(-3.5);
+                    //     break;
 
                     default:
                         break;
