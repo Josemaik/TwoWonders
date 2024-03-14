@@ -25,10 +25,12 @@ public:
 
     // Create node in parentNode
     Node* CreateNode(const char* nodeName, Node* parentNode);
-    // Create rectangle
-    Node* CreateRectangle(glm::vec2 position, glm::vec2 size, Color color, const char* nodeName, Node* parentNode);
-    // Create triangle
+    // Create pixel in node
+    Node* CreatePixel(glm::vec2 pos, Color color, const char* nodeName, Node* parentNode);
+    // Create triangle in node
     Node* CreateTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, Color color, const char* nodeName, Node* parentNode);
+    // Create rectangle in node
+    Node* CreateRectangle(glm::vec2 position, glm::vec2 size, Color color, const char* nodeName, Node* parentNode);
     // Create camera
     Camera* CreateCamera(const char* nodeName, Node* parentNode);
     // Get root node

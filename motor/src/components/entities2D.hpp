@@ -6,6 +6,55 @@
 #include <GL/gl.h>
 #include <glm/glm.hpp>
 
+struct Pixel : Entity{
+    glm::vec2 position;
+    Color color;
+
+    Pixel(glm::vec2 p = {0.0f, 0.0f}, Color c = BLACK)
+        : position(p), color(c) {};
+
+    void draw(glm::mat4 transMatrix) override{
+        RenderManager rm = RenderManager::getInstance();
+
+        // Apply Transformation Matrix
+        position = glm::vec2(transMatrix[3][0], transMatrix[3][1]);
+
+        // Define a single vertex for the pixel
+        float vertex[] = { rm.normalizeX(position.x), rm.normalizeY(position.y) };
+
+        // Create and configure VAO, VBO
+        GLuint VAO, VBO;
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+
+        glBindVertexArray(VAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
+
+        // Set up vertex attribute pointers
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        glBindVertexArray(0);
+
+        // Set the uniform color in the shader
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
+        glUseProgram(rm.getShader()->id_shader);
+        glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
+
+        // Draw the pixel
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_POINTS, 0, 1);
+        glBindVertexArray(0);
+
+        // Clean up resources
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
+    };
+};
+
 struct Triangle : Entity{
 public:
     glm::vec2 v1, v2, v3;

@@ -34,6 +34,19 @@ Node* DarkMoonEngine::CreateNode(const char* nodeName, Node* parentNode){
     return p_node;
 }
 
+
+// Create pixel in node
+Node* DarkMoonEngine::CreatePixel(glm::vec2 position, Color color, const char* nodeName, Node* parentNode){
+    auto p_nodePix = CreateNode(nodeName, parentNode);
+
+    // Create Pixel
+    auto pixel = std::make_unique<Pixel>(position, color);
+    p_nodePix->translate({position.x, position.y, 0.0f});
+    p_nodePix->setEntity(std::move(pixel));
+
+    return p_nodePix;
+}
+
 // Create rectangle in node
 Node* DarkMoonEngine::CreateRectangle(glm::vec2 position, glm::vec2 size, Color color, const char* nodeName, Node* parentNode){
     auto p_nodeRec = CreateNode(nodeName, parentNode);
@@ -68,7 +81,6 @@ Camera* DarkMoonEngine::CreateCamera(const char* nodeName, Node* parentNode){
 
     return p_eCamera;
 }
-
 
 // Get root node
 Node* DarkMoonEngine::GetRootNode(){

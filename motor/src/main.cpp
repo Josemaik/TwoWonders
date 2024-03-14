@@ -12,6 +12,9 @@ Node* createHUD(DarkMoonEngine& engine){
     // Node: Triangulo Verde
     engine.CreateTriangle({10.0f, 54.0f}, {10.0f, 590.0f}, {210.0f, 590.0f}, KAIWA, "Triangulo verde", p_nodeHUD);
 
+    // Node: Pixel Negro
+    engine.CreatePixel({400.0f, 300.0f}, BLACK, "Pixel negro", p_nodeHUD);
+
     return p_nodeHUD;
 }
 
