@@ -27,6 +27,8 @@ public:
     Node* CreateNode(const char* nodeName, Node* parentNode);
     // Create pixel in node
     Node* CreatePixel(glm::vec2 pos, Color color, const char* nodeName, Node* parentNode);
+    // Create line in node
+    Node* CreateLine(glm::vec2 startPos, glm::vec2 endPos, Color color, const char* nodeName, Node* parentNode);
     // Create triangle in node
     Node* CreateTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, Color color, const char* nodeName, Node* parentNode);
     // Create rectangle in node

@@ -47,6 +47,17 @@ Node* DarkMoonEngine::CreatePixel(glm::vec2 position, Color color, const char* n
     return p_nodePix;
 }
 
+// Create line in node
+Node* DarkMoonEngine::CreateLine(glm::vec2 startPos, glm::vec2 endPos, Color color, const char* nodeName, Node* parentNode){
+    auto p_nodeLin = CreateNode(nodeName, parentNode);
+
+    // Create Line
+    auto line = std::make_unique<Line>(startPos, endPos, color);
+    p_nodeLin->setEntity(std::move(line));
+
+    return p_nodeLin;
+}
+
 // Create rectangle in node
 Node* DarkMoonEngine::CreateRectangle(glm::vec2 position, glm::vec2 size, Color color, const char* nodeName, Node* parentNode){
     auto p_nodeRec = CreateNode(nodeName, parentNode);

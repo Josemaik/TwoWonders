@@ -55,6 +55,59 @@ struct Pixel : Entity{
     };
 };
 
+struct Line : Entity{
+    glm::vec2 startPos, endPos;
+    Color color;
+
+    Line(glm::vec2 sP = {0.0f, 0.0f}, glm::vec2 eP = {10.0f, 10.0f}, Color c = BLACK)
+        : startPos(sP), endPos(eP), color(c) {};
+
+    void draw(glm::mat4 transMatrix) override{
+        RenderManager rm = RenderManager::getInstance();
+
+        // Apply Transformation Matrix
+        auto position = glm::vec2(transMatrix[3][0], transMatrix[3][1]);
+        glm::vec2 aux_size;
+        aux_size.x = glm::length(glm::vec2(transMatrix[0][0], transMatrix[1][0]));
+        aux_size.y = glm::length(glm::vec2(transMatrix[1][1], transMatrix[1][0]));
+
+        // Define the vertices for the line
+        float vertices[] = {
+            rm.normalizeX(startPos.x * aux_size.x + position.x), rm.normalizeY(startPos.y * aux_size.y + position.y),
+            rm.normalizeX(endPos.x * aux_size.x + position.x)  , rm.normalizeY(endPos.y * aux_size.y + position.y)
+        };
+
+        // Create and configure VAO, VBO
+        GLuint VAO, VBO;
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        // Set up vertex attribute pointers
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        glBindVertexArray(0);
+
+        // Set the uniform color in the shader
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
+        glUseProgram(rm.getShader()->id_shader);
+        glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
+
+        // Draw the line
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_LINES, 0, 2);
+        glBindVertexArray(0);
+
+        // Clean up resources
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
+    };
+};
+
 struct Triangle : Entity{
 public:
     glm::vec2 v1, v2, v3;

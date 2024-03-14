@@ -15,6 +15,9 @@ Node* createHUD(DarkMoonEngine& engine){
     // Node: Pixel Negro
     engine.CreatePixel({400.0f, 300.0f}, BLACK, "Pixel negro", p_nodeHUD);
 
+    // Node: Linea Roja
+    engine.CreateLine({0.0f, 0.0f}, {700.0f, 600.0f}, RED, "Linea roja", p_nodeHUD);
+
     return p_nodeHUD;
 }
 
