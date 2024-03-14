@@ -81,6 +81,18 @@ Node* DarkMoonEngine::CreateTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, C
     return p_nodeTri;
 }
 
+// Create circle in node
+Node* DarkMoonEngine::CreateCircle(glm::vec2 position, float radius, int segments, Color color, const char* nodeName, Node* parentNode){
+    auto p_nodeCir = CreateNode(nodeName, parentNode);
+
+    // Create circle
+    auto circle = std::make_unique<Circle>(position, radius, segments, color);
+    p_nodeCir->translate({position.x, position.y, 0.0f});
+    p_nodeCir->setEntity(std::move(circle));
+
+    return p_nodeCir;
+}
+
 // Create camera in node
 Camera* DarkMoonEngine::CreateCamera(const char* nodeName, Node* parentNode){
     auto p_nodeCam = CreateNode(nodeName, parentNode);

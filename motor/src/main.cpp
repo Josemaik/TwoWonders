@@ -4,19 +4,21 @@ Node* createHUD(DarkMoonEngine& engine){
     // Node HUD
     auto p_nodeHUD = engine.CreateNode("HUD", engine.GetRootNode());
     
+    // Node: Pixel Negro
+    engine.CreatePixel({400.0f, 300.0f}, BLACK, "Pixel negro", p_nodeHUD);
+    // Node: Linea Roja
+    engine.CreateLine({0.0f, 0.0f}, {700.0f, 600.0f}, RED, "Linea roja", p_nodeHUD);
+
+    // Node: Triangulo Verde
+    engine.CreateTriangle({10.0f, 54.0f}, {10.0f, 590.0f}, {210.0f, 590.0f}, KAIWA, "Triangulo verde", p_nodeHUD);
+
     // Node: Rectangulo Naranja Oscuro
     engine.CreateRectangle({12.0f, 12.0f}, {200.0f, 40.0f}, ORANGE_DARK, "Rectangulo naranja oscuro", p_nodeHUD);
     // Node: Rectangulo Naranja
     engine.CreateRectangle({10.0f, 10.0f}, {200.0f, 40.0f}, ORANGE, "Rectangulo naranja", p_nodeHUD);
 
-    // Node: Triangulo Verde
-    engine.CreateTriangle({10.0f, 54.0f}, {10.0f, 590.0f}, {210.0f, 590.0f}, KAIWA, "Triangulo verde", p_nodeHUD);
-
-    // Node: Pixel Negro
-    engine.CreatePixel({400.0f, 300.0f}, BLACK, "Pixel negro", p_nodeHUD);
-
-    // Node: Linea Roja
-    engine.CreateLine({0.0f, 0.0f}, {700.0f, 600.0f}, RED, "Linea roja", p_nodeHUD);
+    // Node: Circulo 
+    engine.CreateCircle({250.0f, 50.0f}, 30.0f, 20, LAVENDER, "Circulo lavanda", p_nodeHUD);
 
     return p_nodeHUD;
 }

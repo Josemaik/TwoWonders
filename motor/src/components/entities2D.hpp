@@ -109,7 +109,6 @@ struct Line : Entity{
 };
 
 struct Triangle : Entity{
-public:
     glm::vec2 v1, v2, v3;
     Color color;
 
@@ -172,7 +171,6 @@ public:
 };
 
 struct Rectangle : Entity{
-public:
     glm::vec2 position;
     glm::vec2 size;
     Color color;
@@ -238,4 +236,61 @@ public:
         glDeleteBuffers(1, &VBO);
         glDeleteBuffers(1, &EBO);
     };
+};
+
+struct Circle : Entity{
+    glm::vec2 position;
+    float radius;
+    int segments;
+    Color color;
+
+    Circle(glm::vec2 p = {0.0f, 0.0f}, float rad = 10.0f, int seg = 20, Color c = BLACK)
+        : position(p), radius(rad), segments(seg), color(c) {};
+
+    void draw(glm::mat4 transMatrix) override{
+        RenderManager rm = RenderManager::getInstance();
+
+        // Apply Transformation Matrix
+        position = glm::vec2(transMatrix[3][0], transMatrix[3][1]);
+        auto scale = glm::length(glm::vec2(transMatrix[0][0], transMatrix[1][0]));
+
+        // Calculate vertices for the circle
+        int vertexCount = segments * 2;
+        std::vector<float> vertices(vertexCount);
+
+        for (int i = 0; i < vertexCount; i += 2) {
+            float theta = static_cast<float>((i / 2) * (2.0f * M_PI / segments));
+            vertices[i] = rm.normalizeX(position.x + (radius * scale) * std::cos(theta));
+            vertices[i + 1] = rm.normalizeY(position.y + (radius * scale) * std::sin(theta));
+        }
+
+        // Create and configure VAO, VBO
+        GLuint VAO, VBO;
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexCount, vertices.data(), GL_STATIC_DRAW);
+
+        // Set up vertex attribute pointers
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        glBindVertexArray(0);
+
+        // Set the uniform color in the shader
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
+        glUseProgram(rm.getShader()->id_shader);
+        glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
+
+        // Draw the circle
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, segments);
+        glBindVertexArray(0);
+
+        // Clean up resources
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
+        };
 };
