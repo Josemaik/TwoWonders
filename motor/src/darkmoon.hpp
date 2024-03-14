@@ -72,33 +72,6 @@ public:
     // Ends 3D mode
     void EndMode3D();
 
-    // ------------------------------ //
-    // Basic shapes drawing functions //
-    // ------------------------------ //
-
-    // Draw a pixel
-    void DrawPixel(int posX, int posY, Color color);
-    // Draw a pixel (vector version)
-    void DrawPixelV(glm::vec2 pos, Color color);
-    // Draw a line
-    void DrawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color);
-    // Draw a line (vector version)
-    void DrawLineV(glm::vec2 startPos, glm::vec2 endPos, Color color);
-    // Draw a color-filled triangle
-    void DrawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, Color color);
-    // Draw triangle outline
-    void DrawTriangleLines(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, Color color);
-    // Draw a color-filled rectangle
-    void DrawRectangle(int x, int y, int sizeX, int sizeY, Color color);
-    // Draw a color-filled rectangle (vector version)
-    void DrawRectangleV(glm::vec2 pos, glm::vec2 size, Color color);
-    // Draw rectangle outline
-    void DrawRectangleLines(glm::vec2 pos, glm::vec2 size, Color color);
-    // Draw a color-filled circle
-    void DrawCircle(int centerX, int centerY, float radius, int segments, Color color);
-    // Draw a color-filled circle (vector version)
-    void DrawCircleV(glm::vec2 pos, float radius, int segments, Color color);
-
     // ------------------------------------- //
     // Texture Loading and Drawing functions //
     // ------------------------------------- //
