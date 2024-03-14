@@ -90,21 +90,12 @@
 					"Ramps":[],
 					"Interactive":[
 						{
-							"type":1,
+							"type":5,
 							"offsetZ":[8.542438507080078],
-							"position":[-15.356, 25.648, 25.742],
-							"scale":[7.101, 6.494, 10.0],
+							"position":[-15.356, 30.648, 20.742],
+							"scale":[25.101, 25.101, 1.0],
 							"rotation": 90.0,
-							"rotVector":[0.0, 0.0, 0.0],
-							"zone": 3,
-							"content": 19,
-							"id": 0,
-							"visible": false,
-							"message": [
-								"¡Encontraste un bastón mágico!", 
-								"Pero no conoces ningún hechizo...",
-								"...aún así podría servir como palo azotador."
-							]
+							"rotVector":[0.0, 0.0, 1.0]
 						}
 					]
 				}

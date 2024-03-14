@@ -3,7 +3,7 @@
 #define COLLISION_MANAGER
 #include <unordered_set>
 #include "../utils/Octree.hpp"
-
+#include "../managers/event_manager.hpp"
 
 constexpr float BORDER = 20.f;
 
@@ -53,6 +53,7 @@ struct CollisionSystem
 
     void update(EntityManager& em);
     bool checkWallCollision(EntityManager& em, vec3d& pos);
+    void setEventManager(EventManager& evm) { this->evm = &evm; }
 private:
     void checkCollision(EntityManager& em, Octree& boxes, pairsType& checkedPairs);
     void checkRampCollision(EntityManager& em, std::vector<Entity*>& entities);
@@ -76,6 +77,7 @@ private:
     Octree octree;
     pairsType checkedPairs{};
     std::vector<RampComponent*> ramps{};
+    EventManager* evm{ nullptr };
     // void checkBorderCollision(EntityManager& em, Octree& boxes);
 };
 

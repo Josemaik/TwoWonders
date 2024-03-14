@@ -69,7 +69,8 @@ struct LevelInfo
 
   // Variables de zona y el nivel
   uint16_t num_zone{};
-  uint8_t mapID{ 1 };
+  uint8_t mapID{ 0 };
+  bool levelChanged{ false };
 
   // Para estado de pausa y cerrar el juego
   SoundSystem* sound_system{ nullptr };
@@ -95,7 +96,7 @@ struct LevelInfo
     debugIA2 = false;
     resetGame = false;
     num_zone = 0;
-    mapID = 1;
+    mapID = 0;
     chestToOpen = max;
     dungeonKeyCreated = false;
     sound_system = nullptr;

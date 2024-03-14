@@ -5,6 +5,7 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
 
     mapType map{};
     auto& li = em.getSingleton<LevelInfo>();
+    li.levelChanged = false;
     iam.resetVec();
 
     switch (mapID)
@@ -146,7 +147,7 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
         vec3d groundScale{ ground["scale"][0].GetDouble(), ground["scale"][2].GetDouble(), ground["scale"][1].GetDouble() };
         vec3d rotationVec{ ground["rotVector"][0].GetDouble(), ground["rotVector"][2].GetDouble(), ground["rotVector"][1].GetDouble() };
         double orientation{ ground["rotation"].GetDouble() };
-        double rot = orientation * DEGTORAD;
+        double rot = (orientation + 90.0) * DEGTORAD;
         Color color{ WHITE };
 
         // Sacamos los máximos y los mínimos
@@ -319,7 +320,7 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         auto& entity = em.newEntity();
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .orientation = rot, .rotationVec = rotationVec });
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = 0, .orientation = rot, .rotationVec = r.rotationVec });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+        auto& c = em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
         em.addComponent<InteractiveComponent>(entity);
 
         switch (type)
@@ -388,12 +389,19 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         }
         case InteractableType::Level:
         {
-            // ???
+            r.visible = false;
+            c.behaviorType = BehaviorType::ZONE;
+            em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = static_cast<uint16_t>(interactable["zone"].GetUint()) });
+            break;
         }
         case InteractableType::Spawn:
         {
             em.addTag<SpawnTag>(entity);
-            r.color = ORANGE;
+            c.behaviorType = BehaviorType::SPAWN;
+            if (interactable.HasMember("offsetZ"))
+            {
+                r.offset = interactable["offsetZ"][0].GetDouble();
+            }
             break;
         }
         }
@@ -402,11 +410,13 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
 
 void MapManager::destroyMap(EntityManager& em)
 {
-    using CMPS = MP::TypeList<>;
-    using TAGS = MP::TypeList<GroundTag, WaterTag, WallTag, ZoneTag, RampTag, DoorTag, ObjectTag, EnemyTag, DestructibleTag, ChestTag>;
     auto& li = em.getSingleton<LevelInfo>();
 
-    em.forEachAny<CMPS, TAGS>([&](Entity& entity) { li.dead_entities.insert(entity.getID()); });
+    for (auto e : em.getEntities())
+    {
+        if (e.getID() != li.playerID)
+            li.dead_entities.insert(e.getID());
+    }
 }
 
 void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
@@ -517,8 +527,11 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
 //     }
 // }
 
-void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man& iam)
+void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man&)
 {
     destroyMap(em);
-    createMap(em, mapID, iam);
+    auto& li = em.getSingleton<LevelInfo>();
+    li.mapID = mapID;
+    li.levelChanged = true;
+    // createMap(em, mapID, iam);
 }

@@ -6,6 +6,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, ZoneComponent& zon)
     {
         if (zon.changeZone) {
+
             // Comprobar en que zona estamos
             if (li.num_zone != zon.zone) {
                 // crear una funcion que devuelva un Evento
@@ -17,29 +18,29 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                 //borro enemigos si cambio de zona
                 // iam.createEnemiesZone(em, zon.zone);
                 // Es una zona
+                auto* playerEn = em.getEntityByID(li.playerID);
+                auto& p = em.getComponent<PhysicsComponent>(*playerEn);
+
                 li.num_zone = zon.zone;
-                if (zon.zone <= 13)
+                switch (zon.zone)
                 {
-                    // Aquí pondremos cosas de las zonas que no sean de tp
-                }
-                // Es un TP
-                else
-                {
-                    auto* playerEn = em.getEntityByID(li.playerID);
-                    auto& p = em.getComponent<PhysicsComponent>(*playerEn);
 
-                    switch (zon.zone)
+                    // SWORD //
+
+                case 12: // TP a la cueva de la espada
+                    switch (li.mapID)
                     {
+                    case 0:
+                    {
+                        map.reset(em, 1, iam);
+                        li.transition = true;
 
-                        // SWORD //
+                        p.position = { 35.0, 22.0, -23.0 };
+                        break;
+                    }
 
-                    // case 14: // TP a la cueva de la espada
-                    //     map.reset(em, 2, iam);
-                    //     li.transition = true;
-
-                    //     p.position.setX(49.0);
-                    //     p.position.setZ(85.0);
-                    //     break;
+                    }
+                    break;
 
                     // case 15: // TP desde la cueva de la espada
                     //     map.reset(em, 0, iam);
@@ -109,11 +110,11 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                     //     p.position.setZ(-3.5);
                     //     break;
 
-                    default:
-                        break;
-                    }
+                default:
+                    break;
                 }
             }
+
             zon.changeZone = false;
         }
     });
@@ -167,10 +168,6 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     {
         checkDoors(em, evm);
         break;
-    }
-    case 12:
-    {
-        checkDungeonSlimes(em, evm);
     }
     default:
         break;

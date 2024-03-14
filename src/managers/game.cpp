@@ -23,19 +23,20 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
+        plfi.spawnPoint = { -116.0, 4.0, 111.0 };
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
     // 32.0, 4.0, 130.0 - Segundo cofre
     // -72.0, 4.0, 72.9 - Cofre con llave
     // -116.0, 4.0, 111.0 - Apisonadora
-    //-125, 4.0, 138.68 - `pos chunck 3
+    // -125, 4.0, 138.68 - `pos chunck 3
+    // 35.0, 22.0, -23.0 - Posición Incial Lvl 1
 
 // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0 });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
 
     auto& lis = em.addComponent<ListenerComponent>(e, ListenerComponent{});
     em.addComponent<InputComponent>(e, InputComponent{});
@@ -87,6 +88,7 @@ void Game::run()
     engine.setShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
 
     render_system.setShader(shader);
+    collision_system.setEventManager(evm);
 
     engine.setTargetFPS(120);
 
@@ -189,6 +191,9 @@ void Game::run()
         {
             if (em.getEntities().empty() || li.resetGame)
                 resetGame(em, engine, render_system);
+
+            if (li.levelChanged)
+                map.createMap(em, li.mapID, iam);
 
             input_system.update(em, engine);
             bool debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();

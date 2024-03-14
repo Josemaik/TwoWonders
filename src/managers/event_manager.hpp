@@ -97,13 +97,6 @@ public:
                     }
                     case EventCodes::SetSpawn:
                     {
-                        auto& plfi = em.getSingleton<PlayerInfo>();
-                        auto& playerPos = em.getComponent<PhysicsComponent>(e).position;
-                        plfi.spawnPoint = playerPos;
-                        auto& life = em.getComponent<LifeComponent>(e);
-                        life.life = life.maxLife;
-                        plfi.mana = plfi.max_mana - 3.0;
-
                         mm.spawnReset(em, iam);
 
                         break;

@@ -527,7 +527,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
             if (!e.hasTag<ZoneTag>())
             {
                 vec3d scl = { 1.0, 1.0, 1.0 };
-                vec3d pos = { r.position.x(), r.position.y(), r.position.z() };
+                vec3d pos = r.position;
                 // Solo generamos la malla si no existe
                 if (!r.meshLoaded)
                     loadModels(e, engine, em, r);
@@ -601,6 +601,11 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 else if (e.hasTag<DestructibleTag>())
                 {
                     pos.setY(pos.y() - r.offset / 1.5);
+                    in = true;
+                }
+                else if (e.hasTag<SpawnTag>())
+                {
+                    pos.setY(pos.y() - r.offset / 2.2);
                     in = true;
                 }
                 else if (e.hasTag<GroundTag>() || e.hasTag<DoorTag>())
@@ -824,6 +829,12 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, EntityManager
     else if (e.hasTag<BarricadeTag>())
     {
         r.model = engine.loadModel("assets/models/Barricada.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<SpawnTag>())
+    {
+        r.model = engine.loadModel("assets/models/Checkpoint.obj");
 
         loadShaders(r.model);
     }

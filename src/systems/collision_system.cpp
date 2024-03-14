@@ -333,7 +333,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
             std::swap(behaviorType1, behaviorType2);
         }
 
-        if (otherEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<DestructibleTag>() || otherEntPtr->hasTag<CrusherTag>())
+        if (otherEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<DestructibleTag>() || otherEntPtr->hasTag<CrusherTag>() || staticEntPtr->hasTag<GroundTag>())
             return;
     }
 
@@ -346,7 +346,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
 
         if (otherEntPtr->hasTag<GroundTag>() || otherEntPtr->hasTag<WaterTag>())
         {
-            floorCollision(*staticPhy, *otherPhy, minOverlap);
+            // floorCollision(*staticPhy, *otherPhy, minOverlap);
             return;
         }
     }
@@ -490,6 +490,22 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
             return;
 
         enemyCollision(em, *staticEntPtr);
+        return;
+    }
+
+    if (behaviorType2 & BehaviorType::SPAWN)
+    {
+        auto& plfi = em.getSingleton<PlayerInfo>();;
+        if (evm != nullptr && plfi.spawnPoint != otherPhy->position)
+        {
+            evm->scheduleEvent(Event{ EventCodes::SetSpawn });
+
+            plfi.spawnPoint = otherPhy->position;
+            auto& life = em.getComponent<LifeComponent>(*staticEntPtr);
+            life.life = life.maxLife;
+            plfi.mana = plfi.max_mana - 3.0;
+        }
+
         return;
     }
 
