@@ -7,7 +7,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
     // Constantes para ángulos de visión
     const double verticalFOV = 60.0; // Ángulo vertical de visión en grados
     const double horizontalFOV = 170.0; // Ángulo horizontal de visión en grados
-    const double MinRayDistance = 10.0; // Ángulo horizontal de visión en grados
+    const double MinRayDistance = 10.0; // Mínima distancia de detección por vista
 
     BTDecisionPlayerDetected() {}
 
@@ -18,49 +18,64 @@ struct BTDecisionPlayerDetected : BTNode_t {
 
         //#### PERCEPCION SENSORIAL - OIDO ################################
         //Calculo la distancia del player al enemigo
-       auto const distance = (ectx.phy.position - getplayerpos(ectx)).lengthSQ();
-       auto const radius_alert = (ectx.ai.detect_radius * ectx.ai.detect_radius);
-       auto const radius_detect = radius_alert / 4.0;
+       auto const distance = (ectx.phy.position - getplayerphy(ectx).position).lengthSQ();
+       auto const radius_listen_1 = (ectx.ai.detect_radius * ectx.ai.detect_radius);
+       auto const radius_listen_2 = radius_listen_1 / 4.0;
         
-        //Si estas dentro de su rango de alerta
-        if(distance < radius_alert){
-            //si ademas no ha sido detectado , pasa a estado de sospecha
-            if(!ectx.ai.playerdetected){
-                //estado de alerta
-                ectx.ai.alert_state = true;
-                //dibujar icono alerta encima de enemigo
-                if(ectx.ai.endangle <= -360.0f){
-                    ectx.ai.playerdetected = true;
-                    ectx.ai.alert_state = false;
-                    ectx.ai.endangle = 0.0f;
-                    return BTNodeStatus_t::success;
+        if(!ectx.ai.playerdetected){
+            bool in_alert_radius{false};
+            ectx.ai.listen_steps = true;
+            //Si estas dentro de su rango de alerta
+            if(distance < radius_listen_1){
+                //Aqui se escuchan los pasos un poco
+                in_alert_radius = true;
+                //Compruebo si se escuchan los pasos del player
+                if(getplayerphy(ectx).velocity.x() == 0.0 && getplayerphy(ectx).velocity.z() == 0.0){
+                    //No se escuchan
+                    ectx.ai.listen_steps = false;
                 }
-            }else{
+                //Nivel de escucha de los pasos
+                ectx.ai.increase_angle = 0.5f;
+            }
+
+            if(distance < radius_listen_2){
+                //Aqui se escuchan los pasos más fuerte
+                in_alert_radius = true;
+                //Compruebo si se escuchan los pasos del player
+                if(getplayerphy(ectx).velocity.x() == 0.0 && getplayerphy(ectx).velocity.z() == 0.0){
+                    ////No se escuchan
+                    ectx.ai.listen_steps = false;
+                }
+                //Nivel de escucha de los pasos
+                ectx.ai.increase_angle = 1.0f;
+            }
+            // Si no entro en ninguno de los radios de escucha no entra en estado de alerta
+            if(!in_alert_radius){
                 ectx.ai.alert_state = false;
+                //Además no me detecta
+                ectx.ai.playerdetected = false;
+            }else{
+                ectx.ai.alert_state = true;
+            }
+            //Si se completa la barra de escucha , me detectan
+            //dibujar icono alerta encima de enemigo
+            if(ectx.ai.endangle <= -360.0f){
+                ectx.ai.playerdetected = true;
+                ectx.ai.alert_state = false;
+                ectx.ai.endangle = 0.0f;
+                return BTNodeStatus_t::success;
             }
         }else{
-            ectx.ai.playerdetected = false;
             ectx.ai.alert_state = false;
             ectx.ai.endangle = 0.0f;
         }
 
-        // Si superas 4 partes de ese radio te detecta directamente
-        if( distance < radius_detect){
-            ectx.ai.alert_state = false;
-            //te escucha
-            if(!ectx.ent.hasTag<BossFinalTag>()){
-                ectx.ai.path_initialized = false;
-            }
-            ectx.ai.playerdetected = true;
-            return BTNodeStatus_t::success;
-        }
-
         //########## PERCEPCION SENSORIAL - VISTA ################
 
-        //Si el player se encuentra a una altura mayor o menor que el enemigo
+        // Si el player se encuentra a una altura mayor o menor que el enemigo
         // que sea superior a 1 metro no puede ser visto por el enemigo
-        if(getplayerpos(ectx).y() - ectx.phy.position.y() > 1.0){
-            if(getplayerpos(ectx).y() > ectx.phy.position.y()){
+        if(getplayerphy(ectx).position.y() - ectx.phy.position.y() > 1.0){
+            if(getplayerphy(ectx).position.y() > ectx.phy.position.y()){
                     ectx.ai.playerdetected = false;
                     return BTNodeStatus_t::fail;
             }
@@ -70,7 +85,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
         //Calcula la dirección de visión del enemigo utilizando su orientación
         vec3d enemyDirection = vec3d(std::sin(ectx.phy.orientation), 0.0, std::cos(ectx.phy.orientation));
         //Vector que apunta desde el enemigo al jugador
-        vec3d toPlayer = getplayerpos(ectx) - ectx.phy.position;
+        vec3d toPlayer = getplayerphy(ectx).position - ectx.phy.position;
         //normalizamos vectores
         enemyDirection.normalize();
         toPlayer.normalize();
@@ -85,7 +100,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
            // Raycast
             vec3d intersection_wall{}, intersection_player{};
             // Realiza un raycast en la dirección en la que el enemigo está mirando para detectar obstáculos
-            vec3d dir = getplayerpos(ectx) - ectx.phy.position;
+            vec3d dir = getplayerphy(ectx).position - ectx.phy.position;
             RayCast ray = { ectx.phy.position,  dir };
 
             // dibujado de raycast
@@ -139,8 +154,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
             }
         }
 
-    //     No ha sido detectado por oido ni vista
-        // ectx.ai.playerdetected = false;
+        //No ha sido detectado por oido ni vista
         if(ectx.ai.playerdetected){
             return BTNodeStatus_t::success;
         }else{
@@ -149,14 +163,14 @@ struct BTDecisionPlayerDetected : BTNode_t {
     }
 
 private:
-    //Obtengo la posición del player
-    vec3d getplayerpos(EntityContext_t& ectx) {
+    // Obtengo la posición del player
+    PhysicsComponent& getplayerphy(EntityContext_t& ectx) {
         auto& li = ectx.em.getSingleton<LevelInfo>();
         auto* playerEn = ectx.em.getEntityByID(li.playerID);
-        if (not playerEn) return vec3d{}; // No hay player
+        //if (not playerEn) return vec3d{}; // No hay player
         // Si hay player
         auto& plphy = ectx.em.getComponent<PhysicsComponent>(*playerEn);
-        return plphy.position;
+        return plphy;
     };
     //Obtengo el colision component del player
     ColliderComponent& getplayercollider(EntityContext_t& ectx) {

@@ -1024,13 +1024,21 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, ENGI::GameEngine& engine,dou
                 }
 
                 Vector2 center = {barX, barY-120.0f};
-                if(aic.alert_state){    
-                    aic.endangle -= 0.5f;
+                if(aic.alert_state){  
+                    //Se escuahn pasos 
+                    if(aic.listen_steps){
+                        aic.endangle -= aic.increase_angle;
+                    }else{
+                        //No se escuchan los pasos
+                        if(aic.endangle != 0.0f){
+                             aic.endangle += aic.increase_angle;
+                        }
+                    }
                     //std::cout << endangle << "\n";
                     DrawCircleSector(center,30.0f,0.0f,aic.endangle,30,RED);
                 }else{
-                    if(aic.endangle != 0.0f && aic.endangle <= -30.0f){
-                        aic.endangle += 1.0f;
+                    if(aic.endangle != 0.0f){
+                        aic.endangle += aic.increase_angle;
                     }
                 }
             }

@@ -60,8 +60,8 @@ struct AIComponent
     bool playerdetected{ false };
     double field_of_view{100};
     //Estado de alerta
-    bool alert_state{false},show_icon{true};
-    float endangle{0.0f};
+    bool alert_state{false},show_icon{true},listen_steps{false};
+    float endangle{0.0f},increase_angle{0.0f};
     //Ataque
     bool ready_attack{ false };
     // data for steering behaviour
