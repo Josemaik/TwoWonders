@@ -36,6 +36,7 @@ private:
     void beginFrame(ENGI::GameEngine& engine);
     void endFrame(ENGI::GameEngine& engine, EntityManager& em, double dt);
     void drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy);
+    void drawAlerts_IA(EntityManager& em, ENGI::GameEngine& engine,double dt);
     void drawEntities(EntityManager& em, ENGI::GameEngine& engine);
     void drawDeath(ENGI::GameEngine& engine);
     void drawCoinBar(ENGI::GameEngine& engine, EntityManager& em);

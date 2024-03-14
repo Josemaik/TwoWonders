@@ -863,6 +863,35 @@
 							"countdown_shoot": 2.0,
 							"countdown_perception": 0.2,
 							"scale_to_respawn_attack": 7.0
+						},
+						{
+							"position": [-111.0, 4.0, 89.0],
+							"rotVector": [0.0, 0.0, 1.0],
+							"rotation": 0.0,
+							"scale": [4.0, 3.0, 4.0],
+							"color": [0, 121, 241, 255],
+							"max_speed": 0.8,
+							"life": 10,
+							"type": 4,
+							"element": 1,
+							"arrival_radius": 2.0,
+							"detect_radius": 40.0,
+							"attack_radius": 2.5,
+							"tx": 0.0,
+							"tz": 0.0,
+							"time2arrive": 1.0,
+							"tactive": true,
+							"perceptionTime": 0.2,
+							"path": [
+								[-131.0, 4.0, 97.2],
+								[-111.0, 4.0, 89.0],
+								[-131.0, 4.0, 97.2],
+								[-111.0, 4.0, 89.0]
+							],
+							"countdown_stop": 0.8,
+							"countdown_shoot": 4.0,
+							"countdown_perception": 0.3,
+							"scale_to_respawn_attack": 7.0
 						}
 					],
 					"Objects": []

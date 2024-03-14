@@ -786,6 +786,7 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
     auto& txti = em.getSingleton<TextInfo>();
 
     drawHUD(em, engine, inpi.debugPhy);
+    drawAlerts_IA(em, engine,dt);
 
     if (txti.hasText())
         drawTextBox(engine, em);
@@ -873,6 +874,8 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
             DrawTextEx(GetFontDefault(), std::to_string(bb.subditosData.size()).c_str(), Vector2{ 680,250 }, 20, 1, RED);
             DrawText("Subditos id alive:", 480, 270, 20, BLACK);
             DrawTextEx(GetFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), Vector2{ 680,270 }, 20, 1, RED);
+             DrawText("Alert state:", 480, 290, 20, BLACK);
+            DrawTextEx(GetFontDefault(), (aic.alert_state == 0) ? "No" : "Sí", Vector2{ 680,290 }, 20, 1, RED);
 
             engine.beginMode3D();
             //raycast
@@ -986,6 +989,61 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
         }
     });
     // engine.endDrawing();
+}
+//Dibujado alertas de detección de enemigos
+void RenderSystem::drawAlerts_IA(EntityManager& em, ENGI::GameEngine& engine,double dt){
+        for (auto const& e : em.getEntities())
+        {
+            //Alert state
+            if(e.hasTag<EnemyTag>() && !e.hasTag<CrusherTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>()){
+                auto &aic = em.getComponent<AIComponent>(e);
+                auto& r = em.getComponent<RenderComponent>(e);
+
+                float barX = engine.getWorldToScreenX(r.position);
+                float barY = engine.getWorldToScreenY(r.position);
+
+                if(!aic.playerdetected){
+                    aic.show_icon = true;
+                }
+
+                if(aic.playerdetected && aic.show_icon){
+                    Vector2 point1 = {barX, barY - 120.0f};
+                    Vector2 point2 = {barX - 30.0f, barY - 50.0f };
+                    Vector2 point3 = {barX + 30.0f, barY - 50.0f};
+                    //dibujar icono alerta
+                    // Dibuja el triángulo
+                    DrawTriangle(point1, point2, point3, BLACK);
+                    // Dibuja el signo de exclamación dentro del triángulo
+                    engine.drawText("!", static_cast<int>(barX - 2), static_cast<int>(barY - 100), 50, YELLOW);
+                    //emepezar contador para borrar
+                    if(aic.elapsed_show_icon >= aic.countdown_show_icon){
+                        aic.elapsed_show_icon = 0.0;
+                        aic.show_icon = false;
+                    }else{
+                        aic.plusdeltatime(dt,aic.elapsed_show_icon);
+                    }
+                }
+
+                Vector2 center = {barX, barY-120.0f};
+                if(aic.alert_state){  
+                    //Se escuahn pasos 
+                    if(aic.listen_steps){
+                        aic.endangle -= aic.increase_angle;
+                    }else{
+                        //No se escuchan los pasos
+                        if(aic.endangle != 0.0f){
+                             aic.endangle += aic.increase_angle;
+                        }
+                    }
+                    //std::cout << endangle << "\n";
+                    DrawCircleSector(center,30.0f,0.0f,aic.endangle,30,RED);
+                }else{
+                    if(aic.endangle != 0.0f){
+                        aic.endangle += aic.increase_angle;
+                    }
+                }
+            }
+        }
 }
 // Se dibuja el HUD
 void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy)
@@ -1192,26 +1250,6 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 }
             }
         }
-
-        //Alert state
-        if (e.hasTag<EnemyTag>() && !e.hasTag<CrusherTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>()) {
-            auto& aic = em.getComponent<AIComponent>(e);
-            if (aic.alert_state) {
-                auto& r = em.getComponent<RenderComponent>(e);
-                float barX = engine.getWorldToScreenX(r.position);
-                float barY = engine.getWorldToScreenY(r.position);
-                // Obtén las coordenadas del triángulo
-                Vector2 point1 = { barX, barY - 120.0f };
-                Vector2 point2 = { barX - 30.0f, barY - 50.0f };
-                Vector2 point3 = { barX + 30.0f, barY - 50.0f };
-
-                // Dibuja el triángulo
-                DrawTriangle(point1, point2, point3, BLACK);
-                // Dibuja el signo de exclamación dentro del triángulo
-                engine.drawText("!", static_cast<int>(barX - 2), static_cast<int>(barY - 100), 50, YELLOW);
-            }
-        }
-
 
         if (e.hasComponent<InteractiveComponent>() && (e.hasComponent<RenderComponent>() || e.hasComponent<PhysicsComponent>()))
         {
