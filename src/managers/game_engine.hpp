@@ -17,13 +17,6 @@ namespace ENGI {
         using u16 = std::uint16_t;
 
         GameEngine(u16 const width, u16 const height);
-        Texture2D texture_logo_two_wonders,
-            texture_logo_kaiwa_games,
-            texture_heart,
-            texture_mago_happy,
-            texture_mana,
-            texture_destellos,
-            texture_empty_heart;
 
         // Timing Related Functions
         void setTargetFPS(int fps);

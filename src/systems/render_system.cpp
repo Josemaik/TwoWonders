@@ -1627,7 +1627,7 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
             int currentX = barX + i * (barWidth + spacing);
 
             // Dibujamos el corazón
-            engine.drawTexture(engine.texture_heart, currentX, barY, SKYBLUE);
+            engine.drawTexture(engine.textures["heart"], currentX, barY, SKYBLUE);
         }
 }
 
