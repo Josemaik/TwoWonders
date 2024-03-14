@@ -51,10 +51,12 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
     engine.beginDrawing();
     engine.clearBackground(WHITE);
     // Logo del videojuego
-    engine.drawTexture(engine.texture_logo_two_wonders,
-        engine.getScreenWidth() / 2 - engine.texture_logo_two_wonders.width / 2,
-        static_cast<int>(engine.getScreenHeight() / 2.5 - engine.texture_logo_two_wonders.height / 2),
-        WHITE);
+    engine.textures["logo_twowonders"].width = static_cast<int>(engine.getScreenWidth() / 1.3);
+    engine.textures["logo_twowonders"].height = static_cast<int>(engine.getScreenHeight() / 1.5);
+    engine.drawTexture(engine.textures["logo_twowonders"],
+        engine.getScreenWidth() / 2 - engine.textures["logo_twowonders"].width / 2,
+        static_cast<int>(engine.getScreenHeight() / 2.0 - engine.textures["logo_twowonders"].height / 1.5),
+        { 255, 255, 255, 255 });
 
     // Datos de los botones
     float buttonWidth = 200.0f;
@@ -433,9 +435,11 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
 void RenderSystem::drawLogoKaiwa(ENGI::GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(Color({ 136, 219, 152, 255 }));
-    engine.drawTexture(engine.texture_logo_kaiwa_games,
-        engine.getScreenWidth() / 2 - engine.texture_logo_kaiwa_games.width / 2,
-        engine.getScreenHeight() / 2 - engine.texture_logo_kaiwa_games.height / 2,
+    engine.textures["logo_kaiwagames"].width = engine.getScreenWidth();
+    engine.textures["logo_kaiwagames"].height = static_cast<int>(engine.getScreenHeight() / 1.6);
+    engine.drawTexture(engine.textures["logo_kaiwagames"],
+        engine.getScreenWidth() / 2 - engine.textures["logo_kaiwagames"].width / 2,
+        engine.getScreenHeight() / 2 - engine.textures["logo_kaiwagames"].height / 2,
         WHITE);
     engine.endDrawing();
 }
@@ -1591,7 +1595,7 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
     // engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * (l.maxLife + plfi.armor) + 2, barHeight + 4, DARKGRAY);
 
     // Dibujamos cara del maguito
-    engine.drawTexture(engine.texture_mago_happy, 25, 20, { 255, 255, 255, 255 });
+    engine.drawTexture(engine.textures["mago_happy"], 25, 20, { 255, 255, 255, 255 });
 
     // Dibujamos cada parte de la barra de vida
     int i{};
@@ -1602,7 +1606,17 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
 
         // Dibujamos el corazón
         // engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
-        engine.drawTexture(engine.texture_heart, currentX, barY, { 255, 255, 255, 255 });
+        engine.drawTexture(engine.textures["heart"], currentX, barY, { 255, 255, 255, 255 });
+    }
+
+    for (; i < l.maxLife; ++i)
+    {
+        // Posición X de cada trozo
+        int currentX = barX + i * (barWidth + spacing);
+
+        // Dibujamos el corazón vacío
+        // engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
+        engine.drawTexture(engine.textures["empty_heart"], currentX, barY, { 255, 255, 255, 255 });
     }
 
     // Dibujamos la armadura
@@ -1640,7 +1654,7 @@ void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
     coinBarX = static_cast<int>((1.f - div) * static_cast<float>(engine.getScreenWidth()) + div * static_cast<float>(engine.getScreenWidth() - 153));
 
     // Barra para los destellos
-    engine.drawTexture(engine.texture_destellos, coinBarX, engine.getScreenHeight() - 130, { 255, 255, 255, 255 });
+    engine.drawTexture(engine.textures["destellos"], coinBarX, engine.getScreenHeight() - 130, { 255, 255, 255, 255 });
     std::string info_text = std::to_string(plfi.coins);
 
     coinNumberX = static_cast<int>((1.f - div) * (static_cast<float>(engine.getScreenWidth()) + 118) + div * static_cast<float>(engine.getScreenWidth() - 35));
@@ -1677,7 +1691,7 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
     int barY = 80;
 
     // Ponemos la textura de la barra de maná
-    engine.drawTexture(engine.texture_mana, barX, barY, { 255, 255, 255, 255 });
+    engine.drawTexture(engine.textures["mana"], barX, barY, { 255, 255, 255, 255 });
 
     int manaWidth = static_cast<int>(static_cast<float>(barWidth) * (static_cast<float>(plfi.mana) / static_cast<float>(plfi.max_mana)));
 

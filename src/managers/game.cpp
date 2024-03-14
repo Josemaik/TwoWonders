@@ -135,7 +135,7 @@ void Game::run()
         case GameScreen::LOGO:
         {
             // Contador para que pasen X segundos
-            currentTime += timeStep;
+            currentTime += timeStep60;
             if (currentTime > 4.0f) {
                 li.currentScreen = GameScreen::TITLE;
                 currentTime = 0;

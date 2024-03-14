@@ -80,7 +80,7 @@ struct LevelInfo
   std::vector<std::size_t> tutorialEnemies{};
 
   // Estado del juego
-  GameScreen currentScreen = GameScreen::GAMEPLAY;
+  GameScreen currentScreen = GameScreen::TITLE;
   GameScreen previousScreen = GameScreen::LOGO;
 
   void reset()

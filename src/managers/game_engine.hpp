@@ -3,6 +3,7 @@
 #define GAME_ENGINE
 #include <cstdint>
 #include <iostream>
+#include <map>
 #include "utils/types.hpp"
 #include "utils/vec3D.hpp"
 
@@ -16,7 +17,13 @@ namespace ENGI {
         using u16 = std::uint16_t;
 
         GameEngine(u16 const width, u16 const height);
-        Texture2D texture_logo_two_wonders, texture_logo_kaiwa_games, texture_heart, texture_mago_happy, texture_mana, texture_destellos;
+        Texture2D texture_logo_two_wonders,
+            texture_logo_kaiwa_games,
+            texture_heart,
+            texture_mago_happy,
+            texture_mana,
+            texture_destellos,
+            texture_empty_heart;
 
         // Timing Related Functions
         void setTargetFPS(int fps);
@@ -104,7 +111,9 @@ namespace ENGI {
         float getWorldToScreenX(vec3d pos);
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();
+        void loadAndResizeImage(const std::string& name, const std::string& path);
 
+        std::map<std::string, Texture2D> textures;
     private:
         u16 const width_{}, height_{};
         Camera3D camera{};

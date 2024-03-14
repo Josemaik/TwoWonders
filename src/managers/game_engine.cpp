@@ -8,40 +8,25 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     ENGI::GameEngine::setProjectionCamera(CAMERA_ORTHOGRAPHIC);
 
     // Logo Two Wonders
-    Image logo_two_wonders = ENGI::GameEngine::loadImage("assets/logo_two_wonders.png");
-    ENGI::GameEngine::imageResize(&logo_two_wonders, width_ - 20, static_cast<int>(height_ / 1.76));
-    texture_logo_two_wonders = ENGI::GameEngine::loadTextureFromImage(logo_two_wonders);
-    ENGI::GameEngine::unloadImage(logo_two_wonders);
+    loadAndResizeImage("logo_twowonders", "assets/logo_two_wonders.png");
 
     // Logo Kaiwa Games
-    Image logo_kaiwa_games = ENGI::GameEngine::loadImage("assets/logo_kaiwa_games.png");
-    ENGI::GameEngine::imageResize(&logo_kaiwa_games, width_, static_cast<int>(height_ / 2)); // 2.49
-    texture_logo_kaiwa_games = ENGI::GameEngine::loadTextureFromImage(logo_kaiwa_games);
-    ENGI::GameEngine::unloadImage(logo_kaiwa_games);
+    loadAndResizeImage("logo_kaiwagames", "assets/logo_kaiwa_games.png");
 
     // Corazones HUD
-    Image heart = ENGI::GameEngine::loadImage("assets/HUD/corazon.png");
-    ENGI::GameEngine::imageResize(&heart, 40, 35);
-    texture_heart = ENGI::GameEngine::loadTextureFromImage(heart);
-    ENGI::GameEngine::unloadImage(heart);
+    loadAndResizeImage("heart", "assets/HUD/corazon.png");
+
+    // Corazones vacíos HUD
+    loadAndResizeImage("empty_heart", "assets/HUD/corazon_vacio.png");
 
     // Mago Happy HUD
-    Image happy = ENGI::GameEngine::loadImage("assets/HUD/mago_happy.png");
-    ENGI::GameEngine::imageResize(&happy, 112, 97);
-    texture_mago_happy = ENGI::GameEngine::loadTextureFromImage(happy);
-    ENGI::GameEngine::unloadImage(happy);
+    loadAndResizeImage("mago_happy", "assets/HUD/mago_happy.png");
 
     // Barra de maná HUD
-    Image mana = ENGI::GameEngine::loadImage("assets/HUD/mana_bar.png");
-    ENGI::GameEngine::imageResize(&mana, 209, 20);
-    texture_mana = ENGI::GameEngine::loadTextureFromImage(mana);
-    ENGI::GameEngine::unloadImage(mana);
+    loadAndResizeImage("mana", "assets/HUD/mana_bar.png");
 
     // Destellos HUD
-    Image destellos = ENGI::GameEngine::loadImage("assets/HUD/destellos.png");
-    ENGI::GameEngine::imageResize(&destellos, 154, 58);
-    texture_destellos = ENGI::GameEngine::loadTextureFromImage(destellos);
-    ENGI::GameEngine::unloadImage(destellos);
+    loadAndResizeImage("destellos", "assets/HUD/destellos.png");
 
     SetExitKey(KEY_F8);
 }
@@ -367,4 +352,11 @@ RayCast ENGI::GameEngine::getMouseRay()
 {
     Ray r = GetMouseRay(GetMousePosition(), camera);
     return RayCast{ .origin = vec3d(r.position.x, r.position.y, r.position.z), .direction = vec3d(r.direction.x, r.direction.y, r.direction.z) };
+}
+
+void ENGI::GameEngine::loadAndResizeImage(const std::string& name, const std::string& path) {
+    Image image = ENGI::GameEngine::loadImage(path.c_str());
+    ENGI::GameEngine::imageResize(&image, static_cast<int>(image.width / 1.3), static_cast<int>(image.height / 1.3));
+    textures[name] = ENGI::GameEngine::loadTextureFromImage(image);
+    ENGI::GameEngine::unloadImage(image);
 }
