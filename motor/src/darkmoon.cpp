@@ -2,16 +2,20 @@
 
 DarkMoonEngine::DarkMoonEngine(){
     //Create scene
-    m_rootNode = CreateNode("Scene");
+    m_rootNode = std::make_unique<Node>();
+    m_rootNode->name = "Scene";
 
     // Create Default Light
-    auto nLight = CreateNode("Default Light");
+    auto nLight = CreateNode("Default Light", GetRootNode());
     auto eLight = std::make_unique<Light>();
     nLight->setEntity(std::move(eLight));
-    m_rootNode->addChild(std::move(nLight));
+    //m_rootNode->addChild(std::move(nLight));
 
     // Create Default Camera
-    auto eCamera = CreateCamera("Default Camera");
+    auto eCamera = CreateCamera("Default Camera", GetRootNode());
+    //auto eCamera = CreateCamera("Default Camera", GetRootNode());
+    //auto eCamera = nCamera->getEntity();
+
     // Assigns Camera to RenderManager
     UseCamera(eCamera);
 }
@@ -20,13 +24,51 @@ DarkMoonEngine::DarkMoonEngine(){
 // Node-related functions //
 // ---------------------- //
 
-// Create node in scene tree
-std::unique_ptr<Node> DarkMoonEngine::CreateNode(const char* nodeName){
+// Create node in parentNode
+Node* DarkMoonEngine::CreateNode(const char* nodeName, Node* parentNode){
     auto node = std::make_unique<Node>();
     node->name = nodeName;
+    auto p_node = node.get();
+    parentNode->addChild(std::move(node));
 
-    return node;
+    return p_node;
 }
+
+// Create rectangle in node
+Node* DarkMoonEngine::CreateRectangle(glm::vec2 position, glm::vec2 size, Color color, const char* nodeName, Node* parentNode){
+    auto p_nodeRec = CreateNode(nodeName, parentNode);
+
+    // Create Rectangle
+    auto rectangle = std::make_unique<Rectangle>(position, size, color);
+    p_nodeRec->translate({position.x, position.y, 0.0f});
+    p_nodeRec->setEntity(std::move(rectangle));
+
+    return p_nodeRec;
+}
+
+// Create triangle in node
+Node* DarkMoonEngine::CreateTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, Color color, const char* nodeName, Node* parentNode){
+    auto p_nodeTri = CreateNode(nodeName, parentNode);
+
+    // Create Triangle
+    auto triangle = std::make_unique<Triangle>(v1, v2, v3, color);
+    p_nodeTri->setEntity(std::move(triangle));
+
+    return p_nodeTri;
+}
+
+// Create camera in node
+Camera* DarkMoonEngine::CreateCamera(const char* nodeName, Node* parentNode){
+    auto p_nodeCam = CreateNode(nodeName, parentNode);
+
+    // Create camera
+    auto eCamera = std::make_unique<Camera>();
+    auto p_eCamera = eCamera.get();
+    p_nodeCam->setEntity(std::move(eCamera));
+
+    return p_eCamera;
+}
+
 
 // Get root node
 Node* DarkMoonEngine::GetRootNode(){
@@ -454,15 +496,15 @@ Shader* DarkMoonEngine::LoadShader(const char* vsFilePath, const char* fsFilePat
 // ------ //
 
 // Create camera
-Camera* DarkMoonEngine::CreateCamera(const char* name){
-    auto nCamera = CreateNode(name);
-    auto eCamera = std::make_unique<Camera>();
-    auto rawPtr = eCamera.get();
-    nCamera->setEntity(std::move(eCamera));
-    m_rootNode->addChild(std::move(nCamera));
-
-    return rawPtr;
-}
+//Camera* DarkMoonEngine::CreateCamera(const char* name){
+//    auto nCamera = CreateNode(name);
+//    auto eCamera = std::make_unique<Camera>();
+//    auto rawPtr = eCamera.get();
+//    nCamera->setEntity(std::move(eCamera));
+//    m_rootNode->addChild(std::move(nCamera));
+//
+//    return rawPtr;
+//}
 
 // Use camera
 void DarkMoonEngine::UseCamera(Camera* newCamera){

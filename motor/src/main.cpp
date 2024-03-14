@@ -1,27 +1,16 @@
 #include "darkmoon.hpp"
 
 Node* createHUD(DarkMoonEngine& engine){
-    // HUD
-    auto nodeHUD = engine.CreateNode("HUD");
-    auto p_nodeHUD = nodeHUD.get();
+    // Node HUD
+    auto p_nodeHUD = engine.CreateNode("HUD", engine.GetRootNode());
+    
+    // Node: Rectangulo Naranja Oscuro
+    engine.CreateRectangle({12.0f, 12.0f}, {200.0f, 40.0f}, ORANGE_DARK, "Rectangulo naranja oscuro", p_nodeHUD);
+    // Node: Rectangulo Naranja
+    engine.CreateRectangle({10.0f, 10.0f}, {200.0f, 40.0f}, ORANGE, "Rectangulo naranja", p_nodeHUD);
 
-    // Rectangulo Naranja Oscuro
-    auto nodeRec1  = engine.CreateNode("Rectangulo naranja oscuro");
-    auto rectangle = std::make_unique<Rectangle>(glm::vec2(12.0f, 12.0f), glm::vec2(200.0f, 40.0f), ORANGE_DARK);
-    auto p_nodeRec1 = nodeRec1.get();
-    p_nodeRec1->translate({12.0f, 12.0f, 0.0f});
-    nodeRec1->setEntity(std::move(rectangle));
-    nodeHUD->addChild(std::move(nodeRec1));
-
-    // Rectangulo Naranja
-    auto nodeRec2  = engine.CreateNode("Rectangulo naranja");
-    auto rectangle2 = std::make_unique<Rectangle>(glm::vec2(10.0f, 10.0f), glm::vec2(200.0f, 40.0f), ORANGE);
-    auto p_nodeRec2 = nodeRec2.get();
-    p_nodeRec2->translate({10.0f, 10.0f, 0.0f});
-    nodeRec2->setEntity(std::move(rectangle2));
-    nodeHUD->addChild(std::move(nodeRec2));
-
-    engine.GetRootNode()->addChild(std::move(nodeHUD));
+    // Node: Triangulo Verde
+    engine.CreateTriangle({10.0f, 54.0f}, {10.0f, 590.0f}, {210.0f, 590.0f}, KAIWA, "Triangulo verde", p_nodeHUD);
 
     return p_nodeHUD;
 }
@@ -51,6 +40,11 @@ int main(){
                 p_nodeHUD->translate({  0.0f,  1.0f, 0.0f});
             if(engine.IsKeyPressed(KEY_W))
                 p_nodeHUD->translate({  0.0f, -1.0f, 0.0f});
+
+            if(engine.IsKeyPressed(GLFW_KEY_LEFT_SHIFT))
+                p_nodeHUD->scale({ 0.95f, 0.95f, 1.0f });
+            if(engine.IsKeyPressed(KEY_SPACE))
+                p_nodeHUD->scale({ 1.05f, 1.05f, 1.0f });
 
             engine.BeginDrawing();
 
