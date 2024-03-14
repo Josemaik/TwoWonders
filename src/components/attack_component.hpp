@@ -1,4 +1,6 @@
 #pragma once
+#include <cstdint>
+
 
 enum AttackType
 {
@@ -21,7 +23,7 @@ enum AttackType
 struct AttackComponent
 {
     AttackType type{ AttackType::Ranged };
-    u_int16_t damage{};
+    uint16_t damage{};
     float range{}; // en segundos
     double scale_to_respawn_attack{ 2.0 };
     float countdown{ 1.0f }, elapsed{ 1.0f }, countdown_air_attk{ 0.2f }, elapsed_air_attk{ 1.0f },

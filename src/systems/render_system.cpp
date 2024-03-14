@@ -1,5 +1,6 @@
 #include "render_system.hpp"
 #include <iomanip>
+//#define RAYGUI_IMPLEMENTATION
 #include "../../libs/raygui.h"
 
 void RenderSystem::init()
@@ -607,7 +608,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     in = true;
                 }
 
-                float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / M_PI));
+                float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / K_PI));
                 engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
 
                 if (!in)
@@ -738,7 +739,7 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
     }
     else if (e.hasTag<BarricadeTag>())
     {
-        r.model = engine.loadModel("assets/models/Barricada.obj");
+        r.model = engine.loadModel("assets/models/Barricada_arboles.obj");
 
         loadShaders(r.model);
     }
@@ -1249,7 +1250,6 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 }
             }
         }
-
 
         if (e.hasComponent<InteractiveComponent>() && (e.hasComponent<RenderComponent>() || e.hasComponent<PhysicsComponent>()))
         {

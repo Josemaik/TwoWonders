@@ -122,7 +122,7 @@ void CollisionSystem::checkRampCollision(EntityManager& em, std::vector<Entity*>
 
                 // baseheight provisionalmente a 0
                 double baseHeight = 0.0;
-                double newHeight;
+                double newHeight{};
 
                 switch (ramp.type)
                 {

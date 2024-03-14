@@ -116,7 +116,7 @@ void Game::run()
     auto& txti = em.getSingleton<TextInfo>();
 
     // Inicializa una variable donde tener el tiempo entre frames
-    float deltaTime{}, currentTime{}, elapsed{};
+    float currentTime{}, elapsed{};
 
     createSound(em);
     li.sound_system = &sound_system;
@@ -124,8 +124,7 @@ void Game::run()
 
     while (!li.gameShouldEnd)
     {
-        deltaTime = engine.getFrameTime();
-        elapsed += deltaTime;
+        elapsed += engine.getFrameTime();
 
         switch (li.currentScreen)
         {

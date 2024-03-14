@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../utils/fmod/fmod_studio.h" // C
-#include "../utils/fmod/fmod_studio.hpp" // C ++
-#include "../utils/fmod/fmod.hpp" // low - level api
+#include "../utils/fmod/fmod.h"
+#include "../utils/fmod/fmod_studio.h"
 #include "../utils/fmod/fmod_errors.h"
+#include "../utils/fmod/fmod_studio_common.h"
 #include <string>
 #include <iostream>
 
@@ -11,7 +11,7 @@ struct SoundSystem {
 
     SoundSystem();
 
-    void initBanks(std::string const& master_bank_location, std::string const& master_string_location, std::string const& ui_bank_location, std::string const& music_bank_location);
+    void initBanks(const char* master_bank_location, const char* master_string_location, const char* ui_bank_location, const char* music_bank_location);
     void createEventInstance();
     void playMusicMenu();
     void seleccion_menu();
@@ -28,23 +28,20 @@ struct SoundSystem {
     bool music_started{ false };
 
 private:
-    FMOD::System* coreSystem;
-    FMOD::Studio::System* soundSystem;
-    FMOD::Studio::Bank* master_bank;
-    FMOD::Studio::Bank* strings_bank;
-    FMOD::Studio::Bank* ui_bank;
-    FMOD::Studio::Bank* music_bank;
+    FMOD_SYSTEM* coreSystem;
+    FMOD_STUDIO_SYSTEM* soundSystem;
+    FMOD_STUDIO_BANK* master_bank;
+    FMOD_STUDIO_BANK* strings_bank;
+    FMOD_STUDIO_BANK* ui_bank;
+    FMOD_STUDIO_BANK* music_bank;
     FMOD_STUDIO_LOADING_STATE loadingState{};
-    FMOD::Studio::EventDescription* eventDescription;
-    FMOD::Studio::EventDescription* eventDescription_Ambiente;
-    FMOD::Studio::EventDescription* eventDescription_Musica;
-    FMOD::Studio::EventInstance* eventInstance;
-    FMOD::Studio::EventInstance* eventInstance_Ambiente;
-    FMOD::Studio::EventInstance* eventInstance_Musica;
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription;
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Ambiente;
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica;
     FMOD_RESULT res;
     float* volume;
     float* finalvolume;
-
-
-
 };

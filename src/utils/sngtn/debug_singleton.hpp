@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-// #include <utils/path.hpp>
+// #include "../path.hpp"
 // #include "ai_component.hpp"
 
 struct Debug_t {

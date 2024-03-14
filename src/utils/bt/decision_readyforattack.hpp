@@ -27,7 +27,7 @@ struct BTDecisionReadyforAttack : BTNode_t{
             // if(!ectx.phy.orientated_to_player){
             //     vec3d direction = plphy.position - ectx.phy.position;
             //     auto target_orientation = atan2(direction.z(), direction.x());
-            //     if (target_orientation < 0) target_orientation += 2 * PI;
+            //     if (target_orientation < 0) target_orientation += 2 * K_PI;
             //     adjustAnglePiMinusPi(target_orientation);
             //     ectx.phy.orientation = target_orientation;
             //     double angle_difference = std::abs(ectx.phy.orientation - target_orientation);

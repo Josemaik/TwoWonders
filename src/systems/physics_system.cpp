@@ -92,8 +92,8 @@ void PhysicsSystem::update(EntityManager& em, float dt)
 
         // }else{ //Enemigo tiene aceleracion lineal y velocidad angular
         //     phy.orientation += dt * vel_a;
-        //     if(phy.orientation > 2*PI) phy.orientation -= 2*PI;
-        //     if(phy.orientation < 0   ) phy.orientation += 2*PI;
+        //     if(phy.orientation > 2*K_PI) phy.orientation -= 2*K_PI;
+        //     if(phy.orientation < 0   ) phy.orientation += 2*K_PI;
 
         //     vel.setX(vel_l * std::cos(phy.orientation) );
         //     vel.setZ(vel_l * std::sin(phy.orientation) );

@@ -1,6 +1,5 @@
 #pragma once 
-#ifndef LIFE_SYSTEM
-#define LIFE_SYSTEM
+
 #include <set>
 #include <functional>
 #include "../utils/types.hpp"
@@ -17,5 +16,3 @@ struct LifeSystem
 private:
     void createObject(EntityManager& em, ObjectSystem& os, vec3d pos);
 };
-
-#endif // !LIFE_SYSTEM
