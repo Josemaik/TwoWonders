@@ -87,13 +87,21 @@
 							"rotVector":[0.0, 0.0, 0.0]
 						}
 					],
-					"Ramps":[],
+					"Ramps":[
+						{
+							"min":[18.266, 10.653, 11.0],
+							"max":[27.267, 22.653, 11.0],
+							"offset":[-27.267, 0, 11.0],
+							"slope":-0.94,
+							"type":0
+						}
+					],
 					"Interactive":[
 						{
 							"type":5,
 							"offsetZ":[8.542438507080078],
-							"position":[-15.356, 30.648, 20.742],
-							"scale":[25.101, 25.101, 1.0],
+							"position":[-15.356, 28.648, 25.742],
+							"scale":[25.101, 25.101, 4.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 1.0]
 						}
@@ -256,50 +264,42 @@
 							"rotVector":[0.0, 0.0, 0.0]
 						}
 					],
-					"Ramps":[
-					],
-					"jajaRamps": [
+					"Ramps": [
 						{
-							"min":[-35.333, -59.539, 1.808],
-							"max":[-35.333, -59.539, 1.808],
-							"offset":["no lo entiendo, sorry"],
-							"slope":["no lo entiendo, sorry"]
+							"min":[-35.733, -59.348, 2.0],
+							"max":[-20.733, -50.347, 2.0],
+							"offset":[0, 59.348, 2.0],
+							"slope": 0.94,
+							"type": 0
 						}
 					],
 					"Interactive":[
 						{
 							"type":1,
-							"offsetZ":[7.834025681018829],
+							"offsetZ":[3.544463634490967],
 							"position":[-28.264, -136.503, 7.0],
 							"scale":[7.101, 6.494, 10.0],
-							"rotation": 90.0,
+							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0],
-							"zone": 3,
-							"content": 19,
+							"zone": 4,
+							"content": 8,
 							"id": 0,
-							"visible": false,
 							"message": [
-								"¡Encontraste un bastón mágico!", 
-								"Pero no conoces ningún hechizo...",
-								"...aún así podría servir como palo azotador."
+								"¡Encontraste una poción de vitalidad superior!", 
+								"Ahora te sientes mucho más vigoroso que antes."
 							]
 						},
 						{
 							"type":1,
-							"offsetZ":[7.834025681018829],
-							"position":[-4.443, -136.347, 7.0],
+							"offsetZ":[3.544463634490967],
+							"position":[-2.443, -133.347, 7.0],
 							"scale":[7.101, 6.494, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 0.0],
-							"zone": 3,
-							"content": 19,
-							"id": 0,
-							"visible": false,
-							"message": [
-								"¡Encontraste un bastón mágico!", 
-								"Pero no conoces ningún hechizo...",
-								"...aún así podría servir como palo azotador."
-							]
+							"zone": 4,
+							"content": 6,
+							"id": 1,
+							"message": ["¡Encontraste 30 destellos!"]
 						}
 					]
 				}
@@ -443,14 +443,12 @@
 						}
 					],
 					"Ramps":[
-		
-					],
-					"jajaRamps":[
 						{
-							"min":[78.867, 3.461, 1.808],
-							"max":[78.867, 3.461, 1.808],
-							"offset":["no lo entiendo, sorry"],
-							"slope":["no lo entiendo, sorry"]
+							"min":[78.267, 3.653, 2.0],
+							"max":[93.267, 12.654, 2.0],
+							"offset":[0, -3.653, 2.0],
+							"slope": 0.94,
+							"type": 0 
 						}
 					],
 					"Interactive":[
@@ -460,31 +458,30 @@
 							"position":[55.767, 30.653, 16.593],
 							"scale":[3.0, 13.0, 20.0],
 							"rotation": 90.0,
-							"rotVector":[0.0, 0.0, 0.0]
+							"rotVector":[0.0, 0.0, 0.0],
+							"noKey": true
 						},
 						{
 							"type":1,
 							"offsetZ":[3.5444633960723877],
 							"position":[107.057, 5.331, 7.0],
 							"scale":[7.101, 6.494, 10.0],
-							"rotation": 90.0,
+							"rotation": 180.0,
 							"rotVector":[0.0, 0.0, 0.0],
-							"zone": 3,
-							"content": 19,
-							"id": 0,
-							"visible": false,
+							"zone": 10,
+							"content": 10,
+							"id": 2,
 							"message": [
-								"¡Encontraste un bastón mágico!", 
-								"Pero no conoces ningún hechizo...",
-								"...aún así podría servir como palo azotador."
+								"¡Encontraste una llave!", 
+								"Parece que es de un solo uso..."
 							]
 						},
 						{
 							"type":3,
 							"offsetZ":[-4.036504745483398],
 							"position":[85.767, 14.153, 16.593],
-							"scale":[3.0, 13.0, 20.0],
-							"rotation": 90.0,
+							"scale":[13.0, 3.0, 20.0],
+							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 1.0]
 						}
 					]
@@ -611,7 +608,7 @@
 							"rotVector":[0.0, 0.0, -1.0]
 						},
 						{
-							"position":[202.767, 30.653, 6.5],
+							"position":[185.767, 30.653, 6.5],
 							"scale":[36.0, 66.0, 9.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, -1.0]
@@ -746,13 +743,12 @@
 						}
 					],
 					"Ramps":[
-					],
-					"jajaRamps":[
 						{
-							"min":[227.167, -26.539, 1.808],
-							"max":[227.167, -26.539, 1.808],
-							"offset":["no lo entiendo, sorry"],
-							"slope":["no lo entiendo, sorry"]
+							"min":[227.767, -26.347, 2.0],
+							"max":[240.767, -17.346, 2.0],
+							"offset":[0, 26.347, 2.0],
+							"slope": 0.94,
+							"type": 0
 						}
 					],
 					"Interactive":[
@@ -760,8 +756,8 @@
 							"type":3,
 							"offsetZ":[-4.036502838134766],
 							"position":[234.267, -15.847, 16.593],
-							"scale":[3.0, 13.0, 20.0],
-							"rotation": 90.0,
+							"scale":[13.0, 3.0, 20.0],
+							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, -1.0]
 						},
 						{
@@ -769,17 +765,24 @@
 							"offsetZ":[3.472766876220703],
 							"position":[242.837, 39.577, 16.0],
 							"scale":[7.101, 6.494, 10.0],
-							"rotation": 90.0,
+							"rotation": 180.0,
 							"rotVector":[0.0, 0.0, 0.0],
-							"zone": 3,
-							"content": 19,
-							"id": 0,
-							"visible": false,
+							"zone": 19,
+							"content": 10,
+							"id": 4,
 							"message": [
-								"¡Encontraste un bastón mágico!", 
-								"Pero no conoces ningún hechizo...",
-								"...aún así podría servir como palo azotador."
+								"¡Encontraste una llave!", 
+								"Parece que es de un solo uso..."
 							]
+						},
+						{
+							"type": 6,
+							"position": [87.0, 44.0, 13.0],
+							"scale": [2.0, 2.0, 6.0],
+							"rotation": 0.0,
+							"rotVector": [0.0, 0.0, 0.0],
+							"zone": 9,
+							"id": 3
 						}
 					]
 				}
@@ -882,46 +885,34 @@
 					"Ramps":[],
 					"Interactive":[
 						{
-							"type":3,
+							"type":2,
 							"offsetZ":[-3.126291275024414],
 							"position":[234.267, -84.847, 8.0],
-							"scale":[3.0, 13.0, 20.0],
-							"rotation": 90.0,
-							"rotVector":[0.0, 0.0, -1.0]
+							"scale":[13.0, 3.0, 20.0],
+							"rotation": 0.0,
+							"rotVector":[0.0, 0.0, -1.0],
+							"life": 3,
+							"weaknesses": [2]
 						},
 						{
 							"type":1,
 							"offsetZ":[3.5444633960723877],
 							"position":[235.773, -135.229, 7.0],
 							"scale":[7.101, 6.494, 10.0],
-							"rotation": 90.0,
+							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0],
-							"zone": 3,
-							"content": 19,
-							"id": 0,
-							"visible": false,
-							"message": [
-								"¡Encontraste un bastón mágico!", 
-								"Pero no conoces ningún hechizo...",
-								"...aún así podría servir como palo azotador."
-							]
+							"zone": 22,
+							"content": 6,
+							"id": 1,
+							"message": ["¡Encontraste 30 destellos!"]
 						},
 						{
-							"type":1,
-							"offsetZ":[7.834025681018829],
-							"position":[173.213, -100.562, 7.0],
-							"scale":[7.101, 6.494, 10.0],
-							"rotation": 90.0,
-							"rotVector":[0.0, 0.0, 0.0],
-							"zone": 3,
-							"content": 19,
-							"id": 0,
-							"visible": false,
-							"message": [
-								"¡Encontraste un bastón mágico!", 
-								"Pero no conoces ningún hechizo...",
-								"...aún así podría servir como palo azotador."
-							]
+							"type":5,
+							"offsetZ":[8.0],
+							"position":[169.213, -115.562, 7.0],
+							"scale":[25.101, 25.101, 4.0],
+							"rotation": 0.0,
+							"rotVector":[0.0, 0.0, 0.0]
 						}
 					],
 					"commentaries":

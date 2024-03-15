@@ -34,7 +34,8 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
 
 mapType MapManager::loadMap(const std::string& mapFile)
 {
-    fileMap = mapFile;
+    if (fileMap != mapFile)
+        fileMap = mapFile;
     std::ifstream file(mapFile);
     rapidjson::IStreamWrapper isw(file);
     rapidjson::Document map;
@@ -144,10 +145,10 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
         // Extraemos los datos del json
         const rapidjson::Value& ground = groundArray[i];
         vec3d groundPosition{ ground["position"][1].GetDouble(), ground["position"][2].GetDouble(), ground["position"][0].GetDouble() };
-        vec3d groundScale{ ground["scale"][0].GetDouble(), ground["scale"][2].GetDouble(), ground["scale"][1].GetDouble() };
-        vec3d rotationVec{ ground["rotVector"][0].GetDouble(), ground["rotVector"][2].GetDouble(), ground["rotVector"][1].GetDouble() };
+        vec3d groundScale{ ground["scale"][1].GetDouble(), ground["scale"][2].GetDouble(), ground["scale"][0].GetDouble() };
+        vec3d rotationVec{ ground["rotVector"][1].GetDouble(), ground["rotVector"][2].GetDouble(), ground["rotVector"][0].GetDouble() };
         double orientation{ ground["rotation"].GetDouble() };
-        double rot = (orientation + 90.0) * DEGTORAD;
+        double rot = orientation * DEGTORAD;
         Color color{ WHITE };
 
         // Sacamos los máximos y los mínimos
@@ -206,7 +207,8 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
         em.addComponent<ZoneComponent>(zoneEntity, ZoneComponent{ .zone = static_cast<uint16_t>(j) });
         auto& rz = em.addComponent<RenderComponent>(zoneEntity, RenderComponent{ .position = zonePosition, .scale = zoneScale, .visible = false });
         auto& pz = em.addComponent<PhysicsComponent>(zoneEntity, PhysicsComponent{ .position = rz.position, .velocity = vec3d::zero(), .scale = rz.scale, .gravity = .0 });
-        em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ pz.position, rz.scale, BehaviorType::ZONE });
+        auto& cz = em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ pz.position, rz.scale, BehaviorType::ZONE });
+        zoneBounds.insert({ j, cz.boundingBox });
         k += 1;
     }
 }
@@ -243,20 +245,22 @@ void MapManager::generateRamps(EntityManager& em, const rapidjson::Value& rampAr
 
         // Extraemos los datos del json
         const rapidjson::Value& ramp = rampArray[i];
-        vec3d position{ ramp["position"][0].GetDouble(), ramp["position"][2].GetDouble(), ramp["position"][1].GetDouble() };
-        vec3d scale{ ramp["scale"][0].GetDouble(), ramp["scale"][2].GetDouble(), ramp["scale"][1].GetDouble() };
-        Color color{ BEIGE };
-        float orientation{ ramp["rotation"].GetFloat() };
-        vec3d rotationVec{ ramp["rotVector"][0].GetDouble(), ramp["rotVector"][2].GetDouble(), ramp["rotVector"][1].GetDouble() };
-        vec2d min{ ramp["min"][0].GetDouble(), ramp["min"][1].GetDouble() };
-        vec2d max{ ramp["max"][0].GetDouble(), ramp["max"][1].GetDouble() };
+        vec2d min{ ramp["min"][1].GetDouble(), ramp["min"][0].GetDouble() };
+        vec2d max{ ramp["max"][1].GetDouble(), ramp["max"][0].GetDouble() };
+        vec3d offset{ ramp["offset"][1].GetDouble(), ramp["offset"][2].GetDouble(), ramp["offset"][0].GetDouble() };
         double slope{ ramp["slope"].GetDouble() };
-        vec3d offset{ ramp["offset"][0].GetDouble(), ramp["offset"][1].GetDouble(), ramp["offset"][2].GetDouble() };
         RampType type{ static_cast<RampType>(ramp["type"].GetUint()) };
 
+        // Creamos las dimensiones de la rampa y su posición
+        vec3d rmin = { min.x, offset.y() - 20, min.y };
+        vec3d rmax = { max.x, offset.y() + 20, max.y };
+
+        vec3d rampPos = (rmin + rmax) / 2;
+        vec3d rampSize = rmax - rmin;
+
         // Creamos los componentes
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
-        em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = rotationVec });
+        em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = rampPos, .scale = rampSize, .gravity = 0 });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ rampPos, rampSize, BehaviorType::RAMP });
         em.addComponent<RampComponent>(entity, RampComponent{ .min = min, .max = max, .slope = slope, .offset = offset, .type = type });
     }
 }
@@ -339,7 +343,8 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
                 messages.emplace(interactable["message"][j].GetString());
             }
 
-            [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .id = interId, .zone = zone, .dropPosition = { vec3d::zero() }, .content = content, .messages = messages });
+            em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = interId, .zone = zone });
+            [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .dropPosition = { vec3d::zero() }, .content = content, .messages = messages });
 
             if (interactable.HasMember("offsetZ"))
             {
@@ -354,7 +359,6 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
                     dc.eventCodes.push_back(interactable["events"][j].GetInt());
                 }
             }
-
             break;
         }
         case InteractableType::Destructible:
@@ -381,10 +385,22 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         }
         case InteractableType::Door:
         {
+            auto& li = em.getSingleton<LevelInfo>();
+
+            switch (li.mapID)
+            {
+            case 0:
+            {
+                em.addTag<SeparateModelTag>(entity);
+                r.position = vec3d::zero();
+                break;
+            }
+            }
             em.addTag<DoorTag>(entity);
             em.addTag<WallTag>(entity);
-            em.addTag<SeparateModelTag>(entity);
-            r.position = vec3d::zero();
+            if (interactable.HasMember("noKey"))
+                em.addTag<NoKeyTag>(entity);
+
             break;
         }
         case InteractableType::Level:
@@ -404,7 +420,18 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
             }
             break;
         }
+        case InteractableType::Lever:
+        {
+            em.addTag<WallTag>(entity);
+            em.addTag<LeverTag>(entity);
+            uint16_t zone = static_cast<uint16_t>(interactable["zone"].GetUint());
+            uint8_t interId = static_cast<uint8_t>(interactable["id"].GetUint());
+
+            em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = interId, .zone = zone });
+            break;
         }
+        }
+        addToZone(em, c.boundingBox, type);
     }
 }
 
@@ -415,13 +442,13 @@ void MapManager::destroyMap(EntityManager& em)
     for (auto e : em.getEntities())
     {
         if (e.getID() != li.playerID)
-            li.dead_entities.insert(e.getID());
+            li.insertDeath(e.getID());
     }
 }
 
 void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
 {
-    using TAGs = MP::TypeList <EnemyTag, DestructibleTag>;
+    using TAGs = MP::TypeList <EnemyTag>;
     destroyParts<TAGs>(em);
 
     mapType map = loadMap(fileMap);
@@ -444,6 +471,14 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
 
     //     generateDestructibles(em, destructibleArray);
     // }
+}
+
+void MapManager::addToZone(EntityManager& em, BBox& b, InteractableType type)
+{
+    auto& zchi = em.getSingleton<ZoneCheckInfo>();
+    for (auto [num, bbox] : zoneBounds)
+        if (bbox.intersects(b))
+            zchi.insertZone(num, type);
 }
 
 // template<>
@@ -531,7 +566,10 @@ void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man&)
 {
     destroyMap(em);
     auto& li = em.getSingleton<LevelInfo>();
+    auto& zchi = em.getSingleton<ZoneCheckInfo>();
+
     li.mapID = mapID;
     li.levelChanged = true;
+    zchi.clearSets();
     // createMap(em, mapID, iam);
 }

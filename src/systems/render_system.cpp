@@ -599,7 +599,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 }
                 else if (e.hasTag<ChestTag>())
                 {
-                    pos.setY(pos.y() - r.offset / 2);
+                    pos.setY(pos.y() - r.offset);
                     in = true;
                 }
                 else if (e.hasTag<DestructibleTag>())
@@ -609,13 +609,16 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 }
                 else if (e.hasTag<SpawnTag>())
                 {
-                    pos.setY(pos.y() - r.offset / 2.2);
+                    pos.setY(pos.y() - r.offset);
                     in = true;
                 }
                 else if (e.hasTag<GroundTag>() || e.hasTag<DoorTag>())
                 {
                     in = true;
                 }
+
+                if (r.rotationVec == vec3d::zero())
+                    r.rotationVec = { 0.0, -1.0, 0.0 };
 
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / K_PI));
                 engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
@@ -797,12 +800,30 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, EntityManager
     }
     else if (e.hasTag<DestructibleTag>())
     {
-        r.model = engine.loadModel("assets/models/Troncos.obj");
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/models/Troncos.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/models/Puerta_prision_agua.obj");
+            break;
+        }
         loadShaders(r.model);
     }
     else if (e.hasTag<DoorTag>())
     {
-        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/Barricada_cambio_lvl.obj");
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/Barricada_cambio_lvl.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/models/Puerta_prision_base.obj");
+            break;
+        }
 
         loadShaders(r.model);
     }
@@ -1090,12 +1111,12 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
 void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy)
 {
     auto& li = em.getSingleton<LevelInfo>();
-    auto* playerEn = em.getEntityByID(li.playerID);
-    if (not playerEn) {
+    if (li.isDead)
+    {
+        em.getComponent<RenderComponent>(*em.getEntityByID(li.playerID)).visible = false;
         drawDeath(engine);
         return;
     }
-    else if (!playerEn->hasTag<PlayerTag>()) { drawDeath(engine); return; }
 
     if (debugphy)
         pointedEntity = std::numeric_limits<std::size_t>::max();
@@ -1398,6 +1419,17 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 RED);
         }
 
+        if (debugphy && e.hasComponent<RampComponent>() && e.hasComponent<PhysicsComponent>())
+        {
+            // Dibujamos el rectángulo de la rampa
+            auto& phy = em.getComponent<PhysicsComponent>(e);
+
+            // La rampa solo tiene vec2d mínimos y máximos, vamos a dibujar el rectángulo que los une
+            engine.beginMode3D();
+            engine.drawCubeWires(phy.position, static_cast<float>(phy.scale.x()), static_cast<float>(phy.scale.y()), static_cast<float>(phy.scale.z()), RED);
+            engine.endMode3D();
+        }
+
         if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
         {
             auto& col{ em.getComponent<ColliderComponent>(e) };
@@ -1406,13 +1438,17 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             vec3d boxPosition = (col.boundingBox.min + col.boundingBox.max) / 2;
             vec3d boxSize = col.boundingBox.max - col.boundingBox.min;
 
+            Color color = BLUE;
+            if (col.behaviorType & BehaviorType::ZONE)
+                color = GREEN;
+
             // Dibujar la bounding box
             engine.beginMode3D();
             engine.drawCubeWires(boxPosition,
                 static_cast<float>(boxSize.x()),
                 static_cast<float>(boxSize.y()),
                 static_cast<float>(boxSize.z()),
-                BLUE);
+                color);
             engine.endMode3D();
 
             auto& phy = em.getComponent<PhysicsComponent>(e);
@@ -1501,7 +1537,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         // }
 
         // Dibujar el ID de las entidades // DEBUG
-        if (debugphy)
+        if (debugphy && e.hasComponent<RenderComponent>())
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
             engine.drawText(std::to_string(e.getID()).c_str(),

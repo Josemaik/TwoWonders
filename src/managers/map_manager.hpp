@@ -2,6 +2,7 @@
 #ifndef MAP_MANAGER
 #define MAP_MANAGER
 
+#include <map>
 #include "../utils/types.hpp"
 #include "ia_manager.hpp"
 
@@ -34,6 +35,10 @@ private:
     void generateObjects(EntityManager& em, const rapidjson::Value& objectArray, uint8_t mapID);
     void generateEnemies(EntityManager& em, const rapidjson::Value& enemyArray, Ia_man& iam);
     void generateInteractables(EntityManager& em, const rapidjson::Value& interactableArray);
+    void addToZone(EntityManager& em, BBox& b, InteractableType type);
+
+    std::string fileMap{};
+    std::map<uint8_t, BBox> zoneBounds{};
 
     template <typename... Tags>
     void destroyParts(EntityManager& em)
@@ -41,18 +46,13 @@ private:
         using CMPS = MP::TypeList<>;
         auto& li = em.getSingleton<LevelInfo>();
 
-        (em.forEachAny<CMPS, Tags>([&](Entity& entity) { li.dead_entities.insert(entity.getID()); }), ...);
+        (em.forEachAny<CMPS, Tags>([&](Entity& entity) { li.insertDeath(entity.getID()); }), ...);
     }
 
     template <typename Tag>
     inline void resetTag(EntityManager&) {}
     template <typename Tag>
     inline void resetTag(EntityManager& em, Ia_man& iam) {}
-
-
-
-    vec3d groundPos{};
-    std::string fileMap{};
 };
 
 #endif // !MAP_MANAGER

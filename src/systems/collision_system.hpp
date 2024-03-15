@@ -56,7 +56,7 @@ struct CollisionSystem
     void setEventManager(EventManager& evm) { this->evm = &evm; }
 private:
     void checkCollision(EntityManager& em, Octree& boxes, pairsType& checkedPairs);
-    void checkRampCollision(EntityManager& em, std::vector<Entity*>& entities);
+    void handleRampCollision(EntityManager& em);
     void enemyCollision(EntityManager& em, Entity& damagedEntity);
     void staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3d& minOverlap);
     void nonStaticCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3d& minOverlap);
@@ -76,7 +76,8 @@ private:
 
     Octree octree;
     pairsType checkedPairs{};
-    std::vector<RampComponent*> ramps{};
+    pairsType checkedPairsRamp{};
+    std::vector<PhysicsComponent*> previousEntsOnRamp{};
     EventManager* evm{ nullptr };
     // void checkBorderCollision(EntityManager& em, Octree& boxes);
 };
