@@ -10,4 +10,5 @@ struct Debug_t {
     double elapsed{1.0},countdown{2.0};
     void plusdeltatime(double deltaTime, double& elapsed) { elapsed += deltaTime; };
     const char *text{};
+    std::vector<vec3d> path{};
 };

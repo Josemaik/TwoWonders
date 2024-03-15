@@ -68,6 +68,16 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         return;
     }
 
+    if (ge.isKeyReleased(KEY_F4))
+    {
+        inpi.pathfind = !inpi.pathfind;
+        inpi.debugPhy = false;
+        inpi.debugAI1 = false;
+        inpi.debugAI2 = false;
+        inpi.pause = false;
+        return;
+    }
+
     // Sacamos las físicas y el input del jugador
     auto& phy = em.getComponent<PhysicsComponent>(player);
     if (phy.stopped)

@@ -105,21 +105,21 @@ std::vector<vec3d> Graph::PathFindAStar(uint16_t startNode, uint16_t goalNode){
                         continue;
                     }
                     endNodeHeuristic = Heuristic(endNode,goalNode);
-                    } else{
+            } else{
                         NodeRecord endNodeRecordcopy(0,Conection(0,0,0),0.0,0.0);
                         endNodeRecord = endNodeRecordcopy;
                         endNodeRecord.node = endNode;
                         endNodeHeuristic = Heuristic(endNode,goalNode);
-                    }
+            }
             
-                    //update node
-                    endNodeRecord.costSoFar = endNodeCost;
-                    endNodeRecord.connection = connection;
-                    endNodeRecord.estimatedTotalCost = endNodeCost + endNodeHeuristic;
-                    //add to the open list
-                    if(!findRecord_b(open,endNode)){
-                        open.push_back(endNodeRecord);
-                    }
+            //update node
+            endNodeRecord.costSoFar = endNodeCost;
+            endNodeRecord.connection = connection;
+            endNodeRecord.estimatedTotalCost = endNodeCost + endNodeHeuristic;
+            //add to the open list
+            if(!findRecord_b(open,endNode)){
+                open.push_back(endNodeRecord);
+            }
         }
         //Terminamos de buscar conexiones
         //eliminamos de la open list y añadimos a la closed

@@ -806,6 +806,10 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
     // Visual Debug AI
     else if (inpi.debugAI2)
         drawDebuggerInGameIA(engine, em, dt);
+        
+    else if (inpi.pathfind)
+        drawTestPathfindinf(engine,em);
+
     engine.endDrawing();
 }
 
@@ -821,6 +825,48 @@ double SelectValue(ENGI::GameEngine& engine, double value, float posx, float pos
     return static_cast<double>(floatvalue);
 }
 
+//Interfaz para probar el pathfinding
+void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& em){
+    auto& debug = em.getSingleton<Debug_t>();
+    //Dibujado de titulo y ventana
+    Rectangle windowRect = { 470, 300, 330, 430 };
+    engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
+    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
+    Vector2 textPositionInfo = { 480, 320 };
+    engine.drawTextEx(GetFontDefault(), "PATHFINDING", textPositionInfo, 20, 1, RED);
+
+    // Datos de los botones
+    float buttonWidth = 200.0f;
+    float buttonHeight = 50.0f;
+    float posX = 540.0f;
+    float posY = 350.0f;
+
+    // Funcionalidad de botones
+    Rectangle btn1Rec = { posX, posY, buttonWidth, buttonHeight }; 
+    // Botón
+    if(GuiButton(btn1Rec, "CALCULATE")){
+        //Creamos 
+        //Lammamos a creargrafo
+        //Graph graph{};
+        //graph.createGraph();
+        //Calcular pathfinding
+        //std::vector<vec3d> path = graph.PathFindAStar();
+        // Copiar el path devuelto por PathFindAStar() a debug.path
+        //debug.path = path;
+        // debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
+        // std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
+    }
+    // resultado
+    Vector2 textPositionInfo2 = { 480, 400 };
+    engine.drawTextEx(GetFontDefault(), "PATH RESULT", textPositionInfo2, 20, 1, RED);
+    //Dibujar path
+    float posyt = 440.0f; 
+    for(auto pos : debug.path){  
+        std::string text = std::to_string(pos.x()) + " " + std::to_string(pos.y()) + " " + std::to_string(pos.z());
+        engine.drawTextEx(GetFontDefault(), text.c_str(), Vector2{480,posyt}, 20, 1, RED);
+        posyt += 20.0f;
+    }
+}
 //Debugger visual in-game
 void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt) {
     // engine.beginDrawing();

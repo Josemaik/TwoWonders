@@ -7,8 +7,23 @@
 struct Graph
 {
     /* data */
-    void createGraph(){
-        //cargo del json los nodos
+    void createGraph(std::vector<Conection> conexiones){
+        //navmesh-----------------
+        //TENDRE QUE PASAR EL JSON CON LOS NAVMESHES
+        // CALCULAR PUNTOS DE CADA NAVMESH Y CALCULAR CONEXIONES
+        // CALCULAR SI UN NAVMESH COLISIONA CON OTRO
+            // EN ESE CASO CALCULAMOS CONEXIONES
+        // ASI EN BUCLE HASTA QUE TERMINEMOS CON TODOS
+        // LOS NAVMESHES
+
+
+        //--------------------------
+
+        //A mano---------------------
+        //paso conexiones
+        // relleno array de conexiones y de puntos
+        ///
+        //-------------------------------
     }
     //Nos devuelve las conexiones que salen de un nodo
     std::vector<Conection> getConections(uint16_t FromNode){

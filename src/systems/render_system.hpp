@@ -4,6 +4,7 @@
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
 #include "../systems/sound_system.hpp"
+#include "../utils/pf/Graph.hpp"
 
 struct RenderSystem
 {
@@ -23,6 +24,7 @@ struct RenderSystem
     void unloadModels(EntityManager& em, ENGI::GameEngine& engine);
     void drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& em);
     void drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt);
+    void drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& em);
     void drawRay(vec3d origin,vec3d end);
     void drawVisionCone(vec3d pos_enemy,double orientation,double horizontalFOV);
     void drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss);
