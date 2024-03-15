@@ -96,7 +96,7 @@ struct LevelInfo
     debugIA2 = false;
     resetGame = false;
     num_zone = 0;
-    mapID = 0;
+    mapID = 1;
     chestToOpen = max;
     dungeonKeyCreated = false;
     sound_system = nullptr;

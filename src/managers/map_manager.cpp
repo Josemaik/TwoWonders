@@ -144,10 +144,10 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
         // Extraemos los datos del json
         const rapidjson::Value& ground = groundArray[i];
         vec3d groundPosition{ ground["position"][1].GetDouble(), ground["position"][2].GetDouble(), ground["position"][0].GetDouble() };
-        vec3d groundScale{ ground["scale"][0].GetDouble(), ground["scale"][2].GetDouble(), ground["scale"][1].GetDouble() };
-        vec3d rotationVec{ ground["rotVector"][0].GetDouble(), ground["rotVector"][2].GetDouble(), ground["rotVector"][1].GetDouble() };
+        vec3d groundScale{ ground["scale"][1].GetDouble(), ground["scale"][2].GetDouble(), ground["scale"][0].GetDouble() };
+        vec3d rotationVec{ ground["rotVector"][1].GetDouble(), ground["rotVector"][2].GetDouble(), ground["rotVector"][0].GetDouble() };
         double orientation{ ground["rotation"].GetDouble() };
-        double rot = (orientation + 90.0) * DEGTORAD;
+        double rot = orientation * DEGTORAD;
         Color color{ WHITE };
 
         // Sacamos los máximos y los mínimos
@@ -243,20 +243,22 @@ void MapManager::generateRamps(EntityManager& em, const rapidjson::Value& rampAr
 
         // Extraemos los datos del json
         const rapidjson::Value& ramp = rampArray[i];
-        vec3d position{ ramp["position"][0].GetDouble(), ramp["position"][2].GetDouble(), ramp["position"][1].GetDouble() };
-        vec3d scale{ ramp["scale"][0].GetDouble(), ramp["scale"][2].GetDouble(), ramp["scale"][1].GetDouble() };
-        Color color{ BEIGE };
-        float orientation{ ramp["rotation"].GetFloat() };
-        vec3d rotationVec{ ramp["rotVector"][0].GetDouble(), ramp["rotVector"][2].GetDouble(), ramp["rotVector"][1].GetDouble() };
-        vec2d min{ ramp["min"][0].GetDouble(), ramp["min"][1].GetDouble() };
-        vec2d max{ ramp["max"][0].GetDouble(), ramp["max"][1].GetDouble() };
+        vec2d min{ ramp["min"][1].GetDouble(), ramp["min"][0].GetDouble() };
+        vec2d max{ ramp["max"][1].GetDouble(), ramp["max"][0].GetDouble() };
+        vec3d offset{ ramp["offset"][1].GetDouble(), ramp["offset"][2].GetDouble(), ramp["offset"][0].GetDouble() };
         double slope{ ramp["slope"].GetDouble() };
-        vec3d offset{ ramp["offset"][0].GetDouble(), ramp["offset"][1].GetDouble(), ramp["offset"][2].GetDouble() };
         RampType type{ static_cast<RampType>(ramp["type"].GetUint()) };
 
+        // Creamos las dimensiones de la rampa y su posición
+        vec3d rmin = { min.x, offset.y() - 20, min.y };
+        vec3d rmax = { max.x, offset.y() + 20, max.y };
+
+        vec3d rampPos = (rmin + rmax) / 2;
+        vec3d rampSize = rmax - rmin;
+
         // Creamos los componentes
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
-        em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = rotationVec });
+        em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = rampPos, .scale = rampSize, .gravity = 0 });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ rampPos, rampSize, BehaviorType::RAMP });
         em.addComponent<RampComponent>(entity, RampComponent{ .min = min, .max = max, .slope = slope, .offset = offset, .type = type });
     }
 }

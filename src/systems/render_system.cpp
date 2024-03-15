@@ -1398,6 +1398,17 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                 RED);
         }
 
+        if (debugphy && e.hasComponent<RampComponent>() && e.hasComponent<PhysicsComponent>())
+        {
+            // Dibujamos el rectángulo de la rampa
+            auto& phy = em.getComponent<PhysicsComponent>(e);
+
+            // La rampa solo tiene vec2d mínimos y máximos, vamos a dibujar el rectángulo que los une
+            engine.beginMode3D();
+            engine.drawCubeWires(phy.position, static_cast<float>(phy.scale.x()), static_cast<float>(phy.scale.y()), static_cast<float>(phy.scale.z()), RED);
+            engine.endMode3D();
+        }
+
         if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
         {
             auto& col{ em.getComponent<ColliderComponent>(e) };
@@ -1501,7 +1512,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         // }
 
         // Dibujar el ID de las entidades // DEBUG
-        if (debugphy)
+        if (debugphy && e.hasComponent<RenderComponent>())
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
             engine.drawText(std::to_string(e.getID()).c_str(),

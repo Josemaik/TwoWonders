@@ -8,7 +8,6 @@ void CollisionSystem::update(EntityManager& em)
 
     // Liberar el octree
     octree.clear();
-    std::vector<Entity*> EntsForRamps{};
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
     {
         // Si la entidad está por debajo del suelo, se destruye
@@ -25,12 +24,6 @@ void CollisionSystem::update(EntityManager& em)
 
         // Insertar en el Octree
         octree.insert(e, col);
-
-        // Revisamos que no sean entidades estáticas
-        if (!(col.behaviorType & BehaviorType::STATIC) && !(col.behaviorType & BehaviorType::ZONE))
-            EntsForRamps.push_back(&e);
-        else if (e.hasTag<ObjectTag>())
-            EntsForRamps.push_back(&e);
     });
 
     // Vector para saber qué colisiones se han calculado ya
@@ -40,7 +33,7 @@ void CollisionSystem::update(EntityManager& em)
     checkCollision(em, octree, checkedPairs);
 
     // Comprobar colisiones con rampas
-    checkRampCollision(em, EntsForRamps);
+    handleRampCollision(em);
 
     // checkBorderCollision(em, ECPair);
 }
@@ -88,95 +81,86 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
     }
 }
 
-void CollisionSystem::checkRampCollision(EntityManager& em, std::vector<Entity*>& Ents)
+void CollisionSystem::handleRampCollision(EntityManager& em)
 {
-    for (auto e : Ents)
+    for (auto& phy : previousEntsOnRamp)
     {
-        auto& col = em.getComponent<ColliderComponent>(*e);
-
-        auto& bbox = col.boundingBox;
-        auto pos = bbox.center();
-
-
-        if (ramps.size() == 0)
-        {
-            using SYSCMPs = MP::TypeList<RampComponent>;
-            using SYSTAGs = MP::TypeList<>;
-            em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, RampComponent& ramp)
-            {
-                ramps.push_back(&ramp);
-            });
-        }
-
-        for (const auto rampP : ramps)
-        {
-            auto& ramp = *rampP;
-
-            auto& min = ramp.min;
-            auto& max = ramp.max;
-            auto& offSet = ramp.offset;
-
-            if (pos.x() >= min.x && pos.x() <= max.x && pos.z() >= min.y && pos.z() <= max.y)
-            {
-                auto& phy = em.getComponent<PhysicsComponent>(*e);
-
-                // baseheight provisionalmente a 0
-                double baseHeight = 0.0;
-                double newHeight{};
-
-                switch (ramp.type)
-                {
-                case RampType::Normal:
-                {
-                    // Calculamos la nueva altura dependiendo del slope
-                    newHeight = baseHeight + ramp.slope;
-
-                    // Utilizamos el offset para saber la dirección de la rampa,
-                    // si el offset en x es 0, la nueva altura se multiplica por la posición en z
-                    // 
-                    // Queremos que el offset siempre sea el contrario del punto donde empieza la rampa.
-                    // Por ejemplo, si la rampa te mueve hacia arriba por desde un 9x a un 14x,
-                    // el offset será -9x y el slope será positivo.
-                    // Si queremos invertir la rampa, el offset será -14x y el slope será negativo.
-                    if (offSet.x() == 0.0)
-                        newHeight *= (pos.z() + offSet.z());
-                    else
-                        newHeight *= (pos.x() + offSet.x());
-
-                    break;
-                }
-                case RampType::Triangular:
-                {
-                    // El punto objetivo se encuentra en offset.x, offset.z
-                    vec2d targetPoint = { offSet.x(), offSet.z() };
-
-                    // Calcula la distancia al punto objetivo
-                    double distanceToTarget = sqrt(pow(pos.x() - targetPoint.x, 2) + pow(pos.z() - targetPoint.y, 2));
-
-                    // Episilon para evitar divisiones por debajo de cierto valor
-                    double ep = 3;
-                    if (distanceToTarget < ep)
-                        distanceToTarget = ep;
-
-                    // Calcula la nueva altura basándose en la distancia al punto objetivo
-                    newHeight = baseHeight + (ramp.slope / distanceToTarget);
-
-                    break;
-                }
-                default:
-                    break;
-                }
-
-                // Nos aseguramos de que la nueva altura no sea menor que baseHeight
-                newHeight = std::max(newHeight, baseHeight);
-                newHeight += offSet.y();
-
-                // Ajustamos la posición en y con la nueva altura
-                phy.position.setY(newHeight);
-                break;
-            }
-        }
+        if (phy->onRamp)
+            phy->onRamp = false;
     }
+
+    previousEntsOnRamp.clear();
+
+    for (auto [rID, eID] : checkedPairsRamp)
+    {
+        auto& r = *em.getEntityByID(rID);
+        auto& e = *em.getEntityByID(eID);
+
+        auto& phy = em.getComponent<PhysicsComponent>(e);
+        previousEntsOnRamp.push_back(&phy);
+        auto& pos = phy.position;
+
+        auto& ramp = em.getComponent<RampComponent>(r);
+        auto& offSet = ramp.offset;
+
+
+        phy.onRamp = true;
+        // baseheight provisionalmente a 0
+        double baseHeight = 0.0;
+        double newHeight{};
+
+        switch (ramp.type)
+        {
+        case RampType::Normal:
+        {
+            // Calculamos la nueva altura dependiendo del slope
+            newHeight = baseHeight + ramp.slope;
+
+            // Utilizamos el offset para saber la dirección de la rampa,
+            // si el offset en x es 0, la nueva altura se multiplica por la posición en z
+            // 
+            // Queremos que el offset siempre sea el contrario del punto donde empieza la rampa.
+            // Por ejemplo, si la rampa te mueve hacia arriba por desde un 9x a un 14x,
+            // el offset será -9x y el slope será positivo.
+            // Si queremos invertir la rampa, el offset será -14x y el slope será negativo.
+            if (offSet.x() == 0.0)
+                newHeight *= (pos.z() + offSet.z());
+            else
+                newHeight *= (pos.x() + offSet.x());
+
+            break;
+        }
+        case RampType::Triangular:
+        {
+            // El punto objetivo se encuentra en offset.x, offset.z
+            vec2d targetPoint = { offSet.x(), offSet.z() };
+
+            // Calcula la distancia al punto objetivo
+            double distanceToTarget = sqrt(pow(pos.x() - targetPoint.x, 2) + pow(pos.z() - targetPoint.y, 2));
+
+            // Episilon para evitar divisiones por debajo de cierto valor
+            double ep = 3;
+            if (distanceToTarget < ep)
+                distanceToTarget = ep;
+
+            // Calcula la nueva altura basándose en la distancia al punto objetivo
+            newHeight = baseHeight + (ramp.slope / distanceToTarget);
+
+            break;
+        }
+        default:
+            break;
+        }
+
+        // Nos aseguramos de que la nueva altura no sea menor que baseHeight
+        newHeight = std::max(newHeight, baseHeight);
+        newHeight += offSet.y() + phy.scale.y() / 2;
+
+        // Ajustamos la posición en y con la nueva altura
+        phy.position.setY(newHeight);
+    }
+
+    checkedPairsRamp.clear();
 }
 
 void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
@@ -203,6 +187,43 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     if (behaviorType1 & BehaviorType::ENEMY && behaviorType2 & BehaviorType::ENEMY)
     {
         nonStaticCollision(staticPhy, otherPhy, minOverlap);
+        return;
+    }
+
+    // Rampas
+    if (behaviorType1 & BehaviorType::RAMP || behaviorType2 & BehaviorType::RAMP)
+    {
+        auto* staticEntPtr = &staticEnt;
+        auto* otherEntPtr = &otherEnt;
+
+        auto* staticPhyPtr = &em.getComponent<PhysicsComponent>(*staticEntPtr);
+        auto* otherPhyPtr = &em.getComponent<PhysicsComponent>(*otherEntPtr);
+
+        if (behaviorType2 & BehaviorType::RAMP)
+        {
+            std::swap(staticEntPtr, otherEntPtr);
+            std::swap(staticPhyPtr, otherPhyPtr);
+        }
+
+        auto& offSet = em.getComponent<RampComponent>(*staticEntPtr).offset;
+        auto& pos = otherPhyPtr->position;
+
+        // Revisamos que no esté tratando de subir por los lados de la rampa
+        if (pos.y() <= (offSet.y() + otherPhyPtr->scale.y() / 2))
+        {
+            if (offSet.x() == 0.0 && minOverlap.x() < minOverlap.z())
+            {
+                resolveCollision<&vec3d::x, &vec3d::setX>(*otherPhyPtr, *staticPhyPtr, minOverlap.x());
+                return;
+            }
+            else if (offSet.z() == 0.0 && minOverlap.z() < minOverlap.x())
+            {
+                resolveCollision<&vec3d::z, &vec3d::setZ>(*otherPhyPtr, *staticPhyPtr, minOverlap.z());
+                return;
+            }
+        }
+
+        checkedPairsRamp.insert({ staticEntPtr->getID(), otherEntPtr->getID() });
         return;
     }
 
@@ -324,6 +345,9 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ZONE)
         return;
 
+    if (!staticEntPtr->hasComponent<ObjectComponent>() && behaviorType2 & BehaviorType::RAMP)
+        return;
+
     if (staticEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<WallTag>())
     {
         if (otherEntPtr->hasTag<WallTag>())
@@ -349,13 +373,19 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
             // floorCollision(*staticPhy, *otherPhy, minOverlap);
             return;
         }
+
+        if (otherEntPtr->hasTag<WallTag>())
+            return;
     }
 
     // Colisiones con el suelo
     if (staticEntPtr->hasTag<GroundTag>() && !otherEntPtr->hasTag<HitPlayerTag>())
     {
-        groundCollision(*otherPhy, otherPhy->scale, minOverlap);
-        return;
+        if (minOverlap.y() <= 1.0 || otherPhy->onRamp)
+        {
+            groundCollision(*otherPhy, otherPhy->scale, minOverlap);
+            return;
+        }
     }
 
     // Si el objeto estático es un objeto
@@ -640,13 +670,27 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
 void CollisionSystem::groundCollision(PhysicsComponent& playerPhysics, vec3d& playerEsc, vec3d& minOverlap)
 {
     auto& pos1 = playerPhysics.position;
-    minOverlap += vec3d{ playerEsc.x() / 2, 0.f, playerEsc.z() / 2 };
 
+    minOverlap += vec3d{ playerEsc.x() / 2, 0.f, playerEsc.z() / 2 };
     if (!playerPhysics.alreadyGrounded && minOverlap.y() < minOverlap.x() && minOverlap.y() < minOverlap.z())
     {
         pos1.setY(pos1.y() + minOverlap.y());
         playerPhysics.alreadyGrounded = true;
+
     }
+    // else if (minOverlap.y() > 2.0)
+    // {
+        // minOverlap -= vec3d{ playerEsc.x() / 2, 0.f, playerEsc.z() / 2 };
+    // std::cout << "alooo\n";
+    // else if (minOverlap.x() < minOverlap.z())
+    // {
+    //     pos1.setX(pos1.x() + minOverlap.x());
+    // }
+    // else
+    // {
+    //     pos1.setZ(pos1.z() + minOverlap.z());
+    // }
+    // }
 }
 
 // Si el suelo choca contra el suelo, solo se desplaza en X o Z (también se usa para paredes con paredes)

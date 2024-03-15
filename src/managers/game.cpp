@@ -23,14 +23,16 @@ void Game::createEntities(EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -116.0, 4.0, 111.0 };
+        plfi.spawnPoint = { -6.0, 4.0, 94.0 };
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
     // 32.0, 4.0, 130.0 - Segundo cofre
     // -72.0, 4.0, 72.9 - Cofre con llave
     // -116.0, 4.0, 111.0 - Apisonadora
     // -125, 4.0, 138.68 - `pos chunck 3
-    // 35.0, 22.0, -23.0 - Posición Incial Lvl 1
+    // 35.0, 22.0, -23.0 - Posición Incial lvl1
+    // -68.0, 4.0, -22.0 - Primera rampa lvl1
+    // -6.0, 4.0, 94.0 - Campamento lvl1
 
 // Player
     auto& e{ em.newEntity() };
@@ -42,7 +44,7 @@ void Game::createEntities(EntityManager& em)
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-
+    em.addComponent<AttackComponent>(e);
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
     lis.addCode(EventCodes::OpenChest);
@@ -50,8 +52,8 @@ void Game::createEntities(EntityManager& em)
     lis.addCode(EventCodes::OpenDoor);
 
     // Código de añadir un hechizo al jugador
-    // Spell spell{ "Fireball", "Shoots a fireball", Spells::FireMeteorites, 20.0, 2 };
-    // plfi.addSpell(spell);
+    Spell spell{ "Fireball", "Shoots a fireball", Spells::FireMeteorites, 20.0, 2 };
+    plfi.addSpell(spell);
 
     // Código de añadir un objeto poción al inventario
     // Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };
