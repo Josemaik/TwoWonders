@@ -7,7 +7,7 @@
 struct Graph
 {
     /* data */
-    void createGraph(std::vector<Conection> conexiones){
+    void createGraph(std::vector<Conection> conexiones,std::vector<vec3d> nodes){
         //navmesh-----------------
         //TENDRE QUE PASAR EL JSON CON LOS NAVMESHES
         // CALCULAR PUNTOS DE CADA NAVMESH Y CALCULAR CONEXIONES
@@ -22,6 +22,26 @@ struct Graph
         //A mano---------------------
         //paso conexiones
         // relleno array de conexiones y de puntos
+        // Rellenar ArrayConections
+        for (const auto& conexion : conexiones) {
+            ArrayConections.push_back(conexion);
+        }
+
+        // Rellenar Nodes
+        for (uint16_t i = 0; i < nodes.size(); ++i) {
+            Nodes[i + 1] = nodes[i];
+        }
+
+        // Recorrer y mostrar los nodos
+        // std::cout << "Nodos:" << std::endl;
+        // for (const auto& node : Nodes) {
+        //     std::cout << "Node " << node.first << ": (" << node.second.x() << ", " << node.second.y() << ", " << node.second.z() << ")" << std::endl;
+        // }
+        // Recorrer ArrayConections e imprimir fromNode y toNode
+        // std::cout << "Conexiones:" << std::endl;
+        // for (const auto& conexion : ArrayConections) {
+        //     std::cout << "From Node: " << conexion.fromNode << " - To Node: " << conexion.toNode << std::endl;
+        // }
         ///
         //-------------------------------
     }

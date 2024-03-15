@@ -845,14 +845,58 @@ void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& 
     Rectangle btn1Rec = { posX, posY, buttonWidth, buttonHeight }; 
     // Botón
     if(GuiButton(btn1Rec, "CALCULATE")){
-        //Creamos 
+        std::vector<vec3d> nodes;
+        nodes.push_back({-106.9, 4.0, 116.0});
+        nodes.push_back({-119.0, 4.0, 114.0});
+        nodes.push_back({-131.0, 4.0, 105.1});
+        nodes.push_back({-105.0, 4.0, 97.3});
+        nodes.push_back({-118.0, 4.0, 92.0});
+        nodes.push_back({-132.0, 4.0, 87.0});
+        nodes.push_back({-117.0, 4.0, 78.0});
+        nodes.push_back({-127.4, 4.0, 69.6});
+        //Creamos puntos y conexiones
+        std::vector<Conection> conexiones;
+        Conection cone12(1,1,2);
+        conexiones.push_back(cone12);
+        Conection cone14(1,1,4);
+        conexiones.push_back(cone14);
+        Conection cone15(1,1,5);
+        conexiones.push_back(cone15);
+        Conection cone25(1,2,5);
+        conexiones.push_back(cone25);
+        Conection cone23(1,2,3);
+        conexiones.push_back(cone23);
+        Conection cone36(1,3,6);
+        conexiones.push_back(cone36);
+        Conection cone45(1,4,5);
+        conexiones.push_back(cone45);
+        Conection cone56(1,5,6);
+        conexiones.push_back(cone56);
+        Conection cone57(1,5,7);
+        conexiones.push_back(cone57);
+        Conection cone58(1,5,8);
+        conexiones.push_back(cone58);
+        Conection cone68(1,6,8);
+        conexiones.push_back(cone68);
+        Conection cone78(1,7,8);
+        conexiones.push_back(cone78);
         //Lammamos a creargrafo
-        //Graph graph{};
-        //graph.createGraph();
+        Graph graph{};
+        graph.createGraph(conexiones,nodes);
         //Calcular pathfinding
-        //std::vector<vec3d> path = graph.PathFindAStar();
+        std::vector<vec3d> path = graph.PathFindAStar(1,8);
+        // if(path.size() == 0){
+        //     std::cout << "CAGUEEEEEEEE \n";
+        // }
         // Copiar el path devuelto por PathFindAStar() a debug.path
-        //debug.path = path;
+        debug.path.resize(path.size());
+        //Rellenamos
+        std::copy(path.begin(), path.end(), debug.path.begin());
+         // Mostrar el camino copiado
+        std::cout << "Camino en debug.path:" << std::endl;
+        for (const auto& node : debug.path) {
+            std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
+        }
         // debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
         // std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
     }

@@ -43,7 +43,7 @@ std::vector<NodeRecord>::iterator findRecordit(std::vector<NodeRecord>& list, ui
 std::vector<vec3d> Graph::PathFindAStar(uint16_t startNode, uint16_t goalNode){
     //Estructuras de datos para almacenar nodos abiertos y cerrados
     std::vector<NodeRecord> open;
-    std::unordered_set<uint16_t> closed;
+    std::vector<NodeRecord> closed;
     
     //Inicializar record desde el start node
     NodeRecord startRecord(startNode,Conection(0,0,0),0.0,0.0);
@@ -51,13 +51,14 @@ std::vector<vec3d> Graph::PathFindAStar(uint16_t startNode, uint16_t goalNode){
     //Inicializar open y closed list
     open.push_back(startRecord);
     
+    NodeRecord current(0,Conection(0,0,0),0.0,0.0);
     //Iteramos a través de cada nodo
     while(!open.empty()){
         //Encontrar el elemento más pequeño en la lista abierta (usando estimatedTotalCost)
         auto currentIt = std::min_element(open.begin(), open.end(), [](const NodeRecord& a, const NodeRecord& b) {
             return a.estimatedTotalCost < b.estimatedTotalCost;
         });
-        NodeRecord current = *currentIt;
+        current = *currentIt;
         //Comprobar si es el goal node -> en ese caso terminamos
         if(current.node == goalNode){
            //Compilar la lista de conexiones en el camino
@@ -67,7 +68,7 @@ std::vector<vec3d> Graph::PathFindAStar(uint16_t startNode, uint16_t goalNode){
                 // Suponiendo que haya un método para obtener la posición de un nodo
                 path.push_back(Nodes[current.node]);
                 // Retroceder al nodo anterior
-                current = *findRecord(open, current.connection.fromNode);
+                current = *findRecord(closed, current.connection.fromNode);
             }
             // Añadir la posición del nodo inicial
             path.push_back(Nodes[startNode]);
@@ -86,21 +87,23 @@ std::vector<vec3d> Graph::PathFindAStar(uint16_t startNode, uint16_t goalNode){
             double endNodeCost = current.costSoFar + connection.cost;
 
             // Buscar el registro del nodo en la lista abierta
-            NodeRecord endNodeRecord = *findRecord(open, endNode);
+            NodeRecord endNodeRecord(startNode,Conection(0,0,0),0.0,0.0); //= *findRecord(open, endNode);
             //inicializo el heuristic
             double endNodeHeuristic{};
             //Comprobamos si esta en la lista cerrada
-            if(closed.count(endNode) > 0){
+            if(findRecord_b(closed,endNode)){
+                endNodeRecord = *findRecord(closed, endNode);
                 //si no encontramos una ruta más corta - skip
                 if(endNodeRecord.costSoFar <= endNodeCost){
                     continue;
                 }
                 //Borramos de la closed list
-                closed.erase(endNode);
+                closed.erase(findRecordit(closed,endNode));
                 
                 // obtenemos el heuristic - dist euclidea
                 endNodeHeuristic = Heuristic(endNode,goalNode);
             } else if(findRecord_b(open,endNode)){
+                    endNodeRecord = *findRecord(open, endNode);
                     if(endNodeRecord.costSoFar <= endNodeCost){
                         continue;
                     }
@@ -124,11 +127,12 @@ std::vector<vec3d> Graph::PathFindAStar(uint16_t startNode, uint16_t goalNode){
         //Terminamos de buscar conexiones
         //eliminamos de la open list y añadimos a la closed
         open.erase(findRecordit(open,current.node));
-        closed.insert(current.node);
+        closed.push_back(current);
+    }
 
-        if(current.node != goalNode){
+    if(current.node != goalNode){
             return std::vector<vec3d>{};
-        }else{
+    }else{
             //Compilar la lista de conexiones en el camino
             std::vector<vec3d> path;
             while (current.node != startNode) {
@@ -136,14 +140,13 @@ std::vector<vec3d> Graph::PathFindAStar(uint16_t startNode, uint16_t goalNode){
                 // Suponiendo que haya un método para obtener la posición de un nodo
                 path.push_back(Nodes[current.node]);
                 // Retroceder al nodo anterior
-                current = *findRecord(open, current.connection.fromNode);
+                current = *findRecord(closed, current.connection.fromNode);
             }
             // Añadir la posición del nodo inicial
             path.push_back(Nodes[startNode]);
             // Invertir el camino ya que se construyó desde el objetivo hasta el inicio
             std::reverse(path.begin(), path.end());
             return path;
-        }
     }
     //Si llega al final sin encontrar path se devuelve uno vacio
     return std::vector<vec3d>();
