@@ -44,7 +44,8 @@ void Game::createEntities(EntityManager& em)
     em.addComponent<InputComponent>(e, InputComponent{});
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e);
+    // em.addComponent<AttackComponent>(e);
+
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
     lis.addCode(EventCodes::OpenChest);
@@ -52,8 +53,8 @@ void Game::createEntities(EntityManager& em)
     lis.addCode(EventCodes::OpenDoor);
 
     // Código de añadir un hechizo al jugador
-    Spell spell{ "Fireball", "Shoots a fireball", Spells::FireMeteorites, 20.0, 2 };
-    plfi.addSpell(spell);
+    // Spell spell{ "Fireball", "Shoots a fireball", Spells::FireMeteorites, 20.0, 2 };
+    // plfi.addSpell(spell);
 
     // Código de añadir un objeto poción al inventario
     // Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };

@@ -599,7 +599,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 }
                 else if (e.hasTag<ChestTag>())
                 {
-                    pos.setY(pos.y() - r.offset / 2);
+                    pos.setY(pos.y() - r.offset);
                     in = true;
                 }
                 else if (e.hasTag<DestructibleTag>())
