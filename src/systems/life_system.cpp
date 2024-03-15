@@ -118,7 +118,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
         }
 
         if (lif.markedForDeletion && !lif.decreaseNextFrame)
-            li.dead_entities.insert(ent.getID());
+            li.insertDeath(ent.getID());
     });
 }
 

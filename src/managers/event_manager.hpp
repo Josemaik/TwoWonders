@@ -98,7 +98,6 @@ public:
                     case EventCodes::SetSpawn:
                     {
                         mm.spawnReset(em, iam);
-
                         break;
                     }
                     case EventCodes::OpenDoor:
@@ -107,7 +106,7 @@ public:
                         auto& plfi = em.getSingleton<PlayerInfo>();
 
                         plfi.hasKey = false;
-                        li.dead_entities.insert(li.doorToOpen);
+                        li.insertDeath(li.doorToOpen);
                         break;
                     }
                     case EventCodes::SpawnWallLevel0:

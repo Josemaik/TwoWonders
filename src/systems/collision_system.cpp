@@ -14,7 +14,7 @@ void CollisionSystem::update(EntityManager& em)
         auto& pos = phy.position;
         if (pos.y() < -20.)
         {
-            li.dead_entities.insert(e.getID());
+            li.insertDeath(e.getID());
             return;
         }
 
@@ -264,7 +264,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
                 em.getComponent<AttackComponent>(*staticEntPtr).attack(AttackType::Spiderweb);
 
             auto& li = em.getSingleton<LevelInfo>();
-            li.dead_entities.insert(staticEntPtr->getID());
+            li.insertDeath(staticEntPtr->getID());
             return;
         }
 
@@ -310,7 +310,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
             std::swap(meteoriteEntPtr, otherEntPtr);
 
         auto& li = em.getSingleton<LevelInfo>();
-        li.dead_entities.insert(meteoriteEntPtr->getID());
+        li.insertDeath(meteoriteEntPtr->getID());
 
         return;
     }
@@ -409,7 +409,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         }
 
         if (!otherEntPtr->hasComponent<ObjectComponent>())
-            li.dead_entities.insert(otherEntPtr->getID());
+            li.insertDeath(otherEntPtr->getID());
 
         return;
     }
@@ -432,7 +432,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
 
     if (behaviorType2 & BehaviorType::METEORITE)
     {
-        li.dead_entities.insert(otherEntPtr->getID());
+        li.insertDeath(otherEntPtr->getID());
         return;
     }
 
@@ -574,7 +574,7 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
             em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife(2);
         }
         auto& li = em.getSingleton<LevelInfo>();
-        li.dead_entities.insert(otherEntPtr->getID());
+        li.insertDeath(otherEntPtr->getID());
         return;
     }
 }
@@ -634,7 +634,7 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                 if (!ent1Ptr->hasComponent<ObjectComponent>())
                 {
                     auto& li = em.getSingleton<LevelInfo>();
-                    li.dead_entities.insert(ent1Ptr->getID());
+                    li.insertDeath(ent1Ptr->getID());
                 }
             }
 

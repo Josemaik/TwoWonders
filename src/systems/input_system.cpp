@@ -5,13 +5,14 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
     auto& bb = em.getSingleton<BlackBoard_t>();
+    auto& plfi = em.getSingleton<PlayerInfo>();
     auto& player = *em.getEntityByID(li.playerID);
 
     // Si no hay jugador, no hacemos nada
-    if (!player.hasTag<PlayerTag>())
+    if (li.isDead)
     {
         if (ge.isKeyReleased(KEY_ENTER) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN))
-            li.resetGame = true;
+            li.resetFromDeath = true;
         return;
     }
 
@@ -160,8 +161,6 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     bb.tz = phy.position.z();
     bb.tactive = true;
     bb.teid = player.getID();
-
-    auto& plfi = em.getSingleton<PlayerInfo>();
 
     // Codigo para el ataque
     if ((ge.isKeyDown(in.space) || ge.isGamepadButtonPressed(0, in.m_space)) && player.hasComponent<AttackComponent>())

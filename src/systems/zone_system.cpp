@@ -120,95 +120,64 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     });
 
     // Cosas que hacer en cada zona
-    switch (li.num_zone)
-    {
-    case 3:
-    {
-        checkChests(em, evm, li.num_zone);
-        break;
-    }
-    case 4:
-    {
-        checkChests(em, evm, li.num_zone);
-        // checkDoors(em, evm);
-        checkTutorialEnemies(em);
-        break;
-    }
-    case 5:
-    {
-        // checkDoors(em, evm);
-        checkTutorialEnemies(em);
+    if (li.mapID == 0)
+        switch (li.num_zone)
+        {
+        case 4:
+        {
+            checkTutorialEnemies(em);
+            break;
+        }
+        case 5:
+        {
+            checkTutorialEnemies(em);
+            break;
+        }
+        case 6:
+        {
+            checkTutorialEnemies(em);
+            break;
+        }
+        case 7:
+        {
+            checkTutorialEnemies(em);
+            break;
+        }
+        default:
+            break;
+        }
 
-        break;
-    }
-    case 6:
-    {
-        // checkSpawns(em, evm);
-        checkTutorialEnemies(em);
+    auto& zchi = em.getSingleton<ZoneCheckInfo>();
 
-        break;
-    }
-    case 7:
-    {
-        checkChests(em, evm, li.num_zone);
-        checkTutorialEnemies(em);
-        break;
-    }
-    case 9:
-    {
-        checkChests(em, evm, li.num_zone);
-        break;
-    }
-    case 10:
-    {
-        checkDoors(em, evm);
-        break;
-    }
-    case 11:
-    {
-        checkDoors(em, evm);
-        break;
-    }
-    default:
-        break;
-    }
+    checkZones(em, evm, zchi.getChestZones(), [&](EntityManager& em, EventManager& evm) { checkChests(em, evm); });
+    checkZones(em, evm, zchi.getLeverZones(), [&](EntityManager& em, EventManager& evm) { checkLevers(em, evm); });
+    checkZones(em, evm, zchi.getDoorZones(), [&](EntityManager& em, EventManager& evm) { checkDoors(em, evm); });
 }
 
-void ZoneSystem::checkDungeonSlimes(EntityManager& em, EventManager& evm)
+void ZoneSystem::checkZones(EntityManager& em, EventManager& evm, checkType zones, checkFuncType checkFunction)
 {
     auto& li = em.getSingleton<LevelInfo>();
-
-    if (!li.dungeonKeyCreated)
+    for (auto zone : zones)
     {
-        using noCMPs = MP::TypeList<>;
-        using enemyTag = MP::TypeList<EnemyTag>;
-        bool slimesDead{ true };
-
-        em.forEach<noCMPs, enemyTag>([&](Entity& ent)
-        {
-            if (slimesDead && ent.hasTag<SlimeTag>())
-                slimesDead = false;
-        });
-
-        if (slimesDead)
-            evm.scheduleEvent(Event{ EventCodes::SpawnDungeonKey });
+        if (li.num_zone == zone)
+            checkFunction(em, evm);
     }
 }
 
-void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone)
+void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
 {
     auto& li = em.getSingleton<LevelInfo>();
     if (li.playerDetected)
         return;
-    using chestCMP = MP::TypeList<ChestComponent, InteractiveComponent, PhysicsComponent>;
+    using chestCMP = MP::TypeList<ChestComponent, InteractiveComponent, PhysicsComponent, OneUseComponent>;
     using chestTag = MP::TypeList<ChestTag>;
 
-    em.forEach<chestCMP, chestTag>([&](Entity& e, ChestComponent& ch, InteractiveComponent& ic, PhysicsComponent& phy)
+    em.forEach<chestCMP, chestTag>([&](Entity& e, ChestComponent& ch, InteractiveComponent& ic, PhysicsComponent& phy, OneUseComponent& ouc)
     {
-        if (ch.zone == zone)
+        if (ouc.zone == li.num_zone)
         {
             // Revisamos si el cofre ha sido abierto
-            std::pair<uint8_t, uint8_t> pair{ li.mapID, ch.id };
+            std::pair<uint8_t, uint8_t> pair{ li.mapID, ouc.id };
 
             if (li.dontLoad.find(pair) != li.dontLoad.end())
                 return;
@@ -237,6 +206,51 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone
                 evm.scheduleEvent(Event{ EventCodes::OpenChest });
                 li.dontLoad.insert(pair);
                 inpi.interact = false;
+            }
+        }
+    });
+}
+
+void ZoneSystem::checkLevers(EntityManager& em, EventManager& evm)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    if (li.playerDetected)
+        return;
+    using leverCMP = MP::TypeList<InteractiveComponent, PhysicsComponent, OneUseComponent>;
+    using leverTAG = MP::TypeList<LeverTag>;
+
+    em.forEach<leverCMP, leverTAG>([&](Entity&, InteractiveComponent& ic, PhysicsComponent& phy, OneUseComponent& ouc)
+    {
+        if (ouc.zone == li.num_zone)
+        {
+            // Revisamos si la palanca ha sido activada
+            std::pair<uint8_t, uint8_t> pair{ li.mapID, ouc.id };
+
+            if (li.dontLoad.find(pair) != li.dontLoad.end())
+                return;
+
+            // Calcula la distancia entre la posición del jugador y la posición de la palanca
+            auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+            auto& playerPos = playerPhy.position;
+
+            double distance = playerPos.distance(phy.position);
+            double range = 7.5;
+
+            // Si la palanca se encuentra a menos de 7.5 unidades de distancia del se muestra el mensaje de activar palanca
+            if (distance < range && !ic.showButton)
+                ic.showButton = true;
+
+            else if (distance > range && ic.showButton)
+                ic.showButton = false;
+
+            auto& inpi = em.getSingleton<InputInfo>();
+
+            if (inpi.interact && ic.showButton)
+            {
+                ic.showButton = false;
+                li.dontLoad.insert(pair);
+                inpi.interact = false;
+                openDoorsZone(em, evm, phy.position);
             }
         }
     });
@@ -284,7 +298,7 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
         auto& playerPos = playerPhy.position;
 
         double distance = playerPos.distance(phy.position);
-        double range = 7.5;
+        double range = 8.5;
 
         auto& inpi = em.getSingleton<InputInfo>();
         auto& plfi = em.getSingleton<PlayerInfo>();
@@ -296,6 +310,24 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
             ic.showButton = false;
 
         if (inpi.interact && ic.showButton && plfi.hasKey)
+        {
+            li.doorToOpen = e.getID();
+            evm.scheduleEvent(Event{ EventCodes::OpenDoor });
+        }
+    });
+}
+
+void ZoneSystem::openDoorsZone(EntityManager& em, EventManager& evm, vec3d& leverPos)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    using CMPs = MP::TypeList<PhysicsComponent>;
+    using doorTag = MP::TypeList<DoorTag>;
+
+    em.forEach<CMPs, doorTag>([&](Entity& e, PhysicsComponent& phy)
+    {
+        // Revisamos que la puerta esté en un radio de 30 unidades de la palanca
+        double distance = leverPos.distance(phy.position);
+        if (distance < 40.0)
         {
             li.doorToOpen = e.getID();
             evm.scheduleEvent(Event{ EventCodes::OpenDoor });
@@ -328,3 +360,24 @@ void ZoneSystem::checkTutorialEnemies(EntityManager& em)
     // if (!playerEnt.hasComponent<AttackComponent>() && playerPhy.stopped)
     //     li.viewPoint = { -33.714, 7.0, -43.494 };
 }
+
+// void ZoneSystem::checkDungeonSlimes(EntityManager& em, EventManager& evm)
+// {
+//     auto& li = em.getSingleton<LevelInfo>();
+
+//     if (!li.dungeonKeyCreated)
+//     {
+//         using noCMPs = MP::TypeList<>;
+//         using enemyTag = MP::TypeList<EnemyTag>;
+//         bool slimesDead{ true };
+
+//         em.forEach<noCMPs, enemyTag>([&](Entity& ent)
+//         {
+//             if (slimesDead && ent.hasTag<SlimeTag>())
+//                 slimesDead = false;
+//         });
+
+//         if (slimesDead)
+//             evm.scheduleEvent(Event{ EventCodes::SpawnDungeonKey });
+//     }
+// }

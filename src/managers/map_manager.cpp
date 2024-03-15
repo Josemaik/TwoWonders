@@ -34,7 +34,8 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
 
 mapType MapManager::loadMap(const std::string& mapFile)
 {
-    fileMap = mapFile;
+    if (fileMap != mapFile)
+        fileMap = mapFile;
     std::ifstream file(mapFile);
     rapidjson::IStreamWrapper isw(file);
     rapidjson::Document map;
@@ -206,7 +207,8 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
         em.addComponent<ZoneComponent>(zoneEntity, ZoneComponent{ .zone = static_cast<uint16_t>(j) });
         auto& rz = em.addComponent<RenderComponent>(zoneEntity, RenderComponent{ .position = zonePosition, .scale = zoneScale, .visible = false });
         auto& pz = em.addComponent<PhysicsComponent>(zoneEntity, PhysicsComponent{ .position = rz.position, .velocity = vec3d::zero(), .scale = rz.scale, .gravity = .0 });
-        em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ pz.position, rz.scale, BehaviorType::ZONE });
+        auto& cz = em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ pz.position, rz.scale, BehaviorType::ZONE });
+        zoneBounds.insert({ j, cz.boundingBox });
         k += 1;
     }
 }
@@ -341,7 +343,8 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
                 messages.emplace(interactable["message"][j].GetString());
             }
 
-            [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .id = interId, .zone = zone, .dropPosition = { vec3d::zero() }, .content = content, .messages = messages });
+            em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = interId, .zone = zone });
+            [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .dropPosition = { vec3d::zero() }, .content = content, .messages = messages });
 
             if (interactable.HasMember("offsetZ"))
             {
@@ -356,7 +359,6 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
                     dc.eventCodes.push_back(interactable["events"][j].GetInt());
                 }
             }
-
             break;
         }
         case InteractableType::Destructible:
@@ -383,9 +385,18 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         }
         case InteractableType::Door:
         {
+            auto& li = em.getSingleton<LevelInfo>();
+
+            switch (li.mapID)
+            {
+            case 0:
+            {
+                em.addTag<SeparateModelTag>(entity);
+                break;
+            }
+            }
             em.addTag<DoorTag>(entity);
             em.addTag<WallTag>(entity);
-            em.addTag<SeparateModelTag>(entity);
             r.position = vec3d::zero();
             break;
         }
@@ -406,7 +417,18 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
             }
             break;
         }
+        case InteractableType::Lever:
+        {
+            em.addTag<WallTag>(entity);
+            em.addTag<LeverTag>(entity);
+            uint16_t zone = static_cast<uint16_t>(interactable["zone"].GetUint());
+            uint8_t interId = static_cast<uint8_t>(interactable["id"].GetUint());
+
+            em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = interId, .zone = zone });
+            break;
         }
+        }
+        addToZone(em, c.boundingBox, type);
     }
 }
 
@@ -417,13 +439,13 @@ void MapManager::destroyMap(EntityManager& em)
     for (auto e : em.getEntities())
     {
         if (e.getID() != li.playerID)
-            li.dead_entities.insert(e.getID());
+            li.insertDeath(e.getID());
     }
 }
 
 void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
 {
-    using TAGs = MP::TypeList <EnemyTag, DestructibleTag>;
+    using TAGs = MP::TypeList <EnemyTag>;
     destroyParts<TAGs>(em);
 
     mapType map = loadMap(fileMap);
@@ -446,6 +468,14 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
 
     //     generateDestructibles(em, destructibleArray);
     // }
+}
+
+void MapManager::addToZone(EntityManager& em, BBox& b, InteractableType type)
+{
+    auto& zchi = em.getSingleton<ZoneCheckInfo>();
+    for (auto [num, bbox] : zoneBounds)
+        if (bbox.intersects(b))
+            zchi.insertZone(num, type);
 }
 
 // template<>
