@@ -458,7 +458,8 @@
 							"position":[55.767, 30.653, 16.593],
 							"scale":[3.0, 13.0, 20.0],
 							"rotation": 90.0,
-							"rotVector":[0.0, 0.0, 0.0]
+							"rotVector":[0.0, 0.0, 0.0],
+							"noKey": true
 						},
 						{
 							"type":1,

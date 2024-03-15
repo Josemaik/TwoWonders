@@ -300,7 +300,9 @@ void Game::resetGame()
     auto& li = em.getSingleton<LevelInfo>();
     auto& bb = em.getSingleton<BlackBoard_t>();
     auto& plfi = em.getSingleton<PlayerInfo>();
+    auto& zchi = em.getSingleton<ZoneCheckInfo>();
 
+    zchi.clearSets();
     em.destroyAll();
     bb.subditosData.clear();
     render_system.unloadModels(em, engine);

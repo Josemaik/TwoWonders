@@ -82,6 +82,7 @@ struct NoDamageTag {};
 struct SeparateModelTag {};
 struct BarricadeTag {};
 struct LeverTag {};
+struct NoKeyTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -141,7 +142,8 @@ using TL = MP::TypeList <
     AngryBushTag2,
     CrusherTag,
     BarricadeTag,
-    LeverTag
+    LeverTag,
+    NoKeyTag
 > ;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

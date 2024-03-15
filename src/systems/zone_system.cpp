@@ -293,6 +293,8 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
 
     em.forEach<CMPs, doorTag>([&](Entity& e, InteractiveComponent& ic, PhysicsComponent& phy)
     {
+        if (e.hasTag<NoKeyTag>())
+            return;
         auto& playerEnt = *em.getEntityByID(li.playerID);
         auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
         auto& playerPos = playerPhy.position;
@@ -321,7 +323,7 @@ void ZoneSystem::openDoorsZone(EntityManager& em, EventManager& evm, vec3d& leve
 {
     auto& li = em.getSingleton<LevelInfo>();
     using CMPs = MP::TypeList<PhysicsComponent>;
-    using doorTag = MP::TypeList<DoorTag>;
+    using doorTag = MP::TypeList<NoKeyTag>;
 
     em.forEach<CMPs, doorTag>([&](Entity& e, PhysicsComponent& phy)
     {

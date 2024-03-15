@@ -392,12 +392,15 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
             case 0:
             {
                 em.addTag<SeparateModelTag>(entity);
+                r.position = vec3d::zero();
                 break;
             }
             }
             em.addTag<DoorTag>(entity);
             em.addTag<WallTag>(entity);
-            r.position = vec3d::zero();
+            if (interactable.HasMember("noKey"))
+                em.addTag<NoKeyTag>(entity);
+
             break;
         }
         case InteractableType::Level:
@@ -563,7 +566,10 @@ void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man&)
 {
     destroyMap(em);
     auto& li = em.getSingleton<LevelInfo>();
+    auto& zchi = em.getSingleton<ZoneCheckInfo>();
+
     li.mapID = mapID;
     li.levelChanged = true;
+    zchi.clearSets();
     // createMap(em, mapID, iam);
 }
