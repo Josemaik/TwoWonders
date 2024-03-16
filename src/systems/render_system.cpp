@@ -832,17 +832,18 @@ void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& 
     Rectangle windowRect = { 470, 300, 330, 430 };
     engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
     engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
-    Vector2 textPositionInfo = { 480, 320 };
+    Vector2 textPositionInfo = { 570, 320 };
     engine.drawTextEx(GetFontDefault(), "PATHFINDING", textPositionInfo, 20, 1, RED);
 
     // Datos de los botones
-    float buttonWidth = 200.0f;
-    float buttonHeight = 50.0f;
-    float posX = 540.0f;
+    float buttonWidth = 150.0f;
+    float buttonHeight = 30.0f;
+    float posX = 500.0f;
     float posY = 350.0f;
 
     // Funcionalidad de botones
     Rectangle btn1Rec = { posX, posY, buttonWidth, buttonHeight }; 
+    Rectangle btn2Rec = { posX + 140.0f, posY, buttonWidth, buttonHeight };
     // Botón
     if(GuiButton(btn1Rec, "CALCULATE")){
         std::vector<vec3d> nodes;
@@ -893,12 +894,15 @@ void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& 
         //Rellenamos
         std::copy(path.begin(), path.end(), debug.path.begin());
          // Mostrar el camino copiado
-        std::cout << "Camino en debug.path:" << std::endl;
-        for (const auto& node : debug.path) {
-            std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
-        }
+        //std::cout << "Camino en debug.path:" << std::endl;
+        // for (const auto& node : debug.path) {
+        //     std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
+        // }
         // debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
         // std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
+    }
+    if(GuiButton(btn2Rec, "CLEAR")){
+        debug.path.clear();
     }
     // resultado
     Vector2 textPositionInfo2 = { 480, 400 };
