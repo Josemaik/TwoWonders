@@ -113,6 +113,6 @@ struct PlayerInfo
         max_mana = 100.0;
         mana = max_mana;
         mana_width = 0;
-        hasKey = true;
+        hasKey = false;
     }
 };
