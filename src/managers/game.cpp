@@ -23,7 +23,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 35.0, 22.0, -23.0 };
+        plfi.spawnPoint = { -116.0, 4.0, 111.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -38,7 +38,7 @@ void Game::createEntities()
     // 30.0, 13.0, 213.0 - Segundo campamento lvl1
     // -113.0, 4.0, 236.0 - Final lvl1
 
-// Player
+    // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
@@ -46,7 +46,7 @@ void Game::createEntities()
 
     auto& lis = em.addComponent<ListenerComponent>(e);
     em.addComponent<InputComponent>(e);
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     // em.addComponent<AttackComponent>(e);
 
@@ -122,7 +122,6 @@ void Game::run()
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
     auto& txti = em.getSingleton<TextInfo>();
-    auto& plfi = em.getSingleton<PlayerInfo>();
 
     // Inicializa una variable donde tener el tiempo entre frames
     float currentTime{}, elapsed{};
@@ -274,6 +273,7 @@ void Game::run()
     sound_system.clear();
     render_system.unloadModels(em, engine);
 
+    engine.unloadGifs();
     engine.unloadShader(shader);
     engine.closeWindow();
 }

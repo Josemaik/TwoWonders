@@ -19,14 +19,77 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // Corazones vacíos HUD
     loadAndResizeImage("empty_heart", "assets/HUD/corazon_vacio.png");
 
+    // Corazones Hielo HUD
+    loadAndResizeImage("ice_heart", "assets/HUD/corazon_escudo.png");
+
     // Mago Happy HUD
     loadAndResizeImage("mago_happy", "assets/HUD/mago_happy.png");
+
+    // Mago Meh HUD
+    loadAndResizeImage("mago_meh", "assets/HUD/mago_meh.png");
+
+    // Mago SOS HUD
+    loadAndResizeImage("mago_sos", "assets/HUD/mago_sos.png");
 
     // Barra de maná HUD
     loadAndResizeImage("mana", "assets/HUD/mana_bar.png");
 
     // Destellos HUD
     loadAndResizeImage("destellos", "assets/HUD/destellos.png");
+
+    // Destello fijado HUD
+    loadAndResizeImage("destellin", "assets/HUD/fijado_destellin.png");
+
+    // Candado abierto HUD
+    loadAndResizeImage("candado_abierto", "assets/HUD/candado_abierto.png");
+
+    // Candado cerrado HUD
+    loadAndResizeImage("candado_cerrado", "assets/HUD/candado_cerrado.png");
+
+    // Diálogo Siguiente HUD
+    loadAndResizeImage("sig", "assets/HUD/dialog_siguiente.png");
+
+    // NÚMEROS
+    //
+    loadAndResizeImage("0", "assets/HUD/numeros/0.png");
+    loadAndResizeImage("1", "assets/HUD/numeros/1.png");
+    loadAndResizeImage("2", "assets/HUD/numeros/2.png");
+    loadAndResizeImage("3", "assets/HUD/numeros/3.png");
+    loadAndResizeImage("4", "assets/HUD/numeros/4.png");
+    loadAndResizeImage("5", "assets/HUD/numeros/5.png");
+    loadAndResizeImage("6", "assets/HUD/numeros/6.png");
+    loadAndResizeImage("7", "assets/HUD/numeros/7.png");
+    loadAndResizeImage("8", "assets/HUD/numeros/8.png");
+    loadAndResizeImage("9", "assets/HUD/numeros/9.png");
+
+    // GIFS
+    //
+    // Joystick Izquierdo
+    loadAndResizeImageGif("joystick_izq", "assets/HUD/botones/joystickL.gif", 0, 35);
+
+    // Fijador de cámara
+    loadAndResizeImageGif("fijado", "assets/HUD/gifs/fijado_trama.gif", 0, 35, 1.2, 1.2);
+
+    // Botón X
+    loadAndResizeImageGif("x", "assets/HUD/botones/x.gif", 0, 55);
+
+    // Botón Círculo
+    loadAndResizeImageGif("circulo", "assets/HUD/botones/circulo.gif", 0);
+
+    // Botón Triángulo
+    loadAndResizeImageGif("triangulo", "assets/HUD/botones/triangulo.gif", 0);
+
+    // Botón Cuadrado
+    loadAndResizeImageGif("cuadrado", "assets/HUD/botones/cuadrado.gif", 0, 55);
+
+    // Botón Menú
+    loadAndResizeImageGif("menu", "assets/HUD/botones/menu.gif", 0);
+
+    // Tecla E
+    loadAndResizeImageGif("e", "assets/HUD/teclas/e.gif", 0, 55);
+
+    // Tecla Espacio
+    loadAndResizeImageGif("espacio", "assets/HUD/teclas/espacio.gif", 0, 55);
 
     SetExitKey(KEY_F8);
 }
@@ -35,6 +98,10 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
 Image ENGI::GameEngine::loadImage(const char* filename) {
     return LoadImage(filename);
+}
+
+Image ENGI::GameEngine::loadImagenAnim(const char* filename, int& frames) {
+    return LoadImageAnim(filename, &frames);
 }
 
 void ENGI::GameEngine::imageResize(Image* image, int newWidth, int newHeight) {
@@ -328,6 +395,11 @@ Texture2D ENGI::GameEngine::loadTexture(const char* filename)
     return LoadTexture(filename);
 }
 
+void ENGI::GameEngine::updateTexture(Texture2D texture, const void* data)
+{
+    UpdateTexture(texture, data);
+}
+
 void ENGI::GameEngine::unloadMesh(Mesh m)
 {
     UnloadMesh(m);
@@ -355,8 +427,44 @@ RayCast ENGI::GameEngine::getMouseRay()
 }
 
 void ENGI::GameEngine::loadAndResizeImage(const std::string& name, const std::string& path) {
-    Image image = ENGI::GameEngine::loadImage(path.c_str());
-    ENGI::GameEngine::imageResize(&image, static_cast<int>(image.width / 1.3), static_cast<int>(image.height / 1.3));
-    textures[name] = ENGI::GameEngine::loadTextureFromImage(image);
-    ENGI::GameEngine::unloadImage(image);
+    Image image = loadImage(path.c_str());
+    imageResize(&image, static_cast<int>(image.width / 1.3), static_cast<int>(image.height / 1.3));
+    textures[name] = loadTextureFromImage(image);
+    unloadImage(image);
+}
+
+void ENGI::GameEngine::loadAndResizeImageGif(const std::string& name, const std::string& path, int frames, int delay, double reScaleX, double reScaleY) {
+    Gif anim;
+    anim.frames = frames;
+    anim.frameDelay = delay;
+    anim.reScaleX = reScaleX;
+    anim.reScaleY = reScaleY;
+    anim.image = loadImagenAnim(path.c_str(), anim.frames);
+    // imageResize(&image, static_cast<int>(image.width / 1.3), static_cast<int>(image.height / 1.3));
+    anim.texture = loadTextureFromImage(anim.image);
+
+    gifs[name] = anim;
+}
+
+void ENGI::GameEngine::updateGif(Gif& anim) {
+    anim.frameCounter += 1;
+    if (anim.frameCounter >= anim.frameDelay)
+    {
+        anim.frameCounter = 0;
+        anim.currentFrame++;
+
+        if (anim.currentFrame >= anim.frames) anim.currentFrame = 0;
+
+        anim.nextFrameDataOffset = anim.image.width * anim.image.height * 4 * anim.currentFrame;
+
+        updateTexture(anim.texture, static_cast<char*>(anim.image.data) + anim.nextFrameDataOffset);
+    }
+}
+
+void ENGI::GameEngine::unloadGifs() {
+    for (auto& gif : gifs)
+    {
+        UnloadTexture(gif.second.texture);
+        UnloadImage(gif.second.image);
+    }
 }

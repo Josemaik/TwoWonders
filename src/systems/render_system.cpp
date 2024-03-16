@@ -1185,23 +1185,31 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                             auto& phy{ em.getComponent<PhysicsComponent>(ene) };
                             if (ren.visible && (ene.hasTag<DummyTag>() || ene.hasTag<DestructibleTag>()))
                             {
-                                std::string text = "ESPACIO";
-                                float offsetX = 25.f;
                                 double multiplier = 28.0;
 
-                                if (ene.hasTag<DestructibleTag>())
-                                    multiplier = 5.0;
+                                ENGI::GameEngine::Gif* gif;
+                                Texture2D gifCopy;
                                 if (engine.isGamepadAvailable(0))
-                                {
-                                    offsetX = 0;
-                                    text = "X";
-                                }
+                                    gif = &engine.gifs.at("cuadrado");
+                                else
+                                    gif = &engine.gifs.at("espacio");
 
-                                engine.drawText(text.c_str(),
-                                    static_cast<int>(engine.getWorldToScreenX(phy.position) - offsetX),
-                                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * multiplier),
-                                    20,
-                                    WHITE);
+
+                                gifCopy = gif->texture;
+
+                                // Redimensionamos la copia
+                                gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
+                                gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
+
+                                multiplier = 55.0;
+
+                                if (ene.hasTag<DestructibleTag>())
+                                    multiplier = 8.0;
+
+                                int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - gifCopy.width / 2;
+                                int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * multiplier);
+
+                                displayGif(engine, gifCopy, *gif, posX, posY);
                             }
                         }
                     }
@@ -1211,17 +1219,32 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             if (li.num_zone == 1 && elapsed_WASD < elapsed_limit_WASD)
             {
                 auto& phy{ em.getComponent<PhysicsComponent>(e) };
-                // Escribimos que puede usar WASD para moverse
 
-                std::string text = "WASD para moverse";
+                // Mostramos gif de joystick para moverse o texto WASD
                 if (engine.isGamepadAvailable(0))
-                    text = "Stick izquierdo para moverse";
+                {
+                    auto& joysitck_gif = engine.gifs.at("joystick_izq");
+                    auto copy = joysitck_gif.texture;
 
-                engine.drawText(text.c_str(),
-                    static_cast<int>(engine.getWorldToScreenX(phy.position) - 120),
-                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 25),
-                    20,
-                    WHITE);
+                    // Redimensionamos la copia
+                    copy.width = static_cast<int>(copy.width / 2.0);
+                    copy.height = static_cast<int>(copy.height / 2.0);
+
+                    int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - copy.width / 2;
+                    int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 37);
+
+                    displayGif(engine, copy, joysitck_gif, posX, posY);
+                }
+                else
+                {
+                    std::string text = "WASD para moverse";
+
+                    engine.drawText(text.c_str(),
+                        static_cast<int>(engine.getWorldToScreenX(phy.position) - 120),
+                        static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 25),
+                        20,
+                        WHITE);
+                }
 
                 elapsed_WASD += 1.0f / 60.0f;
             }
@@ -1336,32 +1359,65 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         if (e.hasComponent<InteractiveComponent>() && (e.hasComponent<RenderComponent>() || e.hasComponent<PhysicsComponent>()))
         {
             auto& inter{ em.getComponent<InteractiveComponent>(e) };
+            vec3d pos{};
+            double sclY{};
+            if (e.hasTag<SeparateModelTag>())
+            {
+                auto phy = em.getComponent<PhysicsComponent>(e);
+                pos = phy.position;
+                sclY = phy.scale.y();
+            }
+            else
+            {
+                auto& ren = em.getComponent<RenderComponent>(e);
+                pos = ren.position;
+                sclY = ren.scale.y();
+            }
+
             if (inter.showButton)
             {
-                vec3d pos{};
-                double sclY{};
-                if (e.hasTag<SeparateModelTag>())
-                {
-                    auto phy = em.getComponent<PhysicsComponent>(e);
-                    pos = phy.position;
-                    sclY = phy.scale.y();
-                }
+                ENGI::GameEngine::Gif* gif;
+                Texture2D gifCopy;
+                int sum = 0;
+                if (engine.isGamepadAvailable(0))
+                    gif = &engine.gifs.at("x");
                 else
                 {
-                    auto& ren = em.getComponent<RenderComponent>(e);
-                    pos = ren.position;
-                    sclY = ren.scale.y();
+                    gif = &engine.gifs.at("e");
+                    sum = 13;
                 }
 
-                std::string button = "E";
-                if (engine.isGamepadAvailable(0))
-                    button = "A";
+                gifCopy = gif->texture;
 
-                engine.drawText(button.c_str(),
-                    static_cast<int>(engine.getWorldToScreenX(pos) - 5),
-                    static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9),
-                    20,
-                    WHITE);
+                // Redimensionamos la copia
+                gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
+                gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
+
+                int offSetX = gifCopy.width / 2;
+                if (e.hasTag<DoorTag>())
+                    offSetX = -(gifCopy.width / 2 + sum);
+
+                int posX = static_cast<int>(engine.getWorldToScreenX(pos)) - offSetX;
+                int posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 11);
+
+                displayGif(engine, gifCopy, *gif, posX, posY);
+
+                if (e.hasTag<DoorTag>())
+                {
+                    auto& candado = engine.textures["candado_abierto"];
+                    engine.drawTexture(candado,
+                        static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(candado.width / 2)),
+                        static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13),
+                        { 255, 255, 255, 255 });
+                }
+            }
+            else if (inter.showLock)
+            {
+                auto& candado = engine.textures["candado_cerrado"];
+                engine.drawTexture(candado,
+                    static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(candado.width / 2)),
+                    static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13),
+                    { 255, 255, 255, 255 });
             }
         }
 
@@ -1568,11 +1624,28 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         if (enemy.hasComponent<RenderComponent>())
         {
             auto& r = em.getComponent<RenderComponent>(enemy);
+            if (color.a == 100)
+            {
+                auto& destellin = engine.textures["destellin"];
+                engine.drawTexture(destellin,
+                    static_cast<int>(engine.getWorldToScreenX(r.position)) - destellin.width / 2,
+                    static_cast<int>(engine.getWorldToScreenY(r.position)) - destellin.height / 2,
+                    { 255, 255, 255, 255 });
+            }
+            else
+            {
+                auto& fijado = engine.gifs.at("fijado");
+                auto copy = fijado.texture;
 
-            engine.drawCircle(static_cast<int>(engine.getWorldToScreenX(r.position)),
-                static_cast<int>(engine.getWorldToScreenY(r.position)),
-                5,
-                color);
+                // Redimensionamos la copia
+                copy.width = static_cast<int>(copy.width / fijado.reScaleX);
+                copy.height = static_cast<int>(copy.height / fijado.reScaleY);
+
+                int posX = static_cast<int>(engine.getWorldToScreenX(r.position)) - copy.width / 2;
+                int posY = static_cast<int>(engine.getWorldToScreenY(r.position)) - copy.height / 2;
+
+                displayGif(engine, copy, fijado, posX, posY);
+            }
         }
     }
 }
@@ -1599,7 +1672,7 @@ void RenderSystem::drawDeath(ENGI::GameEngine& engine)
     // engine.drawText("HAS MUERTO", 250, 250, 40, RED);
     std::string text = "[ENTER] para volver a jugar";
     if (engine.isGamepadAvailable(0))
-        text = "Pulsa [A] para volver a jugar";
+        text = "Pulsa [X] para volver a jugar";
     GuiLabelButton(Rectangle{ posX2, posY + 50, boxWidth2, boxHeight }, text.c_str());
     init();
 }
@@ -1631,7 +1704,12 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
     // engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * (l.maxLife + plfi.armor) + 2, barHeight + 4, DARKGRAY);
 
     // Dibujamos cara del maguito
-    engine.drawTexture(engine.textures["mago_happy"], 25, 20, { 255, 255, 255, 255 });
+    if (l.life > l.maxLife / 2)
+        engine.drawTexture(engine.textures["mago_happy"], 25, 20, { 255, 255, 255, 255 });
+    else if (l.life > 2)
+        engine.drawTexture(engine.textures["mago_meh"], 25, 20, { 255, 255, 255, 255 });
+    else
+        engine.drawTexture(engine.textures["mago_sos"], 25, 20, { 255, 255, 255, 255 });
 
     // Dibujamos cada parte de la barra de vida
     int i{};
@@ -1663,7 +1741,7 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
             int currentX = barX + i * (barWidth + spacing);
 
             // Dibujamos el corazón
-            engine.drawTexture(engine.textures["heart"], currentX, barY, SKYBLUE);
+            engine.drawTexture(engine.textures["ice_heart"], currentX, barY, SKYBLUE);
         }
 }
 
@@ -1685,32 +1763,39 @@ void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
     }
 
     float div = elapsed_CoinBar / elapsed_limit_CoinBar;
-
+    int offSetX = 153;
     // Interpolación
-    coinBarX = static_cast<int>((1.f - div) * static_cast<float>(engine.getScreenWidth()) + div * static_cast<float>(engine.getScreenWidth() - 153));
+    coinBarX = static_cast<int>((1.f - div) * static_cast<float>(engine.getScreenWidth()) + div * static_cast<float>(engine.getScreenWidth() - offSetX));
 
     // Barra para los destellos
     engine.drawTexture(engine.textures["destellos"], coinBarX, engine.getScreenHeight() - 130, { 255, 255, 255, 255 });
-    std::string info_text = std::to_string(plfi.coins);
 
-    coinNumberX = static_cast<int>((1.f - div) * (static_cast<float>(engine.getScreenWidth()) + 118) + div * static_cast<float>(engine.getScreenWidth() - 35));
-    int posY = engine.getScreenHeight() - 114;
+    // Interpolación de la posición de los números
+    int offSetCoinNum = 40;
+    coinNumberX = static_cast<int>((1.f - div) * (static_cast<float>(engine.getScreenWidth() + (offSetX - offSetCoinNum))) + div * static_cast<float>(engine.getScreenWidth() - offSetCoinNum));
+    int posY = engine.getScreenHeight() - 117;
 
-    // Sacamos el número de dígitos que tiene el número de destellos
-    int num_digits = 0;
-    int temp = plfi.coins;
-    while (temp > 0)
+    std::vector<int> digits{};
+    auto coinsCopy = plfi.coins;
+
+    // Sacamos cada dígito individual
+    while (coinsCopy > 0)
     {
-        temp /= 10;
-        num_digits++;
-
-        if (num_digits > 1)
-            coinNumberX -= 16;
+        digits.push_back(coinsCopy % 10);
+        coinsCopy /= 10;
     }
 
     // Dibujamos el número de destellos
-    if (elapsed_CoinBar > 0)
-        engine.drawText(info_text.c_str(), coinNumberX, posY, 28, YELLOW);
+
+    if (elapsed_CoinBar > 0 && plfi.coins > 0)
+    {
+        for (std::size_t i = 0; i < digits.size(); i++)
+        {
+            auto& texture = engine.textures.at(std::to_string(digits[i]));
+            engine.drawTexture(texture, coinNumberX, posY, { 255, 255, 255, 255 });
+            coinNumberX -= static_cast<int>(texture.width / 1.7);
+        }
+    }
 }
 
 void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
@@ -1770,7 +1855,55 @@ void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
     {
         txti.popText();
         inpi.interact = false;
-        if (textQueue.empty())
-            txti.waitTime = .8f;
     }
+
+    int posButtonX = static_cast<int>(posX + boxWidth - 8);
+    int posButtonY = static_cast<int>(posY + boxHeight - 8);
+    if (textQueue.size() > 1)
+    {
+        auto& sig = engine.textures["sig"];
+        auto copy = sig;
+        copy.width /= 2;
+        copy.height /= 2;
+
+        posButtonX -= copy.width;
+        posButtonY -= copy.height;
+
+        engine.drawTexture(copy,
+            posButtonX,
+            posButtonY,
+            { 255, 255, 255, 255 });
+
+        posButtonY += copy.height;
+    }
+
+    ENGI::GameEngine::Gif* gif;
+    Texture2D gifCopy;
+    int rest = 5;
+    if (engine.isGamepadAvailable(0))
+    {
+        gif = &engine.gifs.at("x");
+    }
+    else
+    {
+        gif = &engine.gifs.at("e");
+        rest = 0;
+    }
+
+    gifCopy = gif->texture;
+
+    // Redimensionamos la copia
+    gifCopy.width = static_cast<int>(gifCopy.width / 3.5);
+    gifCopy.height = static_cast<int>(gifCopy.height / 3.5);
+
+    posButtonX -= gifCopy.width;
+    posButtonY -= gifCopy.height - rest;
+
+    displayGif(engine, gifCopy, *gif, posButtonX, posButtonY);
+}
+
+void RenderSystem::displayGif(ENGI::GameEngine& engine, Texture2D& copy, GameEngine::Gif& gif, int& posX, int& posY)
+{
+    engine.drawTexture(copy, posX, posY, WHITE);
+    engine.updateGif(gif);
 }
