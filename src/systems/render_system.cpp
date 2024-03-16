@@ -1419,6 +1419,30 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                     static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13),
                     { 255, 255, 255, 255 });
             }
+
+            if (e.hasTag<ChestTag>() && li.enemyToChestPos != vec3d::zero() && !li.playerDetected)
+            {
+                auto& chest = em.getComponent<ChestComponent>(e);
+                if (!chest.isOpen)
+                {
+                    auto& phy = em.getComponent<PhysicsComponent>(e);
+                    if (phy.position.distance(li.enemyToChestPos) < 30.0)
+                    {
+                        if (elapsed_Lock < elapsed_limit_Lock)
+                        {
+                            auto& candado = engine.textures["candado_abierto"];
+                            engine.drawTexture(candado,
+                                static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(candado.width / 2)),
+                                static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9),
+                                { 255, 255, 255, 255 });
+
+                            elapsed_Lock += timeStep60;
+                        }
+                        else
+                            li.enemyToChestPos = vec3d::zero();
+                    }
+                }
+            }
         }
 
         if (debugphy && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)

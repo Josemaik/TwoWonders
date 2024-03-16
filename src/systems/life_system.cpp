@@ -45,7 +45,12 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
         {
             // Si es enemigo creamos un objeto
             if (ent.hasTag<EnemyTag>() && !lif.decreaseNextFrame)
-                createObject(em, os, em.getComponent<PhysicsComponent>(ent).position);
+            {
+                auto& phy = em.getComponent<PhysicsComponent>(ent);
+                createObject(em, os, phy.position);
+                li.enemyToChestPos = phy.position;
+            }
+
             //Si es un slime
             if (ent.hasTag<SlimeTag>())
             {

@@ -167,8 +167,6 @@ void ZoneSystem::checkZones(EntityManager& em, EventManager& evm, checkType zone
 void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
 {
     auto& li = em.getSingleton<LevelInfo>();
-    if (li.playerDetected)
-        return;
     using chestCMP = MP::TypeList<ChestComponent, InteractiveComponent, PhysicsComponent, OneUseComponent>;
     using chestTag = MP::TypeList<ChestTag>;
 
@@ -190,11 +188,17 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
             double range = 7.5;
 
             // Si el cofre se encuentra a menos de 2 unidades de distancia del se muestra el mensaje de abrir cofre
-            if (distance < range && !ch.isOpen && !ic.showButton)
+            if (distance < range && !ch.isOpen && !ic.showButton && !li.playerDetected)
                 ic.showButton = true;
 
-            else if (distance > range && ic.showButton)
+            else if ((distance > range && ic.showButton) || li.playerDetected)
                 ic.showButton = false;
+
+            if (distance < range && !ic.showButton && li.playerDetected)
+                ic.showLock = true;
+
+            else if ((distance > range && ic.showLock) || !li.playerDetected)
+                ic.showLock = false;
 
             auto& inpi = em.getSingleton<InputInfo>();
 

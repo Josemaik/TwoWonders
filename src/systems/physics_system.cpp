@@ -3,14 +3,6 @@
 
 void PhysicsSystem::update(EntityManager& em, float dt)
 {
-    // if (elapsed >= elapsed_limit) {
-    //     elapsed = 0;
-    // }
-    // else {
-    //     elapsed += dt;
-    //     return;
-    // }
-
     em.forEach<SYSCMPs, SYSTAGs>([dt, &em](Entity& ent, PhysicsComponent& phy)
     {
         // Cuando el jugador se para por un tiempo determinado

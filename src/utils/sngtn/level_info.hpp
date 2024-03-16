@@ -60,10 +60,10 @@ struct LevelInfo
     notLoadSet dontLoad{};
 
     // Variables relacionadas con los eventos
-    vec3d posWall{}, scaleWall{};
     std::size_t chestToOpen{ max };
     std::size_t doorToOpen{ max };
     bool dungeonKeyCreated{ false };
+    vec3d enemyToChestPos{};
 
     // Variables de debug
     bool debugIA2{ false };
@@ -94,7 +94,7 @@ struct LevelInfo
     {
         if (id != 0)
             dead_entities.insert(id);
-        else
+        else if (!isDead)
         {
             isDead = true;
             deathCount += 1;

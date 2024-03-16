@@ -56,6 +56,7 @@ private:
     float elapsed{ 0.f }, elapsed_limit{ 0.4f };
     float elapsed_WASD{ 0.f }, elapsed_limit_WASD{ 50.0f };
     float elapsed_CoinBar{ 0.f }, elapsed_limit_CoinBar{ 5.0f };
+    float elapsed_Lock{ 0.f }, elapsed_limit_Lock{ 5.0f };
 
     int coinBarX{}, coinNumberX{};
 };

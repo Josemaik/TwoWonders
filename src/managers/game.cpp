@@ -48,7 +48,7 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    // em.addComponent<AttackComponent>(e);
+    em.addComponent<AttackComponent>(e);
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
@@ -291,6 +291,7 @@ void Game::resetDeath()
     em.getComponent<RenderComponent>(player).visible = true;
     em.getComponent<PhysicsComponent>(player).position = plfi.spawnPoint;
     lif.life = lif.maxLife;
+    lif.markedForDeletion = false;
 
     map.spawnReset(em, iam);
 }
