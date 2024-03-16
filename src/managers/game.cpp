@@ -68,7 +68,7 @@ void Game::createEntities(EntityManager& em)
 
 //inicializar bancos
 void Game::createSound(EntityManager&) {
-    sound_system.initBanks("assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Music.bank");
+    sound_system.initBanks("assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Ambient.bank", "assets/banks/Music.bank");
     //sound_system.createEventInstance();
     //sound_system.play();
 }
@@ -187,6 +187,10 @@ void Game::run()
         // CODIGO DEL GAMEPLAY
         case GameScreen::GAMEPLAY:
         {
+             if (sound_system.ambient_started == false) {
+                sound_system.playAmbient();
+                sound_system.ambient_started = true;
+            } 
             if (em.getEntities().empty() || li.resetGame)
                 resetGame(em, engine, render_system);
 

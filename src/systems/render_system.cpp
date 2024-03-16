@@ -48,6 +48,8 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt
 }
 
 void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
+    ss.ambient_stop();
+    ss.ambient_started = false;
     engine.beginDrawing();
     engine.clearBackground(WHITE);
     // Logo del videojuego
@@ -91,10 +93,12 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
     else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) { // D-Pad Up
         // Move the selection up
         currentButton = (currentButton > 0) ? currentButton - 1 : 1;
+        ss.sonido_mov();
     }
     else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) { // D-Pad Down
         // Move the selection down
         currentButton = (currentButton < 1) ? currentButton + 1 : 0;
+        ss.sonido_mov();
     }
 
     // Draw the buttons
@@ -162,16 +166,19 @@ void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, Soun
     if (GuiButton(btn2Rec, "800x600"))
     {
         engine.setWindowSize(800, 600);
+        ss.seleccion_menu();
     }
 
     if (GuiButton(btn3Rec, "1280x720"))
     {
         engine.setWindowSize(1280, 720);
+        ss.seleccion_menu();
     }
 
     if (GuiButton(btn4Rec, "1920x1080"))
     {
         engine.setWindowSize(1920, 1080);
+        ss.seleccion_menu();
     }
 
     if (fullScreen)
@@ -184,9 +191,10 @@ void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, Soun
     {
         engine.setWindowSize(1920, 1080);
         fullScreen = true;
+        ss.seleccion_menu();
     }
 
-    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec)) {
+    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn3Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn4Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn5Rec)) {
         if (ss.pushed == false)
             ss.sonido_mov();
         ss.pushed = true;
@@ -255,6 +263,7 @@ void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, So
         }
         case 3: // "SALIR"
         {
+            ss.sonido_salir();
             li.gameShouldEnd = true;
             return;
         }
@@ -266,10 +275,12 @@ void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, So
     else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) { // D-Pad Up
         // Move the selection up
         currentButton = (currentButton > 0) ? currentButton - 1 : 3;
+        ss.sonido_mov();
     }
     else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) { // D-Pad Down
         // Move the selection down
         currentButton = (currentButton < 3) ? currentButton + 1 : 0;
+        ss.sonido_mov();
     }
 
     // Draw the buttons
@@ -293,6 +304,13 @@ void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, So
         currentButton = 3;
         inpi.mouseClick = true;
     }
+
+    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec)|| engine.checkCollisionPointRec(GetMousePosition(), btn3Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn4Rec)) {
+        if (ss.pushed == false)
+            ss.sonido_mov();
+        ss.pushed = true;
+    }else
+        ss.pushed = false;
 }
 
 void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)

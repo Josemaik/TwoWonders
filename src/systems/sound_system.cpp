@@ -19,23 +19,24 @@ SoundSystem::SoundSystem() {
     ERRCHECK(FMOD_Studio_System_Initialize(soundSystem, 512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0));
 }
 
-void SoundSystem::initBanks(const char* master_bank_location, const char* master_string_location, const char* ui_bank_location, const char* music_bank_location)
+void SoundSystem::initBanks(const char* master_bank_location, const char* master_string_location, const char* ui_bank_location,const char* ambient_bank_location,  const char* music_bank_location)
 {
     ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, master_bank_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &master_bank));
     ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, master_string_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &strings_bank));
     ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, ui_bank_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &ui_bank));
     ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, music_bank_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &music_bank));
+        ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, ambient_bank_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &ambient_bank));
     ERRCHECK(FMOD_Studio_Bank_GetLoadingState(ui_bank, &loadingState));
 }
 
 void SoundSystem::createEventInstance() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Menús/main_select", &eventDescription));
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Menus/main_select", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     FMOD_Studio_EventInstance_Start(eventInstance);
 }
 
 void SoundSystem::playMusicMenu() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Música/Menu/menu_music", &eventDescription_Musica));
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/Menu/menu_music", &eventDescription_Musica));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica));
     FMOD_Studio_EventInstance_Start(eventInstance_Musica);
     FMOD_Studio_System_Update(soundSystem);
@@ -43,20 +44,32 @@ void SoundSystem::playMusicMenu() {
 
 
 void SoundSystem::seleccion_menu() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Menús/main_select", &eventDescription));
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Menus/main_select", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     FMOD_Studio_EventInstance_Start(eventInstance);
     update();
 }
+void SoundSystem::playAmbient(){
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_bosque", &eventDescription_Ambiente));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Ambiente, &eventInstance_Ambiente));
+    FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
+    FMOD_Studio_System_Update(soundSystem);
+}
 
 void SoundSystem::sonido_config() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Menús/sound_config", &eventDescription));
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Menus/sound_config", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     FMOD_Studio_EventInstance_Start(eventInstance);
 }
 
 void SoundSystem::sonido_mov() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Menús/main_mov", &eventDescription));
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Menus/main_mov", &eventDescription));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+    FMOD_Studio_EventInstance_Start(eventInstance);
+    update();
+}
+void SoundSystem::sonido_salir() {
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Menus/salir", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     FMOD_Studio_EventInstance_Start(eventInstance);
     update();
@@ -75,11 +88,16 @@ void SoundSystem::clear() {
     FMOD_Studio_Bank_Unload(strings_bank);
     FMOD_Studio_Bank_Unload(ui_bank);
     FMOD_Studio_Bank_Unload(music_bank);
+    FMOD_Studio_Bank_Unload(ambient_bank);
     FMOD_Studio_System_UnloadAll(soundSystem);
 }
 
 void SoundSystem::music_stop() {
     FMOD_Studio_EventInstance_Stop(eventInstance_Musica, FMOD_STUDIO_STOP_ALLOWFADEOUT);
+}
+void SoundSystem::ambient_stop() {
+    FMOD_Studio_EventInstance_Stop(eventInstance_Ambiente, FMOD_STUDIO_STOP_ALLOWFADEOUT);
+    update();
 }
 
 /*float SoundSystem::getVolume(){
