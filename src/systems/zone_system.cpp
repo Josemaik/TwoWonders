@@ -311,6 +311,12 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
         else if ((distance > range && ic.showButton) || !plfi.hasKey)
             ic.showButton = false;
 
+        if (distance < range && !ic.showButton && !plfi.hasKey)
+            ic.showLock = true;
+
+        else if ((distance > range && ic.showLock) || plfi.hasKey)
+            ic.showLock = false;
+
         if (inpi.interact && ic.showButton && plfi.hasKey)
         {
             li.doorToOpen = e.getID();

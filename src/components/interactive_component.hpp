@@ -14,4 +14,5 @@ enum struct InteractableType : uint8_t
 struct InteractiveComponent
 {
     bool showButton{ false };
+    bool showLock{ false };
 };

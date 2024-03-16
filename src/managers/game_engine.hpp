@@ -11,19 +11,29 @@ namespace ENGI {
 
     struct GameEngine
     {
+        struct Gif
+        {
+            std::string name{};
+            Image image{};
+            Texture2D texture{};
+            int currentFrame{};
+            int frames{};
+            int nextFrameDataOffset{};
+
+            double reScaleX{ 2.0 };
+            double reScaleY{ 2.0 };
+
+            // Variable para el update del frame
+            int frameCounter{ 0 };
+            int frameDelay{ 25 };
+        };
+
         using CL = MP::TypeList<PhysicsComponent, RenderComponent>;
         using TL = MP::TypeList<>;
 
         using u16 = std::uint16_t;
 
         GameEngine(u16 const width, u16 const height);
-        Texture2D texture_logo_two_wonders,
-            texture_logo_kaiwa_games,
-            texture_heart,
-            texture_mago_happy,
-            texture_mana,
-            texture_destellos,
-            texture_empty_heart;
 
         // Timing Related Functions
         void setTargetFPS(int fps);
@@ -31,6 +41,7 @@ namespace ENGI {
 
         // Image and Texture
         Image loadImage(const char* filename);
+        Image loadImagenAnim(const char* filename, int& frames);
         void imageResize(Image* image, int newWidth, int newHeight);
         void unloadImage(Image image);
         Texture2D loadTextureFromImage(Image image);
@@ -106,14 +117,20 @@ namespace ENGI {
         Model loadModelFromMesh(Mesh m);
         Model loadModel(const char* filename);
         Texture2D loadTexture(const char* filename);
+        void updateTexture(Texture2D texture, const void* data);
         void unloadMesh(Mesh m);
         void unloadModel(Model m);
         float getWorldToScreenX(vec3d pos);
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();
         void loadAndResizeImage(const std::string& name, const std::string& path);
+        void loadAndResizeImageGif(const std::string& name, const std::string& path, int frames, int delay = 15, double reScaleX = 2.0, double reScaleY = 2.0);
+        void updateGif(Gif& anim);
+        void unloadGifs();
 
         std::map<std::string, Texture2D> textures;
+        std::map<std::string, Gif> gifs;
+
     private:
         u16 const width_{}, height_{};
         Camera3D camera{};

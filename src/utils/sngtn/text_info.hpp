@@ -24,9 +24,6 @@ struct TextInfo
     {
         return textQueue;
     }
-
-    float waitTime{ 0.0f };
-
 private:
     // Cola para los textos
     std::queue<std::string> textQueue{};
