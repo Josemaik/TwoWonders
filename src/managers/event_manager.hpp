@@ -114,8 +114,9 @@ public:
                         auto& e{ em.newEntity() };
                         em.addTag<BarricadeTag>(e);
                         em.addTag<WallTag>(e);
-                        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -37.852, 7.0, 139.238 }, .scale = { 19.127, 10.0, 15.979 }, .color = DARKBROWN, .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, 1.0, 0.0 } });
-                        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0, .orientation = r.orientation, .rotationVec = r.rotationVec });
+                        em.addTag<SeparateModelTag>(e);
+                        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = vec3d::zero(), .scale = vec3d::zero(), .color = DARKBROWN, .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, -1.0, 0.0 } });
+                        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { -37.852, 7.0, 139.238 }, .scale = { 19.127, 10.0, 15.979 }, .gravity = 0, .orientation = r.orientation, .rotationVec = r.rotationVec });
                         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, p.scale, BehaviorType::STATIC });
                         break;
                     }

@@ -31,6 +31,7 @@ OBJSUBDIRS 	:= $(patsubst $(SRC)%,$(OBJ)%,$(SUBDIRS))
 DATE       	:= $(shell date +'%d-%m-%y')
 ZIP_NAME   	:= $(APP)_$(RELEASE)_$(DATE).zip
 
+
 # Variables si es make release
 ifeq ($(filter release,$(MAKECMDGOALS)),release)
     SANITIZE :=
