@@ -2,7 +2,7 @@
 // #include "../utils/memory_viewer.hpp"
 // #include <chrono>
 
-void Game::createShield(EntityManager& em, Entity& ent)
+void Game::createShield(Entity& ent)
 {
     auto& e{ em.newEntity() };
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = DARKBROWN });
@@ -11,7 +11,7 @@ void Game::createShield(EntityManager& em, Entity& ent)
     em.addComponent<ShieldComponent>(e, ShieldComponent{ .createdby = EntitieswithShield::Player });
 }
 
-void Game::createEnding(EntityManager& em)
+void Game::createEnding()
 {
     auto& e{ em.newEntity() };
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = {83.0f, 1.0f, -87.0f}, .scale = {1.0f, 1.0f, 1.0f}, .color = WHITE });
@@ -19,28 +19,36 @@ void Game::createEnding(EntityManager& em)
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
 }
 
-void Game::createEntities(EntityManager& em)
+void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
+        plfi.spawnPoint = { 35.0, 22.0, -23.0 };
+
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
     // 32.0, 4.0, 130.0 - Segundo cofre
     // -72.0, 4.0, 72.9 - Cofre con llave
     // -116.0, 4.0, 111.0 - Apisonadora
-    //-125, 4.0, 138.68 - `pos chunck 3
+    // -125, 4.0, 138.68 - `pos chunck 3
+    // 35.0, 22.0, -23.0 - Posición Incial lvl1
+    // -68.0, 4.0, -22.0 - Primera rampa lvl1
+    // -6.0, 4.0, 94.0 - Campamento lvl1
+    // -126.0, 4.0, 152.0 - Segundo altar lvl1
+    // 30.0, 13.0, 213.0 - Segundo campamento lvl1
+    // -113.0, 4.0, 236.0 - Final lvl1
 
-// Player
+    // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
 
-    auto& lis = em.addComponent<ListenerComponent>(e, ListenerComponent{});
-    em.addComponent<InputComponent>(e, InputComponent{});
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
+    auto& lis = em.addComponent<ListenerComponent>(e);
+    em.addComponent<InputComponent>(e);
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
+    em.addComponent<AttackComponent>(e);
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
@@ -49,7 +57,7 @@ void Game::createEntities(EntityManager& em)
     lis.addCode(EventCodes::OpenDoor);
 
     // Código de añadir un hechizo al jugador
-    // Spell spell{ "Fireball", "Shoots a fireball", Spells::FireMeteorites, 20.0, 2 };
+    // Spell spell{ "Fireball", "Shoots a fireball", Spells::WaterBomb, 20.0, 2 };
     // plfi.addSpell(spell);
 
     // Código de añadir un objeto poción al inventario
@@ -61,13 +69,12 @@ void Game::createEntities(EntityManager& em)
 
     // Ending
     // createEnding(em);
-
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
 }
 
 //inicializar bancos
-void Game::createSound(EntityManager&) {
+void Game::createSound() {
     sound_system.initBanks("assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Music.bank");
     //sound_system.createEventInstance();
     //sound_system.play();
@@ -87,6 +94,7 @@ void Game::run()
     engine.setShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
 
     render_system.setShader(shader);
+    collision_system.setEventManager(evm);
 
     engine.setTargetFPS(120);
 
@@ -118,7 +126,7 @@ void Game::run()
     // Inicializa una variable donde tener el tiempo entre frames
     float currentTime{}, elapsed{};
 
-    createSound(em);
+    createSound();
     li.sound_system = &sound_system;
     attack_system.setCollisionSystem(&collision_system);
 
@@ -133,7 +141,7 @@ void Game::run()
         case GameScreen::LOGO:
         {
             // Contador para que pasen X segundos
-            currentTime += timeStep;
+            currentTime += timeStep60;
             if (currentTime > 4.0f) {
                 li.currentScreen = GameScreen::TITLE;
                 currentTime = 0;
@@ -175,11 +183,12 @@ void Game::run()
                 li.currentScreen = GameScreen::GAMEPLAY;
             render_system.drawStory(engine);
 
-            if (em.getEntities().empty())
-            {
-                createEntities(em);
-                map.reset(em, 0, iam);
-            }
+            // TODO - Cuando se implemente el sistema de guardado, cargar el nivel en el que se quedó
+            if (!map.isComplete())
+                map.createMap(em, 0, iam);
+
+            if (li.playerID == li.max)
+                createEntities();
 
             break;
         }
@@ -188,13 +197,27 @@ void Game::run()
         case GameScreen::GAMEPLAY:
         {
             if (em.getEntities().empty() || li.resetGame)
-                resetGame(em, engine, render_system);
+                resetGame();
+
+            if (li.resetFromDeath)
+                resetDeath();
+
+            if (!map.isComplete())
+            {
+                if (!li.isCharging() && li.loading)
+                    li.loadingTime = 0;
+                map.createMap(em, li.mapID, iam);
+            }
+
+            if (li.isCharging())
+                render_system.drawChargeScreen(engine, em);
 
             input_system.update(em, engine);
-            bool debugs = inpi.debugPhy || inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();
+            bool debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();
+            bool resets = li.resetGame || li.resetFromDeath;
 
             // seleccionar modo de debug ( physics o AI)
-            if (!li.resetGame && !debugs)
+            if (!resets && !debugs)
             {
                 while (elapsed >= timeStep)
                 {
@@ -215,15 +238,15 @@ void Game::run()
                     camera_system.update(em, engine, timeStep);
                     event_system.update(em, evm, iam, map, object_system);
 
-                    if (!li.dead_entities.empty())
+                    if (!li.getDeath().empty())
                     {
-                        em.destroyEntities(li.dead_entities);
-                        li.dead_entities.clear();
+                        em.destroyEntities(li.getDeath());
+                        li.clearDeath();
                     }
                 }
                 render_system.update(em, engine, timeStep);
             }
-            else if ((!li.resetGame) && debugs)
+            else if (!resets && debugs)
                 render_system.update(em, engine, timeStep);
 
             break;
@@ -240,7 +263,7 @@ void Game::run()
                 li.currentScreen = GameScreen::TITLE;
 
             render_system.drawEnding(engine);
-            resetGame(em, engine, render_system);
+            resetGame();
             break;
         }
 
@@ -258,22 +281,44 @@ void Game::run()
     sound_system.clear();
     render_system.unloadModels(em, engine);
 
+    engine.unloadGifsAndTextures();
     engine.unloadShader(shader);
     engine.closeWindow();
 }
 
-void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
+void Game::resetDeath()
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& plfi = em.getSingleton<PlayerInfo>();
+
+    li.deathReset();
+    plfi.onDeath();
+    auto& player = *em.getEntityByID(li.playerID);
+    auto& lif = em.getComponent<LifeComponent>(player);
+
+    em.getComponent<RenderComponent>(player).visible = true;
+    em.getComponent<PhysicsComponent>(player).position = plfi.spawnPoint;
+    lif.life = lif.maxLife;
+    lif.markedForDeletion = false;
+
+    map.spawnReset(em, iam);
+}
+
+void Game::resetGame()
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto& bb = em.getSingleton<BlackBoard_t>();
+    auto& plfi = em.getSingleton<PlayerInfo>();
+    auto& zchi = em.getSingleton<ZoneCheckInfo>();
 
+    zchi.clearSets();
     em.destroyAll();
     bb.subditosData.clear();
-    rs.unloadModels(em, engine);
+    render_system.unloadModels(em, engine);
     li.reset();
-    // plfi.reset();
+    plfi.reset();
     lock_system.reset();
-    createEntities(em);
-    map.reset(em, 0, iam);
+    map.reset(em, li.mapID, iam);
+    createEntities();
     li.sound_system = &sound_system;
 }

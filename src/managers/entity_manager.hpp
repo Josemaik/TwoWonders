@@ -249,6 +249,17 @@ namespace ETMG {
             }
         }
 
+        // Plantilla para destruir un tag de una entidad
+        template<typename TAG>
+        void destroyTag(Entity& e)
+        {
+            if (e.template hasTag<TAG>())
+            {
+                // Elimina el tag de la máscara de tags
+                e.tag_mask_ &= ~tag_info::template mask<TAG>();
+            }
+        }
+
     private:
         // Plantilla para sacar una lista de componentes de la tupla que los guarda
         template <typename CMP>

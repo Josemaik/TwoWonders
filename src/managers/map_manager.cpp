@@ -3,29 +3,33 @@
 
 void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
 
-    mapType map{};
     auto& li = em.getSingleton<LevelInfo>();
     iam.resetVec();
 
-    switch (mapID)
+    if (li.levelChanged || fileMap.size() == 0)
     {
-    case 0:
-        li.mapID = 0;
-        map = loadMap("assets/levels/maps/lvl_0.kaiwa");
-        break;
+        switch (mapID)
+        {
+        case 0:
+            li.mapID = 0;
+            map = loadMap("assets/levels/maps/lvl_0.kaiwa");
+            break;
 
-    case 1:
-        li.mapID = 1;
-        map = loadMap("assets/levels/mazmorra_level.json");
-        break;
+        case 1:
+            li.mapID = 1;
+            map = loadMap("assets/levels/maps/lvl_1.kaiwa");
+            break;
 
-    case 2:
-        li.mapID = 2;
-        map = loadMap("assets/levels/caves_level.json");
-        break;
+        case 2:
+            li.mapID = 2;
+            map = loadMap("assets/levels/caves_level.json");
+            break;
 
-    default:
-        break;
+        default:
+            break;
+        }
+
+        li.levelChanged = false;
     }
 
     generateMapFromJSON(em, map, iam);
@@ -33,7 +37,8 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
 
 mapType MapManager::loadMap(const std::string& mapFile)
 {
-    fileMap = mapFile;
+    if (fileMap != mapFile)
+        fileMap = mapFile;
     std::ifstream file(mapFile);
     rapidjson::IStreamWrapper isw(file);
     rapidjson::Document map;
@@ -53,11 +58,52 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
     {
         std::string chunkName = "Chunk" + std::to_string(i);
         const rapidjson::Value& chunk = chunks[i][chunkName.c_str()];
-        generateChunkFromJSON(em, chunk, iam, mapID, j);
+
+        switch (state)
+        {
+        case LoadState::LOAD_GROUND:
+        {
+            const rapidjson::Value& overworld = chunk[0]["overworld"];
+            const rapidjson::Value& groundArray = overworld["Ground"];
+            generateChunkModel(em, i);
+            generateGround(em, groundArray, j);
+            break;
+        }
+        case LoadState::LOAD_WALLS:
+        {
+            const rapidjson::Value& overworld = chunk[0]["overworld"];
+            const rapidjson::Value& wallArray = overworld["Walls"];
+            generateWalls(em, wallArray);
+            break;
+        }
+        case LoadState::LOAD_RAMPS_INTERACTABLES:
+        {
+            const rapidjson::Value& overworld = chunk[0]["overworld"];
+            const rapidjson::Value& rampArray = overworld["Ramps"];
+            const rapidjson::Value& interactablesArray = overworld["Interactive"];
+            generateRamps(em, rampArray);
+            generateInteractables(em, interactablesArray);
+        }
+        break;
+        case LoadState::LOAD_OBJECTS_ENEMIES:
+        {
+            const rapidjson::Value& underworld = chunk[1]["underworld"];
+            const rapidjson::Value& objectArray = underworld["Objects"];
+            const rapidjson::Value& enemyArray = underworld["Enemies"];
+            generateObjects(em, objectArray, mapID);
+            generateEnemies(em, enemyArray, iam);
+            break;
+        }
+        default:
+            break;
+        }
     }
+
+    if (!(state == LoadState::LOAD_COMPLETE))
+        state = static_cast<LoadState>(static_cast<int>(state) + 1);
 }
 
-void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value& chunk, Ia_man& iam, uint8_t mapID, int& j)
+void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value& chunk, Ia_man& iam, uint8_t mapID, rapidjson::SizeType& i, int& j)
 {
     const rapidjson::Value& overworld = chunk[0]["overworld"];
     const rapidjson::Value& groundArray = overworld["Ground"];
@@ -67,6 +113,8 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
     const rapidjson::Value& underworld = chunk[1]["underworld"];
     const rapidjson::Value& objectArray = underworld["Objects"];
     const rapidjson::Value& enemyArray = underworld["Enemies"];
+
+    generateChunkModel(em, i);
 
     generateGround(em, groundArray, j);
 
@@ -80,7 +128,7 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
 
     generateInteractables(em, interactablesArray);
 
-    // pseudo codigo para scheduling xdddd
+    // pseudo-codigo para scheduling xdddd
     // for enemy : map[enemies]
     // {
 
@@ -95,8 +143,44 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
     // }
 }
 
+void MapManager::generateChunkModel(EntityManager& em, rapidjson::SizeType& i)
+{
+
+    // Creamos la entidad modelo del chunk
+    auto& modelEntity{ em.newEntity() };
+
+    // Asignamos etiquetas al número del chunk
+    switch (i)
+    {
+    case 0:
+        em.addTag<Chunk0Tag>(modelEntity);
+        break;
+    case 1:
+        em.addTag<Chunk1Tag>(modelEntity);
+        break;
+    case 2:
+        em.addTag<Chunk2Tag>(modelEntity);
+        break;
+    case 3:
+        em.addTag<Chunk3Tag>(modelEntity);
+        break;
+    case 4:
+        em.addTag<Chunk4Tag>(modelEntity);
+        break;
+    case 5:
+        em.addTag<Chunk5Tag>(modelEntity);
+        break;
+    case 6:
+        em.addTag<Chunk6Tag>(modelEntity);
+        break;
+    }
+    em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = vec3d::zero(), .scale = vec3d::zero(), .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, -1.0, 0.0 } });
+}
+
 void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groundArray, int& j)
 {
+    vec2d min{}, max{};
+    double minHeigth = 0.0;
     for (rapidjson::SizeType i = 0; i < groundArray.Size(); i++)
     {
         auto& groundEntity = em.newEntity();
@@ -105,57 +189,71 @@ void MapManager::generateGround(EntityManager& em, const rapidjson::Value& groun
         // Extraemos los datos del json
         const rapidjson::Value& ground = groundArray[i];
         vec3d groundPosition{ ground["position"][1].GetDouble(), ground["position"][2].GetDouble(), ground["position"][0].GetDouble() };
-        vec3d groundScale{ ground["scale"][0].GetDouble(), ground["scale"][2].GetDouble(), ground["scale"][1].GetDouble() };
-        vec3d rotationVec{ ground["rotVector"][0].GetDouble(), ground["rotVector"][2].GetDouble(), ground["rotVector"][1].GetDouble() };
+        vec3d groundScale{ ground["scale"][1].GetDouble(), ground["scale"][2].GetDouble(), ground["scale"][0].GetDouble() };
+        vec3d rotationVec{ ground["rotVector"][1].GetDouble(), ground["rotVector"][2].GetDouble(), ground["rotVector"][0].GetDouble() };
         double orientation{ ground["rotation"].GetDouble() };
         double rot = orientation * DEGTORAD;
         Color color{ WHITE };
 
+        // Sacamos los máximos y los mínimos
+        if (i == 0)
+        {
+            min.x = groundPosition.x() - groundScale.x() / 2;
+            min.y = groundPosition.z() - groundScale.z() / 2;
+
+            max.x = groundPosition.x() + groundScale.x() / 2;
+            max.y = groundPosition.z() + groundScale.z() / 2;
+
+            minHeigth = groundPosition.y();
+        }
+        else
+        {
+            if (min.x > groundPosition.x() - groundScale.x() / 2)
+                min.x = groundPosition.x() - groundScale.x() / 2;
+            if (min.y > groundPosition.z() - groundScale.z() / 2)
+                min.y = groundPosition.z() - groundScale.z() / 2;
+
+            if (max.x < groundPosition.x() + groundScale.x() / 2)
+                max.x = groundPosition.x() + groundScale.x() / 2;
+            if (max.y < groundPosition.z() + groundScale.z() / 2)
+                max.y = groundPosition.z() + groundScale.z() / 2;
+
+            if (minHeigth > groundPosition.y())
+                minHeigth = groundPosition.y();
+        }
+
         // Creamos los componentes del suelo
-        auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .orientation = rot, .rotationVec = rotationVec });
+        auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .visible = false, .orientation = rot, .rotationVec = rotationVec });
         auto& p = em.addComponent<PhysicsComponent>(groundEntity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = rot, .rotationVec = r.rotationVec });
         em.addComponent<ColliderComponent>(groundEntity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
         em.addTag<SeparateModelTag>(groundEntity);
+    }
 
-        if (j >= 4)
-        {
-            r.position = groundPos;
-            if (j >= 8)
-                em.addTag<Chunk2Tag>(groundEntity);
-            else
-                em.addTag<Chunk1Tag>(groundEntity);
-        }
-        else {
-            em.addTag<Chunk0Tag>(groundEntity);
-            // r.position -= {-0.847, 0.0, 4.767};
-            r.position = vec3d::zero();
-            // r.position.setX(groundPosition.x());
-            groundPos = r.position;
-        }
+    // Sacamos la posición del centro del chunk
+    vec3d center = { (min.x + max.x) / 2, minHeigth, (min.y + max.y) / 2 };
 
-        // Creamos las 4 zonas
-        vec3d zoneScale = groundScale / 2; // Dividimos la escala del suelo por 2
-        zoneScale.setY(2); // Elevamos la zona en 2 unidades en y
-        int k = 0;
-        int limit = j + 4;
-        for (; j < limit; j++)
-        {
-            auto& zoneEntity = em.newEntity();
-            em.addTag<ZoneTag>(zoneEntity);
+    // Creamos 4 zonas para el chunk
+    vec3d zoneScale = { (max.x - min.x) / 2, 20, (max.y - min.y) / 2 };
+    int k = 0;
+    int limit = j + 4;
+    for (; j < limit; j++)
+    {
+        auto& zoneEntity = em.newEntity();
+        em.addTag<ZoneTag>(zoneEntity);
 
-            // Ajustamos la posición de la zona
-            vec3d zonePosition = groundPosition;
-            zonePosition.setX(groundPosition.x() + (k % 2 - 0.5) * zoneScale.x());
-            zonePosition.setZ(groundPosition.z() + (k / 2 - 0.5) * zoneScale.z());
-            zonePosition.setY(groundPosition.y() + 2); // Elevamos la zona en 2 unidades en y
+        // Ajustamos la posición de la zona
+        vec3d zonePosition = center;
+        zonePosition.setX(center.x() + (k % 2 - 0.5) * zoneScale.x());
+        zonePosition.setZ(center.z() + (k / 2 - 0.5) * zoneScale.z());
+        zonePosition.setY(center.y() + 2); // Elevamos la zona en 2 unidades en y
 
-            // Creamos los componentes de la zona
-            em.addComponent<ZoneComponent>(zoneEntity, ZoneComponent{ .zone = static_cast<uint16_t>(j) });
-            auto& rz = em.addComponent<RenderComponent>(zoneEntity, RenderComponent{ .position = zonePosition, .scale = zoneScale, .visible = false });
-            auto& pz = em.addComponent<PhysicsComponent>(zoneEntity, PhysicsComponent{ .position = rz.position, .velocity = vec3d::zero(), .scale = rz.scale, .gravity = .0 });
-            em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ pz.position, rz.scale, BehaviorType::ZONE });
-            k += 1;
-        }
+        // Creamos los componentes de la zona
+        em.addComponent<ZoneComponent>(zoneEntity, ZoneComponent{ .zone = static_cast<uint16_t>(j) });
+        auto& rz = em.addComponent<RenderComponent>(zoneEntity, RenderComponent{ .position = zonePosition, .scale = zoneScale, .visible = false });
+        auto& pz = em.addComponent<PhysicsComponent>(zoneEntity, PhysicsComponent{ .position = rz.position, .velocity = vec3d::zero(), .scale = rz.scale, .gravity = .0 });
+        auto& cz = em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ pz.position, rz.scale, BehaviorType::ZONE });
+        zoneBounds.insert({ j, cz.boundingBox });
+        k += 1;
     }
 }
 
@@ -191,20 +289,22 @@ void MapManager::generateRamps(EntityManager& em, const rapidjson::Value& rampAr
 
         // Extraemos los datos del json
         const rapidjson::Value& ramp = rampArray[i];
-        vec3d position{ ramp["position"][0].GetDouble(), ramp["position"][2].GetDouble(), ramp["position"][1].GetDouble() };
-        vec3d scale{ ramp["scale"][0].GetDouble(), ramp["scale"][2].GetDouble(), ramp["scale"][1].GetDouble() };
-        Color color{ BEIGE };
-        float orientation{ ramp["rotation"].GetFloat() };
-        vec3d rotationVec{ ramp["rotVector"][0].GetDouble(), ramp["rotVector"][2].GetDouble(), ramp["rotVector"][1].GetDouble() };
-        vec2d min{ ramp["min"][0].GetDouble(), ramp["min"][1].GetDouble() };
-        vec2d max{ ramp["max"][0].GetDouble(), ramp["max"][1].GetDouble() };
+        vec2d min{ ramp["min"][1].GetDouble(), ramp["min"][0].GetDouble() };
+        vec2d max{ ramp["max"][1].GetDouble(), ramp["max"][0].GetDouble() };
+        vec3d offset{ ramp["offset"][1].GetDouble(), ramp["offset"][2].GetDouble(), ramp["offset"][0].GetDouble() };
         double slope{ ramp["slope"].GetDouble() };
-        vec3d offset{ ramp["offset"][0].GetDouble(), ramp["offset"][1].GetDouble(), ramp["offset"][2].GetDouble() };
         RampType type{ static_cast<RampType>(ramp["type"].GetUint()) };
 
+        // Creamos las dimensiones de la rampa y su posición
+        vec3d rmin = { min.x, offset.y() - 20, min.y };
+        vec3d rmax = { max.x, offset.y() + 20, max.y };
+
+        vec3d rampPos = (rmin + rmax) / 2;
+        vec3d rampSize = rmax - rmin;
+
         // Creamos los componentes
-        auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .rotationVec = rotationVec });
-        em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = .0, .orientation = orientation * DEGTORAD, .rotationVec = rotationVec });
+        em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = rampPos, .scale = rampSize, .gravity = 0 });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ rampPos, rampSize, BehaviorType::RAMP });
         em.addComponent<RampComponent>(entity, RampComponent{ .min = min, .max = max, .slope = slope, .offset = offset, .type = type });
     }
 }
@@ -268,7 +368,7 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         auto& entity = em.newEntity();
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .orientation = rot, .rotationVec = rotationVec });
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = 0, .orientation = rot, .rotationVec = r.rotationVec });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+        auto& c = em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
         em.addComponent<InteractiveComponent>(entity);
 
         switch (type)
@@ -287,11 +387,12 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
                 messages.emplace(interactable["message"][j].GetString());
             }
 
-            [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .id = interId, .zone = zone, .dropPosition = { vec3d::zero() }, .content = content, .messages = messages });
+            em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = interId, .zone = zone });
+            [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .dropPosition = { vec3d::zero() }, .content = content, .messages = messages });
 
             if (interactable.HasMember("offsetZ"))
             {
-                r.offset = interactable["offsetZ"].GetDouble();
+                r.offset = interactable["offsetZ"][0].GetDouble();
             }
 
             if (interactable.HasMember("events"))
@@ -302,7 +403,6 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
                     dc.eventCodes.push_back(interactable["events"][j].GetInt());
                 }
             }
-
             break;
         }
         case InteractableType::Destructible:
@@ -321,7 +421,7 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
 
             if (interactable.HasMember("offsetZ"))
             {
-                r.offset = interactable["offsetZ"].GetDouble();
+                r.offset = interactable["offsetZ"][0].GetDouble();
             }
 
             em.destroyComponent<InteractiveComponent>(entity);
@@ -329,38 +429,70 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         }
         case InteractableType::Door:
         {
+            auto& li = em.getSingleton<LevelInfo>();
+
+            switch (li.mapID)
+            {
+            case 0:
+            {
+                em.addTag<SeparateModelTag>(entity);
+                r.position = vec3d::zero();
+                break;
+            }
+            }
             em.addTag<DoorTag>(entity);
             em.addTag<WallTag>(entity);
-            em.addTag<SeparateModelTag>(entity);
-            r.position = vec3d::zero();
+            if (interactable.HasMember("noKey"))
+                em.addTag<NoKeyTag>(entity);
+
             break;
         }
         case InteractableType::Level:
         {
-            // ???
+            r.visible = false;
+            c.behaviorType = BehaviorType::ZONE;
+            em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = static_cast<uint16_t>(interactable["zone"].GetUint()) });
+            break;
         }
         case InteractableType::Spawn:
         {
             em.addTag<SpawnTag>(entity);
-            r.color = ORANGE;
+            c.behaviorType = BehaviorType::SPAWN;
+            if (interactable.HasMember("offsetZ"))
+            {
+                r.offset = interactable["offsetZ"][0].GetDouble();
+            }
+            break;
+        }
+        case InteractableType::Lever:
+        {
+            em.addTag<WallTag>(entity);
+            em.addTag<LeverTag>(entity);
+            uint16_t zone = static_cast<uint16_t>(interactable["zone"].GetUint());
+            uint8_t interId = static_cast<uint8_t>(interactable["id"].GetUint());
+
+            em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = interId, .zone = zone });
             break;
         }
         }
+        addToZone(em, c.boundingBox, type);
     }
 }
 
 void MapManager::destroyMap(EntityManager& em)
 {
-    using CMPS = MP::TypeList<>;
-    using TAGS = MP::TypeList<GroundTag, WaterTag, WallTag, ZoneTag, RampTag, DoorTag, ObjectTag, EnemyTag, DestructibleTag, ChestTag>;
     auto& li = em.getSingleton<LevelInfo>();
 
-    em.forEachAny<CMPS, TAGS>([&](Entity& entity) { li.dead_entities.insert(entity.getID()); });
+    for (auto e : em.getEntities())
+    {
+        if (e.getID() != li.playerID)
+            li.insertDeath(e.getID());
+    }
 }
 
 void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
 {
-    using TAGs = MP::TypeList <EnemyTag, DestructibleTag>;
+    using TAGs = MP::TypeList <EnemyTag>;
     destroyParts<TAGs>(em);
 
     mapType map = loadMap(fileMap);
@@ -383,6 +515,14 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
 
     //     generateDestructibles(em, destructibleArray);
     // }
+}
+
+void MapManager::addToZone(EntityManager& em, BBox& b, InteractableType type)
+{
+    auto& zchi = em.getSingleton<ZoneCheckInfo>();
+    for (auto [num, bbox] : zoneBounds)
+        if (bbox.intersects(b))
+            zchi.insertZone(num, type);
 }
 
 // template<>
@@ -466,8 +606,24 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
 //     }
 // }
 
-void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man& iam)
+void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man&)
 {
     destroyMap(em);
-    createMap(em, mapID, iam);
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& zchi = em.getSingleton<ZoneCheckInfo>();
+
+    li.mapID = mapID;
+    li.levelChanged = true;
+    li.loading = false;
+    state = LoadState::LOAD_GROUND;
+    zchi.clearSets();
+    zoneBounds.clear();
+    // createMap(em, mapID, iam);
+}
+
+void MapManager::changeMap(EntityManager& em, uint8_t mapID, Ia_man& iam)
+{
+    reset(em, mapID, iam);
+    auto& li = em.getSingleton<LevelInfo>();
+    li.loading = true;
 }

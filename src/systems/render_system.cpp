@@ -51,10 +51,12 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
     engine.beginDrawing();
     engine.clearBackground(WHITE);
     // Logo del videojuego
-    engine.drawTexture(engine.texture_logo_two_wonders,
-        engine.getScreenWidth() / 2 - engine.texture_logo_two_wonders.width / 2,
-        static_cast<int>(engine.getScreenHeight() / 2.5 - engine.texture_logo_two_wonders.height / 2),
-        WHITE);
+    engine.textures["logo_twowonders"].width = static_cast<int>(engine.getScreenWidth() / 1.3);
+    engine.textures["logo_twowonders"].height = static_cast<int>(engine.getScreenHeight() / 1.5);
+    engine.drawTexture(engine.textures["logo_twowonders"],
+        engine.getScreenWidth() / 2 - engine.textures["logo_twowonders"].width / 2,
+        static_cast<int>(engine.getScreenHeight() / 2.0 - engine.textures["logo_twowonders"].height / 1.5),
+        { 255, 255, 255, 255 });
 
     // Datos de los botones
     float buttonWidth = 200.0f;
@@ -117,6 +119,28 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
         li.previousScreen = GameScreen::TITLE;
         ss.seleccion_menu();
     }
+
+    engine.endDrawing();
+}
+
+void RenderSystem::drawChargeScreen(GameEngine& engine, EntityManager& em)
+{
+    engine.beginDrawing();
+    engine.clearBackground({ 171, 159, 197, 255 });
+    ENGI::GameEngine::Gif& gif = engine.gifs.at("carga");
+    Texture2D gifCopy = gif.texture;
+
+    // Redimensionamos la copia
+    gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
+    gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
+
+    int posX = static_cast<int>(engine.getScreenWidth() / 2 - gifCopy.width / 2);
+    int posY = static_cast<int>(engine.getScreenHeight() / 2 - gifCopy.height / 2);
+
+    displayGif(engine, gifCopy, gif, posX, posY);
+
+    auto& li = em.getSingleton<LevelInfo>();
+    li.loadingTime += timeStep60;
 
     engine.endDrawing();
 }
@@ -433,9 +457,11 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
 void RenderSystem::drawLogoKaiwa(ENGI::GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(Color({ 136, 219, 152, 255 }));
-    engine.drawTexture(engine.texture_logo_kaiwa_games,
-        engine.getScreenWidth() / 2 - engine.texture_logo_kaiwa_games.width / 2,
-        engine.getScreenHeight() / 2 - engine.texture_logo_kaiwa_games.height / 2,
+    engine.textures["logo_kaiwagames"].width = engine.getScreenWidth();
+    engine.textures["logo_kaiwagames"].height = static_cast<int>(engine.getScreenHeight() / 1.6);
+    engine.drawTexture(engine.textures["logo_kaiwagames"],
+        engine.getScreenWidth() / 2 - engine.textures["logo_kaiwagames"].width / 2,
+        engine.getScreenHeight() / 2 - engine.textures["logo_kaiwagames"].height / 2,
         WHITE);
     engine.endDrawing();
 }
@@ -527,10 +553,14 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
             if (!e.hasTag<ZoneTag>())
             {
                 vec3d scl = { 1.0, 1.0, 1.0 };
-                vec3d pos = { r.position.x(), r.position.y(), r.position.z() };
+                vec3d pos = r.position;
                 // Solo generamos la malla si no existe
                 if (!r.meshLoaded)
-                    loadModels(e, engine, r);
+                    loadModels(e, engine, em, r);
+
+                auto& li = em.getSingleton<LevelInfo>();
+                if (li.isCharging())
+                    return;
 
                 bool in{ false };
                 if (e.hasTag<PlayerTag>())
@@ -595,7 +625,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 }
                 else if (e.hasTag<ChestTag>())
                 {
-                    pos.setY(pos.y() - r.offset / 2);
+                    pos.setY(pos.y() - r.offset);
                     in = true;
                 }
                 else if (e.hasTag<DestructibleTag>())
@@ -603,10 +633,18 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     pos.setY(pos.y() - r.offset / 1.5);
                     in = true;
                 }
+                else if (e.hasTag<SpawnTag>())
+                {
+                    pos.setY(pos.y() - r.offset);
+                    in = true;
+                }
                 else if (e.hasTag<GroundTag>() || e.hasTag<DoorTag>())
                 {
                     in = true;
                 }
+
+                if (r.rotationVec == vec3d::zero())
+                    r.rotationVec = { 0.0, -1.0, 0.0 };
 
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / K_PI));
                 engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
@@ -624,8 +662,10 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
     });
 }
 
-void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderComponent& r)
+void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, EntityManager& em, RenderComponent& r)
 {
+    auto& li = em.getSingleton<LevelInfo>();
+
     if (e.hasTag<PlayerTag>())
     {
         r.model = engine.loadModel("assets/models/main_character.obj");
@@ -680,21 +720,103 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
         r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
     }
-    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk0Tag>())
+    else if (e.hasTag<Chunk0Tag>())
     {
-        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_0.obj");
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_0.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_0.obj");
+            break;
+        }
 
         loadShaders(r.model);
     }
-    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk1Tag>())
+    else if (e.hasTag<Chunk1Tag>())
     {
-        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_1.obj");
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_1.obj");
+            break;
 
+        case 1:
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_1.obj");
+            break;
+        }
         loadShaders(r.model);
     }
-    else if (e.hasTag<GroundTag>() && e.hasTag<Chunk2Tag>())
+    else if (e.hasTag<Chunk2Tag>())
     {
-        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_2.obj");
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_2.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_2.obj");
+            break;
+        }
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<Chunk3Tag>())
+    {
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_3.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_3.obj");
+            break;
+        }
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<Chunk4Tag>())
+    {
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_4.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_4.obj");
+            break;
+        }
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<Chunk5Tag>())
+    {
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_5.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_5.obj");
+            break;
+        }
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<Chunk6Tag>())
+    {
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_6.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_6.obj");
+            break;
+        }
         loadShaders(r.model);
     }
     else if (e.hasTag<ChestTag>())
@@ -704,12 +826,30 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
     }
     else if (e.hasTag<DestructibleTag>())
     {
-        r.model = engine.loadModel("assets/models/Troncos.obj");
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/models/Troncos.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/models/Puerta_prision_agua.obj");
+            break;
+        }
         loadShaders(r.model);
     }
     else if (e.hasTag<DoorTag>())
     {
-        r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/Barricada_cambio_lvl.obj");
+        switch (li.mapID)
+        {
+        case 0:
+            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/Barricada_cambio_lvl.obj");
+            break;
+
+        case 1:
+            r.model = engine.loadModel("assets/models/Puerta_prision_base.obj");
+            break;
+        }
 
         loadShaders(r.model);
     }
@@ -740,6 +880,12 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, RenderCompone
     else if (e.hasTag<BarricadeTag>())
     {
         r.model = engine.loadModel("assets/models/Barricada_arboles.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<SpawnTag>())
+    {
+        r.model = engine.loadModel("assets/models/Checkpoint.obj");
 
         loadShaders(r.model);
     }
@@ -784,6 +930,9 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
     auto& txti = em.getSingleton<TextInfo>();
+
+    if (li.isCharging())
+        return;
 
     drawHUD(em, engine, inpi.debugPhy);
     drawAlerts_IA(em, engine,dt);
@@ -1049,12 +1198,12 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, ENGI::GameEngine& engine,dou
 void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy)
 {
     auto& li = em.getSingleton<LevelInfo>();
-    auto* playerEn = em.getEntityByID(li.playerID);
-    if (not playerEn) {
+    if (li.isDead)
+    {
+        em.getComponent<RenderComponent>(*em.getEntityByID(li.playerID)).visible = false;
         drawDeath(engine);
         return;
     }
-    else if (!playerEn->hasTag<PlayerTag>()) { drawDeath(engine); return; }
 
     if (debugphy)
         pointedEntity = std::numeric_limits<std::size_t>::max();
@@ -1123,23 +1272,30 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                             auto& phy{ em.getComponent<PhysicsComponent>(ene) };
                             if (ren.visible && (ene.hasTag<DummyTag>() || ene.hasTag<DestructibleTag>()))
                             {
-                                std::string text = "ESPACIO";
-                                float offsetX = 25.f;
                                 double multiplier = 28.0;
 
-                                if (ene.hasTag<DestructibleTag>())
-                                    multiplier = 5.0;
+                                ENGI::GameEngine::Gif* gif;
+                                Texture2D gifCopy;
                                 if (engine.isGamepadAvailable(0))
-                                {
-                                    offsetX = 0;
-                                    text = "X";
-                                }
+                                    gif = &engine.gifs.at("cuadrado");
+                                else
+                                    gif = &engine.gifs.at("espacio");
 
-                                engine.drawText(text.c_str(),
-                                    static_cast<int>(engine.getWorldToScreenX(phy.position) - offsetX),
-                                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * multiplier),
-                                    20,
-                                    WHITE);
+                                gifCopy = gif->texture;
+
+                                // Redimensionamos la copia
+                                gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
+                                gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
+
+                                multiplier = 55.0;
+
+                                if (ene.hasTag<DestructibleTag>())
+                                    multiplier = 8.0;
+
+                                int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - gifCopy.width / 2;
+                                int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * multiplier);
+
+                                displayGif(engine, gifCopy, *gif, posX, posY);
                             }
                         }
                     }
@@ -1149,17 +1305,32 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             if (li.num_zone == 1 && elapsed_WASD < elapsed_limit_WASD)
             {
                 auto& phy{ em.getComponent<PhysicsComponent>(e) };
-                // Escribimos que puede usar WASD para moverse
 
-                std::string text = "WASD para moverse";
+                // Mostramos gif de joystick para moverse o texto WASD
                 if (engine.isGamepadAvailable(0))
-                    text = "Stick izquierdo para moverse";
+                {
+                    auto& joysitck_gif = engine.gifs.at("joystick_izq");
+                    auto copy = joysitck_gif.texture;
 
-                engine.drawText(text.c_str(),
-                    static_cast<int>(engine.getWorldToScreenX(phy.position) - 120),
-                    static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 25),
-                    20,
-                    WHITE);
+                    // Redimensionamos la copia
+                    copy.width = static_cast<int>(copy.width / 2.0);
+                    copy.height = static_cast<int>(copy.height / 2.0);
+
+                    int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - copy.width / 2;
+                    int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 37);
+
+                    displayGif(engine, copy, joysitck_gif, posX, posY);
+                }
+                else
+                {
+                    std::string text = "WASD para moverse";
+
+                    engine.drawText(text.c_str(),
+                        static_cast<int>(engine.getWorldToScreenX(phy.position) - 120),
+                        static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 25),
+                        20,
+                        WHITE);
+                }
 
                 elapsed_WASD += 1.0f / 60.0f;
             }
@@ -1254,32 +1425,92 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         if (e.hasComponent<InteractiveComponent>() && (e.hasComponent<RenderComponent>() || e.hasComponent<PhysicsComponent>()))
         {
             auto& inter{ em.getComponent<InteractiveComponent>(e) };
+            vec3d pos{};
+            double sclY{};
+            if (e.hasTag<SeparateModelTag>())
+            {
+                auto phy = em.getComponent<PhysicsComponent>(e);
+                pos = phy.position;
+                sclY = phy.scale.y();
+            }
+            else
+            {
+                auto& ren = em.getComponent<RenderComponent>(e);
+                pos = ren.position;
+                sclY = ren.scale.y();
+            }
+
             if (inter.showButton)
             {
-                vec3d pos{};
-                double sclY{};
-                if (e.hasTag<SeparateModelTag>())
-                {
-                    auto phy = em.getComponent<PhysicsComponent>(e);
-                    pos = phy.position;
-                    sclY = phy.scale.y();
-                }
+                ENGI::GameEngine::Gif* gif;
+                Texture2D gifCopy;
+                int sum = 0;
+                if (engine.isGamepadAvailable(0))
+                    gif = &engine.gifs.at("x");
                 else
                 {
-                    auto& ren = em.getComponent<RenderComponent>(e);
-                    pos = ren.position;
-                    sclY = ren.scale.y();
+                    gif = &engine.gifs.at("e");
+                    sum = 13;
                 }
 
-                std::string button = "E";
-                if (engine.isGamepadAvailable(0))
-                    button = "A";
+                gifCopy = gif->texture;
 
-                engine.drawText(button.c_str(),
-                    static_cast<int>(engine.getWorldToScreenX(pos) - 5),
-                    static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9),
-                    20,
-                    WHITE);
+                // Redimensionamos la copia
+                gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
+                gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
+
+                int offSetX = gifCopy.width / 2;
+                if (e.hasTag<DoorTag>())
+                    offSetX = -(gifCopy.width / 2 + sum);
+
+                int posX = static_cast<int>(engine.getWorldToScreenX(pos)) - offSetX;
+                int posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 11);
+
+                displayGif(engine, gifCopy, *gif, posX, posY);
+
+                if (e.hasTag<DoorTag>())
+                {
+                    auto& candado = engine.textures["candado_abierto"];
+                    engine.drawTexture(candado,
+                        static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(candado.width / 2)),
+                        static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13),
+                        { 255, 255, 255, 255 });
+                }
+            }
+            else if (inter.showLock)
+            {
+                auto& candado = engine.textures["candado_cerrado"];
+                engine.drawTexture(candado,
+                    static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(candado.width / 2)),
+                    static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13),
+                    { 255, 255, 255, 255 });
+            }
+
+            if (e.hasTag<ChestTag>() && li.enemyToChestPos != vec3d::zero() && !li.playerDetected)
+            {
+                auto& chest = em.getComponent<ChestComponent>(e);
+                if (!chest.isOpen)
+                {
+                    auto& phy = em.getComponent<PhysicsComponent>(e);
+                    if (phy.position.distance(li.enemyToChestPos) < 30.0)
+                    {
+                        if (elapsed_Lock < elapsed_limit_Lock)
+                        {
+                            auto& candado = engine.textures["candado_abierto"];
+                            engine.drawTexture(candado,
+                                static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(candado.width / 2)),
+                                static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9),
+                                { 255, 255, 255, 255 });
+
+                            elapsed_Lock += timeStep60;
+                        }
+                        else
+                        {
+                            li.enemyToChestPos = vec3d::zero();
+                            elapsed_Lock = 0.0;
+                        }
+                    }
+                }
             }
         }
 
@@ -1332,9 +1563,20 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             engine.drawText(std::to_string(z.zone).c_str(),
                 static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 50),
+                static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 5),
                 20,
-                BLACK);
+                RED);
+        }
+
+        if (debugphy && e.hasComponent<RampComponent>() && e.hasComponent<PhysicsComponent>())
+        {
+            // Dibujamos el rectángulo de la rampa
+            auto& phy = em.getComponent<PhysicsComponent>(e);
+
+            // La rampa solo tiene vec2d mínimos y máximos, vamos a dibujar el rectángulo que los une
+            engine.beginMode3D();
+            engine.drawCubeWires(phy.position, static_cast<float>(phy.scale.x()), static_cast<float>(phy.scale.y()), static_cast<float>(phy.scale.z()), RED);
+            engine.endMode3D();
         }
 
         if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
@@ -1345,13 +1587,17 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             vec3d boxPosition = (col.boundingBox.min + col.boundingBox.max) / 2;
             vec3d boxSize = col.boundingBox.max - col.boundingBox.min;
 
+            Color color = BLUE;
+            if (col.behaviorType & BehaviorType::ZONE)
+                color = GREEN;
+
             // Dibujar la bounding box
             engine.beginMode3D();
             engine.drawCubeWires(boxPosition,
                 static_cast<float>(boxSize.x()),
                 static_cast<float>(boxSize.y()),
                 static_cast<float>(boxSize.z()),
-                BLUE);
+                color);
             engine.endMode3D();
 
             auto& phy = em.getComponent<PhysicsComponent>(e);
@@ -1440,7 +1686,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         // }
 
         // Dibujar el ID de las entidades // DEBUG
-        if (debugphy)
+        if (debugphy && e.hasComponent<RenderComponent>())
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
             engine.drawText(std::to_string(e.getID()).c_str(),
@@ -1471,11 +1717,28 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
         if (enemy.hasComponent<RenderComponent>())
         {
             auto& r = em.getComponent<RenderComponent>(enemy);
+            if (color.a == 100)
+            {
+                auto& destellin = engine.textures["destellin"];
+                engine.drawTexture(destellin,
+                    static_cast<int>(engine.getWorldToScreenX(r.position)) - destellin.width / 2,
+                    static_cast<int>(engine.getWorldToScreenY(r.position)) - destellin.height / 2,
+                    { 255, 255, 255, 255 });
+            }
+            else
+            {
+                auto& fijado = engine.gifs.at("fijado");
+                auto copy = fijado.texture;
 
-            engine.drawCircle(static_cast<int>(engine.getWorldToScreenX(r.position)),
-                static_cast<int>(engine.getWorldToScreenY(r.position)),
-                5,
-                color);
+                // Redimensionamos la copia
+                copy.width = static_cast<int>(copy.width / fijado.reScaleX);
+                copy.height = static_cast<int>(copy.height / fijado.reScaleY);
+
+                int posX = static_cast<int>(engine.getWorldToScreenX(r.position)) - copy.width / 2;
+                int posY = static_cast<int>(engine.getWorldToScreenY(r.position)) - copy.height / 2;
+
+                displayGif(engine, copy, fijado, posX, posY);
+            }
         }
     }
 }
@@ -1502,7 +1765,7 @@ void RenderSystem::drawDeath(ENGI::GameEngine& engine)
     // engine.drawText("HAS MUERTO", 250, 250, 40, RED);
     std::string text = "[ENTER] para volver a jugar";
     if (engine.isGamepadAvailable(0))
-        text = "Pulsa [A] para volver a jugar";
+        text = "Pulsa [X] para volver a jugar";
     GuiLabelButton(Rectangle{ posX2, posY + 50, boxWidth2, boxHeight }, text.c_str());
     init();
 }
@@ -1534,7 +1797,12 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
     // engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * (l.maxLife + plfi.armor) + 2, barHeight + 4, DARKGRAY);
 
     // Dibujamos cara del maguito
-    engine.drawTexture(engine.texture_mago_happy, 25, 20, { 255, 255, 255, 255 });
+    if (l.life > l.maxLife / 2)
+        engine.drawTexture(engine.textures["mago_happy"], 25, 20, { 255, 255, 255, 255 });
+    else if (l.life > 2)
+        engine.drawTexture(engine.textures["mago_meh"], 25, 20, { 255, 255, 255, 255 });
+    else
+        engine.drawTexture(engine.textures["mago_sos"], 25, 20, { 255, 255, 255, 255 });
 
     // Dibujamos cada parte de la barra de vida
     int i{};
@@ -1545,7 +1813,17 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
 
         // Dibujamos el corazón
         // engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
-        engine.drawTexture(engine.texture_heart, currentX, barY, { 255, 255, 255, 255 });
+        engine.drawTexture(engine.textures["heart"], currentX, barY, { 255, 255, 255, 255 });
+    }
+
+    for (; i < l.maxLife; ++i)
+    {
+        // Posición X de cada trozo
+        int currentX = barX + i * (barWidth + spacing);
+
+        // Dibujamos el corazón vacío
+        // engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
+        engine.drawTexture(engine.textures["empty_heart"], currentX, barY, { 255, 255, 255, 255 });
     }
 
     // Dibujamos la armadura
@@ -1556,13 +1834,16 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
             int currentX = barX + i * (barWidth + spacing);
 
             // Dibujamos el corazón
-            engine.drawTexture(engine.texture_heart, currentX, barY, SKYBLUE);
+            engine.drawTexture(engine.textures["ice_heart"], currentX, barY, SKYBLUE);
         }
 }
 
 void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
 {
     auto& plfi{ em.getSingleton<PlayerInfo>() };
+    if (plfi.coins == 0)
+        return;
+
     const float multip = 3.5f;
     if (plfi.elapsed_coins < plfi.elapsed_limit_coins)
     {
@@ -1577,33 +1858,43 @@ void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
         if (elapsed_CoinBar < 0) elapsed_CoinBar = 0;
     }
 
-    float div = elapsed_CoinBar / elapsed_limit_CoinBar;
+    std::vector<int> digits{};
+    auto coinsCopy = plfi.coins;
 
-    // Interpolación
-    coinBarX = static_cast<int>((1.f - div) * static_cast<float>(engine.getScreenWidth()) + div * static_cast<float>(engine.getScreenWidth() - 153));
-
-    // Barra para los destellos
-    engine.drawTexture(engine.texture_destellos, coinBarX, engine.getScreenHeight() - 130, { 255, 255, 255, 255 });
-    std::string info_text = std::to_string(plfi.coins);
-
-    coinNumberX = static_cast<int>((1.f - div) * (static_cast<float>(engine.getScreenWidth()) + 118) + div * static_cast<float>(engine.getScreenWidth() - 35));
-    int posY = engine.getScreenHeight() - 114;
-
-    // Sacamos el número de dígitos que tiene el número de destellos
-    int num_digits = 0;
-    int temp = plfi.coins;
-    while (temp > 0)
+    // Sacamos cada dígito individual
+    while (coinsCopy > 0)
     {
-        temp /= 10;
-        num_digits++;
-
-        if (num_digits > 1)
-            coinNumberX -= 16;
+        digits.push_back(coinsCopy % 10);
+        coinsCopy /= 10;
     }
 
+    float div = elapsed_CoinBar / elapsed_limit_CoinBar;
+
+    // Posición de la barra de destellos
+    auto sum = static_cast<double>(digits.size()) * 16.5; // 16.5 es la mitad del ancho de la textura de la moneda
+    int offSetX = static_cast<int>(120 + sum);
+
+    // Interpolación
+    coinBarX = static_cast<int>((1.f - div) * static_cast<float>(engine.getScreenWidth()) + div * static_cast<float>(engine.getScreenWidth() - offSetX));
+
+    // Barra para los destellos
+    engine.drawTexture(engine.textures["destellos"], coinBarX, engine.getScreenHeight() - 130, { 255, 255, 255, 255 });
+
+    // Interpolación de la posición de los números
+    int offSetCoinNum = static_cast<int>(40 + sum);
+    coinNumberX = static_cast<int>((1.f - div) * (static_cast<float>(engine.getScreenWidth() + (offSetX - offSetCoinNum))) + div * static_cast<float>(engine.getScreenWidth() - offSetCoinNum));
+    int posY = engine.getScreenHeight() - 117;
+
     // Dibujamos el número de destellos
-    if (elapsed_CoinBar > 0)
-        engine.drawText(info_text.c_str(), coinNumberX, posY, 28, YELLOW);
+    if (elapsed_CoinBar > 0 && plfi.coins > 0)
+    {
+        for (std::size_t i = digits.size(); i-- > 0; )
+        {
+            auto& texture = engine.textures.at(std::to_string(digits[i]));
+            engine.drawTexture(texture, coinNumberX, posY, { 255, 255, 255, 255 });
+            coinNumberX += static_cast<int>(texture.width / 1.7);
+        }
+    }
 }
 
 void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
@@ -1620,7 +1911,7 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
     int barY = 80;
 
     // Ponemos la textura de la barra de maná
-    engine.drawTexture(engine.texture_mana, barX, barY, { 255, 255, 255, 255 });
+    engine.drawTexture(engine.textures["mana"], barX, barY, { 255, 255, 255, 255 });
 
     int manaWidth = static_cast<int>(static_cast<float>(barWidth) * (static_cast<float>(plfi.mana) / static_cast<float>(plfi.max_mana)));
 
@@ -1663,7 +1954,55 @@ void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
     {
         txti.popText();
         inpi.interact = false;
-        if (textQueue.empty())
-            txti.waitTime = .8f;
     }
+
+    int posButtonX = static_cast<int>(posX + boxWidth - 8);
+    int posButtonY = static_cast<int>(posY + boxHeight - 8);
+    if (textQueue.size() > 1)
+    {
+        auto& sig = engine.textures["sig"];
+        auto copy = sig;
+        copy.width /= 2;
+        copy.height /= 2;
+
+        posButtonX -= copy.width;
+        posButtonY -= copy.height;
+
+        engine.drawTexture(copy,
+            posButtonX,
+            posButtonY,
+            { 255, 255, 255, 255 });
+
+        posButtonY += copy.height;
+    }
+
+    ENGI::GameEngine::Gif* gif;
+    Texture2D gifCopy;
+    int rest = 5;
+    if (engine.isGamepadAvailable(0))
+    {
+        gif = &engine.gifs.at("x");
+    }
+    else
+    {
+        gif = &engine.gifs.at("e");
+        rest = 0;
+    }
+
+    gifCopy = gif->texture;
+
+    // Redimensionamos la copia
+    gifCopy.width = static_cast<int>(gifCopy.width / 3.5);
+    gifCopy.height = static_cast<int>(gifCopy.height / 3.5);
+
+    posButtonX -= gifCopy.width;
+    posButtonY -= gifCopy.height - rest;
+
+    displayGif(engine, gifCopy, *gif, posButtonX, posButtonY);
+}
+
+void RenderSystem::displayGif(ENGI::GameEngine& engine, Texture2D& copy, GameEngine::Gif& gif, int& posX, int& posY)
+{
+    engine.drawTexture(copy, posX, posY, WHITE);
+    engine.updateGif(gif);
 }
