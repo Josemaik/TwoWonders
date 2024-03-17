@@ -4,10 +4,12 @@
 
 #include "../utils/types.hpp"
 #include "ia_manager.hpp"
+#include "../utils/pf/Graph.hpp"
 
 struct MapManager
 {
     void createMap(EntityManager& em, uint8_t mapID, Ia_man& iam);
+    void createNavmesh(EntityManager& em);
     void reset(EntityManager& em, uint8_t mapID, Ia_man& iam);
     void spawnReset(EntityManager& em, Ia_man& iam);
 

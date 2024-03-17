@@ -828,6 +828,7 @@ double SelectValue(ENGI::GameEngine& engine, double value, float posx, float pos
 //Interfaz para probar el pathfinding
 void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& em){
     auto& debug = em.getSingleton<Debug_t>();
+    auto& navs = em.getSingleton<navmesh_info>();
     //Dibujado de titulo y ventana
     Rectangle windowRect = { 470, 300, 330, 430 };
     engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
@@ -882,8 +883,10 @@ void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& 
         Conection cone78(1,7,8);
         conexiones.push_back(cone78);
         //Lammamos a creargrafo
+        //Creamos el grafo
         Graph graph{};
-        graph.createGraph(conexiones,nodes);
+        graph.createGraph(navs.conexiones,navs.nodes);
+        // graph.createGraph(conexiones,nodes);
         //Calcular pathfinding
         std::vector<vec3d> path = graph.PathFindAStar(1,8);
         // if(path.size() == 0){

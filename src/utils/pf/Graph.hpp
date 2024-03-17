@@ -3,11 +3,12 @@
 #include <vector>
 #include "Conection.hpp"
 #include <map>
+#include <utils/types.hpp>
 
 struct Graph
 {
     /* data */
-    void createGraph(std::vector<Conection> conexiones,std::vector<vec3d> nodes){
+    void createGraph(std::vector<Conection> conexiones,std::set<std::pair<uint16_t, vec3d>> nodes){
         //navmesh-----------------
         //TENDRE QUE PASAR EL JSON CON LOS NAVMESHES
         // CALCULAR PUNTOS DE CADA NAVMESH Y CALCULAR CONEXIONES
@@ -28,8 +29,8 @@ struct Graph
         }
 
         // Rellenar Nodes
-        for (uint16_t i = 0; i < nodes.size(); ++i) {
-            Nodes[i + 1] = nodes[i];
+        for (const auto& node: nodes) {
+            Nodes.insert(node);
         }
 
         // Recorrer y mostrar los nodos

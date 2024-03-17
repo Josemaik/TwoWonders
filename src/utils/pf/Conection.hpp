@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/types.hpp>
+#include <cstdint>
 
 struct Conection
 {
