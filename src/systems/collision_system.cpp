@@ -357,7 +357,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
             std::swap(behaviorType1, behaviorType2);
         }
 
-        if (otherEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<DestructibleTag>() || otherEntPtr->hasTag<CrusherTag>() || staticEntPtr->hasTag<GroundTag>())
+        if (otherEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<DestructibleTag>() || otherEntPtr->hasTag<CrusherTag>() || otherEntPtr->hasTag<DummyTag>() || staticEntPtr->hasTag<GroundTag>())
             return;
     }
 
@@ -381,7 +381,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Colisiones con el suelo
     if (staticEntPtr->hasTag<GroundTag>() && !otherEntPtr->hasTag<HitPlayerTag>())
     {
-        if (minOverlap.y() <= 1.0 || otherPhy->onRamp)
+        if (minOverlap.y() <= 1.0 || otherPhy->onRamp || otherPhy->stopped)
         {
             groundCollision(*otherPhy, otherPhy->scale, minOverlap);
             return;
@@ -511,12 +511,15 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
     {
         classicCollision(*staticPhy, *otherPhy, minOverlap);
 
-        if (otherEntPtr->hasTag<NoDamageTag>() && !otherEntPtr->hasTag<CrusherTag>())
+        if (!otherEntPtr->hasTag<DummyTag>() && !otherEntPtr->hasTag<CrusherTag>())
         {
             resolvePlayerDirection(*staticPhy, *otherPhy);
             return;
         }
-        else if (otherEntPtr->hasTag<CrusherTag>())
+        else if (otherEntPtr->hasTag<CrusherTag>() || otherEntPtr->hasTag<DummyTag>())
+            return;
+
+        if (otherEntPtr->hasTag<NoDamageTag>())
             return;
 
         enemyCollision(em, *staticEntPtr);
@@ -583,8 +586,34 @@ void CollisionSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, Physic
 {
     auto& pos = playerPhy.position;
     auto& otherPos = enemyPhy.position;
+    auto& enemyVel = enemyPhy.velocity;
     vec3d dir = { pos.x() - otherPos.x(), 0, pos.z() - otherPos.z() };
+    vec3d dirEnemy = { otherPos.x() - enemyVel.x(), 0, otherPos.z() - enemyVel.z() };
+
+    // Si la dirección del enemigo y la del jugador tienen menos de 20 grados de diferencia, el jugador se le suman 45º en la dirección contraria
     dir.normalize();
+    dirEnemy.normalize();
+
+    // Calcular el ángulo entre las dos direcciones
+    double dot = dir.x() * dirEnemy.x() + dir.z() * dirEnemy.z(); // producto punto
+    double det = dir.x() * dirEnemy.z() - dir.z() * dirEnemy.x(); // determinante
+    double angle = atan2(det, dot); // atan2(y, x) o atan2(sin, cos)
+
+    // Convertir el ángulo a grados
+    double angleDeg = angle * 180 / M_PI;
+
+    // Si el ángulo es menor de 20 grados, ajustar la dirección del jugador
+    if (std::abs(angleDeg) < 20)
+    {
+        // Rotar la dirección del jugador 45 grados en la dirección contraria
+        double angleRad = -135 * M_PI / 180; // Convertir a radianes
+        double cosAngle = cos(angleRad);
+        double sinAngle = sin(angleRad);
+        vec3d newDir = { dir.x() * cosAngle - dir.z() * sinAngle, 0.0, dir.x() * sinAngle + dir.z() * cosAngle };
+
+        dir = newDir;
+        // dir.normalize();
+    }
     playerPhy.velocity = dir * 7;
     playerPhy.stopped = true;
 }

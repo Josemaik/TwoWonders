@@ -46,16 +46,19 @@ void PhysicsSystem::update(EntityManager& em, float dt)
             phy.plusdeltatime(dt, phy.elapsed_stunned);
         }
 
-        //Stunear o RAlentizar al player
-        if (phy.dragActivated) {
-            phy.dragActivated = false;
-            // float dragFactor = 0.3f;
-            // vel -= dragFactor;
-            vel /= phy.kDrag;
-        }
-        else {
-            // si el player no esta siendo ralentizado-> no esta siendo capturado por tearaña
-            em.getSingleton<BlackBoard_t>().playerhunted = false;
+        //Stunear o Ralentizar al player
+        if (ent.hasTag<PlayerTag>())
+        {
+            if (phy.dragActivated) {
+                phy.dragActivated = false;
+                // float dragFactor = 0.3f;
+                // vel -= dragFactor;
+                vel /= phy.kDrag;
+            }
+            else {
+                // si el player no esta siendo ralentizado-> no esta siendo capturado por tearaña
+                em.getSingleton<BlackBoard_t>().playerhunted = false;
+            }
         }
 
         pos.setX((pos.x() + vel.x()));
@@ -79,35 +82,6 @@ void PhysicsSystem::update(EntityManager& em, float dt)
                 }
             }
         }
-
-        // }
-
-        // }else{ //Enemigo tiene aceleracion lineal y velocidad angular
-        //     phy.orientation += dt * vel_a;
-        //     if(phy.orientation > 2*K_PI) phy.orientation -= 2*K_PI;
-        //     if(phy.orientation < 0   ) phy.orientation += 2*K_PI;
-
-        //     vel.setX(vel_l * std::cos(phy.orientation) );
-        //     vel.setZ(vel_l * std::sin(phy.orientation) );
-        //     // e = e0 + v0t + (1/2)at² t = 1 / 30
-        //     // e = vt
-        //     // a = at
-        //     // e = v*t
-        //     pos.setX(pos.x() + (vel.x() * dt) );
-        //     pos.setY(pos.y() + vel.y());
-        //     pos.setZ(pos.z() + (vel.z() * dt) );
-        //     // v = at
-        //     phy.v_linear += phy.a_linear * dt;
-        //     phy.v_angular += phy.a_angular * dt;
-        //     phy.v_linear =  std::clamp(phy.v_linear,  -phy.kMaxVLin, phy.kMaxVLin);
-        //     phy.v_angular = std::clamp(phy.v_angular, -phy.kMaxAAng, phy.kMaxAAng);
-        //     // drag
-        // if(phy.dragactivated){
-        //     auto drag { dt * std::abs(phy.v_linear) * phy.kDrag };
-        //     if ( phy.v_linear > 0 ) phy.v_linear -= drag;
-        //     else                    phy.v_linear += drag;
-        // }
-
 
         // comprobar si están en el suelo
         if (phy.alreadyGrounded)

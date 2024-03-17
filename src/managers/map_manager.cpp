@@ -493,8 +493,6 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
     using TAGs = MP::TypeList <EnemyTag>;
     destroyParts<TAGs>(em);
 
-    mapType map = loadMap(fileMap);
-
     const rapidjson::Value& chunks = map["Chunks"];
     for (rapidjson::SizeType i = 0; i < chunks.Size(); i++)
     {

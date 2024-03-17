@@ -257,6 +257,18 @@ struct vec3D
         }
     }
 
+    // Devuelve el ángulo entre dos vectores en radianes
+    constexpr DataT angle(vec3D const& rhs) const
+    {
+        return std::acos(dotProduct(rhs) / (length() * rhs.length()));
+    }
+
+    // Devuelve el ángulo entre dos vectores en grados
+    constexpr DataT angleDeg(vec3D const& rhs) const
+    {
+        return angle(rhs) * 180 / M_PI;
+    }
+
     constexpr DataT distance(vec3D const& rhs) const
     {
         return (rhs - *this).length();
