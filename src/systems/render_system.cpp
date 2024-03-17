@@ -236,7 +236,7 @@ void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, So
     };
     engine.drawRectangleLinesEx(windowRect, 2, BLACK);
     engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
-    engine.drawTextEx(GetFontDefault(), "PAUSA", Vector2{ windowRect.x + 100, windowRect.y + 40 }, 40, 1, BLACK);
+    engine.drawTextEx(engine.getFontDefault(), "PAUSA", vec2d{ windowRect.x + 100, windowRect.y + 40 }, 40, 1, BLACK);
 
     float posX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2.0f);
     float posY = static_cast<float>(engine.getScreenHeight() / 2) - (buttonHeight / .5f);
@@ -339,7 +339,7 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
     };
     engine.drawRectangleLinesEx(windowRect, 2, BLACK);
     engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
-    engine.drawTextEx(GetFontDefault(), "INVENTARIO", Vector2{ windowRect.x + 110, windowRect.y + 20 }, 40, 1, BLACK);
+    engine.drawTextEx(engine.getFontDefault(), "INVENTARIO", vec2d{ windowRect.x + 110, windowRect.y + 20 }, 40, 1, BLACK);
 
     auto& plfi = em.getSingleton<PlayerInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
@@ -935,7 +935,7 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
         return;
 
     drawHUD(em, engine, inpi.debugPhy);
-    drawAlerts_IA(em, engine,dt);
+    drawAlerts_IA(em, engine, dt);
 
     if (txti.hasText())
         drawTextBox(engine, em);
@@ -973,11 +973,13 @@ double SelectValue(ENGI::GameEngine& engine, double value, float posx, float pos
 //Debugger visual in-game
 void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt) {
     // engine.beginDrawing();
-    Rectangle windowRect = { 470, 80, 330, 230 };
+    float posX = static_cast<float>(engine.getScreenWidth() - 330);
+    int posText = static_cast<int>(posX + 10);
+    Rectangle windowRect = { posX, 80, 330, 230 };
     engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
     engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
-    Vector2 textPositionInfo = { 480, 90 };
-    engine.drawTextEx(GetFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
+    vec2d textPositionInfo = { static_cast<double>(posText), 90 };
+    engine.drawTextEx(engine.getFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
     auto& debugsnglt = em.getSingleton<Debug_t>();
 
     using SYSCMPss = MP::TypeList<AIComponent, ColliderComponent, RenderComponent>;
@@ -998,7 +1000,7 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
             engine.beginMode3D();
             engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
             engine.endMode3D();
-            engine.drawText("Node active:", 480, 110, 20, BLACK);
+            engine.drawText("Node active:", posText, 110, 20, BLACK);
             if (debugsnglt.elapsed >= debugsnglt.countdown) {
                 debugsnglt.elapsed = 0;
                 debugsnglt.text = aic.bh;
@@ -1006,25 +1008,25 @@ void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager&
             else {
                 debugsnglt.plusdeltatime(dt, debugsnglt.elapsed);
             }
-            DrawTextEx(GetFontDefault(), debugsnglt.text, Vector2{ 610,110 }, 20, 1, DARKGRAY);
-            DrawText("TEID:", 480, 130, 20, BLACK);
-            DrawTextEx(GetFontDefault(), std::to_string(aic.teid).c_str(), Vector2{ 550,130 }, 20, 1, DARKGRAY);
-            DrawText("TX:", 480, 150, 20, BLACK);
-            DrawTextEx(GetFontDefault(), std::to_string(aic.tx).c_str(), Vector2{ 520,150 }, 20, 1, DARKGRAY);
-            DrawText("TZ:", 480, 170, 20, BLACK);
-            DrawTextEx(GetFontDefault(), std::to_string(aic.tz).c_str(), Vector2{ 520,170 }, 20, 1, DARKGRAY);
-            DrawText("Culldown:", 480, 190, 20, BLACK);
-            DrawTextEx(GetFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), Vector2{ 590,190 }, 20, 1, DARKGRAY);
-            DrawText("Player Detected?:", 480, 210, 20, BLACK);
-            DrawTextEx(GetFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", Vector2{ 680,210 }, 20, 1, RED);
-            DrawText("Player hunted?:", 480, 230, 20, BLACK);
-            DrawTextEx(GetFontDefault(), (bb.playerhunted == 0) ? "No" : "Sí", Vector2{ 680,230 }, 20, 1, RED);
-            DrawText("Subditos alive:", 480, 250, 20, BLACK);
-            DrawTextEx(GetFontDefault(), std::to_string(bb.subditosData.size()).c_str(), Vector2{ 680,250 }, 20, 1, RED);
-            DrawText("Subditos id alive:", 480, 270, 20, BLACK);
-            DrawTextEx(GetFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), Vector2{ 680,270 }, 20, 1, RED);
-             DrawText("Alert state:", 480, 290, 20, BLACK);
-            DrawTextEx(GetFontDefault(), (aic.alert_state == 0) ? "No" : "Sí", Vector2{ 680,290 }, 20, 1, RED);
+            engine.drawTextEx(engine.getFontDefault(), debugsnglt.text, vec2d{ 610,110 }, 20, 1, DARKGRAY);
+            engine.drawText("TEID:", posText, 130, 20, BLACK);
+            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.teid).c_str(), vec2d{ 550,130 }, 20, 1, DARKGRAY);
+            engine.drawText("TX:", posText, 150, 20, BLACK);
+            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tx).c_str(), vec2d{ 520,150 }, 20, 1, DARKGRAY);
+            engine.drawText("TZ:", posText, 170, 20, BLACK);
+            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tz).c_str(), vec2d{ 520,170 }, 20, 1, DARKGRAY);
+            engine.drawText("Culldown:", posText, 190, 20, BLACK);
+            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), vec2d{ 590,190 }, 20, 1, DARKGRAY);
+            engine.drawText("Player Detected?:", posText, 210, 20, BLACK);
+            engine.drawTextEx(engine.getFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", vec2d{ 680,210 }, 20, 1, RED);
+            engine.drawText("Player hunted?:", posText, 230, 20, BLACK);
+            engine.drawTextEx(engine.getFontDefault(), (bb.playerhunted == 0) ? "No" : "Sí", vec2d{ 680,230 }, 20, 1, RED);
+            engine.drawText("Subditos alive:", posText, 250, 20, BLACK);
+            engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.subditosData.size()).c_str(), vec2d{ 680,250 }, 20, 1, RED);
+            engine.drawText("Subditos id alive:", posText, 270, 20, BLACK);
+            engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), vec2d{ 680,270 }, 20, 1, RED);
+            engine.drawText("Alert state:", posText, 290, 20, BLACK);
+            engine.drawTextEx(engine.getFontDefault(), (aic.alert_state == 0) ? "No" : "Sí", vec2d{ 680,290 }, 20, 1, RED);
 
             engine.beginMode3D();
             //raycast
@@ -1074,21 +1076,21 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
     engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
 
     // Dibujar el texto "debugger IA" en el centro de la ventana
-    Vector2 textSize = MeasureTextEx(GetFontDefault(), "Debugger IA", 20, 1);
-    Vector2 textPosition = { windowRect.x + 20,
+    vec2d textSize = engine.measureTextEx(engine.getFontDefault(), "Debugger IA", 20, 1);
+    vec2d textPosition = { windowRect.x + 20,
                              windowRect.y + 10 };
 
-    engine.drawTextEx(GetFontDefault(), "Editor IA", textPosition, 20, 1, DARKBLUE);
+    engine.drawTextEx(engine.getFontDefault(), "Editor IA", textPosition, 20, 1, DARKBLUE);
 
     // Dibujar una línea recta debajo del texto
-    float lineY = textPosition.y + textSize.y + 5;  // Ajusta la posición de la línea según tus necesidades
+    float lineY = static_cast<float>(textPosition.y + textSize.y + 5);  // Ajusta la posición de la línea según tus necesidades
     engine.drawLine(static_cast<int>(windowRect.x), static_cast<int>(lineY), static_cast<int>(windowRect.x) + static_cast<int>(windowRect.width),
         static_cast<int>(lineY), DARKGRAY);
     // Dibujar el texto "INFO" debajo de la línea
 
-    Vector2 textPositionParameters = { windowRect.x + 5, 150 };
+    vec2d textPositionParameters = { windowRect.x + 5, 150 };
 
-    engine.drawTextEx(GetFontDefault(), "PARÁMETROS", textPositionParameters, 20, 1, RED);
+    engine.drawTextEx(engine.getFontDefault(), "PARÁMETROS", textPositionParameters, 20, 1, RED);
 
     auto& debugsnglt = em.getSingleton<Debug_t>();
 
@@ -1140,59 +1142,62 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
     // engine.endDrawing();
 }
 //Dibujado alertas de detección de enemigos
-void RenderSystem::drawAlerts_IA(EntityManager& em, ENGI::GameEngine& engine,double dt){
-        for (auto const& e : em.getEntities())
-        {
-            //Alert state
-            if(e.hasTag<EnemyTag>() && !e.hasTag<CrusherTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>()){
-                auto &aic = em.getComponent<AIComponent>(e);
-                auto& r = em.getComponent<RenderComponent>(e);
+void RenderSystem::drawAlerts_IA(EntityManager& em, ENGI::GameEngine& engine, double dt) {
+    for (auto const& e : em.getEntities())
+    {
+        //Alert state
+        if (e.hasTag<EnemyTag>() && !e.hasTag<CrusherTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>()) {
+            auto& aic = em.getComponent<AIComponent>(e);
+            auto& r = em.getComponent<RenderComponent>(e);
 
-                float barX = engine.getWorldToScreenX(r.position);
-                float barY = engine.getWorldToScreenY(r.position);
+            float barX = engine.getWorldToScreenX(r.position);
+            float barY = engine.getWorldToScreenY(r.position);
 
-                if(!aic.playerdetected){
-                    aic.show_icon = true;
+            if (!aic.playerdetected) {
+                aic.show_icon = true;
+            }
+
+            if (aic.playerdetected && aic.show_icon) {
+                vec2d point1 = { barX, barY - 120.0f };
+                vec2d point2 = { barX - 30.0f, barY - 50.0f };
+                vec2d point3 = { barX + 30.0f, barY - 50.0f };
+                //dibujar icono alerta
+                // Dibuja el triángulo
+                engine.drawTriangle(point1, point2, point3, BLACK);
+                // Dibuja el signo de exclamación dentro del triángulo
+                engine.drawText("!", static_cast<int>(barX - 2), static_cast<int>(barY - 100), 50, YELLOW);
+                //emepezar contador para borrar
+                if (aic.elapsed_show_icon >= aic.countdown_show_icon) {
+                    aic.elapsed_show_icon = 0.0;
+                    aic.show_icon = false;
                 }
-
-                if(aic.playerdetected && aic.show_icon){
-                    Vector2 point1 = {barX, barY - 120.0f};
-                    Vector2 point2 = {barX - 30.0f, barY - 50.0f };
-                    Vector2 point3 = {barX + 30.0f, barY - 50.0f};
-                    //dibujar icono alerta
-                    // Dibuja el triángulo
-                    DrawTriangle(point1, point2, point3, BLACK);
-                    // Dibuja el signo de exclamación dentro del triángulo
-                    engine.drawText("!", static_cast<int>(barX - 2), static_cast<int>(barY - 100), 50, YELLOW);
-                    //emepezar contador para borrar
-                    if(aic.elapsed_show_icon >= aic.countdown_show_icon){
-                        aic.elapsed_show_icon = 0.0;
-                        aic.show_icon = false;
-                    }else{
-                        aic.plusdeltatime(dt,aic.elapsed_show_icon);
-                    }
+                else {
+                    aic.plusdeltatime(dt, aic.elapsed_show_icon);
                 }
+            }
 
-                Vector2 center = {barX, barY-120.0f};
-                if(aic.alert_state){  
-                    //Se escuahn pasos 
-                    if(aic.listen_steps){
-                        aic.endangle -= aic.increase_angle;
-                    }else{
-                        //No se escuchan los pasos
-                        if(aic.endangle != 0.0f){
-                             aic.endangle += aic.increase_angle;
-                        }
-                    }
-                    //std::cout << endangle << "\n";
-                    DrawCircleSector(center,30.0f,0.0f,aic.endangle,30,RED);
-                }else{
-                    if(aic.endangle != 0.0f){
+            vec2d center = { barX, barY - 120.0f };
+            if (aic.alert_state) {
+                //Se escuahn pasos 
+                if (aic.listen_steps) {
+                    aic.endangle -= aic.increase_angle;
+                }
+                else {
+                    //No se escuchan los pasos
+                    if (aic.endangle != 0.0f) {
                         aic.endangle += aic.increase_angle;
                     }
                 }
+                //std::cout << endangle << "\n";
+                engine.drawCircleSector(center, 30.0f, 0.0f, aic.endangle, 30, RED);
+            }
+            else {
+                if (aic.endangle != 0.0f) {
+                    aic.endangle += aic.increase_angle;
+                }
             }
         }
+    }
 }
 // Se dibuja el HUD
 void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy)

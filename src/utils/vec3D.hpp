@@ -281,6 +281,10 @@ struct vec2D
 {
     constexpr vec2D() = default;
     constexpr vec2D(DataT x, DataT y) : x{ x }, y{ y } {}
+    constexpr Vector2 toRaylib() const noexcept
+    {
+        return Vector2{ static_cast<float>(x),  static_cast<float>(y) };
+    }
 
     DataT x{}, y{};
 };

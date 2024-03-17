@@ -155,6 +155,10 @@ void ENGI::GameEngine::endMode3D() {
     EndMode3D();
 }
 
+void ENGI::GameEngine::drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color) {
+    DrawLine(startPosX, startPosY, endPosX, endPosY, color);
+}
+
 void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color) {
     DrawLine3D(startPos.toRaylib(), endPos.toRaylib(), color);
 }
@@ -195,8 +199,12 @@ void ENGI::GameEngine::drawCircle(int posX, int posY, float radius, Color color)
     DrawCircle(posX, posY, radius, color);
 }
 
-void ENGI::GameEngine::drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color) {
-    DrawLine(startPosX, startPosY, endPosX, endPosY, color);
+void ENGI::GameEngine::drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color) {
+    DrawCircleSector(center.toRaylib(), radius, startAngle, endAngle, segments, color);
+}
+
+void ENGI::GameEngine::drawTriangle(vec2d v1, vec2d v2, vec2d v3, Color color) {
+    DrawTriangle(v1.toRaylib(), v2.toRaylib(), v3.toRaylib(), color);
 }
 
 ////// TEXT //////
@@ -205,8 +213,17 @@ void ENGI::GameEngine::drawText(const char* text, int posX, int posY, int fontSi
     DrawText(text, posX, posY, fontSize, color);
 }
 
-void ENGI::GameEngine::drawTextEx(Font font, const char* text, Vector2 position, float fontSize, float spacing, Color tint) {
-    DrawTextEx(font, text, position, fontSize, spacing, tint);
+void ENGI::GameEngine::drawTextEx(Font font, const char* text, vec2d position, float fontSize, float spacing, Color tint) {
+    DrawTextEx(font, text, position.toRaylib(), fontSize, spacing, tint);
+}
+
+vec2d ENGI::GameEngine::measureTextEx(Font font, const char* text, float fontSize, float spacing) {
+    Vector2 v = MeasureTextEx(font, text, fontSize, spacing);
+    return vec2d(v.x, v.y);
+}
+
+Font ENGI::GameEngine::getFontDefault() {
+    return GetFontDefault();
 }
 
 ////// WINDOW //////
