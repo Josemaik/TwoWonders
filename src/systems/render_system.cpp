@@ -1467,7 +1467,10 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                             elapsed_Lock += timeStep60;
                         }
                         else
+                        {
                             li.enemyToChestPos = vec3d::zero();
+                            elapsed_Lock = 0.0;
+                        }
                     }
                 }
             }
@@ -1800,6 +1803,9 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
 void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
 {
     auto& plfi{ em.getSingleton<PlayerInfo>() };
+    if (plfi.coins == 0)
+        return;
+
     const float multip = 3.5f;
     if (plfi.elapsed_coins < plfi.elapsed_limit_coins)
     {
@@ -1814,19 +1820,6 @@ void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
         if (elapsed_CoinBar < 0) elapsed_CoinBar = 0;
     }
 
-    float div = elapsed_CoinBar / elapsed_limit_CoinBar;
-    int offSetX = 153;
-    // Interpolación
-    coinBarX = static_cast<int>((1.f - div) * static_cast<float>(engine.getScreenWidth()) + div * static_cast<float>(engine.getScreenWidth() - offSetX));
-
-    // Barra para los destellos
-    engine.drawTexture(engine.textures["destellos"], coinBarX, engine.getScreenHeight() - 130, { 255, 255, 255, 255 });
-
-    // Interpolación de la posición de los números
-    int offSetCoinNum = 40;
-    coinNumberX = static_cast<int>((1.f - div) * (static_cast<float>(engine.getScreenWidth() + (offSetX - offSetCoinNum))) + div * static_cast<float>(engine.getScreenWidth() - offSetCoinNum));
-    int posY = engine.getScreenHeight() - 117;
-
     std::vector<int> digits{};
     auto coinsCopy = plfi.coins;
 
@@ -1837,15 +1830,31 @@ void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
         coinsCopy /= 10;
     }
 
-    // Dibujamos el número de destellos
+    float div = elapsed_CoinBar / elapsed_limit_CoinBar;
 
+    // Posición de la barra de destellos
+    auto sum = static_cast<double>(digits.size()) * 16.5; // 16.5 es la mitad del ancho de la textura de la moneda
+    int offSetX = static_cast<int>(120 + sum);
+
+    // Interpolación
+    coinBarX = static_cast<int>((1.f - div) * static_cast<float>(engine.getScreenWidth()) + div * static_cast<float>(engine.getScreenWidth() - offSetX));
+
+    // Barra para los destellos
+    engine.drawTexture(engine.textures["destellos"], coinBarX, engine.getScreenHeight() - 130, { 255, 255, 255, 255 });
+
+    // Interpolación de la posición de los números
+    int offSetCoinNum = static_cast<int>(40 + sum);
+    coinNumberX = static_cast<int>((1.f - div) * (static_cast<float>(engine.getScreenWidth() + (offSetX - offSetCoinNum))) + div * static_cast<float>(engine.getScreenWidth() - offSetCoinNum));
+    int posY = engine.getScreenHeight() - 117;
+
+    // Dibujamos el número de destellos
     if (elapsed_CoinBar > 0 && plfi.coins > 0)
     {
-        for (std::size_t i = 0; i < digits.size(); i++)
+        for (std::size_t i = digits.size(); i-- > 0; )
         {
             auto& texture = engine.textures.at(std::to_string(digits[i]));
             engine.drawTexture(texture, coinNumberX, posY, { 255, 255, 255, 255 });
-            coinNumberX -= static_cast<int>(texture.width / 1.7);
+            coinNumberX += static_cast<int>(texture.width / 1.7);
         }
     }
 }

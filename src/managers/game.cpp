@@ -23,7 +23,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 32.0, 4.0, 130.0 };
+        plfi.spawnPoint = { 35.0, 22.0, -23.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -90,7 +90,7 @@ void Game::run()
 
     // Ambient light level (some basic lighting)
     int ambientLoc = engine.getShaderLocation(shader, "ambient");
-    float ambientValue[4] = { 3.1f, 3.1f, 3.1f, -.6f };
+    float ambientValue[4] = { 3.1f, 3.1f, 3.1f, 20.0f };
     engine.setShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
 
     render_system.setShader(shader);
@@ -281,7 +281,7 @@ void Game::run()
     sound_system.clear();
     render_system.unloadModels(em, engine);
 
-    engine.unloadGifs();
+    engine.unloadGifsAndTextures();
     engine.unloadShader(shader);
     engine.closeWindow();
 }

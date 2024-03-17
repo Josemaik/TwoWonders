@@ -617,6 +617,7 @@ void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man&)
     li.loading = false;
     state = LoadState::LOAD_GROUND;
     zchi.clearSets();
+    zoneBounds.clear();
     // createMap(em, mapID, iam);
 }
 

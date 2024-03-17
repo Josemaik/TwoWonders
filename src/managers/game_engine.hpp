@@ -126,7 +126,7 @@ namespace ENGI {
         void loadAndResizeImage(const std::string& name, const std::string& path);
         void loadAndResizeImageGif(const std::string& name, const std::string& path, int frames, int delay = 15, double reScaleX = 2.0, double reScaleY = 2.0);
         void updateGif(Gif& anim);
-        void unloadGifs();
+        void unloadGifsAndTextures();
 
         std::map<std::string, Texture2D> textures;
         std::map<std::string, Gif> gifs;

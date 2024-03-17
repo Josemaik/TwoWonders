@@ -48,7 +48,9 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
             {
                 auto& phy = em.getComponent<PhysicsComponent>(ent);
                 createObject(em, os, phy.position);
-                li.enemyToChestPos = phy.position;
+
+                if (li.playerDetected)
+                    li.enemyToChestPos = phy.position;
             }
 
             //Si es un slime

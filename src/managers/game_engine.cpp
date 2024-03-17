@@ -465,10 +465,15 @@ void ENGI::GameEngine::updateGif(Gif& anim) {
     }
 }
 
-void ENGI::GameEngine::unloadGifs() {
+void ENGI::GameEngine::unloadGifsAndTextures() {
     for (auto& gif : gifs)
     {
         UnloadTexture(gif.second.texture);
         UnloadImage(gif.second.image);
+    }
+
+    for (auto& texture : textures)
+    {
+        UnloadTexture(texture.second);
     }
 }

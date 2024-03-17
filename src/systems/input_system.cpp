@@ -16,6 +16,9 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         return;
     }
 
+    if (li.isCharging())
+        return;
+
     // PAUSE
     if ((ge.isKeyReleased(KEY_ESCAPE) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_MIDDLE_RIGHT)) && li.currentScreen == GameScreen::GAMEPLAY)
     {
