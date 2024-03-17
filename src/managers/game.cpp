@@ -68,7 +68,7 @@ void Game::createEntities(EntityManager& em)
 
 //inicializar bancos
 void Game::createSound(EntityManager&) {
-    sound_system.initBanks("assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Ambient.bank", "assets/banks/Music.bank");
+    sound_system.initBanks("assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Ambient.bank", "assets/banks/Music.bank", "assets/banks/SFX.bank");
     //sound_system.createEventInstance();
     //sound_system.play();
 }

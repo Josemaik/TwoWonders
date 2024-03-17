@@ -11,7 +11,7 @@ struct SoundSystem {
 
     SoundSystem();
 
-    void initBanks(const char* master_bank_location, const char* master_string_location, const char* ui_bank_location,const char* ambient_bank_location,  const char* music_bank_location);
+    void initBanks(const char* master_bank_location, const char* master_string_location, const char* ui_bank_location,const char* ambient_bank_location,  const char* music_bank_location, const char* SFX_bank_location);
     void createEventInstance();
     void playMusicMenu();
     void playAmbient();
@@ -39,13 +39,16 @@ private:
     FMOD_STUDIO_BANK* ui_bank;
     FMOD_STUDIO_BANK* music_bank;
     FMOD_STUDIO_BANK* ambient_bank;
+    FMOD_STUDIO_BANK* SFX_bank;
     FMOD_STUDIO_LOADING_STATE loadingState{};
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription;
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Ambiente;
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica;
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_SFX;  
     FMOD_STUDIO_EVENTINSTANCE* eventInstance;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_SFX; 
     FMOD_RESULT res;
     float* volume;
     float* finalvolume;

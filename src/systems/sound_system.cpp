@@ -19,13 +19,14 @@ SoundSystem::SoundSystem() {
     ERRCHECK(FMOD_Studio_System_Initialize(soundSystem, 512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0));
 }
 
-void SoundSystem::initBanks(const char* master_bank_location, const char* master_string_location, const char* ui_bank_location,const char* ambient_bank_location,  const char* music_bank_location)
+void SoundSystem::initBanks(const char* master_bank_location, const char* master_string_location, const char* ui_bank_location,const char* ambient_bank_location,  const char* music_bank_location, const char* SFX_bank_location)
 {
     ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, master_bank_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &master_bank));
     ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, master_string_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &strings_bank));
     ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, ui_bank_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &ui_bank));
     ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, music_bank_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &music_bank));
-        ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, ambient_bank_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &ambient_bank));
+    ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, ambient_bank_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &ambient_bank));
+    ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, SFX_bank_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &SFX_bank));
     ERRCHECK(FMOD_Studio_Bank_GetLoadingState(ui_bank, &loadingState));
 }
 
@@ -89,6 +90,7 @@ void SoundSystem::clear() {
     FMOD_Studio_Bank_Unload(ui_bank);
     FMOD_Studio_Bank_Unload(music_bank);
     FMOD_Studio_Bank_Unload(ambient_bank);
+    FMOD_Studio_Bank_Unload(SFX_bank); 
     FMOD_Studio_System_UnloadAll(soundSystem);
 }
 
