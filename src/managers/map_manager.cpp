@@ -377,7 +377,6 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         {
             em.addTag<ChestTag>(entity);
             em.addTag<WallTag>(entity);
-            uint16_t zone = static_cast<uint16_t>(interactable["zone"].GetUint());
             ObjectType content{ static_cast<ObjectType>(interactable["content"].GetInt()) };
             uint8_t interId = static_cast<uint8_t>(interactable["id"].GetUint());
 
@@ -387,7 +386,7 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
                 messages.emplace(interactable["message"][j].GetString());
             }
 
-            em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = interId, .zone = zone });
+            em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = interId });
             [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .dropPosition = { vec3d::zero() }, .content = content, .messages = messages });
 
             if (interactable.HasMember("offsetZ"))
@@ -468,14 +467,13 @@ void MapManager::generateInteractables(EntityManager& em, const rapidjson::Value
         {
             em.addTag<WallTag>(entity);
             em.addTag<LeverTag>(entity);
-            uint16_t zone = static_cast<uint16_t>(interactable["zone"].GetUint());
             uint8_t interId = static_cast<uint8_t>(interactable["id"].GetUint());
 
-            em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = interId, .zone = zone });
+            em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = interId });
             break;
         }
         }
-        addToZone(em, c.boundingBox, type);
+        addToZone(em, entity, type);
     }
 }
 
@@ -517,12 +515,21 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
     // }
 }
 
-void MapManager::addToZone(EntityManager& em, BBox& b, InteractableType type)
+void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
 {
     auto& zchi = em.getSingleton<ZoneCheckInfo>();
+    auto& c = em.getComponent<ColliderComponent>(e);
     for (auto [num, bbox] : zoneBounds)
-        if (bbox.intersects(b))
+        if (bbox.intersects(c.boundingBox))
+        {
             zchi.insertZone(num, type);
+
+            if (e.hasComponent<OneUseComponent>())
+            {
+                auto& ouc = em.getComponent<OneUseComponent>(e);
+                ouc.zone = num;
+            }
+        }
 }
 
 // template<>

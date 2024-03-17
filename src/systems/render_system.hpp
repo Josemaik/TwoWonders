@@ -42,6 +42,7 @@ private:
     void drawCoinBar(GameEngine& engine, EntityManager& em);
     void drawHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
     void drawManaBar(GameEngine& engine, EntityManager& em);
+    void drawAlerts_IA(EntityManager& em, ENGI::GameEngine& engine, double dt);
     void loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r);
     void loadShaders(Model& model);
     void drawTextBox(GameEngine& engine, EntityManager& em);

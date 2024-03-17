@@ -45,7 +45,7 @@ private:
     void generateObjects(EntityManager& em, const rapidjson::Value& objectArray, uint8_t mapID);
     void generateEnemies(EntityManager& em, const rapidjson::Value& enemyArray, Ia_man& iam);
     void generateInteractables(EntityManager& em, const rapidjson::Value& interactableArray);
-    void addToZone(EntityManager& em, BBox& b, InteractableType type);
+    void addToZone(EntityManager& em, Entity& e, InteractableType type);
 
     std::string fileMap{};
     std::map<uint8_t, BBox> zoneBounds{};
