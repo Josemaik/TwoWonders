@@ -23,7 +23,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 35.0, 22.0, -23.0 };
+        plfi.spawnPoint = { 32.0, 4.0, 130.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -183,11 +183,12 @@ void Game::run()
                 li.currentScreen = GameScreen::GAMEPLAY;
             render_system.drawStory(engine);
 
-            if (em.getEntities().empty())
-            {
+            // TODO - Cuando se implemente el sistema de guardado, cargar el nivel en el que se quedó
+            if (!map.isComplete())
+                map.createMap(em, 0, iam);
+
+            if (li.playerID == li.max)
                 createEntities();
-                map.reset(em, 0, iam);
-            }
 
             break;
         }
@@ -201,8 +202,15 @@ void Game::run()
             if (li.resetFromDeath)
                 resetDeath();
 
-            if (li.levelChanged)
+            if (!map.isComplete())
+            {
+                if (!li.isCharging() && li.loading)
+                    li.loadingTime = 0;
                 map.createMap(em, li.mapID, iam);
+            }
+
+            if (li.isCharging())
+                render_system.drawChargeScreen(engine, em);
 
             input_system.update(em, engine);
             bool debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();

@@ -91,6 +91,9 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // Tecla Espacio
     loadAndResizeImageGif("espacio", "assets/HUD/teclas/espacio.gif", 0, 55);
 
+    // Pantalla de carga
+    loadAndResizeImageGif("carga", "assets/HUD/gifs/carga_elementos.gif", 0, 55);
+
     SetExitKey(KEY_F8);
 }
 
@@ -435,6 +438,7 @@ void ENGI::GameEngine::loadAndResizeImage(const std::string& name, const std::st
 
 void ENGI::GameEngine::loadAndResizeImageGif(const std::string& name, const std::string& path, int frames, int delay, double reScaleX, double reScaleY) {
     Gif anim;
+    anim.name = name;
     anim.frames = frames;
     anim.frameDelay = delay;
     anim.reScaleX = reScaleX;

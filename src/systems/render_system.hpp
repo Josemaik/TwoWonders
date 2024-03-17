@@ -20,6 +20,7 @@ struct RenderSystem
     void drawOptions(GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawEnding(GameEngine& engine);
     void drawStory(GameEngine& engine);
+    void drawChargeScreen(GameEngine& engine, EntityManager& em);
     void unloadModels(EntityManager& em, GameEngine& engine);
     void drawEditorInGameIA(GameEngine& engine, EntityManager& em);
     void drawDebuggerInGameIA(GameEngine& engine, EntityManager& em, double dt);

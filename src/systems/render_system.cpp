@@ -123,6 +123,28 @@ void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, Sou
     engine.endDrawing();
 }
 
+void RenderSystem::drawChargeScreen(GameEngine& engine, EntityManager& em)
+{
+    engine.beginDrawing();
+    engine.clearBackground({ 171, 159, 197, 255 });
+    ENGI::GameEngine::Gif& gif = engine.gifs.at("carga");
+    Texture2D gifCopy = gif.texture;
+
+    // Redimensionamos la copia
+    gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
+    gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
+
+    int posX = static_cast<int>(engine.getScreenWidth() / 2 - gifCopy.width / 2);
+    int posY = static_cast<int>(engine.getScreenHeight() / 2 - gifCopy.height / 2);
+
+    displayGif(engine, gifCopy, gif, posX, posY);
+
+    auto& li = em.getSingleton<LevelInfo>();
+    li.loadingTime += timeStep60;
+
+    engine.endDrawing();
+}
+
 void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
@@ -536,6 +558,10 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                 if (!r.meshLoaded)
                     loadModels(e, engine, em, r);
 
+                auto& li = em.getSingleton<LevelInfo>();
+                if (li.isCharging())
+                    return;
+
                 bool in{ false };
                 if (e.hasTag<PlayerTag>())
                 {
@@ -905,6 +931,9 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
     auto& inpi = em.getSingleton<InputInfo>();
     auto& txti = em.getSingleton<TextInfo>();
 
+    if (li.isCharging())
+        return;
+
     drawHUD(em, engine, inpi.debugPhy);
 
     if (txti.hasText())
@@ -1193,7 +1222,6 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                                     gif = &engine.gifs.at("cuadrado");
                                 else
                                     gif = &engine.gifs.at("espacio");
-
 
                                 gifCopy = gif->texture;
 

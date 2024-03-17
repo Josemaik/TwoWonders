@@ -40,7 +40,7 @@ struct LevelInfo
     using deathSet = std::set<std::size_t, std::greater<std::size_t>>;
 
     // Referencia al player
-    std::size_t playerID;
+    std::size_t playerID{ max };
     bool playerDetected{ false };
     bool isDead{ false };
     bool resetFromDeath{ false };
@@ -58,6 +58,10 @@ struct LevelInfo
 
     // Variables de carga de entidades
     notLoadSet dontLoad{};
+
+    // Pantalla de carga
+    float loadingLimit{ 3.0f }, loadingTime{ loadingLimit };
+    bool loading{ false };
 
     // Variables relacionadas con los eventos
     std::size_t chestToOpen{ max };
@@ -84,6 +88,11 @@ struct LevelInfo
     // Estado del juego
     GameScreen currentScreen = GameScreen::GAMEPLAY;
     GameScreen previousScreen = GameScreen::LOGO;
+
+    bool isCharging()
+    {
+        return loadingTime < loadingLimit;
+    }
 
     const deathSet& getDeath() const
     {
@@ -128,16 +137,19 @@ struct LevelInfo
         cameraChange = false;
         lockedEnemy = max;
         closestEnemy = max;
+        loadingTime = loadingLimit;
+        loading = false;
         dontLoad.clear();
         dead_entities.clear();
         debugIA2 = false;
         resetGame = false;
         num_zone = 0;
-        mapID = 1;
+        mapID = 0;
         chestToOpen = max;
         dungeonKeyCreated = false;
         sound_system = nullptr;
         gameShouldEnd = false;
+        levelChanged = false;
     }
 
 private:

@@ -32,7 +32,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                     {
                     case 0:
                     {
-                        map.reset(em, 1, iam);
+                        map.changeMap(em, 1, iam);
                         li.transition = true;
 
                         p.position = { 35.0, 22.0, -23.0 };

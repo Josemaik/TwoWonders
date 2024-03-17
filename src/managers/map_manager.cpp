@@ -3,30 +3,33 @@
 
 void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
 
-    mapType map{};
     auto& li = em.getSingleton<LevelInfo>();
-    li.levelChanged = false;
     iam.resetVec();
 
-    switch (mapID)
+    if (li.levelChanged || fileMap.size() == 0)
     {
-    case 0:
-        li.mapID = 0;
-        map = loadMap("assets/levels/maps/lvl_0.kaiwa");
-        break;
+        switch (mapID)
+        {
+        case 0:
+            li.mapID = 0;
+            map = loadMap("assets/levels/maps/lvl_0.kaiwa");
+            break;
 
-    case 1:
-        li.mapID = 1;
-        map = loadMap("assets/levels/maps/lvl_1.kaiwa");
-        break;
+        case 1:
+            li.mapID = 1;
+            map = loadMap("assets/levels/maps/lvl_1.kaiwa");
+            break;
 
-    case 2:
-        li.mapID = 2;
-        map = loadMap("assets/levels/caves_level.json");
-        break;
+        case 2:
+            li.mapID = 2;
+            map = loadMap("assets/levels/caves_level.json");
+            break;
 
-    default:
-        break;
+        default:
+            break;
+        }
+
+        li.levelChanged = false;
     }
 
     generateMapFromJSON(em, map, iam);
@@ -55,8 +58,49 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
     {
         std::string chunkName = "Chunk" + std::to_string(i);
         const rapidjson::Value& chunk = chunks[i][chunkName.c_str()];
-        generateChunkFromJSON(em, chunk, iam, mapID, i, j);
+
+        switch (state)
+        {
+        case LoadState::LOAD_GROUND:
+        {
+            const rapidjson::Value& overworld = chunk[0]["overworld"];
+            const rapidjson::Value& groundArray = overworld["Ground"];
+            generateChunkModel(em, i);
+            generateGround(em, groundArray, j);
+            break;
+        }
+        case LoadState::LOAD_WALLS:
+        {
+            const rapidjson::Value& overworld = chunk[0]["overworld"];
+            const rapidjson::Value& wallArray = overworld["Walls"];
+            generateWalls(em, wallArray);
+            break;
+        }
+        case LoadState::LOAD_RAMPS_INTERACTABLES:
+        {
+            const rapidjson::Value& overworld = chunk[0]["overworld"];
+            const rapidjson::Value& rampArray = overworld["Ramps"];
+            const rapidjson::Value& interactablesArray = overworld["Interactive"];
+            generateRamps(em, rampArray);
+            generateInteractables(em, interactablesArray);
+        }
+        break;
+        case LoadState::LOAD_OBJECTS_ENEMIES:
+        {
+            const rapidjson::Value& underworld = chunk[1]["underworld"];
+            const rapidjson::Value& objectArray = underworld["Objects"];
+            const rapidjson::Value& enemyArray = underworld["Enemies"];
+            generateObjects(em, objectArray, mapID);
+            generateEnemies(em, enemyArray, iam);
+            break;
+        }
+        default:
+            break;
+        }
     }
+
+    if (!(state == LoadState::LOAD_COMPLETE))
+        state = static_cast<LoadState>(static_cast<int>(state) + 1);
 }
 
 void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value& chunk, Ia_man& iam, uint8_t mapID, rapidjson::SizeType& i, int& j)
@@ -84,7 +128,7 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
 
     generateInteractables(em, interactablesArray);
 
-    // pseudo codigo para scheduling xdddd
+    // pseudo-codigo para scheduling xdddd
     // for enemy : map[enemies]
     // {
 
@@ -570,6 +614,15 @@ void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man&)
 
     li.mapID = mapID;
     li.levelChanged = true;
+    li.loading = false;
+    state = LoadState::LOAD_GROUND;
     zchi.clearSets();
     // createMap(em, mapID, iam);
+}
+
+void MapManager::changeMap(EntityManager& em, uint8_t mapID, Ia_man& iam)
+{
+    reset(em, mapID, iam);
+    auto& li = em.getSingleton<LevelInfo>();
+    li.loading = true;
 }

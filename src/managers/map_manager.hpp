@@ -6,11 +6,22 @@
 #include "../utils/types.hpp"
 #include "ia_manager.hpp"
 
+enum struct LoadState
+{
+    LOAD_GROUND,
+    LOAD_WALLS,
+    LOAD_RAMPS_INTERACTABLES,
+    LOAD_OBJECTS_ENEMIES,
+    LOAD_COMPLETE
+};
+
 struct MapManager
 {
     void createMap(EntityManager& em, uint8_t mapID, Ia_man& iam);
     void reset(EntityManager& em, uint8_t mapID, Ia_man& iam);
+    void changeMap(EntityManager& em, uint8_t mapID, Ia_man& iam);
     void spawnReset(EntityManager& em, Ia_man& iam);
+    bool isComplete() const { return state == LoadState::LOAD_COMPLETE; }
 
     template <typename... Tags>
     inline void resetParts(EntityManager& em)
@@ -31,7 +42,6 @@ private:
     void generateGround(EntityManager& em, const rapidjson::Value& groundArray, int& j);
     void generateWalls(EntityManager& em, const rapidjson::Value& wallArray);
     void generateRamps(EntityManager& em, const rapidjson::Value& rampArray);
-    void generateDestructibles(EntityManager& em, const rapidjson::Value& destructibleArray);
     void generateObjects(EntityManager& em, const rapidjson::Value& objectArray, uint8_t mapID);
     void generateEnemies(EntityManager& em, const rapidjson::Value& enemyArray, Ia_man& iam);
     void generateInteractables(EntityManager& em, const rapidjson::Value& interactableArray);
@@ -39,6 +49,8 @@ private:
 
     std::string fileMap{};
     std::map<uint8_t, BBox> zoneBounds{};
+    LoadState state{ LoadState::LOAD_GROUND };
+    mapType map{};
 
     template <typename... Tags>
     void destroyParts(EntityManager& em)
