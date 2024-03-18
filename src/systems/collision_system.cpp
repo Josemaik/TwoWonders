@@ -427,7 +427,9 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
-    if (behaviorType2 & BehaviorType::SPIDERWEB || behaviorType2 & BehaviorType::WARNINGZONE)
+    if (behaviorType2 & BehaviorType::SPIDERWEB ||
+        behaviorType2 & BehaviorType::WARNINGZONE ||
+        behaviorType2 & BehaviorType::AREADAMAGECRUSHER)
         return;
 
     if (behaviorType2 & BehaviorType::METEORITE)
