@@ -19,6 +19,25 @@ struct SoundSystem {
     void sonido_config();
     void sonido_mov();
     void sonido_salir();
+    //// sonidos nivel 0
+    void abrir_cofre();
+    void abrir_puerta();
+    void apisonadora_ataque();
+    void apisonadora_danyo();
+    void cerrar_cofre();
+    void dummy_golpe();
+    void interaccion_e();
+    void mele();
+    void movimiento_camara();
+    void muerte_enemigo();
+    void pasos_pradera();
+    void pasos_prision();
+    void piedras_golpe();
+    void rebote();
+    void recoger_vida();
+
+
+    /// 
     void play();
     void music_stop();
     void ambient_stop();
