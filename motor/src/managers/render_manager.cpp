@@ -5,6 +5,7 @@
 // Basic drawing functions
 
 void RenderManager::beginMode3D(){
+    useShader(shader3D);
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -13,6 +14,7 @@ void RenderManager::endMode3D(){
     //glPopAttrib();
 
     glDisable(GL_DEPTH_TEST);
+    useShader(shaderColor);
 }
 
 // Basic drawing functions

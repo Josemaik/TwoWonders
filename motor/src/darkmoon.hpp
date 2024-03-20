@@ -4,7 +4,9 @@
 #include "components/entity.hpp"
 #include "components/entity_model.hpp"
 #include "components/entity_camera.hpp"
+
 #include "components/entities2D.hpp"
+#include "components/entities3D.hpp"
 
 #include "managers/resource_manager.hpp"
 #include "managers/windows_manager.hpp"
@@ -25,6 +27,9 @@ public:
 
     // Create node in parentNode
     Node* CreateNode(const char* nodeName, Node* parentNode);
+
+    // 2D
+
     // Create pixel in node
     Node* CreatePixel(glm::vec2 position, Color color, const char* nodeName, Node* parentNode);
     // Create line in node
@@ -37,8 +42,16 @@ public:
     Node* CreateCircle(glm::vec2 position, float radius, int segments, Color color, const char* nodeName, Node* parentNode);
     // Create texture 2D in node
     Node* CreateTexture2D(glm::vec2 position, const char* filePath, Color color, const char* nodeName, Node* parentNode);
+    
+    // 3D
+
+    // Create point 3D in node
+    Node* CreatePoint3D(glm::vec3 position, float pointSize, Color color, const char* nodeName, Node* parentNode);
+
     // Create camera
     Camera* CreateCamera(const char* nodeName, Node* parentNode);
+    // Get actual camera
+    Camera* GetCamera(){ return m_renderManager.m_camera; }
     // Get root node
     Node* GetRootNode();
 

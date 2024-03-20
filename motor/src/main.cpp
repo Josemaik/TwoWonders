@@ -10,9 +10,9 @@ Node* createHUD(DarkMoonEngine& engine){
     engine.CreateRectangle({10.0f, 10.0f}, {200.0f, 40.0f}, ORANGE, "Rectangulo naranja", p_nodeHUD);
 
     // Node: Texture2D
-    auto nodeTexture = engine.CreateTexture2D({70.0f, 170.0f}, "assets/koromaru.png", {255, 255, 255, 0}, "Textura Koromaru", p_nodeHUD);
+    auto nodeTexture = engine.CreateTexture2D({70.0f, 170.0f}, "assets/koromaru.png", WHITE, "Textura Koromaru", p_nodeHUD);
     nodeTexture->scale({0.3f, 0.3f, 1.0f});
-    
+
     // // Node: Pixel Negro
     // engine.CreatePixel({400.0f, 300.0f}, BLACK, "Pixel negro", p_nodeHUD);
     // // Node: Linea Roja
@@ -25,30 +25,43 @@ Node* createHUD(DarkMoonEngine& engine){
     return p_nodeHUD;
 }
 
+Node* createScene3D(DarkMoonEngine& engine){
+    // Node Scene 3D
+    auto p_node3D = engine.CreateNode("Scene 3D", engine.GetRootNode());
+
+    // Node: Punto en 3D en (0,0,0)
+    engine.CreatePoint3D({0.0f, 0.0f, 0.0f}, 5.0f, BLACK, "Punto enmedio del mundo", p_node3D);
+
+    return p_node3D;
+}
+
 int main(){
     DarkMoonEngine engine;
 
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
         auto nodeHUD = createHUD(engine);
+        createScene3D(engine);
 
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Tree │" << std::endl;
         std::cout << "└──────┘" << std::endl;
         engine.GetRootNode()->drawTree();
 
+        auto camera = engine.GetCamera();
+
         while(!engine.WindowShouldClose()){
 
             // Logic
 
             if(engine.IsKeyPressed(KEY_A))
-                nodeHUD->translate({-1.0f,  0.0f, 0.0f});
+                camera->position.x -= 0.1f;
             if(engine.IsKeyPressed(KEY_D))
-                nodeHUD->translate({ 1.0f,  0.0f, 0.0f});
+                camera->position.x += 0.1f;
             if(engine.IsKeyPressed(KEY_W))
-                nodeHUD->translate({ 0.0f, -1.0f, 0.0f});
+                camera->position.y += 0.1f;
             if(engine.IsKeyPressed(KEY_S))
-                nodeHUD->translate({ 0.0f,  1.0f, 0.0f});
+                camera->position.y -= 0.1f;
 
             // Draw
 

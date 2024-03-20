@@ -32,6 +32,7 @@ Node* DarkMoonEngine::CreateNode(const char* nodeName, Node* parentNode){
     return p_node;
 }
 
+// 2D
 
 // Create pixel in node
 Node* DarkMoonEngine::CreatePixel(glm::vec2 position, Color color, const char* nodeName, Node* parentNode){
@@ -104,6 +105,20 @@ Node* DarkMoonEngine::CreateTexture2D(glm::vec2 position, const char* filePath, 
     p_nodeTex->setEntity(std::move(text2D));
 
     return p_nodeTex;
+}
+
+// 3D
+
+// Create point 3D in node
+Node* DarkMoonEngine::CreatePoint3D(glm::vec3 position, float pointSize, Color color, const char* nodeName, Node* parentNode){
+    auto p_nodePoint = CreateNode(nodeName, parentNode);
+
+    // Create point 3D
+    auto point3D = std::make_unique<Point3D>(position, pointSize, color);
+    p_nodePoint->translate({position.x, position.y, 0.0f});
+    p_nodePoint->setEntity(std::move(point3D));
+
+    return p_nodePoint;
 }
 
 // Create camera in node
@@ -206,13 +221,11 @@ void DarkMoonEngine::EndDrawing(){
 // Begin 3D mode
 void DarkMoonEngine::BeginMode3D(){
     m_renderManager.beginMode3D();
-    m_renderManager.useShader(m_renderManager.shader3D);
 }
 
 // Ends 3D mode
 void DarkMoonEngine::EndMode3D(){
     m_renderManager.endMode3D();
-    m_renderManager.useShader(m_renderManager.shaderColor);
 }
 
 // ------------------------- //
@@ -231,13 +244,6 @@ Texture* DarkMoonEngine::LoadTexture(const char* filePath){
 void DarkMoonEngine::UnloadTexture(Texture* texture){
     m_resourceManager.unloadResource(texture->id);
 }
-
-// Draw a texture
-//void DarkMoonEngine::DrawTexture(Texture* texture, int posX, int posY, Color tint){
-//    m_renderManager.useShader(m_shaderTexture);
-//    m_renderManager.drawTexture(texture, {posX, posY}, tint);
-//    m_renderManager.useShader(m_shaderColor);
-//}
 
 // ------------------------------------------- //
 // Basic geometric 3D shapes drawing functions //

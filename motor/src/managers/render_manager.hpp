@@ -73,9 +73,9 @@ public:
         glUseProgram(m_shaderProgram->id_shader);
     };
 
-    Shader* getShader(){
-        return m_shaderProgram;
-    }
+    Shader* getShader(){ return m_shaderProgram; };
+    int getWidth(){ return m_width; };
+    int getHeight(){ return m_height; };
 
     // Text
     void drawText(const char* text, glm::vec2 pos, int fontSize, Color color);
