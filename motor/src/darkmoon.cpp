@@ -13,8 +13,6 @@ DarkMoonEngine::DarkMoonEngine(){
 
     // Create Default Camera
     auto eCamera = CreateCamera("Default Camera", GetRootNode());
-    //auto eCamera = CreateCamera("Default Camera", GetRootNode());
-    //auto eCamera = nCamera->getEntity();
 
     // Assigns Camera to RenderManager
     UseCamera(eCamera);
@@ -40,7 +38,7 @@ Node* DarkMoonEngine::CreatePixel(glm::vec2 position, Color color, const char* n
     auto p_nodePix = CreateNode(nodeName, parentNode);
 
     // Create Pixel
-    auto pixel = std::make_unique<Pixel>(position, color);
+    auto pixel = std::make_unique<Pixel>(color);
     p_nodePix->translate({position.x, position.y, 0.0f});
     p_nodePix->setEntity(std::move(pixel));
 
@@ -93,6 +91,21 @@ Node* DarkMoonEngine::CreateCircle(glm::vec2 position, float radius, int segment
     return p_nodeCir;
 }
 
+// Create texture 2D in node
+Node* DarkMoonEngine::CreateTexture2D(glm::vec2 position, const char* filePath, Color color, const char* nodeName, Node* parentNode){
+    auto p_nodeTex = CreateNode(nodeName, parentNode);
+
+    // Load texture
+    auto texture = LoadTexture(filePath);
+
+    // Create texture2D
+    auto text2D = std::make_unique<Texture2D>(position, texture, color);
+    p_nodeTex->translate({position.x, position.y, 0.0f});
+    p_nodeTex->setEntity(std::move(text2D));
+
+    return p_nodeTex;
+}
+
 // Create camera in node
 Camera* DarkMoonEngine::CreateCamera(const char* nodeName, Node* parentNode){
     auto p_nodeCam = CreateNode(nodeName, parentNode);
@@ -129,9 +142,9 @@ bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
         std::cout << "└──────┘" << std::endl;
         
         //----- Shaders -----//
-        m_shaderColor = LoadShader("src/shaders/color.vs", "src/shaders/color.fs");
-        m_shaderTexture = LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");
-        m_shader3D = LoadShader("src/shaders/3D.vs", "src/shaders/3D.fs");
+        m_renderManager.shaderColor = LoadShader("src/shaders/color.vs", "src/shaders/color.fs");
+        m_renderManager.shaderTexture = LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");
+        m_renderManager.shader3D = LoadShader("src/shaders/3D.vs", "src/shaders/3D.fs");
 
         //----- Font -----//
         m_renderManager.setDefaultFont(LoadFont("assets/fonts/roboto.ttf"));
@@ -180,7 +193,7 @@ void DarkMoonEngine::ClearBackground(Color color){
 // Setup canvas to start drawing
 void DarkMoonEngine::BeginDrawing(){
     m_windowsManager.beginDrawing();
-    m_renderManager.useShader(m_shaderColor);
+    m_renderManager.useShader(m_renderManager.shaderColor);
 
     m_inputManager.update();
 }
@@ -193,17 +206,17 @@ void DarkMoonEngine::EndDrawing(){
 // Begin 3D mode
 void DarkMoonEngine::BeginMode3D(){
     m_renderManager.beginMode3D();
-    m_renderManager.useShader(m_shader3D);
+    m_renderManager.useShader(m_renderManager.shader3D);
 }
 
 // Ends 3D mode
 void DarkMoonEngine::EndMode3D(){
     m_renderManager.endMode3D();
-    m_renderManager.useShader(m_shaderColor);
+    m_renderManager.useShader(m_renderManager.shaderColor);
 }
 
 // ------------------------- //
-// Texture drawing functions //
+// Texture loading functions //
 // ------------------------- //
 
 // Load texture from file into GPU memory
@@ -220,25 +233,11 @@ void DarkMoonEngine::UnloadTexture(Texture* texture){
 }
 
 // Draw a texture
-void DarkMoonEngine::DrawTexture(Texture* texture, int posX, int posY, Color tint){
-    m_renderManager.useShader(m_shaderTexture);
-    m_renderManager.drawTexture(texture, {posX, posY}, tint);
-    m_renderManager.useShader(m_shaderColor);
-}
-
-// Draw a texture (vector version)
-void DarkMoonEngine::DrawTextureV(Texture* texture, glm::vec2 pos, Color tint){
-    m_renderManager.useShader(m_shaderTexture);
-    m_renderManager.drawTexture(texture, pos, tint);
-    m_renderManager.useShader(m_shaderColor);
-}
-
-// Draw a texture with extended parameters
-void DarkMoonEngine::DrawTextureEx(Texture* texture, glm::vec2 pos, float rotation, float scale, Color tint){
-    m_renderManager.useShader(m_shaderTexture);
-    m_renderManager.drawTextureExtra(texture, pos, rotation, scale, tint);
-    m_renderManager.useShader(m_shaderColor);
-}
+//void DarkMoonEngine::DrawTexture(Texture* texture, int posX, int posY, Color tint){
+//    m_renderManager.useShader(m_shaderTexture);
+//    m_renderManager.drawTexture(texture, {posX, posY}, tint);
+//    m_renderManager.useShader(m_shaderColor);
+//}
 
 // ------------------------------------------- //
 // Basic geometric 3D shapes drawing functions //

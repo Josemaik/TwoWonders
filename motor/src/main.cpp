@@ -9,14 +9,18 @@ Node* createHUD(DarkMoonEngine& engine){
     // Node: Rectangulo Naranja
     engine.CreateRectangle({10.0f, 10.0f}, {200.0f, 40.0f}, ORANGE, "Rectangulo naranja", p_nodeHUD);
 
-    // Node: Pixel Negro
-    //engine.CreatePixel({400.0f, 300.0f}, BLACK, "Pixel negro", p_nodeHUD);
-    // Node: Linea Roja
-    //engine.CreateLine({0.0f, 0.0f}, {700.0f, 600.0f}, RED, "Linea roja", p_nodeHUD);
-    // Node: Triangulo Verde
-    //engine.CreateTriangle({10.0f, 54.0f}, {10.0f, 590.0f}, {210.0f, 590.0f}, KAIWA, "Triangulo verde", p_nodeHUD);
-    // Node: Circulo 
-    //engine.CreateCircle({250.0f, 50.0f}, 30.0f, 20, LAVENDER, "Circulo lavanda", p_nodeHUD);
+    // Node: Texture2D
+    auto nodeTexture = engine.CreateTexture2D({70.0f, 170.0f}, "assets/koromaru.png", {255, 255, 255, 0}, "Textura Koromaru", p_nodeHUD);
+    nodeTexture->scale({0.3f, 0.3f, 1.0f});
+    
+    // // Node: Pixel Negro
+    // engine.CreatePixel({400.0f, 300.0f}, BLACK, "Pixel negro", p_nodeHUD);
+    // // Node: Linea Roja
+    // engine.CreateLine({0.0f, 0.0f}, {700.0f, 600.0f}, RED, "Linea roja", p_nodeHUD);
+    // // Node: Triangulo Verde
+    // engine.CreateTriangle({10.0f, 54.0f}, {10.0f, 590.0f}, {210.0f, 590.0f}, KAIWA, "Triangulo verde", p_nodeHUD);
+    // // Node: Circulo 
+    // engine.CreateCircle({250.0f, 50.0f}, 30.0f, 20, LAVENDER, "Circulo lavanda", p_nodeHUD);
 
     return p_nodeHUD;
 }
@@ -24,19 +28,27 @@ Node* createHUD(DarkMoonEngine& engine){
 int main(){
     DarkMoonEngine engine;
 
-    createHUD(engine);
-
-    std::cout << "┌──────┐" << std::endl;
-    std::cout << "│ Tree │" << std::endl;
-    std::cout << "└──────┘" << std::endl;
-    engine.GetRootNode()->drawTree();
-
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
+
+        auto nodeHUD = createHUD(engine);
+
+        std::cout << "┌──────┐" << std::endl;
+        std::cout << "│ Tree │" << std::endl;
+        std::cout << "└──────┘" << std::endl;
+        engine.GetRootNode()->drawTree();
+
         while(!engine.WindowShouldClose()){
 
             // Logic
 
-
+            if(engine.IsKeyPressed(KEY_A))
+                nodeHUD->translate({-1.0f,  0.0f, 0.0f});
+            if(engine.IsKeyPressed(KEY_D))
+                nodeHUD->translate({ 1.0f,  0.0f, 0.0f});
+            if(engine.IsKeyPressed(KEY_W))
+                nodeHUD->translate({ 0.0f, -1.0f, 0.0f});
+            if(engine.IsKeyPressed(KEY_S))
+                nodeHUD->translate({ 0.0f,  1.0f, 0.0f});
 
             // Draw
 
@@ -242,19 +254,5 @@ int main(){
 */
 /*
     // Patron Dirty //
-
-        //----- Gamepad -----//
-        if(im.isGamePadAvailable(0) == 1)
-            std::cout << "Gamepad: " << im.getGamePadName(0) << std::endl;
-
-            // Input
-            im.update();
-
-            // renm.drawTexture3D(rTexture2, {0.0f, 0.0f}, 50.0f, 0.01f, {1.0f, 1.0f, 1.0f, 1.0f});
-
-    //----- Draw -----//
-    // std::cout << "┌──────┐" << std::endl;
-    // std::cout << "│ Draw │" << std::endl;
-    // std::cout << "└──────┘" << std::endl;
-    // nScene->traverse(glm::mat4());
+    // renm.drawTexture3D(rTexture2, {0.0f, 0.0f}, 50.0f, 0.01f, {1.0f, 1.0f, 1.0f, 1.0f});
 */

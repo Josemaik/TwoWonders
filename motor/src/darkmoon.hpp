@@ -26,7 +26,7 @@ public:
     // Create node in parentNode
     Node* CreateNode(const char* nodeName, Node* parentNode);
     // Create pixel in node
-    Node* CreatePixel(glm::vec2 pos, Color color, const char* nodeName, Node* parentNode);
+    Node* CreatePixel(glm::vec2 position, Color color, const char* nodeName, Node* parentNode);
     // Create line in node
     Node* CreateLine(glm::vec2 startPos, glm::vec2 endPos, Color color, const char* nodeName, Node* parentNode);
     // Create triangle in node
@@ -35,6 +35,8 @@ public:
     Node* CreateRectangle(glm::vec2 position, glm::vec2 size, Color color, const char* nodeName, Node* parentNode);
     // Create circle in node
     Node* CreateCircle(glm::vec2 position, float radius, int segments, Color color, const char* nodeName, Node* parentNode);
+    // Create texture 2D in node
+    Node* CreateTexture2D(glm::vec2 position, const char* filePath, Color color, const char* nodeName, Node* parentNode);
     // Create camera
     Camera* CreateCamera(const char* nodeName, Node* parentNode);
     // Get root node
@@ -72,20 +74,14 @@ public:
     // Ends 3D mode
     void EndMode3D();
 
-    // ------------------------------------- //
-    // Texture Loading and Drawing functions //
-    // ------------------------------------- //
+    // ------------------------ //
+    // Texture Loading unctions //
+    // ------------------------ //
 
     // Load texture from file into GPU memory
     Texture* LoadTexture(const char* filePath);
     // Unload texture data from CPU and GPU
     void UnloadTexture(Texture* texture);
-    // Draw a texture
-    void DrawTexture(Texture* texture, int posX, int posY, Color tint);
-    // Draw a texture (vector version)
-    void DrawTextureV(Texture* texture, glm::vec2 pos, Color tint);
-    // Draw a texture with extended parameters
-    void DrawTextureEx(Texture* texture, glm::vec2 pos, float rotation, float scale, Color tint);
 
     // ------------------------------------------- //
     // Basic geometric 3D shapes drawing functions //
@@ -235,9 +231,4 @@ private:
     RenderManager& m_renderManager = RenderManager::getInstance();
     WindowsManager m_windowsManager;
     ResourceManager& m_resourceManager = ResourceManager::getInstance();
-
-    // Shaders
-    Shader* m_shaderColor;
-    Shader* m_shaderTexture;
-    Shader* m_shader3D;
 };

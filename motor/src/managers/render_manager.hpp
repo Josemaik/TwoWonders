@@ -28,15 +28,18 @@ private:
     Font* m_defaultFont;
     int m_width, m_height;
 
-    void draw(float vertices[], std::size_t vertSize, GLuint indices[], std::size_t indSize,glm::vec4 color);
-
 public:
     Camera* m_camera;
+
+    // Shaders
+    Shader* shaderColor;
+    Shader* shaderTexture;
+    Shader* shader3D;
 
     // Screen width and height
     void setWindowSize(int width, int height){ m_width = width; m_height = height; };
 
-    // Drawing
+    // Basic drawing functions
     void beginMode3D();
     void endMode3D();
 
@@ -45,10 +48,6 @@ public:
 
     // Basic drawing functions
     void clearBackground(Color color);
-
-    // Texture drawing functions
-    void drawTexture(Texture* texture, glm::vec2 pos, Color color);
-    void drawTextureExtra(Texture* texture, glm::vec2 pos, float rotation, float scale, Color color);
 
     // Basic geometric 3D shapes drawing functions
     void drawPoint3D(glm::vec3 position, float pointSize, Color color);
