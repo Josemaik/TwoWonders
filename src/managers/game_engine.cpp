@@ -316,17 +316,26 @@ float ENGI::GameEngine::getFovyCamera()
 
 bool ENGI::GameEngine::isKeyPressed(int key)
 {
-    return IsKeyPressed(key);
+    if (replayMode)
+        return gameData->isKeyPressed(key);
+    else
+        return IsKeyPressed(key);
 }
 
 bool ENGI::GameEngine::isKeyDown(int key)
 {
-    return IsKeyDown(key);
+    if (replayMode)
+        return gameData->isKeyDown(key);
+    else
+        return IsKeyDown(key);
 }
 
 bool ENGI::GameEngine::isKeyReleased(int key)
 {
-    return IsKeyReleased(key);
+    if (replayMode)
+        return gameData->isKeyReleased(key);
+    else
+        return IsKeyReleased(key);
 }
 
 bool ENGI::GameEngine::isMouseButtonPressed(int button)
@@ -446,9 +455,9 @@ RayCast ENGI::GameEngine::getMouseRay()
     return RayCast{ .origin = vec3d(r.position.x, r.position.y, r.position.z), .direction = vec3d(r.direction.x, r.direction.y, r.direction.z) };
 }
 
-void ENGI::GameEngine::loadAndResizeImage(const std::string& name, const std::string& path) {
+void ENGI::GameEngine::loadAndResizeImage(const std::string& name, const std::string& path, double reScaleX, double reScaleY) {
     Image image = loadImage(path.c_str());
-    imageResize(&image, static_cast<int>(image.width / 1.3), static_cast<int>(image.height / 1.3));
+    imageResize(&image, static_cast<int>(image.width / reScaleX), static_cast<int>(image.height / reScaleY));
     textures[name] = loadTextureFromImage(image);
     unloadImage(image);
 }
@@ -493,4 +502,10 @@ void ENGI::GameEngine::unloadGifsAndTextures() {
     {
         UnloadTexture(texture.second);
     }
+}
+
+void ENGI::GameEngine::setReplayMode(bool replay, GameData& gd)
+{
+    replayMode = replay;
+    gameData = &gd;
 }

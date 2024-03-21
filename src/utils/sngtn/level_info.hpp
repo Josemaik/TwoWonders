@@ -85,6 +85,9 @@ struct LevelInfo
     // Tutorial
     std::vector<std::size_t> tutorialEnemies{};
 
+    // Replay de inputs
+    bool replay{ false };
+
     // Estado del juego
     GameScreen currentScreen = GameScreen::GAMEPLAY;
     GameScreen previousScreen = GameScreen::LOGO;

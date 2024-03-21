@@ -515,7 +515,7 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
 
         if (!otherEntPtr->hasTag<DummyTag>() && !otherEntPtr->hasTag<CrusherTag>())
         {
-            resolvePlayerDirection(*staticPhy, *otherPhy);
+            resolvePlayerDirection(*staticPhy, *otherPhy, true);
             return;
         }
         else if (otherEntPtr->hasTag<CrusherTag>() || otherEntPtr->hasTag<DummyTag>())
@@ -559,7 +559,7 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
             bb.playerdamagebycrusher = true;
 
             // El jugador se mueve hacia atrás de la posición del crusher
-            resolvePlayerDirection(*staticPhy, *otherPhy);
+            resolvePlayerDirection(*staticPhy, *otherPhy, false);
         }
         return;
     }
@@ -584,37 +584,41 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
     }
 }
 
-void CollisionSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, PhysicsComponent& enemyPhy)
+void CollisionSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, PhysicsComponent& enemyPhy, bool isEnemy)
 {
     auto& pos = playerPhy.position;
     auto& otherPos = enemyPhy.position;
     auto& enemyVel = enemyPhy.velocity;
     vec3d dir = { pos.x() - otherPos.x(), 0, pos.z() - otherPos.z() };
-    vec3d dirEnemy = { otherPos.x() - enemyVel.x(), 0, otherPos.z() - enemyVel.z() };
 
-    // Si la dirección del enemigo y la del jugador tienen menos de 20 grados de diferencia, el jugador se le suman 45º en la dirección contraria
     dir.normalize();
-    dirEnemy.normalize();
 
-    // Calcular el ángulo entre las dos direcciones
-    double dot = dir.x() * dirEnemy.x() + dir.z() * dirEnemy.z(); // producto punto
-    double det = dir.x() * dirEnemy.z() - dir.z() * dirEnemy.x(); // determinante
-    double angle = atan2(det, dot); // atan2(y, x) o atan2(sin, cos)
-
-    // Convertir el ángulo a grados
-    double angleDeg = angle * 180 / M_PI;
-
-    // Si el ángulo es menor de 20 grados, ajustar la dirección del jugador
-    if (std::abs(angleDeg) < 20)
+    if (isEnemy)
     {
-        // Rotar la dirección del jugador 45 grados en la dirección contraria
-        double angleRad = -135 * M_PI / 180; // Convertir a radianes
-        double cosAngle = cos(angleRad);
-        double sinAngle = sin(angleRad);
-        vec3d newDir = { dir.x() * cosAngle - dir.z() * sinAngle, 0.0, dir.x() * sinAngle + dir.z() * cosAngle };
+        // Si la dirección del enemigo y la del jugador tienen menos de 20 grados de diferencia, el jugador se le suman 45º en la dirección contraria
+        vec3d dirEnemy = { otherPos.x() - enemyVel.x(), 0, otherPos.z() - enemyVel.z() };
+        dirEnemy.normalize();
 
-        dir = newDir;
-        // dir.normalize();
+        // Calcular el ángulo entre las dos direcciones
+        double dot = dir.x() * dirEnemy.x() + dir.z() * dirEnemy.z(); // producto punto
+        double det = dir.x() * dirEnemy.z() - dir.z() * dirEnemy.x(); // determinante
+        double angle = atan2(det, dot); // atan2(y, x) o atan2(sin, cos)
+
+        // Convertir el ángulo a grados
+        double angleDeg = angle * 180 / M_PI;
+
+        // Si el ángulo es menor de 20 grados, ajustar la dirección del jugador
+        if (std::abs(angleDeg) < 20)
+        {
+            // Rotar la dirección del jugador 45 grados en la dirección contraria
+            double angleRad = -135 * M_PI / 180; // Convertir a radianes
+            double cosAngle = cos(angleRad);
+            double sinAngle = sin(angleRad);
+            vec3d newDir = { dir.x() * cosAngle - dir.z() * sinAngle, 0.0, dir.x() * sinAngle + dir.z() * cosAngle };
+
+            dir = newDir;
+            // dir.normalize();
+        }
     }
     playerPhy.velocity = dir * 7;
     playerPhy.stopped = true;

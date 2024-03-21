@@ -4,7 +4,7 @@
 #include "../pf/Conection.hpp"
 #include <vector>
 
-struct navmesh_info
+struct NavmeshInfo
 {
     /* data */
     //Contador de ids de los nodos
@@ -14,41 +14,42 @@ struct navmesh_info
     //Nodos
     std::set<std::pair<uint16_t, vec3d>> nodes;
     //Pares de ndos que forman una conexion
-    std::set<std::pair<uint16_t,uint16_t>> conexids;
+    std::set<std::pair<uint16_t, uint16_t>> conexids;
     //Puntos medios de los nodos
     std::set<vec3d> midpoints{};
     //Conexiones
     std::vector<Conection> conexiones;
-   
+
 
     // recorrer navmeshes y rellenar array de nodos sin repetir
     // cojo el componente collider y compruebo si colisiona con otra entidad navmes
     // recorro los nodos de ambos y elimino los que se repitan
     // luego creo las conexiones
     // al añadirla comprobar que no exista ya
-    bool insert_ids(uint16_t id1, uint16_t id2){
+    bool insert_ids(uint16_t id1, uint16_t id2) {
         uint16_t min{}, max{};
-        if(id1 < id2){
+        if (id1 < id2) {
             min = id1;
             max = id2;
-        }else{
+        }
+        else {
             max = id1;
             min = id2;
         }
-        auto pair = std::make_pair(min,max);
-        if(conexids.find(pair) == conexids.end()){
+        auto pair = std::make_pair(min, max);
+        if (conexids.find(pair) == conexids.end()) {
             conexids.insert(pair);
             return true;
         }
         return false;
     }
 
-    bool checkmidpoints(vec3d p1, vec3d p2){
+    bool checkmidpoints(vec3d p1, vec3d p2) {
         vec3d puntoMedio;
         puntoMedio.setX((p1.x() + p2.x()) / 2);
         puntoMedio.setY((p1.y() + p2.y()) / 2);
         puntoMedio.setZ((p1.z() + p2.z()) / 2);
-        if(midpoints.find(puntoMedio) == midpoints.end()){
+        if (midpoints.find(puntoMedio) == midpoints.end()) {
             return true;
         }
         return false;

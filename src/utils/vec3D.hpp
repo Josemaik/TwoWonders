@@ -4,6 +4,10 @@
 #include <optional>
 #include <raylib.h>
 #include <array>
+#define CEREAL_RAPIDJSON_NAMESPACE cereal_rapidjson
+#include <cereal/types/vector.hpp>
+#include <cereal/types/chrono.hpp>
+#include <cereal/archives/json.hpp>
 
 template <typename DataT>
 struct vec3D
@@ -272,6 +276,12 @@ struct vec3D
     constexpr DataT distance(vec3D const& rhs) const
     {
         return (rhs - *this).length();
+    }
+
+    template <typename Archive>
+    void serialize(Archive& archive)
+    {
+        archive(x_, y_, z_);
     }
 
 private:
