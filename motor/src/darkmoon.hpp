@@ -57,11 +57,13 @@ public:
     Node* CreateCube(glm::vec3 position, glm::vec3 size, Color color, const char* nodeName, Node* parentNode);
     // Create cube wires in node
     Node* CreateCubeWires(glm::vec3 position, glm::vec3 size, Color color, const char* nodeName, Node* parentNode);
+    // Create model in node
+    Node* CreateModel(const char* filePath, Color tint, const char* nodeName, Node* parentNode);
+
+    // EXTRA
 
     // Create camera
     Camera* CreateCamera(const char* nodeName, Node* parentNode);
-    // Get actual camera
-    Camera* GetCamera(){ return m_renderManager.m_camera; }
     // Get root node
     Node* GetRootNode();
 
@@ -107,19 +109,11 @@ public:
     // -------------------------------------- //
 
     // Load model from file into GPU memory
-    Model* LoadModel(const char* filePath);
-    // Load model from generated mesh ?
+    // Model* LoadModel(const char* filePath);
+    // Load model from generated mesh ? TODO
 
     // Unload model data from CPU and GPU
     void UnloadModel(Model* model);
-    // Draw a model (with texture if set)
-    void DrawModel(Model* model, glm::vec3 position, float scale, Color tint);
-    // Draw a model with extended parameters
-    void DrawModelExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
-    // Draw a model wires (with textures if set)
-    void DrawModelWires(Model* model, glm::vec3 position, float scale, Color tint);
-    // Draw a model wires with extended parameters
-    void DrawModelWiresExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
 
     // ---------------------------------------- //
     // Mesh management and generation functions //
@@ -149,8 +143,6 @@ public:
     bool IsKeyReleased(int key);
     // Check if a key is not being pressed
     bool IsKeyUp(int key);
-
-    // MANDO
 
     // ------------------------------ //
     // Input-related functions: mouse //
@@ -205,10 +197,10 @@ public:
     // Camera //
     // ------ //
     
-    // Create camera
-    // Camera* CreateCamera(const char* name);
-    // Use camera
-    void UseCamera(Camera* newCamera);
+    // Get actual camera
+    Camera* GetCamera(){ return m_renderManager.m_camera; }
+    // Assigns camera
+    void UseCamera(Camera* newCamera){ m_renderManager.setCamera(newCamera); }
 
     // ---------------------- //
     // Text drawing functions //

@@ -23,10 +23,49 @@ void Model::unload(ResourceManager& rm){
         rm.unloadResource(m_meshes[i]->id);
 }
 
-void Model::draw(glm::mat4) { 
-    // std::cout << "Draw a model" << std::endl; 
-    for(int i=0; i<static_cast<int>(m_meshes.size()); i++)
-        m_meshes[i]->draw();
+void Model::draw(glm::mat4 transMatrix){
+    RenderManager rm = RenderManager::getInstance();
+
+    rm.beginMode3D();
+
+    // Set the uniform color in the shader
+    GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
+    glUseProgram(rm.getShader()->id_shader);
+    glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
+
+    // Transform
+    glm::mat4 model = transMatrix;
+    glm::mat4 view       = rm.m_camera->getViewMatrix();
+    glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
+    
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+    // Draw meshes
+    if(drawModel)
+        for (const auto& mesh : m_meshes) {
+            GLuint VAO = mesh->getVAO();
+            glBindVertexArray(VAO);
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->getNumIndices()), GL_UNSIGNED_SHORT, 0);
+            glBindVertexArray(0);
+        }
+
+    // Draw wires
+    if(drawWires){
+        colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
+        glUseProgram(rm.getShader()->id_shader);
+        glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(BLACK)));
+
+        for (const auto& mesh : m_meshes) {
+            GLuint VAO = mesh->getVAO();
+            glBindVertexArray(VAO);
+            glDrawElements(GL_LINES, static_cast<GLsizei>(mesh->getNumIndices()), GL_UNSIGNED_SHORT, 0);
+            glBindVertexArray(0);
+        }
+    }
+
+    rm.endMode3D();
 };
 
 // PRIVATE

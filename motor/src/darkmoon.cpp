@@ -177,6 +177,22 @@ Node* DarkMoonEngine::CreateCubeWires(glm::vec3 position, glm::vec3 size, Color 
     return p_nodeCubeWires;
 }
 
+// Create model in node
+Node* DarkMoonEngine::CreateModel(const char* filePath, Color tint, const char* nodeName, Node* parentNode){
+    auto p_nodeModel = CreateNode(nodeName, parentNode);
+
+    // Load model
+    auto model = std::make_unique<Model>();
+    model->load(filePath, m_resourceManager);
+    model->setColor(tint);
+
+    p_nodeModel->setEntity(std::move(model));
+
+    return p_nodeModel;
+}
+
+// EXTRA
+
 // Create camera in node
 Camera* DarkMoonEngine::CreateCamera(const char* nodeName, Node* parentNode){
     auto p_nodeCam = CreateNode(nodeName, parentNode);
@@ -295,43 +311,9 @@ void DarkMoonEngine::UnloadTexture(Texture* texture){
 // Model 3D Loading and Drawing functions //
 // -------------------------------------- //
 
-// Load model from file into GPU memory
-Model* DarkMoonEngine::LoadModel(const char* filePath){
-    auto nModel = std::make_unique<Node>();
-    nModel->name = filePath;
-    auto eModel = std::make_unique<Model>();
-    auto rawPtr = eModel.get();
-    eModel->load(filePath, m_resourceManager);
-    if(eModel->isLoaded()){
-        nModel->setEntity(std::move(eModel));
-        m_rootNode->addChild(std::move(nModel));
-    }
-    return rawPtr;
-}
-
 // Unload model data from CPU and GPU
 void DarkMoonEngine::UnloadModel(Model* model){
     model->unload(m_resourceManager);
-}
-
-// Draw a model (with texture if set)
-void DarkMoonEngine::DrawModel(Model* model, glm::vec3 position, float scale, Color tint){
-    m_renderManager.drawModel(model, position, scale, tint);
-}
-
-// Draw a model with extended parameters
-void DarkMoonEngine::DrawModelExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
-    m_renderManager.drawModelExtra(model, position, scale, rotationAxis, rotationAngle, tint);
-}
-
-// Draw a model wires (with textures if set)
-void DarkMoonEngine::DrawModelWires(Model* model, glm::vec3 position, float scale, Color tint){
-    m_renderManager.drawModelWires(model, position, scale, tint);
-}
-
-// Draw a model wires with extended parameters
-void DarkMoonEngine::DrawModelWiresExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint){
-    m_renderManager.drawModelWiresExtra(model, position, scale, rotationAxis, rotationAngle, tint);
 }
 
 // --------------------------------- //
@@ -462,27 +444,6 @@ Font* DarkMoonEngine::LoadFont(const char* filePath){
 // Load shader from file into GPU memory
 Shader* DarkMoonEngine::LoadShader(const char* vsFilePath, const char* fsFilePath){
     return m_resourceManager.loadResource<Shader>(vsFilePath, fsFilePath, ShaderType::COLOR);
-}
-
-// ------ //
-// Camera //
-// ------ //
-
-// Create camera
-//Camera* DarkMoonEngine::CreateCamera(const char* name){
-//    auto nCamera = CreateNode(name);
-//    auto eCamera = std::make_unique<Camera>();
-//    auto rawPtr = eCamera.get();
-//    nCamera->setEntity(std::move(eCamera));
-//    m_rootNode->addChild(std::move(nCamera));
-//
-//    return rawPtr;
-//}
-
-// Use camera
-void DarkMoonEngine::UseCamera(Camera* newCamera){
-    // Assigns Camera to RenderManager
-    m_renderManager.setCamera(newCamera);
 }
 
 // ---------------------- //

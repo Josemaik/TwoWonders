@@ -45,6 +45,15 @@ Node* createScene3D(DarkMoonEngine& engine){
     // Node: Wireframe
     engine.CreateCubeWires({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, BLACK, "Wireframe", p_node3D);
 
+    // Node: Modelo
+    auto model = engine.CreateModel("assets/Dummy.obj", GRAY, "Modelo: Dummy", p_node3D);
+    model->scale({0.2f, 0.2f, 0.2f});
+    model->setTranslation({0.0f, -0.5f, 0.0f});
+
+    auto eModel = dynamic_cast<Model*>(model->getEntity());
+    eModel->drawModel = true;
+    eModel->drawWires = true;
+
     return p_node3D;
 }
 
@@ -55,8 +64,6 @@ int main(){
 
         createHUD(engine);
         createScene3D(engine);
-
-        //engine.SetTargetFPS(120);
 
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Tree │" << std::endl;

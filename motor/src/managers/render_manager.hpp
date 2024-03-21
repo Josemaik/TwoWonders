@@ -5,7 +5,6 @@
 #include "../resources/resource_font.hpp"
 #include "../resources/resource_mesh.hpp"
 #include "../components/entity_camera.hpp"
-#include "../components/entity_model.hpp"
 
 #include "resource_manager.hpp"
 
@@ -48,12 +47,6 @@ public:
 
     // Basic drawing functions
     void clearBackground(Color color);
-
-    // Model drawing functions
-    void drawModel(Model* model, glm::vec3 position, float scale, Color tint);
-    void drawModelExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
-    void drawModelWires(Model* model, glm::vec3 position, float scale, Color tint);
-    void drawModelWiresExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
 
     // Mesh generation functions
     // TODO
