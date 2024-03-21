@@ -54,7 +54,7 @@ int main(){
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
         createHUD(engine);
-        auto scene3D = createScene3D(engine);
+        createScene3D(engine);
 
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Tree │" << std::endl;
@@ -75,20 +75,6 @@ int main(){
                 camera->position.y += 0.1f;
             if(engine.IsKeyPressed(KEY_DOWN))
                 camera->position.y -= 0.1f;
-
-            if(engine.IsKeyPressed(KEY_A))
-                scene3D->translate({-0.05f, 0.0f, 0.0f});
-            if(engine.IsKeyPressed(KEY_D))
-                scene3D->translate({0.05f, 0.0f, 0.0f});
-            if(engine.IsKeyPressed(KEY_W))
-                scene3D->translate({0.0f, 0.0f, -0.05f});
-            if(engine.IsKeyPressed(KEY_S))
-                scene3D->translate({0.0f, 0.0f, 0.05f});
-
-            if(engine.IsKeyPressed(KEY_O))
-                scene3D->scale({1.1f, 1.1f, 1.1f});
-            if(engine.IsKeyPressed(KEY_L))
-                scene3D->scale({0.9f, 0.9f, 0.9f});
 
             // Draw
 

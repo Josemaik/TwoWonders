@@ -17,18 +17,17 @@ int Node::addChild(std::unique_ptr<Node> child) {
     return static_cast<int>(m_children.size() - 1);
 }
 
-int Node::removeChild(Node*) {
-    /* TODO
-    auto it = std::find_if(m_children.begin(), m_children.end(), [child](const auto* rawChild) {
-        return rawChild == child;
-    });
+int Node::removeChild(Node* child) {
+    auto it = std::find_if(m_children.begin(), m_children.end(),
+        [child](const std::unique_ptr<Node>& ptr){ return ptr.get() == child; });
 
-    if (it != m_children.end()) {
+    if(it != m_children.end()){
         m_children.erase(it);
-        (*it)->m_parent = nullptr;
+        child->m_parent = nullptr;
+
         return 0;
     }
-    */
+    
     return -1;
 }
 
