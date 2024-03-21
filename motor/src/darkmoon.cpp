@@ -111,14 +111,35 @@ Node* DarkMoonEngine::CreateTexture2D(glm::vec2 position, const char* filePath, 
 
 // Create point 3D in node
 Node* DarkMoonEngine::CreatePoint3D(glm::vec3 position, float pointSize, Color color, const char* nodeName, Node* parentNode){
-    auto p_nodePoint = CreateNode(nodeName, parentNode);
+    auto p_nodePoint3D = CreateNode(nodeName, parentNode);
 
     // Create point 3D
     auto point3D = std::make_unique<Point3D>(position, pointSize, color);
-    p_nodePoint->translate({position.x, position.y, 0.0f});
-    p_nodePoint->setEntity(std::move(point3D));
+    p_nodePoint3D->setEntity(std::move(point3D));
 
-    return p_nodePoint;
+    return p_nodePoint3D;
+}
+
+// Create line 3D in node
+Node* DarkMoonEngine::CreateLine3D(glm::vec3 startPos, glm::vec3 endPos, float lineSize, Color color, const char* nodeName, Node* parentNode){
+    auto p_nodeLine3D = CreateNode(nodeName, parentNode);
+
+    // Create line 3D
+    auto line3D = std::make_unique<Line3D>(startPos, endPos, lineSize, color);
+    p_nodeLine3D->setEntity(std::move(line3D));
+
+    return p_nodeLine3D;
+}
+
+// Create grid 3D in node
+Node* DarkMoonEngine::CreateGrid(int slices, float spacing, Color color, const char* nodeName, Node* parentNode){
+    auto p_nodeGrid =  CreateNode(nodeName, parentNode);
+
+    // Create grid 3D
+    auto grid3D = std::make_unique<Grid>(slices, spacing, color);
+    p_nodeGrid->setEntity(std::move(grid3D));
+
+    return p_nodeGrid;
 }
 
 // Create camera in node
@@ -248,26 +269,6 @@ void DarkMoonEngine::UnloadTexture(Texture* texture){
 // ------------------------------------------- //
 // Basic geometric 3D shapes drawing functions //
 // ------------------------------------------- //
-
-// Draw a point in 3D space
-void DarkMoonEngine::DrawPoint3D(glm::vec3 pos, Color color){
-    m_renderManager.drawPoint3D(pos, 1.0f, color);
-}
-
-// Draw a point in 3D space with extended parameters
-void DarkMoonEngine::DrawPoint3DExtra(glm::vec3 pos, float pointSize, Color color){
-    m_renderManager.drawPoint3D(pos, pointSize, color);
-}
-
-// Draw a line in 3D space
-void DarkMoonEngine::DrawLine3D(glm::vec3 startPos, glm::vec3 endPos, float lineSize, Color color){
-    m_renderManager.drawLine3D(startPos, endPos, lineSize, color);
-}
-
-// Draw a grid (centered at (0, 0, 0))
-void DarkMoonEngine::DrawGrid(int slices, float spacing, Color color){
-    m_renderManager.drawGrid(slices, spacing, color);
-}
 
 // Draw a plane XZ
 void DarkMoonEngine::DrawPlane(glm::vec3 centerPos, glm::vec2 size, Color color){

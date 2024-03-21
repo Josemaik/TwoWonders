@@ -47,6 +47,10 @@ public:
 
     // Create point 3D in node
     Node* CreatePoint3D(glm::vec3 position, float pointSize, Color color, const char* nodeName, Node* parentNode);
+    // Create line 3D in node
+    Node* CreateLine3D(glm::vec3 startPos, glm::vec3 endPos, float lineSize, Color color, const char* nodeName, Node* parentNode);
+    // Create grid 3D in node
+    Node* CreateGrid(int slices, float spacing, Color color, const char* nodeName, Node* parentNode);
 
     // Create camera
     Camera* CreateCamera(const char* nodeName, Node* parentNode);
@@ -100,14 +104,6 @@ public:
     // Basic geometric 3D shapes drawing functions //
     // ------------------------------------------- //
 
-    // Draw a point in 3D space
-    void DrawPoint3D(glm::vec3 pos, Color color);
-    // Draw a point in 3D space with extended parameters
-    void DrawPoint3DExtra(glm::vec3 pos, float pointSize, Color color);
-    // Draw a line in 3D space
-    void DrawLine3D(glm::vec3 startPos, glm::vec3 endPos, float lineSize, Color color);
-    // Draw a grid (centered at (0, 0, 0))
-    void DrawGrid(int slices, float spacing, Color color);
     // Draw a plane XZ
     void DrawPlane(glm::vec3 centerPos, glm::vec2 size, Color color);
     // Draw a cube

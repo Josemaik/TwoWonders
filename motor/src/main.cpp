@@ -29,8 +29,13 @@ Node* createScene3D(DarkMoonEngine& engine){
     // Node Scene 3D
     auto p_node3D = engine.CreateNode("Scene 3D", engine.GetRootNode());
 
-    // Node: Punto en 3D en (0,0,0)
-    engine.CreatePoint3D({0.0f, 0.0f, 0.0f}, 5.0f, BLACK, "Punto enmedio del mundo", p_node3D);
+    // Node: Rejilla
+    engine.CreateGrid(10, 1.0f, GRAY, "Rejilla principal", p_node3D);
+
+    // Node: Linea diagonal
+    engine.CreatePoint3D({-1.0f, 0.0f, 1.0f}, 5.0f, BLACK, "Punto principio linea", p_node3D);
+    engine.CreateLine3D({-1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, -1.0f}, 2.0f, YELLOW_DARK, "Linea amarilla", p_node3D);
+    engine.CreatePoint3D({1.0f, 1.0f, -1.0f}, 5.0f, BLACK, "Punto fin linea", p_node3D);
 
     return p_node3D;
 }
@@ -40,8 +45,8 @@ int main(){
 
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
-        auto nodeHUD = createHUD(engine);
-        createScene3D(engine);
+        createHUD(engine);
+        auto scene3D = createScene3D(engine);
 
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Tree │" << std::endl;
@@ -54,14 +59,28 @@ int main(){
 
             // Logic
 
-            if(engine.IsKeyPressed(KEY_A))
+            if(engine.IsKeyPressed(KEY_LEFT))
                 camera->position.x -= 0.1f;
-            if(engine.IsKeyPressed(KEY_D))
+            if(engine.IsKeyPressed(KEY_RIGHT))
                 camera->position.x += 0.1f;
-            if(engine.IsKeyPressed(KEY_W))
+            if(engine.IsKeyPressed(KEY_UP))
                 camera->position.y += 0.1f;
-            if(engine.IsKeyPressed(KEY_S))
+            if(engine.IsKeyPressed(KEY_DOWN))
                 camera->position.y -= 0.1f;
+
+            if(engine.IsKeyPressed(KEY_A))
+                scene3D->translate({-0.05f, 0.0f, 0.0f});
+            if(engine.IsKeyPressed(KEY_D))
+                scene3D->translate({0.05f, 0.0f, 0.0f});
+            if(engine.IsKeyPressed(KEY_W))
+                scene3D->translate({0.0f, 0.0f, -0.05f});
+            if(engine.IsKeyPressed(KEY_S))
+                scene3D->translate({0.0f, 0.0f, 0.05f});
+
+            if(engine.IsKeyPressed(KEY_O))
+                scene3D->scale({1.1f, 1.1f, 1.1f});
+            if(engine.IsKeyPressed(KEY_L))
+                scene3D->scale({0.9f, 0.9f, 0.9f});
 
             // Draw
 
@@ -69,9 +88,9 @@ int main(){
 
             engine.ClearBackground(WHITE);
 
-            engine.BeginMode3D();
-            engine.DrawGrid(10, 1.0f, GRAY);
-            engine.EndMode3D();
+            // engine.BeginMode3D();
+            // engine.DrawGrid(10, 1.0f, GRAY);
+            // engine.EndMode3D();
         
             engine.GetRootNode()->traverse(glm::mat4());
 

@@ -50,9 +50,6 @@ public:
     void clearBackground(Color color);
 
     // Basic geometric 3D shapes drawing functions
-    void drawPoint3D(glm::vec3 position, float pointSize, Color color);
-    void drawLine3D(glm::vec3 startPos, glm::vec3 endPos, float lineSize, Color color);
-    void drawGrid(int slices, float spacing, Color color);
     void drawPlane(glm::vec3 centerPos, glm::vec2 size, Color color); // XZ
     void drawCube(glm::vec3 position, glm::vec3 size, Color color);
     void drawCubeWires(glm::vec3 position, glm::vec3 size, Color color);
