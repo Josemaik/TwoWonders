@@ -46,6 +46,7 @@ private:
     void generateRamps(EntityManager& em, const rapidjson::Value& rampArray);
     void generateObjects(EntityManager& em, const rapidjson::Value& objectArray, uint8_t mapID);
     void generateEnemies(EntityManager& em, const rapidjson::Value& enemyArray, Ia_man& iam);
+    void generateNPCs(EntityManager& em, const rapidjson::Value& npcArray);
     void generateInteractables(EntityManager& em, const rapidjson::Value& interactableArray);
     void addToZone(EntityManager& em, Entity& e, InteractableType type);
 

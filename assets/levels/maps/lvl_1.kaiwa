@@ -200,6 +200,7 @@
 							"scale_to_respawn_attack": 7.0
 						}
 					],
+					"NPCs":[],
 					"Objects": []
 				}
 			}
@@ -453,6 +454,7 @@
 							"scale_to_respawn_attack": 7.0
 						}
 					],
+					"NPCs":[],
 					"Objects": []
 				}
 			}
@@ -694,6 +696,7 @@
 							"scale_to_respawn_attack": 7.0
 						}
 					],
+					"NPCs":[],
 					"Objects": []
 				}
 			}
@@ -818,6 +821,7 @@
 							"scale_to_respawn_attack": 7.0
 						}
 					],
+					"NPCs":[],
 					"Objects": []
 				}
 			}
@@ -1253,6 +1257,16 @@
 							"scale_to_respawn_attack": 7.0
 						}
 					],
+					"NPCs":[
+						{
+							"position": [-23.08, 4.0, 244.7],
+							"rotVector": [0.0, 0.0, 1.0],
+							"rotation": 90.0,
+							"scale": [3.0, 4.0, 3.0],
+							"color": [0, 121, 241, 255],
+							"max_speed": 0.2
+						}
+					],
 					"Objects": []
 				}
 			}
@@ -1567,6 +1581,9 @@
 							"countdown_perception": 0.5,
 							"scale_to_respawn_attack": 7.0
 						}
+					],
+					"NPCs":[
+					
 					],
 					"Objects": []
 				}

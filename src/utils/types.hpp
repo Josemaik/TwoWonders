@@ -20,6 +20,7 @@
 //ia
 #include "../components/ai_component.hpp"
 #include "../components/navmesh_component.hpp"
+#include "../components/npc_component.hpp"
 #include "../components/projectile_component.hpp"
 #include "../components/object_component.hpp"
 #include "../components/zone_component.hpp"
@@ -85,6 +86,7 @@ struct SeparateModelTag {};
 struct BarricadeTag {};
 struct LeverTag {};
 struct NoKeyTag {};
+struct NPCTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -109,7 +111,8 @@ using CL = MP::TypeList <
     AngryBushComponent,
     DispatcherComponent,
     Navmesh,
-    OneUseComponent
+    OneUseComponent,
+    NPC_component
 > ;
 using TL = MP::TypeList <
     PlayerTag,
@@ -146,7 +149,8 @@ using TL = MP::TypeList <
     CrusherTag,
     BarricadeTag,
     LeverTag,
-    NoKeyTag
+    NoKeyTag,
+    NPCTag
 > ;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo,navmesh_info,ZoneCheckInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

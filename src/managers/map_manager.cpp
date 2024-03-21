@@ -90,8 +90,11 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             const rapidjson::Value& underworld = chunk[1]["underworld"];
             const rapidjson::Value& objectArray = underworld["Objects"];
             const rapidjson::Value& enemyArray = underworld["Enemies"];
+            const rapidjson::Value& NPCsArray = underworld["NPCs"];
             generateObjects(em, objectArray, mapID);
             generateEnemies(em, enemyArray, iam);
+            generateNPCs(em,NPCsArray);
+
             break;
         }
         default:
@@ -113,6 +116,7 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
     const rapidjson::Value& underworld = chunk[1]["underworld"];
     const rapidjson::Value& objectArray = underworld["Objects"];
     const rapidjson::Value& enemyArray = underworld["Enemies"];
+    const rapidjson::Value& NPCsArray = underworld["NPCs"];
 
     generateChunkModel(em, i);
 
@@ -127,6 +131,8 @@ void MapManager::generateChunkFromJSON(EntityManager& em, const rapidjson::Value
     generateEnemies(em, enemyArray, iam);
 
     generateInteractables(em, interactablesArray);
+
+    generateNPCs(em,NPCsArray);
 
     // pseudo-codigo para scheduling xdddd
     // for enemy : map[enemies]
@@ -617,6 +623,27 @@ void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
             }
         }
 }
+
+ void MapManager::generateNPCs(EntityManager& em, const rapidjson::Value& npcArray){
+    for (rapidjson::SizeType i = 0; i < npcArray.Size(); i++)
+    {
+        // const rapidjson::Value& npcArray = npcArray[i];
+        vec3d position = { npcArray[i]["position"][0].GetDouble(), npcArray[i]["position"][1].GetDouble(), npcArray[i]["position"][2].GetDouble() };
+        vec3d rotationVec{ npcArray[i]["rotVector"][1].GetDouble(), npcArray[i]["rotVector"][2].GetDouble(), npcArray[i]["rotVector"][0].GetDouble() };
+        double orientation{ npcArray[i]["rotation"].GetDouble() };
+        vec3d scale = { npcArray[i]["scale"][0].GetDouble(), npcArray[i]["scale"][1].GetDouble(), npcArray[i]["scale"][2].GetDouble() };
+        Color color = { static_cast<unsigned char>(npcArray[i]["color"][0].GetUint()), static_cast<unsigned char>(npcArray[i]["color"][1].GetUint()), static_cast<unsigned char>(npcArray[i]["color"][2].GetUint()), static_cast<unsigned char>(npcArray[i]["color"][3].GetUint()) };
+        double rot = orientation * DEGTORAD;
+        double max_speed = npcArray[i]["max_speed"].GetDouble();
+
+        auto& e{ em.newEntity() };
+        em.addTag<NPCTag>(e);
+
+        auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = position, .scale = scale, .color = color,.orientation = rot,.rotationVec = rotationVec });
+        auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.rotationVec = rotationVec, .max_speed = max_speed });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
+    }
+ }
 
 // template<>
 // void MapManager::resetTag<WallTag>(EntityManager& em)
