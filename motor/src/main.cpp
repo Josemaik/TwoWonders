@@ -37,6 +37,14 @@ Node* createScene3D(DarkMoonEngine& engine){
     engine.CreateLine3D({-1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, -1.0f}, 2.0f, YELLOW_DARK, "Linea amarilla", p_node3D);
     engine.CreatePoint3D({1.0f, 1.0f, -1.0f}, 5.0f, BLACK, "Punto fin linea", p_node3D);
 
+    // Node: Plano
+    engine.CreatePlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, PINK, "Plano rosita", p_node3D);
+
+    // Node: Cubo
+    engine.CreateCube({-3.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, AQUA_DARK, "Cubo azulito", p_node3D);
+    // Node: Wireframe
+    engine.CreateCubeWires({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, BLACK, "Wireframe", p_node3D);
+
     return p_node3D;
 }
 
@@ -87,11 +95,6 @@ int main(){
             engine.BeginDrawing();
 
             engine.ClearBackground(WHITE);
-
-            // engine.BeginMode3D();
-            // engine.DrawGrid(10, 1.0f, GRAY);
-            // engine.EndMode3D();
-        
             engine.GetRootNode()->traverse(glm::mat4());
 
             engine.EndDrawing();

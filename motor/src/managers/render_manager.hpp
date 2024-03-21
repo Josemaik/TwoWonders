@@ -49,11 +49,6 @@ public:
     // Basic drawing functions
     void clearBackground(Color color);
 
-    // Basic geometric 3D shapes drawing functions
-    void drawPlane(glm::vec3 centerPos, glm::vec2 size, Color color); // XZ
-    void drawCube(glm::vec3 position, glm::vec3 size, Color color);
-    void drawCubeWires(glm::vec3 position, glm::vec3 size, Color color);
-
     // Model drawing functions
     void drawModel(Model* model, glm::vec3 position, float scale, Color tint);
     void drawModelExtra(Model* model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);

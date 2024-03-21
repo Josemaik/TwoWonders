@@ -133,13 +133,48 @@ Node* DarkMoonEngine::CreateLine3D(glm::vec3 startPos, glm::vec3 endPos, float l
 
 // Create grid 3D in node
 Node* DarkMoonEngine::CreateGrid(int slices, float spacing, Color color, const char* nodeName, Node* parentNode){
-    auto p_nodeGrid =  CreateNode(nodeName, parentNode);
+    auto p_nodeGrid = CreateNode(nodeName, parentNode);
 
     // Create grid 3D
     auto grid3D = std::make_unique<Grid>(slices, spacing, color);
     p_nodeGrid->setEntity(std::move(grid3D));
 
     return p_nodeGrid;
+}
+
+// Create plane 3D (XZ) in node
+Node* DarkMoonEngine::CreatePlane(glm::vec3 centerPos, glm::vec2 size, Color color, const char* nodeName, Node* parentNode){
+    auto p_nodePlane = CreateNode(nodeName, parentNode);
+
+    // Create plane XZ 3D
+    auto plane3D = std::make_unique<Plane>(centerPos, size, color);
+    p_nodePlane->setEntity(std::move(plane3D));
+
+    return p_nodePlane;
+}
+
+// Create cube in node
+Node* DarkMoonEngine::CreateCube(glm::vec3 position, glm::vec3 size, Color color, const char* nodeName, Node* parentNode){
+    auto p_nodeCube = CreateNode(nodeName, parentNode);
+
+    // Create cube
+    auto cube3D = std::make_unique<Cube>(position, size, color);
+    p_nodeCube->translate(position);
+    p_nodeCube->setEntity(std::move(cube3D));
+
+    return p_nodeCube;
+}
+
+// Create cube wires in node
+Node* DarkMoonEngine::CreateCubeWires(glm::vec3 position, glm::vec3 size, Color color, const char* nodeName, Node* parentNode){
+    auto p_nodeCubeWires = CreateNode(nodeName, parentNode);
+
+    // Create cube wires
+    auto cubeWires3D = std::make_unique<CubeWires>(position, size, color);
+    p_nodeCubeWires->translate(position);
+    p_nodeCubeWires->setEntity(std::move(cubeWires3D));
+
+    return p_nodeCubeWires;
 }
 
 // Create camera in node
@@ -239,16 +274,6 @@ void DarkMoonEngine::EndDrawing(){
     m_windowsManager.endDrawing();
 }
 
-// Begin 3D mode
-void DarkMoonEngine::BeginMode3D(){
-    m_renderManager.beginMode3D();
-}
-
-// Ends 3D mode
-void DarkMoonEngine::EndMode3D(){
-    m_renderManager.endMode3D();
-}
-
 // ------------------------- //
 // Texture loading functions //
 // ------------------------- //
@@ -264,35 +289,6 @@ Texture* DarkMoonEngine::LoadTexture(const char* filePath){
 // Unload texture data from CPU and GPU
 void DarkMoonEngine::UnloadTexture(Texture* texture){
     m_resourceManager.unloadResource(texture->id);
-}
-
-// ------------------------------------------- //
-// Basic geometric 3D shapes drawing functions //
-// ------------------------------------------- //
-
-// Draw a plane XZ
-void DarkMoonEngine::DrawPlane(glm::vec3 centerPos, glm::vec2 size, Color color){
-    m_renderManager.drawPlane(centerPos, size, color);
-}
-
-// Draw a cube
-void DarkMoonEngine::DrawCube(glm::vec3 position, float width, float height, float length, Color color){
-    m_renderManager.drawCube(position, {width, height, length}, color);
-}
-
-// Draw a cube (vector version)
-void DarkMoonEngine::DrawCubeV(glm::vec3 position, glm::vec3 size, Color color){
-    m_renderManager.drawCube(position, size, color);
-}
-
-// Draw a cube wires
-void DarkMoonEngine::DrawCubeWires(glm::vec3 position, float width, float height, float length, Color color){
-    m_renderManager.drawCubeWires(position, {width, height, length}, color);
-}
-
-// Draw a cube wires (vector version)
-void DarkMoonEngine::DrawCubeWiresV(glm::vec3 position, glm::vec3 size, Color color){
-    m_renderManager.drawCubeWires(position, size, color);
 }
 
 // -------------------------------------- //

@@ -51,6 +51,12 @@ public:
     Node* CreateLine3D(glm::vec3 startPos, glm::vec3 endPos, float lineSize, Color color, const char* nodeName, Node* parentNode);
     // Create grid 3D in node
     Node* CreateGrid(int slices, float spacing, Color color, const char* nodeName, Node* parentNode);
+    // Create plane 3D (XZ) in node
+    Node* CreatePlane(glm::vec3 centerPos, glm::vec2 size, Color color, const char* nodeName, Node* parentNode);
+    // Create cube in node
+    Node* CreateCube(glm::vec3 position, glm::vec3 size, Color color, const char* nodeName, Node* parentNode);
+    // Create cube wires in node
+    Node* CreateCubeWires(glm::vec3 position, glm::vec3 size, Color color, const char* nodeName, Node* parentNode);
 
     // Create camera
     Camera* CreateCamera(const char* nodeName, Node* parentNode);
@@ -86,10 +92,6 @@ public:
     void BeginDrawing();
     // End canvas drawing and swap buffers
     void EndDrawing();
-    // Begin 3D mode
-    void BeginMode3D();
-    // Ends 3D mode
-    void EndMode3D();
 
     // ------------------------ //
     // Texture Loading unctions //
@@ -99,21 +101,6 @@ public:
     Texture* LoadTexture(const char* filePath);
     // Unload texture data from CPU and GPU
     void UnloadTexture(Texture* texture);
-
-    // ------------------------------------------- //
-    // Basic geometric 3D shapes drawing functions //
-    // ------------------------------------------- //
-
-    // Draw a plane XZ
-    void DrawPlane(glm::vec3 centerPos, glm::vec2 size, Color color);
-    // Draw a cube
-    void DrawCube(glm::vec3 position, float width, float height, float length, Color color);
-    // Draw a cube (vector version)
-    void DrawCubeV(glm::vec3 position, glm::vec3 size, Color color);
-    // Draw a cube wires
-    void DrawCubeWires(glm::vec3 position, float width, float height, float length, Color color);
-    // Draw a cube wires (vector version)
-    void DrawCubeWiresV(glm::vec3 position, glm::vec3 size, Color color);
 
     // -------------------------------------- //
     // Model 3D Loading and Drawing functions //
