@@ -18,6 +18,9 @@ bool WindowsManager::initWindow(int width, int height, const char* title){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    // Deactivate V-Sync
+    // glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_FALSE);
+
     // glfw window creation
     // --------------------
     m_window = glfwCreateWindow(width, height, title, nullptr, nullptr);
@@ -93,6 +96,52 @@ void WindowsManager::beginDrawing(){
 }
 
 void WindowsManager::endDrawing(){
+    controlFrameRate();
+
     glfwSwapBuffers(m_window);
     glfwPollEvents();
+}
+
+// Timing-related functions
+void WindowsManager::setTargetFPS(int fps){
+    m_targetFrameTime = 1.0 / static_cast<double>(fps);
+}
+
+float WindowsManager::getFrameTime(){
+    double currentFrameTime = glfwGetTime();
+    m_deltaTime = currentFrameTime - m_lastFrameTime;
+    m_lastFrameTime = currentFrameTime;
+
+    return static_cast<float>(m_deltaTime);
+}
+
+double WindowsManager::getTime(){
+    return glfwGetTime();
+}
+
+int WindowsManager::getFPS(){
+    double currentTime = glfwGetTime();
+    ++m_frameCount;
+
+    if (currentTime - m_lastFPSTime >= 1.0) {
+        m_fps = m_frameCount;
+        m_frameCount = 0;
+        m_lastFPSTime += 1.0;
+    }
+
+    return m_fps;
+}
+
+void WindowsManager::controlFrameRate(){
+    if (m_targetFrameTime > 0.0) {
+        double currentTime = glfwGetTime();
+        double elapsedTime = currentTime - m_lastFrameTime;
+
+        if (elapsedTime < m_targetFrameTime) {
+            double sleepTime = m_targetFrameTime - elapsedTime;
+            int milliseconds = static_cast<int>(sleepTime * 1000);
+            if (milliseconds > 0)
+                std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+        }
+    }
 }

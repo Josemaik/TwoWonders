@@ -217,6 +217,19 @@ public:
     // Draw text (using default font)
     // TODO
     void DrawText(const char* text, int posX, int posY, int fontSize, Color color);
+
+    // ------------------------ //
+    // Timing-related functions //
+    // ------------------------ //
+
+    // Set target FPS (max)
+    void SetTargetFPS(int fps);
+    // Get time in seconds for last frame drawn
+    float GetFrameTime();
+    // Get elapsed time in seconds
+    double GetTime();
+    // Get current FPS
+    int GetFPS();
     
 private:
     // Root node 

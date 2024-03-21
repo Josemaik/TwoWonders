@@ -493,3 +493,27 @@ void DarkMoonEngine::UseCamera(Camera* newCamera){
 void DarkMoonEngine::DrawText(const char* text, int posX, int posY, int fontSize, Color color){
     m_renderManager.drawText(text, {posX, posY}, fontSize, color);
 }
+
+// ------------------------ //
+// Timing-related functions //
+// ------------------------ //
+
+// Set target FPS (max)
+void DarkMoonEngine::SetTargetFPS(int fps){
+    m_windowsManager.setTargetFPS(fps);
+}
+
+// Get time in seconds for last frame drawn
+float DarkMoonEngine::GetFrameTime(){
+    return m_windowsManager.getFrameTime();
+}
+
+// Get elapsed time in seconds
+double DarkMoonEngine::GetTime(){
+    return m_windowsManager.getTime();
+}
+
+// Get current FPS
+int DarkMoonEngine::GetFPS(){
+    return m_windowsManager.getFPS();
+}

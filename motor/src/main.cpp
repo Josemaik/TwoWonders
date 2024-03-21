@@ -56,6 +56,8 @@ int main(){
         createHUD(engine);
         createScene3D(engine);
 
+        //engine.SetTargetFPS(120);
+
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Tree │" << std::endl;
         std::cout << "└──────┘" << std::endl;
