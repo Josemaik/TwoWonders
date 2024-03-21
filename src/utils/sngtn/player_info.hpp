@@ -20,7 +20,6 @@ struct PlayerInfo
     std::vector<Spell> spells{};
     Spell currentSpell{ "None", "No spell", Spells::None, 0.0, 0 };
     std::size_t selectedItem{ max };
-    bool isDead{ false };
     vec3d spawnPoint{};
 
     void addSpell(Spell spell) { spells.push_back(spell); currentSpell = spell; }
@@ -100,6 +99,12 @@ struct PlayerInfo
     }
 
     void decreaseBomb() { if (bombs > 0) bombs -= 1; }
+
+    void onDeath()
+    {
+        mana = max_mana;
+        armor = 0;
+    }
 
     void reset()
     {

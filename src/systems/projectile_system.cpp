@@ -11,7 +11,7 @@ void ProjectileSystem::update(EntityManager& em, float deltaTime) {
 
             if (pro.startedFalling)
             {
-                li.dead_entities.insert(e.getID());
+                li.insertDeath(e.getID());
                 return;
             }
 
@@ -34,7 +34,8 @@ void ProjectileSystem::update(EntityManager& em, float deltaTime) {
         if (plfi.currentSpell == Spells::WaterBomb || plfi.currentSpell == Spells::FireBall || plfi.currentSpell == Spells::FireMeteorites)
         {
             // Vemos si el hechizo está en la lista de destrucción
-            if (li.dead_entities.find(e.getID()) != li.dead_entities.end())
+            auto& dead_ents = li.getDeath();
+            if (dead_ents.find(e.getID()) != dead_ents.end())
             {
                 auto& col = em.getComponent<ColliderComponent>(e);
                 if (col.behaviorType & BehaviorType::ATK_PLAYER)
@@ -50,6 +51,5 @@ void ProjectileSystem::update(EntityManager& em, float deltaTime) {
                 }
             }
         }
-
     });
 }

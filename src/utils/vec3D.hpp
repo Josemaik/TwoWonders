@@ -257,6 +257,18 @@ struct vec3D
         }
     }
 
+    // Devuelve el ángulo entre dos vectores en radianes
+    constexpr DataT angle(vec3D const& rhs) const
+    {
+        return std::acos(dotProduct(rhs) / (length() * rhs.length()));
+    }
+
+    // Devuelve el ángulo entre dos vectores en grados
+    constexpr DataT angleDeg(vec3D const& rhs) const
+    {
+        return angle(rhs) * 180 / M_PI;
+    }
+
     constexpr DataT distance(vec3D const& rhs) const
     {
         return (rhs - *this).length();
@@ -281,6 +293,10 @@ struct vec2D
 {
     constexpr vec2D() = default;
     constexpr vec2D(DataT x, DataT y) : x{ x }, y{ y } {}
+    constexpr Vector2 toRaylib() const noexcept
+    {
+        return Vector2{ static_cast<float>(x),  static_cast<float>(y) };
+    }
 
     DataT x{}, y{};
 };

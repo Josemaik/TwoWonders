@@ -10,7 +10,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             if (obj.type == ObjectType::BombExplode || obj.type == ObjectType::Heal_Spell)
                 obj.effect();
             else
-                li.dead_entities.insert(ent.getID());
+                li.insertDeath(ent.getID());
 
         }
 
@@ -59,9 +59,16 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 break;
 
             case ObjectType::ShopItem_ExtraLife:
-                shop_object = buyExtraLife(em, playerEnt);
+            {
+                if (playerEnt->hasComponent<LifeComponent>())
+                {
+                    auto& life = em.getComponent<LifeComponent>(*playerEnt);
+                    life.increaseMaxLife();
+                    life.increaseLife(4);
+                }
+                // shop_object = buyExtraLife(em, playerEnt);
                 break;
-
+            }
             case ObjectType::BombExplode:
                 explodeBomb(em, ent);
                 break;
@@ -97,7 +104,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 break;
             }
             if (shop_object)
-                li.dead_entities.insert(ent.getID());
+                li.insertDeath(ent.getID());
             else
                 obj.active = false;
 
