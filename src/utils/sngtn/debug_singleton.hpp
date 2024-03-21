@@ -11,4 +11,7 @@ struct Debug_t {
     void plusdeltatime(double deltaTime, double& elapsed) { elapsed += deltaTime; };
     const char *text{};
     std::vector<vec3d> path{};
+    //start node
+    float startnode{0.0f};
+    float goalnode{0.0f};
 };

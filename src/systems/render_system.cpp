@@ -842,9 +842,25 @@ void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& 
     float posX = 500.0f;
     float posY = 350.0f;
 
-    // Funcionalidad de botones
-    Rectangle btn1Rec = { posX, posY, buttonWidth, buttonHeight }; 
-    Rectangle btn2Rec = { posX + 140.0f, posY, buttonWidth, buttonHeight };
+    // Slider para startnode
+    float startMinValue = 1.0f;
+    float startMaxValue = 100.0f;
+    const char* startNodeText = "Start Node";
+    posX = 600.0f; // Reseteamos la posición X
+    posY = 355.0f; // Posición Y para el slider de startnode
+    int startnodenew = GuiSliderBar(Rectangle(posX, posY, buttonWidth, buttonHeight), startNodeText, NULL, &debug.startnode, startMinValue, startMaxValue);
+    engine.drawText(std::to_string(static_cast<int>(debug.startnode)).c_str(), posX + 160, posY, 20, BLUE);
+    startnodenew+=1;
+    // Slider para goalnode
+    float goalMinValue = 1.0f;
+    float goalMaxValue = 100.0f;
+    const char* goalNodeText = "Goal Node";
+    int goalnodenew = GuiSliderBar(Rectangle(posX, posY + 40, buttonWidth, buttonHeight), goalNodeText, NULL, &debug.goalnode, goalMinValue, goalMaxValue);
+    engine.drawText(std::to_string(static_cast<int>(debug.goalnode)).c_str(), posX + 160, posY + 40, 20, BLUE);
+    goalnodenew+=1;
+
+    Rectangle btn1Rec = { posX - 130, posY + 80, buttonWidth, buttonHeight };
+    Rectangle btn2Rec = { posX + 30, posY + 80, buttonWidth, buttonHeight };
     // Botón
     if(GuiButton(btn1Rec, "CALCULATE")){
         std::vector<vec3d> nodes;
@@ -888,7 +904,8 @@ void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& 
         graph.createGraph(navs.conexiones,navs.nodes);
         // graph.createGraph(conexiones,nodes);
         //Calcular pathfinding
-        std::vector<vec3d> path = graph.PathFindAStar(1,8);
+        std::cout << static_cast<uint16_t>(debug.startnode) << static_cast<uint16_t>(debug.goalnode) << "\n";
+        std::vector<vec3d> path = graph.PathFindAStar(static_cast<uint16_t>(debug.startnode), static_cast<uint16_t>(debug.goalnode));
         // if(path.size() == 0){
         //     std::cout << "CAGUEEEEEEEE \n";
         // }
@@ -908,10 +925,10 @@ void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& 
         debug.path.clear();
     }
     // resultado
-    Vector2 textPositionInfo2 = { 480, 400 };
+    Vector2 textPositionInfo2 = { 480, 480 };
     engine.drawTextEx(GetFontDefault(), "PATH RESULT", textPositionInfo2, 20, 1, RED);
     //Dibujar path
-    float posyt = 440.0f; 
+    float posyt = 510.0f; 
     for(auto pos : debug.path){  
         std::string text = std::to_string(pos.x()) + " " + std::to_string(pos.y()) + " " + std::to_string(pos.z());
         engine.drawTextEx(GetFontDefault(), text.c_str(), Vector2{480,posyt}, 20, 1, RED);

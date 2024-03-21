@@ -7,15 +7,19 @@
 struct navmesh_info
 {
     /* data */
-    //std::vector<Navmeshes>
+    //Contador de ids de los nodos
     uint16_t num_nodes{};
+    //Navmeshes
     std::vector<Navmesh> NavMeshes{};
-
-    //Sacar
+    //Nodos
     std::set<std::pair<uint16_t, vec3d>> nodes;
-    std::vector<Conection> conexiones;
+    //Pares de ndos que forman una conexion
     std::set<std::pair<uint16_t,uint16_t>> conexids;
+    //Puntos medios de los nodos
     std::set<vec3d> midpoints{};
+    //Conexiones
+    std::vector<Conection> conexiones;
+   
 
     // recorrer navmeshes y rellenar array de nodos sin repetir
     // cojo el componente collider y compruebo si colisiona con otra entidad navmes
