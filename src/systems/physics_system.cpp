@@ -32,9 +32,7 @@ void PhysicsSystem::update(EntityManager& em, float dt)
 
         // Normalizamos la velocidad
         if (std::abs(vel.x()) > phy.max_speed || std::abs(vel.y()) > phy.max_speed || std::abs(vel.z()) > phy.max_speed)
-        {
             vel.normalize();
-        }
 
         //Stuneo al jugador durante un tiempo provocado por el golpe de un golem
         if (phy.dragActivatedTime) {

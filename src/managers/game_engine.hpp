@@ -127,17 +127,21 @@ namespace ENGI {
         float getWorldToScreenX(vec3d pos);
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();
-        void loadAndResizeImage(const std::string& name, const std::string& path);
+        void loadAndResizeImage(const std::string& name, const std::string& path, double reScaleX = 1.3, double reScaleY = 1.3);
         void loadAndResizeImageGif(const std::string& name, const std::string& path, int frames, int delay = 15, double reScaleX = 2.0, double reScaleY = 2.0);
         void updateGif(Gif& anim);
         void unloadGifsAndTextures();
+        void setReplayMode(bool replay, GameData& gd);
 
         std::map<std::string, Texture2D> textures;
         std::map<std::string, Gif> gifs;
 
+
     private:
         u16 const width_{}, height_{};
         Camera3D camera{};
+        bool replayMode{ false };
+        GameData* gameData{ nullptr };
     };
 
 #endif // !GAME_ENGINE

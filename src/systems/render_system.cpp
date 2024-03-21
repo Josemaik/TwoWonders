@@ -955,9 +955,9 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
     // Visual Debug AI
     else if (inpi.debugAI2)
         drawDebuggerInGameIA(engine, em, dt);
-        
+
     else if (inpi.pathfind)
-        drawTestPathfindinf(engine,em);
+        drawTestPathfindinf(engine, em);
 
     engine.endDrawing();
 }
@@ -975,9 +975,9 @@ double SelectValue(ENGI::GameEngine& engine, double value, float posx, float pos
 }
 
 //Interfaz para probar el pathfinding
-void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& em){
+void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& em) {
     auto& debug = em.getSingleton<Debug_t>();
-    auto& navs = em.getSingleton<navmesh_info>();
+    auto& navs = em.getSingleton<NavmeshInfo>();
     //Dibujado de titulo y ventana
     Rectangle windowRect = { 470, 300, 330, 430 };
     engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
@@ -998,59 +998,59 @@ void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& 
     posX = 600.0f; // Reseteamos la posición X
     posY = 355.0f; // Posición Y para el slider de startnode
     int startnodenew = GuiSliderBar(Rectangle(posX, posY, buttonWidth, buttonHeight), startNodeText, NULL, &debug.startnode, startMinValue, startMaxValue);
-    engine.drawText(std::to_string(static_cast<int>(debug.startnode)).c_str(),static_cast<int>(posX + 160),static_cast<int>(posY), 20, BLUE);
-    startnodenew+=1;
+    engine.drawText(std::to_string(static_cast<int>(debug.startnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY), 20, BLUE);
+    startnodenew += 1;
     // Slider para goalnode
     float goalMinValue = 1.0f;
     float goalMaxValue = 100.0f;
     const char* goalNodeText = "Goal Node";
     int goalnodenew = GuiSliderBar(Rectangle(posX, posY + 40, buttonWidth, buttonHeight), goalNodeText, NULL, &debug.goalnode, goalMinValue, goalMaxValue);
     engine.drawText(std::to_string(static_cast<int>(debug.goalnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY + 40), 20, BLUE);
-    goalnodenew+=1;
+    goalnodenew += 1;
 
     Rectangle btn1Rec = { posX - 130, posY + 80, buttonWidth, buttonHeight };
     Rectangle btn2Rec = { posX + 30, posY + 80, buttonWidth, buttonHeight };
     // Botón
-    if(GuiButton(btn1Rec, "CALCULATE")){
+    if (GuiButton(btn1Rec, "CALCULATE")) {
         std::vector<vec3d> nodes;
-        nodes.push_back({-106.9, 4.0, 116.0});
-        nodes.push_back({-119.0, 4.0, 114.0});
-        nodes.push_back({-131.0, 4.0, 105.1});
-        nodes.push_back({-105.0, 4.0, 97.3});
-        nodes.push_back({-118.0, 4.0, 92.0});
-        nodes.push_back({-132.0, 4.0, 87.0});
-        nodes.push_back({-117.0, 4.0, 78.0});
-        nodes.push_back({-127.4, 4.0, 69.6});
+        nodes.push_back({ -106.9, 4.0, 116.0 });
+        nodes.push_back({ -119.0, 4.0, 114.0 });
+        nodes.push_back({ -131.0, 4.0, 105.1 });
+        nodes.push_back({ -105.0, 4.0, 97.3 });
+        nodes.push_back({ -118.0, 4.0, 92.0 });
+        nodes.push_back({ -132.0, 4.0, 87.0 });
+        nodes.push_back({ -117.0, 4.0, 78.0 });
+        nodes.push_back({ -127.4, 4.0, 69.6 });
         //Creamos puntos y conexiones
         std::vector<Conection> conexiones;
-        Conection cone12(1,1,2);
+        Conection cone12(1, 1, 2);
         conexiones.push_back(cone12);
-        Conection cone14(1,1,4);
+        Conection cone14(1, 1, 4);
         conexiones.push_back(cone14);
-        Conection cone15(1,1,5);
+        Conection cone15(1, 1, 5);
         conexiones.push_back(cone15);
-        Conection cone25(1,2,5);
+        Conection cone25(1, 2, 5);
         conexiones.push_back(cone25);
-        Conection cone23(1,2,3);
+        Conection cone23(1, 2, 3);
         conexiones.push_back(cone23);
-        Conection cone36(1,3,6);
+        Conection cone36(1, 3, 6);
         conexiones.push_back(cone36);
-        Conection cone45(1,4,5);
+        Conection cone45(1, 4, 5);
         conexiones.push_back(cone45);
-        Conection cone56(1,5,6);
+        Conection cone56(1, 5, 6);
         conexiones.push_back(cone56);
-        Conection cone57(1,5,7);
+        Conection cone57(1, 5, 7);
         conexiones.push_back(cone57);
-        Conection cone58(1,5,8);
+        Conection cone58(1, 5, 8);
         conexiones.push_back(cone58);
-        Conection cone68(1,6,8);
+        Conection cone68(1, 6, 8);
         conexiones.push_back(cone68);
-        Conection cone78(1,7,8);
+        Conection cone78(1, 7, 8);
         conexiones.push_back(cone78);
         //Lammamos a creargrafo
         //Creamos el grafo
         Graph graph{};
-        graph.createGraph(navs.conexiones,navs.nodes);
+        graph.createGraph(navs.conexiones, navs.nodes);
         // graph.createGraph(conexiones,nodes);
         //Calcular pathfinding
         std::cout << static_cast<uint16_t>(debug.startnode) << static_cast<uint16_t>(debug.goalnode) << "\n";
@@ -1062,25 +1062,25 @@ void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& 
         debug.path.resize(path.size());
         //Rellenamos
         std::copy(path.begin(), path.end(), debug.path.begin());
-         // Mostrar el camino copiado
-        //std::cout << "Camino en debug.path:" << std::endl;
-        // for (const auto& node : debug.path) {
-        //     std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
-        // }
-        // debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
-        // std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
+        // Mostrar el camino copiado
+       //std::cout << "Camino en debug.path:" << std::endl;
+       // for (const auto& node : debug.path) {
+       //     std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
+       // }
+       // debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
+       // std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
     }
-    if(GuiButton(btn2Rec, "CLEAR")){
+    if (GuiButton(btn2Rec, "CLEAR")) {
         debug.path.clear();
     }
     // resultado
     vec2d textPositionInfo2 = { 480, 480 };
     engine.drawTextEx(GetFontDefault(), "PATH RESULT", textPositionInfo2, 20, 1, RED);
     //Dibujar path
-    float posyt = 510.0f; 
-    for(auto pos : debug.path){  
+    float posyt = 510.0f;
+    for (auto pos : debug.path) {
         std::string text = std::to_string(pos.x()) + " " + std::to_string(pos.y()) + " " + std::to_string(pos.z());
-        engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{480,posyt}, 20, 1, RED);
+        engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{ 480,posyt }, 20, 1, RED);
         posyt += 20.0f;
     }
 }
@@ -2024,13 +2024,10 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
         plfi.mana = plfi.max_mana - 2;
 
     // Datos para la barra para el maná
-    int barWidth = static_cast<int>(plfi.max_mana) * 2;
+    int barWidth = static_cast<int>(plfi.max_mana * 1.8);
     // int barHeight = 20;
     int barX = 155;
     int barY = 80;
-
-    // Ponemos la textura de la barra de maná
-    engine.drawTexture(engine.textures["mana"], barX, barY, { 255, 255, 255, 255 });
 
     int manaWidth = static_cast<int>(static_cast<float>(barWidth) * (static_cast<float>(plfi.mana) / static_cast<float>(plfi.max_mana)));
 
@@ -2043,7 +2040,11 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
     // Entre medias algo que tape la barra dependiendo de la cantidad de maná en la barra.
 
     // Dibujamos la barra de maná
-    // engine.drawRectangle(barX + 3, barY + 3, manaWidth, barHeight - 6, SKYBLUE);
+    engine.drawRectangle(barX + 14, barY + 9, manaWidth, 25, { 154, 222, 235, 255 });
+
+    // Ponemos la textura de la barra de maná
+    engine.drawTexture(engine.textures["mana"], barX, barY, { 255, 255, 255, 255 });
+
 
     plfi.mana_width = manaWidth;
 }

@@ -36,6 +36,11 @@
 #include "../utils/sngtn/text_info.hpp"
 #include "../utils/sngtn/navmesh_info.hpp"
 #include "../utils/sngtn/zonecheck_info.hpp"
+
+// GameData
+#include "../utils/sngtn/GameData.hpp"
+
+// External Libraries
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
 
@@ -148,7 +153,7 @@ using TL = MP::TypeList <
     LeverTag,
     NoKeyTag
 > ;
-using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo,navmesh_info,ZoneCheckInfo>;
+using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;
