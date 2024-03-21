@@ -1658,6 +1658,7 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
 
 void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
 {
+    auto& li = em.getSingleton<LevelInfo>();
     auto& txti = em.getSingleton<TextInfo>();
     auto& textQueue = txti.getTextQueue();
 
@@ -1682,6 +1683,13 @@ void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
         txti.popText();
         inpi.interact = false;
         if (textQueue.empty())
+        {
             txti.waitTime = .8f;
+            if(li.openChest)
+            {
+                li.openChest = false;
+                em.getSingleton<SoundSystem>().sonido_cerrar_cofre();
+            }    
+        }    
     }
 }

@@ -239,6 +239,7 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm, uint16_t zone
                 li.chestToOpen = e.getID();
                 evm.scheduleEvent(Event{ EventCodes::OpenChest });
                 li.dontLoad.insert(pair);
+                em.getSingleton<SoundSystem>().sonido_interaccion_e();
                 inpi.interact = false;
             }
         }
@@ -302,6 +303,9 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
         {
             li.doorToOpen = e.getID();
             evm.scheduleEvent(Event{ EventCodes::OpenDoor });
+            em.getSingleton<SoundSystem>().sonido_interaccion_e();
+
+            inpi.interact = false;
         }
     });
 }

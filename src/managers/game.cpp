@@ -67,14 +67,16 @@ void Game::createEntities(EntityManager& em)
 }
 
 //inicializar bancos
-void Game::createSound(EntityManager&) {
-    sound_system.initBanks("assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Ambient.bank", "assets/banks/Music.bank", "assets/banks/SFX.bank");
+void Game::createSound(EntityManager& em) {
+    em.getSingleton<SoundSystem>().initBanks("assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Ambient.bank", "assets/banks/Music.bank", "assets/banks/SFX.bank");
     //sound_system.createEventInstance();
     //sound_system.play();
 }
 
 void Game::run()
 {
+    auto& sound_system = em.getSingleton<SoundSystem>();
+
     Shader shader = engine.loadShader(TextFormat("assets/shaders/lighting.vs", 330),
         TextFormat("assets/shaders/lighting.fs", 330));
 
@@ -217,7 +219,7 @@ void Game::run()
                     sound_system.update();
                     // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     camera_system.update(em, engine, timeStep);
-                    event_system.update(em, evm, iam, map, object_system);
+                    event_system.update(em, evm, iam, map, object_system, sound_system);
 
                     if (!li.dead_entities.empty())
                     {
@@ -279,5 +281,5 @@ void Game::resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs)
     lock_system.reset();
     createEntities(em);
     map.reset(em, 0, iam);
-    li.sound_system = &sound_system;
+    li.sound_system = &em.getSingleton<SoundSystem>();
 }

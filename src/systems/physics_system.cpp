@@ -120,5 +120,20 @@ void PhysicsSystem::update(EntityManager& em, float dt)
         // comprobar si están en el suelo
         if (phy.alreadyGrounded)
             phy.alreadyGrounded = false;
+        
+        if (phy.velocity != vec3d::zero()){
+            auto& li = em.getSingleton<LevelInfo>();
+            auto& ss = em.getSingleton<SoundSystem>();
+            switch( li.mapID )
+            {
+                case 0: 
+                    //ss.sonido_pasos_pradera(); 
+                break;
+                case 1:
+                    ss.sonido_pasos_prision();
+                break;
+            }
+        }
+
     });
 }

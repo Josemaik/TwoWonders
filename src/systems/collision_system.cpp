@@ -484,6 +484,7 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         if (otherEntPtr->hasTag<NoDamageTag>() && !otherEntPtr->hasTag<CrusherTag>())
         {
             resolvePlayerDirection(*staticPhy, *otherPhy);
+            em.getSingleton<SoundSystem>().sonido_rebote();
             return;
         }
         else if (otherEntPtr->hasTag<CrusherTag>())
@@ -506,9 +507,11 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         if (bb.playerdamagebycrusher == false) {
             em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife(2);
             bb.playerdamagebycrusher = true;
+            em.getSingleton<SoundSystem>().sonido_apisonadora_danyo();
 
             // El jugador se mueve hacia atrás de la posición del crusher
             resolvePlayerDirection(*staticPhy, *otherPhy);
+            em.getSingleton<SoundSystem>().sonido_rebote();
         }
         return;
     }

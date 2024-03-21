@@ -54,7 +54,10 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             auto& plfi = em.getSingleton<PlayerInfo>();
 
             if (plfi.currentSpell == Spells::None)
-                att.type = AttackType::Melee;
+                {
+                    att.type = AttackType::Melee;
+                    em.getSingleton<SoundSystem>().sonido_melee();
+                }
             else
             {
                 createSpellAttack(em, ent, att);
@@ -210,6 +213,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             tipoElemental = ElementalType::Neutral;
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::AREADAMAGECRUSHER });
+        em.getSingleton<SoundSystem>().sonido_apisonadora_ataque();
         break;
     }
     case AttackType::WaterBomb:

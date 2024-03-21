@@ -35,6 +35,10 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                     }
                 }
             }
+            else if (ent.hasTag<DummyTag>())
+            {
+                em.getSingleton<SoundSystem>().sonido_dummy_golpe();
+            }
 
             lif.lifeLost = 0;
         }
@@ -45,7 +49,10 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
         {
             // Si es enemigo creamos un objeto
             if (ent.hasTag<EnemyTag>() && !lif.decreaseNextFrame)
+            {
                 createObject(em, os, em.getComponent<PhysicsComponent>(ent).position);
+                em.getSingleton<SoundSystem>().sonido_muerte_enemigo();
+            }
             //Si es un slime
             if (ent.hasTag<SlimeTag>())
             {

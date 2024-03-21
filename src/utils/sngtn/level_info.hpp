@@ -73,6 +73,7 @@ struct LevelInfo
 
   // Para estado de pausa y cerrar el juego
   SoundSystem* sound_system{ nullptr };
+  bool openChest{ false };
   bool gameShouldEnd{ false };
 
   // Tutorial

@@ -19,25 +19,23 @@ struct SoundSystem {
     void sonido_config();
     void sonido_mov();
     void sonido_salir();
-    //// sonidos nivel 0
-    void abrir_cofre();
-    void abrir_puerta();
-    void apisonadora_ataque();
-    void apisonadora_danyo();
-    void cerrar_cofre();
-    void dummy_golpe();
-    void interaccion_e();
-    void mele();
-    void movimiento_camara();
-    void muerte_enemigo();
-    void pasos_pradera();
-    void pasos_prision();
-    void piedras_golpe();
-    void rebote();
-    void recoger_vida();
+   
+    void sonido_abrir_cofre();
+    void sonido_abrir_puerta();       //comprobar
+    void sonido_apisonadora_ataque(); //comprobar
+    void sonido_apisonadora_danyo();  //comprobar
+    void sonido_cerrar_cofre();       
+    void sonido_dummy_golpe();        
+    void sonido_interaccion_e();      //comprobar
+    void sonido_melee();              //comprobar
+    void sonido_movimiento_camara();  //comprobar
+    void sonido_muerte_enemigo();     //comprobar
+    void sonido_pasos_pradera();      //comprobar
+    void sonido_pasos_prision();      //comprobar
+    void sonido_piedras_golpe();      //comprobar
+    void sonido_rebote();             
+    void sonido_recoger_vida();       //falta
 
-
-    /// 
     void play();
     void music_stop();
     void ambient_stop();

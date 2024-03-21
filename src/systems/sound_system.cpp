@@ -76,101 +76,101 @@ void SoundSystem::sonido_salir() {
     update();
 }
 
-void SoundSystem::abrir_cofre() {
+void SoundSystem::sonido_abrir_cofre() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Interaccion/Cofre/Abrir-cofre", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
     update();
 }
 
-void SoundSystem::abrir_puerta() {
+void SoundSystem::sonido_abrir_puerta() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Puerta/Abrir_puerta", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
     update();
 }
 
-void SoundSystem::apisonadora_ataque() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "eevent:/Efectos/Enemigos/Apisonadora/Apisonadora_ataque", &eventDescription));
+void SoundSystem::sonido_apisonadora_ataque() {
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Apisonadora/Apisonadora_ataque", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
     update();
 }
 
-void SoundSystem::apisonadora_danyo() {
+void SoundSystem::sonido_apisonadora_danyo() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Apisonadora/Apisonadora_danyo", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
     update();
 }
 
-void SoundSystem::cerrar_cofre() {
+void SoundSystem::sonido_cerrar_cofre() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Interaccion/Cofre/Cerrar-cofre", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
     update();
 }
 
-void SoundSystem::dummy_golpe() {
+void SoundSystem::sonido_dummy_golpe() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Dummy_golpe", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
     update();
 }
-void SoundSystem::interaccion_e() {
+void SoundSystem::sonido_interaccion_e() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Interaccion/E", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
     update();
 }
 
-void SoundSystem::mele() {
+void SoundSystem::sonido_melee() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Ataques/Mele", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
     update();
 }
 
-void SoundSystem::movimiento_camara() {
+void SoundSystem::sonido_movimiento_camara() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Feedback/Movimiento_camara", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
     update();
 }
 
-void SoundSystem::muerte_enemigo() {
+void SoundSystem::sonido_muerte_enemigo() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Muere_cualquier_enemigo", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
     update();
 }
-void SoundSystem::pasos_pradera() {
+void SoundSystem::sonido_pasos_pradera() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_pradera", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
     update();
 }
-void SoundSystem::pasos_prision() {
+void SoundSystem::sonido_pasos_prision() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_prision", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
     update();
 }
-void SoundSystem::piedras_golpe() {
+void SoundSystem::sonido_piedras_golpe() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Piedras_golpe", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
     update();
 }
 
-void SoundSystem::rebote() {
+void SoundSystem::sonido_rebote() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Interaccion/Rebote", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
     update();
 }
 
-void SoundSystem::recoger_vida() {
+void SoundSystem::sonido_recoger_vida() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Interaccion/Recoger_vida", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();

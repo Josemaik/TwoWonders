@@ -34,7 +34,7 @@ public:
     }
 
     // Dispara todos los eventos pendientes
-    void dispatchEvents(EntityManager& em, MapManager& mm, Ia_man& iam, ObjectSystem& os) {
+    void dispatchEvents(EntityManager& em, MapManager& mm, Ia_man& iam, ObjectSystem& os, SoundSystem& ss) {
         // Recorre todos los eventos pendientes
         while (!events.empty()) {
             // Obtiene el siguiente evento y lo elimina de la cola
@@ -72,6 +72,8 @@ public:
                         auto& chest = *em.getEntityByID(li.chestToOpen);
                         auto& cc = em.getComponent<ChestComponent>(chest);
 
+                        ss.sonido_abrir_cofre();
+
                         os.addObject(cc.content, playerPos);
                         auto& msgs = cc.messages;
                         while (!msgs.empty())
@@ -81,6 +83,7 @@ public:
                         }
 
                         li.chestToOpen = li.max;
+                        li.openChest = true;
 
                         if (chest.hasComponent<DispatcherComponent>())
                         {
@@ -92,6 +95,7 @@ public:
                                 lc.addCode(static_cast<EventCodes>(dc.eventCodes[i]));
                             }
                         }
+
 
                         break;
                     }
@@ -113,6 +117,8 @@ public:
                         auto& li = em.getSingleton<LevelInfo>();
                         auto& plfi = em.getSingleton<PlayerInfo>();
 
+                        ss.sonido_abrir_puerta();
+
                         plfi.hasKey = false;
                         li.dead_entities.insert(li.doorToOpen);
                         break;
@@ -132,6 +138,7 @@ public:
                     {
                         auto& li = em.getSingleton<LevelInfo>();
                         li.viewPoint = { -100.554, 4.935, 145.0 };
+                        em.getSingleton<SoundSystem>().sonido_movimiento_camara();
                         break;
                     }
                     }

@@ -12,6 +12,7 @@ struct AttackSystem
 
     void update(EntityManager& em, float deltaTime);
     void setCollisionSystem(CollisionSystem* col_sys);
+    
 private:
     void createAttack(EntityManager& em, Entity& e, AttackComponent& att, float dt);
     vec3d getPosMeteorito(uint16_t fase, vec3d posplayer);

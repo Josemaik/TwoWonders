@@ -18,6 +18,11 @@ struct BTAction_Pendulum : BTNode_t {
                     abc.move = true;
                     abc.vel = -abc.vel;
                     ectx.phy.max_speed = abc.max_speed;
+                    auto& li = ectx.em.getSingleton<LevelInfo>();
+                    auto& playerPos = ectx.em.getComponent<PhysicsComponent>(*ectx.em.getEntityByID(li.playerID)).position; 
+
+                    if( playerPos.distance(ectx.phy.position) < 14.0 )
+                        ectx.em.getSingleton<SoundSystem>().sonido_piedras_golpe();
                 }
                 else {
                     ectx.ai.plusdeltatime(ectx.deltatime, ectx.ai.elapsed_stop);
