@@ -62,6 +62,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
 
             case ObjectType::ShopItem_ExtraLife:
                 shop_object = buyExtraLife(em, playerEnt);
+                em.getSingleton<SoundSystem>().sonido_aum_vida_max();
                 break;
 
             case ObjectType::BombExplode:
@@ -73,9 +74,11 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             case ObjectType::Key:
             {
                 plfi.addKey();
+                //em.getSingleton<SoundSystem>().sonido_llave();
                 Item key = { "Llave", "Una llave, parece que solo puede abrir una puerta" };
                 plfi.addItem(std::make_unique<Item>(key));
-                em.getSingleton<SoundSystem>().sonido_llave();
+                
+                
                 break;
             }
             case ObjectType::Fire_Spell:

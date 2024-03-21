@@ -36,7 +36,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                     }
                 }
             }
-            else if (ent.hasTag<DummyTag>())
+            else if (ent.hasTag<DummyTag>() || ent.hasTag<DestructibleTag>())
             {
                 em.getSingleton<SoundSystem>().sonido_dummy_golpe();
             }

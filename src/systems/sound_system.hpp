@@ -34,14 +34,15 @@ struct SoundSystem {
     void sonido_pasos_prision();        //comprobar
     void sonido_piedras_golpe();
     void sonido_rebote();             
-    void sonido_destello();             //comprobar
+    void sonido_destello();
     void sonido_recoger_vida();         //a futuro
 
-    void sonido_llave();                //comprobar
+    void sonido_llave();                //crashea el sonido
     void sonido_h_pompa();              //comprobar
-    void sonido_checkpoint();           //falta
-    void sonido_palanca();              //falta
-    void sonido_recibir_danyo();        //comprobar
+    void sonido_checkpoint();           //por integrar en codigo y comprobar
+    void sonido_palanca();              //por integrar en codigo y comprobar
+    void sonido_recibir_danyo();        //por anyadir sonido y probar
+    void sonido_aum_vida_max();         //comprobar
 
     //poner sonido de golpe dummy a romper las maderas
     //bajar volumen de ambiente

@@ -128,7 +128,7 @@ void PhysicsSystem::update(EntityManager& em, float dt)
             switch( li.mapID )
             {
                 case 0: 
-                    ss.sonido_pasos_pradera();
+                    //ss.sonido_pasos_pradera();
                 break;
                 case 1:
                     ss.sonido_pasos_prision();
