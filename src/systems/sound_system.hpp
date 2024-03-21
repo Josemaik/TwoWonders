@@ -21,20 +21,32 @@ struct SoundSystem {
     void sonido_salir();
    
     void sonido_abrir_cofre();
-    void sonido_abrir_puerta();       //comprobar
-    void sonido_apisonadora_ataque(); //comprobar
-    void sonido_apisonadora_danyo();  //comprobar
-    void sonido_cerrar_cofre();       
-    void sonido_dummy_golpe();        
-    void sonido_interaccion_e();      //comprobar
-    void sonido_melee();              //comprobar
-    void sonido_movimiento_camara();  //comprobar
-    void sonido_muerte_enemigo();     //comprobar
-    void sonido_pasos_pradera();      //comprobar
-    void sonido_pasos_prision();      //comprobar
-    void sonido_piedras_golpe();      //comprobar
+    void sonido_abrir_puerta();
+    void sonido_apisonadora_ataque();
+    void sonido_apisonadora_danyo();    //no se hace
+    void sonido_cerrar_cofre();         
+    void sonido_dummy_golpe();          
+    void sonido_interaccion_e();
+    void sonido_melee();
+    void sonido_movimiento_camara();    //no se hace cuando la cámara se mueve, ahora ni suena
+    void sonido_muerte_enemigo();
+    void sonido_pasos_pradera();        //comprobar
+    void sonido_pasos_prision();        //comprobar
+    void sonido_piedras_golpe();        //no se hace cuando chocan se hace nada más moverse
     void sonido_rebote();             
-    void sonido_recoger_vida();       //falta
+    void sonido_destello();             //falta
+    void sonido_recoger_vida();         //falta
+
+    void sonido_llave();
+    void sonido_h_pompa();
+    void sonido_checkpoint();
+    void sonido_palanca();
+    void sonido_recibir_danyo();
+
+    //poner sonido de golpe dummy a romper las maderas
+    //bajar volumen de ambiente
+    ///subir SFX
+    //bajar interacción
 
     void play();
     void music_stop();
