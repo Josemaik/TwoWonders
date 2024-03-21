@@ -76,14 +76,20 @@ int main(){
 
             // Logic
 
-            if(engine.IsKeyPressed(KEY_LEFT))
+            if(engine.IsKeyPressed(KEY_A))
                 camera->position.x -= 0.1f;
-            if(engine.IsKeyPressed(KEY_RIGHT))
+            if(engine.IsKeyPressed(KEY_D))
                 camera->position.x += 0.1f;
-            if(engine.IsKeyPressed(KEY_UP))
+
+            if(engine.IsKeyPressed(KEY_SPACE))
                 camera->position.y += 0.1f;
-            if(engine.IsKeyPressed(KEY_DOWN))
+            if(engine.IsKeyPressed(GLFW_KEY_LEFT_SHIFT))
                 camera->position.y -= 0.1f;
+
+            if(engine.IsKeyPressed(KEY_W))
+                camera->position.z -= 0.1f;
+            if(engine.IsKeyPressed(KEY_S))
+                camera->position.z += 0.1f;
 
             // Draw
 
