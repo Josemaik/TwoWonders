@@ -11,10 +11,10 @@ enum struct CameraProjection { CAMERA_PERSPECTIVE, CAMERA_ORTHOGRAPHIC };
 struct Camera : Entity{
 public:
     // CameraProjection
-    CameraProjection cameraProjection { CameraProjection::CAMERA_PERSPECTIVE };
+    CameraProjection cameraProjection { CameraProjection::CAMERA_ORTHOGRAPHIC };
 
     // Camera Attributes
-    glm::vec3 position { 0.0f, 2.0f, 3.0f };
+    glm::vec3 position { 3.0f, 3.0f, 3.0f };
     glm::vec3 target { 0.0f, 0.0f, 0.0f };
     glm::vec3 up { 0.0f, 1.0f, 0.0f };
 
@@ -29,21 +29,26 @@ public:
     }
 
     // Returns the view matrix
-    // TODO
     glm::mat4 getViewMatrix(){
-        return glm::lookAt(position, position + front /* target ? */, up);
+        return glm::lookAt(position, position + front, up);
     }
 
     // Return the projection matrix
     glm::mat4 getProjectionMatrix(int screenWidth, int screenHeight) const {
         if (cameraProjection == CameraProjection::CAMERA_PERSPECTIVE) {
             return glm::perspective(glm::radians(fovy), static_cast<float>(screenWidth) / static_cast<float>(screenHeight), 0.1f, 100.0f);
-        } else if (cameraProjection == CameraProjection::CAMERA_ORTHOGRAPHIC) { // TODO
-            // Ajusta estos valores según tus necesidades
-            float left = -1.0f;
-            float right = 1.0f;
-            float bottom = -1.0f;
-            float top = 1.0f;
+        } else if (cameraProjection == CameraProjection::CAMERA_ORTHOGRAPHIC) {
+            float aspectRatio = static_cast<float>(screenWidth) / static_cast<float>(screenHeight);
+            float scale = glm::distance(position, target);
+
+            float halfWidth = scale * aspectRatio;
+            float halfHeight = scale;
+
+            float left = -halfWidth;
+            float right = halfWidth;
+            float bottom = -halfHeight;
+            float top = halfHeight;
+
             float nearPlane = 0.1f;
             float farPlane = 100.0f;
 
@@ -57,7 +62,7 @@ public:
         direction = glm::normalize(position - target);
         right = glm::normalize(glm::cross(up, direction));
         up = glm::cross(direction, right);
-        //front = -direction;
+        front = -direction;
     }
 
     void draw(glm::mat4) override {};
