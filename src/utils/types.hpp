@@ -19,6 +19,7 @@
 #include "../components/oneuse_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
+#include "../components/navmesh_component.hpp"
 #include "../components/projectile_component.hpp"
 #include "../components/object_component.hpp"
 #include "../components/zone_component.hpp"
@@ -33,6 +34,7 @@
 #include "../utils/sngtn/level_info.hpp"
 #include "../utils/sngtn/input_info.hpp"
 #include "../utils/sngtn/text_info.hpp"
+#include "../utils/sngtn/navmesh_info.hpp"
 #include "../utils/sngtn/zonecheck_info.hpp"
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
@@ -106,6 +108,7 @@ using CL = MP::TypeList <
     SubjectComponent,
     AngryBushComponent,
     DispatcherComponent,
+    Navmesh,
     OneUseComponent
 > ;
 using TL = MP::TypeList <
@@ -145,7 +148,7 @@ using TL = MP::TypeList <
     LeverTag,
     NoKeyTag
 > ;
-using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo>;
+using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo,navmesh_info,ZoneCheckInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;

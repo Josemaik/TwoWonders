@@ -4,6 +4,7 @@
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
 #include "../systems/sound_system.hpp"
+#include "../utils/pf/Graph.hpp"
 
 struct RenderSystem
 {
@@ -15,6 +16,7 @@ struct RenderSystem
 
     void update(EntityManager& em, GameEngine& engine, double dt);
 
+
     void drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawLogoKaiwa(GameEngine& engine);
     void drawOptions(GameEngine& engine, EntityManager& em, SoundSystem& ss);
@@ -24,6 +26,7 @@ struct RenderSystem
     void unloadModels(EntityManager& em, GameEngine& engine);
     void drawEditorInGameIA(GameEngine& engine, EntityManager& em);
     void drawDebuggerInGameIA(GameEngine& engine, EntityManager& em, double dt);
+    void drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& em);
     void drawRay(vec3d origin, vec3d end);
     void drawVisionCone(vec3d pos_enemy, double orientation, double horizontalFOV);
     void drawPauseMenu(GameEngine& engine, EntityManager& em, SoundSystem& ss);

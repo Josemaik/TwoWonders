@@ -513,6 +513,94 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
     // }
 }
 
+
+void MapManager::createNavmesh(EntityManager& em){
+    auto& navs = em.getSingleton<navmesh_info>();
+    mapType navmeshkaiwa = loadMap("assets/levels/navmeshtest/lvl_2-nav.kaiwa");
+
+    const rapidjson::Value& navmeshes = navmeshkaiwa["NavMesh"];
+    for (rapidjson::SizeType i = 0; i < navmeshes.Size(); i++){
+        std::array<vec3d,9> vecnodes{};
+        //Obtenemos el centro
+        const rapidjson::Value& navmesh = navmeshes[i];
+        vecnodes[0] = { navmesh["center"][1].GetDouble(), navmesh["center"][2].GetDouble(), navmesh["center"][0].GetDouble() };
+        //Recorremos vertices
+        vec3d min{};
+        vec3d max{};
+        const rapidjson::Value& vertices = navmesh["vertices"];
+        for (rapidjson::SizeType j = 0; j < vertices.Size(); j++){
+            vecnodes[j+1] = { vertices[j][1].GetDouble(),  vertices[j][2].GetDouble(),  vertices[j][0].GetDouble() };
+            if(j == 0){
+                max = vecnodes[j + 1];
+                min = vecnodes[j + 1];
+            }else{
+                if(max.x() < vecnodes[j+1].x()){
+                    max.setX(vecnodes[j+1].x());
+                }
+                if(max.z() < vecnodes[j+1].z()){
+                    max.setZ(vecnodes[j+1].z());
+                }
+                 if(min.x() > vecnodes[j+1].x()){
+                    min.setX(vecnodes[j+1].x());
+                }
+                 if(min.z() > vecnodes[j+1].z()){
+                    min.setZ(vecnodes[j+1].z());
+                }
+            }
+        }
+        //Recorremos puntos medios
+        const rapidjson::Value& midpoints = navmesh["puntos medios"];
+        for (rapidjson::SizeType k = 0; k < midpoints.Size(); k++){
+            vecnodes[k+4] = { midpoints[k][1].GetDouble(),  midpoints[k][2].GetDouble(),  midpoints[k][0].GetDouble() };
+            navs.midpoints.insert(vecnodes[k+4]);
+        }
+        //Creamos NavMesh
+        BBox b{ min,max };
+        Navmesh nav {.box = b};
+        for(auto& n : vecnodes){
+            auto pair = std::make_pair(navs.num_nodes,n);
+            navs.nodes.insert(pair);
+            nav.nodes.insert(pair);
+            navs.num_nodes++;
+        }
+        // Guardamos info
+        navs.NavMeshes.push_back(nav);
+
+        //Creamos conexiones de el navmesh
+        for (auto it = nav.nodes.begin(); it != std::prev(nav.nodes.end()); ++it) {
+            auto&   currentNode = it->second;
+            auto&   nextNode = std::next(it)->second;
+            // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
+            if (navs.insert_ids(it->first, std::next(it)->first) &&
+                navs.checkmidpoints(currentNode, nextNode)) {
+                Conection c{1, it->first, std::next(it)->first};
+                navs.conexiones.push_back(c);
+            }
+        }
+    }
+    //Crear conexiones de navmesh con otros con los que colisiona
+    for(auto it = navs.NavMeshes.begin(); it != std::prev(navs.NavMeshes.end()); ++it){
+        auto  nextnavmesh = std::next(it);
+        auto&  currentbbox = it->box;
+        auto&  nextbbox = nextnavmesh->box;
+        //Conexiones con navmeshes colisionables
+        if(currentbbox.intersects(nextbbox)){
+            //Recorremos nodos del primer navmesh
+            for (auto it2 = it->nodes.begin(); it2 != std::prev(it->nodes.end()); ++it2) {
+                const auto& currentNode = it2;
+                //Recorremos nodos del segundo navmesh
+                for(auto it3 = nextnavmesh->nodes.begin(); it3 != std::prev(nextnavmesh->nodes.end()); ++it3){
+                    const auto& nextNode = it3;       
+                    //Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
+                    if (navs.insert_ids(currentNode->first, nextNode->first)) {
+                        Conection c{1, currentNode->first, nextNode->first};
+                        navs.conexiones.push_back(c);
+                    }
+                }
+            }
+        }
+    }
+}
 void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
 {
     auto& zchi = em.getSingleton<ZoneCheckInfo>();
@@ -614,6 +702,7 @@ void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
 void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man&)
 {
     destroyMap(em);
+    createNavmesh(em);
     auto& li = em.getSingleton<LevelInfo>();
     auto& zchi = em.getSingleton<ZoneCheckInfo>();
 
