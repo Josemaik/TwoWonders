@@ -44,10 +44,12 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
 
             case ObjectType::Coin:
                 plfi.addCoin(5);
+                em.getSingleton<SoundSystem>().sonido_destello();
                 break;
 
             case ObjectType::Coin30:
                 plfi.addCoin(30);
+                em.getSingleton<SoundSystem>().sonido_destello();
                 break;
 
             case ObjectType::ShopItem_Bomb:
@@ -73,6 +75,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 plfi.addKey();
                 Item key = { "Llave", "Una llave, parece que solo puede abrir una puerta" };
                 plfi.addItem(std::make_unique<Item>(key));
+                em.getSingleton<SoundSystem>().sonido_llave();
                 break;
             }
             case ObjectType::Fire_Spell:

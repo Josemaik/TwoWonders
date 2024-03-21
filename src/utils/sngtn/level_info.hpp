@@ -48,6 +48,7 @@ struct LevelInfo
   bool transition{ false };
   bool cameraChange{ false };
   vec3d viewPoint{};
+  bool viewPointSound{ false };
 
   // Variables de lock on
   std::size_t lockedEnemy{ max };

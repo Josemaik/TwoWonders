@@ -146,8 +146,8 @@ void SoundSystem::sonido_muerte_enemigo() {
 }
 void SoundSystem::sonido_pasos_pradera() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_pradera", &eventDescription));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
-    play();
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_SFX));
+    play_pasos();
     update();
 }
 void SoundSystem::sonido_pasos_prision() {
@@ -221,6 +221,11 @@ void SoundSystem::play() {
     FMOD_Studio_EventInstance_Start(eventInstance);
 }
 
+void SoundSystem::play_pasos(){
+    FMOD_Studio_EventInstance_Start(eventInstance_SFX);
+    
+}
+
 void SoundSystem::update() {
     ERRCHECK(FMOD_Studio_System_Update(soundSystem));
 }
@@ -240,6 +245,11 @@ void SoundSystem::music_stop() {
 }
 void SoundSystem::ambient_stop() {
     FMOD_Studio_EventInstance_Stop(eventInstance_Ambiente, FMOD_STUDIO_STOP_ALLOWFADEOUT);
+    update();
+}
+
+void SoundSystem::SFX_stop() {
+    FMOD_Studio_EventInstance_Stop(eventInstance_SFX,  FMOD_STUDIO_STOP_ALLOWFADEOUT);
     update();
 }
 

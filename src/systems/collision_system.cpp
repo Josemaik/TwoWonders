@@ -423,6 +423,12 @@ void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& ent, Physi
         auto& ab = em.getComponent<AngryBushComponent>(ent);
         ab.chargeAttack = true;
         ab.move = false;
+        if (ab.angrySoundOneTime)
+        {
+            ab.angrySound = true;
+            ab.angrySoundOneTime = false;
+        }
+        
     }
 }
 
@@ -507,7 +513,6 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         if (bb.playerdamagebycrusher == false) {
             em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife(2);
             bb.playerdamagebycrusher = true;
-            em.getSingleton<SoundSystem>().sonido_apisonadora_danyo();
 
             // El jugador se mueve hacia atrás de la posición del crusher
             resolvePlayerDirection(*staticPhy, *otherPhy);

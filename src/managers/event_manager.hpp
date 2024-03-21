@@ -138,7 +138,7 @@ public:
                     {
                         auto& li = em.getSingleton<LevelInfo>();
                         li.viewPoint = { -100.554, 4.935, 145.0 };
-                        em.getSingleton<SoundSystem>().sonido_movimiento_camara();
+                        li.viewPointSound = true;
                         break;
                     }
                     }

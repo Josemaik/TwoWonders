@@ -23,6 +23,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
             else if (ent.hasTag<PlayerTag>())
             {
                 auto& plfi = em.getSingleton<PlayerInfo>();
+                em.getSingleton<SoundSystem>().sonido_recibir_danyo();
                 if (plfi.armor > 0)
                 {
                     lif.life += lif.lifeLost;
@@ -38,6 +39,10 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
             else if (ent.hasTag<DummyTag>())
             {
                 em.getSingleton<SoundSystem>().sonido_dummy_golpe();
+            }
+            else if (ent.hasTag<CrusherTag>())
+            {
+                em.getSingleton<SoundSystem>().sonido_apisonadora_danyo();
             }
 
             lif.lifeLost = 0;
