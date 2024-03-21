@@ -982,7 +982,7 @@ void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& 
     Rectangle windowRect = { 470, 300, 330, 430 };
     engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
     engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
-    Vector2 textPositionInfo = { 570, 320 };
+    vec2d textPositionInfo = { 570, 320 };
     engine.drawTextEx(GetFontDefault(), "PATHFINDING", textPositionInfo, 20, 1, RED);
 
     // Datos de los botones
@@ -998,14 +998,14 @@ void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& 
     posX = 600.0f; // Reseteamos la posición X
     posY = 355.0f; // Posición Y para el slider de startnode
     int startnodenew = GuiSliderBar(Rectangle(posX, posY, buttonWidth, buttonHeight), startNodeText, NULL, &debug.startnode, startMinValue, startMaxValue);
-    engine.drawText(std::to_string(static_cast<int>(debug.startnode)).c_str(), posX + 160, posY, 20, BLUE);
+    engine.drawText(std::to_string(static_cast<int>(debug.startnode)).c_str(),static_cast<int>(posX + 160),static_cast<int>(posY), 20, BLUE);
     startnodenew+=1;
     // Slider para goalnode
     float goalMinValue = 1.0f;
     float goalMaxValue = 100.0f;
     const char* goalNodeText = "Goal Node";
     int goalnodenew = GuiSliderBar(Rectangle(posX, posY + 40, buttonWidth, buttonHeight), goalNodeText, NULL, &debug.goalnode, goalMinValue, goalMaxValue);
-    engine.drawText(std::to_string(static_cast<int>(debug.goalnode)).c_str(), posX + 160, posY + 40, 20, BLUE);
+    engine.drawText(std::to_string(static_cast<int>(debug.goalnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY + 40), 20, BLUE);
     goalnodenew+=1;
 
     Rectangle btn1Rec = { posX - 130, posY + 80, buttonWidth, buttonHeight };
@@ -1074,13 +1074,13 @@ void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& 
         debug.path.clear();
     }
     // resultado
-    Vector2 textPositionInfo2 = { 480, 480 };
+    vec2d textPositionInfo2 = { 480, 480 };
     engine.drawTextEx(GetFontDefault(), "PATH RESULT", textPositionInfo2, 20, 1, RED);
     //Dibujar path
     float posyt = 510.0f; 
     for(auto pos : debug.path){  
         std::string text = std::to_string(pos.x()) + " " + std::to_string(pos.y()) + " " + std::to_string(pos.z());
-        engine.drawTextEx(GetFontDefault(), text.c_str(), Vector2{480,posyt}, 20, 1, RED);
+        engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{480,posyt}, 20, 1, RED);
         posyt += 20.0f;
     }
 }
