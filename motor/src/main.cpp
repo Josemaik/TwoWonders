@@ -45,48 +45,66 @@ Node* createScene3D(DarkMoonEngine& engine){
     // Node: Wireframe
     engine.CreateCubeWires({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, BLACK, "Wireframe", p_node3D);
 
+    return p_node3D;
+}
+
+Node* createMainCharacter(DarkMoonEngine& engine){
     // Node: Modelo
-    auto model = engine.CreateModel("assets/Dummy.obj", GRAY, "Modelo: Dummy", p_node3D);
+    auto model = engine.CreateModel("assets/Main_Character.obj", GRAY, "Modelo: Main Character", engine.GetRootNode());
     model->scale({0.2f, 0.2f, 0.2f});
-    model->setTranslation({0.0f, -0.5f, 0.0f});
 
     auto eModel = dynamic_cast<Model*>(model->getEntity());
     eModel->drawModel = true;
     eModel->drawWires = true;
 
-    return p_node3D;
+    return model;
 }
 
-void inputManager(DarkMoonEngine& engine){
+void inputManager(DarkMoonEngine& engine, Node* nodeCharacter){
     auto camera = engine.GetCamera();
 
-    if(engine.IsKeyPressed(KEY_A)){
-        camera->position.x -= 0.1f;
-        camera->target.x   -= 0.1f;
-    }
-    if(engine.IsKeyPressed(KEY_D)){
+    if(engine.IsKeyPressed(KEY_A)){ // +X -Z
         camera->position.x += 0.1f;
         camera->target.x   += 0.1f;
-    }
 
-    if(engine.IsKeyPressed(KEY_SPACE)){
-        camera->position.y += 0.1f;
-        camera->target.y   += 0.1f;
-    }
-    if(engine.IsKeyPressed(GLFW_KEY_LEFT_SHIFT)){
-        camera->position.y -= 0.1f;
-        camera->target.y   -= 0.1f;
-    }
-
-    if(engine.IsKeyPressed(KEY_W)){
         camera->position.z -= 0.1f;
         camera->target.z   -= 0.1f;
+
+        nodeCharacter->translate({0.1f, 0.0f, -0.1f});
+        nodeCharacter->setRotation({0.0f, 1.0f, 0.0f}, 135.0f);
     }
-    if(engine.IsKeyPressed(KEY_S)){
+    if(engine.IsKeyPressed(KEY_D)){ // -X +Z
+        camera->position.x -= 0.1f;
+        camera->target.x   -= 0.1f;
+
         camera->position.z += 0.1f;
         camera->target.z   += 0.1f;
+
+        nodeCharacter->translate({-0.1f, 0.0f, 0.1f});
+        nodeCharacter->setRotation({0.0f, 1.0f, 0.0f}, 315.0f);
+    }
+    if(engine.IsKeyPressed(KEY_W)){ // +X +Z
+        camera->position.x += 0.1f;
+        camera->target.x   += 0.1f;
+
+        camera->position.z += 0.1f;
+        camera->target.z   += 0.1f;
+
+        nodeCharacter->translate({0.1f, 0.0f, 0.1f});
+        nodeCharacter->setRotation({0.0f, 1.0f, 0.0f}, 45.0f);
+    }
+    if(engine.IsKeyPressed(KEY_S)){ // -X -Z
+        camera->position.x -= 0.1f;
+        camera->target.x   -= 0.1f;
+
+        camera->position.z -= 0.1f;
+        camera->target.z   -= 0.1f;
+
+        nodeCharacter->translate({-0.1f, 0.0f, -0.1f});
+        nodeCharacter->setRotation({0.0f, 1.0f, 0.0f}, 225.0f);
     }
 }
+
 
 int main(){
     DarkMoonEngine engine;
@@ -94,6 +112,7 @@ int main(){
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
         createScene3D(engine);
+        auto mainCharacter = createMainCharacter(engine);
         createHUD(engine);
 
         std::cout << "┌──────┐" << std::endl;
@@ -105,7 +124,7 @@ int main(){
 
             // Logic
 
-            inputManager(engine);
+            inputManager(engine, mainCharacter);
 
             // Draw
 

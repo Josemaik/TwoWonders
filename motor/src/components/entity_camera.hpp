@@ -14,15 +14,15 @@ public:
     CameraProjection cameraProjection { CameraProjection::CAMERA_ORTHOGRAPHIC };
 
     // Camera Attributes
-    glm::vec3 position { 3.0f, 3.0f, 3.0f };
-    glm::vec3 target { 0.0f, 0.0f, 0.0f };
+    glm::vec3 position { -6.0f, 6.0f, -6.0f }; // -60 66 -60
+    glm::vec3 target { 0.0f, 0.0f, 0.0f };   // position -> player
     glm::vec3 up { 0.0f, 1.0f, 0.0f };
 
     glm::vec3 direction;
 
     glm::vec3 front { 0.0f, 0.0f, -1.0f };
     glm::vec3 right;
-    float fovy { 95.0f };
+    float fovy { 60.0f };                    // 60
 
     Camera(){
         updateCameraVectors();
@@ -38,12 +38,12 @@ public:
         if (cameraProjection == CameraProjection::CAMERA_PERSPECTIVE) {
             return glm::perspective(glm::radians(fovy), static_cast<float>(screenWidth) / static_cast<float>(screenHeight), 0.1f, 100.0f);
         } else if (cameraProjection == CameraProjection::CAMERA_ORTHOGRAPHIC) {
+            // Calculate the dimensions of the orthographic projection box
             float aspectRatio = static_cast<float>(screenWidth) / static_cast<float>(screenHeight);
-            float scale = glm::distance(position, target);
+            float halfHeight = glm::tan(glm::radians(fovy / 2.0f)) * glm::distance(position, target);
+            float halfWidth = aspectRatio * halfHeight;
 
-            float halfWidth = scale * aspectRatio;
-            float halfHeight = scale;
-
+            // Calculate the bounds of the orthographic projection
             float left = -halfWidth;
             float right = halfWidth;
             float bottom = -halfHeight;
