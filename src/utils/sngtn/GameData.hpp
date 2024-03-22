@@ -50,10 +50,15 @@ struct GameData
 
     void addMovementEvent(vec3d& vel, std::chrono::duration<double> timeStamp)
     {
-        if (!movementEvents.empty() && movementEvents.back().vel != vel)
+        if (movementEvents.empty())
+        {
             movementEvents.push_back({ vel, timeStamp });
-        else if (movementEvents.empty())
+        }
+        else if (lastVel != vel)
+        {
             movementEvents.push_back({ vel, timeStamp });
+            lastVel = vel;
+        }
     }
 
     void setRandomSeed(unsigned int seed)
@@ -256,4 +261,5 @@ private:
     InputEvent currentInput{};
     MovementEvent currentMovement{};
     std::size_t input_it{ 0 }, movement_it{ 0 };
+    vec3d lastVel{};
 };

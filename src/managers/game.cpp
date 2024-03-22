@@ -47,7 +47,7 @@ void Game::createEntities()
     // -72.0, 4.0, 72.9 - Cofre con llave
     // -116.0, 4.0, 111.0 - Apisonadora
     // -125, 4.0, 138.68 - `pos chunck 3
-    // 7.0, 22.0, -21.0- Posición Incial lvl1
+    // 7.0, 22.0, -21.0 - Posición Incial lvl1
     // -68.0, 4.0, -22.0 - Primera rampa lvl1
     // -6.0, 4.0, 94.0 - Campamento lvl1
     // -126.0, 4.0, 152.0 - Segundo altar lvl1

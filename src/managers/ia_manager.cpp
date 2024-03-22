@@ -712,9 +712,9 @@ void Ia_man::createBossFinalFase2(EntityManager& em, const mapType& map) {
 //Generación de subditos
 vec3d Ia_man::getRandomPosAroundBoss(double radio, const vec3d& spawnerPos) {
     // Generar un ángulo aleatorio en radianes
-    double angle = ((double)rand() / RAND_MAX) * 2 * K_PI;
+    double angle = ((double)std::rand() / RAND_MAX) * 2 * K_PI;
     // Generar una distancia aleatoria dentro del radio
-    double distance = ((double)rand() / RAND_MAX) * radio;
+    double distance = ((double)std::rand() / RAND_MAX) * radio;
     // Calcular las coordenadas x e y a partir del ángulo y la distancia
     double random_x = std::cos(angle) * distance;
     double random_z = std::sin(angle) * distance;
