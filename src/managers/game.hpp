@@ -19,6 +19,7 @@
 #include "../systems/sound_system.hpp"
 #include "../systems/camera_system.hpp"
 #include "../systems/lock_system.hpp"
+#include "../systems/npc_system.hpp"
 #include "game_engine.hpp"
 #include "ia_manager.hpp"
 #include "map_manager.hpp"
@@ -65,6 +66,7 @@ private:
     MapManager map{};
     CameraSystem camera_system{};
     LockSystem lock_system{};
+    NPCSystem npc_system{};
 };
 
 

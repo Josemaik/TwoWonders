@@ -38,6 +38,8 @@ void AISystem::update(EntityManager& em, float dt)
 
     em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, RenderComponent& ren, AIComponent& ai, LifeComponent& lc)
     {
+        AIComponent* aiptr = &ai;
+        LifeComponent* lcptr = &lc;
         //percibir el entorno
         perception(bb, ai, dt);
         // Actualizar datos de los slimes y subditos en blackboard
@@ -69,7 +71,7 @@ void AISystem::update(EntityManager& em, float dt)
             enemyPositions.push_back(phy.position);
 
         if (ai.behaviourTree) {
-            ai.behaviourTree->run({ em,e,ai,phy,ren,lc,dt });
+            ai.behaviourTree->run({ em,e,aiptr,nullptr,phy,ren,lcptr,dt });
             return;
         }
     });

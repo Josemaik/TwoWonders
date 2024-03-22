@@ -119,6 +119,12 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 bb.boss_fase++;
             }
 
+            if(ent.hasTag<DestructibleTag>()){
+                if(li.mapID == 1){
+                    li.door_open = true;
+                }
+            }
+
             if (li.lockedEnemy == ent.getID())
                 li.lockedEnemy = li.max;
 

@@ -12,27 +12,27 @@ struct BTDecisionPlayerDetected : BTNode_t {
     BTDecisionPlayerDetected() {}
 
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
-        ectx.ai.bh = "detecting player";
+        ectx.ai->bh = "detecting player";
 
         if(ectx.ent.hasTag<CrusherTag>()){
             auto const distance = (ectx.phy.position - getplayerphy(ectx).position).lengthSQ();
-            if(distance < (ectx.ai.detect_radius * ectx.ai.detect_radius)){
-                ectx.ai.playerdetected = true;
+            if(distance < (ectx.ai->detect_radius * ectx.ai->detect_radius)){
+                ectx.ai->playerdetected = true;
                 return BTNodeStatus_t::success;
             }  else{
-                ectx.ai.playerdetected = false;
+                ectx.ai->playerdetected = false;
                 return BTNodeStatus_t::fail;
             }    
         }else{
             //#### PERCEPCION SENSORIAL - OIDO ################################
             //Calculo la distancia del player al enemigo
             auto const distance = (ectx.phy.position - getplayerphy(ectx).position).lengthSQ();
-            auto const radius_listen_1 = (ectx.ai.detect_radius * ectx.ai.detect_radius);
+            auto const radius_listen_1 = (ectx.ai->detect_radius * ectx.ai->detect_radius);
             auto const radius_listen_2 = radius_listen_1 / 4.0;
             
-            if(!ectx.ai.playerdetected){
+            if(!ectx.ai->playerdetected){
                 bool in_alert_radius{false};
-                ectx.ai.listen_steps = true;
+                ectx.ai->listen_steps = true;
                 //Si estas dentro de su rango de alerta
                 if(distance < radius_listen_1){
                     //Aqui se escuchan los pasos un poco
@@ -40,10 +40,10 @@ struct BTDecisionPlayerDetected : BTNode_t {
                     //Compruebo si se escuchan los pasos del player
                     if(getplayerphy(ectx).velocity.x() == 0.0 && getplayerphy(ectx).velocity.z() == 0.0){
                         //No se escuchan
-                        ectx.ai.listen_steps = false;
+                        ectx.ai->listen_steps = false;
                     }
                     //Nivel de escucha de los pasos
-                    ectx.ai.increase_angle = 0.5f;
+                    ectx.ai->increase_angle = 0.5f;
                 }
 
                 if(distance < radius_listen_2){
@@ -52,30 +52,30 @@ struct BTDecisionPlayerDetected : BTNode_t {
                     //Compruebo si se escuchan los pasos del player
                     if(getplayerphy(ectx).velocity.x() == 0.0 && getplayerphy(ectx).velocity.z() == 0.0){
                         ////No se escuchan
-                        ectx.ai.listen_steps = false;
+                        ectx.ai->listen_steps = false;
                     }
                     //Nivel de escucha de los pasos
-                    ectx.ai.increase_angle = 1.0f;
+                    ectx.ai->increase_angle = 1.0f;
                 }
                 // Si no entro en ninguno de los radios de escucha no entra en estado de alerta
                 if(!in_alert_radius){
-                    ectx.ai.alert_state = false;
+                    ectx.ai->alert_state = false;
                     //Además no me detecta
-                    ectx.ai.playerdetected = false;
+                    ectx.ai->playerdetected = false;
                 }else{
-                    ectx.ai.alert_state = true;
+                    ectx.ai->alert_state = true;
                 }
                 //Si se completa la barra de escucha , me detectan
                 //dibujar icono alerta encima de enemigo
-                if(ectx.ai.endangle <= -360.0f){
-                    ectx.ai.playerdetected = true;
-                    ectx.ai.alert_state = false;
-                    ectx.ai.endangle = 0.0f;
+                if(ectx.ai->endangle <= -360.0f){
+                    ectx.ai->playerdetected = true;
+                    ectx.ai->alert_state = false;
+                    ectx.ai->endangle = 0.0f;
                     return BTNodeStatus_t::success;
                 }
             }else{
-                ectx.ai.alert_state = false;
-                ectx.ai.endangle = 0.0f;
+                ectx.ai->alert_state = false;
+                ectx.ai->endangle = 0.0f;
             }
 
             //########## PERCEPCION SENSORIAL - VISTA ################
@@ -84,7 +84,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
             // que sea superior a 1 metro no puede ser visto por el enemigo
             if(getplayerphy(ectx).position.y() - ectx.phy.position.y() > 1.0){
                 if(getplayerphy(ectx).position.y() > ectx.phy.position.y()){
-                        ectx.ai.playerdetected = false;
+                        ectx.ai->playerdetected = false;
                         return BTNodeStatus_t::fail;
                 }
             }
@@ -146,25 +146,25 @@ struct BTDecisionPlayerDetected : BTNode_t {
                 // comprobamos las distancias a los puntos de intersección
                 if (intersection_wall.distance(ectx.phy.position) < intersection_player.distance(ectx.phy.position)) {
                     // Hay un obstáculo delante
-                    ectx.ai.playerdetected = false;
+                    ectx.ai->playerdetected = false;
                     return BTNodeStatus_t::fail;
                 }
                 else {
                     // Si te sales del cono de visión ( evitar que te vea hasta el infinito )
-                    if(intersection_player.distance(ectx.phy.position) > ectx.ai.detect_radius){
-                        ectx.ai.playerdetected = false;
+                    if(intersection_player.distance(ectx.phy.position) > ectx.ai->detect_radius){
+                        ectx.ai->playerdetected = false;
                         return BTNodeStatus_t::fail;
                     }else{
                         // No hay obstáculo, eres detectado
-                        ectx.ai.alert_state = false;
-                        ectx.ai.playerdetected = true;
+                        ectx.ai->alert_state = false;
+                        ectx.ai->playerdetected = true;
                         return BTNodeStatus_t::success;
                     }
                 }
             }
 
             //No ha sido detectado por oido ni vista
-            if(ectx.ai.playerdetected){
+            if(ectx.ai->playerdetected){
                 return BTNodeStatus_t::success;
             }else{
                 return BTNodeStatus_t::fail;

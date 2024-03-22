@@ -70,6 +70,7 @@ struct LevelInfo
     std::size_t npcToTalk{ max };
     bool dungeonKeyCreated{ false };
     vec3d enemyToChestPos{};
+     bool door_open{false};
 
     // Variables de debug
     bool debugIA2{ false };
@@ -83,6 +84,7 @@ struct LevelInfo
     // Para estado de pausa y cerrar el juego
     bool openChest{ false };
     bool gameShouldEnd{ false };
+    
 
     // Tutorial
     std::vector<std::size_t> tutorialEnemies{};
@@ -149,7 +151,7 @@ struct LevelInfo
         debugIA2 = false;
         resetGame = false;
         num_zone = 0;
-        mapID = 0;
+        mapID = 1;
         chestToOpen = max;
         dungeonKeyCreated = false;
         openChest = false;
