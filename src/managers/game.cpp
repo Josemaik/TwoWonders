@@ -230,7 +230,7 @@ void Game::run()
         case GameScreen::GAMEPLAY:
         {
             if (sound_system.ambient_started == false) {
-                sound_system.playAmbient();
+                //sound_system.playAmbient();
                 sound_system.ambient_started = true;
             }
             if (em.getEntities().empty() || li.resetGame)

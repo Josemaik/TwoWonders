@@ -22,6 +22,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                     {
                         map.changeMap(em, 1, iam);
                         li.transition = true;
+                        em.getSingleton<SoundSystem>().ambient_stop();
 
                         p.position = { 7.0, 22.0, -21.0 };
                         break;
@@ -179,8 +180,7 @@ void ZoneSystem::checkLevers(EntityManager& em, EventManager& evm)
                 inpi.interact = false;
                 openDoorsZone(em, evm, phy.position);
 
-                // FIXME: Crashea el juego
-                // em.getSingleton<SoundSystem>().sonido_palanca();
+                em.getSingleton<SoundSystem>().sonido_palanca();
             }
         }
     });

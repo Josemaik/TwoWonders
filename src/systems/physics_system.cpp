@@ -85,26 +85,26 @@ void PhysicsSystem::update(EntityManager& em, float dt)
         if (phy.alreadyGrounded)
             phy.alreadyGrounded = false;
 
-        auto& ss = em.getSingleton<SoundSystem>();
-        if ((phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !playerWalking){
+        // auto& ss = em.getSingleton<SoundSystem>();
+        if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
             auto& li = em.getSingleton<LevelInfo>();
-            
-            switch( li.mapID )
+
+            switch (li.mapID)
             {
-                case 0: 
-                    //ss.sonido_pasos_pradera();
+            case 0:
+                //ss.sonido_pasos_pradera();
                 break;
-                case 1:
-                    ss.sonido_pasos_prision();
+            case 1:
+                //ss.sonido_pasos_prision();
                 break;
             }
             playerWalking = true;
         }
-        else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0 ) && playerWalking)
-            {
-                playerWalking = false;
-                //ss.SFX_stop();
-            }
+        else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) && playerWalking)
+        {
+            playerWalking = false;
+            //ss.SFX_stop();
+        }
 
     });
 }

@@ -146,6 +146,7 @@ void RenderSystem::drawChargeScreen(GameEngine& engine, EntityManager& em)
 
     auto& li = em.getSingleton<LevelInfo>();
     li.loadingTime += timeStep60;
+    
 
     engine.endDrawing();
 }

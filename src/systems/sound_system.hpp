@@ -15,6 +15,7 @@ struct SoundSystem {
     void createEventInstance();
     void playMusicMenu();
     void playAmbient();
+    void sonido_mazmorra();
     void seleccion_menu();
     void sonido_config();
     void sonido_mov();
@@ -31,18 +32,18 @@ struct SoundSystem {
     void sonido_movimiento_camara();    
     void sonido_muerte_enemigo();
     void sonido_pasos_pradera();        //arreglar metodo, falla
-    void sonido_pasos_prision();        //comprobar
+    void sonido_pasos_prision();        //arreglar metodo, falla
     void sonido_piedras_golpe();
     void sonido_rebote();             
     void sonido_destello();
     void sonido_recoger_vida();         //a futuro
 
-    void sonido_llave();                //crashea el sonido
+    void sonido_llave();                
     void sonido_h_pompa();              //comprobar
-    void sonido_checkpoint();           //por integrar en codigo y comprobar
-    void sonido_palanca();              //por integrar en codigo y comprobar
-    void sonido_recibir_danyo();        //por anyadir sonido y probar
-    void sonido_aum_vida_max();         //comprobar
+    void sonido_checkpoint();           
+    void sonido_palanca();              
+    void sonido_recibir_danyo();         
+    void sonido_aum_vida_max();         
 
     //poner sonido de golpe dummy a romper las maderas
     //bajar volumen de ambiente

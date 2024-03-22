@@ -333,8 +333,7 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
     case Spells::WaterBomb:
     {
         eleType = ElementalType::Water;
-        // FIXME: Crashea el juego
-        // em.getSingleton<SoundSystem>().sonido_h_pompa();
+        em.getSingleton<SoundSystem>().sonido_h_pompa();
         break;
     }
     case Spells::FireMeteorites:
