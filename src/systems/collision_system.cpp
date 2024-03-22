@@ -539,7 +539,7 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
             plfi.mana = plfi.max_mana - 3.0;
 
             // FIXME: Crashea el juego
-            // em.getSingleton<SoundSystem>().sonido_checkpoint();
+            em.getSingleton<SoundSystem>().sonido_checkpoint();
 
             if (otherEntPtr->hasComponent<DispatcherComponent>())
             {

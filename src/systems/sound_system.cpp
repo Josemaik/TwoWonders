@@ -55,7 +55,17 @@ void SoundSystem::playAmbient() {
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Ambiente, &eventInstance_Ambiente));
     FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
     FMOD_Studio_System_Update(soundSystem);
+    play();
 }
+
+void SoundSystem::sonido_mazmorra() {
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_mazmorra", &eventDescription_Ambiente));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Ambiente, &eventInstance_Ambiente));
+    FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
+    FMOD_Studio_System_Update(soundSystem);
+    play();
+}
+
 
 void SoundSystem::sonido_config() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Menus/sound_config", &eventDescription));
@@ -212,10 +222,10 @@ void SoundSystem::sonido_palanca() {
     update();
 }
 void SoundSystem::sonido_recibir_danyo() {
-    //ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Interaccion/Recoger_vida", &eventDescription));
-    //ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
-    //play();
-    //update();
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Jugador_danyo", &eventDescription));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+    play();
+    update();
 }
 
 void SoundSystem::sonido_aum_vida_max() {
@@ -253,7 +263,7 @@ void SoundSystem::music_stop() {
 }
 void SoundSystem::ambient_stop() {
     FMOD_Studio_EventInstance_Stop(eventInstance_Ambiente, FMOD_STUDIO_STOP_ALLOWFADEOUT);
-    update();
+    //update();
 }
 
 void SoundSystem::SFX_stop() {

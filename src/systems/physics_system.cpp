@@ -95,7 +95,7 @@ void PhysicsSystem::update(EntityManager& em, float dt)
                     //ss.sonido_pasos_pradera();
                 break;
                 case 1:
-                    ss.sonido_pasos_prision();
+                    //ss.sonido_pasos_prision();
                 break;
             }
             playerWalking = true;

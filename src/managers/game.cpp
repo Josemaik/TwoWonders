@@ -230,7 +230,7 @@ void Game::run()
         case GameScreen::GAMEPLAY:
         {
             if (sound_system.ambient_started == false) {
-                sound_system.playAmbient();
+                //sound_system.playAmbient();
                 sound_system.ambient_started = true;
             }
             if (em.getEntities().empty() || li.resetGame)
@@ -242,7 +242,10 @@ void Game::run()
             if (!map.isComplete())
             {
                 if (!li.isCharging() && li.loading)
+                {
                     li.loadingTime = 0;
+                    em.getSingleton<SoundSystem>().ambient_stop();
+                }
                 map.createMap(em, li.mapID, iam);
             }
 

@@ -29,7 +29,10 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             {
             case ObjectType::Life:
                 if (playerEnt->hasComponent<LifeComponent>())
+                {
                     em.getComponent<LifeComponent>(*playerEnt).increaseLife();
+                    em.getSingleton<SoundSystem>().sonido_recoger_vida();
+                }
                 break;
 
             case ObjectType::Sword:
@@ -71,7 +74,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                     life.increaseMaxLife();
                     life.increaseLife(4);
                     // FIXME: Crashea el juego
-                    // em.getSingleton<SoundSystem>().sonido_aum_vida_max();
+                     em.getSingleton<SoundSystem>().sonido_aum_vida_max();
                 }
                 break;
             }
@@ -84,7 +87,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             case ObjectType::Key:
             {
                 plfi.addKey();
-                //em.getSingleton<SoundSystem>().sonido_llave();
+                em.getSingleton<SoundSystem>().sonido_llave();
                 Item key = { "Llave", "Una llave, parece que solo puede abrir una puerta" };
                 plfi.addItem(std::make_unique<Item>(key));
 

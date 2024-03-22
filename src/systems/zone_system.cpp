@@ -180,7 +180,7 @@ void ZoneSystem::checkLevers(EntityManager& em, EventManager& evm)
                 openDoorsZone(em, evm, phy.position);
 
                 // FIXME: Crashea el juego
-                // em.getSingleton<SoundSystem>().sonido_palanca();
+                em.getSingleton<SoundSystem>().sonido_palanca();
             }
         }
     });
