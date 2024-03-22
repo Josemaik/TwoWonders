@@ -64,6 +64,8 @@ public:
 
     // Create camera
     Camera* CreateCamera(const char* nodeName, Node* parentNode);
+    // Create light in node
+    Node* CreateLight(glm::vec3 position, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, const char* nodeName, Node* parentNode);
     // Get root node
     Node* GetRootNode();
 

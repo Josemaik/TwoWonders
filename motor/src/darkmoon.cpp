@@ -6,10 +6,7 @@ DarkMoonEngine::DarkMoonEngine(){
     m_rootNode->name = "Scene";
 
     // Create Default Light
-    auto nLight = CreateNode("Default Light", GetRootNode());
-    auto eLight = std::make_unique<Light>();
-    nLight->setEntity(std::move(eLight));
-    //m_rootNode->addChild(std::move(nLight));
+    CreateLight({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, "Default Light", GetRootNode());
 
     // Create Default Camera
     auto eCamera = CreateCamera("Default Camera", GetRootNode());
@@ -203,6 +200,16 @@ Camera* DarkMoonEngine::CreateCamera(const char* nodeName, Node* parentNode){
     p_nodeCam->setEntity(std::move(eCamera));
 
     return p_eCamera;
+}
+
+// Create light in node
+Node* DarkMoonEngine::CreateLight(glm::vec3, glm::vec3, glm::vec3, glm::vec3, const char* nodeName, Node* parentNode){
+    auto p_nodeLight = CreateNode(nodeName, parentNode);
+
+    // Create light
+    auto light = std::make_unique<Light>();
+    
+    return p_nodeLight;
 }
 
 // Get root node
