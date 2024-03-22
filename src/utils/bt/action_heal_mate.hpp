@@ -10,16 +10,16 @@ struct BTAction_HealMate : BTNode_t{
         return std::sqrt(dx * dx + dz * dz);
     }
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
-        if( !ectx.ai.tactive ) return BTNodeStatus_t::fail;
-        ectx.ai.bh = "Healing mate";
+        if( !ectx.ai->tactive ) return BTNodeStatus_t::fail;
+        ectx.ai->bh = "Healing mate";
         if(ectx.ent.hasTag<SlimeTag>()){
-            auto const& phyTarget = ectx.em.getComponent<PhysicsComponent>(*ectx.em.getEntityByID(ectx.ai.slimetarget));
+            auto const& phyTarget = ectx.em.getComponent<PhysicsComponent>(*ectx.em.getEntityByID(ectx.ai->slimetarget));
             Steer_t steering = STBH::Pursue(phyTarget ,ectx.phy);
             double tdist = calculatedistance(phyTarget.position,ectx.phy.position);
-            if(tdist < ectx.ai.arrival_radius){
+            if(tdist < ectx.ai->arrival_radius){
                 //Nos matamos
-                ectx.lifec.life = 0;
-                ectx.ai.healbeforedie = true;
+                ectx.lifec->life = 0;
+                ectx.ai->healbeforedie = true;
                 return BTNodeStatus_t::success;
             }
             ectx.phy.velocity = vec3d{steering.v_x,0.0,steering.v_z};

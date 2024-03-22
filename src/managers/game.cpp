@@ -261,6 +261,7 @@ void Game::run()
                     elapsed -= timeStep;
 
                     ai_system.update(em, timeStep);
+                    npc_system.update(em, timeStep);
                     physics_system.update(em, timeStep);
                     collision_system.update(em);
                     zone_system.update(em, engine, iam, evm, map, timeStep);

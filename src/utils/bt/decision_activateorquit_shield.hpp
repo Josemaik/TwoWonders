@@ -5,9 +5,9 @@
 
 struct BTDecisionActivateorQuit_Shield : BTNode_t {
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
-        ectx.ai.bh = "Activate or quit shield";
-        if (ectx.ai.elapsed_shield >= ectx.ai.countdown_shield) {
-            ectx.ai.elapsed_shield = 0;
+        ectx.ai->bh = "Activate or quit shield";
+        if (ectx.ai->elapsed_shield >= ectx.ai->countdown_shield) {
+            ectx.ai->elapsed_shield = 0;
             auto& bb = ectx.em.getSingleton<BlackBoard_t>();
             //bb.activate_shield = !bb.activate_shield;
            // ectx.ren.colormutable = !ectx.ren.colormutable;
@@ -21,7 +21,7 @@ struct BTDecisionActivateorQuit_Shield : BTNode_t {
                 }
             }
         }
-        ectx.ai.plusdeltatime(ectx.deltatime, ectx.ai.elapsed_shield);
+        ectx.ai->plusdeltatime(ectx.deltatime, ectx.ai->elapsed_shield);
         return BTNodeStatus_t::fail;
     }
 };

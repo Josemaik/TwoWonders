@@ -511,6 +511,16 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
         Color color = { static_cast<unsigned char>(npc["color"][0].GetUint()), static_cast<unsigned char>(npc["color"][1].GetUint()), static_cast<unsigned char>(npc["color"][2].GetUint()), static_cast<unsigned char>(npc["color"][3].GetUint()) };
         double rot = orientation * DEGTORAD;
         double max_speed = npc["max_speed"].GetDouble();
+        Path_t<4> path = { vec3d{npc["path"][0][0].GetDouble(), npc["path"][0][1].GetDouble(), npc["path"][0][2].GetDouble()},
+                       vec3d{npc["path"][1][0].GetDouble(), npc["path"][1][1].GetDouble(), npc["path"][1][2].GetDouble()},
+                       vec3d{npc["path"][2][0].GetDouble(), npc["path"][2][1].GetDouble(), npc["path"][2][2].GetDouble()},
+                       vec3d{npc["path"][3][0].GetDouble(), npc["path"][3][1].GetDouble(), npc["path"][3][2].GetDouble()} };
+         double arrival_radius = npc["arrival_radius"].GetDouble();
+
+        vec_t.push_back(std::make_unique<BehaviourTree_t>());
+        auto& tree = *vec_t.back();
+
+        tree.createNode<BTAction_PatrolNPC>();
 
         auto& entity{ em.newEntity() };
         em.addTag<NPCTag>(entity);
@@ -519,7 +529,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
         auto& wp = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.rotationVec = rotationVec, .max_speed = max_speed });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
         em.addComponent<InteractiveComponent>(entity);
-
+        em.addComponent<NPCComponent>(entity,NPCComponent{.path = path,.behaviourTree = &tree,.arrival_radius = arrival_radius});
 
         em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
 

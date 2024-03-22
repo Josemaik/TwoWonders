@@ -6,6 +6,8 @@
 #include "../utils/types.hpp"
 #include "ia_manager.hpp"
 #include "../utils/pf/Graph.hpp"
+#include "../utils/bt/behaviourtree.hpp"
+#include "../utils/bt/action_patrolNPC.hpp"
 
 enum struct LoadState
 {
@@ -71,6 +73,8 @@ private:
     inline void resetTag(EntityManager&) {}
     template <typename Tag>
     inline void resetTag(EntityManager& em, Ia_man& iam) {}
+
+    std::vector<std::unique_ptr<BehaviourTree_t>> vec_t{};
 };
 
 #endif // !MAP_MANAGER
