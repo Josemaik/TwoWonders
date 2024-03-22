@@ -187,7 +187,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
     else if (plfi.mana < plfi.max_mana)
     {
-        plfi.mana += .1;
+        plfi.mana += .07;
 
         if (plfi.mana > plfi.max_mana)
             plfi.mana = plfi.max_mana;

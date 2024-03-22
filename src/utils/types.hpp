@@ -92,6 +92,7 @@ struct BarricadeTag {};
 struct LeverTag {};
 struct NoKeyTag {};
 struct NPCTag {};
+struct LevelChangeTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -117,7 +118,7 @@ using CL = MP::TypeList <
     DispatcherComponent,
     Navmesh,
     OneUseComponent,
-    NPC_component
+    NPCComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,
@@ -155,7 +156,8 @@ using TL = MP::TypeList <
     BarricadeTag,
     LeverTag,
     NoKeyTag,
-    NPCTag
+    NPCTag,
+    LevelChangeTag
 > ;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
@@ -163,3 +165,5 @@ using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;
 using deathSet = std::set<std::size_t, std::greater<std::size_t>>;
 using mapType = rapidjson::Document;
+using valueType = rapidjson::Value;
+using mapSizeType = rapidjson::SizeType;

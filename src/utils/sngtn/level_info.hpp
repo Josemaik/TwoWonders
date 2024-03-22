@@ -66,6 +66,7 @@ struct LevelInfo
     // Variables relacionadas con los eventos
     std::size_t chestToOpen{ max };
     std::size_t doorToOpen{ max };
+    std::size_t npcToTalk{ max };
     bool dungeonKeyCreated{ false };
     vec3d enemyToChestPos{};
 

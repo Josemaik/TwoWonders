@@ -3,7 +3,7 @@
 #include <array>
 
 // template<std::size_t N>
-struct NPC_component
+struct NPCComponent
 {
     //path tamaño 4
     Path_t<4> path{ };

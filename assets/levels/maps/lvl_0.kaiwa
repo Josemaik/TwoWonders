@@ -121,7 +121,6 @@
 							"rotation": 270.0,
 							"rotVector": [0.0, 0.0, -1.0],
 							"content": 19,
-							"id": 0,
 							"visible": false,
 							"message": [
 								"¡Encontraste un bastón mágico!", 
@@ -253,6 +252,7 @@
 							"scale_to_respawn_attack": 7.0
 						}
 					],
+					"NPCs": [],
 					"Commentaries": [
 						{
 							"position": [-11.6, -1.12, -16.0],
@@ -387,7 +387,6 @@
 							"rotation": 270.0,
 							"rotVector": [0.0, 0.0, -1.0],
 							"content": 6,
-							"id": 1,
 							"message": ["¡Encontraste 30 destellos!"]
 						},
 						{
@@ -611,6 +610,7 @@
 						}
 					],
 					"Objects": [],
+					"NPCs": [],
 					"Spawns":[
 						{
 							"position":[55.427, 19.951, 3.75]
@@ -744,7 +744,6 @@
 							"rotation": 180.0,
 							"rotVector":[0.0, 0.0, 1.0],
 							"content": 10,
-							"id": 3,
 							"message": ["¡Encontraste una llave!", "Parece que es de un solo uso..."],
 							"events": [6, 7]
 						},
@@ -771,8 +770,7 @@
 							"position":[160.097, -99.475, 7.819],
 							"scale":[18.257, 28.414, 18.257],
 							"rotation": 90.0,
-							"rotVector":[0.0, 0.0, 0.0],
-							"zone": 12
+							"rotVector":[0.0, 0.0, 0.0]
 						}
 					]
 				}
@@ -868,7 +866,8 @@
 							"scale_to_respawn_attack": 7.0
 						}
 					],
-					"Objects": []
+					"Objects": [],
+					"NPCs": []
 				}
 			}
 		]

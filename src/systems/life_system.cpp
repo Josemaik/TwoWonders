@@ -109,9 +109,13 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 bb.boss_fase++;
             }
 
+            if (li.lockedEnemy == ent.getID())
+                li.lockedEnemy = li.max;
+
             lif.markedForDeletion = true;
         }
 
+        // Para cuando se recoge una poción de vida
         if (ent.hasTag<PlayerTag>())
         {
             auto& plfi = em.getSingleton<PlayerInfo>();

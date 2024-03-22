@@ -10,8 +10,11 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             if (obj.type == ObjectType::BombExplode || obj.type == ObjectType::Heal_Spell)
                 obj.effect();
             else
+            {
                 li.insertDeath(ent.getID());
-
+                if (ent.hasComponent<RenderComponent>())
+                    em.getComponent<RenderComponent>(ent).visible = false;
+            }
         }
 
         // Recuperamos la entidad del player

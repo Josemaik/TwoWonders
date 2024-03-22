@@ -24,7 +24,7 @@ void RenderSystem::init()
     GuiSetStyle(DEFAULT, TEXT_WRAP_MODE, 2);
 }
 
-void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt)
+void RenderSystem::update(EntityManager& em, GameEngine& engine, double dt)
 {
     // Actualizamos la posicion de render del componente de fisicas
     em.forEach<SYSCMPs, SYSTAGs>([](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
@@ -47,7 +47,7 @@ void RenderSystem::update(EntityManager& em, ENGI::GameEngine& engine, double dt
     endFrame(engine, em, dt);
 }
 
-void RenderSystem::drawLogoGame(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
+void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
     // Logo del videojuego
@@ -127,7 +127,7 @@ void RenderSystem::drawChargeScreen(GameEngine& engine, EntityManager& em)
 {
     engine.beginDrawing();
     engine.clearBackground({ 171, 159, 197, 255 });
-    ENGI::GameEngine::Gif& gif = engine.gifs.at("carga");
+    GameEngine::Gif& gif = engine.gifs.at("carga");
     Texture2D gifCopy = gif.texture;
 
     // Redimensionamos la copia
@@ -145,7 +145,7 @@ void RenderSystem::drawChargeScreen(GameEngine& engine, EntityManager& em)
     engine.endDrawing();
 }
 
-void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss) {
+void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSystem& ss) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
     auto& li = em.getSingleton<LevelInfo>();
@@ -221,7 +221,7 @@ void RenderSystem::drawOptions(ENGI::GameEngine& engine, EntityManager& em, Soun
     engine.endDrawing();
 }
 
-void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, SoundSystem& ss)
+void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, SoundSystem& ss)
 {
     float windowWidth = 330.0f;
     float windowHeight = 460.0f;
@@ -319,7 +319,7 @@ void RenderSystem::drawPauseMenu(ENGI::GameEngine& engine, EntityManager& em, So
     }
 }
 
-void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
+void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
 {
     float windowWidth = 450.0f;
     float windowHeight = 450.0f;
@@ -454,7 +454,7 @@ void RenderSystem::drawInventory(ENGI::GameEngine& engine, EntityManager& em)
     }
 }
 
-void RenderSystem::drawLogoKaiwa(ENGI::GameEngine& engine) {
+void RenderSystem::drawLogoKaiwa(GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(Color({ 136, 219, 152, 255 }));
     engine.textures["logo_kaiwagames"].width = engine.getScreenWidth();
@@ -466,7 +466,7 @@ void RenderSystem::drawLogoKaiwa(ENGI::GameEngine& engine) {
     engine.endDrawing();
 }
 
-void RenderSystem::drawEnding(ENGI::GameEngine& engine) {
+void RenderSystem::drawEnding(GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
     engine.drawText("FIN DEL NIVEL 1", 250, 250, 50, BLACK);
@@ -477,7 +477,7 @@ void RenderSystem::drawEnding(ENGI::GameEngine& engine) {
     engine.endDrawing();
 }
 
-void RenderSystem::drawStory(ENGI::GameEngine& engine) {
+void RenderSystem::drawStory(GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
     float boxWidth = 700.f;
@@ -506,7 +506,7 @@ void RenderSystem::drawStory(ENGI::GameEngine& engine) {
     engine.endDrawing();
 }
 
-void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
+void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
 {
     using SYSCMPs = MP::TypeList<RenderComponent>;
 
@@ -548,7 +548,12 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
             if (e.hasComponent<LifeComponent>()) {
                 auto& l{ em.getComponent<LifeComponent>(e) };
                 if (l.elapsed < l.countdown)
+                {
                     colorEntidad = MAROON;
+
+                    if (e.hasTag<DestructibleTag>())
+                        r.position.setZ(shakeDouble(r.position.z()));
+                }
             }
             if (!e.hasTag<ZoneTag>())
             {
@@ -638,7 +643,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
                     pos.setY(pos.y() - r.offset);
                     in = true;
                 }
-                else if (e.hasTag<GroundTag>() || e.hasTag<DoorTag>())
+                else if (e.hasTag<GroundTag>() || e.hasTag<DoorTag>() || e.hasTag<LeverTag>())
                 {
                     in = true;
                 }
@@ -662,7 +667,7 @@ void RenderSystem::drawEntities(EntityManager& em, ENGI::GameEngine& engine)
     });
 }
 
-void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, EntityManager& em, RenderComponent& r)
+void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r)
 {
     auto& li = em.getSingleton<LevelInfo>();
 
@@ -889,6 +894,18 @@ void RenderSystem::loadModels(Entity& e, ENGI::GameEngine& engine, EntityManager
 
         loadShaders(r.model);
     }
+    else if (e.hasTag<LevelChangeTag>())
+    {
+        r.model = engine.loadModel("assets/models/Tp.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<LeverTag>())
+    {
+        r.model = engine.loadModel("assets/models/Palanca-prision.obj");
+
+        loadShaders(r.model);
+    }
     else
     {
         r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
@@ -907,7 +924,7 @@ void RenderSystem::loadShaders(Model& model)
 }
 
 // Empieza el dibujado y se limpia la pantalla
-void RenderSystem::beginFrame(ENGI::GameEngine& engine)
+void RenderSystem::beginFrame(GameEngine& engine)
 {
     engine.beginDrawing();
 
@@ -923,7 +940,7 @@ void RenderSystem::drawRay(vec3d origin, vec3d dir) {
     EndDrawing();
 }
 // Se termina el dibujado
-void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double dt)
+void RenderSystem::endFrame(GameEngine& engine, EntityManager& em, double dt)
 {
     engine.endMode3D();
 
@@ -963,7 +980,7 @@ void RenderSystem::endFrame(ENGI::GameEngine& engine, EntityManager& em, double 
 }
 
 //Dibuja Slider en función de los parámetros
-double SelectValue(ENGI::GameEngine& engine, double value, float posx, float posy, float height, float width, const char* text, float min_value, float max_value) {
+double SelectValue(GameEngine& engine, double value, float posx, float posy, float height, float width, const char* text, float min_value, float max_value) {
     // pasamos a float el valor
     float floatvalue = static_cast<float>(value);
     // dibujamos el slider para modificar su valor
@@ -975,7 +992,7 @@ double SelectValue(ENGI::GameEngine& engine, double value, float posx, float pos
 }
 
 //Interfaz para probar el pathfinding
-void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& em) {
+void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     auto& debug = em.getSingleton<Debug_t>();
     auto& navs = em.getSingleton<NavmeshInfo>();
     //Dibujado de titulo y ventana
@@ -1085,7 +1102,7 @@ void RenderSystem::drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& 
     }
 }
 //Debugger visual in-game
-void RenderSystem::drawDebuggerInGameIA(ENGI::GameEngine& engine, EntityManager& em, double dt) {
+void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em, double dt) {
     // engine.beginDrawing();
     float posX = static_cast<float>(engine.getScreenWidth() - 330);
     int posText = static_cast<int>(posX + 10);
@@ -1181,7 +1198,7 @@ void RenderSystem::drawVisionCone(vec3d pos_enemy, double orientation, double ho
 }
 
 //Editor In-Game
-void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& em) {
+void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
     // engine.beginDrawing();
 
     // Dibujar un rectángulo que simula una ventana
@@ -1256,7 +1273,7 @@ void RenderSystem::drawEditorInGameIA(ENGI::GameEngine& engine, EntityManager& e
     // engine.endDrawing();
 }
 //Dibujado alertas de detección de enemigos
-void RenderSystem::drawAlerts_IA(EntityManager& em, ENGI::GameEngine& engine, double dt) {
+void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine, double dt) {
     for (auto const& e : em.getEntities())
     {
         //Alert state
@@ -1314,7 +1331,7 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, ENGI::GameEngine& engine, do
     }
 }
 // Se dibuja el HUD
-void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool debugphy)
+void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
 {
     auto& li = em.getSingleton<LevelInfo>();
     if (li.isDead)
@@ -1347,18 +1364,8 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
             // Dibujamos el número de monedas en pantalla
             drawCoinBar(engine, em);
 
-            // Dibujar el countdown restante del ataque del player en el HUD
-            // if (e.hasComponent<AttackComponent>())
-            // {
-            //     auto const& a{ em.getComponent<AttackComponent>(e) };
-            //     std::string countdown_ataque;
-            //     if (a.elapsed > a.countdown)
-            //         countdown_ataque = "Ataque listo (SPACE) - Bomba lista (B)";
-            //     else
-            //         countdown_ataque = "Ataque listo en: " + std::to_string(-1 * (a.elapsed - 1.0f)) + " segundos";
-
-            //     engine.drawText(countdown_ataque.c_str(), 10, 35, 20, BLACK);
-            // }
+            // Dibujar espacios de hechizos
+            drawSpellSlots(engine, em);
 
             // Dibujar el tipo de ataque que tiene equipado
             if (e.hasComponent<TypeComponent>())
@@ -1393,7 +1400,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
                             {
                                 double multiplier = 28.0;
 
-                                ENGI::GameEngine::Gif* gif;
+                                GameEngine::Gif* gif;
                                 Texture2D gifCopy;
                                 if (engine.isGamepadAvailable(0))
                                     gif = &engine.gifs.at("cuadrado");
@@ -1561,7 +1568,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
 
             if (inter.showButton)
             {
-                ENGI::GameEngine::Gif* gif;
+                GameEngine::Gif* gif;
                 Texture2D gifCopy;
                 int sum = 0;
                 if (engine.isGamepadAvailable(0))
@@ -1862,7 +1869,7 @@ void RenderSystem::drawHUD(EntityManager& em, ENGI::GameEngine& engine, bool deb
     }
 }
 
-void RenderSystem::drawDeath(ENGI::GameEngine& engine)
+void RenderSystem::drawDeath(GameEngine& engine)
 {
     engine.drawRectangle(0, 0, engine.getScreenWidth(), engine.getScreenHeight(), Fade(BLACK, 0.5f));
 
@@ -1889,7 +1896,7 @@ void RenderSystem::drawDeath(ENGI::GameEngine& engine)
     init();
 }
 
-void RenderSystem::unloadModels(EntityManager& em, ENGI::GameEngine& engine)
+void RenderSystem::unloadModels(EntityManager& em, GameEngine& engine)
 {
     using SYSCMPs = MP::TypeList<RenderComponent>;
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, RenderComponent& ren)
@@ -1900,7 +1907,7 @@ void RenderSystem::unloadModels(EntityManager& em, ENGI::GameEngine& engine)
     });
 }
 
-void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, const Entity& e)
+void RenderSystem::drawHealthBar(GameEngine& engine, EntityManager& em, const Entity& e)
 {
     auto const& l{ em.getComponent<LifeComponent>(e) };
     auto& plfi = em.getSingleton<PlayerInfo>();
@@ -1957,7 +1964,7 @@ void RenderSystem::drawHealthBar(ENGI::GameEngine& engine, EntityManager& em, co
         }
 }
 
-void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
+void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
 {
     auto& plfi{ em.getSingleton<PlayerInfo>() };
     if (plfi.coins == 0)
@@ -2016,7 +2023,7 @@ void RenderSystem::drawCoinBar(ENGI::GameEngine& engine, EntityManager& em)
     }
 }
 
-void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
+void RenderSystem::drawManaBar(GameEngine& engine, EntityManager& em)
 {
     auto& plfi{ em.getSingleton<PlayerInfo>() };
 
@@ -2049,7 +2056,45 @@ void RenderSystem::drawManaBar(ENGI::GameEngine& engine, EntityManager& em)
     plfi.mana_width = manaWidth;
 }
 
-void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
+void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
+{
+    auto& plfi{ em.getSingleton<PlayerInfo>() };
+
+    if (plfi.spells.empty())
+        return;
+
+    else
+    {
+        if (elapsed_spell < elapsed_limit_spell)
+        {
+            elapsed_spell += timeStep60;
+
+            if (static_cast<int>(elapsed_spell * 10) % 16 < 8)
+                return;
+        }
+
+        auto& current = plfi.currentSpell;
+        int posX = engine.getScreenWidth() - 150;
+        int posY = 20;
+
+        switch (current.spell)
+        {
+        case Spells::WaterBomb:
+        {
+            engine.drawTexture(engine.textures["agua_holder"], posX, posY, { 255, 255, 255, 255 });
+            engine.drawTexture(engine.textures["pompas"], posX + 10, posY + 15, { 255, 255, 255, 255 });
+
+            break;
+        }
+        default:
+            break;
+        }
+
+    }
+}
+
+
+void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
 {
     auto& txti = em.getSingleton<TextInfo>();
     auto& textQueue = txti.getTextQueue();
@@ -2064,6 +2109,8 @@ void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
     // Sacamos el texto en formatos para GuiTextBox
     auto& str = textQueue.front();
     auto text = const_cast<char*>(str.c_str());
+
+    GuiSetStyle(DEFAULT, TEXT_LINE_SPACING, 20);
 
     // Dibujamos el cuadro de diálogo con RayGui
     engine.drawRectangle(static_cast<int>(posX), static_cast<int>(posY), static_cast<int>(boxWidth), static_cast<int>(boxHeight), WHITE);
@@ -2096,7 +2143,7 @@ void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
         posButtonY += copy.height;
     }
 
-    ENGI::GameEngine::Gif* gif;
+    GameEngine::Gif* gif;
     Texture2D gifCopy;
     int rest = 5;
     if (engine.isGamepadAvailable(0))
@@ -2121,8 +2168,13 @@ void RenderSystem::drawTextBox(ENGI::GameEngine& engine, EntityManager& em)
     displayGif(engine, gifCopy, *gif, posButtonX, posButtonY);
 }
 
-void RenderSystem::displayGif(ENGI::GameEngine& engine, Texture2D& copy, GameEngine::Gif& gif, int& posX, int& posY)
+void RenderSystem::displayGif(GameEngine& engine, Texture2D& copy, GameEngine::Gif& gif, int& posX, int& posY)
 {
     engine.drawTexture(copy, posX, posY, WHITE);
     engine.updateGif(gif);
+}
+
+double RenderSystem::shakeDouble(double value)
+{
+    return value += static_cast<double>(rand() % 3 - 1) / 5.0;
 }

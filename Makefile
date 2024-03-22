@@ -9,7 +9,7 @@ ifeq ($(OS),Windows_NT)
 	LIBS_COPY  	:= libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll libs/libstdc++-6.dll libs/libgcc_s_seh-1.dll libs/libwinpthread-1.dll
 else
 	CCACHE 	   	:= ccache
-    LIBS := -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so
+    LIBS 		:= -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so
 	SANITIZE   	:= -fsanitize=address,undefined
 	LIBS_COPY  	:= /usr/lib/libraylib.so.420 libs/raygui.so fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13
 endif

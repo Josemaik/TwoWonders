@@ -12,17 +12,23 @@ void LockSystem::update(EntityManager& em)
         auto& playerPos = playerPhy.position;
         enemies.clear();
 
-        em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy)
+        em.forEachAny<SYSCMPs, SYSTAGs>([&](Entity& e)
         {
-            auto& pos = phy.position;
+            if (e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>())
+                return;
 
-            // Calcula la distancia entre la posición del jugador y la posición del enemigo
-            double distance = playerPos.distance(pos);
+            if (e.hasComponent<PhysicsComponent>())
+            {
+                auto& phy = em.getComponent<PhysicsComponent>(e);
+                auto& pos = phy.position;
 
-            // Si el enemigo se encuentra a menos de 10 unidades de distancia del jugador se inserta en el set
-            if (distance < 25.0)
-                enemies.push_back({ e.getID(), distance });
+                // Calcula la distancia entre la posición del jugador y la posición del enemigo
+                double distance = playerPos.distance(pos);
 
+                // Si el enemigo se encuentra a menos de 10 unidades de distancia del jugador se inserta en el set
+                if (distance < 25.0)
+                    enemies.push_back({ e.getID(), distance });
+            }
         });
 
         // Ordenar de menor a mayor
@@ -48,7 +54,7 @@ void LockSystem::update(EntityManager& em)
 
                 auto& enemy = *em.getEntityByID(li.lockedEnemy);
 
-                if (!enemy.hasTag<EnemyTag>())
+                if (!enemy.hasTag<EnemyTag>() && !enemy.hasTag<DestructibleTag>())
                 {
                     li.lockedEnemy = li.max;
                     inpi.lockOn = false;

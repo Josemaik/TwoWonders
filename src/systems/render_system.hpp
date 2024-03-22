@@ -45,11 +45,13 @@ private:
     void drawCoinBar(GameEngine& engine, EntityManager& em);
     void drawHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
     void drawManaBar(GameEngine& engine, EntityManager& em);
-    void drawAlerts_IA(EntityManager& em, ENGI::GameEngine& engine, double dt);
+    void drawSpellSlots(GameEngine& engine, EntityManager& em);
+    void drawAlerts_IA(EntityManager& em, GameEngine& engine, double dt);
     void loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r);
     void loadShaders(Model& model);
     void drawTextBox(GameEngine& engine, EntityManager& em);
     void displayGif(GameEngine& engine, Texture2D& copy, GameEngine::Gif& gif, int& posX, int& posY);
+    double shakeDouble(double value);
 
     bool isSelected{ false };
     bool isSelectedfordebug{ false }, fullScreen{ false };
@@ -62,6 +64,7 @@ private:
     float elapsed_WASD{ 0.f }, elapsed_limit_WASD{ 50.0f };
     float elapsed_CoinBar{ 0.f }, elapsed_limit_CoinBar{ 5.0f };
     float elapsed_Lock{ 0.f }, elapsed_limit_Lock{ 5.0f };
+    float elapsed_spell{ 0.f }, elapsed_limit_spell{ 5.0f };
 
     int coinBarX{}, coinNumberX{};
 };

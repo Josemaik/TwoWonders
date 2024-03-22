@@ -275,14 +275,6 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
 
     if (behaviorType1 & BehaviorType::PLAYER || behaviorType2 & BehaviorType::PLAYER)
     {
-        // Colision con la meta
-        if (behaviorType1 & BehaviorType::ENDING || behaviorType2 & BehaviorType::ENDING)
-        {
-            auto& li = em.getSingleton<LevelInfo>();
-            li.currentScreen = GameScreen::ENDING;
-            return;
-        }
-
         // Colisiones de enemigos con el jugador
         if (!(behaviorType1 & BehaviorType::SHIELD || behaviorType2 & BehaviorType::SHIELD))
         {
@@ -539,6 +531,17 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
             auto& life = em.getComponent<LifeComponent>(*staticEntPtr);
             life.life = life.maxLife;
             plfi.mana = plfi.max_mana - 3.0;
+
+            if (otherEntPtr->hasComponent<DispatcherComponent>())
+            {
+                auto& dc = em.getComponent<DispatcherComponent>(*otherEntPtr);
+                auto& lc = em.getComponent<ListenerComponent>(*staticEntPtr);
+                for (std::size_t i = 0; i < dc.eventCodes.size(); i++)
+                {
+                    evm->scheduleEvent(Event{ static_cast<EventCodes>(dc.eventCodes[i]) });
+                    lc.addCode(static_cast<EventCodes>(dc.eventCodes[i]));
+                }
+            }
         }
 
         return;
@@ -580,6 +583,18 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         }
         auto& li = em.getSingleton<LevelInfo>();
         li.insertDeath(otherEntPtr->getID());
+        return;
+    }
+
+    // Colision con la meta
+    if (behaviorType2 & BehaviorType::ENDING)
+    {
+        auto& li = em.getSingleton<LevelInfo>();
+        li.currentScreen = GameScreen::ENDING;
+        em.destroyComponent<AttackComponent>(*staticEntPtr);
+        auto& lif = em.getComponent<LifeComponent>(*staticEntPtr);
+        lif.maxLife = 7;
+        lif.life = 7;
         return;
     }
 }
@@ -677,6 +692,19 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
             if (!balalaunchedbyspider)
             {
                 auto& li = em.getComponent<LifeComponent>(*ent2Ptr);
+                int damage = 2;
+
+                if (balaCol.behaviorType & BehaviorType::ATK_PLAYER)
+                {
+                    auto& plfi = em.getSingleton<PlayerInfo>();
+                    damage = plfi.currentSpell.damage;
+
+                    if (ent1Ptr->hasComponent<ObjectComponent>())
+                        damage = static_cast<int>(damage * 2.0);
+
+                    if (damage == 0)
+                        damage = 2;
+                }
 
                 if (li.invulnerable)
                     return;
@@ -685,13 +713,13 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                     (typeBala == ElementalType::Ice && typeEnemyPlayer == ElementalType::Water) ||
                     (typeBala == ElementalType::Water && typeEnemyPlayer == ElementalType::Fire))
                 {
-                    li.decreaseLife(3);
+                    li.decreaseLife(static_cast<int>(damage * 1.5));
                 }
                 else if (typeBala == ElementalType::Neutral)
-                    li.decreaseLife(2);
+                    li.decreaseLife(damage);
                 else
                 {
-                    li.decreaseLife(1);
+                    li.decreaseLife(damage / 2);
                     if (balaCol.attackType & AttackType::GollemAttack) {
                         em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
                     }

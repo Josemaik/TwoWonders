@@ -49,6 +49,12 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // Diálogo Siguiente HUD
     loadAndResizeImage("sig", "assets/HUD/dialog_siguiente.png");
 
+    // Espacio para hechizos de agua HUD
+    loadAndResizeImage("agua_holder", "assets/HUD/item_agua.png");
+
+    // Icono para las pompas de agua HUD
+    loadAndResizeImage("pompas", "assets/HUD/pompas.png", 1.5, 1.5);
+
     // NÚMEROS
     //
     loadAndResizeImage("0", "assets/HUD/numeros/0.png");
