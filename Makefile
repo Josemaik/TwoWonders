@@ -1,13 +1,14 @@
 APP		   	:= TwoWonders
-CC         	:= g++
 CCFLAGS    	:= -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
 
 ifeq ($(OS),Windows_NT)
+	CC 	   		:= g++
 	CCACHE 	   	:=
     LIBS 	   	:= -L./ libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll -lwinmm -lgdi32
 	SANITIZE   	:=
 	LIBS_COPY  	:= libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll libs/libstdc++-6.dll libs/libgcc_s_seh-1.dll libs/libwinpthread-1.dll
 else
+	CC 		   	:= g++-12
 	CCACHE 	   	:= ccache
     LIBS 		:= -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so
 	SANITIZE   	:= -fsanitize=address,undefined

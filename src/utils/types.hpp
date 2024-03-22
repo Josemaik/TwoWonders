@@ -28,15 +28,16 @@
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
 #include "../utils/Item.hpp"
+
 //singelton
-#include "../utils/sngtn/player_info.hpp"
-#include "../utils/sngtn/blackboard.hpp"
-#include "../utils/sngtn/debug_singleton.hpp"
-#include "../utils/sngtn/level_info.hpp"
-#include "../utils/sngtn/input_info.hpp"
-#include "../utils/sngtn/text_info.hpp"
-#include "../utils/sngtn/navmesh_info.hpp"
-#include "../utils/sngtn/zonecheck_info.hpp"
+#include "./sngtn/player_info.hpp"
+#include "./sngtn/blackboard.hpp"
+#include "./sngtn/debug_singleton.hpp"
+#include "./sngtn/level_info.hpp"
+#include "./sngtn/input_info.hpp"
+#include "./sngtn/text_info.hpp"
+#include "./sngtn/navmesh_info.hpp"
+#include "./sngtn/zonecheck_info.hpp"
 
 // GameData
 #include "../utils/sngtn/GameData.hpp"
