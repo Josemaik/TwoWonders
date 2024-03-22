@@ -56,6 +56,7 @@ void SoundSystem::playAmbient() {
     FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
     FMOD_Studio_System_Update(soundSystem);
     play();
+    update();
 }
 
 void SoundSystem::sonido_mazmorra() {
@@ -64,6 +65,7 @@ void SoundSystem::sonido_mazmorra() {
     FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
     FMOD_Studio_System_Update(soundSystem);
     play();
+    update();
 }
 
 
@@ -263,7 +265,7 @@ void SoundSystem::music_stop() {
 }
 void SoundSystem::ambient_stop() {
     FMOD_Studio_EventInstance_Stop(eventInstance_Ambiente, FMOD_STUDIO_STOP_ALLOWFADEOUT);
-    //update();
+    // update();
 }
 
 void SoundSystem::SFX_stop() {

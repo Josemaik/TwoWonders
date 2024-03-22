@@ -10,17 +10,19 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
         switch (mapID)
         {
         case 0:
+        {
             li.mapID = 0;
             map = loadMap("assets/levels/maps/lvl_0.kaiwa");
             em.getSingleton<SoundSystem>().playAmbient();
             break;
-
+        }
         case 1:
+        {
             li.mapID = 1;
             map = loadMap("assets/levels/maps/lvl_1.kaiwa");
             em.getSingleton<SoundSystem>().sonido_mazmorra();
             break;
-
+        }
         case 2:
             li.mapID = 2;
             map = loadMap("assets/levels/caves_level.json");

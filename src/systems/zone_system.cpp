@@ -22,6 +22,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                     {
                         map.changeMap(em, 1, iam);
                         li.transition = true;
+                        em.getSingleton<SoundSystem>().ambient_stop();
 
                         p.position = { 7.0, 22.0, -21.0 };
                         break;
