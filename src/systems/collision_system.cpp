@@ -630,13 +630,13 @@ void CollisionSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, Physic
         double angle = atan2(det, dot); // atan2(y, x) o atan2(sin, cos)
 
         // Convertir el ángulo a grados
-        double angleDeg = angle * 180 / M_PI;
+        double angleDeg = angle * 180 / K_PI;
 
         // Si el ángulo es menor de 20 grados, ajustar la dirección del jugador
         if (std::abs(angleDeg) < 20)
         {
             // Rotar la dirección del jugador 45 grados en la dirección contraria
-            double angleRad = -135 * M_PI / 180; // Convertir a radianes
+            double angleRad = -135 * K_PI / 180; // Convertir a radianes
             double cosAngle = cos(angleRad);
             double sinAngle = sin(angleRad);
             vec3d newDir = { dir.x() * cosAngle - dir.z() * sinAngle, 0.0, dir.x() * sinAngle + dir.z() * cosAngle };

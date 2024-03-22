@@ -272,7 +272,7 @@ struct vec3D
     // Devuelve el ángulo entre dos vectores en grados
     constexpr DataT angleDeg(vec3D const& rhs) const
     {
-        return angle(rhs) * 180 / M_PI;
+        return angle(rhs) * 180 / 3.14159265358979323846;
     }
 
     constexpr DataT distance(vec3D const& rhs) const
