@@ -10,8 +10,8 @@ double calculatePointDistance(vec3d const& target, vec3d const& origin) {
 }
 
 // void adjustAnglePiMinusPi(double& angle){
-//       while      ( angle >  PI ) angle -= 2*PI;
-//       while      ( angle < -PI ) angle += 2*PI;
+//       while      ( angle >  K_PI ) angle -= 2*K_PI;
+//       while      ( angle < -K_PI ) angle += 2*K_PI;
 // }
 
 // Steer_t velocity_match(PhysicsComponent const& phy,double const target_v, double const time2arrive) {
@@ -37,7 +37,7 @@ double calculatePointDistance(vec3d const& target, vec3d const& origin) {
 //         auto distx { target.x() - phy.position.x() };
 //         auto distz { target.z() - phy.position.z() };
 //         auto target_orientation { std::atan2(distz,distx) };
-//         if( target_orientation < 0 ) target_orientation += 2*PI;
+//         if( target_orientation < 0 ) target_orientation += 2*K_PI;
 
 //         // Align and Set angular velocity 
 //         auto angular_distance = target_orientation - phy.orientation;
@@ -85,6 +85,11 @@ Steer_t STBH::Seek(PhysicsComponent const& phy, vec3d const& target) {
         // auto acceleration { phy.kMaxVLin / (1 + angular_velocity_size) };
         steering.v_x = std::clamp((target.x() - phy.position.x()), -phy.max_speed, phy.max_speed);
         steering.v_z = std::clamp((target.z() - phy.position.z()), -phy.max_speed, phy.max_speed);
+
+        // Cambiamos la orientación del objeto para que mire hacia el objetivo
+        vec3d dir = target - phy.position;
+        steering.orientation = atan2(dir.x(), dir.z());
+
         // steering.v_x = std::clamp(distance.x(), -phy.max_speed, phy.max_speed);
         // steering.v_z = std::clamp(distance.z(), -phy.max_speed, phy.max_speed);
         return steering;

@@ -462,7 +462,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     vec3d rotationVec{ json["rotVector"][1].GetDouble(), json["rotVector"][2].GetDouble(), json["rotVector"][0].GetDouble() };
     double orientation{ json["rotation"].GetDouble() };
     vec3d scale = { json["scale"][0].GetDouble(), json["scale"][1].GetDouble(), json["scale"][2].GetDouble() };
-    Color color = { static_cast<u_char>(json["color"][0].GetUint()), static_cast<u_char>(json["color"][1].GetUint()), static_cast<u_char>(json["color"][2].GetUint()), static_cast<u_char>(json["color"][3].GetUint()) };
+    Color color = { static_cast<unsigned char>(json["color"][0].GetUint()), static_cast<unsigned char>(json["color"][1].GetUint()), static_cast<unsigned char>(json["color"][2].GetUint()), static_cast<unsigned char>(json["color"][3].GetUint()) };
     double max_speed = json["max_speed"].GetDouble();
     int life = json["life"].GetInt();
     int type = json["type"].GetInt();
@@ -630,10 +630,11 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* a_a_6 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee, vec3d{});
         auto* sequence0 = &tree.createNode<BTNodeSequence_t>(d_p_h, d_s_1, a_a_6);
 
+        auto* d_1_7 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* d_ra = &tree.createNode<BTDecisionReadyforAttack>();
         auto* a_as = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer, vec3d{}); // fail si disparo succes si no disparo
         auto* d_or = &tree.createNode<BTDecisionOnAttackRadius>();
-        auto* sequence1 = &tree.createNode<BTNodeSequence_t>(d_ra, a_as, d_or);
+        auto* sequence1 = &tree.createNode<BTNodeSequence_t>(d_1_7, d_ra, a_as, d_or);
 
         auto* d_1_6 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* a_s_6 = &tree.createNode<BTAction_Seek>();
@@ -654,7 +655,8 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         tree.createNode<BTAction_Pendulum>();
     }
           break;
-    case 6: em.addTag<DummyTag>(e);
+    case 6:
+        em.addTag<DummyTag>(e);
         break;
     case 7: em.addTag<AngryBushTag2>(e); tree.createNode<BTAction_Patrol>();
         break;
@@ -710,7 +712,7 @@ void Ia_man::createBossFinalFase2(EntityManager& em, const mapType& map) {
 //Generación de subditos
 vec3d Ia_man::getRandomPosAroundBoss(double radio, const vec3d& spawnerPos) {
     // Generar un ángulo aleatorio en radianes
-    double angle = ((double)rand() / RAND_MAX) * 2 * M_PI;
+    double angle = ((double)rand() / RAND_MAX) * 2 * K_PI;
     // Generar una distancia aleatoria dentro del radio
     double distance = ((double)rand() / RAND_MAX) * radio;
     // Calcular las coordenadas x e y a partir del ángulo y la distancia

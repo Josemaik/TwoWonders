@@ -34,15 +34,16 @@ struct Game
     void run();
 
 private:
-    void createEntities(EntityManager& em);
-    void createSword(EntityManager& em);
-    void createShield(EntityManager& em, Entity& ent);
-    void createCoin(EntityManager& em);
-    void createShop(EntityManager& em);
-    void createEnding(EntityManager& em);
-    void resetGame(EntityManager& em, GameEngine& engine, RenderSystem& rs);
-    void createSound(EntityManager& em);
-    void createPlayer(EntityManager& em, Entity player);
+    void createEntities();
+    void createSword();
+    void createShield(Entity& ent);
+    void createCoin();
+    void createShop();
+    void createEnding();
+    void createSound();
+    void resetGame();
+    void resetDeath();
+    Shader createShader();
 
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};
@@ -62,7 +63,6 @@ private:
     ShieldSystem shield_system{};
     EventSystem event_system{};
     MapManager map{};
-    SoundSystem sound_system{};
     CameraSystem camera_system{};
     LockSystem lock_system{};
 };

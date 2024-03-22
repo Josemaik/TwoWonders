@@ -12,6 +12,8 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
     static constexpr float cameraFovyCinematic = 40.f;
 
     auto& li = em.getSingleton<LevelInfo>();
+    if (li.isDead)
+        return;
 
     // Velocidad de la transición
     float t = 0.1f;
@@ -73,6 +75,11 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
         cameraTar = li.viewPoint;
         cameraFovy = cameraFovyCinematic;
 
+        if( li.viewPointSound)
+        {
+            em.getSingleton<SoundSystem>().sonido_movimiento_camara();
+            li.viewPointSound = false;
+        }
         // La cinematica se desactiva cuando pasan 4 segundos
         viewPointTime += dt;
         if (viewPointTime >= viewPointLimit)

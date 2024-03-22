@@ -2,14 +2,28 @@
 #ifndef MAP_MANAGER
 #define MAP_MANAGER
 
+#include <map>
 #include "../utils/types.hpp"
 #include "ia_manager.hpp"
+#include "../utils/pf/Graph.hpp"
+
+enum struct LoadState
+{
+    LOAD_GROUND,
+    LOAD_WALLS,
+    LOAD_RAMPS_INTERACTABLES,
+    LOAD_OBJECTS_ENEMIES,
+    LOAD_NAVMESHES,
+    LOAD_COMPLETE
+};
 
 struct MapManager
 {
     void createMap(EntityManager& em, uint8_t mapID, Ia_man& iam);
     void reset(EntityManager& em, uint8_t mapID, Ia_man& iam);
+    void changeMap(EntityManager& em, uint8_t mapID, Ia_man& iam);
     void spawnReset(EntityManager& em, Ia_man& iam);
+    bool isComplete() const { return state == LoadState::LOAD_COMPLETE; }
 
     template <typename... Tags>
     inline void resetParts(EntityManager& em)
@@ -20,19 +34,29 @@ struct MapManager
         // Luego, resetea cada parte
         (resetTag<Tags>(em), ...);
     }
-  
-  private:
+
+private:
     mapType loadMap(const std::string& path);
     void destroyMap(EntityManager& em);
     void generateMapFromJSON(EntityManager& em, const mapType& map, Ia_man& iam);
-    void generateChunkFromJSON(EntityManager& em, const rapidjson::Value& chunk, Ia_man& iam, uint8_t mapID, int& j);
-    void generateGround(EntityManager& em, const rapidjson::Value& groundArray, int& j);
-    void generateWalls(EntityManager& em, const rapidjson::Value& wallArray);
-    void generateRamps(EntityManager& em, const rapidjson::Value& rampArray);
-    void generateDestructibles(EntityManager& em, const rapidjson::Value& destructibleArray);
-    void generateObjects(EntityManager& em, const rapidjson::Value& objectArray, uint8_t mapID);
-    void generateEnemies(EntityManager& em, const rapidjson::Value& enemyArray, Ia_man& iam);
-    void generateInteractables(EntityManager& em, const rapidjson::Value& interactableArray);
+    void generateChunkFromJSON(EntityManager& em, const valueType& chunk, Ia_man& iam, uint8_t mapID, rapidjson::SizeType& i, int& j);
+    void generateChunkModel(EntityManager& em, rapidjson::SizeType& i);
+    void generateGround(EntityManager& em, const valueType& groundArray, int& j);
+    void generateWalls(EntityManager& em, const valueType& wallArray);
+    void generateRamps(EntityManager& em, const valueType& rampArray);
+    void generateObjects(EntityManager& em, const valueType& objectArray, uint8_t mapID);
+    void generateEnemies(EntityManager& em, const valueType& enemyArray, Ia_man& iam);
+    void generateNPCs(EntityManager& em, const valueType& npcArray);
+    void generateInteractables(EntityManager& em, const valueType& interactableArray);
+    void generateNavmeshes(EntityManager& em);
+    void addToZone(EntityManager& em, Entity& e, InteractableType type);
+    void checkDispatcher(EntityManager& em, Entity& e, const valueType& value);
+
+    std::string fileMap{};
+    std::map<uint8_t, BBox> zoneBounds{};
+    LoadState state{ LoadState::LOAD_GROUND };
+    mapType map{};
+    uint8_t unique_ids{ 0 };
 
     template <typename... Tags>
     void destroyParts(EntityManager& em)
@@ -40,18 +64,13 @@ struct MapManager
         using CMPS = MP::TypeList<>;
         auto& li = em.getSingleton<LevelInfo>();
 
-        (em.forEachAny<CMPS, Tags>([&](Entity& entity) { li.dead_entities.insert(entity.getID()); }), ...);
+        (em.forEachAny<CMPS, Tags>([&](Entity& entity) { li.insertDeath(entity.getID()); }), ...);
     }
 
     template <typename Tag>
     inline void resetTag(EntityManager&) {}
     template <typename Tag>
     inline void resetTag(EntityManager& em, Ia_man& iam) {}
-
-
-
-    vec3d groundPos{};
-    std::string fileMap{};
 };
 
 #endif // !MAP_MANAGER

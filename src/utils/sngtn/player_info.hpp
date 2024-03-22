@@ -11,15 +11,16 @@ struct PlayerInfo
 
     double increaseLife{ 0.0 };
     uint16_t coins{}, bombs{}, max_bombs{ 8 };
+    float elapsed_limit_coins{ 5.0f }, elapsed_coins{ elapsed_limit_coins };
     double max_mana{ 100.0 }, mana{ max_mana };
     int mana_width{}, armor{};
-    bool hasKey{ true };
+    bool hasKey{ false };
     bool hasStaff{ false };
+    bool onSpawn{ false };
     std::vector<std::unique_ptr<Item>> inventory{};
     std::vector<Spell> spells{};
     Spell currentSpell{ "None", "No spell", Spells::None, 0.0, 0 };
     std::size_t selectedItem{ max };
-    bool isDead{ false };
     vec3d spawnPoint{};
 
     void addSpell(Spell spell) { spells.push_back(spell); currentSpell = spell; }
@@ -51,9 +52,12 @@ struct PlayerInfo
         return it->get();
     }
 
-    void addCoin() { coins += 5; }
+    void addCoin(uint16_t add)
+    {
+        coins += add;
+        elapsed_coins = 0.0f;
+    }
     void addKey() { hasKey = true; }
-    void add30Coins() { coins += 30; }
     void addBomb() {
         if (bombs < max_bombs)
             bombs += 3;
@@ -97,13 +101,26 @@ struct PlayerInfo
 
     void decreaseBomb() { if (bombs > 0) bombs -= 1; }
 
+    void onDeath()
+    {
+        mana = max_mana;
+        armor = 0;
+    }
+
     void reset()
     {
+        currentSpell = { "None", "No spell", Spells::None, 0.0, 0 };
+        selectedItem = max;
+        inventory.clear();
+        spells.clear();
+        increaseLife = 0.0;
+        armor = 0;
         coins = 0;
         bombs = 0;
         max_mana = 100.0;
         mana = max_mana;
         mana_width = 0;
         hasKey = false;
+        spawnPoint = { 33.0, 4.0, -25.9 };
     }
 };

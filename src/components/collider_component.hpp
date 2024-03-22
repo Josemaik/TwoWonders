@@ -19,7 +19,9 @@ enum BehaviorType
     SPIDERWEB = 0x400,
     WARNINGZONE = 0x800,
     METEORITE = 0X1000,
-    AREADAMAGECRUSHER = 0x2000
+    AREADAMAGECRUSHER = 0x2000,
+    SPAWN = 0x4000,
+    RAMP = 0x8000,
 };
 
 struct ColliderComponent

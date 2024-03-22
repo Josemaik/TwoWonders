@@ -23,6 +23,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
             else if (ent.hasTag<PlayerTag>())
             {
                 auto& plfi = em.getSingleton<PlayerInfo>();
+                em.getSingleton<SoundSystem>().sonido_recibir_danyo();
                 if (plfi.armor > 0)
                 {
                     lif.life += lif.lifeLost;
@@ -35,6 +36,14 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                     }
                 }
             }
+            else if (ent.hasTag<DummyTag>() || ent.hasTag<DestructibleTag>())
+            {
+                em.getSingleton<SoundSystem>().sonido_dummy_golpe();
+            }
+            else if (ent.hasTag<CrusherTag>())
+            {
+                em.getSingleton<SoundSystem>().sonido_apisonadora_danyo();
+            }
 
             lif.lifeLost = 0;
         }
@@ -45,7 +54,15 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
         {
             // Si es enemigo creamos un objeto
             if (ent.hasTag<EnemyTag>() && !lif.decreaseNextFrame)
-                createObject(em, os, em.getComponent<PhysicsComponent>(ent).position);
+            {
+                auto& phy = em.getComponent<PhysicsComponent>(ent);
+                createObject(em, os, phy.position);
+                em.getSingleton<SoundSystem>().sonido_muerte_enemigo();
+              
+                if (li.playerDetected)
+                    li.enemyToChestPos = phy.position;
+            }
+
             //Si es un slime
             if (ent.hasTag<SlimeTag>())
             {
@@ -102,9 +119,13 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 bb.boss_fase++;
             }
 
+            if (li.lockedEnemy == ent.getID())
+                li.lockedEnemy = li.max;
+
             lif.markedForDeletion = true;
         }
 
+        // Para cuando se recoge una poción de vida
         if (ent.hasTag<PlayerTag>())
         {
             auto& plfi = em.getSingleton<PlayerInfo>();
@@ -118,7 +139,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
         }
 
         if (lif.markedForDeletion && !lif.decreaseNextFrame)
-            li.dead_entities.insert(ent.getID());
+            li.insertDeath(ent.getID());
     });
 }
 

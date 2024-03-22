@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-// #include <utils/path.hpp>
+// #include "../path.hpp"
 // #include "ai_component.hpp"
 
 struct Debug_t {
@@ -10,4 +10,8 @@ struct Debug_t {
     double elapsed{1.0},countdown{2.0};
     void plusdeltatime(double deltaTime, double& elapsed) { elapsed += deltaTime; };
     const char *text{};
+    std::vector<vec3d> path{};
+    //start node
+    float startnode{0.0f};
+    float goalnode{0.0f};
 };

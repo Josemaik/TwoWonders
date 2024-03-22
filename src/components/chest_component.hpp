@@ -4,8 +4,6 @@
 
 struct ChestComponent
 {
-    uint8_t id{};
-    uint16_t zone{};
     bool isOpen{ false };
 
     vec3d dropPosition{};

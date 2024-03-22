@@ -18,7 +18,11 @@ enum EventCodes : uint16_t
     SetSpawn,
     OpenDoor,
     SpawnWallLevel0,
-    ViewPointCave
+    ViewPointCave,
+    NPCDialog,
+    DialogPrisonNomad1,
+    DialogPrisonNomad2,
+    DialogFirstSpawn
 };
 
 struct Event {
@@ -34,9 +38,10 @@ public:
     }
 
     // Dispara todos los eventos pendientes
-    void dispatchEvents(EntityManager& em, MapManager& mm, Ia_man& iam, ObjectSystem& os) {
+    void dispatchEvents(EntityManager& em, MapManager& mm, Ia_man& iam, ObjectSystem& os, SoundSystem& ss) {
         // Recorre todos los eventos pendientes
-        while (!events.empty()) {
+        bool out = false;
+        while (!events.empty() && !out) {
             // Obtiene el siguiente evento y lo elimina de la cola
             Event& event = events.back();
             events.pop_back();
@@ -72,6 +77,8 @@ public:
                         auto& chest = *em.getEntityByID(li.chestToOpen);
                         auto& cc = em.getComponent<ChestComponent>(chest);
 
+                        ss.sonido_abrir_cofre();
+
                         os.addObject(cc.content, playerPos);
                         auto& msgs = cc.messages;
                         while (!msgs.empty())
@@ -81,6 +88,7 @@ public:
                         }
 
                         li.chestToOpen = li.max;
+                        li.openChest = true;
 
                         if (chest.hasComponent<DispatcherComponent>())
                         {
@@ -93,19 +101,12 @@ public:
                             }
                         }
 
+
                         break;
                     }
                     case EventCodes::SetSpawn:
                     {
-                        auto& plfi = em.getSingleton<PlayerInfo>();
-                        auto& playerPos = em.getComponent<PhysicsComponent>(e).position;
-                        plfi.spawnPoint = playerPos;
-                        auto& life = em.getComponent<LifeComponent>(e);
-                        life.life = life.maxLife;
-                        plfi.mana = plfi.max_mana - 3.0;
-
                         mm.spawnReset(em, iam);
-
                         break;
                     }
                     case EventCodes::OpenDoor:
@@ -113,8 +114,10 @@ public:
                         auto& li = em.getSingleton<LevelInfo>();
                         auto& plfi = em.getSingleton<PlayerInfo>();
 
+                        ss.sonido_abrir_puerta();
+
                         plfi.hasKey = false;
-                        li.dead_entities.insert(li.doorToOpen);
+                        li.insertDeath(li.doorToOpen);
                         break;
                     }
                     case EventCodes::SpawnWallLevel0:
@@ -122,8 +125,9 @@ public:
                         auto& e{ em.newEntity() };
                         em.addTag<BarricadeTag>(e);
                         em.addTag<WallTag>(e);
-                        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = { -37.852, 7.0, 139.238 }, .scale = { 19.127, 10.0, 15.979 }, .color = DARKBROWN, .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, 1.0, 0.0 } });
-                        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0, .orientation = r.orientation, .rotationVec = r.rotationVec });
+                        em.addTag<SeparateModelTag>(e);
+                        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = vec3d::zero(), .scale = vec3d::zero(), .color = DARKBROWN, .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, -1.0, 0.0 } });
+                        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { -37.852, 7.0, 139.238 }, .scale = { 19.127, 10.0, 15.979 }, .gravity = 0, .orientation = r.orientation, .rotationVec = r.rotationVec });
                         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, p.scale, BehaviorType::STATIC });
                         break;
                     }
@@ -131,6 +135,91 @@ public:
                     {
                         auto& li = em.getSingleton<LevelInfo>();
                         li.viewPoint = { -100.554, 4.935, 145.0 };
+                        li.viewPointSound = true;
+                        break;
+                    }
+                    case EventCodes::DialogPrisonNomad1:
+                    {
+                        auto& txti = em.getSingleton<TextInfo>();
+
+                        std::array<std::string, 9> msgs =
+                        {
+                            "Nómada: \nSaludos, no esperaba encontrarme a un \naprendiz de mago por aquí.",
+                            "Mago: \nBuenas! Sabes qué son todos estos enemigos?\nNo aparecían en los libros que estudié.",
+                            "Nómada: \nCuanto más se debilita la barrera más enemigos \nentran al mundo, cosa del viejo.",
+                            "Mago: \n¿Qué viejo?",
+                            "Nómada: \nEl pellejo.",
+                            "Mago: \nEspera, ¿¿no será el gran mago??",
+                            "Nómada: \nEse mismo",
+                            "Mago: \nEse es mi maestro! \nMe abandonó y me encomendó que lo encontrara.",
+                            "Nómada: \nSi eres el aprendiz del viejo sabrás utilizar esto."
+                        };
+
+                        // Metemos el texto en el array de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        em.getComponent<ListenerComponent>(e).addCode(EventCodes::DialogPrisonNomad2);
+                        events.push_back(Event{ EventCodes::DialogPrisonNomad2 });
+                        out = true;
+                        break;
+                    }
+                    case EventCodes::DialogPrisonNomad2:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        auto& txti = em.getSingleton<TextInfo>();
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+
+                        std::array<std::string, 2> msgs =
+                        {
+                            "¡Haz recibido un pergamino con la formulación \npara crear una pompa de agua!",
+                            "Nómada: \nCon esto podremos salir de aquí por si disparas a esa puerta. \nLos muñecos de por medio te servirán de práctica."
+                        };
+
+                        // Le damos el hechizo
+                        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 4 };
+                        plfi.addSpell(spell);
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        li.viewPoint = { -84.847, 8.0, 234.267 };
+
+                        break;
+                    }
+                    case EventCodes::NPCDialog:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        if (li.npcToTalk == li.max)
+                            break;
+
+                        auto& npc = *em.getEntityByID(li.npcToTalk);
+                        auto& dc = em.getComponent<DispatcherComponent>(npc);
+                        auto& lc = em.getComponent<ListenerComponent>(e);
+
+                        for (std::size_t i = 0; i < dc.eventCodes.size(); i++)
+                        {
+                            scheduleEvent(Event{ static_cast<EventCodes>(dc.eventCodes[i]) });
+                            lc.addCode(static_cast<EventCodes>(dc.eventCodes[i]));
+                        }
+
+                        li.npcToTalk = li.max;
+                        break;
+                    }
+                    case EventCodes::DialogFirstSpawn:
+                    {
+                        auto& txti = em.getSingleton<TextInfo>();
+
+                        std::array<std::string, 2> msgs =
+                        {
+                            "Este parece un buen lugar para descansar...",
+                            "Te sientes revitalizado."
+                        };
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
                         break;
                     }
                     }
