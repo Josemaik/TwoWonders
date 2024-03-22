@@ -5,7 +5,7 @@
 
 struct BTDecisionSubditosAlreadyGenerated : BTNode_t {
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
-        ectx.ai.bh = "subditos already generated?";
+        ectx.ai->bh = "subditos already generated?";
         // comprobar radio de cura
         //obtenemos blackboard
         auto& bb = ectx.em.getSingleton<BlackBoard_t>();
