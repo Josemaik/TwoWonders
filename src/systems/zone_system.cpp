@@ -3,31 +3,19 @@
 void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, EventManager& evm, MapManager& map, const float&) {
     auto& li = em.getSingleton<LevelInfo>();
 
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, ZoneComponent& zon)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, ZoneComponent& zon)
     {
         if (zon.changeZone) {
 
             // Comprobar en que zona estamos
             if (li.num_zone != zon.zone) {
-                // crear una funcion que devuelva un Evento
-                //Crear enemigos de la zona nueva
-                // if(!iam.checkEnemiesCreaeted(zon.zone)){
-                // }
-                //lanzar evento
-                // evm.scheduleEvent(Event{ EVENT_CODE_CHANGE_ZONE });
-                //borro enemigos si cambio de zona
-                // iam.createEnemiesZone(em, zon.zone);
-                // Es una zona
                 auto* playerEn = em.getEntityByID(li.playerID);
                 auto& p = em.getComponent<PhysicsComponent>(*playerEn);
 
                 li.num_zone = zon.zone;
-                switch (zon.zone)
+
+                if (e.hasTag<LevelChangeTag>())
                 {
-
-                    // SWORD //
-
-                case 12: // TP a la cueva de la espada
                     switch (li.mapID)
                     {
                     case 0:
@@ -35,83 +23,16 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         map.changeMap(em, 1, iam);
                         li.transition = true;
 
-                        p.position = { 35.0, 22.0, -23.0 };
+                        p.position = { 7.0, 22.0, -21.0 };
+                        break;
+                    }
+                    case 1:
+                    {
+                        li.currentScreen = GameScreen::ENDING;
                         break;
                     }
 
                     }
-                    break;
-
-                    // case 15: // TP desde la cueva de la espada
-                    //     map.reset(em, 0, iam);
-                    //     li.transition = true;
-
-                    //     p.position.setX(-5.0);
-                    //     p.position.setZ(-4.5);
-                    //     break;
-
-                    //     // COINS //
-
-                    // case 16: // TP a la cueva de las monedas
-                    //     map.reset(em, 2, iam);
-                    //     li.transition = true;
-
-                    //     p.position.setX(71.0);
-                    //     p.position.setZ(85.0);
-                    //     break;
-
-                    // case 17: // TP desde la cueva de las monedas
-                    //     map.reset(em, 0, iam);
-                    //     li.transition = true;
-
-                    //     p.position.setX(3.0);
-                    //     p.position.setZ(-20.0);
-                    //     break;
-
-                    //     // SHOP //
-
-                    // case 18: // TP a la cueva de la tienda
-                    //     map.reset(em, 2, iam);
-                    //     li.transition = true;
-
-                    //     p.position.setX(93.0);
-                    //     p.position.setY(0.0);
-                    //     p.position.setZ(85.0);
-                    //     break;
-
-                    // case 19: // TP desde la cueva de la tienda
-                    //     map.reset(em, 0, iam);
-                    //     li.transition = true;
-
-                    //     p.position.setX(-17.0);
-                    //     p.position.setY(2.0);
-                    //     p.position.setZ(-20.0);
-                    //     break;
-
-                    //     // MAZMORRA //
-
-                    // case 20: // TP a la cueva de la mazmorra
-                    //     li.cameraChange = true;
-
-                    //     map.reset(em, 1, iam);
-                    //     li.transition = true;
-
-                    //     p.position.setX(61.0);
-                    //     p.position.setZ(-65.0);
-                    //     break;
-
-                    // case 21: // TP desde la cueva de la mazmorra
-                    //     li.cameraChange = false;
-
-                    //     map.reset(em, 0, iam);
-                    //     li.transition = true;
-
-                    //     p.position.setX(-50.0);
-                    //     p.position.setZ(-3.5);
-                    //     break;
-
-                default:
-                    break;
                 }
             }
 
@@ -152,6 +73,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     checkZones(em, evm, zchi.getChestZones(), [&](EntityManager& em, EventManager& evm) { checkChests(em, evm); });
     checkZones(em, evm, zchi.getLeverZones(), [&](EntityManager& em, EventManager& evm) { checkLevers(em, evm); });
     checkZones(em, evm, zchi.getDoorZones(), [&](EntityManager& em, EventManager& evm) { checkDoors(em, evm); });
+    checkZones(em, evm, zchi.getNpcZones(), [&](EntityManager& em, EventManager& evm) { checkNPCs(em, evm); });
 }
 
 void ZoneSystem::checkZones(EntityManager& em, EventManager& evm, checkType zones, checkFuncType checkFunction)
@@ -209,6 +131,7 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
                 li.chestToOpen = e.getID();
                 evm.scheduleEvent(Event{ EventCodes::OpenChest });
                 li.dontLoad.insert(pair);
+                em.getSingleton<SoundSystem>().sonido_interaccion_e();
                 inpi.interact = false;
             }
         }
@@ -255,6 +178,9 @@ void ZoneSystem::checkLevers(EntityManager& em, EventManager& evm)
                 li.dontLoad.insert(pair);
                 inpi.interact = false;
                 openDoorsZone(em, evm, phy.position);
+
+                // FIXME: Crashea el juego
+                // em.getSingleton<SoundSystem>().sonido_palanca();
             }
         }
     });
@@ -325,6 +251,9 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
         {
             li.doorToOpen = e.getID();
             evm.scheduleEvent(Event{ EventCodes::OpenDoor });
+            em.getSingleton<SoundSystem>().sonido_interaccion_e();
+
+            inpi.interact = false;
         }
     });
 }
@@ -371,6 +300,44 @@ void ZoneSystem::checkTutorialEnemies(EntityManager& em)
     // Si el jugador se choca con el primer golem, se le va a señalar el cofre con el bastón
     // if (!playerEnt.hasComponent<AttackComponent>() && playerPhy.stopped)
     //     li.viewPoint = { -33.714, 7.0, -43.494 };
+}
+
+void ZoneSystem::checkNPCs(EntityManager& em, EventManager& evm)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& playerEnt = *em.getEntityByID(li.playerID);
+    auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
+    auto& playerPos = playerPhy.position;
+    using noCMP = MP::TypeList<PhysicsComponent, InteractiveComponent, OneUseComponent>;
+    using npcTag = MP::TypeList<NPCTag>;
+
+    em.forEach<noCMP, npcTag>([&](Entity& e, PhysicsComponent& phy, InteractiveComponent& ic, OneUseComponent& ouc)
+    {
+        // Revisamos si ya se ha hablado con el npc
+        std::pair<uint8_t, uint8_t> pair{ li.mapID, ouc.id };
+
+        if (li.dontLoad.find(pair) != li.dontLoad.end())
+            return;
+
+        double distance = playerPos.distance(phy.position);
+        double range = 7.0;
+        if (distance < range && !ic.showButton && !li.playerDetected)
+            ic.showButton = true;
+
+        else if (distance > range && ic.showButton)
+            ic.showButton = false;
+
+        auto& inpi = em.getSingleton<InputInfo>();
+
+        if (inpi.interact && ic.showButton && !li.playerDetected)
+        {
+            li.dontLoad.insert(pair);
+            li.npcToTalk = e.getID();
+            inpi.interact = false;
+            ic.showButton = false;
+            evm.scheduleEvent(Event{ EventCodes::NPCDialog });
+        }
+    });
 }
 
 // void ZoneSystem::checkDungeonSlimes(EntityManager& em, EventManager& evm)

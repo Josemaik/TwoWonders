@@ -4,6 +4,7 @@
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
 #include "../systems/sound_system.hpp"
+#include "../utils/pf/Graph.hpp"
 
 struct RenderSystem
 {
@@ -15,6 +16,7 @@ struct RenderSystem
 
     void update(EntityManager& em, GameEngine& engine, double dt);
 
+
     void drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawLogoKaiwa(GameEngine& engine);
     void drawOptions(GameEngine& engine, EntityManager& em, SoundSystem& ss);
@@ -24,9 +26,10 @@ struct RenderSystem
     void unloadModels(EntityManager& em, GameEngine& engine);
     void drawEditorInGameIA(GameEngine& engine, EntityManager& em);
     void drawDebuggerInGameIA(GameEngine& engine, EntityManager& em, double dt);
+    void drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& em);
     void drawRay(vec3d origin, vec3d end);
     void drawVisionCone(vec3d pos_enemy, double orientation, double horizontalFOV);
-    void drawPauseMenu(GameEngine& engine, EntityManager& em, SoundSystem& ss);
+    void drawPauseMenu(GameEngine& engine, EntityManager& em);
     void drawInventory(GameEngine& engine, EntityManager& em);
     void drawItemDescription(GameEngine& engine, EntityManager& em, Item& item);
     void setShader(Shader& shader) { shaderPtr = &shader; }
@@ -42,11 +45,13 @@ private:
     void drawCoinBar(GameEngine& engine, EntityManager& em);
     void drawHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
     void drawManaBar(GameEngine& engine, EntityManager& em);
-    void drawAlerts_IA(EntityManager& em, ENGI::GameEngine& engine, double dt);
+    void drawSpellSlots(GameEngine& engine, EntityManager& em);
+    void drawAlerts_IA(EntityManager& em, GameEngine& engine, double dt);
     void loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r);
     void loadShaders(Model& model);
     void drawTextBox(GameEngine& engine, EntityManager& em);
     void displayGif(GameEngine& engine, Texture2D& copy, GameEngine::Gif& gif, int& posX, int& posY);
+    double shakeDouble(double value);
 
     bool isSelected{ false };
     bool isSelectedfordebug{ false }, fullScreen{ false };
@@ -59,6 +64,7 @@ private:
     float elapsed_WASD{ 0.f }, elapsed_limit_WASD{ 50.0f };
     float elapsed_CoinBar{ 0.f }, elapsed_limit_CoinBar{ 5.0f };
     float elapsed_Lock{ 0.f }, elapsed_limit_Lock{ 5.0f };
+    float elapsed_spell{ 0.f }, elapsed_limit_spell{ 5.0f };
 
     int coinBarX{}, coinNumberX{};
 };

@@ -101,9 +101,10 @@
 							"type":5,
 							"offsetZ":[8.542438507080078],
 							"position":[-15.356, 28.648, 25.742],
-							"scale":[25.101, 25.101, 4.0],
+							"scale":[25.101, 25.101, 6.0],
 							"rotation": 90.0,
-							"rotVector":[0.0, 0.0, 1.0]
+							"rotVector":[0.0, 0.0, 1.0],
+							"events": [11]
 						}
 					]
 				}
@@ -171,10 +172,10 @@
 							"scale_to_respawn_attack": 7.0
 						},
 						{
-							"position": [-47.15, 13.0, -31.6],
+							"position": [-47.15, 13.0, -28.6],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 90.0,
-							"scale": [13.0, 3.0, 9.0],
+							"scale": [26.0, 3.0, 9.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.2,
 							"life": 4,
@@ -200,6 +201,7 @@
 							"scale_to_respawn_attack": 7.0
 						}
 					],
+					"NPCs":[],
 					"Objects": []
 				}
 			}
@@ -370,7 +372,6 @@
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0],
 							"content": 8,
-							"id": 0,
 							"message": [
 								"¡Encontraste una poción de vitalidad superior!", 
 								"Ahora te sientes mucho más vigoroso que antes."
@@ -384,7 +385,6 @@
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 0.0],
 							"content": 6,
-							"id": 1,
 							"message": ["¡Encontraste 30 destellos!"]
 						}
 					]
@@ -453,6 +453,7 @@
 							"scale_to_respawn_attack": 7.0
 						}
 					],
+					"NPCs":[],
 					"Objects": []
 				}
 			}
@@ -581,8 +582,8 @@
 							"rotVector":[0.0, 0.0, -2.0]
 						},
 						{
-							"position":[103.767, 47.153, 16.593],
-							"scale":[3.0, 99.0, 20.0],
+							"position":[103.767, 48.653, 16.593],
+							"scale":[6.0, 99.0, 20.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 1.0]
 						}
@@ -614,7 +615,6 @@
 							"rotation": 180.0,
 							"rotVector":[0.0, 0.0, 0.0],
 							"content": 10,
-							"id": 2,
 							"message": [
 								"¡Encontraste una llave!", 
 								"Parece que es de un solo uso..."
@@ -694,6 +694,7 @@
 							"scale_to_respawn_attack": 7.0
 						}
 					],
+					"NPCs":[],
 					"Objects": []
 				}
 			}
@@ -818,6 +819,7 @@
 							"scale_to_respawn_attack": 7.0
 						}
 					],
+					"NPCs":[],
 					"Objects": []
 				}
 			}
@@ -963,8 +965,8 @@
 							"rotVector":[0.0, 0.0, 0.0]
 						},
 						{
-							"position":[202.767, 47.153, 16.593],
-							"scale":[3.0, 99.0, 20.0],
+							"position":[202.767, 48.653, 16.593],
+							"scale":[6.0, 99.0, 20.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 1.0]
 						},
@@ -1001,7 +1003,6 @@
 							"rotation": 180.0,
 							"rotVector":[0.0, 0.0, 0.0],
 							"content": 10,
-							"id": 4,
 							"message": [
 								"¡Encontraste una llave!", 
 								"Parece que es de un solo uso..."
@@ -1009,11 +1010,10 @@
 						},
 						{
 							"type": 6,
-							"position": [87.0, 44.0, 13.0],
-							"scale": [2.0, 2.0, 6.0],
-							"rotation": 0.0,
-							"rotVector": [0.0, 0.0, 0.0],
-							"id": 3
+							"position": [87.0, 45.5, 16.0],
+							"scale": [2.0, 2.0, 10.0],
+							"rotation": 90.0,
+							"rotVector": [0.0, 0.0, 0.0]
 						}
 					]
 				}
@@ -1033,7 +1033,7 @@
 							"type": 8,
 							"element": 1,
 							"arrival_radius": 2.0,
-							"detect_radius": 35.0,
+							"detect_radius": 25.0,
 							"attack_radius": 2.5,
 							"tx": 0.0,
 							"tz": 0.0,
@@ -1062,7 +1062,7 @@
 							"type": 8,
 							"element": 1,
 							"arrival_radius": 2.0,
-							"detect_radius": 35.0,
+							"detect_radius": 20.0,
 							"attack_radius": 2.5,
 							"tx": 0.0,
 							"tz": 0.0,
@@ -1081,13 +1081,41 @@
 							"scale_to_respawn_attack": 7.0
 						},
 						{
-							"position": [30.38, 13.0, 122.51],
+							"position": [38.38, 13.0, 122.51],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 180.0,
-							"scale": [29.5, 3.0, 7.0],
+							"scale": [15.0, 3.0, 7.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.2,
-							"life": 10,
+							"life": 4,
+							"type": 6,
+							"element": 1,
+							"arrival_radius": 2.0,
+							"detect_radius": 7.0,
+							"attack_radius": 2.5,
+							"tx": 0.0,
+							"tz": 0.0,
+							"time2arrive": 1.0,
+							"tactive": true,
+							"perceptionTime": 0.2,
+							"path": [
+								[-44.93, 13.0, 51.54],
+								[-30.0, 4.0, 18.0],
+								[-25.0, 4.0, 6.0],
+								[-30.0, 4.0, 18.0]
+							],
+							"countdown_stop": 2.5,
+							"countdown_shoot": 0.5,
+							"countdown_perception": 0.5,
+							"scale_to_respawn_attack": 7.0
+						},{
+							"position": [23.38, 13.0, 122.51],
+							"rotVector": [0.0, 0.0, 1.0],
+							"rotation": 180.0,
+							"scale": [15.0, 3.0, 7.0],
+							"color": [0, 121, 241, 255],
+							"max_speed": 0.2,
+							"life": 4,
 							"type": 6,
 							"element": 1,
 							"arrival_radius": 2.0,
@@ -1113,7 +1141,7 @@
 							"position": [42.53, 13.0, 155.43],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 180.0,
-							"scale": [29.5, 3.0, 7.0],
+							"scale": [7.0, 3.0, 7.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.2,
 							"life": 10,
@@ -1139,13 +1167,41 @@
 							"scale_to_respawn_attack": 7.0
 						},
 						{
-							"position": [30.38, 13.0, 177.1],
+							"position": [38.38, 13.0, 177.1],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 180.0,
-							"scale": [29.5, 3.0, 7.0],
+							"scale": [15.0, 3.0, 7.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.2,
-							"life": 10,
+							"life": 4,
+							"type": 6,
+							"element": 1,
+							"arrival_radius": 2.0,
+							"detect_radius": 7.0,
+							"attack_radius": 2.5,
+							"tx": 0.0,
+							"tz": 0.0,
+							"time2arrive": 1.0,
+							"tactive": true,
+							"perceptionTime": 0.2,
+							"path": [
+								[-44.93, 13.0, 51.54],
+								[-30.0, 4.0, 18.0],
+								[-25.0, 4.0, 6.0],
+								[-30.0, 4.0, 18.0]
+							],
+							"countdown_stop": 2.5,
+							"countdown_shoot": 0.5,
+							"countdown_perception": 0.5,
+							"scale_to_respawn_attack": 7.0
+						},{
+							"position": [24.38, 13.0, 177.1],
+							"rotVector": [0.0, 0.0, 1.0],
+							"rotation": 180.0,
+							"scale": [15.0, 3.0, 7.0],
+							"color": [0, 121, 241, 255],
+							"max_speed": 0.2,
+							"life": 4,
 							"type": 6,
 							"element": 1,
 							"arrival_radius": 2.0,
@@ -1171,7 +1227,7 @@
 							"position": [16.65, 13.0, 202.2],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 180.0,
-							"scale": [29.5, 3.0, 7.0],
+							"scale": [7.0, 3.0, 7.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.2,
 							"life": 10,
@@ -1195,6 +1251,17 @@
 							"countdown_shoot": 0.5,
 							"countdown_perception": 0.5,
 							"scale_to_respawn_attack": 7.0
+						}
+					],
+					"NPCs":[
+						{
+							"position": [-23.08, 4.0, 244.7],
+							"rotVector": [0.0, 0.0, 1.0],
+							"rotation": 90.0,
+							"scale": [3.0, 4.0, 3.0],
+							"color": [0, 121, 241, 255],
+							"max_speed": 0.2,
+							"events": [9]
 						}
 					],
 					"Objects": []
@@ -1308,15 +1375,22 @@
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0],
 							"content": 6,
-							"id": 1,
 							"message": ["¡Encontraste 30 destellos!"]
 						},
 						{
 							"type":5,
 							"offsetZ":[8.0],
 							"position":[169.213, -115.562, 7.0],
-							"scale":[25.101, 25.101, 4.0],
+							"scale":[25.101, 25.101, 6.0],
 							"rotation": 0.0,
+							"rotVector":[0.0, 0.0, 0.0]
+						},
+						{
+							"type":4,
+							"offsetZ":[1.5],
+							"position":[203.231, -130.974, 7.0],
+							"scale":[15.732, 14.386, 10.0],
+							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 0.0]
 						}
 					],
@@ -1367,13 +1441,13 @@
 							"scale_to_respawn_attack": 7.0
 						},
 						{
-							"position": [-38.48, 4.0, 235.5],
+							"position": [38.24, 13.0, 228.41],
 							"rotVector": [0.0, 0.0, 1.0],
-							"rotation": 90.0,
-							"scale": [29.5, 3.0, 7.0],
+							"rotation": 180.0,
+							"scale": [14.0, 3.0, 10.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.2,
-							"life": 10,
+							"life": 4,
 							"type": 6,
 							"element": 1,
 							"arrival_radius": 2.0,
@@ -1396,13 +1470,100 @@
 							"scale_to_respawn_attack": 7.0
 						},
 						{
-							"position": [-65.26, 4.0, 235.5],
+							"position": [-38.48, 4.0, 240.5],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 90.0,
-							"scale": [29.5, 3.0, 7.0],
+							"scale": [15.5, 3.0, 7.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.2,
-							"life": 10,
+							"life": 4,
+							"type": 6,
+							"element": 1,
+							"arrival_radius": 2.0,
+							"detect_radius": 7.0,
+							"attack_radius": 2.5,
+							"tx": 0.0,
+							"tz": 0.0,
+							"time2arrive": 1.0,
+							"tactive": true,
+							"perceptionTime": 0.2,
+							"path": [
+								[-44.93, 13.0, 51.54],
+								[-30.0, 4.0, 18.0],
+								[-25.0, 4.0, 6.0],
+								[-30.0, 4.0, 18.0]
+							],
+							"countdown_stop": 2.5,
+							"countdown_shoot": 0.5,
+							"countdown_perception": 0.5,
+							"scale_to_respawn_attack": 7.0
+						},
+						{
+							"position": [-38.48, 4.0, 225.5],
+							"rotVector": [0.0, 0.0, 1.0],
+							"rotation": 90.0,
+							"scale": [15.5, 3.0, 7.0],
+							"color": [0, 121, 241, 255],
+							"max_speed": 0.2,
+							"life": 4,
+							"type": 6,
+							"element": 1,
+							"arrival_radius": 2.0,
+							"detect_radius": 7.0,
+							"attack_radius": 2.5,
+							"tx": 0.0,
+							"tz": 0.0,
+							"time2arrive": 1.0,
+							"tactive": true,
+							"perceptionTime": 0.2,
+							"path": [
+								[-44.93, 13.0, 51.54],
+								[-30.0, 4.0, 18.0],
+								[-25.0, 4.0, 6.0],
+								[-30.0, 4.0, 18.0]
+							],
+							"countdown_stop": 2.5,
+							"countdown_shoot": 0.5,
+							"countdown_perception": 0.5,
+							"scale_to_respawn_attack": 7.0
+						},
+						{
+							"position": [-65.26, 4.0, 225.5],
+							"rotVector": [0.0, 0.0, 1.0],
+							"rotation": 90.0,
+							"scale": [15.5, 3.0, 7.0],
+							"color": [0, 121, 241, 255],
+							"max_speed": 0.2,
+							"life": 4,
+							"type": 6,
+							"element": 1,
+							"arrival_radius": 2.0,
+							"detect_radius": 7.0,
+							"attack_radius": 2.5,
+							"tx": 0.0,
+							"tz": 0.0,
+							"time2arrive": 1.0,
+							"tactive": true,
+							"perceptionTime": 0.2,
+							"path": [
+								[-44.93, 13.0, 51.54],
+								[-30.0, 4.0, 18.0],
+								[-25.0, 4.0, 6.0],
+								[-30.0, 4.0, 18.0]
+							],
+							"countdown_stop": 2.5,
+							"countdown_shoot": 0.5,
+							"countdown_perception": 0.5,
+							"scale_to_respawn_attack": 7.0
+						},
+						{
+							"position": [-65.26, 4.0, 240.5],
+							"rotVector": [0.0, 0.0, 1.0],
+							"rotation": 90.0,
+							"scale": [15.5, 3.0, 7.0],
+							"color": [0, 121, 241, 255],
+							"max_speed": 0.2,
+							"life": 4,
 							"type": 6,
 							"element": 1,
 							"arrival_radius": 2.0,
@@ -1424,6 +1585,9 @@
 							"countdown_perception": 0.5,
 							"scale_to_respawn_attack": 7.0
 						}
+					],
+					"NPCs":[
+					
 					],
 					"Objects": []
 				}

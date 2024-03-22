@@ -70,7 +70,7 @@ private:
     void enemiesWallCollision(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3d& minOverlap);
     void classicCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3d& minOverlap);
     void resolveEnemyDirection(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, double overlap, bool isZAxis);
-    void resolvePlayerDirection(PhysicsComponent& playerPhysics, PhysicsComponent& enemyPhy);
+    void resolvePlayerDirection(PhysicsComponent& playerPhysics, PhysicsComponent& enemyPhy, bool isEnemy);
     template <auto getPos, auto setPos>
     bool resolveCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, double overlap);
 

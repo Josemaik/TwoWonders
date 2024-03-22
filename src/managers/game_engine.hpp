@@ -66,10 +66,14 @@ namespace ENGI {
         void drawRectangleRec(Rectangle rec, Color color);
         void drawTexture(Texture2D texture, int posX, int posY, Color tint);
         void drawCircle(int posX, int posY, float radius, Color color);
+        void drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color);
+        void drawTriangle(vec2d v1, vec2d v2, vec2d v3, Color color);
 
         // Text
         void drawText(const char* text, int posX, int posY, int fontSize, Color color);
-        void drawTextEx(Font font, const char* text, Vector2 position, float fontSize, float spacing, Color tint);
+        void drawTextEx(Font font, const char* text, vec2d position, float fontSize, float spacing, Color tint);
+        vec2d measureTextEx(Font font, const char* text, float fontSize, float spacing);
+        Font getFontDefault();
 
         // Window
         void initWindow(int width, int height, const char* title);
@@ -123,17 +127,21 @@ namespace ENGI {
         float getWorldToScreenX(vec3d pos);
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();
-        void loadAndResizeImage(const std::string& name, const std::string& path);
+        void loadAndResizeImage(const std::string& name, const std::string& path, double reScaleX = 1.3, double reScaleY = 1.3);
         void loadAndResizeImageGif(const std::string& name, const std::string& path, int frames, int delay = 15, double reScaleX = 2.0, double reScaleY = 2.0);
         void updateGif(Gif& anim);
         void unloadGifsAndTextures();
+        void setReplayMode(bool replay, GameData& gd);
 
         std::map<std::string, Texture2D> textures;
         std::map<std::string, Gif> gifs;
 
+
     private:
         u16 const width_{}, height_{};
         Camera3D camera{};
+        bool replayMode{ false };
+        GameData* gameData{ nullptr };
     };
 
 #endif // !GAME_ENGINE

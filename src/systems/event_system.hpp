@@ -5,7 +5,7 @@
 
 struct EventSystem
 {
-    void update(EntityManager& em, EventManager& evm, Ia_man& iam, MapManager& mm, ObjectSystem& os) { evm.dispatchEvents(em, mm, iam, os); };
+    void update(EntityManager& em, EventManager& evm, Ia_man& iam, MapManager& mm, ObjectSystem& os, SoundSystem& ss) { evm.dispatchEvents(em, mm, iam, os, ss); };
 };
 
 #endif // !EVENT_SYSTEM

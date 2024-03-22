@@ -10,8 +10,11 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             if (obj.type == ObjectType::BombExplode || obj.type == ObjectType::Heal_Spell)
                 obj.effect();
             else
+            {
                 li.insertDeath(ent.getID());
-
+                if (ent.hasComponent<RenderComponent>())
+                    em.getComponent<RenderComponent>(ent).visible = false;
+            }
         }
 
         // Recuperamos la entidad del player
@@ -44,10 +47,12 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
 
             case ObjectType::Coin:
                 plfi.addCoin(5);
+                em.getSingleton<SoundSystem>().sonido_destello();
                 break;
 
             case ObjectType::Coin30:
                 plfi.addCoin(30);
+                em.getSingleton<SoundSystem>().sonido_destello();
                 break;
 
             case ObjectType::ShopItem_Bomb:
@@ -65,8 +70,9 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                     auto& life = em.getComponent<LifeComponent>(*playerEnt);
                     life.increaseMaxLife();
                     life.increaseLife(4);
+                    // FIXME: Crashea el juego
+                    // em.getSingleton<SoundSystem>().sonido_aum_vida_max();
                 }
-                // shop_object = buyExtraLife(em, playerEnt);
                 break;
             }
             case ObjectType::BombExplode:
@@ -78,8 +84,11 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
             case ObjectType::Key:
             {
                 plfi.addKey();
+                //em.getSingleton<SoundSystem>().sonido_llave();
                 Item key = { "Llave", "Una llave, parece que solo puede abrir una puerta" };
                 plfi.addItem(std::make_unique<Item>(key));
+
+
                 break;
             }
             case ObjectType::Fire_Spell:

@@ -19,6 +19,8 @@
 #include "../components/oneuse_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
+#include "../components/navmesh_component.hpp"
+#include "../components/npc_component.hpp"
 #include "../components/projectile_component.hpp"
 #include "../components/object_component.hpp"
 #include "../components/zone_component.hpp"
@@ -33,9 +35,16 @@
 #include "../utils/sngtn/level_info.hpp"
 #include "../utils/sngtn/input_info.hpp"
 #include "../utils/sngtn/text_info.hpp"
+#include "../utils/sngtn/navmesh_info.hpp"
 #include "../utils/sngtn/zonecheck_info.hpp"
+
+// GameData
+#include "../utils/sngtn/GameData.hpp"
+
+// External Libraries
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
+#include "../systems/sound_system.hpp"
 
 // Constants
 static constexpr double K_PI = 3.14159265358979323846;
@@ -83,6 +92,8 @@ struct SeparateModelTag {};
 struct BarricadeTag {};
 struct LeverTag {};
 struct NoKeyTag {};
+struct NPCTag {};
+struct LevelChangeTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -106,7 +117,9 @@ using CL = MP::TypeList <
     SubjectComponent,
     AngryBushComponent,
     DispatcherComponent,
-    OneUseComponent
+    Navmesh,
+    OneUseComponent,
+    NPCComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,
@@ -143,11 +156,15 @@ using TL = MP::TypeList <
     CrusherTag,
     BarricadeTag,
     LeverTag,
-    NoKeyTag
+    NoKeyTag,
+    NPCTag,
+    LevelChangeTag
 > ;
-using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo>;
+using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;
 using deathSet = std::set<std::size_t, std::greater<std::size_t>>;
 using mapType = rapidjson::Document;
+using valueType = rapidjson::Value;
+using mapSizeType = rapidjson::SizeType;

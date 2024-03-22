@@ -9,6 +9,7 @@ enum struct InteractableType : uint8_t
     Level = 4,
     Spawn = 5,
     Lever = 6,
+    NPC = 7
 };
 
 struct InteractiveComponent

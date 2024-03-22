@@ -43,6 +43,7 @@ private:
     void createSound();
     void resetGame();
     void resetDeath();
+    Shader createShader();
 
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};
@@ -62,7 +63,6 @@ private:
     ShieldSystem shield_system{};
     EventSystem event_system{};
     MapManager map{};
-    SoundSystem sound_system{};
     CameraSystem camera_system{};
     LockSystem lock_system{};
 };

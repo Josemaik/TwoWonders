@@ -51,6 +51,5 @@ void ProjectileSystem::update(EntityManager& em, float deltaTime) {
                 }
             }
         }
-
     });
 }

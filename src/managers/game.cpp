@@ -1,6 +1,6 @@
 #include "game.hpp"
 // #include "../utils/memory_viewer.hpp"
-// #include <chrono>
+#include <chrono>
 
 void Game::createShield(Entity& ent)
 {
@@ -19,11 +19,27 @@ void Game::createEnding()
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
 }
 
+Shader Game::createShader()
+{
+    Shader shader = engine.loadShader(TextFormat("assets/shaders/lighting.vs", 330),
+        TextFormat("assets/shaders/lighting.fs", 330));
+
+    // Get some required shader locations
+    shader.locs[SHADER_LOC_VECTOR_VIEW] = engine.getShaderLocation(shader, "viewPos");
+
+    // Ambient light level (some basic lighting)
+    int ambientLoc = engine.getShaderLocation(shader, "ambient");
+    float ambientValue[4] = { 3.1f, 3.1f, 3.1f, 20.0f };
+    engine.setShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
+
+    return shader;
+}
+
 void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 35.0, 22.0, -23.0 };
+        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -31,12 +47,14 @@ void Game::createEntities()
     // -72.0, 4.0, 72.9 - Cofre con llave
     // -116.0, 4.0, 111.0 - Apisonadora
     // -125, 4.0, 138.68 - `pos chunck 3
-    // 35.0, 22.0, -23.0 - Posición Incial lvl1
+    // 7.0, 22.0, -21.0- Posición Incial lvl1
     // -68.0, 4.0, -22.0 - Primera rampa lvl1
     // -6.0, 4.0, 94.0 - Campamento lvl1
     // -126.0, 4.0, 152.0 - Segundo altar lvl1
+    // 34.0, 13.0, 99.0 - Pasillo antes segundo campamento lvl1
     // 30.0, 13.0, 213.0 - Segundo campamento lvl1
-    // -113.0, 4.0, 236.0 - Final lvl1
+    // -26.0, 4.0, 235.0 - NPC lvl1
+    // -113.0, 13.0, 236.0 - Final lvl1
 
     // Player
     auto& e{ em.newEntity() };
@@ -48,13 +66,15 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e);
+    // em.addComponent<AttackComponent>(e);
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
     lis.addCode(EventCodes::OpenChest);
     lis.addCode(EventCodes::SetSpawn);
     lis.addCode(EventCodes::OpenDoor);
+    lis.addCode(EventCodes::NPCDialog);
+    lis.addCode(EventCodes::DialogFirstSpawn);
 
     // Código de añadir un hechizo al jugador
     // Spell spell{ "Fireball", "Shoots a fireball", Spells::WaterBomb, 20.0, 2 };
@@ -75,42 +95,22 @@ void Game::createEntities()
 
 //inicializar bancos
 void Game::createSound() {
-    sound_system.initBanks("assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Music.bank");
+    em.getSingleton<SoundSystem>().initBanks("assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Ambient.bank", "assets/banks/Music.bank", "assets/banks/SFX.bank");
     //sound_system.createEventInstance();
     //sound_system.play();
 }
 
 void Game::run()
 {
-    Shader shader = engine.loadShader(TextFormat("assets/shaders/lighting.vs", 330),
-        TextFormat("assets/shaders/lighting.fs", 330));
-
-    // Get some required shader locations
-    shader.locs[SHADER_LOC_VECTOR_VIEW] = engine.getShaderLocation(shader, "viewPos");
-
-    // Ambient light level (some basic lighting)
-    int ambientLoc = engine.getShaderLocation(shader, "ambient");
-    float ambientValue[4] = { 3.1f, 3.1f, 3.1f, 20.0f };
-    engine.setShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
-
-    render_system.setShader(shader);
-    collision_system.setEventManager(evm);
-
-    engine.setTargetFPS(120);
-
-    // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
-    srand((unsigned int)time(NULL));
-
-    // MemoryViewer mv{ em.getCMPStorage<ColliderComponent>() };
-    // mv.printMemory();
+    // Cosas para medir el tiempo de ejecución
+    using std::chrono::high_resolution_clock;
+    using std::chrono::duration_cast;
+    using std::chrono::duration;
+    using std::chrono::milliseconds;
 
     // Codigo para medir el tiempo de ejecucion
     //
     // - Descomentar estas líneas y dejarlas ahí
-    // using std::chrono::high_resolution_clock;
-    // using std::chrono::duration_cast;
-    // using std::chrono::duration;
-    // using std::chrono::milliseconds;
     //
     // - Colocar antes de donde se quiere medir el tiempo
     // auto t1 = high_resolution_clock::now();
@@ -119,15 +119,48 @@ void Game::run()
     // auto t2 = high_resolution_clock::now();
     // duration<float, std::milli> duration = t2 - t1;
 
+    // Singletons
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
     auto& txti = em.getSingleton<TextInfo>();
+    auto& gami = em.getSingleton<GameData>();
+
+    // Shader ambiente
+    Shader shader = createShader();
+
+    render_system.setShader(shader);
+    collision_system.setEventManager(evm);
+    auto& sound_system = em.getSingleton<SoundSystem>();
+
+    // Incializamos FPSs
+    engine.setTargetFPS(120);
+
+    // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
+    unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
+
+    // Revisamos si es replay
+    std::ifstream is("assets/data/input/data.cereal");
+    if (is.good())
+    {
+        cereal::BinaryInputArchive arch(is);
+        arch(CEREAL_NVP(gami));
+        li.replay = true;
+        seed = gami.getRandomSeed();
+    }
+
+    std::srand(seed);
+
+    gami.setRandomSeed(seed);
+    engine.setReplayMode(li.replay, gami);
+
+    // Variable tiempo para saber cuánto dura la ejecución del juego
+    auto gameStart = high_resolution_clock::now();
+    gami.setStartTime(gameStart);
 
     // Inicializa una variable donde tener el tiempo entre frames
     float currentTime{}, elapsed{};
 
     createSound();
-    li.sound_system = &sound_system;
     attack_system.setCollisionSystem(&collision_system);
 
     while (!li.gameShouldEnd)
@@ -171,7 +204,7 @@ void Game::run()
         // CODIGO DE LA PANTALLA DE PAUSA
         case GameScreen::PAUSE:
         {
-            render_system.drawPauseMenu(engine, em, sound_system);
+            render_system.drawPauseMenu(engine, em);
             break;
         }
 
@@ -183,12 +216,12 @@ void Game::run()
                 li.currentScreen = GameScreen::GAMEPLAY;
             render_system.drawStory(engine);
 
+            if (li.playerID == li.max)
+                createEntities();
+
             // TODO - Cuando se implemente el sistema de guardado, cargar el nivel en el que se quedó
             if (!map.isComplete())
                 map.createMap(em, 0, iam);
-
-            if (li.playerID == li.max)
-                createEntities();
 
             break;
         }
@@ -196,6 +229,10 @@ void Game::run()
         // CODIGO DEL GAMEPLAY
         case GameScreen::GAMEPLAY:
         {
+            if (sound_system.ambient_started == false) {
+                sound_system.playAmbient();
+                sound_system.ambient_started = true;
+            }
             if (em.getEntities().empty() || li.resetGame)
                 resetGame();
 
@@ -236,7 +273,7 @@ void Game::run()
                     sound_system.update();
                     // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     camera_system.update(em, engine, timeStep);
-                    event_system.update(em, evm, iam, map, object_system);
+                    event_system.update(em, evm, iam, map, object_system, sound_system);
 
                     if (!li.getDeath().empty())
                     {
@@ -275,6 +312,23 @@ void Game::run()
 
         if (engine.windowShouldClose())
             li.gameShouldEnd = true;
+    }
+
+    // Pillamos el tiempo de finalización del juego
+    auto finalTime = high_resolution_clock::now();
+
+    // Calculamos el tiempo que ha durado el juego
+    duration<float, std::milli> dur = finalTime - gameStart;
+
+    gami.setFinalTime(dur);
+
+    // Creamos un archivo de salida con los datos de la partida
+    // Para hacer replay con este archivo hay que colocarlo en la carpeta assets/data/input
+    if (!li.replay)
+    {
+        std::ofstream os("assets/data/output/data.cereal", std::ios::binary);
+        cereal::BinaryOutputArchive archive(os);
+        archive(CEREAL_NVP(gami));
     }
 
     //liberar bancos
@@ -320,5 +374,4 @@ void Game::resetGame()
     lock_system.reset();
     map.reset(em, li.mapID, iam);
     createEntities();
-    li.sound_system = &sound_system;
 }

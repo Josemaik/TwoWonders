@@ -275,14 +275,6 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
 
     if (behaviorType1 & BehaviorType::PLAYER || behaviorType2 & BehaviorType::PLAYER)
     {
-        // Colision con la meta
-        if (behaviorType1 & BehaviorType::ENDING || behaviorType2 & BehaviorType::ENDING)
-        {
-            auto& li = em.getSingleton<LevelInfo>();
-            li.currentScreen = GameScreen::ENDING;
-            return;
-        }
-
         // Colisiones de enemigos con el jugador
         if (!(behaviorType1 & BehaviorType::SHIELD || behaviorType2 & BehaviorType::SHIELD))
         {
@@ -357,7 +349,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
             std::swap(behaviorType1, behaviorType2);
         }
 
-        if (otherEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<DestructibleTag>() || otherEntPtr->hasTag<CrusherTag>() || staticEntPtr->hasTag<GroundTag>())
+        if (otherEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<DestructibleTag>() || otherEntPtr->hasTag<CrusherTag>() || otherEntPtr->hasTag<DummyTag>() || staticEntPtr->hasTag<GroundTag>())
             return;
     }
 
@@ -381,7 +373,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Colisiones con el suelo
     if (staticEntPtr->hasTag<GroundTag>() && !otherEntPtr->hasTag<HitPlayerTag>())
     {
-        if (minOverlap.y() <= 1.0 || otherPhy->onRamp)
+        if (minOverlap.y() <= 1.0 || otherPhy->onRamp || otherPhy->stopped)
         {
             groundCollision(*otherPhy, otherPhy->scale, minOverlap);
             return;
@@ -427,7 +419,9 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
-    if (behaviorType2 & BehaviorType::SPIDERWEB || behaviorType2 & BehaviorType::WARNINGZONE)
+    if (behaviorType2 & BehaviorType::SPIDERWEB ||
+        behaviorType2 & BehaviorType::WARNINGZONE ||
+        behaviorType2 & BehaviorType::AREADAMAGECRUSHER)
         return;
 
     if (behaviorType2 & BehaviorType::METEORITE)
@@ -453,6 +447,11 @@ void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& ent, Physi
         auto& ab = em.getComponent<AngryBushComponent>(ent);
         ab.chargeAttack = true;
         ab.move = false;
+        if (ab.angrySoundOneTime)
+        {
+            ab.angrySound = true;
+            ab.angrySoundOneTime = false;
+        }
     }
 }
 
@@ -511,12 +510,16 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
     {
         classicCollision(*staticPhy, *otherPhy, minOverlap);
 
-        if (otherEntPtr->hasTag<NoDamageTag>() && !otherEntPtr->hasTag<CrusherTag>())
+        if (!otherEntPtr->hasTag<DummyTag>() && !otherEntPtr->hasTag<CrusherTag>())
         {
-            resolvePlayerDirection(*staticPhy, *otherPhy);
+            resolvePlayerDirection(*staticPhy, *otherPhy, true);
+            em.getSingleton<SoundSystem>().sonido_rebote();
             return;
         }
-        else if (otherEntPtr->hasTag<CrusherTag>())
+        else if (otherEntPtr->hasTag<CrusherTag>() || otherEntPtr->hasTag<DummyTag>())
+            return;
+
+        if (otherEntPtr->hasTag<NoDamageTag>())
             return;
 
         enemyCollision(em, *staticEntPtr);
@@ -534,6 +537,20 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
             auto& life = em.getComponent<LifeComponent>(*staticEntPtr);
             life.life = life.maxLife;
             plfi.mana = plfi.max_mana - 3.0;
+
+            // FIXME: Crashea el juego
+            // em.getSingleton<SoundSystem>().sonido_checkpoint();
+
+            if (otherEntPtr->hasComponent<DispatcherComponent>())
+            {
+                auto& dc = em.getComponent<DispatcherComponent>(*otherEntPtr);
+                auto& lc = em.getComponent<ListenerComponent>(*staticEntPtr);
+                for (std::size_t i = 0; i < dc.eventCodes.size(); i++)
+                {
+                    evm->scheduleEvent(Event{ static_cast<EventCodes>(dc.eventCodes[i]) });
+                    lc.addCode(static_cast<EventCodes>(dc.eventCodes[i]));
+                }
+            }
         }
 
         return;
@@ -554,7 +571,8 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
             bb.playerdamagebycrusher = true;
 
             // El jugador se mueve hacia atrás de la posición del crusher
-            resolvePlayerDirection(*staticPhy, *otherPhy);
+            resolvePlayerDirection(*staticPhy, *otherPhy, false);
+            em.getSingleton<SoundSystem>().sonido_rebote();
         }
         return;
     }
@@ -577,14 +595,56 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         li.insertDeath(otherEntPtr->getID());
         return;
     }
+
+    // Colision con la meta
+    if (behaviorType2 & BehaviorType::ENDING)
+    {
+        auto& li = em.getSingleton<LevelInfo>();
+        li.currentScreen = GameScreen::ENDING;
+        em.destroyComponent<AttackComponent>(*staticEntPtr);
+        auto& lif = em.getComponent<LifeComponent>(*staticEntPtr);
+        lif.maxLife = 7;
+        lif.life = 7;
+        return;
+    }
 }
 
-void CollisionSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, PhysicsComponent& enemyPhy)
+void CollisionSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, PhysicsComponent& enemyPhy, bool isEnemy)
 {
     auto& pos = playerPhy.position;
     auto& otherPos = enemyPhy.position;
+    auto& enemyVel = enemyPhy.velocity;
     vec3d dir = { pos.x() - otherPos.x(), 0, pos.z() - otherPos.z() };
+
     dir.normalize();
+
+    if (isEnemy)
+    {
+        // Si la dirección del enemigo y la del jugador tienen menos de 20 grados de diferencia, el jugador se le suman 45º en la dirección contraria
+        vec3d dirEnemy = { otherPos.x() - enemyVel.x(), 0, otherPos.z() - enemyVel.z() };
+        dirEnemy.normalize();
+
+        // Calcular el ángulo entre las dos direcciones
+        double dot = dir.x() * dirEnemy.x() + dir.z() * dirEnemy.z(); // producto punto
+        double det = dir.x() * dirEnemy.z() - dir.z() * dirEnemy.x(); // determinante
+        double angle = atan2(det, dot); // atan2(y, x) o atan2(sin, cos)
+
+        // Convertir el ángulo a grados
+        double angleDeg = angle * 180 / M_PI;
+
+        // Si el ángulo es menor de 20 grados, ajustar la dirección del jugador
+        if (std::abs(angleDeg) < 20)
+        {
+            // Rotar la dirección del jugador 45 grados en la dirección contraria
+            double angleRad = -135 * M_PI / 180; // Convertir a radianes
+            double cosAngle = cos(angleRad);
+            double sinAngle = sin(angleRad);
+            vec3d newDir = { dir.x() * cosAngle - dir.z() * sinAngle, 0.0, dir.x() * sinAngle + dir.z() * cosAngle };
+
+            dir = newDir;
+            // dir.normalize();
+        }
+    }
     playerPhy.velocity = dir * 7;
     playerPhy.stopped = true;
 }
@@ -642,6 +702,19 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
             if (!balalaunchedbyspider)
             {
                 auto& li = em.getComponent<LifeComponent>(*ent2Ptr);
+                int damage = 2;
+
+                if (balaCol.behaviorType & BehaviorType::ATK_PLAYER)
+                {
+                    auto& plfi = em.getSingleton<PlayerInfo>();
+                    damage = plfi.currentSpell.damage;
+
+                    if (ent1Ptr->hasComponent<ObjectComponent>())
+                        damage = static_cast<int>(damage * 2.0);
+
+                    if (damage == 0)
+                        damage = 2;
+                }
 
                 if (li.invulnerable)
                     return;
@@ -650,13 +723,13 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                     (typeBala == ElementalType::Ice && typeEnemyPlayer == ElementalType::Water) ||
                     (typeBala == ElementalType::Water && typeEnemyPlayer == ElementalType::Fire))
                 {
-                    li.decreaseLife(3);
+                    li.decreaseLife(static_cast<int>(damage * 1.5));
                 }
                 else if (typeBala == ElementalType::Neutral)
-                    li.decreaseLife(2);
+                    li.decreaseLife(damage);
                 else
                 {
-                    li.decreaseLife(1);
+                    li.decreaseLife(damage / 2);
                     if (balaCol.attackType & AttackType::GollemAttack) {
                         em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
                     }

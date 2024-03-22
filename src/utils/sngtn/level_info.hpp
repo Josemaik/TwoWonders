@@ -51,6 +51,7 @@ struct LevelInfo
     bool transition{ false };
     bool cameraChange{ false };
     vec3d viewPoint{};
+    bool viewPointSound{ false };
 
     // Variables de lock on
     std::size_t lockedEnemy{ max };
@@ -66,6 +67,7 @@ struct LevelInfo
     // Variables relacionadas con los eventos
     std::size_t chestToOpen{ max };
     std::size_t doorToOpen{ max };
+    std::size_t npcToTalk{ max };
     bool dungeonKeyCreated{ false };
     vec3d enemyToChestPos{};
 
@@ -79,11 +81,14 @@ struct LevelInfo
     bool levelChanged{ false };
 
     // Para estado de pausa y cerrar el juego
-    SoundSystem* sound_system{ nullptr };
+    bool openChest{ false };
     bool gameShouldEnd{ false };
 
     // Tutorial
     std::vector<std::size_t> tutorialEnemies{};
+
+    // Replay de inputs
+    bool replay{ false };
 
     // Estado del juego
     GameScreen currentScreen = GameScreen::GAMEPLAY;
@@ -144,10 +149,10 @@ struct LevelInfo
         debugIA2 = false;
         resetGame = false;
         num_zone = 0;
-        mapID = 1;
+        mapID = 0;
         chestToOpen = max;
         dungeonKeyCreated = false;
-        sound_system = nullptr;
+        openChest = false;
         gameShouldEnd = false;
         levelChanged = false;
     }

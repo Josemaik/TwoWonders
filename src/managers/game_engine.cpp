@@ -49,6 +49,12 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // Diálogo Siguiente HUD
     loadAndResizeImage("sig", "assets/HUD/dialog_siguiente.png");
 
+    // Espacio para hechizos de agua HUD
+    loadAndResizeImage("agua_holder", "assets/HUD/item_agua.png");
+
+    // Icono para las pompas de agua HUD
+    loadAndResizeImage("pompas", "assets/HUD/pompas.png", 1.5, 1.5);
+
     // NÚMEROS
     //
     loadAndResizeImage("0", "assets/HUD/numeros/0.png");
@@ -155,6 +161,10 @@ void ENGI::GameEngine::endMode3D() {
     EndMode3D();
 }
 
+void ENGI::GameEngine::drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color) {
+    DrawLine(startPosX, startPosY, endPosX, endPosY, color);
+}
+
 void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color) {
     DrawLine3D(startPos.toRaylib(), endPos.toRaylib(), color);
 }
@@ -195,8 +205,12 @@ void ENGI::GameEngine::drawCircle(int posX, int posY, float radius, Color color)
     DrawCircle(posX, posY, radius, color);
 }
 
-void ENGI::GameEngine::drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color) {
-    DrawLine(startPosX, startPosY, endPosX, endPosY, color);
+void ENGI::GameEngine::drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color) {
+    DrawCircleSector(center.toRaylib(), radius, startAngle, endAngle, segments, color);
+}
+
+void ENGI::GameEngine::drawTriangle(vec2d v1, vec2d v2, vec2d v3, Color color) {
+    DrawTriangle(v1.toRaylib(), v2.toRaylib(), v3.toRaylib(), color);
 }
 
 ////// TEXT //////
@@ -205,8 +219,17 @@ void ENGI::GameEngine::drawText(const char* text, int posX, int posY, int fontSi
     DrawText(text, posX, posY, fontSize, color);
 }
 
-void ENGI::GameEngine::drawTextEx(Font font, const char* text, Vector2 position, float fontSize, float spacing, Color tint) {
-    DrawTextEx(font, text, position, fontSize, spacing, tint);
+void ENGI::GameEngine::drawTextEx(Font font, const char* text, vec2d position, float fontSize, float spacing, Color tint) {
+    DrawTextEx(font, text, position.toRaylib(), fontSize, spacing, tint);
+}
+
+vec2d ENGI::GameEngine::measureTextEx(Font font, const char* text, float fontSize, float spacing) {
+    Vector2 v = MeasureTextEx(font, text, fontSize, spacing);
+    return vec2d(v.x, v.y);
+}
+
+Font ENGI::GameEngine::getFontDefault() {
+    return GetFontDefault();
 }
 
 ////// WINDOW //////
@@ -299,17 +322,26 @@ float ENGI::GameEngine::getFovyCamera()
 
 bool ENGI::GameEngine::isKeyPressed(int key)
 {
-    return IsKeyPressed(key);
+    if (replayMode)
+        return gameData->isKeyPressed(key);
+    else
+        return IsKeyPressed(key);
 }
 
 bool ENGI::GameEngine::isKeyDown(int key)
 {
-    return IsKeyDown(key);
+    if (replayMode)
+        return gameData->isKeyDown(key);
+    else
+        return IsKeyDown(key);
 }
 
 bool ENGI::GameEngine::isKeyReleased(int key)
 {
-    return IsKeyReleased(key);
+    if (replayMode)
+        return gameData->isKeyReleased(key);
+    else
+        return IsKeyReleased(key);
 }
 
 bool ENGI::GameEngine::isMouseButtonPressed(int button)
@@ -429,9 +461,9 @@ RayCast ENGI::GameEngine::getMouseRay()
     return RayCast{ .origin = vec3d(r.position.x, r.position.y, r.position.z), .direction = vec3d(r.direction.x, r.direction.y, r.direction.z) };
 }
 
-void ENGI::GameEngine::loadAndResizeImage(const std::string& name, const std::string& path) {
+void ENGI::GameEngine::loadAndResizeImage(const std::string& name, const std::string& path, double reScaleX, double reScaleY) {
     Image image = loadImage(path.c_str());
-    imageResize(&image, static_cast<int>(image.width / 1.3), static_cast<int>(image.height / 1.3));
+    imageResize(&image, static_cast<int>(image.width / reScaleX), static_cast<int>(image.height / reScaleY));
     textures[name] = loadTextureFromImage(image);
     unloadImage(image);
 }
@@ -476,4 +508,10 @@ void ENGI::GameEngine::unloadGifsAndTextures() {
     {
         UnloadTexture(texture.second);
     }
+}
+
+void ENGI::GameEngine::setReplayMode(bool replay, GameData& gd)
+{
+    replayMode = replay;
+    gameData = &gd;
 }

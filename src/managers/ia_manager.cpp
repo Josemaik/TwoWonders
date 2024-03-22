@@ -634,7 +634,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* d_ra = &tree.createNode<BTDecisionReadyforAttack>();
         auto* a_as = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer, vec3d{}); // fail si disparo succes si no disparo
         auto* d_or = &tree.createNode<BTDecisionOnAttackRadius>();
-        auto* sequence1 = &tree.createNode<BTNodeSequence_t>(d_1_7,d_ra, a_as, d_or);
+        auto* sequence1 = &tree.createNode<BTNodeSequence_t>(d_1_7, d_ra, a_as, d_or);
 
         auto* d_1_6 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* a_s_6 = &tree.createNode<BTAction_Seek>();
@@ -655,7 +655,8 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         tree.createNode<BTAction_Pendulum>();
     }
           break;
-    case 6: em.addTag<DummyTag>(e);
+    case 6:
+        em.addTag<DummyTag>(e);
         break;
     case 7: em.addTag<AngryBushTag2>(e); tree.createNode<BTAction_Patrol>();
         break;

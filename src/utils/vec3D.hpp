@@ -4,6 +4,12 @@
 #include <optional>
 #include <raylib.h>
 #include <array>
+// Si queremos que la serialización sea en json, descomentar las siguientes líneas
+// #define CEREAL_RAPIDJSON_NAMESPACE cereal_rapidjson
+// #include <cereal/archives/json.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/chrono.hpp>
+#include <cereal/archives/binary.hpp>
 
 template <typename DataT>
 struct vec3D
@@ -257,9 +263,27 @@ struct vec3D
         }
     }
 
+    // Devuelve el ángulo entre dos vectores en radianes
+    constexpr DataT angle(vec3D const& rhs) const
+    {
+        return std::acos(dotProduct(rhs) / (length() * rhs.length()));
+    }
+
+    // Devuelve el ángulo entre dos vectores en grados
+    constexpr DataT angleDeg(vec3D const& rhs) const
+    {
+        return angle(rhs) * 180 / M_PI;
+    }
+
     constexpr DataT distance(vec3D const& rhs) const
     {
         return (rhs - *this).length();
+    }
+
+    template <typename Archive>
+    void serialize(Archive& archive)
+    {
+        archive(x_, y_, z_);
     }
 
 private:
@@ -281,6 +305,10 @@ struct vec2D
 {
     constexpr vec2D() = default;
     constexpr vec2D(DataT x, DataT y) : x{ x }, y{ y } {}
+    constexpr Vector2 toRaylib() const noexcept
+    {
+        return Vector2{ static_cast<float>(x),  static_cast<float>(y) };
+    }
 
     DataT x{}, y{};
 };

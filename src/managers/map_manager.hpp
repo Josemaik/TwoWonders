@@ -5,6 +5,7 @@
 #include <map>
 #include "../utils/types.hpp"
 #include "ia_manager.hpp"
+#include "../utils/pf/Graph.hpp"
 
 enum struct LoadState
 {
@@ -12,6 +13,7 @@ enum struct LoadState
     LOAD_WALLS,
     LOAD_RAMPS_INTERACTABLES,
     LOAD_OBJECTS_ENEMIES,
+    LOAD_NAVMESHES,
     LOAD_COMPLETE
 };
 
@@ -37,20 +39,24 @@ private:
     mapType loadMap(const std::string& path);
     void destroyMap(EntityManager& em);
     void generateMapFromJSON(EntityManager& em, const mapType& map, Ia_man& iam);
-    void generateChunkFromJSON(EntityManager& em, const rapidjson::Value& chunk, Ia_man& iam, uint8_t mapID, rapidjson::SizeType& i, int& j);
+    void generateChunkFromJSON(EntityManager& em, const valueType& chunk, Ia_man& iam, uint8_t mapID, rapidjson::SizeType& i, int& j);
     void generateChunkModel(EntityManager& em, rapidjson::SizeType& i);
-    void generateGround(EntityManager& em, const rapidjson::Value& groundArray, int& j);
-    void generateWalls(EntityManager& em, const rapidjson::Value& wallArray);
-    void generateRamps(EntityManager& em, const rapidjson::Value& rampArray);
-    void generateObjects(EntityManager& em, const rapidjson::Value& objectArray, uint8_t mapID);
-    void generateEnemies(EntityManager& em, const rapidjson::Value& enemyArray, Ia_man& iam);
-    void generateInteractables(EntityManager& em, const rapidjson::Value& interactableArray);
+    void generateGround(EntityManager& em, const valueType& groundArray, int& j);
+    void generateWalls(EntityManager& em, const valueType& wallArray);
+    void generateRamps(EntityManager& em, const valueType& rampArray);
+    void generateObjects(EntityManager& em, const valueType& objectArray, uint8_t mapID);
+    void generateEnemies(EntityManager& em, const valueType& enemyArray, Ia_man& iam);
+    void generateNPCs(EntityManager& em, const valueType& npcArray);
+    void generateInteractables(EntityManager& em, const valueType& interactableArray);
+    void generateNavmeshes(EntityManager& em);
     void addToZone(EntityManager& em, Entity& e, InteractableType type);
+    void checkDispatcher(EntityManager& em, Entity& e, const valueType& value);
 
     std::string fileMap{};
     std::map<uint8_t, BBox> zoneBounds{};
     LoadState state{ LoadState::LOAD_GROUND };
     mapType map{};
+    uint8_t unique_ids{ 0 };
 
     template <typename... Tags>
     void destroyParts(EntityManager& em)
