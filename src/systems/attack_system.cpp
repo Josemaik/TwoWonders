@@ -54,10 +54,10 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             auto& plfi = em.getSingleton<PlayerInfo>();
 
             if (plfi.currentSpell == Spells::None)
-                {
-                    att.type = AttackType::Melee;
-                    em.getSingleton<SoundSystem>().sonido_melee();
-                }
+            {
+                att.type = AttackType::Melee;
+                em.getSingleton<SoundSystem>().sonido_melee();
+            }
             else
             {
                 createSpellAttack(em, ent, att);
@@ -333,7 +333,8 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
     case Spells::WaterBomb:
     {
         eleType = ElementalType::Water;
-        em.getSingleton<SoundSystem>().sonido_h_pompa();
+        // FIXME: Crashea el juego
+        // em.getSingleton<SoundSystem>().sonido_h_pompa();
         break;
     }
     case Spells::FireMeteorites:

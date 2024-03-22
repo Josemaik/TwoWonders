@@ -50,7 +50,7 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine, double dt)
 void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss) {
     ss.ambient_stop();
     ss.ambient_started = false;
-    
+
     engine.beginDrawing();
     engine.clearBackground(WHITE);
     // Logo del videojuego
@@ -230,8 +230,10 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     engine.endDrawing();
 }
 
-void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, SoundSystem& ss)
+void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em)
 {
+    auto& ss = em.getSingleton<SoundSystem>();
+
     float windowWidth = 330.0f;
     float windowHeight = 460.0f;
     float buttonWidth = 200.0f;
@@ -330,11 +332,12 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, SoundSys
         inpi.mouseClick = true;
     }
 
-    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec)|| engine.checkCollisionPointRec(GetMousePosition(), btn3Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn4Rec)) {
+    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn3Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn4Rec)) {
         if (ss.pushed == false)
             ss.sonido_mov();
         ss.pushed = true;
-    }else
+    }
+    else
         ss.pushed = false;
 }
 
@@ -994,9 +997,9 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em, double dt)
     if (txti.hasText())
         drawTextBox(engine, em);
 
-    if (inpi.pause && li.sound_system != nullptr)
-        drawPauseMenu(engine, em, *li.sound_system);
-    else if (inpi.pause && li.sound_system == nullptr)
+    if (inpi.pause)
+        drawPauseMenu(engine, em);
+    else if (inpi.pause)
         inpi.pause = false;
 
     else if (inpi.inventory)
@@ -2159,16 +2162,12 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     {
         txti.popText();
         inpi.interact = false;
-      
-        if (textQueue.empty())
+
+        if (textQueue.empty() && li.openChest)
         {
-            txti.waitTime = .8f;
-            if(li.openChest)
-            {
-                li.openChest = false;
-                em.getSingleton<SoundSystem>().sonido_cerrar_cofre();
-            }    
-        }    
+            em.getSingleton<SoundSystem>().sonido_cerrar_cofre();
+            li.openChest = false;
+        }
     }
 
     int posButtonX = static_cast<int>(posX + boxWidth - 8);

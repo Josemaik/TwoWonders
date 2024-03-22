@@ -19,7 +19,7 @@ SoundSystem::SoundSystem() {
     ERRCHECK(FMOD_Studio_System_Initialize(soundSystem, 512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0));
 }
 
-void SoundSystem::initBanks(const char* master_bank_location, const char* master_string_location, const char* ui_bank_location,const char* ambient_bank_location,  const char* music_bank_location, const char* SFX_bank_location)
+void SoundSystem::initBanks(const char* master_bank_location, const char* master_string_location, const char* ui_bank_location, const char* ambient_bank_location, const char* music_bank_location, const char* SFX_bank_location)
 {
     ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, master_bank_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &master_bank));
     ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, master_string_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &strings_bank));
@@ -50,7 +50,7 @@ void SoundSystem::seleccion_menu() {
     FMOD_Studio_EventInstance_Start(eventInstance);
     update();
 }
-void SoundSystem::playAmbient(){
+void SoundSystem::playAmbient() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_bosque", &eventDescription_Ambiente));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Ambiente, &eventInstance_Ambiente));
     FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
@@ -218,7 +218,7 @@ void SoundSystem::sonido_recibir_danyo() {
     //update();
 }
 
-void SoundSystem::sonido_aum_vida_max(){
+void SoundSystem::sonido_aum_vida_max() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Interaccion/Aumentar_vida_max", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     play();
@@ -229,9 +229,9 @@ void SoundSystem::play() {
     FMOD_Studio_EventInstance_Start(eventInstance);
 }
 
-void SoundSystem::play_pasos(){
+void SoundSystem::play_pasos() {
     FMOD_Studio_EventInstance_Start(eventInstance_SFX);
-    
+
 }
 
 void SoundSystem::update() {
@@ -244,7 +244,7 @@ void SoundSystem::clear() {
     FMOD_Studio_Bank_Unload(ui_bank);
     FMOD_Studio_Bank_Unload(music_bank);
     FMOD_Studio_Bank_Unload(ambient_bank);
-    FMOD_Studio_Bank_Unload(SFX_bank); 
+    FMOD_Studio_Bank_Unload(SFX_bank);
     FMOD_Studio_System_UnloadAll(soundSystem);
 }
 
@@ -257,7 +257,7 @@ void SoundSystem::ambient_stop() {
 }
 
 void SoundSystem::SFX_stop() {
-    FMOD_Studio_EventInstance_Stop(eventInstance_SFX,  FMOD_STUDIO_STOP_ALLOWFADEOUT);
+    FMOD_Studio_EventInstance_Stop(eventInstance_SFX, FMOD_STUDIO_STOP_ALLOWFADEOUT);
     update();
 }
 

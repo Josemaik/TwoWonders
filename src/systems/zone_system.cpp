@@ -23,7 +23,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         map.changeMap(em, 1, iam);
                         li.transition = true;
 
-                        p.position = { 35.0, 22.0, -23.0 };
+                        p.position = { 7.0, 22.0, -21.0 };
                         break;
                     }
                     case 1:
@@ -178,6 +178,9 @@ void ZoneSystem::checkLevers(EntityManager& em, EventManager& evm)
                 li.dontLoad.insert(pair);
                 inpi.interact = false;
                 openDoorsZone(em, evm, phy.position);
+
+                // FIXME: Crashea el juego
+                // em.getSingleton<SoundSystem>().sonido_palanca();
             }
         }
     });

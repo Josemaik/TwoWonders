@@ -39,7 +39,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 34.0, 13.0, 99.0 };
+        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -47,7 +47,7 @@ void Game::createEntities()
     // -72.0, 4.0, 72.9 - Cofre con llave
     // -116.0, 4.0, 111.0 - Apisonadora
     // -125, 4.0, 138.68 - `pos chunck 3
-    // 35.0, 22.0, -23.0 - Posición Incial lvl1
+    // 7.0, 22.0, -21.0- Posición Incial lvl1
     // -68.0, 4.0, -22.0 - Primera rampa lvl1
     // -6.0, 4.0, 94.0 - Campamento lvl1
     // -126.0, 4.0, 152.0 - Segundo altar lvl1
@@ -66,7 +66,7 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e);
+    // em.addComponent<AttackComponent>(e);
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
@@ -131,7 +131,7 @@ void Game::run()
     render_system.setShader(shader);
     collision_system.setEventManager(evm);
     auto& sound_system = em.getSingleton<SoundSystem>();
-  
+
     // Incializamos FPSs
     engine.setTargetFPS(120);
 
@@ -161,7 +161,6 @@ void Game::run()
     float currentTime{}, elapsed{};
 
     createSound();
-    li.sound_system = &sound_system;
     attack_system.setCollisionSystem(&collision_system);
 
     while (!li.gameShouldEnd)
@@ -205,7 +204,7 @@ void Game::run()
         // CODIGO DE LA PANTALLA DE PAUSA
         case GameScreen::PAUSE:
         {
-            render_system.drawPauseMenu(engine, em, sound_system);
+            render_system.drawPauseMenu(engine, em);
             break;
         }
 
@@ -230,10 +229,10 @@ void Game::run()
         // CODIGO DEL GAMEPLAY
         case GameScreen::GAMEPLAY:
         {
-             if (sound_system.ambient_started == false) {
+            if (sound_system.ambient_started == false) {
                 sound_system.playAmbient();
                 sound_system.ambient_started = true;
-            } 
+            }
             if (em.getEntities().empty() || li.resetGame)
                 resetGame();
 
@@ -375,5 +374,4 @@ void Game::resetGame()
     lock_system.reset();
     map.reset(em, li.mapID, iam);
     createEntities();
-    li.sound_system = &em.getSingleton<SoundSystem>();
 }

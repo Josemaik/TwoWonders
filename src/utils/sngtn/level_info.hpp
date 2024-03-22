@@ -81,7 +81,6 @@ struct LevelInfo
     bool levelChanged{ false };
 
     // Para estado de pausa y cerrar el juego
-    SoundSystem* sound_system{ nullptr };
     bool openChest{ false };
     bool gameShouldEnd{ false };
 
@@ -150,10 +149,9 @@ struct LevelInfo
         debugIA2 = false;
         resetGame = false;
         num_zone = 0;
-        mapID = 1;
+        mapID = 0;
         chestToOpen = max;
         dungeonKeyCreated = false;
-        sound_system = nullptr;
         openChest = false;
         gameShouldEnd = false;
         levelChanged = false;

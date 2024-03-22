@@ -70,7 +70,8 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                     auto& life = em.getComponent<LifeComponent>(*playerEnt);
                     life.increaseMaxLife();
                     life.increaseLife(4);
-                    em.getSingleton<SoundSystem>().sonido_aum_vida_max();
+                    // FIXME: Crashea el juego
+                    // em.getSingleton<SoundSystem>().sonido_aum_vida_max();
                 }
                 break;
             }
@@ -86,8 +87,8 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                 //em.getSingleton<SoundSystem>().sonido_llave();
                 Item key = { "Llave", "Una llave, parece que solo puede abrir una puerta" };
                 plfi.addItem(std::make_unique<Item>(key));
-                
-                
+
+
                 break;
             }
             case ObjectType::Fire_Spell:

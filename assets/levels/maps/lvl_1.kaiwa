@@ -1418,7 +1418,7 @@
 							"scale": [7.0, 3.0, 17.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.4,
-							"life": 2,
+							"life": 10,
 							"type": 8,
 							"element": 1,
 							"arrival_radius": 2.0,

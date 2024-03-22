@@ -452,7 +452,6 @@ void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& ent, Physi
             ab.angrySound = true;
             ab.angrySoundOneTime = false;
         }
-        
     }
 }
 
@@ -538,6 +537,9 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
             auto& life = em.getComponent<LifeComponent>(*staticEntPtr);
             life.life = life.maxLife;
             plfi.mana = plfi.max_mana - 3.0;
+
+            // FIXME: Crashea el juego
+            // em.getSingleton<SoundSystem>().sonido_checkpoint();
 
             if (otherEntPtr->hasComponent<DispatcherComponent>())
             {
