@@ -230,7 +230,17 @@ void InputSystem::updateInputEvents(EntityManager& em, GameEngine& ge, bool repl
     {
         // Botón de ataque
         if (ge.isKeyDown(KEY_SPACE) || ge.isGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN))
-            gami.addInputEvent(InputEvent::Type::AttackKeyDown, gami.getTime());
+        {
+            auto& li = em.getSingleton<LevelInfo>();
+            auto& player = *em.getEntityByID(li.playerID);
+
+            if (player.hasComponent<AttackComponent>())
+            {
+                auto& atc = em.getComponent<AttackComponent>(player);
+                if (atc.elapsed >= atc.countdown)
+                    gami.addInputEvent(InputEvent::Type::AttackKeyDown, gami.getTime());
+            }
+        }
 
         // Enter
         if (ge.isKeyReleased(KEY_ENTER))

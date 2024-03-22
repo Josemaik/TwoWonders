@@ -1,9 +1,6 @@
 #pragma once
 #include <vector>
 #include <chrono>
-#include <cereal/types/vector.hpp>
-#include <cereal/types/chrono.hpp>
-#include <cereal/archives/json.hpp>
 #include "../vec3D.hpp"
 
 struct InputEvent
@@ -29,6 +26,7 @@ struct InputEvent
 
     Type type{};
     std::chrono::duration<double> timeStamp{};
+    bool used{ false };
 };
 
 struct MovementEvent
@@ -118,13 +116,16 @@ struct GameData
     bool isKeyDown(int key)
     {
         auto time = getTime();
-        if (currentInput.timeStamp < time && time < finalTime)
+        if (currentInput.timeStamp < time && time < finalTime && !currentInput.used)
             switch (currentInput.type)
             {
             case InputEvent::Type::AttackKeyDown:
             {
                 if (key == 32 || key == 7)
+                {
+                    currentInput.used = true;
                     return true;
+                }
                 break;
             }
             default:
@@ -137,13 +138,16 @@ struct GameData
     bool isKeyPressed(int key)
     {
         auto time = getTime();
-        if (currentInput.timeStamp < time && time < finalTime)
+        if (currentInput.timeStamp < time && time < finalTime && !currentInput.used)
             switch (currentInput.type)
             {
             case InputEvent::Type::InteractKeyPressed:
             {
                 if (key == 69 || key == 7)
+                {
+                    currentInput.used = true;
                     return true;
+                }
                 break;
             }
             default:
@@ -156,37 +160,52 @@ struct GameData
     bool isKeyReleased(int key)
     {
         auto time = getTime();
-        if (currentInput.timeStamp < time && time < finalTime)
+        if (currentInput.timeStamp < time && time < finalTime && !currentInput.used)
             switch (currentInput.type)
             {
             case InputEvent::Type::EnterReleased:
             {
                 if (key == 257)
+                {
+                    currentInput.used = true;
                     return true;
+                }
                 break;
             }
             case InputEvent::Type::EscapeReleased:
             {
                 if (key == 256 || key == 15)
+                {
+                    currentInput.used = true;
                     return true;
+                }
                 break;
             }
             case InputEvent::Type::InventoryReleased:
             {
                 if (key == 73 || key == 14)
+                {
+                    currentInput.used = true;
                     return true;
+                }
                 break;
             }
             case InputEvent::Type::LockInReleased:
             {
                 if (key == 70 || key == 6)
+                {
+                    currentInput.used = true;
                     return true;
+                }
                 break;
             }
             case InputEvent::Type::ChangeSpellReleased:
             {
                 if (key == 81)
+                {
+                    currentInput.used = true;
                     return true;
+                }
                 break;
             }
             default:

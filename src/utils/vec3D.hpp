@@ -4,10 +4,12 @@
 #include <optional>
 #include <raylib.h>
 #include <array>
-#define CEREAL_RAPIDJSON_NAMESPACE cereal_rapidjson
+// Si queremos que la serialización sea en json, descomentar las siguientes líneas
+// #define CEREAL_RAPIDJSON_NAMESPACE cereal_rapidjson
+// #include <cereal/archives/json.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/chrono.hpp>
-#include <cereal/archives/json.hpp>
+#include <cereal/archives/binary.hpp>
 
 template <typename DataT>
 struct vec3D

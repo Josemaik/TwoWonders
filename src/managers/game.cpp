@@ -139,10 +139,10 @@ void Game::run()
     unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
 
     // Revisamos si es replay
-    std::ifstream is("assets/data/input/data.json");
+    std::ifstream is("assets/data/input/data.cereal");
     if (is.good())
     {
-        cereal::JSONInputArchive arch(is);
+        cereal::BinaryInputArchive arch(is);
         arch(CEREAL_NVP(gami));
         li.replay = true;
         seed = gami.getRandomSeed();
@@ -326,8 +326,8 @@ void Game::run()
     // Para hacer replay con este archivo hay que colocarlo en la carpeta assets/data/input
     if (!li.replay)
     {
-        std::ofstream os("assets/data/output/data.json");
-        cereal::JSONOutputArchive archive(os);
+        std::ofstream os("assets/data/output/data.cereal", std::ios::binary);
+        cereal::BinaryOutputArchive archive(os);
         archive(CEREAL_NVP(gami));
     }
 
