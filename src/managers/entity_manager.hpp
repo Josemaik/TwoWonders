@@ -133,7 +133,7 @@ namespace ETMG {
 
             std::size_t id_{}; // ID de la entidad
             typename cmp_info::mask_type cmp_mask_{}; // Máscara de componentes
-            typename cmp_info::mask_type tag_mask_{}; // Máscara de tags
+            typename tag_info::mask_type tag_mask_{}; // Máscara de tags
             key_storage_type cmp_keys_{}; // Tupla de las claves de los componentes
         };
 
@@ -153,11 +153,9 @@ namespace ETMG {
         template <typename CMP, typename... InitTypes>
         CMP& addComponent(Entity& e, InitTypes&&... args)
         {
-            // std::cout << "Adding component " << typeid(CMP).name() << std::endl;
             // Revisamos si ya tiene el componente
             if (e.template hasComponent<CMP>())
             {
-                // std::cout << "Component " << typeid(CMP).name() << " already present" << std::endl;
                 return getComponent<CMP>(e);
             }
 
@@ -236,13 +234,29 @@ namespace ETMG {
 
         // Plantilla para destruir un componente de una entidad
         template<typename CMP>
-        void destroyComponent(Entity& e) {
-            if (e.template hasComponent<CMP>()) {
+        void destroyComponent(Entity& e)
+        {
+            if (e.template hasComponent<CMP>())
+            {
                 if constexpr (std::is_same_v<CMP, RenderComponent>)
                     getComponent<RenderComponent>(e).destroyMesh();
 
                 auto key = e.template getComponentKey<CMP>();
                 this->template getCMPStorage<CMP>().erase(key);
+
+                // Elimina el componente de la máscara de componentes
+                e.cmp_mask_ &= ~cmp_info::template mask<CMP>();
+            }
+        }
+
+        // Plantilla para destruir un tag de una entidad
+        template<typename TAG>
+        void destroyTag(Entity& e)
+        {
+            if (e.template hasTag<TAG>())
+            {
+                // Elimina el tag de la máscara de tags
+                e.tag_mask_ &= ~tag_info::template mask<TAG>();
             }
         }
 

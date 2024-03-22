@@ -11,14 +11,16 @@ struct EntityContext_t {
     EntityManager& em;
     Entity& ent;
     //AI
-    AIComponent& ai;
+    AIComponent* ai;
     // RandomShootComponent& rsc;
     // ShootPlayerComponent& spc;
     // DiagonalComponent& dc;
     // DrakeComponent& drc;
     //Components
+    NPCComponent* npc;
     PhysicsComponent& phy;
-    LifeComponent& lifec;
+    RenderComponent& ren;
+    LifeComponent* lifec;
     float deltatime;
 };
 enum class BTNodeStatus_t : uint8_t {

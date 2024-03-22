@@ -2,6 +2,11 @@ obj
 .vscode
 .vscode/*
 ZeldaWonders
+TwoWonders.exe
 TwoWonders
 *.zip
 release
+motor/Motor
+motor/obj
+motor/release
+assets/data

@@ -4,6 +4,12 @@
 #include <optional>
 #include <raylib.h>
 #include <array>
+// Si queremos que la serialización sea en json, descomentar las siguientes líneas
+// #define CEREAL_RAPIDJSON_NAMESPACE cereal_rapidjson
+// #include <cereal/archives/json.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/chrono.hpp>
+#include <cereal/archives/binary.hpp>
 
 template <typename DataT>
 struct vec3D
@@ -166,12 +172,12 @@ struct vec3D
         return max;
     }
 
-    double max() const {
-        return std::max({ x_, y_, z_ });
+    DataT max() const {
+        return std::max(std::max(x_, y_), z_);
     }
 
-    double min() const {
-        return std::min({ x_, y_, z_ });
+    DataT min() const {
+        return std::min(std::min(x_, y_), z_);
     }
 
     static constexpr vec3D abs(const vec3D& a)
@@ -232,6 +238,18 @@ struct vec3D
         return os;
     }
 
+    // Cuando DataT es float, pasarlo a double
+    constexpr vec3D<double> toDouble() const noexcept
+    {
+        return vec3D<double>{ static_cast<double>(x_), static_cast<double>(y_), static_cast<double>(z_) };
+    }
+
+    constexpr vec3D<float> toFloat() const noexcept
+    {
+        return vec3D<float>{ static_cast<float>(x_), static_cast<float>(y_), static_cast<float>(z_) };
+    }
+
+
     void updateLowest(vec3D const& v) noexcept
     {
         if (x_ <= y_ && x_ <= z_) {
@@ -243,6 +261,29 @@ struct vec3D
         else {
             z_ += v.z_ < 0 ? -v.z_ : v.z_;
         }
+    }
+
+    // Devuelve el ángulo entre dos vectores en radianes
+    constexpr DataT angle(vec3D const& rhs) const
+    {
+        return std::acos(dotProduct(rhs) / (length() * rhs.length()));
+    }
+
+    // Devuelve el ángulo entre dos vectores en grados
+    constexpr DataT angleDeg(vec3D const& rhs) const
+    {
+        return angle(rhs) * 180 / 3.14159265358979323846;
+    }
+
+    constexpr DataT distance(vec3D const& rhs) const
+    {
+        return (rhs - *this).length();
+    }
+
+    template <typename Archive>
+    void serialize(Archive& archive)
+    {
+        archive(x_, y_, z_);
     }
 
 private:
@@ -264,6 +305,10 @@ struct vec2D
 {
     constexpr vec2D() = default;
     constexpr vec2D(DataT x, DataT y) : x{ x }, y{ y } {}
+    constexpr Vector2 toRaylib() const noexcept
+    {
+        return Vector2{ static_cast<float>(x),  static_cast<float>(y) };
+    }
 
     DataT x{}, y{};
 };
