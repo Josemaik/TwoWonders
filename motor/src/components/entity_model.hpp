@@ -1,8 +1,9 @@
 #pragma once
 #include "node.hpp"
 #include "entity.hpp"
-#include "resource_mesh.hpp"
+#include "../resources/resource_mesh.hpp"
 #include "../managers/resource_manager.hpp"
+#include "../managers/render_manager.hpp"
 
 #include <vector>
 #include <glm/glm.hpp>
@@ -14,18 +15,21 @@
 struct Model : Entity{
 private:
     const char* m_name;
-    std::vector<std::shared_ptr<Mesh>> m_meshes; 
+    std::vector<Mesh*> m_meshes; 
     bool m_loaded { false };
+
+    Color color = WHITE;
 
     void processNode(aiNode*, const aiScene*, ResourceManager& rm);
     void processMesh(aiMesh*, const aiScene*, ResourceManager& rm);
 
 public:
+    bool drawModel { true }, drawWires { false };
+
     void load(const char* filePath, ResourceManager& rm);
     void unload(ResourceManager& rm);
-    void draw(glm::mat4) const override;
+    void draw(glm::mat4) override;
 
     bool isLoaded(){ return m_loaded; };
-
-    const std::vector<std::shared_ptr<Mesh>>& getMeshes() const { return m_meshes; };
+    void setColor(Color c){ color = c; };
 };

@@ -33,7 +33,16 @@ public:
     int getGamepadAxisCount(int gamepad);
     float getGamepadAxisMovement(int gamepad, int axis);
 
-    // Mouse
+    // Input-related functions: mouse
+    bool isMouseButtonPressed(int button);
+    bool isMouseButtonDown(int button);
+    bool isMouseButtonReleased(int button);
+    bool isMouseButtonUp(int button);
+    int getMouseX(GLFWwindow* window);
+    int getMouseY(GLFWwindow* window);
+    void setMousePosition(GLFWwindow* window, int x, int y);
+
+    static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
 private:
     // Key States
@@ -42,6 +51,10 @@ private:
 
     // Button States
     GLFWgamepadstate m_gamepadStates[GLFW_JOYSTICK_LAST + 1];
+
+    // Mouse States
+    int m_mouseButtonStates[GLFW_MOUSE_BUTTON_LAST] = { GLFW_RELEASE };
+    int m_mouseButtonReleaseStates[GLFW_MOUSE_BUTTON_LAST] = { GLFW_RELEASE };
 
     // Instance
     static InputManager& getInstance(){

@@ -24,9 +24,9 @@ public:
     // Mesh data
     std::vector<Vertex> vertices;
     std::vector<u_int16_t> indices;
-    std::vector<std::shared_ptr<Texture>> textures;
+    std::vector<Texture*> textures;
 
-    Mesh(std::size_t, std::vector<Vertex>, std::vector<u_int16_t>, std::vector<std::shared_ptr<Texture>>);
+    Mesh(std::size_t, std::vector<Vertex>, std::vector<u_int16_t>, std::vector<Texture*>);
 
     bool load() override;
     void unload() override;

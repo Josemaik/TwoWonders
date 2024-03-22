@@ -1,160 +1,126 @@
 #include "darkmoon.hpp"
 
+Node* createHUD(DarkMoonEngine& engine){
+    // Node HUD
+    auto p_nodeHUD = engine.CreateNode("HUD", engine.GetRootNode());
+    
+    // Node: Rectangulo Naranja Oscuro
+    engine.CreateRectangle({12.0f, 12.0f}, {200.0f, 40.0f}, ORANGE_DARK, "Rectangulo naranja oscuro", p_nodeHUD);
+    // Node: Rectangulo Naranja
+    engine.CreateRectangle({10.0f, 10.0f}, {200.0f, 40.0f}, ORANGE, "Rectangulo naranja", p_nodeHUD);
+
+    // Node: Texture2D
+    auto nodeTexture = engine.CreateTexture2D({70.0f, 170.0f}, "assets/koromaru.png", WHITE, "Textura Koromaru", p_nodeHUD);
+    nodeTexture->scale({0.3f, 0.3f, 1.0f});
+
+    // // Node: Pixel Negro
+    // engine.CreatePixel({400.0f, 300.0f}, BLACK, "Pixel negro", p_nodeHUD);
+    // // Node: Linea Roja
+    // engine.CreateLine({0.0f, 0.0f}, {700.0f, 600.0f}, RED, "Linea roja", p_nodeHUD);
+    // // Node: Triangulo Verde
+    // engine.CreateTriangle({10.0f, 54.0f}, {10.0f, 590.0f}, {210.0f, 590.0f}, KAIWA, "Triangulo verde", p_nodeHUD);
+    // // Node: Circulo 
+    // engine.CreateCircle({250.0f, 50.0f}, 30.0f, 20, LAVENDER, "Circulo lavanda", p_nodeHUD);
+
+    return p_nodeHUD;
+}
+
+Node* createScene3D(DarkMoonEngine& engine){
+    // Node Scene 3D
+    auto p_node3D = engine.CreateNode("Scene 3D", engine.GetRootNode());
+
+    // Node: Rejilla
+    engine.CreateGrid(10, 1.0f, GRAY, "Rejilla principal", p_node3D);
+
+    // Node: Linea diagonal
+    engine.CreatePoint3D({-1.0f, 0.0f, 1.0f}, 5.0f, BLACK, "Punto principio linea", p_node3D);
+    engine.CreateLine3D({-1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, -1.0f}, 2.0f, YELLOW_DARK, "Linea amarilla", p_node3D);
+    engine.CreatePoint3D({1.0f, 1.0f, -1.0f}, 5.0f, BLACK, "Punto fin linea", p_node3D);
+
+    // Node: Plano
+    engine.CreatePlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, PINK, "Plano rosita", p_node3D);
+
+    // Node: Cubo
+    engine.CreateCube({-3.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, AQUA_DARK, "Cubo azulito", p_node3D);
+    // Node: Wireframe
+    engine.CreateCubeWires({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, BLACK, "Wireframe", p_node3D);
+
+    // Node: Modelo
+    auto model = engine.CreateModel("assets/Dummy.obj", GRAY, "Modelo: Dummy", p_node3D);
+    model->scale({0.2f, 0.2f, 0.2f});
+    model->setTranslation({0.0f, -0.5f, 0.0f});
+
+    auto eModel = dynamic_cast<Model*>(model->getEntity());
+    eModel->drawModel = true;
+    eModel->drawWires = true;
+
+    return p_node3D;
+}
+
+void inputManager(DarkMoonEngine& engine){
+    auto camera = engine.GetCamera();
+
+    if(engine.IsKeyPressed(KEY_A)){
+        camera->position.x -= 0.1f;
+        camera->target.x   -= 0.1f;
+    }
+    if(engine.IsKeyPressed(KEY_D)){
+        camera->position.x += 0.1f;
+        camera->target.x   += 0.1f;
+    }
+
+    if(engine.IsKeyPressed(KEY_SPACE)){
+        camera->position.y += 0.1f;
+        camera->target.y   += 0.1f;
+    }
+    if(engine.IsKeyPressed(GLFW_KEY_LEFT_SHIFT)){
+        camera->position.y -= 0.1f;
+        camera->target.y   -= 0.1f;
+    }
+
+    if(engine.IsKeyPressed(KEY_W)){
+        camera->position.z -= 0.1f;
+        camera->target.z   -= 0.1f;
+    }
+    if(engine.IsKeyPressed(KEY_S)){
+        camera->position.z += 0.1f;
+        camera->target.z   += 0.1f;
+    }
+}
+
 int main(){
     DarkMoonEngine engine;
 
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
-        // Auxiliars
+        createScene3D(engine);
+        createHUD(engine);
 
-        glm::vec3 positionCharacter = {0.0f, 0.0f, 0.0f};
-        float angleCharacter = 180.0f;
-
-        // ------ //
-        // Camera //
-        // ------ //
-
-        auto camera = engine.CreateCamera("Main");
-        engine.UseCamera(camera);
-
-        // camera->cameraProjection = CameraProjection::CAMERA_ORTHOGRAPHIC;
-
-        // ---- //
-        // Load //
-        // ---- //
-
-        // auto font = engine.LoadFont("assets/fonts/roboto.ttf");
-        // auto shader = engine.LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");
-        auto texture = engine.LoadTexture("assets/koromaru.png");
-        auto texture2 = engine.LoadTexture("assets/wall.jpg");
-
-        auto model = engine.LoadModel("assets/main_character.obj");
-
-        // ------ //
-        // Unload //
-        // ------ //
-
-        //engine.UnloadTexture(texture);
-        //engine.UnloadModel(model);
+        std::cout << "┌──────┐" << std::endl;
+        std::cout << "│ Tree │" << std::endl;
+        std::cout << "└──────┘" << std::endl;
+        engine.GetRootNode()->drawTree();
 
         while(!engine.WindowShouldClose()){
-            // ----- //
-            // Logic //
-            // ----- //
 
-            if(engine.IsKeyPressed(KEY_A)){
-                positionCharacter.x -= 0.1f;
-                camera->position.x  -= 0.1f;
-                angleCharacter       = 270.0f;
-            }
-            if(engine.IsKeyPressed(KEY_D)){
-                positionCharacter.x += 0.1f;
-                camera->position.x  += 0.1f;
-                angleCharacter       = 90.0f;
-            }
-            if(engine.IsKeyPressed(KEY_W)){
-                positionCharacter.z -= 0.1f;
-                camera->position.z  -= 0.1f;
-                angleCharacter       = 180.0f;
-            }
-            if(engine.IsKeyPressed(KEY_S)){
-                positionCharacter.z += 0.1f;
-                camera->position.z  += 0.1f;
-                angleCharacter       = 0.0f;
-            }
+            // Logic
 
-            if(engine.IsKeyPressed(GLFW_KEY_LEFT_SHIFT))
-                camera->position.y -= 0.1f;
-            if(engine.IsKeyPressed(KEY_SPACE))
-                camera->position.y += 0.1f;
+            inputManager(engine);
 
-            camera->target = positionCharacter;
-
-            // ------- //
-            // Drawing //
-            // ------- //
+            // Draw
 
             engine.BeginDrawing();
+
             engine.ClearBackground(WHITE);
-
-            // 3D
-
-            engine.BeginMode3D();
-
-            engine.DrawPoint3DExtra({0.0f, 0.0f, 0.0f}, 5.0f, BLACK);
-            engine.DrawPoint3DExtra({0.0f, 1.0f, 0.0f}, 5.0f, BLACK);
-            engine.DrawPoint3DExtra({0.0f, -1.0f, 0.0f}, 5.0f, BLACK);
-            engine.DrawPoint3DExtra({1.0f, 0.0f, -1.0f}, 5.0f, BLACK);
-            engine.DrawPoint3DExtra({1.0f, 1.0f, -1.0f}, 5.0f, BLACK);
-
-            engine.DrawLine3D({0.0f, 1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, 1.0f, {255, 255, 0, 255});
-            engine.DrawLine3D({-1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, -1.0f}, 1.0f, {255, 255, 0, 255});
-            engine.DrawLine3D({1.0f, 0.0f, -1.0f}, {1.0f, 1.0f, -1.0f}, 1.0f, {255, 255, 0, 255}); 
-
-            engine.DrawGrid(10, 1.0f, {140, 140, 140, 255});
-            engine.DrawPlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, {255, 128, 128, 255});
-
-            engine.DrawCubeV({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, {255, 0, 0, 255});
-            engine.DrawCubeWiresV({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, BLACK);
-            engine.DrawCubeWiresV({-3.0f, 2.0f, 0.0f}, {1.0f, 1.0f, 3.0f}, {128, 0, 128, 255});
-            
-            //engine.DrawModel(model, {0.0f, 0.0f, 0.0f}, 0.2f, {255, 0, 0, 255});
-            //engine.DrawModelWires(model, {0.0f, 0.0f, 0.0f}, 0.2f, BLACK);
-            engine.DrawModelExtra(model, positionCharacter, 0.2f, {0.0f, 1.0f, 0.0f}, angleCharacter, {100, 100, 100, 255});
-            engine.DrawModelWiresExtra(model, positionCharacter, 0.2f, {0.0f, 1.0f, 0.0f}, angleCharacter, BLACK);
-
-            engine.EndMode3D();
-
-            // 2D
-
-            // engine.DrawText("Hola", 0, 0, 24, BLACK);
-
-            engine.DrawRectangle(12, 12, 200, 40, {128, 128, 128, 255});     
-            engine.DrawRectangleV({10, 10}, {200, 40}, {180, 180, 180, 255});
-            engine.DrawRectangleLines({10, 10}, {200, 40}, BLACK);    
-
-            /* PRUEBAS
-            engine.DrawPixel(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, {0, 0, 0, 255});
-            engine.DrawPixelV({20.0f, 40.0f}, BLACK);
-
-            engine.DrawTriangle({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, {255, 128, 50, 255});
-            engine.DrawTriangleLines({560.0f, 300.0f}, {10.0f, 590.0f}, {410.0f, 590.0f}, BLACK);
-
-
-            engine.DrawCircle(engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2, 30.0f, 20, {100, 0, 0, 255});
-            engine.DrawCircleV({engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2}, 20.0f, 20, {255, 100, 0, 255});
-
-            engine.DrawTextureV(texture2, {engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2}, WHITE);
-            engine.DrawTextureEx(texture, {engine.GetScreenWidth() / 2, engine.GetScreenHeight() / 2}, 0.0f, 0.2f, WHITE);
-
-            engine.DrawLine(0, 0, engine.GetScreenWidth(), engine.GetScreenHeight(), {140, 140, 140, 255});
-            engine.DrawLine(0, engine.GetScreenHeight(), engine.GetScreenWidth(), 0, {140, 140, 140, 255});
-            */
+            engine.GetRootNode()->traverse(glm::mat4());
 
             engine.EndDrawing();
         }
-
-        engine.CloseWindow();
     }
 
     return 0;
 }
-
 /*
     // Patron Dirty //
-
-        //----- Gamepad -----//
-        if(im.isGamePadAvailable(0) == 1)
-            std::cout << "Gamepad: " << im.getGamePadName(0) << std::endl;
-
-            // Input
-            im.update();
-
-            // renm.drawTexture3D(rTexture2, {0.0f, 0.0f}, 50.0f, 0.01f, {1.0f, 1.0f, 1.0f, 1.0f});
-
-    //----- Draw -----//
-    // std::cout << "┌──────┐" << std::endl;
-    // std::cout << "│ Draw │" << std::endl;
-    // std::cout << "└──────┘" << std::endl;
-    // nScene->traverse(glm::mat4());
+    // renm.drawTexture3D(rTexture2, {0.0f, 0.0f}, 50.0f, 0.01f, {1.0f, 1.0f, 1.0f, 1.0f});
 */

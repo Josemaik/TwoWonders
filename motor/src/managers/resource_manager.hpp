@@ -1,5 +1,5 @@
 #pragma once
-#include "../components/resource.hpp"
+#include "../resources/resource.hpp"
 
 #include <string>
 #include <memory>
@@ -9,19 +9,37 @@
 struct ResourceManager{
 public:
 
-    inline static std::size_t nextID{ 0 };
-
-    template<typename T> T& getResource(const std::size_t& id){
-        // resource is null -> loadResource
-        return *static_cast<T*>(m_resources[id].get());
+    static ResourceManager& getInstance(){
+        static ResourceManager instance;
+        return instance;
     }
 
-    template<typename T, typename... Args> std::shared_ptr<T> loadResource(Args&&... args){
+    ~ResourceManager(){ 
+        std::cout << "┌────────┐" << std::endl;
+        std::cout << "│ Unload │" << std::endl;
+        std::cout << "└────────┘" << std::endl;
+        
+        unloadAllResources(); 
+    };
+
+    template<typename T> 
+    T* getResource(const std::size_t& id){
+        auto it = m_resources.find(id);
+        if(it != m_resources.end())
+            return static_cast<T*>(it->second.get());
+        
+        return nullptr;
+    }
+
+    template<typename T, typename... Args> 
+    T* loadResource(Args&&... args){
+        // if resource in memory, dont load
         nextID++;
-        auto resource = std::make_shared<T>(nextID, std::forward<Args>(args)...);
+        auto resource = std::make_unique<T>(nextID, std::forward<Args>(args)...);
         if(resource->load()){
-            m_resources[nextID] = resource;
-            return resource;
+            auto rawPtr = resource.get();
+            m_resources[nextID] = std::move(resource);
+            return rawPtr;
         }
         else
             throw std::runtime_error("Error loading resource");
@@ -42,5 +60,8 @@ public:
     }
 
 private:
-    std::unordered_map<std::size_t, std::shared_ptr<Resource>> m_resources;  
+    ResourceManager() = default;
+
+    inline static std::size_t nextID{ 0 };
+    std::unordered_map<std::size_t, std::unique_ptr<Resource>> m_resources;  
 };

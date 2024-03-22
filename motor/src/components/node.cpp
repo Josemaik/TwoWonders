@@ -18,21 +18,17 @@ int Node::addChild(std::unique_ptr<Node> child) {
 }
 
 int Node::removeChild(Node* child) {
-    auto it = std::find_if(m_children.begin(), m_children.end(), [child](const auto& uniqueChild) {
-        return uniqueChild.get() == child;
-    });
+    auto it = std::find_if(m_children.begin(), m_children.end(),
+        [child](const std::unique_ptr<Node>& ptr){ return ptr.get() == child; });
 
-    if (it != m_children.end()) {
+    if(it != m_children.end()){
         m_children.erase(it);
-        (*it)->m_parent = nullptr;
+        child->m_parent = nullptr;
+
         return 0;
     }
+    
     return -1;
-}
-
-bool Node::setEntity(std::shared_ptr<Entity> newEntity) {
-    m_entity = newEntity;
-    return true;
 }
 
 void Node::traverse(glm::mat4 parentMatrix) {
@@ -45,13 +41,13 @@ void Node::traverse(glm::mat4 parentMatrix) {
                 * glm::scale(glm::mat4(1.0f), m_scale);
     }
 
-    std::cout << "Node: " << this->name << std::endl;
-
     // Draw Entity
-    // if(m_entity)
-    //     m_entity->draw(m_transformationMatrix);
-
-    // printTransformationMatrix();
+    if(m_entity)
+        m_entity->draw(m_transformationMatrix);
+    
+    //std::cout << "Node: " << this->name << std::endl;
+    //printTransformationMatrix();
+    //std::cout << "Node: " << this->name << " --> entidad" << std::endl;
 
     for (auto& child : m_children) {
         if(m_updateMatrix)
@@ -82,7 +78,7 @@ void Node::setTransformationMatrix(glm::mat4 newMatrix) {
 }
 
 void Node::translate(glm::vec3 newTranslate){ setTranslation(m_translation + newTranslate); }
-void Node::scale(glm::vec3 newScale){ setScale(m_scale + newScale); }
+void Node::scale(glm::vec3 newScale){ setScale(m_scale * newScale); }
 
 void Node::rotate(glm::vec3 axis, float angle){ 
     auto additionalRotation = glm::angleAxis(glm::radians(angle), glm::normalize(axis));
@@ -92,7 +88,7 @@ void Node::rotate(glm::vec3 axis, float angle){
 
 // GETTERS
 
-std::shared_ptr<Entity> Node::getEntity() { return m_entity; }
+Entity* Node::getEntity() { return m_entity.get(); }
 Node* Node::getParent() { return m_parent; }
 glm::vec3 Node::getTranslation() { return m_translation;}
 glm::quat Node::getRotation() { return m_rotation; }

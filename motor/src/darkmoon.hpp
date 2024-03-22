@@ -4,18 +4,68 @@
 #include "components/entity.hpp"
 #include "components/entity_model.hpp"
 #include "components/entity_camera.hpp"
+
+#include "components/entities2D.hpp"
+#include "components/entities3D.hpp"
+
 #include "managers/resource_manager.hpp"
 #include "managers/windows_manager.hpp"
 #include "managers/render_manager.hpp"
 #include "managers/input_manager.hpp"
-#include "components/resource_shader.hpp"
+#include "resources/resource_shader.hpp"
 
 #include "utils/keys.hpp"
 
 struct DarkMoonEngine{
 public:
-    DarkMoonEngine(){};
+    DarkMoonEngine();
     ~DarkMoonEngine(){};
+
+    // ---------------------- //
+    // Node-related functions //
+    // ---------------------- //
+
+    // Create node in parentNode
+    Node* CreateNode(const char* nodeName, Node* parentNode);
+
+    // 2D
+
+    // Create pixel in node
+    Node* CreatePixel(glm::vec2 position, Color color, const char* nodeName, Node* parentNode);
+    // Create line in node
+    Node* CreateLine(glm::vec2 startPos, glm::vec2 endPos, Color color, const char* nodeName, Node* parentNode);
+    // Create triangle in node
+    Node* CreateTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, Color color, const char* nodeName, Node* parentNode);
+    // Create rectangle in node
+    Node* CreateRectangle(glm::vec2 position, glm::vec2 size, Color color, const char* nodeName, Node* parentNode);
+    // Create circle in node
+    Node* CreateCircle(glm::vec2 position, float radius, int segments, Color color, const char* nodeName, Node* parentNode);
+    // Create texture 2D in node
+    Node* CreateTexture2D(glm::vec2 position, const char* filePath, Color color, const char* nodeName, Node* parentNode);
+    
+    // 3D
+
+    // Create point 3D in node
+    Node* CreatePoint3D(glm::vec3 position, float pointSize, Color color, const char* nodeName, Node* parentNode);
+    // Create line 3D in node
+    Node* CreateLine3D(glm::vec3 startPos, glm::vec3 endPos, float lineSize, Color color, const char* nodeName, Node* parentNode);
+    // Create grid 3D in node
+    Node* CreateGrid(int slices, float spacing, Color color, const char* nodeName, Node* parentNode);
+    // Create plane 3D (XZ) in node
+    Node* CreatePlane(glm::vec3 centerPos, glm::vec2 size, Color color, const char* nodeName, Node* parentNode);
+    // Create cube in node
+    Node* CreateCube(glm::vec3 position, glm::vec3 size, Color color, const char* nodeName, Node* parentNode);
+    // Create cube wires in node
+    Node* CreateCubeWires(glm::vec3 position, glm::vec3 size, Color color, const char* nodeName, Node* parentNode);
+    // Create model in node
+    Node* CreateModel(const char* filePath, Color tint, const char* nodeName, Node* parentNode);
+
+    // EXTRA
+
+    // Create camera
+    Camera* CreateCamera(const char* nodeName, Node* parentNode);
+    // Get root node
+    Node* GetRootNode();
 
     // ------------------------ //
     // Window-related functions //
@@ -44,92 +94,40 @@ public:
     void BeginDrawing();
     // End canvas drawing and swap buffers
     void EndDrawing();
-    // Begin 3D mode
-    void BeginMode3D();
-    // Ends 3D mode
-    void EndMode3D();
 
-    // ------------------------------ //
-    // Basic shapes drawing functions //
-    // ------------------------------ //
-
-    // Draw a pixel
-    void DrawPixel(int posX, int posY, Color color);
-    // Draw a pixel (vector version)
-    void DrawPixelV(glm::vec2 pos, Color color);
-    // Draw a line
-    void DrawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color);
-    // Draw a line (vector version)
-    void DrawLineV(glm::vec2 startPos, glm::vec2 endPos, Color color);
-    // Draw a color-filled triangle
-    void DrawTriangle(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, Color color);
-    // Draw triangle outline
-    void DrawTriangleLines(glm::vec2 v1, glm::vec2 v2, glm::vec2 v3, Color color);
-    // Draw a color-filled rectangle
-    void DrawRectangle(int x, int y, int sizeX, int sizeY, Color color);
-    // Draw a color-filled rectangle (vector version)
-    void DrawRectangleV(glm::vec2 pos, glm::vec2 size, Color color);
-    // Draw rectangle outline
-    void DrawRectangleLines(glm::vec2 pos, glm::vec2 size, Color color);
-    // Draw a color-filled circle
-    void DrawCircle(int centerX, int centerY, float radius, int segments, Color color);
-    // Draw a color-filled circle (vector version)
-    void DrawCircleV(glm::vec2 pos, float radius, int segments, Color color);
-
-    // ------------------------------------- //
-    // Texture Loading and Drawing functions //
-    // ------------------------------------- //
+    // ------------------------ //
+    // Texture Loading unctions //
+    // ------------------------ //
 
     // Load texture from file into GPU memory
-    std::shared_ptr<Texture> LoadTexture(const char* filePath);
+    Texture* LoadTexture(const char* filePath);
     // Unload texture data from CPU and GPU
-    void UnloadTexture(std::shared_ptr<Texture> texture);
-    // Draw a texture
-    void DrawTexture(std::shared_ptr<Texture> texture, int posX, int posY, Color tint);
-    // Draw a texture (vector version)
-    void DrawTextureV(std::shared_ptr<Texture> texture, glm::vec2 pos, Color tint);
-    // Draw a texture with extended parameters
-    void DrawTextureEx(std::shared_ptr<Texture> texture, glm::vec2 pos, float rotation, float scale, Color tint);
-
-    // ------------------------------------------- //
-    // Basic geometric 3D shapes drawing functions //
-    // ------------------------------------------- //
-
-    // Draw a point in 3D space
-    void DrawPoint3D(glm::vec3 pos, Color color);
-    // Draw a point in 3D space with extended parameters
-    void DrawPoint3DExtra(glm::vec3 pos, float pointSize, Color color);
-    // Draw a line in 3D space
-    void DrawLine3D(glm::vec3 startPos, glm::vec3 endPos, float lineSize, Color color);
-    // Draw a grid (centered at (0, 0, 0))
-    void DrawGrid(int slices, float spacing, Color color);
-    // Draw a plane XZ
-    void DrawPlane(glm::vec3 centerPos, glm::vec2 size, Color color);
-    // Draw a cube
-    void DrawCube(glm::vec3 position, float width, float height, float length, Color color);
-    // Draw a cube (vector version)
-    void DrawCubeV(glm::vec3 position, glm::vec3 size, Color color);
-    // Draw a cube wires
-    void DrawCubeWires(glm::vec3 position, float width, float height, float length, Color color);
-    // Draw a cube wires (vector version)
-    void DrawCubeWiresV(glm::vec3 position, glm::vec3 size, Color color);
+    void UnloadTexture(Texture* texture);
 
     // -------------------------------------- //
     // Model 3D Loading and Drawing functions //
     // -------------------------------------- //
 
     // Load model from file into GPU memory
-    std::shared_ptr<Model> LoadModel(const char* filePath);
+    // Model* LoadModel(const char* filePath);
+    // Load model from generated mesh ? TODO
+
     // Unload model data from CPU and GPU
-    void UnloadModel(std::shared_ptr<Model> model);
-    // Draw a model (with texture if set)
-    void DrawModel(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
-    // Draw a model with extended parameters
-    void DrawModelExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
-    // Draw a model wires (with textures if set)
-    void DrawModelWires(std::shared_ptr<Model> model, glm::vec3 position, float scale, Color tint);
-    // Draw a model wires with extended parameters
-    void DrawModelWiresExtra(std::shared_ptr<Model> model, glm::vec3 position, float scale, glm::vec3 rotationAxis, float rotationAngle, Color tint);
+    void UnloadModel(Model* model);
+
+    // ---------------------------------------- //
+    // Mesh management and generation functions //
+    // ---------------------------------------- //
+
+    // TODO
+    // Generate cuboid mesh
+    Mesh* GenerateMeshCube(float width, float height, float length);
+    // Unload mesh data from CPU and GPU
+    void UnloadMesh(Mesh* mesh);
+    // Draw mesh ?
+
+
+    // MATERIAL
 
     // --------------------------------- //
     // Input-related functions: keyboard //
@@ -146,23 +144,63 @@ public:
     // Check if a key is not being pressed
     bool IsKeyUp(int key);
 
+    // ------------------------------ //
+    // Input-related functions: mouse //
+    // ------------------------------ //
+
+    // Check if a mouse button has been pressed once
+    bool IsMouseButtonPressed(int button);
+    // Check if a mouse button is being pressed
+    bool IsMouseButtonDown(int button);
+    // Check if a mouse button has been released once
+    bool IsMouseButtonReleased(int button);
+    // Check if a mouse button is not being pressed
+    bool IsMouseButtonUp(int button);
+    // Get mouse position X
+    int GetMouseX();
+    // Get mouse position Y
+    int GetMouseY();
+    // Set mouse position XY
+    void SetMousePosition(int x, int y);
+
+    // -------------------------------- //
+    // Input-related functions: gamepad //
+    // -------------------------------- //
+
+    // Check if gamepad is available
+    bool IsGamepadAvailable(int gamepad);
+    // Get gamepad internal name id
+    const char* GetGamepadName(int gamepad);
+    // Check is a gamepad button has been pressed once
+    bool IsGamepadButtonPressed(int gamepad, int button);
+    // Check is a gamepad button is being pressed
+    bool IsGamepadButtonDown(int gamepad, int button);
+    // Check is a gamepad button has been released once
+    bool IsGamepadButtonReleased(int gamepad, int button);
+    // Check is a gamepad button is not being pressed
+    bool IsGamepadButtonUp(int gamepad, int button);
+    // Get gamepad axis count for a gamepad
+    int GetGamepadAxisCount(int gamepad);
+    // Get axis movement value for a gamepad axis
+    float GetGamepadAxisMovement(int gamepad, int axis);
+
     // ----------------------------- //
     // Loading / Unloading functions //
     // ----------------------------- //
 
     // Load font from file into GPU memory
-    std::shared_ptr<Font> LoadFont(const char* filePath);
+    Font* LoadFont(const char* filePath);
     // Load shader from file into GPU memory
-    std::shared_ptr<Shader> LoadShader(const char* vsFilePath, const char* fsFilePath);
+    Shader* LoadShader(const char* vsFilePath, const char* fsFilePath);
 
     // ------ //
     // Camera //
     // ------ //
     
-    // Create camera
-    std::shared_ptr<Camera> CreateCamera(const char* name);
-    // Use camera
-    void UseCamera(std::shared_ptr<Camera> newCamera);
+    // Get actual camera
+    Camera* GetCamera(){ return m_renderManager.m_camera; }
+    // Assigns camera
+    void UseCamera(Camera* newCamera){ m_renderManager.setCamera(newCamera); }
 
     // ---------------------- //
     // Text drawing functions //
@@ -171,6 +209,19 @@ public:
     // Draw text (using default font)
     // TODO
     void DrawText(const char* text, int posX, int posY, int fontSize, Color color);
+
+    // ------------------------ //
+    // Timing-related functions //
+    // ------------------------ //
+
+    // Set target FPS (max)
+    void SetTargetFPS(int fps);
+    // Get time in seconds for last frame drawn
+    float GetFrameTime();
+    // Get elapsed time in seconds
+    double GetTime();
+    // Get current FPS
+    int GetFPS();
     
 private:
     // Root node 
@@ -178,10 +229,7 @@ private:
 
     // Managers
     InputManager m_inputManager;
-    RenderManager m_renderManager;
+    RenderManager& m_renderManager = RenderManager::getInstance();
     WindowsManager m_windowsManager;
-    ResourceManager m_resourceManager;
-
-    // Shaders
-    std::shared_ptr<Shader> m_shaderColor, m_shaderTexture, m_shader3D;
+    ResourceManager& m_resourceManager = ResourceManager::getInstance();
 };
