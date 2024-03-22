@@ -469,11 +469,29 @@ void RenderSystem::drawLogoKaiwa(GameEngine& engine) {
 void RenderSystem::drawEnding(GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(WHITE);
-    engine.drawText("FIN DEL NIVEL 1", 250, 250, 50, BLACK);
-    engine.drawText("PRESS [ENTER] TO RETURN TITLE",
-        engine.getScreenWidth() / 2 - 280,
-        engine.getScreenHeight() - 50, 30,
-        BLACK);
+
+    // Valores de la caja de texto
+    float boxWidth = 600.f;
+    float boxHeight = 100.f;
+    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth / 2.f);
+    float posY = static_cast<float>(engine.getScreenHeight() / 2) - (boxHeight / 2.f);
+
+    std::string text = "[ENTER] PARA VOLVER AL TÍTULO";
+
+    if (engine.isGamepadAvailable(0))
+        text = "[X] PARA VOLVER AL TÍTULO";
+
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 40);
+    GuiSetStyle(LABEL, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+
+    GuiLabelButton(Rectangle{ posX, posY, boxWidth, boxHeight },
+        "¡Gracias por jugar a nuestra demo!");
+
+    GuiLabelButton(Rectangle{ posX, posY + 50, boxWidth + 100, boxHeight },
+        text.c_str());
+
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
+
     engine.endDrawing();
 }
 
@@ -1888,7 +1906,7 @@ void RenderSystem::drawDeath(GameEngine& engine)
     GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, 0xFF0000ff);
 
     GuiLabelButton(Rectangle{ posX, posY, boxWidth, boxHeight }, "HAS MUERTO");
-    // engine.drawText("HAS MUERTO", 250, 250, 40, RED);
+
     std::string text = "[ENTER] para volver a jugar";
     if (engine.isGamepadAvailable(0))
         text = "Pulsa [X] para volver a jugar";
