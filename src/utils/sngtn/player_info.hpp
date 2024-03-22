@@ -16,11 +16,11 @@ struct PlayerInfo
     int mana_width{}, armor{};
     bool hasKey{ false };
     bool hasStaff{ false };
+    bool onSpawn{ false };
     std::vector<std::unique_ptr<Item>> inventory{};
     std::vector<Spell> spells{};
     Spell currentSpell{ "None", "No spell", Spells::None, 0.0, 0 };
     std::size_t selectedItem{ max };
-    bool isDead{ false };
     vec3d spawnPoint{};
 
     void addSpell(Spell spell) { spells.push_back(spell); currentSpell = spell; }
@@ -101,13 +101,26 @@ struct PlayerInfo
 
     void decreaseBomb() { if (bombs > 0) bombs -= 1; }
 
+    void onDeath()
+    {
+        mana = max_mana;
+        armor = 0;
+    }
+
     void reset()
     {
+        currentSpell = { "None", "No spell", Spells::None, 0.0, 0 };
+        selectedItem = max;
+        inventory.clear();
+        spells.clear();
+        increaseLife = 0.0;
+        armor = 0;
         coins = 0;
         bombs = 0;
         max_mana = 100.0;
         mana = max_mana;
         mana_width = 0;
         hasKey = false;
+        // spawnPoint = { 33.0, 4.0, -25.9 };
     }
 };

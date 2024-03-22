@@ -24,6 +24,7 @@ struct PhysicsComponent
 
     double gravity{ KGravity };
     bool alreadyGrounded{ false };
+    bool onRamp{ false };
 
     // Ángulo del vector con respecto al eje de origen
     double orientation{ 0.0 };

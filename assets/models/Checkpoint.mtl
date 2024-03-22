@@ -1,0 +1,62 @@
+# Blender 4.0.2 MTL File: 'Zona_1-Prision.blend'
+# www.blender.org
+
+newmtl Checkpoint
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/entity_textures/Checkpoint-texture.png
+
+newmtl Checkpoint_Caldero
+Ns 360.000000
+Ka 0.300000 0.300000 0.300000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/entity_textures/Checkpoint-texture.png
+
+newmtl Checkpoint_Metal
+Ns 490.000000
+Ka 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/entity_textures/Checkpoint-texture.png
+
+newmtl Checkpoint_magia
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 0.900000
+illum 9
+map_Kd textures/entity_textures/Checkpoint-texture.png
+map_Ke textures/entity_textures/Checkpoint-texture.png
+
+newmtl Checkpoint_piedras
+Ns 159.999985
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/entity_textures/Checkpoint-texture.png
+map_Ke textures/entity_textures/Checkpoint-texture.png
+
+newmtl Cristal_pociones
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 0.500000
+illum 9
+map_Kd textures/entity_textures/Checkpoint-texture.png

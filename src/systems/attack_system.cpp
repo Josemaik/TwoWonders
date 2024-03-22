@@ -203,7 +203,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     {
         auto& e{ em.newEntity() };
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = vec3d{att.pos_respawn_crush_attack.x(),
-        att.pos_respawn_crush_attack.y(),att.pos_respawn_crush_attack.z()}, .scale = { 15.0f, 0.1f, 15.0f }, .color = GREEN });
+        att.pos_respawn_crush_attack.y(),att.pos_respawn_crush_attack.z()}, .scale = { 20.0f, 0.1f, 20.0f }, .color = GREEN });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.0 });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::CrusherAttack, .life_time = 2.0f });
         ElementalType tipoElemental;
@@ -406,7 +406,7 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
         em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-        em.addComponent<ProjectileComponent>(e, ProjectileComponent{});
+        em.addComponent<ProjectileComponent>(e);
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = eleType });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
     }
