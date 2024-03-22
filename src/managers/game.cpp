@@ -39,7 +39,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 7.0, 22.0, -21.0 };
+        plfi.spawnPoint = { -116.0, 4.0, 111.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -47,7 +47,7 @@ void Game::createEntities()
     // -72.0, 4.0, 72.9 - Cofre con llave
     // -116.0, 4.0, 111.0 - Apisonadora
     // -125, 4.0, 138.68 - `pos chunck 3
-    // 7.0, 22.0, -21.0- Posición Incial lvl1
+    // 7.0, 22.0, -21.0 - Posición Incial lvl1
     // -68.0, 4.0, -22.0 - Primera rampa lvl1
     // -6.0, 4.0, 94.0 - Campamento lvl1
     // -126.0, 4.0, 152.0 - Segundo altar lvl1
@@ -259,7 +259,7 @@ void Game::run()
                 while (elapsed >= timeStep)
                 {
                     elapsed -= timeStep;
-            
+
                     ai_system.update(em, timeStep);
                     npc_system.update(em, timeStep);
                     physics_system.update(em, timeStep);

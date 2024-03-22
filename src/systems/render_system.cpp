@@ -38,7 +38,7 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine, double dt)
     });
 
     // Empezamos el frame
-    beginFrame(engine);
+    beginFrame(engine, em);
 
     // Dibuja todas las entidades con componente de render
     drawEntities(em, engine);
@@ -964,11 +964,24 @@ void RenderSystem::loadShaders(Model& model)
 }
 
 // Empieza el dibujado y se limpia la pantalla
-void RenderSystem::beginFrame(GameEngine& engine)
+void RenderSystem::beginFrame(GameEngine& engine, EntityManager& em)
 {
     engine.beginDrawing();
 
-    engine.clearBackground(RAYWHITE);
+    auto& li = em.getSingleton<LevelInfo>();
+
+    Color bgColor = RAYWHITE;
+    switch (li.mapID)
+    {
+    case 0:
+        bgColor = RAYWHITE;
+        break;
+    case 1:
+        bgColor = { 103, 49, 71, 255 };
+        break;
+    }
+
+    engine.clearBackground(bgColor);
 
     engine.beginMode3D();
     //engine.drawGrid(50, 1.f);
@@ -2223,5 +2236,5 @@ void RenderSystem::displayGif(GameEngine& engine, Texture2D& copy, GameEngine::G
 
 double RenderSystem::shakeDouble(double value)
 {
-    return value += static_cast<double>(rand() % 3 - 1) / 5.0;
+    return value += static_cast<double>(std::rand() % 3 - 1) / 5.0;
 }

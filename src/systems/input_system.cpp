@@ -9,7 +9,8 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     auto& player = *em.getEntityByID(li.playerID);
     auto& gami = em.getSingleton<GameData>();
 
-    updateInputEvents(em, ge, li.replay);
+    if (li.replay)
+        gami.update();
 
     // Si no hay jugador, no hacemos nada
     if (li.isDead)
@@ -105,6 +106,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     }
 
     // Código de movimiento
+    // std::chrono::duration<float, std::milli> velTime{};
     if (!li.replay)
     {
         if (ge.isKeyDown(in.right))
@@ -112,6 +114,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             vel.setX(vel.x() - INP_SPEED);
             vel.setZ(vel.z() + INP_SPEED);
 
+            // velTime = gami.getTime();
             keysPressed++;
         }
         if (ge.isKeyDown(in.left))
@@ -119,6 +122,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             vel.setX(vel.x() + INP_SPEED);
             vel.setZ(vel.z() - INP_SPEED);
 
+            // velTime = gami.getTime();
             keysPressed++;
         }
         if (ge.isKeyDown(in.up))
@@ -126,6 +130,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             vel.setX(vel.x() + INP_SPEED);
             vel.setZ(vel.z() + INP_SPEED);
 
+            // velTime = gami.getTime();
             keysPressed++;
         }
         if (ge.isKeyDown(in.down))
@@ -134,6 +139,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             vel.setX(vel.x() - INP_SPEED);
             vel.setZ(vel.z() - INP_SPEED);
 
+            // velTime = gami.getTime();
             keysPressed++;
         }
 
@@ -168,9 +174,24 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             vel.setX(vel.x() + (-joystick_y + joystick_x) * speed);
             vel.setZ(vel.z() + (-joystick_y - joystick_x) * speed);
 
+            // velTime = gami.getTime();
+
             if (in.m_joystickX != 0 && in.m_joystickY != 0)
                 vel.normalize();
         }
+
+        // Normalizar la velocidad si se está moviendo en diagonal
+        if (vel.x() != 0.0f && vel.z() != 0.0f)
+        {
+            vel.normalize();
+        }
+
+        // Guardamos el registro de la velocidad
+        gami.addMovementEvent(vel, gami.getTime());
+    }
+    else
+    {
+        gami.setVel(vel);
     }
 
     // Código para el lock-in
@@ -183,14 +204,21 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     bb.teid = player.getID();
 
     // Codigo para el ataque
-    if ((ge.isKeyDown(in.space) || ge.isGamepadButtonPressed(0, in.m_space)) && player.hasComponent<AttackComponent>())
-        em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
-    else if (plfi.mana < plfi.max_mana)
+    if (player.hasComponent<AttackComponent>())
     {
-        plfi.mana += .07;
+        auto& atc = em.getComponent<AttackComponent>(player);
+        if (atc.elapsed >= atc.countdown)
+        {
+            if ((ge.isKeyDown(in.space) || ge.isGamepadButtonPressed(0, in.m_space)))
+                em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
+            else if (plfi.mana < plfi.max_mana)
+            {
+                plfi.mana += .07;
 
-        if (plfi.mana > plfi.max_mana)
-            plfi.mana = plfi.max_mana;
+                if (plfi.mana > plfi.max_mana)
+                    plfi.mana = plfi.max_mana;
+            }
+        }
     }
 
     if (ge.isKeyPressed(in.interact) || ge.isGamepadButtonPressed(0, in.m_interact))
@@ -206,72 +234,8 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     if (ge.isKeyDown(KEY_Z) && player.hasComponent<LifeComponent>())
         em.getComponent<LifeComponent>(player).increaseLife();
 
-    // Normalizar la velocidad si se está moviendo en diagonal
-    if (vel.x() != 0.0f && vel.z() != 0.0f)
-    {
-        vel.normalize();
-    }
-
-    // Guardamos el registro de la velocidad
-    if (!li.replay)
-        gami.addMovementEvent(vel, gami.getTime());
-    else
-        gami.setVel(vel);
 }
 
 bool InputSystem::pressEnter(GameEngine& ge) {
     return ge.isKeyReleased(KEY_ENTER) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN);
-}
-
-void InputSystem::updateInputEvents(EntityManager& em, GameEngine& ge, bool replay)
-{
-    auto& gami = em.getSingleton<GameData>();
-    if (!replay)
-    {
-        // Botón de ataque
-        if (ge.isKeyDown(KEY_SPACE) || ge.isGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN))
-        {
-            auto& li = em.getSingleton<LevelInfo>();
-            auto& player = *em.getEntityByID(li.playerID);
-
-            if (player.hasComponent<AttackComponent>())
-            {
-                auto& atc = em.getComponent<AttackComponent>(player);
-                if (atc.elapsed >= atc.countdown)
-                    gami.addInputEvent(InputEvent::Type::AttackKeyDown, gami.getTime());
-            }
-        }
-
-        // Enter
-        if (ge.isKeyReleased(KEY_ENTER))
-            gami.addInputEvent(InputEvent::Type::EnterReleased, gami.getTime());
-
-        // Escape
-        if (ge.isKeyReleased(KEY_ESCAPE))
-            gami.addInputEvent(InputEvent::Type::EscapeReleased, gami.getTime());
-
-        // Inventario
-        if (ge.isKeyReleased(KEY_I) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_MIDDLE_LEFT))
-            gami.addInputEvent(InputEvent::Type::InventoryReleased, gami.getTime());
-
-        // Lock-in
-        if (ge.isKeyReleased(KEY_F) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT))
-            gami.addInputEvent(InputEvent::Type::LockInReleased, gami.getTime());
-
-        // Cambiar de hechizo
-        if (ge.isKeyReleased(KEY_Q))
-            gami.addInputEvent(InputEvent::Type::ChangeSpellReleased, gami.getTime());
-
-        // Interactuar - apretar
-        if (ge.isKeyPressed(KEY_E) || ge.isGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN))
-            gami.addInputEvent(InputEvent::Type::InteractKeyPressed, gami.getTime());
-
-        // Interactuar - soltar
-        if (ge.isKeyReleased(KEY_E) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN))
-            gami.addInputEvent(InputEvent::Type::InteractKeyReleased, gami.getTime());
-    }
-    else
-    {
-        gami.update();
-    }
 }

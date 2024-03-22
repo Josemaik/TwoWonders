@@ -37,7 +37,7 @@ struct RenderSystem
     // Funciones double dtprivadas para organizar el codigo
 private:
     void init();
-    void beginFrame(GameEngine& engine);
+    void beginFrame(GameEngine& engine, EntityManager& em);
     void endFrame(GameEngine& engine, EntityManager& em, double dt);
     void drawHUD(EntityManager& em, GameEngine& engine, bool debugphy);
     void drawEntities(EntityManager& em, GameEngine& engine);

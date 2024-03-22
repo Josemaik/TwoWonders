@@ -15,9 +15,6 @@ struct InputSystem
     void update(EntityManager& em, GameEngine& ge);
 
     bool pressEnter(GameEngine& ge);
-
-private:
-    void updateInputEvents(EntityManager& em, GameEngine& ge, bool replay);
 };
 
 #endif // !INPUT_MANAGER

@@ -325,7 +325,21 @@ bool ENGI::GameEngine::isKeyPressed(int key)
     if (replayMode)
         return gameData->isKeyPressed(key);
     else
-        return IsKeyPressed(key);
+    {
+        if (IsKeyPressed(key))
+        {
+            switch (key)
+            {
+            case KEY_E:
+                gameData->addInputEvent(InputEvent::Type::InteractKeyPressed, gameData->getTime());
+                break;
+            default:
+                break;
+            }
+            return true;
+        }
+        return false;
+    }
 }
 
 bool ENGI::GameEngine::isKeyDown(int key)
@@ -333,7 +347,21 @@ bool ENGI::GameEngine::isKeyDown(int key)
     if (replayMode)
         return gameData->isKeyDown(key);
     else
-        return IsKeyDown(key);
+    {
+        if (IsKeyDown(key))
+        {
+            switch (key)
+            {
+            case KEY_SPACE:
+                gameData->addInputEvent(InputEvent::Type::AttackKeyDown, gameData->getTime());
+                break;
+            default:
+                break;
+            }
+            return true;
+        }
+        return false;
+    }
 }
 
 bool ENGI::GameEngine::isKeyReleased(int key)
@@ -341,7 +369,36 @@ bool ENGI::GameEngine::isKeyReleased(int key)
     if (replayMode)
         return gameData->isKeyReleased(key);
     else
-        return IsKeyReleased(key);
+    {
+        if (IsKeyReleased(key))
+        {
+            switch (key)
+            {
+            case KEY_ENTER:
+                gameData->addInputEvent(InputEvent::Type::EnterReleased, gameData->getTime());
+                break;
+            case KEY_ESCAPE:
+                gameData->addInputEvent(InputEvent::Type::EscapeReleased, gameData->getTime());
+                break;
+            case KEY_I:
+                gameData->addInputEvent(InputEvent::Type::InventoryReleased, gameData->getTime());
+                break;
+            case KEY_F:
+                gameData->addInputEvent(InputEvent::Type::LockInReleased, gameData->getTime());
+                break;
+            case KEY_Q:
+                gameData->addInputEvent(InputEvent::Type::ChangeSpellReleased, gameData->getTime());
+                break;
+            case KEY_E:
+                gameData->addInputEvent(InputEvent::Type::InteractKeyReleased, gameData->getTime());
+                break;
+            default:
+                break;
+            }
+            return true;
+        }
+        return false;
+    }
 }
 
 bool ENGI::GameEngine::isMouseButtonPressed(int button)
@@ -361,7 +418,39 @@ bool ENGI::GameEngine::isGamepadAvailable(int gamepad)
 
 bool ENGI::GameEngine::isGamepadButtonPressed(int gamepad, int button)
 {
-    return IsGamepadButtonPressed(gamepad, button);
+    if (replayMode)
+    {
+        switch (button)
+        {
+        case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+            return gameData->isKeyPressed(KEY_E);
+            break;
+        case GAMEPAD_BUTTON_RIGHT_FACE_LEFT:
+            return gameData->isKeyDown(KEY_SPACE);
+            break;
+        default:
+            return false;
+        }
+    }
+    else
+    {
+        if (IsGamepadButtonPressed(gamepad, button))
+        {
+            switch (button)
+            {
+            case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+                gameData->addInputEvent(InputEvent::Type::InteractKeyPressed, gameData->getTime());
+                break;
+            case GAMEPAD_BUTTON_RIGHT_FACE_LEFT:
+                gameData->addInputEvent(InputEvent::Type::AttackKeyDown, gameData->getTime());
+                break;
+            default:
+                break;
+            }
+            return true;
+        }
+        return false;
+    }
 }
 
 bool ENGI::GameEngine::isGamepadButtonDown(int gamepad, int button)
@@ -371,7 +460,45 @@ bool ENGI::GameEngine::isGamepadButtonDown(int gamepad, int button)
 
 bool ENGI::GameEngine::isGamepadButtonReleased(int gamepad, int button)
 {
-    return IsGamepadButtonReleased(gamepad, button);
+    if (replayMode)
+    {
+        switch (button)
+        {
+        case GAMEPAD_BUTTON_MIDDLE_LEFT:
+            return gameData->isKeyReleased(KEY_I);
+            break;
+        case GAMEPAD_BUTTON_RIGHT_FACE_RIGHT:
+            return gameData->isKeyReleased(KEY_F);
+            break;
+        case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+            return gameData->isKeyReleased(KEY_E);
+            break;
+        default:
+            return false;
+        }
+    }
+    else
+    {
+        if (IsGamepadButtonReleased(gamepad, button))
+        {
+            switch (button)
+            {
+            case GAMEPAD_BUTTON_MIDDLE_LEFT:
+                gameData->addInputEvent(InputEvent::Type::InventoryReleased, gameData->getTime());
+                break;
+            case GAMEPAD_BUTTON_RIGHT_FACE_RIGHT:
+                gameData->addInputEvent(InputEvent::Type::LockInReleased, gameData->getTime());
+                break;
+            case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+                gameData->addInputEvent(InputEvent::Type::InteractKeyReleased, gameData->getTime());
+                break;
+            default:
+                break;
+            }
+            return true;
+        }
+        return false;
+    }
 }
 
 float ENGI::GameEngine::getGamepadAxisMovement(int gamepad, int axis)
