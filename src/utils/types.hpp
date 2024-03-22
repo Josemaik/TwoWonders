@@ -44,6 +44,7 @@
 // External Libraries
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
+#include "../systems/sound_system.hpp"
 
 // Constants
 static constexpr double K_PI = 3.14159265358979323846;
@@ -159,7 +160,7 @@ using TL = MP::TypeList <
     NPCTag,
     LevelChangeTag
 > ;
-using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo>;
+using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;

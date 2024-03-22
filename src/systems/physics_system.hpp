@@ -13,6 +13,8 @@ struct PhysicsSystem
 
 private:
     float elapsed{ 0.f }, elapsed_limit{ 1.0f };
+    float elapsedSound{ 0.f }, elapsedSound_limit{ 1.0f };
+    bool playerWalking { false };
 };
 
 #endif // !PHYSICS_SYSTEM

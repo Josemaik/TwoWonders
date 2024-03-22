@@ -95,7 +95,7 @@ void Game::createEntities()
 
 //inicializar bancos
 void Game::createSound() {
-    sound_system.initBanks("assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Music.bank");
+    em.getSingleton<SoundSystem>().initBanks("assets/banks/Master.bank", "assets/banks/Master.strings.bank", "assets/banks/UI.bank", "assets/banks/Ambient.bank", "assets/banks/Music.bank", "assets/banks/SFX.bank");
     //sound_system.createEventInstance();
     //sound_system.play();
 }
@@ -130,7 +130,8 @@ void Game::run()
 
     render_system.setShader(shader);
     collision_system.setEventManager(evm);
-
+    auto& sound_system = em.getSingleton<SoundSystem>();
+  
     // Incializamos FPSs
     engine.setTargetFPS(120);
 
@@ -229,6 +230,10 @@ void Game::run()
         // CODIGO DEL GAMEPLAY
         case GameScreen::GAMEPLAY:
         {
+             if (sound_system.ambient_started == false) {
+                sound_system.playAmbient();
+                sound_system.ambient_started = true;
+            } 
             if (em.getEntities().empty() || li.resetGame)
                 resetGame();
 
@@ -269,7 +274,7 @@ void Game::run()
                     sound_system.update();
                     // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     camera_system.update(em, engine, timeStep);
-                    event_system.update(em, evm, iam, map, object_system);
+                    event_system.update(em, evm, iam, map, object_system, sound_system);
 
                     if (!li.getDeath().empty())
                     {
@@ -370,5 +375,5 @@ void Game::resetGame()
     lock_system.reset();
     map.reset(em, li.mapID, iam);
     createEntities();
-    li.sound_system = &sound_system;
+    li.sound_system = &em.getSingleton<SoundSystem>();
 }

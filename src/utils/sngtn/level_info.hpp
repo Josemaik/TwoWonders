@@ -51,6 +51,7 @@ struct LevelInfo
     bool transition{ false };
     bool cameraChange{ false };
     vec3d viewPoint{};
+    bool viewPointSound{ false };
 
     // Variables de lock on
     std::size_t lockedEnemy{ max };
@@ -81,6 +82,7 @@ struct LevelInfo
 
     // Para estado de pausa y cerrar el juego
     SoundSystem* sound_system{ nullptr };
+    bool openChest{ false };
     bool gameShouldEnd{ false };
 
     // Tutorial
@@ -152,6 +154,7 @@ struct LevelInfo
         chestToOpen = max;
         dungeonKeyCreated = false;
         sound_system = nullptr;
+        openChest = false;
         gameShouldEnd = false;
         levelChanged = false;
     }

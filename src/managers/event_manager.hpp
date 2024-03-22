@@ -38,7 +38,7 @@ public:
     }
 
     // Dispara todos los eventos pendientes
-    void dispatchEvents(EntityManager& em, MapManager& mm, Ia_man& iam, ObjectSystem& os) {
+    void dispatchEvents(EntityManager& em, MapManager& mm, Ia_man& iam, ObjectSystem& os, SoundSystem& ss) {
         // Recorre todos los eventos pendientes
         bool out = false;
         while (!events.empty() && !out) {
@@ -77,6 +77,8 @@ public:
                         auto& chest = *em.getEntityByID(li.chestToOpen);
                         auto& cc = em.getComponent<ChestComponent>(chest);
 
+                        ss.sonido_abrir_cofre();
+
                         os.addObject(cc.content, playerPos);
                         auto& msgs = cc.messages;
                         while (!msgs.empty())
@@ -86,6 +88,7 @@ public:
                         }
 
                         li.chestToOpen = li.max;
+                        li.openChest = true;
 
                         if (chest.hasComponent<DispatcherComponent>())
                         {
@@ -98,6 +101,7 @@ public:
                             }
                         }
 
+
                         break;
                     }
                     case EventCodes::SetSpawn:
@@ -109,6 +113,8 @@ public:
                     {
                         auto& li = em.getSingleton<LevelInfo>();
                         auto& plfi = em.getSingleton<PlayerInfo>();
+
+                        ss.sonido_abrir_puerta();
 
                         plfi.hasKey = false;
                         li.insertDeath(li.doorToOpen);
@@ -129,6 +135,7 @@ public:
                     {
                         auto& li = em.getSingleton<LevelInfo>();
                         li.viewPoint = { -100.554, 4.935, 145.0 };
+                        li.viewPointSound = true;
                         break;
                     }
                     case EventCodes::DialogPrisonNomad1:

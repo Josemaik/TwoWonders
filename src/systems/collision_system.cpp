@@ -447,6 +447,12 @@ void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& ent, Physi
         auto& ab = em.getComponent<AngryBushComponent>(ent);
         ab.chargeAttack = true;
         ab.move = false;
+        if (ab.angrySoundOneTime)
+        {
+            ab.angrySound = true;
+            ab.angrySoundOneTime = false;
+        }
+        
     }
 }
 
@@ -508,6 +514,7 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         if (!otherEntPtr->hasTag<DummyTag>() && !otherEntPtr->hasTag<CrusherTag>())
         {
             resolvePlayerDirection(*staticPhy, *otherPhy, true);
+            em.getSingleton<SoundSystem>().sonido_rebote();
             return;
         }
         else if (otherEntPtr->hasTag<CrusherTag>() || otherEntPtr->hasTag<DummyTag>())
@@ -563,6 +570,7 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
 
             // El jugador se mueve hacia atrás de la posición del crusher
             resolvePlayerDirection(*staticPhy, *otherPhy, false);
+            em.getSingleton<SoundSystem>().sonido_rebote();
         }
         return;
     }

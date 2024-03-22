@@ -48,6 +48,9 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine, double dt)
 }
 
 void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss) {
+    ss.ambient_stop();
+    ss.ambient_started = false;
+    
     engine.beginDrawing();
     engine.clearBackground(WHITE);
     // Logo del videojuego
@@ -93,10 +96,12 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
     else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) { // D-Pad Up
         // Move the selection up
         currentButton = (currentButton > 0) ? currentButton - 1 : 1;
+        ss.sonido_mov();
     }
     else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) { // D-Pad Down
         // Move the selection down
         currentButton = (currentButton < 1) ? currentButton + 1 : 0;
+        ss.sonido_mov();
     }
 
     // Draw the buttons
@@ -186,16 +191,19 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     if (GuiButton(btn2Rec, "800x600"))
     {
         engine.setWindowSize(800, 600);
+        ss.seleccion_menu();
     }
 
     if (GuiButton(btn3Rec, "1280x720"))
     {
         engine.setWindowSize(1280, 720);
+        ss.seleccion_menu();
     }
 
     if (GuiButton(btn4Rec, "1920x1080"))
     {
         engine.setWindowSize(1920, 1080);
+        ss.seleccion_menu();
     }
 
     if (fullScreen)
@@ -208,9 +216,10 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     {
         engine.setWindowSize(1920, 1080);
         fullScreen = true;
+        ss.seleccion_menu();
     }
 
-    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec)) {
+    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn3Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn4Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn5Rec)) {
         if (ss.pushed == false)
             ss.sonido_mov();
         ss.pushed = true;
@@ -279,6 +288,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, SoundSys
         }
         case 3: // "SALIR"
         {
+            ss.sonido_salir();
             li.gameShouldEnd = true;
             return;
         }
@@ -290,10 +300,12 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, SoundSys
     else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) { // D-Pad Up
         // Move the selection up
         currentButton = (currentButton > 0) ? currentButton - 1 : 3;
+        ss.sonido_mov();
     }
     else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) { // D-Pad Down
         // Move the selection down
         currentButton = (currentButton < 3) ? currentButton + 1 : 0;
+        ss.sonido_mov();
     }
 
     // Draw the buttons
@@ -317,6 +329,13 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, SoundSys
         currentButton = 3;
         inpi.mouseClick = true;
     }
+
+    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec)|| engine.checkCollisionPointRec(GetMousePosition(), btn3Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn4Rec)) {
+        if (ss.pushed == false)
+            ss.sonido_mov();
+        ss.pushed = true;
+    }else
+        ss.pushed = false;
 }
 
 void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
@@ -2114,6 +2133,7 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
 
 void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
 {
+    auto& li = em.getSingleton<LevelInfo>();
     auto& txti = em.getSingleton<TextInfo>();
     auto& textQueue = txti.getTextQueue();
 
@@ -2139,6 +2159,16 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     {
         txti.popText();
         inpi.interact = false;
+      
+        if (textQueue.empty())
+        {
+            txti.waitTime = .8f;
+            if(li.openChest)
+            {
+                li.openChest = false;
+                em.getSingleton<SoundSystem>().sonido_cerrar_cofre();
+            }    
+        }    
     }
 
     int posButtonX = static_cast<int>(posX + boxWidth - 8);
