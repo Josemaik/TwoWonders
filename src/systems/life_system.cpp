@@ -1,76 +1,181 @@
 #include "life_system.hpp"
 
-void LifeSystem::update(EntityManager& em, float deltaTime) {
+void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
+    auto& li = em.getSingleton<LevelInfo>();
+
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, LifeComponent& lif)
     {
+        if (lif.lifeLost > 0)
+        {
+            // Si es un subdito y tiene escudo activo, se le resta al escudo
+            if (ent.hasTag<SubjectTag>() && ent.hasComponent<SubjectComponent>())
+            {
+                auto& sub = em.getComponent<SubjectComponent>(ent);
+                if (sub.activeShield)
+                {
+                    lif.life += lif.lifeLost;
+                    sub.decreaseShield();
+
+                    if (sub.shieldLife == 0)
+                        sub.activeShield = false;
+                }
+            }
+            else if (ent.hasTag<PlayerTag>())
+            {
+                auto& plfi = em.getSingleton<PlayerInfo>();
+                em.getSingleton<SoundSystem>().sonido_recibir_danyo();
+                if (plfi.armor > 0)
+                {
+                    lif.life += lif.lifeLost;
+                    plfi.armor -= lif.lifeLost;
+
+                    if (plfi.armor < 0)
+                    {
+                        lif.life += plfi.armor;
+                        plfi.armor = 0;
+                    }
+                }
+            }
+            else if (ent.hasTag<DummyTag>() || ent.hasTag<DestructibleTag>())
+            {
+                em.getSingleton<SoundSystem>().sonido_dummy_golpe();
+            }
+            else if (ent.hasTag<CrusherTag>())
+            {
+                em.getSingleton<SoundSystem>().sonido_apisonadora_danyo();
+            }
+
+            lif.lifeLost = 0;
+        }
+
         lif.decreaseCountdown(deltaTime);
 
         if (lif.life == 0)
         {
             // Si es enemigo creamos un objeto
             if (ent.hasTag<EnemyTag>() && !lif.decreaseNextFrame)
-                createObject(em, em.getComponent<PhysicsComponent>(ent).position);
+            {
+                auto& phy = em.getComponent<PhysicsComponent>(ent);
+                createObject(em, os, phy.position);
+                em.getSingleton<SoundSystem>().sonido_muerte_enemigo();
+              
+                if (li.playerDetected)
+                    li.enemyToChestPos = phy.position;
+            }
 
+            //Si es un slime
             if (ent.hasTag<SlimeTag>())
             {
                 if (!lif.decreaseNextFrame)
                     lif.decreaseNextFrame = true;
                 else
                     lif.decreaseNextFrame = false;
-                if(em.getComponent<AIComponent>(ent).healbeforedie){
+                if (em.getComponent<AIComponent>(ent).healbeforedie) {
                     em.getComponent<AttackComponent>(ent).attack(AttackType::HealSpell);
-                }else{
-                    em.getComponent<AttackComponent>(ent).attack(AttackType::Bomb);
+                }
+                else {
+                    em.getComponent<AttackComponent>(ent).attack(AttackType::HealSpell);
                 }
             }
+            //si es un golem
+            if (ent.hasTag<GolemTag>()) {
+                if (!lif.decreaseNextFrame)
+                    lif.decreaseNextFrame = true;
+                else
+                    lif.decreaseNextFrame = false;
+
+                //em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
+            }
+
+            //Si es una bala
+            if (ent.hasTag<HitPlayerTag>()) {
+                if (!lif.decreaseNextFrame)
+                    lif.decreaseNextFrame = true;
+                else
+                    lif.decreaseNextFrame = false;
+
+                if (ent.hasComponent<ColliderComponent>() && ent.hasComponent<AttackComponent>()) {
+                    if (em.getComponent<ColliderComponent>(ent).attackType == AttackType::Spiderweb) {
+                        em.getComponent<AttackComponent>(ent).attack(AttackType::Spiderweb);
+                    }
+                }
+            }
+
+            if (ent.hasTag<SubjectTag>()) {
+                if (!lif.decreaseNextFrame)
+                    lif.decreaseNextFrame = true;
+                else
+                    lif.decreaseNextFrame = false;
+                auto& bb = em.getSingleton<BlackBoard_t>();
+                bb.subditosData.erase(ent.getID());
+            }
+
+            if (ent.hasTag<BossFinalTag>()) {
+                // if (!lif.decreaseNextFrame)
+                //     lif.decreaseNextFrame = true;
+                // else
+                //     lif.decreaseNextFrame = false;
+                auto& bb = em.getSingleton<BlackBoard_t>();
+                bb.boss_fase++;
+            }
+
+            if(ent.hasTag<DestructibleTag>()){
+                if(li.mapID == 1){
+                    li.door_open = true;
+                }
+            }
+
+            if (li.lockedEnemy == ent.getID())
+                li.lockedEnemy = li.max;
 
             lif.markedForDeletion = true;
         }
 
+        // Para cuando se recoge una poción de vida
+        if (ent.hasTag<PlayerTag>())
+        {
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            if (plfi.increaseLife > 0.0)
+            {
+                lif.life += static_cast<int>(plfi.increaseLife);
+                if (lif.life > lif.maxLife)
+                    lif.life = lif.maxLife;
+                plfi.increaseLife = 0.0;
+            }
+        }
+
         if (lif.markedForDeletion && !lif.decreaseNextFrame)
-            dead_entities.insert(ent.getID());
-
+            li.insertDeath(ent.getID());
     });
-
-    if (!dead_entities.empty())
-    {
-        em.destroyEntities(dead_entities);
-        dead_entities.clear();
-    }
 }
 
 // Se podra crear objetos: vida, bomba, moneda o nada
-void LifeSystem::createObject(EntityManager& em, vec3d pos) {
+void LifeSystem::createObject(EntityManager&, ObjectSystem& os, vec3d pos) {
     int random_value = std::rand();
     if (random_value % 4 > 0) {
-        Object_type tipo_nuevo_objeto{};
+        ObjectType tipo_nuevo_objeto{};
         Color color_nuevo_objeto{};
         if (random_value % 4 == 1)
         {
-            tipo_nuevo_objeto = Object_type::Bomb;
-            color_nuevo_objeto = GRAY;
+            tipo_nuevo_objeto = ObjectType::Coin;
+            color_nuevo_objeto = YELLOW;
         }
         else if (random_value % 4 == 2)
         {
-            tipo_nuevo_objeto = Object_type::Coin;
-            color_nuevo_objeto = YELLOW;
+            tipo_nuevo_objeto = ObjectType::Life;
+            color_nuevo_objeto = RED;
         }
         else if (random_value % 4 == 3)
         {
-            tipo_nuevo_objeto = Object_type::Life;
-            color_nuevo_objeto = RED;
+            tipo_nuevo_objeto = ObjectType::Mana_Potion;
+            color_nuevo_objeto = SKYBLUE;
         }
         else
         {
-            tipo_nuevo_objeto = Object_type::None;
+            tipo_nuevo_objeto = ObjectType::None;
         }
 
-        // Se crea el nuevo objeto
-        auto& e{ em.newEntity() };
-        em.addTag<ObjectTag>(e);
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = { 0.5, 0.5, 0.5 }, .color = color_nuevo_objeto });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0 });
-        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = tipo_nuevo_objeto });
+        // Se crea el nuevo objeto en el object system
+        os.addObject(tipo_nuevo_objeto, pos);
     }
 }

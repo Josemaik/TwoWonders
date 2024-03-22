@@ -2,14 +2,14 @@
 
 struct LifeComponent
 {
-    int life{ 1 }, maxLife{ 6 };
+    int life{ 1 }, maxLife{ life }, life_width{}, lifeLost{ 0 };
     float countdown{ 1.0f }, elapsed{ 1.0f }; // En segundos
-    bool markedForDeletion{ false };
+    bool markedForDeletion{ false }, invulnerable{ false };
 
     void decreaseLife(); // decrease 1 life
     void decreaseLife(int minusLife);
 
-    void increaseLife();
+    void increaseLife(int i = 2);
     void increaseMaxLife();
     void decreaseCountdown(float deltaTime) { elapsed += deltaTime; };
     bool vidaMax() { return (life == maxLife); };

@@ -1,6 +1,6 @@
 #pragma once
 #include <raylib.h>
-#include "utils/vec3D.hpp"
+#include "utils/BBox.hpp"
 
 struct RenderComponent
 {
@@ -11,16 +11,18 @@ struct RenderComponent
     void setOrientation(double o);
     void setRotationVec(vec3d r);
     void destroyMesh();
+    void updateBBox();
 
     vec3d position{};
     vec3d scale{};
-    double orientation{ 0.0 };
     Color color{};
     bool visible{ true };
+    double orientation{ 0.0 };
     vec3d rotationVec{ 0.0, 0.1, 0.0 };
+    double offset{};
+    BBox bbox{};
 
     Model model{};
     Mesh mesh{};
     bool meshLoaded{ false };
-    bool cameraChange{ false };
 };

@@ -17,16 +17,17 @@
 #include "../systems/shield_system.hpp"
 #include "../systems/event_system.hpp"
 #include "../systems/sound_system.hpp"
+#include "../systems/camera_system.hpp"
+#include "../systems/lock_system.hpp"
+#include "../systems/npc_system.hpp"
 #include "game_engine.hpp"
 #include "ia_manager.hpp"
-
-
-#include "map.hpp"
+#include "map_manager.hpp"
 
 struct Game
 {
-    static constexpr uint16_t SCREEN_WIDTH{ 800 };
-    static constexpr uint16_t SCREEN_HEIGHT{ 600 };
+    static constexpr uint16_t SCREEN_WIDTH{ 1280 };
+    static constexpr uint16_t SCREEN_HEIGHT{ 720 };
 
     Game() = default;
     ~Game() = default;
@@ -34,19 +35,20 @@ struct Game
     void run();
 
 private:
-    void createEntities(EntityManager& em, Eventmanager& evm);
-    void createSword(EntityManager& em);
-    void createShield(EntityManager& em, Entity& ent);
-    void createCoin(EntityManager& em);
-    void createShop(EntityManager& em);
-    void createEnding(EntityManager& em);
-    void normalExecution(EntityManager& em, float deltaTime);
-    void debugExecution(EntityManager& em, bool debugphy,bool debugai);
-    void createSound(EntityManager& em);
+    void createEntities();
+    void createSword();
+    void createShield(Entity& ent);
+    void createCoin();
+    void createShop();
+    void createEnding();
+    void createSound();
+    void resetGame();
+    void resetDeath();
+    Shader createShader();
 
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};
-    Eventmanager evm{};
+    EventManager evm{};
     Ia_man iam{};
     PhysicsSystem physics_system{};
     RenderSystem render_system{};
@@ -61,8 +63,10 @@ private:
     ZoneSystem zone_system{};
     ShieldSystem shield_system{};
     EventSystem event_system{};
-    Map map{};
-    SoundSystem sound_system{};
+    MapManager map{};
+    CameraSystem camera_system{};
+    LockSystem lock_system{};
+    NPCSystem npc_system{};
 };
 
 

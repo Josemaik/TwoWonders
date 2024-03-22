@@ -27,7 +27,7 @@
 struct AISystem
 {
     // Se van a buscar las entidad que tengan estos componentes y tags
-    using SYSCMPs = MP::TypeList<PhysicsComponent, AIComponent,LifeComponent>;
+    using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent, AIComponent, LifeComponent>;
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em, float dt);

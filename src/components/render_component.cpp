@@ -49,3 +49,8 @@ void RenderComponent::setRotationVec(vec3d r)
     rotationVec.setY(r.y());
     rotationVec.setZ(r.z());
 }
+
+void RenderComponent::updateBBox()
+{
+    bbox = BBox(position, scale);
+}

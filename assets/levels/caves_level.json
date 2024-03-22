@@ -111,18 +111,12 @@
             }
         ],
         "ramps": [],
-        "doors": []
+        "doors": [],
+        "destructibles": []
     },
     "underworld":
     {
         "objects": [
-            {
-                "position": [71.0, 0.0, 78.0],
-                "scale": [0.5, 0.5, 0.5],
-                "color": [253, 249, 0, 255],
-                "type": 6,
-                "id": 0
-            },
             {
                 "position": [93.0, 0.0, 78.0],
                 "scale": [0.5, 0.5, 0.5],
@@ -146,13 +140,14 @@
             },
             {
                 "position": [49.0, 0.0, 78.0],
-                "scale": [1.0, 0.3, 0.3],
-                "color": [200, 200, 200, 255],
-                "type": 2,
+                "scale": [0.5, 0.5, 0.5],
+                "color": [102, 191, 255, 255],
+                "type": 12,
                 "id": 4
             }
         ],
         "enemies": [],
+        "interactables": [],
         "npcs": [],
         "player": []
     }
