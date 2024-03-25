@@ -51,110 +51,96 @@ mapType MapManager::loadMap(const std::string& mapFile)
 
 void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_man& iam)
 {
-    const valueType& id = map["id"];
-    uint8_t mapID = static_cast<uint8_t>(id.GetUint());
-
-    const valueType& chunks = map["Chunks"];
+    mapSizeType size{};
+    const valueType* chunks = nullptr;
     int j = 0;
 
-    for (mapSizeType i = 0; i < chunks.Size(); i++)
+    if (state == LoadState::LOAD_CHUNKS)
     {
-        std::string chunkName = "Chunk" + std::to_string(i);
-        const valueType& chunk = chunks[i][chunkName.c_str()];
+        chunks = &map["Chunks"];
+        size = chunks->Size();
+        chunksVec.reserve(size);
+    }
+    else
+        size = static_cast<mapSizeType>(chunksVec.size());
 
-        switch (state)
+    for (mapSizeType i = 0; i < size; i++)
+    {
+        if (state == LoadState::LOAD_CHUNKS)
         {
-        case LoadState::LOAD_GROUND:
-        {
-            const valueType& overworld = chunk[0]["overworld"];
-            const valueType& groundArray = overworld["Ground"];
+            std::string chunkName = "Chunk" + std::to_string(i);
+            chunksVec.push_back(&(*chunks)[i][chunkName.c_str()]);
             generateChunkModel(em, i);
-            generateGround(em, groundArray, j);
-            break;
         }
-        case LoadState::LOAD_WALLS:
+        else
         {
-            const valueType& overworld = chunk[0]["overworld"];
-            const valueType& wallArray = overworld["Walls"];
-            generateWalls(em, wallArray);
-            break;
+            const valueType& chunk = *chunksVec[i];
+            switch (state)
+            {
+            case LoadState::LOAD_GROUND:
+            {
+                const valueType& overworld = chunk[0]["overworld"];
+                const valueType& groundArray = overworld["Ground"];
+                generateGround(em, groundArray, j);
+                break;
+            }
+            case LoadState::LOAD_WALLS:
+            {
+                const valueType& overworld = chunk[0]["overworld"];
+                const valueType& wallArray = overworld["Walls"];
+                generateWalls(em, wallArray);
+                break;
+            }
+            case LoadState::LOAD_RAMPS:
+            {
+                const valueType& overworld = chunk[0]["overworld"];
+                const valueType& rampArray = overworld["Ramps"];
+                generateRamps(em, rampArray);
+                break;
+            }
+            case LoadState::LOAD_INTERACTABLES:
+            {
+                const valueType& overworld = chunk[0]["overworld"];
+                const valueType& interactablesArray = overworld["Interactive"];
+                generateInteractables(em, interactablesArray);
+                break;
+            }
+            case LoadState::LOAD_OBJECTS:
+            {
+                auto& li = em.getSingleton<LevelInfo>();
+                const valueType& underworld = chunk[1]["underworld"];
+                const valueType& objectArray = underworld["Objects"];
+                generateObjects(em, objectArray, li.mapID);
+                break;
+            }
+            case LoadState::LOAD_ENEMIES:
+            {
+                const valueType& underworld = chunk[1]["underworld"];
+                const valueType& enemyArray = underworld["Enemies"];
+                generateEnemies(em, enemyArray, iam);
+                break;
+            }
+            case LoadState::LOAD_NPCS:
+            {
+                const valueType& underworld = chunk[1]["underworld"];
+                const valueType& NPCsArray = underworld["NPCs"];
+                generateNPCs(em, NPCsArray);
+                break;
+            }
+            case LoadState::LOAD_NAVMESHES:
+            {
+                generateNavmeshes(em);
+                break;
+            }
+            default:
+                break;
+            }
         }
-        case LoadState::LOAD_RAMPS_INTERACTABLES:
-        {
-            const valueType& overworld = chunk[0]["overworld"];
-            const valueType& rampArray = overworld["Ramps"];
-            const valueType& interactablesArray = overworld["Interactive"];
-            generateRamps(em, rampArray);
-            generateInteractables(em, interactablesArray);
-        }
-        break;
-        case LoadState::LOAD_OBJECTS_ENEMIES:
-        {
-            const valueType& underworld = chunk[1]["underworld"];
-            const valueType& objectArray = underworld["Objects"];
-            const valueType& enemyArray = underworld["Enemies"];
-            const valueType& NPCsArray = underworld["NPCs"];
-            generateObjects(em, objectArray, mapID);
-            generateEnemies(em, enemyArray, iam);
-            generateNPCs(em, NPCsArray);
 
-            break;
-        }
-        case LoadState::LOAD_NAVMESHES:
-        {
-            generateNavmeshes(em);
-            break;
-        }
-        default:
-            break;
-        }
     }
 
     if (!(state == LoadState::LOAD_COMPLETE))
         state = static_cast<LoadState>(static_cast<int>(state) + 1);
-}
-
-void MapManager::generateChunkFromJSON(EntityManager& em, const valueType& chunk, Ia_man& iam, uint8_t mapID, mapSizeType& i, int& j)
-{
-    const valueType& overworld = chunk[0]["overworld"];
-    const valueType& groundArray = overworld["Ground"];
-    const valueType& wallArray = overworld["Walls"];
-    const valueType& rampArray = overworld["Ramps"];
-    const valueType& interactablesArray = overworld["Interactive"];
-    const valueType& underworld = chunk[1]["underworld"];
-    const valueType& objectArray = underworld["Objects"];
-    const valueType& enemyArray = underworld["Enemies"];
-    const valueType& NPCsArray = underworld["NPCs"];
-
-    generateChunkModel(em, i);
-
-    generateGround(em, groundArray, j);
-
-    generateWalls(em, wallArray);
-
-    generateRamps(em, rampArray);
-
-    generateObjects(em, objectArray, mapID);
-
-    generateEnemies(em, enemyArray, iam);
-
-    generateInteractables(em, interactablesArray);
-
-    generateNPCs(em, NPCsArray);
-
-    // pseudo-codigo para scheduling xdddd
-    // for enemy : map[enemies]
-    // {
-
-    //     if(tiempo pasado > x)
-    //     {
-    //         texturas enemigo = map[enemies][slime][texturas][1];
-    //     }
-    //     else
-    //     {
-    //         texturas enemigo = map[enemies][slime][texturas][0];
-    //     }
-    // }
 }
 
 void MapManager::generateChunkModel(EntityManager& em, mapSizeType& i)
@@ -515,7 +501,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
                        vec3d{npc["path"][1][0].GetDouble(), npc["path"][1][1].GetDouble(), npc["path"][1][2].GetDouble()},
                        vec3d{npc["path"][2][0].GetDouble(), npc["path"][2][1].GetDouble(), npc["path"][2][2].GetDouble()},
                        vec3d{npc["path"][3][0].GetDouble(), npc["path"][3][1].GetDouble(), npc["path"][3][2].GetDouble()} };
-         double arrival_radius = npc["arrival_radius"].GetDouble();
+        double arrival_radius = npc["arrival_radius"].GetDouble();
 
         vec_t.push_back(std::make_unique<BehaviourTree_t>());
         auto& tree = *vec_t.back();
@@ -529,7 +515,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
         auto& wp = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.rotationVec = rotationVec, .max_speed = max_speed });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
         em.addComponent<InteractiveComponent>(entity);
-        em.addComponent<NPCComponent>(entity,NPCComponent{.path = path,.behaviourTree = &tree,.arrival_radius = arrival_radius});
+        em.addComponent<NPCComponent>(entity, NPCComponent{ .path = path,.behaviourTree = &tree,.arrival_radius = arrival_radius });
 
         em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
 
@@ -538,44 +524,6 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
         addToZone(em, entity, InteractableType::NPC);
     }
 }
-
-
-void MapManager::destroyMap(EntityManager& em)
-{
-    auto& li = em.getSingleton<LevelInfo>();
-
-    for (auto e : em.getEntities())
-    {
-        if (e.getID() != li.playerID)
-            li.insertDeath(e.getID());
-    }
-}
-
-void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
-{
-    using TAGs = MP::TypeList <EnemyTag>;
-    destroyParts<TAGs>(em);
-
-    const valueType& chunks = map["Chunks"];
-    for (mapSizeType i = 0; i < chunks.Size(); i++)
-    {
-        std::string chunkName = "Chunk" + std::to_string(i);
-        const valueType& chunk = chunks[i][chunkName.c_str()];
-        const valueType& enemyArray = chunk[1]["underworld"]["Enemies"];
-
-        generateEnemies(em, enemyArray, iam);
-    }
-
-    // for (mapSizeType i = 0; i < chunks.Size(); i++)
-    // {
-    //     std::string chunkName = "Chunk" + std::to_string(i);
-    //     const valueType& chunk = chunks[i][chunkName.c_str()];
-    //     const valueType& destructibleArray = chunk[0]["overworld"]["Destroyables"];
-
-    //     generateDestructibles(em, destructibleArray);
-    // }
-}
-
 
 void MapManager::generateNavmeshes(EntityManager& em)
 {
@@ -675,6 +623,17 @@ void MapManager::generateNavmeshes(EntityManager& em)
     }
 }
 
+void MapManager::destroyMap(EntityManager& em)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+
+    for (auto e : em.getEntities())
+    {
+        if (e.getID() != li.playerID)
+            li.insertDeath(e.getID());
+    }
+}
+
 void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
 {
     auto& zchi = em.getSingleton<ZoneCheckInfo>();
@@ -690,6 +649,29 @@ void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
                 ouc.zone = num;
             }
         }
+}
+
+void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
+{
+    if (!reSpawn)
+    {
+        using TAGs = MP::TypeList<EnemyTag>;
+        destroyParts<TAGs>(em);
+        reSpawn = true;
+    }
+    else
+    {
+        const valueType& chunks = map["Chunks"];
+        for (mapSizeType i = 0; i < chunks.Size(); i++)
+        {
+            std::string chunkName = "Chunk" + std::to_string(i);
+            const valueType& chunk = chunks[i][chunkName.c_str()];
+            const valueType& enemyArray = chunk[1]["underworld"]["Enemies"];
+
+            generateEnemies(em, enemyArray, iam);
+        }
+        reSpawn = false;
+    }
 }
 
 // template<>
@@ -783,9 +765,10 @@ void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man& iam)
     li.mapID = mapID;
     li.levelChanged = true;
     li.loading = false;
-    state = LoadState::LOAD_GROUND;
+    state = LoadState::LOAD_CHUNKS;
     zchi.clearSets();
     zoneBounds.clear();
+    chunksVec.clear();
 }
 
 void MapManager::changeMap(EntityManager& em, uint8_t mapID, Ia_man& iam)

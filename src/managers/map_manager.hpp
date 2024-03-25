@@ -11,10 +11,14 @@
 
 enum struct LoadState
 {
+    LOAD_CHUNKS,
     LOAD_GROUND,
     LOAD_WALLS,
-    LOAD_RAMPS_INTERACTABLES,
-    LOAD_OBJECTS_ENEMIES,
+    LOAD_RAMPS,
+    LOAD_INTERACTABLES,
+    LOAD_OBJECTS,
+    LOAD_ENEMIES,
+    LOAD_NPCS,
     LOAD_NAVMESHES,
     LOAD_COMPLETE
 };
@@ -25,6 +29,7 @@ struct MapManager
     void reset(EntityManager& em, uint8_t mapID, Ia_man& iam);
     void changeMap(EntityManager& em, uint8_t mapID, Ia_man& iam);
     void spawnReset(EntityManager& em, Ia_man& iam);
+    bool isRespawning() const { return reSpawn; }
     bool isComplete() const { return state == LoadState::LOAD_COMPLETE; }
 
     template <typename... Tags>
@@ -56,9 +61,11 @@ private:
 
     std::string fileMap{};
     std::map<uint8_t, BBox> zoneBounds{};
-    LoadState state{ LoadState::LOAD_GROUND };
+    LoadState state{ LoadState::LOAD_CHUNKS };
     mapType map{};
+    std::vector<const valueType*> chunksVec{};
     uint8_t unique_ids{ 0 };
+    bool reSpawn{ false };
 
     template <typename... Tags>
     void destroyParts(EntityManager& em)

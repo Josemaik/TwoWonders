@@ -241,6 +241,8 @@ void Game::run()
                     li.loadingTime = 0;
                 map.createMap(em, li.mapID, iam);
             }
+            else if (map.isRespawning())
+                map.spawnReset(em, iam);
 
             if (li.isCharging())
                 render_system.drawChargeScreen(engine, em);
