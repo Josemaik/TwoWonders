@@ -404,12 +404,11 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
         // Creamos el hechizo
         auto& e{ em.newEntity() };
         em.addTag<HitPlayerTag>(e);
-        att.vel.setY(0.12);
-        std::cout << att.vel << std::endl;
+        att.vel.setY(0.3);
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
         em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-        em.addComponent<ProjectileComponent>(e);
+        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f });
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = eleType });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
 

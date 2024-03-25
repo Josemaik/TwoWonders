@@ -39,7 +39,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -6.0, 4.0, 94.0 };
+        plfi.spawnPoint = { 7.0, 22.0, -21.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -66,7 +66,7 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    // em.addComponent<AttackComponent>(e);
+    em.addComponent<AttackComponent>(e);
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
@@ -103,21 +103,18 @@ void Game::createSound() {
 void Game::run()
 {
     // Cosas para medir el tiempo de ejecución
-    // using std::chrono::high_resolution_clock;
-    // using std::chrono::duration_cast;
-    // using std::chrono::duration;
-    // using std::chrono::milliseconds;
+    using std::chrono::high_resolution_clock;
+    using std::chrono::duration_cast;
+    using std::chrono::duration;
+    using std::chrono::milliseconds;
 
     // Codigo para medir el tiempo de ejecucion
     //
     // - Descomentar estas líneas y dejarlas ahí
     //
     // - Colocar antes de donde se quiere medir el tiempo
-    // auto t1 = high_resolution_clock::now();
     //
     // - Colocar despues de donde se quiere medir el tiempo
-    // auto t2 = high_resolution_clock::now();
-    // duration<float, std::milli> duration = t2 - t1;
 
     // Singletons
     auto& li = em.getSingleton<LevelInfo>();
