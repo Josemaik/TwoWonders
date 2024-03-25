@@ -3,7 +3,7 @@
 #include <random>
 
 // Cada cuanto se percibe al jugador
-void perception(BlackBoard_t& bb, AIComponent& ai, float dt) {
+void perception(BlackBoard_t& bb, AIComponent& ai, double dt) {
     // Accumulate delta time still perception time
     // ai.accumulated_dt += dt;
     // if (ai.accumulated_dt <= ai.perceptionTime) return;
@@ -28,7 +28,7 @@ void perception(BlackBoard_t& bb, AIComponent& ai, float dt) {
     }
 }
 // Actualizar las IA
-void AISystem::update(EntityManager& em, float dt)
+void AISystem::update(EntityManager& em, double dt)
 {
     bool isDetected{ false };
     std::vector<vec3d> enemyPositions{};

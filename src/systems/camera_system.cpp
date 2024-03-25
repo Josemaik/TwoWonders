@@ -1,6 +1,6 @@
 #include "camera_system.hpp"
 
-void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
+void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, double dt)
 {
     // Constantes de los distintos estados de la cámara
     static constexpr vec3d cameraPosSum = { -60.f, 66.f, -60.f };

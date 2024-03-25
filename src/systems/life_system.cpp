@@ -1,6 +1,6 @@
 #include "life_system.hpp"
 
-void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
+void LifeSystem::update(EntityManager& em, ObjectSystem& os, double deltaTime) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, LifeComponent& lif)
@@ -162,12 +162,12 @@ void LifeSystem::createObject(EntityManager&, ObjectSystem& os, vec3d pos) {
         }
         else if (random_value % 4 == 2)
         {
-            tipo_nuevo_objeto = ObjectType::Coin;
+            tipo_nuevo_objeto = ObjectType::Life;
             color_nuevo_objeto = RED;
         }
         else if (random_value % 4 == 3)
         {
-            tipo_nuevo_objeto = ObjectType::Coin;
+            tipo_nuevo_objeto = ObjectType::Mana_Potion;
             color_nuevo_objeto = SKYBLUE;
         }
         else

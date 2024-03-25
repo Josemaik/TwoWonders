@@ -10,7 +10,7 @@ struct BTDecisionReadyforHeal : BTNode_t {
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         ectx.ai->bh = "check ready heal mate";
 
-        if(ectx.ent.hasTag<SlimeTag>()){
+        if (ectx.ent.hasTag<SlimeTag>()) {
             //obtenemos blackboard
             auto& bb = ectx.em.getSingleton<BlackBoard_t>();
             // si encuentro un slime que tenga menos de 3 vidas, guardo como objetivo su posición
@@ -24,12 +24,13 @@ struct BTDecisionReadyforHeal : BTNode_t {
                 }
             return BTNodeStatus_t::success;
         }
-        if(ectx.ent.hasTag<BossFinalTag>()){
-            if(ectx.ai->elapsed_heal >= ectx.ai->countdown_heal){
+        if (ectx.ent.hasTag<BossFinalTag>()) {
+            if (ectx.ai->elapsed_heal >= ectx.ai->countdown_heal) {
                 ectx.ai->elapsed_heal = 0;
                 return BTNodeStatus_t::success;
-            }else{
-                ectx.ai->plusdeltatime(ectx.deltatime,ectx.ai->elapsed_heal);
+            }
+            else {
+                ectx.ai->plusdeltatime(ectx.deltaTime, ectx.ai->elapsed_heal);
             }
         }
         return BTNodeStatus_t::fail;

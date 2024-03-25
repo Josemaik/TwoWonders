@@ -1,6 +1,6 @@
 #include "object_system.hpp"
 
-void ObjectSystem::update(EntityManager& em, float deltaTime) {
+void ObjectSystem::update(EntityManager& em, double deltaTime) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ObjectComponent& obj)

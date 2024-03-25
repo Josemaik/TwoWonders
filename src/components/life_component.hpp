@@ -3,7 +3,7 @@
 struct LifeComponent
 {
     int life{ 1 }, maxLife{ life }, life_width{}, lifeLost{ 0 };
-    float countdown{ 1.0f }, elapsed{ 1.0f }; // En segundos
+    double countdown{ 1.0 }, elapsed{ 1.0 }; // En segundos
     bool markedForDeletion{ false }, invulnerable{ false };
 
     void decreaseLife(); // decrease 1 life
@@ -11,7 +11,7 @@ struct LifeComponent
 
     void increaseLife(int i = 2);
     void increaseMaxLife();
-    void decreaseCountdown(float deltaTime) { elapsed += deltaTime; };
+    void decreaseCountdown(double deltaTime) { elapsed += deltaTime; };
     bool vidaMax() { return (life == maxLife); };
     bool decreaseNextFrame{ false };
 };

@@ -1,6 +1,6 @@
 #include "attack_system.hpp"
 
-void AttackSystem::update(EntityManager& em, float deltaTime) {
+void AttackSystem::update(EntityManager& em, double deltaTime) {
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, AttackComponent& att)
     {
@@ -25,7 +25,7 @@ vec3d AttackSystem::getPosMeteorito(uint16_t fase, vec3d posplayer) {
     return vec3d{};
 }
 
-void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att, float dt) {
+void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att, double dt) {
     // att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
 
     auto& phy = em.getComponent<PhysicsComponent>(ent);

@@ -2036,7 +2036,7 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
     if (plfi.coins == 0)
         return;
 
-    const float multip = 3.5f;
+    const double multip = 3.5f;
     if (plfi.elapsed_coins < plfi.elapsed_limit_coins)
     {
         elapsed_CoinBar += timeStep60 * multip;
@@ -2060,7 +2060,7 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
         coinsCopy /= 10;
     }
 
-    float div = elapsed_CoinBar / elapsed_limit_CoinBar;
+    double div = elapsed_CoinBar / elapsed_limit_CoinBar;
 
     // Posición de la barra de destellos
     auto sum = static_cast<double>(digits.size()) * 16.5; // 16.5 es la mitad del ancho de la textura de la moneda

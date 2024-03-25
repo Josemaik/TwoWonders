@@ -1,6 +1,6 @@
 #include "projectile_system.hpp"
 
-void ProjectileSystem::update(EntityManager& em, float deltaTime) {
+void ProjectileSystem::update(EntityManager& em, double deltaTime) {
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& plfi = em.getSingleton<PlayerInfo>();

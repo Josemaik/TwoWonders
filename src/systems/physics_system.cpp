@@ -1,7 +1,7 @@
 #include "physics_system.hpp"
 #include <math.h>
 
-void PhysicsSystem::update(EntityManager& em, float dt)
+void PhysicsSystem::update(EntityManager& em, double dt)
 {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, PhysicsComponent& phy)
     {

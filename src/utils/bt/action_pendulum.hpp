@@ -21,12 +21,12 @@ struct BTAction_Pendulum : BTNode_t {
                     abc.angrySoundOneTime = true;
                 }
                 else {
-                    ectx.ai->plusdeltatime(ectx.deltatime, ectx.ai->elapsed_stop);
+                    ectx.ai->plusdeltatime(ectx.deltaTime, ectx.ai->elapsed_stop);
                     if (abc.angrySound)
                     {
                         auto& li = ectx.em.getSingleton<LevelInfo>();
-                        auto& playerPos = ectx.em.getComponent<PhysicsComponent>(*ectx.em.getEntityByID(li.playerID)).position; 
-                        if( playerPos.distance(ectx.phy.position) < 28.0 )
+                        auto& playerPos = ectx.em.getComponent<PhysicsComponent>(*ectx.em.getEntityByID(li.playerID)).position;
+                        if (playerPos.distance(ectx.phy.position) < 28.0)
                             ectx.em.getSingleton<SoundSystem>().sonido_piedras_golpe();
                         abc.angrySound = false;
                     }

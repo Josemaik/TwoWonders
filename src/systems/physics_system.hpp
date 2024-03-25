@@ -9,12 +9,12 @@ struct PhysicsSystem
     using SYSCMPs = MP::TypeList<PhysicsComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, float deltaTime);
+    void update(EntityManager& em, double deltaTime);
 
 private:
     float elapsed{ 0.f }, elapsed_limit{ 1.0f };
     float elapsedSound{ 0.f }, elapsedSound_limit{ 1.0f };
-    bool playerWalking { false };
+    bool playerWalking{ false };
 };
 
 #endif // !PHYSICS_SYSTEM

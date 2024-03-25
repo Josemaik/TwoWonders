@@ -61,7 +61,7 @@ struct LevelInfo
     notLoadSet dontLoad{};
 
     // Pantalla de carga
-    float loadingLimit{ 3.0f }, loadingTime{ loadingLimit };
+    double loadingLimit{ 3.0 }, loadingTime{ loadingLimit };
     bool loading{ false };
 
     // Variables relacionadas con los eventos
@@ -151,7 +151,7 @@ struct LevelInfo
         debugIA2 = false;
         resetGame = false;
         num_zone = 0;
-        mapID = 1;
+        mapID = 0;
         chestToOpen = max;
         dungeonKeyCreated = false;
         openChest = false;
