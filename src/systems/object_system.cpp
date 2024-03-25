@@ -74,7 +74,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                     life.increaseMaxLife();
                     life.increaseLife(4);
                     // FIXME: Crashea el juego
-                     em.getSingleton<SoundSystem>().sonido_aum_vida_max();
+                    em.getSingleton<SoundSystem>().sonido_aum_vida_max();
                 }
                 break;
             }
@@ -194,9 +194,12 @@ void ObjectSystem::addObject(ObjectType type, vec3d pos)
 
 void ObjectSystem::createObjects(EntityManager& em)
 {
+
     // Se crean los objetos del vector
     for (auto& [obj, pos] : toCreate)
     {
+        // Se crea el nuevo objeto
+        auto& e{ em.newEntity() };
         Color color{};
         vec3d scl{ 1.5, 1.5, 1.5 };
         bool inmortal = false;
@@ -210,6 +213,7 @@ void ObjectSystem::createObjects(EntityManager& em)
         }
         case ObjectType::Coin:
         {
+            em.addTag<CoinTag>(e);
             color = YELLOW;
             break;
         }
@@ -249,8 +253,6 @@ void ObjectSystem::createObjects(EntityManager& em)
             break;
         }
 
-        // Se crea el nuevo objeto
-        auto& e{ em.newEntity() };
         em.addTag<ObjectTag>(e);
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = scl, .color = color });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale });

@@ -220,7 +220,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     {
         auto& e{ em.newEntity() };
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 10.0f, 0.1f, 10.0f }, .color = BLUE });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.001 });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 5.0f });
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Water });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
@@ -316,9 +316,10 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
 void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackComponent& att)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
+    auto& spell = plfi.currentSpell;
     ElementalType eleType = ElementalType::Neutral;
 
-    switch (plfi.currentSpell.spell)
+    switch (spell.spell)
     {
     case Spells::FireBall:
         eleType = ElementalType::Fire;
@@ -403,12 +404,24 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
         // Creamos el hechizo
         auto& e{ em.newEntity() };
         em.addTag<HitPlayerTag>(e);
+        att.vel.setY(0.12);
+        std::cout << att.vel << std::endl;
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
         em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
         em.addComponent<ProjectileComponent>(e);
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = eleType });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+
+        // Asignamos tags para los modelos
+        switch (spell.spell)
+        {
+        case Spells::WaterBomb:
+            em.addTag<WaterBombTag>(e);
+            break;
+        default:
+            break;
+        }
     }
 
     for (auto& s : plfi.spells)

@@ -58,7 +58,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 auto& phy = em.getComponent<PhysicsComponent>(ent);
                 createObject(em, os, phy.position);
                 em.getSingleton<SoundSystem>().sonido_muerte_enemigo();
-              
+
                 if (li.playerDetected)
                     li.enemyToChestPos = phy.position;
             }
@@ -119,8 +119,8 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 bb.boss_fase++;
             }
 
-            if(ent.hasTag<DestructibleTag>()){
-                if(li.mapID == 1){
+            if (ent.hasTag<DestructibleTag>()) {
+                if (li.mapID == 1) {
                     li.door_open = true;
                 }
             }
@@ -162,12 +162,12 @@ void LifeSystem::createObject(EntityManager&, ObjectSystem& os, vec3d pos) {
         }
         else if (random_value % 4 == 2)
         {
-            tipo_nuevo_objeto = ObjectType::Life;
+            tipo_nuevo_objeto = ObjectType::Coin;
             color_nuevo_objeto = RED;
         }
         else if (random_value % 4 == 3)
         {
-            tipo_nuevo_objeto = ObjectType::Mana_Potion;
+            tipo_nuevo_objeto = ObjectType::Coin;
             color_nuevo_objeto = SKYBLUE;
         }
         else

@@ -93,7 +93,7 @@ struct LevelInfo
     bool replay{ false };
 
     // Estado del juego
-    GameScreen currentScreen = GameScreen::TITLE;
+    GameScreen currentScreen = GameScreen::GAMEPLAY;
     GameScreen previousScreen = GameScreen::LOGO;
 
     bool isCharging()
@@ -151,7 +151,7 @@ struct LevelInfo
         debugIA2 = false;
         resetGame = false;
         num_zone = 0;
-        mapID = 0;
+        mapID = 1;
         chestToOpen = max;
         dungeonKeyCreated = false;
         openChest = false;

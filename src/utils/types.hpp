@@ -61,7 +61,6 @@ struct PlayerTag {};
 struct EnemyTag {};
 struct HitPlayerTag {};
 struct GroundTag {};
-struct WaterTag {};
 struct WallTag {};
 struct ObjectTag {};
 struct ZoneTag {};
@@ -95,6 +94,8 @@ struct LeverTag {};
 struct NoKeyTag {};
 struct NPCTag {};
 struct LevelChangeTag {};
+struct CoinTag {};
+struct WaterBombTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -127,7 +128,6 @@ using TL = MP::TypeList <
     EnemyTag,
     HitPlayerTag,
     GroundTag,
-    WaterTag,
     WallTag,
     ObjectTag,
     ZoneTag,
@@ -159,7 +159,9 @@ using TL = MP::TypeList <
     LeverTag,
     NoKeyTag,
     NPCTag,
-    LevelChangeTag
+    LevelChangeTag,
+    CoinTag,
+    WaterBombTag
 > ;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

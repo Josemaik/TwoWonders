@@ -75,7 +75,7 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
         cameraTar = li.viewPoint;
         cameraFovy = cameraFovyCinematic;
 
-        if( li.viewPointSound)
+        if (li.viewPointSound)
         {
             em.getSingleton<SoundSystem>().sonido_movimiento_camara();
             li.viewPointSound = false;
