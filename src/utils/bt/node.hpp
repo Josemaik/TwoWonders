@@ -21,7 +21,7 @@ struct EntityContext_t {
     PhysicsComponent& phy;
     RenderComponent& ren;
     LifeComponent* lifec;
-    float deltatime;
+    double deltaTime;
 };
 enum class BTNodeStatus_t : uint8_t {
     success

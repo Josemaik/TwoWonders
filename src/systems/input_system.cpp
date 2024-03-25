@@ -187,7 +187,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         }
 
         // Guardamos el registro de la velocidad
-        gami.addMovementEvent(vel, gami.getTime());
+        gami.addMovementEvent(vel);
     }
     else
     {

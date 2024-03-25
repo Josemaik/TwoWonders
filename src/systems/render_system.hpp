@@ -60,11 +60,11 @@ private:
     // bool chunk1Charged{ false };
     Shader* shaderPtr{ nullptr };
 
-    float elapsed{ 0.f }, elapsed_limit{ 0.4f };
-    float elapsed_WASD{ 0.f }, elapsed_limit_WASD{ 50.0f };
-    float elapsed_CoinBar{ 0.f }, elapsed_limit_CoinBar{ 5.0f };
-    float elapsed_Lock{ 0.f }, elapsed_limit_Lock{ 5.0f };
-    float elapsed_spell{ 0.f }, elapsed_limit_spell{ 5.0f };
+    double elapsed{ 0.0 }, elapsed_limit{ 0.4 };
+    double elapsed_WASD{ 0.0 }, elapsed_limit_WASD{ 5.0 };
+    double elapsed_CoinBar{ 0.0 }, elapsed_limit_CoinBar{ 5.0 };
+    double elapsed_Lock{ 0.0 }, elapsed_limit_Lock{ 5.0 };
+    double elapsed_spell{ 0.0 }, elapsed_limit_spell{ 5.0 };
 
     int coinBarX{}, coinNumberX{};
 };

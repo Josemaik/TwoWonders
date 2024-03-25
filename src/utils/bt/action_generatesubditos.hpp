@@ -8,15 +8,16 @@ struct BTDAction_GenerateSubditos : BTNode_t {
         ectx.ai->bh = "generating subditos";
         // comprobar radio de cura
         //obtenemos blackboard
-        if(ectx.ai->elapsed_spawning >= ectx.ai->couldown_spawning){
+        if (ectx.ai->elapsed_spawning >= ectx.ai->couldown_spawning) {
             ectx.ai->elapsed_spawning = 0;
             auto& bb = ectx.em.getSingleton<BlackBoard_t>();
             bb.create_subdito = true;
             //debilitar
             ectx.lifec->decreaseLife();
             return BTNodeStatus_t::fail;
-        }else{
-            ectx.ai->plusdeltatime(ectx.deltatime,ectx.ai->elapsed_spawning);
+        }
+        else {
+            ectx.ai->plusdeltatime(ectx.deltaTime, ectx.ai->elapsed_spawning);
         }
         return BTNodeStatus_t::fail;
     }

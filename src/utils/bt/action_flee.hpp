@@ -19,7 +19,7 @@ struct BTAction_Flee : BTNode_t {
         else {
             Steer_t steering = STBH::Flee(ectx.phy, { ectx.ai->tx,0.0,ectx.ai->tz });
             ectx.phy.velocity = vec3d{ steering.v_x,0.0,steering.v_z };
-            ectx.ai->plusdeltatime(ectx.deltatime, ectx.ai->elapsed_fleeing);
+            ectx.ai->plusdeltatime(ectx.deltaTime, ectx.ai->elapsed_fleeing);
             return BTNodeStatus_t::running;
         }
     }

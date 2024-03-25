@@ -146,7 +146,7 @@ void RenderSystem::drawChargeScreen(GameEngine& engine, EntityManager& em)
 
     auto& li = em.getSingleton<LevelInfo>();
     li.loadingTime += timeStep60;
-    
+
 
     engine.endDrawing();
 }
@@ -684,7 +684,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     pos.setY(pos.y() - r.offset);
                     in = true;
                 }
-                else if (e.hasTag<GroundTag>() || e.hasTag<DoorTag>() || e.hasTag<LeverTag>())
+                else if (e.hasTag<GroundTag>() || e.hasTag<DoorTag>() || e.hasTag<LeverTag>() || e.hasTag<CoinTag>() || e.hasTag<WaterBombTag>())
                 {
                     in = true;
                 }
@@ -775,7 +775,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_0.obj");
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_0.obj");
             break;
         }
 
@@ -790,7 +790,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_1.obj");
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_1.obj");
             break;
         }
         loadShaders(r.model);
@@ -804,7 +804,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_2.obj");
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_2.obj");
             break;
         }
         loadShaders(r.model);
@@ -818,7 +818,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_3.obj");
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_3.obj");
             break;
         }
         loadShaders(r.model);
@@ -832,7 +832,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_4.obj");
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_4.obj");
             break;
         }
         loadShaders(r.model);
@@ -846,7 +846,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_5.obj");
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_5.obj");
             break;
         }
         loadShaders(r.model);
@@ -860,7 +860,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/lvl_1-cnk_6.obj");
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_6.obj");
             break;
         }
         loadShaders(r.model);
@@ -944,6 +944,18 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<LeverTag>())
     {
         r.model = engine.loadModel("assets/models/Palanca-prision.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<CoinTag>())
+    {
+        r.model = engine.loadModel("assets/models/props/Destellos.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<WaterBombTag>())
+    {
+        r.model = engine.loadModel("assets/models/props/Hechizos/Agua_1.obj");
 
         loadShaders(r.model);
     }
@@ -2024,7 +2036,7 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
     if (plfi.coins == 0)
         return;
 
-    const float multip = 3.5f;
+    const double multip = 3.5f;
     if (plfi.elapsed_coins < plfi.elapsed_limit_coins)
     {
         elapsed_CoinBar += timeStep60 * multip;
@@ -2048,7 +2060,7 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
         coinsCopy /= 10;
     }
 
-    float div = elapsed_CoinBar / elapsed_limit_CoinBar;
+    double div = elapsed_CoinBar / elapsed_limit_CoinBar;
 
     // Posición de la barra de destellos
     auto sum = static_cast<double>(digits.size()) * 16.5; // 16.5 es la mitad del ancho de la textura de la moneda
@@ -2088,7 +2100,7 @@ void RenderSystem::drawManaBar(GameEngine& engine, EntityManager& em)
     int barWidth = static_cast<int>(plfi.max_mana * 1.8);
     // int barHeight = 20;
     int barX = 155;
-    int barY = 80;
+    int barY = 85;
 
     int manaWidth = static_cast<int>(static_cast<float>(barWidth) * (static_cast<float>(plfi.mana) / static_cast<float>(plfi.max_mana)));
 

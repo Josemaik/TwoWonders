@@ -322,16 +322,14 @@ float ENGI::GameEngine::getFovyCamera()
 
 bool ENGI::GameEngine::isKeyPressed(int key)
 {
-    if (replayMode)
-        return gameData->isKeyPressed(key);
-    else
+    if (!replayMode)
     {
         if (IsKeyPressed(key))
         {
             switch (key)
             {
             case KEY_E:
-                gameData->addInputEvent(InputEvent::Type::InteractKeyPressed, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::InteractKeyPressed);
                 break;
             default:
                 break;
@@ -340,20 +338,20 @@ bool ENGI::GameEngine::isKeyPressed(int key)
         }
         return false;
     }
+    else
+        return gameData->isKeyPressed(key);
 }
 
 bool ENGI::GameEngine::isKeyDown(int key)
 {
-    if (replayMode)
-        return gameData->isKeyDown(key);
-    else
+    if (!replayMode)
     {
         if (IsKeyDown(key))
         {
             switch (key)
             {
             case KEY_SPACE:
-                gameData->addInputEvent(InputEvent::Type::AttackKeyDown, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::AttackKeyDown);
                 break;
             default:
                 break;
@@ -362,35 +360,35 @@ bool ENGI::GameEngine::isKeyDown(int key)
         }
         return false;
     }
+    else
+        return gameData->isKeyDown(key);
 }
 
 bool ENGI::GameEngine::isKeyReleased(int key)
 {
-    if (replayMode)
-        return gameData->isKeyReleased(key);
-    else
+    if (!replayMode)
     {
         if (IsKeyReleased(key))
         {
             switch (key)
             {
             case KEY_ENTER:
-                gameData->addInputEvent(InputEvent::Type::EnterReleased, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::EnterReleased);
                 break;
             case KEY_ESCAPE:
-                gameData->addInputEvent(InputEvent::Type::EscapeReleased, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::EscapeReleased);
                 break;
             case KEY_I:
-                gameData->addInputEvent(InputEvent::Type::InventoryReleased, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::InventoryReleased);
                 break;
             case KEY_F:
-                gameData->addInputEvent(InputEvent::Type::LockInReleased, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::LockInReleased);
                 break;
             case KEY_Q:
-                gameData->addInputEvent(InputEvent::Type::ChangeSpellReleased, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::ChangeSpellReleased);
                 break;
             case KEY_E:
-                gameData->addInputEvent(InputEvent::Type::InteractKeyReleased, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::InteractKeyReleased);
                 break;
             default:
                 break;
@@ -399,6 +397,8 @@ bool ENGI::GameEngine::isKeyReleased(int key)
         }
         return false;
     }
+    else
+        return gameData->isKeyReleased(key);
 }
 
 bool ENGI::GameEngine::isMouseButtonPressed(int button)
@@ -418,7 +418,26 @@ bool ENGI::GameEngine::isGamepadAvailable(int gamepad)
 
 bool ENGI::GameEngine::isGamepadButtonPressed(int gamepad, int button)
 {
-    if (replayMode)
+    if (!replayMode)
+    {
+        if (IsGamepadButtonPressed(gamepad, button))
+        {
+            switch (button)
+            {
+            case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+                gameData->addInputEvent(InputEvent::Type::InteractKeyPressed);
+                break;
+            case GAMEPAD_BUTTON_RIGHT_FACE_LEFT:
+                gameData->addInputEvent(InputEvent::Type::AttackKeyDown);
+                break;
+            default:
+                break;
+            }
+            return true;
+        }
+        return false;
+    }
+    else
     {
         switch (button)
         {
@@ -432,25 +451,6 @@ bool ENGI::GameEngine::isGamepadButtonPressed(int gamepad, int button)
             return false;
         }
     }
-    else
-    {
-        if (IsGamepadButtonPressed(gamepad, button))
-        {
-            switch (button)
-            {
-            case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
-                gameData->addInputEvent(InputEvent::Type::InteractKeyPressed, gameData->getTime());
-                break;
-            case GAMEPAD_BUTTON_RIGHT_FACE_LEFT:
-                gameData->addInputEvent(InputEvent::Type::AttackKeyDown, gameData->getTime());
-                break;
-            default:
-                break;
-            }
-            return true;
-        }
-        return false;
-    }
 }
 
 bool ENGI::GameEngine::isGamepadButtonDown(int gamepad, int button)
@@ -460,7 +460,29 @@ bool ENGI::GameEngine::isGamepadButtonDown(int gamepad, int button)
 
 bool ENGI::GameEngine::isGamepadButtonReleased(int gamepad, int button)
 {
-    if (replayMode)
+    if (!replayMode)
+    {
+        if (IsGamepadButtonReleased(gamepad, button))
+        {
+            switch (button)
+            {
+            case GAMEPAD_BUTTON_MIDDLE_LEFT:
+                gameData->addInputEvent(InputEvent::Type::InventoryReleased);
+                break;
+            case GAMEPAD_BUTTON_RIGHT_FACE_RIGHT:
+                gameData->addInputEvent(InputEvent::Type::LockInReleased);
+                break;
+            case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+                gameData->addInputEvent(InputEvent::Type::InteractKeyReleased);
+                break;
+            default:
+                break;
+            }
+            return true;
+        }
+        return false;
+    }
+    else
     {
         switch (button)
         {
@@ -476,28 +498,6 @@ bool ENGI::GameEngine::isGamepadButtonReleased(int gamepad, int button)
         default:
             return false;
         }
-    }
-    else
-    {
-        if (IsGamepadButtonReleased(gamepad, button))
-        {
-            switch (button)
-            {
-            case GAMEPAD_BUTTON_MIDDLE_LEFT:
-                gameData->addInputEvent(InputEvent::Type::InventoryReleased, gameData->getTime());
-                break;
-            case GAMEPAD_BUTTON_RIGHT_FACE_RIGHT:
-                gameData->addInputEvent(InputEvent::Type::LockInReleased, gameData->getTime());
-                break;
-            case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
-                gameData->addInputEvent(InputEvent::Type::InteractKeyReleased, gameData->getTime());
-                break;
-            default:
-                break;
-            }
-            return true;
-        }
-        return false;
     }
 }
 

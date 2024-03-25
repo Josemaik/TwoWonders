@@ -61,7 +61,7 @@ struct LevelInfo
     notLoadSet dontLoad{};
 
     // Pantalla de carga
-    float loadingLimit{ 3.0f }, loadingTime{ loadingLimit };
+    double loadingLimit{ 3.0 }, loadingTime{ loadingLimit };
     bool loading{ false };
 
     // Variables relacionadas con los eventos
@@ -93,7 +93,7 @@ struct LevelInfo
     bool replay{ false };
 
     // Estado del juego
-    GameScreen currentScreen = GameScreen::TITLE;
+    GameScreen currentScreen = GameScreen::GAMEPLAY;
     GameScreen previousScreen = GameScreen::LOGO;
 
     bool isCharging()

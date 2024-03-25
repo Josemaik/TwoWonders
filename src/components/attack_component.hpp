@@ -26,7 +26,7 @@ struct AttackComponent
     uint16_t damage{};
     float range{}; // en segundos
     double scale_to_respawn_attack{ 2.0 };
-    float countdown{ 1.0f }, elapsed{ 1.0f }, countdown_air_attk{ 0.2f }, elapsed_air_attk{ 1.0f },
+    double countdown{ 1.0f }, elapsed{ 1.0f }, countdown_air_attk{ 0.2f }, elapsed_air_attk{ 1.0f },
         countdown_warning_airatk{ 1.5 }, elapsed_warning_airatk{ 1.0 }; // en segundos
     vec3d vel{};
     //air attack
@@ -43,5 +43,5 @@ struct AttackComponent
         }
     }
 
-    void decreaseCountdown(float deltaTime, float& elapsed) { elapsed += deltaTime; }; // delta time
+    void decreaseCountdown(double deltaTime, double& elapsed) { elapsed += deltaTime; }; // delta time
 };

@@ -1,6 +1,6 @@
 #include "game.hpp"
 // #include "../utils/memory_viewer.hpp"
-#include <chrono>
+// #include <chrono>
 
 void Game::createShield(Entity& ent)
 {
@@ -39,7 +39,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
+        plfi.spawnPoint = { -6.0, 4.0, 94.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -66,7 +66,7 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e);
+    // em.addComponent<AttackComponent>(e);
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
@@ -103,10 +103,10 @@ void Game::createSound() {
 void Game::run()
 {
     // Cosas para medir el tiempo de ejecución
-    using std::chrono::high_resolution_clock;
-    using std::chrono::duration_cast;
-    using std::chrono::duration;
-    using std::chrono::milliseconds;
+    // using std::chrono::high_resolution_clock;
+    // using std::chrono::duration_cast;
+    // using std::chrono::duration;
+    // using std::chrono::milliseconds;
 
     // Codigo para medir el tiempo de ejecucion
     //
@@ -153,29 +153,25 @@ void Game::run()
     gami.setRandomSeed(seed);
     engine.setReplayMode(li.replay, gami);
 
-    // Variable tiempo para saber cuánto dura la ejecución del juego
-    auto gameStart = high_resolution_clock::now();
-    gami.setStartTime(gameStart);
-
     // Inicializa una variable donde tener el tiempo entre frames
-    float currentTime{}, elapsed{};
+    double currentTime{}, elapsed{};
 
     createSound();
     attack_system.setCollisionSystem(&collision_system);
 
     while (!li.gameShouldEnd)
     {
-        elapsed += engine.getFrameTime();
+        elapsed += timeStep120;
+        gami.updateFrame();
 
         switch (li.currentScreen)
         {
-
             // CODIGO DE LA PANTALLA DE LOGO DE EMPRESA
         case GameScreen::LOGO:
         {
             // Contador para que pasen X segundos
             currentTime += timeStep60;
-            if (currentTime > 4.0f) {
+            if (currentTime > 4.0) {
                 li.currentScreen = GameScreen::TITLE;
                 currentTime = 0;
             }
@@ -245,6 +241,8 @@ void Game::run()
                     li.loadingTime = 0;
                 map.createMap(em, li.mapID, iam);
             }
+            else if (map.isRespawning())
+                map.spawnReset(em, iam);
 
             if (li.isCharging())
                 render_system.drawChargeScreen(engine, em);
@@ -314,14 +312,6 @@ void Game::run()
         if (engine.windowShouldClose())
             li.gameShouldEnd = true;
     }
-
-    // Pillamos el tiempo de finalización del juego
-    auto finalTime = high_resolution_clock::now();
-
-    // Calculamos el tiempo que ha durado el juego
-    duration<float, std::milli> dur = finalTime - gameStart;
-
-    gami.setFinalTime(dur);
 
     // Creamos un archivo de salida con los datos de la partida
     // Para hacer replay con este archivo hay que colocarlo en la carpeta assets/data/input

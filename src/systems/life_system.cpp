@@ -1,6 +1,6 @@
 #include "life_system.hpp"
 
-void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
+void LifeSystem::update(EntityManager& em, ObjectSystem& os, double deltaTime) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, LifeComponent& lif)
@@ -58,7 +58,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 auto& phy = em.getComponent<PhysicsComponent>(ent);
                 createObject(em, os, phy.position);
                 em.getSingleton<SoundSystem>().sonido_muerte_enemigo();
-              
+
                 if (li.playerDetected)
                     li.enemyToChestPos = phy.position;
             }
@@ -119,8 +119,8 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 bb.boss_fase++;
             }
 
-            if(ent.hasTag<DestructibleTag>()){
-                if(li.mapID == 1){
+            if (ent.hasTag<DestructibleTag>()) {
+                if (li.mapID == 1) {
                     li.door_open = true;
                 }
             }

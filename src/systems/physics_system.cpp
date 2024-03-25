@@ -1,7 +1,7 @@
 #include "physics_system.hpp"
 #include <math.h>
 
-void PhysicsSystem::update(EntityManager& em, float dt)
+void PhysicsSystem::update(EntityManager& em, double dt)
 {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, PhysicsComponent& phy)
     {
@@ -59,6 +59,14 @@ void PhysicsSystem::update(EntityManager& em, float dt)
             }
         }
 
+        // Si estamos en una rampa queremos ir un poco más lento
+        if (phy.onRamp)
+        {
+            vel.setX(vel.x() / 1.5);
+            vel.setZ(vel.z() / 1.5);
+        }
+
+        // Colocamos la posición
         pos.setX((pos.x() + vel.x()));
         pos.setY((pos.y() + vel.y()));
         pos.setZ((pos.z() + vel.z()));

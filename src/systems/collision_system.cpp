@@ -196,14 +196,15 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         auto* staticEntPtr = &staticEnt;
         auto* otherEntPtr = &otherEnt;
 
+        if (behaviorType2 & BehaviorType::RAMP)
+            std::swap(staticEntPtr, otherEntPtr);
+
+        // Entidades que no queremos que colisionen con rampas
+        if (otherEntPtr->hasTag<WaterBombTag>())
+            return;
+
         auto* staticPhyPtr = &em.getComponent<PhysicsComponent>(*staticEntPtr);
         auto* otherPhyPtr = &em.getComponent<PhysicsComponent>(*otherEntPtr);
-
-        if (behaviorType2 & BehaviorType::RAMP)
-        {
-            std::swap(staticEntPtr, otherEntPtr);
-            std::swap(staticPhyPtr, otherPhyPtr);
-        }
 
         auto& offSet = em.getComponent<RampComponent>(*staticEntPtr).offset;
         auto& pos = otherPhyPtr->position;
@@ -354,13 +355,13 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     }
 
     // Nos aseguramos que el suelo siempre esté en staticEntPtr
-    if (otherEntPtr->hasTag<GroundTag>() || otherEntPtr->hasTag<WaterTag>())
+    if (otherEntPtr->hasTag<GroundTag>())
     {
         std::swap(staticPhy, otherPhy);
         std::swap(staticEntPtr, otherEntPtr);
         std::swap(behaviorType1, behaviorType2);
 
-        if (otherEntPtr->hasTag<GroundTag>() || otherEntPtr->hasTag<WaterTag>())
+        if (otherEntPtr->hasTag<GroundTag>())
         {
             // floorCollision(*staticPhy, *otherPhy, minOverlap);
             return;
@@ -409,12 +410,6 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Si impacta enemigo con pared
     if (behaviorType2 & BehaviorType::ENEMY)
     {
-        if (staticEntPtr->hasTag<WaterTag>())
-        {
-            staticCollision(*otherPhy, *staticPhy, minOverlap);
-            return;
-        }
-
         enemiesWallCollision(em, *otherEntPtr, *staticPhy, *otherPhy, minOverlap);
         return;
     }
@@ -659,9 +654,7 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
 
         // Nos aseguramos que la bala esté en sea la de la entidad 1
         if (atkPl2 || atkEn2)
-        {
             std::swap(ent1Ptr, ent2Ptr);
-        }
 
         // Ahora sabemos seguro que la entidad con la que ha colisionado la bala está en la entidad 2, pero es enemigo o jugador?
         // Lo comprobamos con el tipo de comportamientoto
