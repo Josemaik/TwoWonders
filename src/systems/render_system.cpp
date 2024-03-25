@@ -1528,6 +1528,17 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             }
         }
 
+        if(e.hasTag<CrusherTag>()){
+            auto& phy = em.getComponent<PhysicsComponent>(e);
+            auto& ai = em.getComponent<AIComponent>(e);
+            int posx = static_cast<int>(engine.getWorldToScreenX(phy.position) + 30);
+            int posz = static_cast<int>(engine.getWorldToScreenY(phy.position) - 70);
+            if(ai.playerdetected){
+                engine.drawRectangle(posx,posz, 10,100, BLACK);
+                engine.drawRectangle(posx,posz, 10,static_cast<int>(ai.elapsed_shoot * 50), BLUE);
+            }
+        }
+
         // Dibujar el precio d elos objetos de la tienda
         if (e.hasTag<ObjectTag>()) {
             if (e.hasComponent<ObjectComponent>() && e.hasComponent<RenderComponent>())

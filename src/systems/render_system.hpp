@@ -47,6 +47,7 @@ private:
     void drawManaBar(GameEngine& engine, EntityManager& em);
     void drawSpellSlots(GameEngine& engine, EntityManager& em);
     void drawAlerts_IA(EntityManager& em, GameEngine& engine, double dt);
+    void drawCulldownBar(EntityManager& em, GameEngine& engine);
     void loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r);
     void loadShaders(Model& model);
     void drawTextBox(GameEngine& engine, EntityManager& em);

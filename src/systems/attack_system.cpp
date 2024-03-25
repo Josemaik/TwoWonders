@@ -205,7 +205,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = vec3d{att.pos_respawn_crush_attack.x(),
         att.pos_respawn_crush_attack.y(),att.pos_respawn_crush_attack.z()}, .scale = { 20.0f, 0.1f, 20.0f }, .color = GREEN });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.0 });
-        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::CrusherAttack, .life_time = 2.0f });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::CrusherAttack, .life_time = 0.5f });
         ElementalType tipoElemental;
         if (ent.hasComponent<TypeComponent>())
             tipoElemental = em.getComponent<TypeComponent>(ent).type;
