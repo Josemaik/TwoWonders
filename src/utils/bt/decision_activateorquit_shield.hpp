@@ -21,7 +21,7 @@ struct BTDecisionActivateorQuit_Shield : BTNode_t {
                 }
             }
         }
-        ectx.ai->plusdeltatime(ectx.deltaTime, ectx.ai->elapsed_shield);
+        ectx.ai->plusDeltatime(ectx.deltaTime, ectx.ai->elapsed_shield);
         return BTNodeStatus_t::fail;
     }
 };

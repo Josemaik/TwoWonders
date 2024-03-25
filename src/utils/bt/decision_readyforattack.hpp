@@ -47,13 +47,13 @@ struct BTDecisionReadyforAttack : BTNode_t {
                         // ectx.phy.v_linear = 0;
                         return BTNodeStatus_t::success;
                     }
-                    ectx.ai->plusdeltatime(ectx.deltaTime, ectx.ai->elapsed_stop);
+                    ectx.ai->plusDeltatime(ectx.deltaTime, ectx.ai->elapsed_stop);
                     //reinicio culldown
                     return BTNodeStatus_t::running;
                     // activo ataque
                 }
                 else {
-                    ectx.ai->plusdeltatime(ectx.deltaTime, ectx.ai->elapsed_shoot);
+                    ectx.ai->plusDeltatime(ectx.deltaTime, ectx.ai->elapsed_shoot);
                     return BTNodeStatus_t::success;
                 }
             }

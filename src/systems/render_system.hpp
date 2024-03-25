@@ -14,9 +14,7 @@ struct RenderSystem
 
     RenderSystem() { init(); };
 
-    void update(EntityManager& em, GameEngine& engine, double dt);
-
-
+    void update(EntityManager& em, GameEngine& engine);
     void drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawLogoKaiwa(GameEngine& engine);
     void drawOptions(GameEngine& engine, EntityManager& em, SoundSystem& ss);
@@ -25,7 +23,7 @@ struct RenderSystem
     void drawChargeScreen(GameEngine& engine, EntityManager& em);
     void unloadModels(EntityManager& em, GameEngine& engine);
     void drawEditorInGameIA(GameEngine& engine, EntityManager& em);
-    void drawDebuggerInGameIA(GameEngine& engine, EntityManager& em, double dt);
+    void drawDebuggerInGameIA(GameEngine& engine, EntityManager& em);
     void drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& em);
     void drawRay(vec3d origin, vec3d end);
     void drawVisionCone(vec3d pos_enemy, double orientation, double horizontalFOV);
@@ -38,7 +36,7 @@ struct RenderSystem
 private:
     void init();
     void beginFrame(GameEngine& engine, EntityManager& em);
-    void endFrame(GameEngine& engine, EntityManager& em, double dt);
+    void endFrame(GameEngine& engine, EntityManager& em);
     void drawHUD(EntityManager& em, GameEngine& engine, bool debugphy);
     void drawEntities(EntityManager& em, GameEngine& engine);
     void drawDeath(GameEngine& engine);
@@ -46,7 +44,8 @@ private:
     void drawHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
     void drawManaBar(GameEngine& engine, EntityManager& em);
     void drawSpellSlots(GameEngine& engine, EntityManager& em);
-    void drawAlerts_IA(EntityManager& em, GameEngine& engine, double dt);
+    void drawAlerts_IA(EntityManager& em, GameEngine& engine);
+    void drawFPSCounter(GameEngine& engine);
     void loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r);
     void loadShaders(Model& model);
     void drawTextBox(GameEngine& engine, EntityManager& em);
@@ -60,11 +59,11 @@ private:
     // bool chunk1Charged{ false };
     Shader* shaderPtr{ nullptr };
 
-    double elapsed{ 0.0 }, elapsed_limit{ 0.4 };
-    double elapsed_WASD{ 0.0 }, elapsed_limit_WASD{ 5.0 };
-    double elapsed_CoinBar{ 0.0 }, elapsed_limit_CoinBar{ 5.0 };
-    double elapsed_Lock{ 0.0 }, elapsed_limit_Lock{ 5.0 };
-    double elapsed_spell{ 0.0 }, elapsed_limit_spell{ 5.0 };
+    float elapsed{ 0.0f }, elapsed_limit{ 0.4f };
+    float elapsed_WASD{ 0.0f }, elapsed_limit_WASD{ 5.0f };
+    float elapsed_CoinBar{ 0.0f }, elapsed_limit_CoinBar{ 5.0f };
+    float elapsed_Lock{ 0.0f }, elapsed_limit_Lock{ 5.0f };
+    float elapsed_spell{ 0.0f }, elapsed_limit_spell{ 5.0f };
 
     int coinBarX{}, coinNumberX{};
 };

@@ -1,4 +1,6 @@
 #include "game_engine.hpp"
+#include <chrono>
+
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
 {
@@ -641,4 +643,12 @@ void ENGI::GameEngine::setReplayMode(bool replay, GameData& gd)
 {
     replayMode = replay;
     gameData = &gd;
+}
+
+double ENGI::GameEngine::getTime()
+{
+    auto now = std::chrono::high_resolution_clock::now();
+    auto duration = now.time_since_epoch();
+    auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+    return microseconds.count() / 1e6;
 }

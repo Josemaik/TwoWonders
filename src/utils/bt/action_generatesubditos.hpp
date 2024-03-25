@@ -17,7 +17,7 @@ struct BTDAction_GenerateSubditos : BTNode_t {
             return BTNodeStatus_t::fail;
         }
         else {
-            ectx.ai->plusdeltatime(ectx.deltaTime, ectx.ai->elapsed_spawning);
+            ectx.ai->plusDeltatime(ectx.deltaTime, ectx.ai->elapsed_spawning);
         }
         return BTNodeStatus_t::fail;
     }

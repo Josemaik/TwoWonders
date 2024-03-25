@@ -1,13 +1,13 @@
 #include "attack_system.hpp"
 
-void AttackSystem::update(EntityManager& em, double deltaTime) {
+void AttackSystem::update(EntityManager& em) {
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, AttackComponent& att)
     {
         if (att.createAttack)
-            createAttack(em, ent, att, deltaTime);
+            createAttack(em, ent, att);
 
-        att.decreaseCountdown(deltaTime, att.elapsed);
+        att.decreaseCountdown(timeStep, att.elapsed);
     });
 }
 
@@ -25,7 +25,7 @@ vec3d AttackSystem::getPosMeteorito(uint16_t fase, vec3d posplayer) {
     return vec3d{};
 }
 
-void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att, double dt) {
+void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att) {
     // att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
 
     auto& phy = em.getComponent<PhysicsComponent>(ent);
@@ -175,7 +175,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
                     att.elapsed_warning_airatk = 0;
                     attk_available = true;
                 }
-                att.decreaseCountdown(dt, att.elapsed_warning_airatk);
+                att.decreaseCountdown(timeStep, att.elapsed_warning_airatk);
             }
                   break;
             case 3: case 2: case 1: { //creo 1 meteorito
@@ -188,7 +188,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
 
                     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::METEORITE });
                 }
-                att.decreaseCountdown(dt, att.elapsed_air_attk);
+                att.decreaseCountdown(timeStep, att.elapsed_air_attk);
             }
             default:
                 break;

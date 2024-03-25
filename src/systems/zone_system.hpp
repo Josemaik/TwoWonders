@@ -16,7 +16,7 @@ struct ZoneSystem
     using checkType = const std::unordered_set<uint8_t>&;
     using checkFuncType = std::function<void(EntityManager&, EventManager&)>;
 
-    void update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam, EventManager& evm, MapManager& map, const float& dt);
+    void update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam, EventManager& evm, MapManager& map);
     void insertZone(uint8_t zone, InteractableType type);
 private:
     void checkZones(EntityManager& em, EventManager& evm, checkType zones, checkFuncType checkFunction);

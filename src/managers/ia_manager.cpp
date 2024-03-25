@@ -677,7 +677,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     auto& ai = em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = arrival_radius, .detect_radius = detect_radius, .attack_radius = attack_radius, .tx = tx, .tz = tz,.time2arrive = time2arrive, .tactive = tactive, .perceptionTime = static_cast<float>(perceptionTime),
         .path = path, .countdown_stop = countdown_stop, .countdown_shoot = countdown_shoot, .countdown_perception = countdown_perception, .behaviourTree = &tree });
 
-    em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = scale_to_respawn_attack });
+    em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = static_cast<float>(scale_to_respawn_attack) });
 
     // Revisamos si está en el mapa tutorial para hacer que los enemigos no hagan daño
     auto& li = em.getSingleton<LevelInfo>();

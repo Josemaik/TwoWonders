@@ -1,11 +1,11 @@
 #include "object_system.hpp"
 
-void ObjectSystem::update(EntityManager& em, double deltaTime) {
+void ObjectSystem::update(EntityManager& em) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ObjectComponent& obj)
     {
-        if (obj.decreaseLifeTime(deltaTime) && (!obj.inmortal))
+        if (obj.decreaseLifeTime(timeStep) && (!obj.inmortal))
         {
             if (obj.type == ObjectType::BombExplode || obj.type == ObjectType::Heal_Spell)
                 obj.effect();

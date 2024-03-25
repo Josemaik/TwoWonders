@@ -3,7 +3,7 @@
 struct LifeComponent
 {
     int life{ 1 }, maxLife{ life }, life_width{}, lifeLost{ 0 };
-    double countdown{ 1.0 }, elapsed{ 1.0 }; // En segundos
+    double countdown{ 0.5 }, elapsed{ countdown }; // En segundos
     bool markedForDeletion{ false }, invulnerable{ false };
 
     void decreaseLife(); // decrease 1 life

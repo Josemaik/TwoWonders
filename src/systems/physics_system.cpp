@@ -1,7 +1,7 @@
 #include "physics_system.hpp"
 #include <math.h>
 
-void PhysicsSystem::update(EntityManager& em, double dt)
+void PhysicsSystem::update(EntityManager& em)
 {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, PhysicsComponent& phy)
     {
@@ -15,7 +15,7 @@ void PhysicsSystem::update(EntityManager& em, double dt)
                 return;
             }
             else
-                phy.plusdeltatime(dt, phy.elapsed_stopped);
+                phy.plusDeltatime(timeStep, phy.elapsed_stopped);
         }
         // Sacamos referencias a la posición y velocidad
         auto& pos = phy.position;
@@ -41,7 +41,7 @@ void PhysicsSystem::update(EntityManager& em, double dt)
                 phy.elapsed_stunned = 0;
                 phy.dragActivatedTime = false;
             }
-            phy.plusdeltatime(dt, phy.elapsed_stunned);
+            phy.plusDeltatime(timeStep, phy.elapsed_stunned);
         }
 
         //Stunear o Ralentizar al player

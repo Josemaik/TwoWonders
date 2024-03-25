@@ -1,6 +1,6 @@
 #include "life_system.hpp"
 
-void LifeSystem::update(EntityManager& em, ObjectSystem& os, double deltaTime) {
+void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, LifeComponent& lif)
@@ -48,7 +48,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, double deltaTime) {
             lif.lifeLost = 0;
         }
 
-        lif.decreaseCountdown(deltaTime);
+        lif.decreaseCountdown(timeStep);
 
         if (lif.life == 0)
         {

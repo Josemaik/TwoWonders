@@ -11,7 +11,7 @@ struct BTDecisionReadyforAirAttack : BTNode_t {
             ectx.ai->ready_attack = true;
             return BTNodeStatus_t::success;
         }
-        ectx.ai->plusdeltatime(ectx.deltaTime, ectx.ai->elapsed_air_attack);
+        ectx.ai->plusDeltatime(ectx.deltaTime, ectx.ai->elapsed_air_attack);
         return BTNodeStatus_t::fail;
     }
 };

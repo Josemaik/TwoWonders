@@ -13,7 +13,7 @@ struct BTDecisionReadyforCrusherAttk : BTNode_t {
             bb.playerdamagebycrusher = false;
             return BTNodeStatus_t::success;
         }
-        ectx.ai->plusdeltatime(ectx.deltaTime, ectx.ai->elapsed_shoot);
+        ectx.ai->plusDeltatime(ectx.deltaTime, ectx.ai->elapsed_shoot);
         return BTNodeStatus_t::fail;
     }
 };

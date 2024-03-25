@@ -199,6 +199,11 @@ struct GameData
         return false;
     }
 
+    unsigned int getCurrentFrame() const
+    {
+        return currentFrame;
+    }
+
     void updateFrame()
     {
         currentFrame += 1;

@@ -24,7 +24,7 @@ void RenderSystem::init()
     GuiSetStyle(DEFAULT, TEXT_WRAP_MODE, 2);
 }
 
-void RenderSystem::update(EntityManager& em, GameEngine& engine, double dt)
+void RenderSystem::update(EntityManager& em, GameEngine& engine)
 {
     // Actualizamos la posicion de render del componente de fisicas
     em.forEach<SYSCMPs, SYSTAGs>([](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
@@ -44,7 +44,7 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine, double dt)
     drawEntities(em, engine);
 
     // Terminamos el frame
-    endFrame(engine, em, dt);
+    endFrame(engine, em);
 }
 
 void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss) {
@@ -145,7 +145,7 @@ void RenderSystem::drawChargeScreen(GameEngine& engine, EntityManager& em)
     displayGif(engine, gifCopy, gif, posX, posY);
 
     auto& li = em.getSingleton<LevelInfo>();
-    li.loadingTime += timeStep60;
+    li.loadingTime += timeStep;
 
 
     engine.endDrawing();
@@ -1006,7 +1006,7 @@ void RenderSystem::drawRay(vec3d origin, vec3d dir) {
     EndDrawing();
 }
 // Se termina el dibujado
-void RenderSystem::endFrame(GameEngine& engine, EntityManager& em, double dt)
+void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
 {
     engine.endMode3D();
 
@@ -1018,7 +1018,7 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em, double dt)
         return;
 
     drawHUD(em, engine, inpi.debugPhy);
-    drawAlerts_IA(em, engine, dt);
+    drawAlerts_IA(em, engine);
 
     if (txti.hasText())
         drawTextBox(engine, em);
@@ -1037,7 +1037,7 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em, double dt)
 
     // Visual Debug AI
     else if (inpi.debugAI2)
-        drawDebuggerInGameIA(engine, em, dt);
+        drawDebuggerInGameIA(engine, em);
 
     else if (inpi.pathfind)
         drawTestPathfindinf(engine, em);
@@ -1168,7 +1168,8 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     }
 }
 //Debugger visual in-game
-void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em, double dt) {
+void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
+{
     // engine.beginDrawing();
     float posX = static_cast<float>(engine.getScreenWidth() - 330);
     int posText = static_cast<int>(posX + 10);
@@ -1203,7 +1204,7 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em, d
                 debugsnglt.text = aic.bh;
             }
             else {
-                debugsnglt.plusdeltatime(dt, debugsnglt.elapsed);
+                debugsnglt.plusDeltatime(timeStep, debugsnglt.elapsed);
             }
             engine.drawTextEx(engine.getFontDefault(), debugsnglt.text, vec2d{ 610,110 }, 20, 1, DARKGRAY);
             engine.drawText("TEID:", posText, 130, 20, BLACK);
@@ -1339,7 +1340,7 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
     // engine.endDrawing();
 }
 //Dibujado alertas de detección de enemigos
-void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine, double dt) {
+void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
     for (auto const& e : em.getEntities())
     {
         //Alert state
@@ -1369,7 +1370,7 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine, double d
                     aic.show_icon = false;
                 }
                 else {
-                    aic.plusdeltatime(dt, aic.elapsed_show_icon);
+                    aic.plusDeltatime(timeStep, aic.elapsed_show_icon);
                 }
             }
 
@@ -1429,6 +1430,8 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
 
             // Dibujamos el número de monedas en pantalla
             drawCoinBar(engine, em);
+
+            drawFPSCounter(engine);
 
             // Dibujar espacios de hechizos
             drawSpellSlots(engine, em);
@@ -1694,7 +1697,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                                 static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9),
                                 { 255, 255, 255, 255 });
 
-                            elapsed_Lock += timeStep60;
+                            elapsed_Lock += timeStep;
                         }
                         else
                         {
@@ -2036,17 +2039,17 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
     if (plfi.coins == 0)
         return;
 
-    const double multip = 3.5f;
+    const float multip = 3.5f;
     if (plfi.elapsed_coins < plfi.elapsed_limit_coins)
     {
-        elapsed_CoinBar += timeStep60 * multip;
+        elapsed_CoinBar += timeStep * multip;
         if (elapsed_CoinBar > elapsed_limit_CoinBar) elapsed_CoinBar = elapsed_limit_CoinBar;
 
-        plfi.elapsed_coins += timeStep60;
+        plfi.elapsed_coins += timeStep;
     }
     else
     {
-        elapsed_CoinBar -= timeStep60 * multip;
+        elapsed_CoinBar -= timeStep * multip;
         if (elapsed_CoinBar < 0) elapsed_CoinBar = 0;
     }
 
@@ -2133,7 +2136,7 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
     {
         if (elapsed_spell < elapsed_limit_spell)
         {
-            elapsed_spell += timeStep60;
+            elapsed_spell += timeStep;
 
             if (static_cast<int>(elapsed_spell * 10) % 16 < 8)
                 return;
@@ -2250,4 +2253,25 @@ void RenderSystem::displayGif(GameEngine& engine, Texture2D& copy, GameEngine::G
 double RenderSystem::shakeDouble(double value)
 {
     return value += static_cast<double>(std::rand() % 3 - 1) / 5.0;
+}
+
+void RenderSystem::drawFPSCounter(GameEngine& engine)
+{
+    static double lastTime = 0.0;
+    static int framesCounter = 0;
+    static double fps = 0.0;
+
+    double currentTime = engine.getTime(); // Suponiendo que tienes una función que devuelve el tiempo actual
+    framesCounter++;
+
+    if (currentTime - lastTime >= 1.0) // Si ha pasado más de un segundo
+    {
+        fps = framesCounter; // El número de frames dibujados en el último segundo es el FPS
+        framesCounter = 0; // Reinicia el contador de frames
+        lastTime = currentTime; // Actualiza el último tiempo
+    }
+
+    // Dibuja el FPS
+    std::string fpsStr = "FPS: " + std::to_string(fps);
+    engine.drawText(fpsStr.c_str(), engine.getScreenWidth() - 100, 10, 20, RED);
 }
