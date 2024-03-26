@@ -209,6 +209,11 @@ struct GameData
         currentFrame += 1;
     }
 
+    void updateFrameDown()
+    {
+        currentFrame -= 1;
+    }
+
     void setVel(vec3d& vel)
     {
         vel = currentMovement.vel;

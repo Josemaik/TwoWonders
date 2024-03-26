@@ -111,6 +111,12 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
         ss.music_stop();
     }
 
+    if(!li.replay)
+    {
+        auto& gami = em.getSingleton<GameData>();
+        gami.updateFrameDown();
+    }
+
     if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec)) {
         if (ss.pushed == false)
             ss.sonido_mov();
