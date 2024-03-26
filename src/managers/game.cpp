@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include <iomanip>
 // #include "../utils/memory_viewer.hpp"
 // #include <chrono>
 
@@ -39,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
+        plfi.spawnPoint = { 30.0, 13.0, 213.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -66,7 +67,7 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    // em.addComponent<AttackComponent>(e);
+    em.addComponent<AttackComponent>(e);
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
@@ -75,6 +76,7 @@ void Game::createEntities()
     lis.addCode(EventCodes::OpenDoor);
     lis.addCode(EventCodes::NPCDialog);
     lis.addCode(EventCodes::DialogFirstSpawn);
+    lis.addCode(EventCodes::ViewPointNPCPrison);
 
     // Código de añadir un hechizo al jugador
     // Spell spell{ "Fireball", "Shoots a fireball", Spells::WaterBomb, 20.0, 2 };
@@ -220,7 +222,7 @@ void Game::run()
 
             // TODO - Cuando se implemente el sistema de guardado, cargar el nivel en el que se quedó
             if (!map.isComplete())
-                map.createMap(em, 0, iam);
+                map.createMap(em, 1, iam);
 
             break;
         }
@@ -282,7 +284,7 @@ void Game::run()
                     life_system.update(em, object_system);
                     sound_system.update();
                     // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
-                    camera_system.update(em, engine);
+                    camera_system.update(em, engine, evm);
                     event_system.update(em, evm, iam, map, object_system, sound_system);
 
                     if (!li.getDeath().empty())
@@ -334,7 +336,7 @@ void Game::run()
         std::tm tm = *std::localtime(&t);
         std::stringstream ss;
         ss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S");
-        name += ss.str(); 
+        name += ss.str();
         name += ".cereal";
         std::ofstream os(name, std::ios::binary);
         cereal::BinaryOutputArchive archive(os);

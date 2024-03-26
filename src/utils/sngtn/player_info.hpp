@@ -14,7 +14,7 @@ struct PlayerInfo
     float elapsed_limit_coins{ 5.0f }, elapsed_coins{ elapsed_limit_coins };
     double max_mana{ 100.0 }, mana{ max_mana };
     int mana_width{}, armor{};
-    bool hasKey{ false };
+    bool hasKey{ true };
     bool hasStaff{ false };
     bool onSpawn{ false };
     bool minusCoins{ false };
@@ -60,13 +60,13 @@ struct PlayerInfo
         elapsed_coins = 0.0f;
     }
 
-    void coinDeath() 
+    void coinDeath()
     {
         auto prev = coins;
         coins = 0;
 
         // Hacemos la división y si tiene resto se lo sumamos
-        auto rest = prev % 2;
+        uint16_t rest = prev % 2;
         addCoin((prev / 2) + rest);
         minusCoins = true;
     }

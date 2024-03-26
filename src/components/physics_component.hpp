@@ -16,6 +16,12 @@ struct PhysicsComponent
     static constexpr double KMaxVy{ 0.5 };
     static constexpr double MAX_SPEED{ 2.0 };
 
+    void lookAt(vec3d& target)
+    {
+        vec3d direction = target - position;
+        orientation = atan2(direction.x(), direction.z());
+    }
+
     vec3d position{};
     vec3d velocity{};
     vec3d scale{};
@@ -43,7 +49,7 @@ struct PhysicsComponent
     float countdown_sttuned{ 3.0f }; // seconds
     float elapsed_stunned{ 0.5f };
 
-    bool stopped{ false };
+    bool stopped{ false }, notMove{ false };
     float countdown_stopped{ 0.35f };
     float elapsed_stopped{ 0.0f };
 

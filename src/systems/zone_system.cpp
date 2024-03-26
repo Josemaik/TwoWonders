@@ -332,7 +332,7 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager& evm)
     using noCMP = MP::TypeList<PhysicsComponent, InteractiveComponent, OneUseComponent>;
     using npcTag = MP::TypeList<NPCTag>;
 
-    em.forEach<noCMP, npcTag>([&](Entity& e, PhysicsComponent& phy, InteractiveComponent& ic, OneUseComponent& ouc)
+    em.forEach<noCMP, npcTag>([&](Entity& e, PhysicsComponent& phy, InteractiveComponent&, OneUseComponent& ouc)
     {
         // Revisamos si ya se ha hablado con el npc
         std::pair<uint8_t, uint8_t> pair{ li.mapID, ouc.id };
@@ -341,22 +341,18 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager& evm)
             return;
 
         double distance = playerPos.distance(phy.position);
-        double range = 7.0;
-        if (distance < range && !ic.showButton && !li.playerDetected)
-            ic.showButton = true;
+        double distanceY = std::abs(playerPos.y() - phy.position.y());
+        double range = 12.0;
 
-        else if (distance > range && ic.showButton)
-            ic.showButton = false;
-
-        auto& inpi = em.getSingleton<InputInfo>();
-
-        if (inpi.interact && ic.showButton && !li.playerDetected)
+        if (distance < range && distanceY < 2.0 && !li.playerDetected)
         {
             li.dontLoad.insert(pair);
             li.npcToTalk = e.getID();
-            inpi.interact = false;
-            ic.showButton = false;
-            evm.scheduleEvent(Event{ EventCodes::NPCDialog });
+            playerPhy.lookAt(phy.position);
+            playerPhy.notMove = true;
+            phy.lookAt(playerPhy.position);
+
+            evm.scheduleEvent(Event{ EventCodes::ViewPointNPCPrison });
         }
     });
 }

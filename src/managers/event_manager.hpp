@@ -23,7 +23,8 @@ enum EventCodes : uint16_t
     DialogPrisonNomad1,
     DialogPrisonNomad2,
     DialogFirstSpawn,
-    ViewPointDoor
+    ViewPointDoor,
+    ViewPointNPCPrison
 };
 
 struct Event {
@@ -187,6 +188,8 @@ public:
 
                         li.viewPoint = { -84.847, 8.0, 234.267 };
 
+                        auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+                        playerPhy.notMove = false;
                         break;
                     }
                     case EventCodes::NPCDialog:
@@ -226,7 +229,15 @@ public:
                     case EventCodes::ViewPointDoor:
                     {
                         auto& li = em.getSingleton<LevelInfo>();
-                        li.viewPoint = { 25.153, 18.593, 85.767 };
+                        li.viewPoint = { 15.153, 18.593, 85.767 };
+                        li.viewPointSound = true;
+                        break;
+                    }
+                    case EventCodes::ViewPointNPCPrison:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        li.viewPoint = { -23.08, 4.0, 244.7 };
+                        li.eventNPCPrison = true;
                         li.viewPointSound = true;
                         break;
                     }

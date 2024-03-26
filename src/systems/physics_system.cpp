@@ -5,6 +5,8 @@ void PhysicsSystem::update(EntityManager& em)
 {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, PhysicsComponent& phy)
     {
+        if (phy.notMove)
+            return;
         // Cuando el jugador se para por un tiempo determinado
         if (phy.stopped)
         {

@@ -4,10 +4,11 @@
 
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
+#include "../managers/event_manager.hpp"
 
 struct CameraSystem
 {
-    void update(EntityManager& em, ENGI::GameEngine& ge);
+    void update(EntityManager& em, GameEngine& ge, EventManager& evm);
 
 private:
     vec3d cameraPos{}, cameraTar{};
