@@ -11,7 +11,7 @@ struct PlayerInfo
 
     double increaseLife{ 0.0 };
     uint16_t coins{}, bombs{}, max_bombs{ 8 };
-    double elapsed_limit_coins{ 5.0 }, elapsed_coins{ elapsed_limit_coins };
+    float elapsed_limit_coins{ 5.0f }, elapsed_coins{ elapsed_limit_coins };
     double max_mana{ 100.0 }, mana{ max_mana };
     int mana_width{}, armor{};
     bool hasKey{ false };

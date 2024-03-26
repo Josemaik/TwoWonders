@@ -11,7 +11,7 @@ struct LifeSystem
     using SYSCMPs = MP::TypeList<LifeComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, ObjectSystem& os, double deltaTime);
+    void update(EntityManager& em, ObjectSystem& os);
 
 private:
     void createObject(EntityManager& em, ObjectSystem& os, vec3d pos);

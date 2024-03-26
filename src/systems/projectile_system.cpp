@@ -1,13 +1,13 @@
 #include "projectile_system.hpp"
 
-void ProjectileSystem::update(EntityManager& em, double deltaTime) {
+void ProjectileSystem::update(EntityManager& em) {
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& plfi = em.getSingleton<PlayerInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, ProjectileComponent& pro)
     {
-        if (pro.checkRange(deltaTime)) {
+        if (pro.checkRange(timeStep)) {
 
             if (pro.startedFalling)
             {

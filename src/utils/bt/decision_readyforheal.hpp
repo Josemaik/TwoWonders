@@ -30,7 +30,7 @@ struct BTDecisionReadyforHeal : BTNode_t {
                 return BTNodeStatus_t::success;
             }
             else {
-                ectx.ai->plusdeltatime(ectx.deltaTime, ectx.ai->elapsed_heal);
+                ectx.ai->plusDeltatime(ectx.deltaTime, ectx.ai->elapsed_heal);
             }
         }
         return BTNodeStatus_t::fail;

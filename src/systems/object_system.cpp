@@ -1,11 +1,11 @@
 #include "object_system.hpp"
 
-void ObjectSystem::update(EntityManager& em, double deltaTime) {
+void ObjectSystem::update(EntityManager& em) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ObjectComponent& obj)
     {
-        if (obj.decreaseLifeTime(deltaTime) && (!obj.inmortal))
+        if (obj.decreaseLifeTime(timeStep) && (!obj.inmortal))
         {
             if (obj.type == ObjectType::BombExplode || obj.type == ObjectType::Heal_Spell)
                 obj.effect();
@@ -203,6 +203,7 @@ void ObjectSystem::createObjects(EntityManager& em)
         Color color{};
         vec3d scl{ 1.5, 1.5, 1.5 };
         bool inmortal = false;
+        bool visible = true;
 
         switch (obj)
         {
@@ -227,18 +228,36 @@ void ObjectSystem::createObjects(EntityManager& em)
             color = SKYBLUE;
             break;
         }
-        case ObjectType::Sword:
+        case ObjectType::Basic_Staff:
         {
             color = GRAY;
-            scl = { 1.5, 0.3, 0.3 };
+            scl = { 10.5, 10.3, 10.3 };
             inmortal = true;
+            visible = false;
             break;
         }
         case ObjectType::Key:
         {
             color = GOLD;
-            scl = { 1.5, 0.3, 0.3 };
+            scl = { 10.5, 10.3, 10.3 };
             inmortal = true;
+            visible = false;
+            break;
+        }
+        case ObjectType::ShopItem_ExtraLife:
+        {
+            color = RED;
+            scl = { 10.5, 10.5, 10.5 };
+            inmortal = true;
+            visible = false;
+            break;
+        }
+        case ObjectType::Coin30:
+        {
+            color = RED;
+            scl = { 10.5, 10.5, 10.5 };
+            inmortal = true;
+            visible = false;
             break;
         }
         case ObjectType::Fire_Spell:
@@ -254,7 +273,7 @@ void ObjectSystem::createObjects(EntityManager& em)
         }
 
         em.addTag<ObjectTag>(e);
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = scl, .color = color });
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = scl, .color = color, .visible = visible });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = obj, .inmortal = inmortal });

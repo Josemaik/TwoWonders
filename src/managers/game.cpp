@@ -39,7 +39,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -6.0, 4.0, 94.0 };
+        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -103,21 +103,19 @@ void Game::createSound() {
 void Game::run()
 {
     // Cosas para medir el tiempo de ejecución
-    // using std::chrono::high_resolution_clock;
-    // using std::chrono::duration_cast;
-    // using std::chrono::duration;
-    // using std::chrono::milliseconds;
+    using std::chrono::high_resolution_clock;
+    using std::chrono::duration_cast;
+    using std::chrono::duration;
+    using std::chrono::milliseconds;
 
     // Codigo para medir el tiempo de ejecucion
     //
-    // - Descomentar estas líneas y dejarlas ahí
-    //
     // - Colocar antes de donde se quiere medir el tiempo
     // auto t1 = high_resolution_clock::now();
-    //
     // - Colocar despues de donde se quiere medir el tiempo
     // auto t2 = high_resolution_clock::now();
-    // duration<float, std::milli> duration = t2 - t1;
+    // auto duration = duration_cast<milliseconds>(t2 - t1);
+    // std::cout << "Collision System: " << duration.count() << "ms" << std::endl;
 
     // Singletons
     auto& li = em.getSingleton<LevelInfo>();
@@ -154,14 +152,16 @@ void Game::run()
     engine.setReplayMode(li.replay, gami);
 
     // Inicializa una variable donde tener el tiempo entre frames
-    double currentTime{}, elapsed{};
+    float currentTime{};
+    double elapsed{};
+    bool debugs{ false }, resets{ false };
 
     createSound();
     attack_system.setCollisionSystem(&collision_system);
 
     while (!li.gameShouldEnd)
     {
-        elapsed += timeStep120;
+        elapsed += timeStepDouble240;
         gami.updateFrame();
 
         switch (li.currentScreen)
@@ -170,7 +170,7 @@ void Game::run()
         case GameScreen::LOGO:
         {
             // Contador para que pasen X segundos
-            currentTime += timeStep60;
+            currentTime += timeStep;
             if (currentTime > 4.0) {
                 li.currentScreen = GameScreen::TITLE;
                 currentTime = 0;
@@ -248,30 +248,30 @@ void Game::run()
                 render_system.drawChargeScreen(engine, em);
 
             input_system.update(em, engine);
-            bool debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();
-            bool resets = li.resetGame || li.resetFromDeath;
+            debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();
+            resets = li.resetGame || li.resetFromDeath;
 
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
             {
-                while (elapsed >= timeStep)
+                while (elapsed >= timeStepDouble)
                 {
-                    elapsed -= timeStep;
+                    elapsed -= timeStepDouble;
 
-                    ai_system.update(em, timeStep);
-                    npc_system.update(em, timeStep);
-                    physics_system.update(em, timeStep);
+                    ai_system.update(em);
+                    npc_system.update(em);
+                    physics_system.update(em);
                     collision_system.update(em);
-                    zone_system.update(em, engine, iam, evm, map, timeStep);
+                    zone_system.update(em, engine, iam, evm, map);
                     lock_system.update(em);
                     shield_system.update(em);
-                    object_system.update(em, timeStep);
-                    projectile_system.update(em, timeStep);
-                    attack_system.update(em, timeStep);
-                    life_system.update(em, object_system, timeStep);
+                    object_system.update(em);
+                    projectile_system.update(em);
+                    attack_system.update(em);
+                    life_system.update(em, object_system);
                     sound_system.update();
-                    // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
-                    camera_system.update(em, engine, timeStep);
+                    // if (elapsed < timeStepDouble) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
+                    camera_system.update(em, engine);
                     event_system.update(em, evm, iam, map, object_system, sound_system);
 
                     if (!li.getDeath().empty())
@@ -280,10 +280,10 @@ void Game::run()
                         li.clearDeath();
                     }
                 }
-                render_system.update(em, engine, timeStep);
+                render_system.update(em, engine);
             }
             else if (!resets && debugs)
-                render_system.update(em, engine, timeStep);
+                render_system.update(em, engine);
 
             break;
         }
@@ -306,7 +306,7 @@ void Game::run()
         default:
             break;
         }
-        if (elapsed >= timeStep)
+        if (elapsed >= timeStepDouble)
             elapsed = 0; // Para que no se acumule el tiempo
 
         if (engine.windowShouldClose())

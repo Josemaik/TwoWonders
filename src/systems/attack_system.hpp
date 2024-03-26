@@ -10,11 +10,11 @@ struct AttackSystem
     using SYSCMPs = MP::TypeList<AttackComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, double deltaTime);
+    void update(EntityManager& em);
     void setCollisionSystem(CollisionSystem* col_sys);
 
 private:
-    void createAttack(EntityManager& em, Entity& e, AttackComponent& att, double dt);
+    void createAttack(EntityManager& em, Entity& e, AttackComponent& att);
     vec3d getPosMeteorito(uint16_t fase, vec3d posplayer);
 
     void createAttackRangedOrMelee(EntityManager& em, Entity& e, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack, double const ranged);

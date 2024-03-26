@@ -30,7 +30,10 @@ struct AISystem
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent, AIComponent, LifeComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, double dt);
+    void update(EntityManager& em);
+
+private:
+    void perception(BlackBoard_t& bb, AIComponent& ai);
 };
 
 #endif // !AI_SYSTEM

@@ -7,12 +7,11 @@
 
 struct CameraSystem
 {
-    void update(EntityManager& em, ENGI::GameEngine& ge, double dt);
+    void update(EntityManager& em, ENGI::GameEngine& ge);
 
 private:
     vec3d cameraPos{}, cameraTar{};
-    float cameraFovy{ 20.f };
-    double transitionTime{ 0. }, transitionLimit{ 0.4 }, viewPointTime{ 0. }, viewPointLimit{ 2.7 };
+    float cameraFovy{ 20.f }, transitionTime{ 0.f }, transitionLimit{ 0.4f }, viewPointTime{ 0.f }, viewPointLimit{ 1.35f };
 };
 
 #endif

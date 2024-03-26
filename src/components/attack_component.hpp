@@ -25,9 +25,9 @@ struct AttackComponent
     AttackType type{ AttackType::Ranged };
     uint16_t damage{};
     float range{}; // en segundos
-    double scale_to_respawn_attack{ 2.0 };
-    double countdown{ 1.0f }, elapsed{ 1.0f }, countdown_air_attk{ 0.2f }, elapsed_air_attk{ 1.0f },
-        countdown_warning_airatk{ 1.5 }, elapsed_warning_airatk{ 1.0 }; // en segundos
+    float scale_to_respawn_attack{ 2.0f };
+    float countdown{ 0.5f }, elapsed{ countdown }, countdown_air_attk{ 0.2f }, elapsed_air_attk{ 1.0f },
+        countdown_warning_airatk{ 0.75f }, elapsed_warning_airatk{ 0.5f }; // en segundos
     vec3d vel{};
     //air attack
     bool warning_created{ false };
@@ -43,5 +43,5 @@ struct AttackComponent
         }
     }
 
-    void decreaseCountdown(double deltaTime, double& elapsed) { elapsed += deltaTime; }; // delta time
+    void decreaseCountdown(float deltaTime, float& elapsed) { elapsed += deltaTime; }; // delta time
 };

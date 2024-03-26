@@ -9,6 +9,9 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     auto& player = *em.getEntityByID(li.playerID);
     auto& gami = em.getSingleton<GameData>();
 
+    if (li.isCharging())
+        return;
+
     if (li.replay)
         gami.update();
 
@@ -19,9 +22,6 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             li.resetFromDeath = true;
         return;
     }
-
-    if (li.isCharging())
-        return;
 
     // PAUSE
     if ((ge.isKeyReleased(KEY_ESCAPE) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_MIDDLE_RIGHT)) && li.currentScreen == GameScreen::GAMEPLAY)

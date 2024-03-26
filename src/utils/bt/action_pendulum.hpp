@@ -21,7 +21,7 @@ struct BTAction_Pendulum : BTNode_t {
                     abc.angrySoundOneTime = true;
                 }
                 else {
-                    ectx.ai->plusdeltatime(ectx.deltaTime, ectx.ai->elapsed_stop);
+                    ectx.ai->plusDeltatime(ectx.deltaTime, ectx.ai->elapsed_stop);
                     if (abc.angrySound)
                     {
                         auto& li = ectx.em.getSingleton<LevelInfo>();

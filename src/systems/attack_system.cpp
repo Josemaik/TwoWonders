@@ -1,13 +1,13 @@
 #include "attack_system.hpp"
 
-void AttackSystem::update(EntityManager& em, double deltaTime) {
+void AttackSystem::update(EntityManager& em) {
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, AttackComponent& att)
     {
         if (att.createAttack)
-            createAttack(em, ent, att, deltaTime);
+            createAttack(em, ent, att);
 
-        att.decreaseCountdown(deltaTime, att.elapsed);
+        att.decreaseCountdown(timeStep, att.elapsed);
     });
 }
 
@@ -25,7 +25,7 @@ vec3d AttackSystem::getPosMeteorito(uint16_t fase, vec3d posplayer) {
     return vec3d{};
 }
 
-void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att, double dt) {
+void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att) {
     // att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
 
     auto& phy = em.getComponent<PhysicsComponent>(ent);
@@ -73,14 +73,14 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     {
     case AttackType::Ranged:
         if (ent.hasTag<SpiderTag>()) {
-            createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack, 1.0);
+            createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack, 0.5);
         }
         else
-            createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack, 3.0);
+            createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack, 1.5);
         break;
 
     case AttackType::Melee:
-        createAttackRangedOrMelee(em, ent, att, false, att.scale_to_respawn_attack, 3.0);
+        createAttackRangedOrMelee(em, ent, att, false, att.scale_to_respawn_attack, 1.5);
         break;
 
     case AttackType::Bomb:
@@ -92,7 +92,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             if (plfi.bombs > 0) {
                 auto& e{ em.newEntity() };
                 em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
-                em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::BombExplode, .life_time = 2.0f });
+                em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::BombExplode, .life_time = 1.0f });
                 plfi.decreaseBomb();
             }
         }
@@ -100,7 +100,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         {
             auto& e{ em.newEntity() };
             em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = BLACK });
-            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::BombExplode, .life_time = 2.0f });
+            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::BombExplode, .life_time = 1.0f });
         }
         break;
     }
@@ -108,7 +108,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     {
         auto& e{ em.newEntity() };
         em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 1.0f, 1.0f, 1.0f }, .color = GREEN });
-        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Heal_Spell, .life_time = 1.0f });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Heal_Spell, .life_time = 0.5f });
         break;
     }
     case AttackType::AttackPlayer:
@@ -122,7 +122,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             em.addTag<HitPlayerTag>(e);
             auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 18.0f, 0.1f, 18.0f }, .color = GREEN });
             auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
-            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::AreaAttack, .life_time = 7.0f });
+            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::AreaAttack, .life_time = 3.5f });
             ElementalType tipoElemental;
             if (ent.hasComponent<TypeComponent>())
                 tipoElemental = em.getComponent<TypeComponent>(ent).type;
@@ -139,7 +139,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         auto& e{ em.newEntity() };
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 3.0f, 0.1f, 3.0f }, .color = GREEN });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
-        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Spiderweb, .life_time = 4.0f });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Spiderweb, .life_time = 2.0f });
         ElementalType tipoElemental;
         if (ent.hasComponent<TypeComponent>())
             tipoElemental = em.getComponent<TypeComponent>(ent).type;
@@ -165,7 +165,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
                 if (!att.warning_created) {
                     auto& e{ em.newEntity() };
                     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = att.pos_respawn_air_attack, .scale = { 4.0f, 0.1f, 4.0f }, .color = ORANGE });
-                    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Meteorit, .life_time = 5.0f });
+                    em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Meteorit, .life_time = 2.5f });
                     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.01 });
                     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::WARNINGZONE });
 
@@ -175,7 +175,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
                     att.elapsed_warning_airatk = 0;
                     attk_available = true;
                 }
-                att.decreaseCountdown(dt, att.elapsed_warning_airatk);
+                att.decreaseCountdown(timeStep, att.elapsed_warning_airatk);
             }
                   break;
             case 3: case 2: case 1: { //creo 1 meteorito
@@ -188,7 +188,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
 
                     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::METEORITE });
                 }
-                att.decreaseCountdown(dt, att.elapsed_air_attk);
+                att.decreaseCountdown(timeStep, att.elapsed_air_attk);
             }
             default:
                 break;
@@ -197,15 +197,15 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
                 att.air_attack_fases--;
             }
         }
+        break;
     }
-                              break;
     case AttackType::CrusherAttack:
     {
         auto& e{ em.newEntity() };
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = vec3d{att.pos_respawn_crush_attack.x(),
         att.pos_respawn_crush_attack.y(),att.pos_respawn_crush_attack.z()}, .scale = { 20.0f, 0.1f, 20.0f }, .color = GREEN });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.0 });
-        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::CrusherAttack, .life_time = 0.5f });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 0.5f });
         ElementalType tipoElemental;
         if (ent.hasComponent<TypeComponent>())
             tipoElemental = em.getComponent<TypeComponent>(ent).type;
@@ -221,7 +221,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         auto& e{ em.newEntity() };
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 10.0f, 0.1f, 10.0f }, .color = BLUE });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.001 });
-        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 5.0f });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 0.5f });
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Water });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
         break;
@@ -231,7 +231,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         auto& e{ em.newEntity() };
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 10.0f, 0.1f, 10.0f }, .color = BLUE });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
-        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 5.0f });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 1.0f });
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Fire });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
         break;
@@ -352,7 +352,7 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
             em.addTag<HitPlayerTag>(e);
             auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getPosMeteorito(i, pos), .scale = { 4.0f, 4.0f, 4.0f }, .color = BROWN });
             auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.02 });
-            em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 1.f });
+            em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.5f });
             em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Fire });
             em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, p.scale, BehaviorType::ATK_PLAYER });
         }
@@ -404,12 +404,11 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
         // Creamos el hechizo
         auto& e{ em.newEntity() };
         em.addTag<HitPlayerTag>(e);
-        att.vel.setY(0.12);
-        std::cout << att.vel << std::endl;
+        att.vel.setY(0.3);
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
         em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-        em.addComponent<ProjectileComponent>(e);
+        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f });
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = eleType });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
 

@@ -1,6 +1,6 @@
 #include "camera_system.hpp"
 
-void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, double dt)
+void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge)
 {
     // Constantes de los distintos estados de la cámara
     static constexpr vec3d cameraPosSum = { -60.f, 66.f, -60.f };
@@ -33,6 +33,9 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, double dt)
             {
                 if (!li.enemyPositions.empty())
                 {
+                    auto& player = *em.getEntityByID(li.playerID);
+                    auto& phy = em.getComponent<PhysicsComponent>(player);
+
                     // Calcular la posición media de los enemigos
                     double x{}, y{}, z{};
                     for (auto& e : li.enemyPositions)
@@ -81,7 +84,7 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, double dt)
             li.viewPointSound = false;
         }
         // La cinematica se desactiva cuando pasan 4 segundos
-        viewPointTime += dt;
+        viewPointTime += timeStep;
         if (viewPointTime >= viewPointLimit)
         {
             viewPointTime = 0.f;
@@ -93,7 +96,7 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, double dt)
 
     if (li.transition)
     {
-        transitionTime += dt;
+        transitionTime += timeStep;
         if (transitionTime >= transitionLimit)
         {
             transitionTime = 0.f;

@@ -3,7 +3,7 @@
 #include <random>
 
 // Cada cuanto se percibe al jugador
-void perception(BlackBoard_t& bb, AIComponent& ai, double dt) {
+void AISystem::perception(BlackBoard_t& bb, AIComponent& ai) {
     // Accumulate delta time still perception time
     // ai.accumulated_dt += dt;
     // if (ai.accumulated_dt <= ai.perceptionTime) return;
@@ -24,11 +24,11 @@ void perception(BlackBoard_t& bb, AIComponent& ai, double dt) {
         }
     }
     else {
-        ai.plusdeltatime(dt, ai.elapsed_perception);
+        ai.plusDeltatime(timeStep, ai.elapsed_perception);
     }
 }
 // Actualizar las IA
-void AISystem::update(EntityManager& em, double dt)
+void AISystem::update(EntityManager& em)
 {
     bool isDetected{ false };
     std::vector<vec3d> enemyPositions{};
@@ -36,12 +36,12 @@ void AISystem::update(EntityManager& em, double dt)
     auto& bb = em.getSingleton<BlackBoard_t>();
     bb.idsubditos.clear();
 
-    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, RenderComponent& ren, AIComponent& ai, LifeComponent& lc)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren, AIComponent& ai, LifeComponent& lc)
     {
         AIComponent* aiptr = &ai;
         LifeComponent* lcptr = &lc;
         //percibir el entorno
-        perception(bb, ai, dt);
+        perception(bb, ai);
         // Actualizar datos de los slimes y subditos en blackboard
         if (e.hasTag<SlimeTag>()) {
             bb.updateInfoSlime(e.getID(), phy.position, lc.life);
@@ -71,7 +71,7 @@ void AISystem::update(EntityManager& em, double dt)
             enemyPositions.push_back(phy.position);
 
         if (ai.behaviourTree) {
-            ai.behaviourTree->run({ em,e,aiptr,nullptr,phy,ren,lcptr,dt });
+            ai.behaviourTree->run({ em,e,aiptr,nullptr,phy,ren,lcptr, timeStep });
             return;
         }
     });

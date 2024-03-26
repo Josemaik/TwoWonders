@@ -1,4 +1,6 @@
 #include "game_engine.hpp"
+#include <chrono>
+
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
 {
@@ -80,7 +82,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImageGif("x", "assets/HUD/botones/x.gif", 0, 55);
 
     // Botón Círculo
-    loadAndResizeImageGif("circulo", "assets/HUD/botones/circulo.gif", 0);
+    loadAndResizeImageGif("circulo", "assets/HUD/botones/circulo.gif", 0, 55);
 
     // Botón Triángulo
     loadAndResizeImageGif("triangulo", "assets/HUD/botones/triangulo.gif", 0);
@@ -93,6 +95,9 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Tecla E
     loadAndResizeImageGif("e", "assets/HUD/teclas/e.gif", 0, 55);
+
+    // Tecla F
+    loadAndResizeImageGif("f", "assets/HUD/teclas/f.gif", 0, 55);
 
     // Tecla Espacio
     loadAndResizeImageGif("espacio", "assets/HUD/teclas/espacio.gif", 0, 55);
@@ -641,4 +646,12 @@ void ENGI::GameEngine::setReplayMode(bool replay, GameData& gd)
 {
     replayMode = replay;
     gameData = &gd;
+}
+
+double ENGI::GameEngine::getTime()
+{
+    auto now = std::chrono::high_resolution_clock::now();
+    auto duration = now.time_since_epoch();
+    auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+    return static_cast<double>(microseconds.count()) / 1e6;
 }

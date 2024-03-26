@@ -28,12 +28,12 @@ enum struct ObjectType
 struct ObjectComponent
 {
     ObjectType type{ ObjectType::Coin };
-    double life_time{ 10.0 }, elapsed{ 0.0 };
+    float life_time{ 10.0f }, elapsed{ 0.0f };
     bool active{ false };
 
     bool inmortal{ false };
 
-    bool decreaseLifeTime(double deltaTime) {
+    bool decreaseLifeTime(float deltaTime) {
         elapsed += deltaTime;
         return elapsed >= life_time ? true : false;
     }
