@@ -25,7 +25,7 @@ void LockSystem::update(EntityManager& em)
                 // Calcula la distancia entre la posición del jugador y la posición del enemigo
                 double distance = playerPos.distance(pos);
 
-                // Si el enemigo se encuentra a menos de 10 unidades de distancia del jugador se inserta en el set
+                // Si el enemigo se encuentra a menos de x unidades de distancia del jugador se inserta en el set
                 if (distance < 25.0)
                     enemies.push_back({ e.getID(), distance });
             }

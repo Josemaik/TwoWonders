@@ -393,6 +393,11 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 r.offset = interactable["offsetZ"][0].GetDouble();
             }
 
+            if (interactable.HasMember("checkCrushers"))
+            {
+                cc.checkCrushers = true;
+            }
+
             checkDispatcher(em, entity, interactable);
             break;
         }
@@ -502,6 +507,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
                        vec3d{npc["path"][2][0].GetDouble(), npc["path"][2][1].GetDouble(), npc["path"][2][2].GetDouble()},
                        vec3d{npc["path"][3][0].GetDouble(), npc["path"][3][1].GetDouble(), npc["path"][3][2].GetDouble()} };
         double arrival_radius = npc["arrival_radius"].GetDouble();
+        uint8_t npcType = static_cast<uint8_t>(npc["npc"].GetUint());
 
         vec_t.push_back(std::make_unique<BehaviourTree_t>());
         auto& tree = *vec_t.back();
@@ -510,6 +516,15 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
 
         auto& entity{ em.newEntity() };
         em.addTag<NPCTag>(entity);
+
+        switch (npcType)
+        {
+        case 0:
+            em.addTag<NomadTag>(entity);
+            break;
+        default:
+            break;
+        }
 
         auto& wr = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color,.orientation = rot,.rotationVec = rotationVec });
         auto& wp = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.rotationVec = rotationVec, .max_speed = max_speed });

@@ -151,7 +151,7 @@ struct LevelInfo
         debugIA2 = false;
         resetGame = false;
         num_zone = 0;
-        mapID = 1;
+        mapID = 0;
         chestToOpen = max;
         dungeonKeyCreated = false;
         openChest = false;

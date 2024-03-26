@@ -27,10 +27,10 @@ void CollisionSystem::update(EntityManager& em)
     });
 
     // Vector para saber qué colisiones se han calculado ya
-    checkedPairs.clear();
+    resetCollisionsMatrix();
 
     // Comprobar colisiones
-    checkCollision(em, octree, checkedPairs);
+    checkCollision(em, octree);
 
     // Comprobar colisiones con rampas
     handleRampCollision(em);
@@ -39,7 +39,7 @@ void CollisionSystem::update(EntityManager& em)
 }
 
 // Función recursiva qué revisa las colisiones de las entidades del octree actual con otras entidades
-void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsType& checkedPairs)
+void CollisionSystem::checkCollision(EntityManager& em, Octree& octree)
 {
     // Si el octree está dividido, revisar sus hijos
     if (octree.isDivided())
@@ -48,7 +48,7 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
         {
             // Si el octante tiene entidades o está dividido, revisar sus colisiones
             if (octant.get()->getNumEntities() > 0 || octant.get()->isDivided())
-                checkCollision(em, *octant, checkedPairs);
+                checkCollision(em, *octant);
         }
         return;
     }
@@ -60,7 +60,13 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
             auto [e, c] = *it1;
             auto [nEnt, nCol] = *it2;
 
-            if (checkedPairs.find({ e->getID(), nEnt->getID() }) == checkedPairs.end() && e != nEnt)
+            auto id1 = e->getID();
+            auto id2 = nEnt->getID();
+
+            if (id1 > id2)
+                std::swap(id1, id2);
+
+            if (!checkedPairs[id1][id2] && e != nEnt)
             {
                 BBox& bbox1 = c->boundingBox;
                 BBox& bbox2 = nCol->boundingBox;
@@ -74,7 +80,7 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
                     handleCollision(em, *e, *nEnt, minOverlap, c->behaviorType, nCol->behaviorType);
 
                     // Marcamos la colisión entre ambas entidades como comprobada
-                    checkedPairs.insert({ e->getID(), nEnt->getID() });
+                    checkedPairs[id1][id2] = true;
                 }
             }
         }
@@ -102,7 +108,6 @@ void CollisionSystem::handleRampCollision(EntityManager& em)
 
         auto& ramp = em.getComponent<RampComponent>(r);
         auto& offSet = ramp.offset;
-
 
         phy.onRamp = true;
         // baseheight provisionalmente a 0
@@ -285,12 +290,13 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         return;
     }
 
-    if (behaviorType2 & BehaviorType::SPIDERWEB || behaviorType1 & BehaviorType::SPIDERWEB)
+    if ((behaviorType2 & BehaviorType::SPIDERWEB || behaviorType1 & BehaviorType::SPIDERWEB) ||
+        (behaviorType2 & BehaviorType::AREADAMAGECRUSHER || behaviorType1 & BehaviorType::AREADAMAGECRUSHER))
     {
-        if (behaviorType2 & BehaviorType::SPIDERWEB)
+        if (behaviorType2 & BehaviorType::SPIDERWEB || behaviorType2 & BehaviorType::AREADAMAGECRUSHER)
             std::swap(behaviorType1, behaviorType2);
 
-        if (behaviorType2 & BehaviorType::ENEMY || behaviorType2 & BehaviorType::SHIELD)
+        if (behaviorType2 & BehaviorType::ENEMY)
             return;
     }
 
@@ -609,6 +615,7 @@ void CollisionSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, Physic
     auto& otherPos = enemyPhy.position;
     auto& enemyVel = enemyPhy.velocity;
     vec3d dir = { pos.x() - otherPos.x(), 0, pos.z() - otherPos.z() };
+    int multiplier = 7;
 
     dir.normalize();
 
@@ -636,10 +643,13 @@ void CollisionSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, Physic
             vec3d newDir = { dir.x() * cosAngle - dir.z() * sinAngle, 0.0, dir.x() * sinAngle + dir.z() * cosAngle };
 
             dir = newDir;
-            // dir.normalize();
         }
+        multiplier = 7;
     }
-    playerPhy.velocity = dir * 7;
+    else
+        playerPhy.gravity = playerPhy.gravity / 2.5;
+
+    playerPhy.velocity = dir * multiplier;
     playerPhy.stopped = true;
 }
 
@@ -874,6 +884,12 @@ bool CollisionSystem::checkWallCollision(EntityManager& em, vec3d& pos)
     });
 
     return collision;
+}
+
+void CollisionSystem::resetCollisionsMatrix()
+{
+    for (auto& row : checkedPairs)
+        std::fill(row.begin(), row.end(), false);
 }
 
 // Función para que no se salgan de los bordes, no se usa

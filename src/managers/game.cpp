@@ -39,7 +39,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 7.0, 22.0, -21.0 };
+        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -110,11 +110,12 @@ void Game::run()
 
     // Codigo para medir el tiempo de ejecucion
     //
-    // - Descomentar estas líneas y dejarlas ahí
-    //
     // - Colocar antes de donde se quiere medir el tiempo
-    //
+    // auto t1 = high_resolution_clock::now();
     // - Colocar despues de donde se quiere medir el tiempo
+    // auto t2 = high_resolution_clock::now();
+    // auto duration = duration_cast<milliseconds>(t2 - t1);
+    // std::cout << "Collision System: " << duration.count() << "ms" << std::endl;
 
     // Singletons
     auto& li = em.getSingleton<LevelInfo>();

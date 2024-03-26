@@ -54,6 +54,9 @@ static constexpr float timeStep30 = 1.0f / 30.0f;  // Actualiza el juego 30 vece
 static constexpr float timeStep = 1.0f / 60.0f;  // Actualiza el juego 60 veces por segundo
 static constexpr float timeStep120 = 1.0f / 120.0f;  // Actualiza el juego 120 veces por segundo
 static constexpr float timeStep240 = 1.0f / 240.0f;  // Actualiza el juego 240 veces por segundo
+static constexpr float timeStep360 = 1.0f / 360.0f;  // Actualiza el juego 360 veces por segundo
+static constexpr float timeStep480 = 1.0f / 480.0f;  // Actualiza el juego 480 veces por segundo
+
 // Forward Declarations
 namespace ENGI { struct GameEngine; }
 
@@ -97,6 +100,7 @@ struct NPCTag {};
 struct LevelChangeTag {};
 struct CoinTag {};
 struct WaterBombTag {};
+struct NomadTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -162,7 +166,8 @@ using TL = MP::TypeList <
     NPCTag,
     LevelChangeTag,
     CoinTag,
-    WaterBombTag
+    WaterBombTag,
+    NomadTag
 > ;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

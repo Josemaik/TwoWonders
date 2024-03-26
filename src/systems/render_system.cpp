@@ -633,7 +633,13 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     pos.setY(pos.y() - 0.7);
                     in = true;
                 }
-                else if (e.hasTag<GolemTag>() || e.hasTag<DummyTag>())
+                else if (e.hasTag<GolemTag>())
+                {
+                    // scl = { 0.4, 0.4, 0.4 };
+                    pos.setY(pos.y() - 4.0);
+                    in = true;
+                }
+                else if (e.hasTag<DummyTag>())
                 {
                     // scl = { 0.4, 0.4, 0.4 };
                     pos.setY(pos.y() - 4.0);
@@ -655,7 +661,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 else if (e.hasTag<CrusherTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
-                    pos.setY(pos.y() - 1.1);
+                    pos.setY(pos.y() - 4.8);
                     in = true;
                 }
                 else if (e.hasTag<AngryBushTag>())
@@ -684,7 +690,13 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     pos.setY(pos.y() - r.offset);
                     in = true;
                 }
-                else if (e.hasTag<GroundTag>() || e.hasTag<DoorTag>() || e.hasTag<LeverTag>() || e.hasTag<CoinTag>() || e.hasTag<WaterBombTag>())
+                else if (e.hasTag<NomadTag>())
+                {
+                    pos.setY(pos.y() - 3.54);
+                    in = true;
+                }
+                else if (e.hasTag<GroundTag>() || e.hasTag<DoorTag>() || e.hasTag<LeverTag>()
+                    || e.hasTag<CoinTag>() || e.hasTag<WaterBombTag>())
                 {
                     in = true;
                 }
@@ -956,6 +968,12 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<WaterBombTag>())
     {
         r.model = engine.loadModel("assets/models/props/Hechizos/Agua_1.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<NomadTag>())
+    {
+        r.model = engine.loadModel("assets/characters/NPCs/Nomada/Nomada.obj");
 
         loadShaders(r.model);
     }
@@ -1575,7 +1593,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             int barWidth = 40;
             int barHeight = 4;
             int barX = static_cast<int>(engine.getWorldToScreenX(r.position) - 18);
-            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 30);
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 15);
 
             engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
 
@@ -1687,7 +1705,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                 if (!chest.isOpen)
                 {
                     auto& phy = em.getComponent<PhysicsComponent>(e);
-                    if (phy.position.distance(li.enemyToChestPos) < 30.0)
+                    if (phy.position.distance(li.enemyToChestPos) < 50.0)
                     {
                         if (elapsed_Lock < elapsed_limit_Lock)
                         {

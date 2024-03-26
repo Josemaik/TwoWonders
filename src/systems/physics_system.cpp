@@ -12,6 +12,7 @@ void PhysicsSystem::update(EntityManager& em)
             {
                 phy.elapsed_stopped = 0;
                 phy.stopped = false;
+                phy.gravity = phy.KGravity;
                 return;
             }
             else

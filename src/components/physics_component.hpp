@@ -40,11 +40,11 @@ struct PhysicsComponent
     bool dragActivated{ false };
     //rozamiento por ataque melee de golem
     bool dragActivatedTime{ false };
-    float countdown_sttuned{ 6.0f }; // seconds
-    float elapsed_stunned{ 1.0f };
+    float countdown_sttuned{ 3.0f }; // seconds
+    float elapsed_stunned{ 0.5f };
 
     bool stopped{ false };
-    float countdown_stopped{ 0.7f };
+    float countdown_stopped{ 0.35f };
     float elapsed_stopped{ 0.0f };
 
     void plusDeltatime(float deltaTime, float& elapsed) { elapsed += deltaTime; };

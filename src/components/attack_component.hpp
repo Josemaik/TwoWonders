@@ -27,7 +27,7 @@ struct AttackComponent
     float range{}; // en segundos
     float scale_to_respawn_attack{ 2.0f };
     float countdown{ 0.5f }, elapsed{ countdown }, countdown_air_attk{ 0.2f }, elapsed_air_attk{ 1.0f },
-        countdown_warning_airatk{ 1.5f }, elapsed_warning_airatk{ 1.0f }; // en segundos
+        countdown_warning_airatk{ 0.75f }, elapsed_warning_airatk{ 0.5f }; // en segundos
     vec3d vel{};
     //air attack
     bool warning_created{ false };

@@ -24,7 +24,10 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         li.transition = true;
                         em.getSingleton<SoundSystem>().ambient_stop();
 
-                        p.position = { 7.0, 22.0, -21.0 };
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+                        vec3d spawnPoint = { 7.0, 22.0, -21.0 };
+                        plfi.spawnPoint = spawnPoint;
+                        p.position = spawnPoint;
                         break;
                     }
                     case 1:
@@ -109,15 +112,33 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
 
             double distance = playerPos.distance(phy.position);
             double range = 7.5;
+            bool crusherClose = false;
+
+            if (ch.checkCrushers)
+            {
+                using crusherCMP = MP::TypeList<PhysicsComponent>;
+                using crusherTag = MP::TypeList<CrusherTag>;
+
+                em.forEach<crusherCMP, crusherTag>([&](Entity&, PhysicsComponent& phyC)
+                {
+                    if (phy.position.distance(phyC.position) < 50.0)
+                    {
+                        crusherClose = true;
+                    }
+
+                    if (crusherClose)
+                        return;
+                });
+            }
 
             // Si el cofre se encuentra a menos de 2 unidades de distancia del se muestra el mensaje de abrir cofre
-            if (distance < range && !ch.isOpen && !ic.showButton && !li.playerDetected)
+            if (distance < range && !ch.isOpen && !ic.showButton && !li.playerDetected && !crusherClose)
                 ic.showButton = true;
 
             else if ((distance > range && ic.showButton) || li.playerDetected)
                 ic.showButton = false;
 
-            if (distance < range && !ic.showButton && li.playerDetected)
+            if (distance < range && !ic.showButton && (li.playerDetected || crusherClose))
                 ic.showLock = true;
 
             else if ((distance > range && ic.showLock) || !li.playerDetected)

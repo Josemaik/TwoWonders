@@ -650,5 +650,5 @@ double ENGI::GameEngine::getTime()
     auto now = std::chrono::high_resolution_clock::now();
     auto duration = now.time_since_epoch();
     auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
-    return microseconds.count() / 1e6;
+    return static_cast<double>(microseconds.count()) / 1e6;
 }

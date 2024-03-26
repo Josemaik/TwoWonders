@@ -33,6 +33,9 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge)
             {
                 if (!li.enemyPositions.empty())
                 {
+                    auto& player = *em.getEntityByID(li.playerID);
+                    auto& phy = em.getComponent<PhysicsComponent>(player);
+
                     // Calcular la posición media de los enemigos
                     double x{}, y{}, z{};
                     for (auto& e : li.enemyPositions)
