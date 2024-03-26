@@ -2100,14 +2100,21 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
         if (elapsed_CoinBar < 0) elapsed_CoinBar = 0;
     }
 
-    std::vector<int> digits{};
+    std::vector<int> digits{}, digits2{};
     auto coinsCopy = plfi.coins;
-
+    auto coinsCopy2 = plfi.coinsAdded;
     // Sacamos cada dígito individual
     while (coinsCopy > 0)
     {
         digits.push_back(coinsCopy % 10);
         coinsCopy /= 10;
+    }
+
+    // Sacamos cada dígito individual
+    while (coinsCopy2 > 0)
+    {
+        digits2.push_back(coinsCopy2 % 10);
+        coinsCopy2 /= 10;
     }
 
     double div = elapsed_CoinBar / elapsed_limit_CoinBar;
@@ -2126,15 +2133,24 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
     int offSetCoinNum = static_cast<int>(40 + sum);
     coinNumberX = static_cast<int>((1.f - div) * (static_cast<float>(engine.getScreenWidth() + (offSetX - offSetCoinNum))) + div * static_cast<float>(engine.getScreenWidth() - offSetCoinNum));
     int posY = engine.getScreenHeight() - 117;
-
+    auto coinNumberX2 = coinNumberX;
     // Dibujamos el número de destellos
     if (elapsed_CoinBar > 0 && plfi.coins > 0)
     {
+        engine.drawText("+", coinNumberX - 10, posY - 25, 25, { 255, 255, 255, 255 });
         for (std::size_t i = digits.size(); i-- > 0; )
         {
             auto& texture = engine.textures.at(std::to_string(digits[i]));
             engine.drawTexture(texture, coinNumberX, posY, { 255, 255, 255, 255 });
             coinNumberX += static_cast<int>(texture.width / 1.7);
+        }
+
+        // Dibujamos el número de monedas
+        for (std::size_t i = digits2.size(); i-- > 0; )
+        {
+            auto& texture = engine.textures.at(std::to_string(digits2[i]));
+            engine.drawTexture(texture, coinNumberX2, posY - 30, { 255, 255, 255, 255 });
+            coinNumberX2 += static_cast<int>(texture.width / 1.7);
         }
     }
 }

@@ -10,7 +10,7 @@ struct PlayerInfo
     static constexpr std::size_t max = std::numeric_limits<std::size_t>::max();
 
     double increaseLife{ 0.0 };
-    uint16_t coins{}, bombs{}, max_bombs{ 8 };
+    uint16_t coins{}, coinsAdded{}, bombs{}, max_bombs{ 8 };
     float elapsed_limit_coins{ 5.0f }, elapsed_coins{ elapsed_limit_coins };
     double max_mana{ 100.0 }, mana{ max_mana };
     int mana_width{}, armor{};
@@ -55,6 +55,7 @@ struct PlayerInfo
     void addCoin(uint16_t add)
     {
         coins += add;
+        coinsAdded = add;
         elapsed_coins = 0.0f;
     }
     void addKey() { hasKey = true; }
