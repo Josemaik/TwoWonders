@@ -2134,10 +2134,15 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
     coinNumberX = static_cast<int>((1.f - div) * (static_cast<float>(engine.getScreenWidth() + (offSetX - offSetCoinNum))) + div * static_cast<float>(engine.getScreenWidth() - offSetCoinNum));
     int posY = engine.getScreenHeight() - 117;
     auto coinNumberX2 = coinNumberX;
+    std::string plusMinus = "+";
+
+    if(plfi.minusCoins)
+        plusMinus = "-";
+
     // Dibujamos el número de destellos
     if (elapsed_CoinBar > 0 && plfi.coins > 0)
     {
-        engine.drawText("+", coinNumberX - 10, posY - 25, 25, { 255, 255, 255, 255 });
+        engine.drawText(plusMinus.c_str(), coinNumberX - 10, posY - 25, 25, { 255, 255, 255, 255 });
         for (std::size_t i = digits.size(); i-- > 0; )
         {
             auto& texture = engine.textures.at(std::to_string(digits[i]));

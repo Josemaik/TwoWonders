@@ -17,6 +17,7 @@ struct PlayerInfo
     bool hasKey{ false };
     bool hasStaff{ false };
     bool onSpawn{ false };
+    bool minusCoins{ false };
     std::vector<std::unique_ptr<Item>> inventory{};
     std::vector<Spell> spells{};
     Spell currentSpell{ "None", "No spell", Spells::None, 0.0, 0 };
@@ -58,6 +59,18 @@ struct PlayerInfo
         coinsAdded = add;
         elapsed_coins = 0.0f;
     }
+
+    void coinDeath() 
+    {
+        auto prev = coins;
+        coins = 0;
+
+        // Hacemos la división y si tiene resto se lo sumamos
+        auto rest = prev % 2;
+        addCoin((prev / 2) + rest);
+        minusCoins = true;
+    }
+
     void addKey() { hasKey = true; }
     void addBomb() {
         if (bombs < max_bombs)
@@ -106,6 +119,7 @@ struct PlayerInfo
     {
         mana = max_mana;
         armor = 0;
+        coinDeath();
     }
 
     void reset()

@@ -174,7 +174,7 @@ void MapManager::generateChunkModel(EntityManager& em, mapSizeType& i)
         em.addTag<Chunk6Tag>(modelEntity);
         break;
     }
-    em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = vec3d::zero(), .scale = vec3d::zero(), .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, -1.0, 0.0 } });
+        em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = vec3d::zero(), .scale = vec3d::zero(), .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, -1.0, 0.0 } });
 }
 
 void MapManager::generateGround(EntityManager& em, const valueType& groundArray, int& j)
@@ -671,7 +671,9 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
     if (!reSpawn)
     {
         using TAGs = MP::TypeList<EnemyTag>;
+        using TAGs2 = MP::TypeList<NPCTag>;
         destroyParts<TAGs>(em);
+        destroyParts<TAGs2>(em);
         reSpawn = true;
     }
     else
@@ -682,8 +684,10 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
             std::string chunkName = "Chunk" + std::to_string(i);
             const valueType& chunk = chunks[i][chunkName.c_str()];
             const valueType& enemyArray = chunk[1]["underworld"]["Enemies"];
+            const valueType& npcArray = chunk[1]["underworld"]["NPCs"];
 
             generateEnemies(em, enemyArray, iam);
+            generateNPCs(em, npcArray);
         }
         reSpawn = false;
     }
