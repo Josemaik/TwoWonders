@@ -46,6 +46,7 @@ private:
     void drawSpellSlots(GameEngine& engine, EntityManager& em);
     void drawAlerts_IA(EntityManager& em, GameEngine& engine);
     void drawFPSCounter(GameEngine& engine);
+    void drawCulldownBar(EntityManager& em, GameEngine& engine);
     void loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r);
     void loadShaders(Model& model);
     void drawTextBox(GameEngine& engine, EntityManager& em);
