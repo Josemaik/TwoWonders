@@ -534,13 +534,13 @@ void RenderSystem::drawStory(GameEngine& engine) {
     // Alineamiento del texto
     GuiSetStyle(LABEL, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
 
-    GuiLabel(boxRect, "Busca la espada en la cueva");
-    GuiLabel({ posX, posY + 50, boxWidth, boxHeight }, "Extermina al dragón de la mazmorra");
-    GuiLabel({ posX, posY + 100, boxWidth, boxHeight }, "(Ana quería historia)");
+    GuiLabel(boxRect, "¡Bienvenido a la aventura!");
+    GuiLabel({ posX, posY + 50, boxWidth, boxHeight }, "Estas perdido por el bosque y debes encontrar a tu maestro");
+    GuiLabel({ posX, posY + 100, boxWidth, boxHeight }, "¡Mucha suerte!");
 
     std::string text = "PRESS [ENTER] TO PLAY";
     if (engine.isGamepadAvailable(0))
-        text = "PRESS [A] TO PLAY";
+        text = "PRESS [X] TO PLAY";
     GuiLabel({ posX, posY + 250, boxWidth, boxHeight }, text.c_str());
 
     init();
@@ -1489,10 +1489,20 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
 
                                 GameEngine::Gif* gif;
                                 Texture2D gifCopy;
-                                if (engine.isGamepadAvailable(0))
-                                    gif = &engine.gifs.at("cuadrado");
+                                if (li.lockedEnemy == li.max)
+                                {
+                                    if (engine.isGamepadAvailable(0))
+                                        gif = &engine.gifs.at("circulo");
+                                    else
+                                        gif = &engine.gifs.at("f");
+                                }
                                 else
-                                    gif = &engine.gifs.at("espacio");
+                                {
+                                    if (engine.isGamepadAvailable(0))
+                                        gif = &engine.gifs.at("cuadrado");
+                                    else
+                                        gif = &engine.gifs.at("espacio");
+                                }
 
                                 gifCopy = gif->texture;
 
@@ -1550,31 +1560,31 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
         }
 
         // Dibujar el precio d elos objetos de la tienda
-        if (e.hasTag<ObjectTag>()) {
-            if (e.hasComponent<ObjectComponent>() && e.hasComponent<RenderComponent>())
-            {
-                auto& ren{ em.getComponent<RenderComponent>(e) };
-                auto& obj{ em.getComponent<ObjectComponent>(e) };
-                if (obj.type == ObjectType::ShopItem_Bomb)
-                    engine.drawText("20",
-                        static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
-                        static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
-                        20,
-                        BLACK);
-                else if (obj.type == ObjectType::ShopItem_Life)
-                    engine.drawText("10",
-                        static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
-                        static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
-                        20,
-                        BLACK);
-                else if (obj.type == ObjectType::ShopItem_ExtraLife)
-                    engine.drawText("30",
-                        static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
-                        static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
-                        20,
-                        BLACK);
-            }
-        }
+        // if (e.hasTag<ObjectTag>()) {
+        //     if (e.hasComponent<ObjectComponent>() && e.hasComponent<RenderComponent>())
+        //     {
+        //         auto& ren{ em.getComponent<RenderComponent>(e) };
+        //         auto& obj{ em.getComponent<ObjectComponent>(e) };
+        //         if (obj.type == ObjectType::ShopItem_Bomb)
+        //             engine.drawText("20",
+        //                 static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
+        //                 static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
+        //                 20,
+        //                 BLACK);
+        //         else if (obj.type == ObjectType::ShopItem_Life)
+        //             engine.drawText("10",
+        //                 static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
+        //                 static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
+        //                 20,
+        //                 BLACK);
+        //         else if (obj.type == ObjectType::ShopItem_ExtraLife)
+        //             engine.drawText("30",
+        //                 static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
+        //                 static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
+        //                 20,
+        //                 BLACK);
+        //     }
+        // }
 
         // Vidas HUD
         if (e.hasTag<EnemyTag>() && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible &&

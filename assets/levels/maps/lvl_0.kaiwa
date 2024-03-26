@@ -837,10 +837,10 @@
 							"scale_to_respawn_attack": 7.0
 						},
 						{
-							"position": [-98.0, 4.0, 73.0],
+							"position": [-98.0, 10.0, 73.0],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 0.0,
-							"scale": [7.0, 3.0, 17.0],
+							"scale": [10.0, 10.0, 17.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.4,
 							"life": 10,

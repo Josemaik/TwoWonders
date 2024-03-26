@@ -39,7 +39,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
+        plfi.spawnPoint = { -116.0, 4.0, 111.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -66,7 +66,7 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e);
+    // em.addComponent<AttackComponent>(e);
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
@@ -152,7 +152,8 @@ void Game::run()
     engine.setReplayMode(li.replay, gami);
 
     // Inicializa una variable donde tener el tiempo entre frames
-    float currentTime{}, elapsed{};
+    float currentTime{};
+    double elapsed{};
     bool debugs{ false }, resets{ false };
 
     createSound();
@@ -160,7 +161,7 @@ void Game::run()
 
     while (!li.gameShouldEnd)
     {
-        elapsed += timeStep240;
+        elapsed += timeStepDouble240;
         gami.updateFrame();
 
         switch (li.currentScreen)
@@ -253,9 +254,9 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
             {
-                while (elapsed >= timeStep)
+                while (elapsed >= timeStepDouble)
                 {
-                    elapsed -= timeStep;
+                    elapsed -= timeStepDouble;
 
                     ai_system.update(em);
                     npc_system.update(em);
@@ -269,7 +270,7 @@ void Game::run()
                     attack_system.update(em);
                     life_system.update(em, object_system);
                     sound_system.update();
-                    // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
+                    // if (elapsed < timeStepDouble) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     camera_system.update(em, engine);
                     event_system.update(em, evm, iam, map, object_system, sound_system);
 
@@ -305,7 +306,7 @@ void Game::run()
         default:
             break;
         }
-        if (elapsed >= timeStep)
+        if (elapsed >= timeStepDouble)
             elapsed = 0; // Para que no se acumule el tiempo
 
         if (engine.windowShouldClose())

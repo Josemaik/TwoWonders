@@ -56,7 +56,8 @@ static constexpr float timeStep120 = 1.0f / 120.0f;  // Actualiza el juego 120 v
 static constexpr float timeStep240 = 1.0f / 240.0f;  // Actualiza el juego 240 veces por segundo
 static constexpr float timeStep360 = 1.0f / 360.0f;  // Actualiza el juego 360 veces por segundo
 static constexpr float timeStep480 = 1.0f / 480.0f;  // Actualiza el juego 480 veces por segundo
-
+static constexpr double timeStepDouble = 1.0 / 60.0;  // Actualiza el juego 60 veces por segundo
+static constexpr double timeStepDouble240 = 1.0 / 240.0;  // Actualiza el juego 240 veces por segundo
 // Forward Declarations
 namespace ENGI { struct GameEngine; }
 
