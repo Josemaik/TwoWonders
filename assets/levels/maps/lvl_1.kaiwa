@@ -619,7 +619,8 @@
 								"¡Encontraste una llave!", 
 								"Parece que es de un solo uso..."
 							],
-							"checkCrushers": true
+							"checkCrushers": true,
+							"events": [12]
 						},
 						{
 							"type":3,

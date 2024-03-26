@@ -22,7 +22,8 @@ enum EventCodes : uint16_t
     NPCDialog,
     DialogPrisonNomad1,
     DialogPrisonNomad2,
-    DialogFirstSpawn
+    DialogFirstSpawn,
+    ViewPointDoor
 };
 
 struct Event {
@@ -220,6 +221,13 @@ public:
                         // Metemos el texto en el stack de texto
                         for (std::size_t i = 0; i < msgs.size(); i++)
                             txti.addText(msgs[i]);
+                        break;
+                    }
+                    case EventCodes::ViewPointDoor:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        li.viewPoint = { 25.153, 18.593, 85.767 };
+                        li.viewPointSound = true;
                         break;
                     }
                     }
