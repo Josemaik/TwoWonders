@@ -535,8 +535,9 @@ void RenderSystem::drawStory(GameEngine& engine) {
     GuiSetStyle(LABEL, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
 
     GuiLabel(boxRect, "¡Bienvenido a la aventura!");
-    GuiLabel({ posX, posY + 50, boxWidth, boxHeight }, "Estas perdido por el bosque y debes encontrar a tu maestro");
-    GuiLabel({ posX, posY + 100, boxWidth, boxHeight }, "¡Mucha suerte!");
+    GuiLabel({ posX, posY + 50, boxWidth, boxHeight }, "Estas perdido por el bosque y");
+    GuiLabel({ posX, posY + 100, boxWidth, boxHeight }, "debes encontrar a tu maestro.");
+    GuiLabel({ posX, posY + 150, boxWidth, boxHeight }, "¡Mucha suerte!");
 
     std::string text = "PRESS [ENTER] TO PLAY";
     if (engine.isGamepadAvailable(0))
@@ -1449,7 +1450,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             // Dibujamos el número de monedas en pantalla
             drawCoinBar(engine, em);
 
-            drawFPSCounter(engine);
+            // drawFPSCounter(engine);
 
             // Dibujar espacios de hechizos
             drawSpellSlots(engine, em);
