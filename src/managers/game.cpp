@@ -153,7 +153,7 @@ void Game::run()
 
     // Inicializa una variable donde tener el tiempo entre frames
     float currentTime{};
-    double elapsed{};
+    float elapsed{};
     bool debugs{ false }, resets{ false };
 
     createSound();
@@ -161,7 +161,7 @@ void Game::run()
 
     while (!li.gameShouldEnd)
     {
-        elapsed += timeStepDouble240;
+        elapsed += timeStep240;
         gami.updateFrame();
 
         switch (li.currentScreen)
@@ -212,6 +212,9 @@ void Game::run()
                 li.currentScreen = GameScreen::GAMEPLAY;
             render_system.drawStory(engine);
 
+            if (li.replay)
+                gami.update();
+
             if (li.playerID == li.max)
                 createEntities();
 
@@ -238,7 +241,15 @@ void Game::run()
             if (!map.isComplete())
             {
                 if (!li.isCharging() && li.loading)
+                {
                     li.loadingTime = 0;
+                    if (!li.replay)
+                    {
+                        auto& gami = em.getSingleton<GameData>();
+                        vec3d vel = { 0.0, 0.0, 0.0 };
+                        gami.addMovementEvent(vel);
+                    }
+                }
                 map.createMap(em, li.mapID, iam);
             }
             else if (map.isRespawning())
@@ -254,9 +265,9 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
             {
-                while (elapsed >= timeStepDouble)
+                while (elapsed >= timeStep)
                 {
-                    elapsed -= timeStepDouble;
+                    elapsed -= timeStep;
 
                     ai_system.update(em);
                     npc_system.update(em);
@@ -270,7 +281,7 @@ void Game::run()
                     attack_system.update(em);
                     life_system.update(em, object_system);
                     sound_system.update();
-                    // if (elapsed < timeStepDouble) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
+                    // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     camera_system.update(em, engine);
                     event_system.update(em, evm, iam, map, object_system, sound_system);
 
@@ -306,7 +317,7 @@ void Game::run()
         default:
             break;
         }
-        if (elapsed >= timeStepDouble)
+        if (elapsed >= timeStep)
             elapsed = 0; // Para que no se acumule el tiempo
 
         if (engine.windowShouldClose())

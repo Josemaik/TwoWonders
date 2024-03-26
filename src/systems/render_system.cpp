@@ -105,7 +105,7 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
     }
 
     // Draw the buttons
-    if (GuiButton(btn1Rec, (currentButton == 0) ? "[JUGAR]" : "JUGAR")) {
+    if (GuiButton(btn1Rec, (currentButton == 0) ? "[JUGAR]" : "JUGAR") || li.replay) {
         li.currentScreen = GameScreen::STORY;
         ss.seleccion_menu();
         ss.music_stop();
