@@ -111,7 +111,7 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
         ss.music_stop();
     }
 
-    if(!li.replay)
+    if (!li.replay)
     {
         auto& gami = em.getSingleton<GameData>();
         gami.updateFrameDown();
@@ -2136,7 +2136,7 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
     auto coinNumberX2 = coinNumberX;
     std::string plusMinus = "+";
 
-    if(plfi.minusCoins)
+    if (plfi.minusCoins)
         plusMinus = "-";
 
     // Dibujamos el número de destellos
@@ -2158,6 +2158,8 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
             coinNumberX2 += static_cast<int>(texture.width / 1.7);
         }
     }
+    else if (plfi.minusCoins)
+        plfi.minusCoins = false;
 }
 
 void RenderSystem::drawManaBar(GameEngine& engine, EntityManager& em)
