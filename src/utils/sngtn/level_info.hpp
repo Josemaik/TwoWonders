@@ -92,7 +92,7 @@ struct LevelInfo
     bool replay{ false };
 
     // Estado del juego
-    GameScreen currentScreen = GameScreen::LOGO;
+    GameScreen currentScreen = GameScreen::GAMEPLAY;
     GameScreen previousScreen = GameScreen::LOGO;
 
     bool isCharging()

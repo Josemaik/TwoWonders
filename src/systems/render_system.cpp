@@ -1461,6 +1461,8 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             // Dibujar espacios de hechizos
             drawSpellSlots(engine, em);
 
+            drawAnimatedTextures(engine);
+
             // Dibujar el tipo de ataque que tiene equipado
             if (e.hasComponent<TypeComponent>())
             {
@@ -1479,7 +1481,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                     engine.drawText("Hielo", 17, 50, 18, SKYBLUE);
             }
 
-            if (li.mapID == 0 && e.hasComponent<AttackComponent>())
+            if ((li.mapID == 0 || li.mapID == 1) && e.hasComponent<AttackComponent>())
             {
                 if (!li.tutorialEnemies.empty())
                 {
@@ -1521,6 +1523,8 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
 
                                 if (ene.hasTag<DestructibleTag>())
                                     multiplier = 8.0;
+                                else if (li.mapID == 1)
+                                    multiplier = 25.0;
 
                                 int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - gifCopy.width / 2;
                                 int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * multiplier);
@@ -2201,37 +2205,63 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
 
     if (plfi.spells.empty())
         return;
-
     else
     {
-        if (elapsed_spell < elapsed_limit_spell)
-        {
-            elapsed_spell += timeStep;
-
-            if (static_cast<int>(elapsed_spell * 10) % 16 < 8)
-                return;
-        }
-
         auto& current = plfi.currentSpell;
-        int posX = engine.getScreenWidth() - 150;
-        int posY = 20;
 
         switch (current.spell)
         {
         case Spells::WaterBomb:
         {
-            engine.drawTexture(engine.textures["agua_holder"], posX, posY, { 255, 255, 255, 255 });
-            engine.drawTexture(engine.textures["pompas"], posX + 10, posY + 15, { 255, 255, 255, 255 });
+            if (animatedTextures.find("agua_holder") == animatedTextures.end())
+            {
+                animatedTextures["agua_holder"] = { "agua_holder", engine.getScreenWidth() - 150, 20,
+                engine.textures["agua_holder"].width, engine.textures["agua_holder"].height, 3.0f };
+
+                animatedTextures["pompas"] = { "pompas", engine.getScreenWidth() - 140, 35,
+                engine.textures["pompas"].width, engine.textures["pompas"].height, 3.0f };
+            }
 
             break;
         }
         default:
             break;
         }
-
     }
 }
 
+void RenderSystem::drawAnimatedTextures(GameEngine& engine)
+{
+    for (auto& [_, textureInfo] : animatedTextures)
+    {
+        // Calculamos el factor de escala
+        textureInfo.scaleFactor = 3.5f - 2.5f * textureInfo.lerpFactor;
+
+        // Calcula la posición del centro de la pantalla
+        int centerX = static_cast<int>(static_cast<float>(engine.getScreenWidth() / 2) - static_cast<float>(textureInfo.width) * textureInfo.scaleFactor / 2);
+        int centerY = static_cast<int>(static_cast<float>(engine.getScreenHeight() / 2 - (50)) - static_cast<float>(textureInfo.height) * textureInfo.scaleFactor / 2);
+
+        // Interpola entre el centro de la pantalla y la posición objetivo
+        int posX = static_cast<int>(static_cast<float>(centerX) + textureInfo.lerpFactor * static_cast<float>(textureInfo.targetPosX - centerX));
+        int posY = static_cast<int>(static_cast<float>(centerY) + textureInfo.lerpFactor * static_cast<float>(textureInfo.targetPosY - centerY));
+
+        // Si el tiempo transcurrido es menor que 1.5 segundos, no hagas nada
+        if (textureInfo.elapsed < 2.5f)
+        {
+            // Incrementamos el tiempo transcurrido
+            textureInfo.elapsed += timeStep;
+        }
+        else
+        {
+            // Incrementamos el factor de interpolación
+            textureInfo.lerpFactor += textureInfo.lerpSpeed;
+            if (textureInfo.lerpFactor > 1.0f)
+                textureInfo.lerpFactor = 1.0f;
+        }
+
+        engine.drawTexture(engine.textures[textureInfo.textureName], posX, posY, { 255, 255, 255, 255 }, textureInfo.scaleFactor);
+    }
+}
 
 void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
 {

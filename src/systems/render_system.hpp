@@ -5,9 +5,23 @@
 #include "../managers/game_engine.hpp"
 #include "../systems/sound_system.hpp"
 #include "../utils/pf/Graph.hpp"
+#include <map>
 
 struct RenderSystem
 {
+    struct AnimatedTexture
+    {
+        std::string textureName;
+        int targetPosX;
+        int targetPosY;
+        int width;
+        int height;
+        float scaleFactor;
+        float lerpFactor{ 0.0f };
+        float lerpSpeed{ 0.01f };
+        float elapsed{ 0.0f };
+    };
+
     // Se van a buscar las entidad que tengan estos componentes y tags
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
@@ -31,7 +45,7 @@ struct RenderSystem
     void drawInventory(GameEngine& engine, EntityManager& em);
     void drawItemDescription(GameEngine& engine, EntityManager& em, Item& item);
     void setShader(Shader& shader) { shaderPtr = &shader; }
-
+    void addAnimatedTexture(std::string textureName, int targetPosX, int targetPosY, float scaleFactor);
     // Funciones double dtprivadas para organizar el codigo
 private:
     void init();
@@ -44,6 +58,7 @@ private:
     void drawHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
     void drawManaBar(GameEngine& engine, EntityManager& em);
     void drawSpellSlots(GameEngine& engine, EntityManager& em);
+    void drawAnimatedTextures(GameEngine& engine);
     void drawAlerts_IA(EntityManager& em, GameEngine& engine);
     void drawFPSCounter(GameEngine& engine);
     void loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r);
@@ -55,6 +70,7 @@ private:
     bool isSelected{ false };
     bool isSelectedfordebug{ false }, fullScreen{ false };
     std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
+    std::map<std::string, AnimatedTexture> animatedTextures;
     // bool chunk0Charged{ false };
     // bool chunk1Charged{ false };
     Shader* shaderPtr{ nullptr };
