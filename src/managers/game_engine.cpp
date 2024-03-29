@@ -206,6 +206,10 @@ void ENGI::GameEngine::drawTexture(Texture2D texture, int posX, int posY, Color 
     DrawTexture(texture, posX, posY, tint);
 }
 
+void ENGI::GameEngine::drawTexture(Texture2D texture, int posX, int posY, Color tint, float scale) {
+    DrawTextureEx(texture, { static_cast<float>(posX), static_cast<float>(posY) }, 0.0f, scale, tint);
+}
+
 void ENGI::GameEngine::drawCircle(int posX, int posY, float radius, Color color) {
     DrawCircle(posX, posY, radius, color);
 }

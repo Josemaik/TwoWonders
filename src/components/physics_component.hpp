@@ -22,6 +22,15 @@ struct PhysicsComponent
         orientation = atan2(direction.x(), direction.z());
     }
 
+    void moveAt(vec3d& targetVec)
+    {
+        // Se moverá en dirección al targetVec y se parará cuando esté a una distancia de 5
+        vec3d direction = targetVec - position;
+        direction.normalize();
+        velocity = direction / 2;
+        target = targetVec;
+    }
+
     vec3d position{};
     vec3d velocity{};
     vec3d scale{};
@@ -52,6 +61,7 @@ struct PhysicsComponent
     bool stopped{ false }, notMove{ false };
     float countdown_stopped{ 0.35f };
     float elapsed_stopped{ 0.0f };
+    vec3d target{};
 
     void plusDeltatime(float deltaTime, float& elapsed) { elapsed += deltaTime; };
 

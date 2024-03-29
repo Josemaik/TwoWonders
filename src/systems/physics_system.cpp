@@ -6,7 +6,18 @@ void PhysicsSystem::update(EntityManager& em)
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, PhysicsComponent& phy)
     {
         if (phy.notMove)
+        {
+            if (phy.velocity != vec3d::zero() && phy.target != vec3d::zero())
+            {
+                if (phy.position.distance(phy.target) < 8.0)
+                    phy.velocity = vec3d::zero();
+                else
+                {
+                    phy.position += phy.velocity;
+                }
+            }
             return;
+        }
         // Cuando el jugador se para por un tiempo determinado
         if (phy.stopped)
         {

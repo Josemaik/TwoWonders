@@ -46,6 +46,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
 
     // Cosas que hacer en cada zona
     if (li.mapID == 0)
+    {
         switch (li.num_zone)
         {
         case 4:
@@ -71,6 +72,24 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
         default:
             break;
         }
+    }
+    else if (li.mapID == 1)
+    {
+        switch (li.num_zone)
+        {
+        case 18:
+        {
+            checkTutorialEnemies(em);
+            break;
+        }
+        case 23:
+        {
+            checkTutorialEnemies(em);
+            break;
+        }
+        }
+    }
+
 
     auto& zchi = em.getSingleton<ZoneCheckInfo>();
 
@@ -312,7 +331,11 @@ void ZoneSystem::checkTutorialEnemies(EntityManager& em)
         auto& phy = em.getComponent<PhysicsComponent>(e);
         double distance = playerPos.distance(phy.position);
 
-        if (distance < 15.0)
+        double range = 15.0;
+        if (li.mapID == 1)
+            range = 18.0;
+
+        if (distance < range)
         {
             li.tutorialEnemies.push_back(e.getID());
         }
@@ -342,7 +365,7 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager& evm)
 
         double distance = playerPos.distance(phy.position);
         double distanceY = std::abs(playerPos.y() - phy.position.y());
-        double range = 12.0;
+        double range = 17.0;
 
         if (distance < range && distanceY < 2.0 && !li.playerDetected)
         {
@@ -350,6 +373,7 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager& evm)
             li.npcToTalk = e.getID();
             playerPhy.lookAt(phy.position);
             playerPhy.notMove = true;
+            playerPhy.moveAt(phy.position);
             phy.lookAt(playerPhy.position);
 
             evm.scheduleEvent(Event{ EventCodes::ViewPointNPCPrison });

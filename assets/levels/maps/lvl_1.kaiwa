@@ -1482,7 +1482,7 @@
 							"scale_to_respawn_attack": 7.0
 						},
 						{
-							"position": [-38.48,20.0, 240.5],
+							"position": [-48.48, 20.0, 240.5],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 90.0,
 							"scale": [15.5, 7.0, 7.0],
@@ -1511,7 +1511,7 @@
 							"scale_to_respawn_attack": 7.0
 						},
 						{
-							"position": [-38.48,20.0, 225.5],
+							"position": [-48.48, 20.0, 225.5],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 90.0,
 							"scale": [15.5, 7.0, 7.0],
@@ -1540,7 +1540,7 @@
 							"scale_to_respawn_attack": 7.0
 						},
 						{
-							"position": [-65.26,20.0, 225.5],
+							"position": [-65.26, 20.0, 225.5],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 90.0,
 							"scale": [15.5, 7.0, 7.0],
@@ -1569,7 +1569,7 @@
 							"scale_to_respawn_attack": 7.0
 						},
 						{
-							"position": [-65.26,20.0, 240.5],
+							"position": [-65.26, 20.0, 240.5],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 90.0,
 							"scale": [15.5, 7.0, 7.0],

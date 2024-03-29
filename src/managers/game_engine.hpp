@@ -65,6 +65,7 @@ namespace ENGI {
         void drawRectangleLinesEx(Rectangle rec, float lineThick, Color color);
         void drawRectangleRec(Rectangle rec, Color color);
         void drawTexture(Texture2D texture, int posX, int posY, Color tint);
+        void drawTexture(Texture2D texture, int posX, int posY, Color tint, float scale);
         void drawCircle(int posX, int posY, float radius, Color color);
         void drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color);
         void drawTriangle(vec2d v1, vec2d v2, vec2d v3, Color color);
