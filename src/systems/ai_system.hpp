@@ -12,7 +12,6 @@
 //actions
 #include "../utils/bt/action_patrol.hpp"
 #include "../utils/bt/action_randommovement.hpp"
-#include "../utils/bt/action_changeposition.hpp"
 #include "../utils/bt/action_diagonalmovement.hpp"
 #include "../utils/bt/action_shoot.hpp"
 #include "../utils/bt/action_arrive.hpp"
