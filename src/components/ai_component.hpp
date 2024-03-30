@@ -7,14 +7,6 @@
 // Forwarding
 struct BehaviourTree_t;
 
-// enum class SB : uint8_t {
-//     Arrive,
-//     Seek,
-//     Flee,
-//     Pursue,
-//     Avoid,
-//     followPath
-// };
 struct AIComponent
 {
     // Type of shoots
@@ -23,36 +15,13 @@ struct AIComponent
     // TypeShoot currentshoot{};
     // Default velocity
     double SPEED_AI = 0.6;
-    // Data for patrol behaviour
-    static constexpr uint8_t max_patrol{ 10 };
-    std::array<vec3d, max_patrol> patrol{};
-    static constexpr vec3d invalid{};
-    uint8_t current{};
     double arrival_radius{ 1.0 };
     bool arrived{ false };
-    uint8_t nexttarget{ 1 };
-    // Directions and functions
-    static constexpr vec3d left = vec3d{ -0.25, 0.0, 0.0 };
-    static constexpr vec3d right = vec3d{ 0.25, 0.0, 0.0 };
-    static constexpr vec3d up = vec3d{ 0.0, 0.0, -0.25 };
-    static constexpr vec3d down = vec3d{ 0.0, 0.0, 0.25 };
-    static constexpr vec3d up_left = vec3d{ -0.25, 0.0, -0.25 };
-    static constexpr vec3d up_right = vec3d{ 0.25, 0.0, -0.25 };
-    static constexpr vec3d down_left = vec3d{ -0.25, 0.0, 0.25 };
-    static constexpr vec3d down_right = vec3d{ 0.25, 0.0, 0.25 };
-    // Called from collision system
-    vec3d getRandomDirection(vec3d dir1, vec3d dir2, vec3d dir3);
-    vec3d getRandomDirectionWithDiagonals(vec3d dir1, vec3d dir2, vec3d dir3, vec3d dir4, vec3d dir5);
-    vec3d getRandomDir();
-    vec3d getRandomDirwithDiagonals();
+    // uint8_t nexttarget{ 1 };
     // Flags
     bool detectplayer{ false }, ghost{ false };
     // Before velocity
     vec3d oldvel{ 0.25, 0.0, 0.0 };
-    // Ranges
-    double Xmin{}, Xmax{}, Zmin{}, Zmax{}, visible{ true };
-    bool isInDesiredRange(const vec3d& direction, double xmin, double xmax, double zmin, double zmax);
-    vec3d getRandomPosinRange(double xmin, double xmax, double zmin, double zmax);
     // Data for detect player
     double detect_radius{ 15.0 };
     double attack_radius{ 6.0 };
@@ -64,8 +33,6 @@ struct AIComponent
     float endangle{ 0.0f }, increase_angle{ 0.0f };
     //Ataque
     bool ready_attack{ false };
-    // data for steering behaviour
-    // SB behaviour { SB::Arrive };
     // posicion objetivo
     double tx{ 0 }, tz{ 0 };
     //tiempor para llegar al objetivo
