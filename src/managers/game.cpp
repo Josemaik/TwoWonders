@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
+        plfi.spawnPoint = { -126.0, 4.0, 152.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -56,6 +56,7 @@ void Game::createEntities()
     // 30.0, 13.0, 213.0 - Segundo campamento lvl1
     // -26.0, 4.0, 235.0 - NPC lvl1
     // -113.0, 13.0, 236.0 - Final lvl1
+    //46.0, 13.0, 86.9 pasillo nivel 1
 
     // Player
     auto& e{ em.newEntity() };
@@ -67,7 +68,7 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    // em.addComponent<AttackComponent>(e);
+    em.addComponent<AttackComponent>(e);
 
     // Listeners de eventos para el jugador
     lis.addCode(EventCodes::SpawnDungeonKey);
