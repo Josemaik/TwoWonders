@@ -42,6 +42,9 @@ void AISystem::update(EntityManager& em)
         LifeComponent* lcptr = &lc;
         //percibir el entorno
         perception(bb, ai);
+        //Actualizar posiciones de la IA para el Flocking
+        if(e.hasTag<SpiderTag>())
+            bb.positions.push_back(phy.position);
         // Actualizar datos de los slimes y subditos en blackboard
         if (e.hasTag<SlimeTag>()) {
             bb.updateInfoSlime(e.getID(), phy.position, lc.life);

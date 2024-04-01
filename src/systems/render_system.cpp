@@ -1224,6 +1224,8 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
             engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
             engine.endMode3D();
             engine.drawText("Node active:", posText, 110, 20, BLACK);
+            std::cout << debugsnglt.elapsed << "\n";
+             std::cout << debugsnglt.countdown << "\n";
             if (debugsnglt.elapsed >= debugsnglt.countdown) {
                 debugsnglt.elapsed = 0;
                 debugsnglt.text = aic.bh;
@@ -1231,25 +1233,25 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
             else {
                 debugsnglt.plusDeltatime(timeStep, debugsnglt.elapsed);
             }
-            engine.drawTextEx(engine.getFontDefault(), debugsnglt.text, vec2d{ 610,110 }, 20, 1, DARKGRAY);
+            engine.drawTextEx(engine.getFontDefault(), debugsnglt.text, vec2d{ static_cast<double>(posText) + 130.0,110 }, 20, 1, DARKGRAY);
             engine.drawText("TEID:", posText, 130, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.teid).c_str(), vec2d{ 550,130 }, 20, 1, DARKGRAY);
+            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.teid).c_str(), vec2d{ static_cast<double>(posText) + 90.0,130 }, 20, 1, DARKGRAY);
             engine.drawText("TX:", posText, 150, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tx).c_str(), vec2d{ 520,150 }, 20, 1, DARKGRAY);
+            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tx).c_str(), vec2d{ static_cast<double>(posText) + 80.0,150 }, 20, 1, DARKGRAY);
             engine.drawText("TZ:", posText, 170, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tz).c_str(), vec2d{ 520,170 }, 20, 1, DARKGRAY);
+            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tz).c_str(), vec2d{ static_cast<double>(posText) + 80.0,170 }, 20, 1, DARKGRAY);
             engine.drawText("Culldown:", posText, 190, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), vec2d{ 590,190 }, 20, 1, DARKGRAY);
+            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), vec2d{ static_cast<double>(posText) + 90.0,190 }, 20, 1, DARKGRAY);
             engine.drawText("Player Detected?:", posText, 210, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", vec2d{ 680,210 }, 20, 1, RED);
+            engine.drawTextEx(engine.getFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,210 }, 20, 1, RED);
             engine.drawText("Player hunted?:", posText, 230, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), (bb.playerhunted == 0) ? "No" : "Sí", vec2d{ 680,230 }, 20, 1, RED);
+            engine.drawTextEx(engine.getFontDefault(), (bb.playerhunted == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,230 }, 20, 1, RED);
             engine.drawText("Subditos alive:", posText, 250, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.subditosData.size()).c_str(), vec2d{ 680,250 }, 20, 1, RED);
+            engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.subditosData.size()).c_str(), vec2d{ static_cast<double>(posText) + 180.0,250 }, 20, 1, RED);
             engine.drawText("Subditos id alive:", posText, 270, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), vec2d{ 680,270 }, 20, 1, RED);
+            engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), vec2d{ static_cast<double>(posText) + 180.0,270 }, 20, 1, RED);
             engine.drawText("Alert state:", posText, 290, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), (aic.alert_state == 0) ? "No" : "Sí", vec2d{ 680,290 }, 20, 1, RED);
+            engine.drawTextEx(engine.getFontDefault(), (aic.alert_state == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,290 }, 20, 1, RED);
 
             engine.beginMode3D();
             //raycast

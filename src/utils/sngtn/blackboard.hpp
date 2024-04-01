@@ -70,4 +70,6 @@ struct BlackBoard_t {
     //cone
     vec3d pos_enemy{};
     double horizontalFOV{},VerticalFOV{},orientation_enemy{};
+    //positions 
+    std::vector<vec3d> positions;
 };
