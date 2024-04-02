@@ -365,6 +365,9 @@ struct Texture2D : Entity{
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+        // Unbind texture
+        glBindTexture(GL_TEXTURE_2D, 0);
+
         // Clean up resources
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);

@@ -2,6 +2,8 @@
 #include "resource.hpp"
 #include "resource_texture.hpp"
 #include "resource_material.hpp"
+#include "../utils/color.hpp"
+#include "../managers/render_manager.hpp"
 
 #include <vector>
 #include <memory>
@@ -30,8 +32,8 @@ public:
     void unload() override;
     bool isLoaded() const override;
 
-    void draw();
-    void drawLines();
+    void draw(glm::mat4 transMatrix, Color color = GRAY);
+    void drawLines(glm::mat4 transMatrix, Color color = BLACK);
 
 private:
     // Render data

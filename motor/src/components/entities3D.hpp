@@ -56,11 +56,17 @@ struct Point3D : Entity {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
+        // Bind default texture
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+
         // Draw the point
         glPointSize(pointSize);
         glBindVertexArray(VAO);
         glDrawArrays(GL_POINTS, 0, 1);
         glPointSize(1.0f);
+
+        // Unbind default texture
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         // Clean up resources
         glDeleteVertexArrays(1, &VAO);
@@ -122,11 +128,17 @@ struct Line3D : Entity {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
+        // Bind default texture
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+
         // Draw the line
         glLineWidth(lineSize);
         glBindVertexArray(VAO);
         glDrawArrays(GL_LINES, 0, 2);
         glLineWidth(1.0f);
+
+        // Unbind default texture
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         // Clean up resources
         glDeleteVertexArrays(1, &VAO);
@@ -200,9 +212,15 @@ struct Grid : Entity {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
+        // Bind default texture
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+
         // Draw the grid
         glBindVertexArray(VAO);
         glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(vertices.size() / 6));
+
+        // Unbind default texture
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         // Clean up resources
         glDeleteVertexArrays(1, &VAO);
@@ -275,9 +293,15 @@ struct Plane : Entity {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
+        // Bind default texture
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+
         // Draw the plane
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        // Unbind default texture
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         // Clean up resources
         glDeleteVertexArrays(1, &VAO);
@@ -365,10 +389,16 @@ struct Cube : Entity {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
+        // Bind default texture
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+
         // Draw cube
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+
+        // Unbind default texture
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         // Clean up resources
         glDeleteVertexArrays(1, &VAO);
@@ -456,10 +486,16 @@ struct CubeWires : Entity {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
+        // Bind default texture
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+
         // Draw the wireframe cube
         glBindVertexArray(VAO);
         glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+        
+        // Unbind default texture
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         // Reset to fill mode
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

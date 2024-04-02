@@ -8,6 +8,8 @@
 
 struct Material : public Resource{
 public:
+    Texture* texture;
+
     Material();
     Material(std::size_t id, glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess){
         this->id = id;
@@ -18,7 +20,7 @@ public:
     };
 
     bool load() override{ 
-        std::cout << "   Load a material (ID:" << id << ")" << std::endl;
+        std::cout << "Load a material (ID:" << id << ")" << std::endl;
         return true; 
     };
     void unload() override {
@@ -26,13 +28,9 @@ public:
     };
     bool isLoaded() const override { return true; };
 
-    void addTexture(Texture* texture){ m_textures.push_back(texture); };
-    std::vector<Texture*> getTextures(){ return m_textures; }
-
 private:
     glm::vec3 m_ambientColor;
     glm::vec3 m_diffuseColor;
     glm::vec3 m_specularColor;
     float m_shininess;
-    std::vector<Texture*> m_textures;
 };

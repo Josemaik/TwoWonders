@@ -4,10 +4,10 @@ Node* createHUD(DarkMoonEngine& engine){
     // Node HUD
     auto p_nodeHUD = engine.CreateNode("HUD", engine.GetRootNode());
     
-    // Node: Rectangulo Naranja Oscuro
-    engine.CreateRectangle({12.0f, 12.0f}, {200.0f, 40.0f}, ORANGE_DARK, "Rectangulo naranja oscuro", p_nodeHUD);
-    // Node: Rectangulo Naranja
-    engine.CreateRectangle({10.0f, 10.0f}, {200.0f, 40.0f}, ORANGE, "Rectangulo naranja", p_nodeHUD);
+    // Node: Rectangulo rosa Oscuro
+    engine.CreateRectangle({12.0f, 12.0f}, {200.0f, 40.0f}, PINK_DARK, "Rectangulo rosa oscuro", p_nodeHUD);
+    // Node: Rectangulo rosa
+    engine.CreateRectangle({10.0f, 10.0f}, {200.0f, 40.0f}, PINK, "Rectangulo rosa", p_nodeHUD);
 
     // Node: Texture2D
     auto nodeTexture = engine.CreateTexture2D({70.0f, 170.0f}, "assets/koromaru.png", WHITE, "Textura Koromaru", p_nodeHUD);
@@ -56,7 +56,7 @@ Node* createMainCharacter(DarkMoonEngine& engine){
 
     auto eModel = dynamic_cast<Model*>(model->getEntity());
     eModel->drawModel = true;
-    eModel->drawWires = true;
+    eModel->drawWires = false;
 
     return model;
 }

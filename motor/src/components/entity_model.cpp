@@ -24,40 +24,17 @@ void Model::unload(ResourceManager& rm){
 }
 
 void Model::draw(glm::mat4 transMatrix){
-    RenderManager rm = RenderManager::getInstance();
-
-    rm.beginMode3D();
-
-    // Set the uniform color in the shader
-    GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-    glUseProgram(rm.getShader()->id_shader);
-    glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
-
-    // Transform
-    glm::mat4 model = transMatrix;
-    glm::mat4 view       = rm.m_camera->getViewMatrix();
-    glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
-    
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     // Draw meshes
     if(drawModel)
         for (const auto& mesh : m_meshes)
-            mesh->draw();
+            mesh->draw(transMatrix, color);
 
     // Draw wires
-    if(drawWires){
-        colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-        glUseProgram(rm.getShader()->id_shader);
-        glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(BLACK)));
-
+    if(drawWires)
         for (const auto& mesh : m_meshes)
-            mesh->drawLines();
-    }
+            mesh->drawLines(transMatrix);
 
-    rm.endMode3D();
 };
 
 // PRIVATE
@@ -171,6 +148,6 @@ void Model::processTextures(aiMaterial* aiMaterial, Material* material, Resource
         auto texture = rm.loadResource<Texture>();
         texture->load(texturePath.c_str());
 
-        material->addTexture(texture);
+        material->texture = texture;
     }
 }

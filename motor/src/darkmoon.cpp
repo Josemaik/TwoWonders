@@ -234,7 +234,14 @@ bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Load │" << std::endl;
         std::cout << "└──────┘" << std::endl;
-        
+
+        //----- Default Material -----//
+        m_renderManager.defaultMaterial = m_resourceManager.loadResource<Material>(glm::vec3(0.2f, 0.2f, 0.2f), 
+                                                                                   glm::vec3(0.8f, 0.8f, 0.8f), 
+                                                                                   glm::vec3(0.0f, 0.0f, 0.0f), 
+                                                                                   0.0f);
+        m_renderManager.defaultMaterial->texture = LoadTexture("assets/defaultTexture.png");
+
         //----- Shaders -----//
         m_renderManager.shaderColor = LoadShader("src/shaders/color.vs", "src/shaders/color.fs");
         m_renderManager.shaderTexture = LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");

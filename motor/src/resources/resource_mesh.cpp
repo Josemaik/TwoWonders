@@ -11,7 +11,7 @@ bool Mesh::load(){
 
     setupMesh();
 
-    isLoaded() ? std::cout << "   Load a mesh (ID: " << id <<")" << std::endl : std::cout << "Error loading a mesh" << std::endl;
+    isLoaded() ? std::cout << "Load a mesh (ID: " << id <<")" << std::endl : std::cout << "Error loading a mesh" << std::endl;
     
     return isLoaded();
 }
@@ -59,31 +59,71 @@ void Mesh::setupMesh(){
     glBindVertexArray(0);
 }
 
-void Mesh::draw(){ 
+void Mesh::draw(glm::mat4 transMatrix, Color color){ 
+    RenderManager rm = RenderManager::getInstance();
 
-    // matrix model, view and projection
+    rm.beginMode3D();
+
+    // Set the uniform color in the shader
+    GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
+    glUseProgram(rm.getShader()->id_shader);
+    glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
+
+    // Transform
+    glm::mat4 model = transMatrix;
+    glm::mat4 view       = rm.m_camera->getViewMatrix();
+    glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
+    
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    
+    // Texture
+    // if(material->texture){
+    //     glActiveTexture(GL_TEXTURE0);
+    //     glUniform1i(glGetUniformLocation(rm.getShader()->id_shader, "texture0"), 0);
+    // }
+    glBindTexture(GL_TEXTURE_2D, material->texture->texture);
 
     // light
 
-    // shader
-
-    // std::cout << "Draw a mesh (ID: " << id <<")" << std::endl; 
-    /* OpenGL */ 
-
-    // Set the uniform color in the shader
-    // GLuint colorUniform = glGetUniformLocation(m_shaderProgram, "customColor");
-    // glUseProgram(m_shaderProgram);
-    // glUniform4fv(colorUniform, 1, glm::value_ptr(color));
+    // Bind default texture
+    //glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
 
     // Draw the triangle of mesh
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_SHORT, 0);
     glBindVertexArray(0);
+
+    // Unbind default texture
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    rm.endMode3D();
 }
 
-void Mesh::drawLines(){
+void Mesh::drawLines(glm::mat4 transMatrix, Color color){
+
+    RenderManager rm = RenderManager::getInstance();
+
+    rm.beginMode3D();
+
+    GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
+    glUseProgram(rm.getShader()->id_shader);
+    glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
+
+    // Transform
+    glm::mat4 model = transMatrix;
+    glm::mat4 view       = rm.m_camera->getViewMatrix();
+    glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
+    
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
     // Draw the lines of mesh
     glBindVertexArray(m_VAO);
     glDrawElements(GL_LINES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_SHORT, 0);
     glBindVertexArray(0);
+
+    rm.endMode3D();
 }
