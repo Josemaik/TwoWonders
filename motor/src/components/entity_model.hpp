@@ -2,6 +2,7 @@
 #include "node.hpp"
 #include "entity.hpp"
 #include "../resources/resource_mesh.hpp"
+#include "../resources/resource_material.hpp"
 #include "../managers/resource_manager.hpp"
 #include "../managers/render_manager.hpp"
 
@@ -21,7 +22,9 @@ private:
     Color color = WHITE;
 
     void processNode(aiNode*, const aiScene*, ResourceManager& rm);
-    void processMesh(aiMesh*, const aiScene*, ResourceManager& rm);
+    void processMesh(aiMesh*, aiMaterial*, const aiScene*, ResourceManager& rm);
+    Material* processMaterial(aiMaterial*, ResourceManager& rm);
+    void processTextures(aiMaterial*, Material*, ResourceManager& rm);
 
 public:
     bool drawModel { true }, drawWires { false };

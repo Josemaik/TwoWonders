@@ -9,13 +9,3 @@ struct Resource{
     virtual void unload() = 0;
     virtual bool isLoaded() const = 0;
 };
-
-// Struct Material // .mtl
-struct Material : public Resource{
-    // coeficientes light
-    // resources Textures
-
-    bool load() override { return true; }
-    void unload() override {}
-    bool isLoaded() const override { return true; }
-};

@@ -50,8 +50,9 @@ Node* createScene3D(DarkMoonEngine& engine){
 
 Node* createMainCharacter(DarkMoonEngine& engine){
     // Node: Modelo
-    auto model = engine.CreateModel("assets/Main_Character.obj", GRAY, "Modelo: Main Character", engine.GetRootNode());
+    auto model = engine.CreateModel("assets/Dummy.obj", GRAY, "Modelo: Main Character", engine.GetRootNode());
     model->scale({0.2f, 0.2f, 0.2f});
+    model->translate({0.0f, -0.5f, 0.0f});
 
     auto eModel = dynamic_cast<Model*>(model->getEntity());
     eModel->drawModel = true;

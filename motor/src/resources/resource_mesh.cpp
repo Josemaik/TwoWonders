@@ -1,10 +1,10 @@
 #include "resource_mesh.hpp"
 
-Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<u_int16_t> indices, std::vector<Texture*> textures){
+Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<u_int16_t> indices, Material* material){
     this->id = id;
     this->vertices = vertices;
     this->indices = indices;
-    this->textures = textures;
+    this->material = material;
 }
 
 bool Mesh::load(){ 
@@ -75,8 +75,15 @@ void Mesh::draw(){
     // glUseProgram(m_shaderProgram);
     // glUniform4fv(colorUniform, 1, glm::value_ptr(color));
 
-    // Draw the triangle
+    // Draw the triangle of mesh
     glBindVertexArray(m_VAO);
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_SHORT, 0);
+    glBindVertexArray(0);
+}
+
+void Mesh::drawLines(){
+    // Draw the lines of mesh
+    glBindVertexArray(m_VAO);
+    glDrawElements(GL_LINES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_SHORT, 0);
     glBindVertexArray(0);
 }
