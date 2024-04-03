@@ -2,8 +2,9 @@
 #include "../resources/resource.hpp"
 
 #include <string>
-#include <memory>
 #include <iostream>
+
+#include <memory>
 #include <unordered_map>
 
 struct ResourceManager{
@@ -32,11 +33,16 @@ public:
     }
 
     template<typename T, typename... Args> 
-    T* loadResource(Args&&... args){
-        // if resource in memory, dont load
+    T* loadResource(const char* filePath, Args&&... args){
+        // Search if the resource is already loaded
+        for (auto& pair : m_resources)
+            if (pair.second->getFilePath() == filePath)
+                return dynamic_cast<T*>(pair.second.get());
+
+        // If the resource is not in memory, load it
         nextID++;
         auto resource = std::make_unique<T>(nextID, std::forward<Args>(args)...);
-        if(resource->load()){
+        if(resource->load(filePath)){
             auto rawPtr = resource.get();
             m_resources[nextID] = std::move(resource);
             return rawPtr;
@@ -47,21 +53,15 @@ public:
 
     void unloadResource(const std::size_t& id){
         auto it = m_resources.find(id);
-        if(it != m_resources.end()){
-            it->second->unload();
+        if(it != m_resources.end())
             m_resources.erase(it);
-        }
     }
 
-    void unloadAllResources(){
-        for (auto& pair : m_resources)
-            pair.second->unload();
-        m_resources.clear();
-    }
+    void unloadAllResources(){ m_resources.clear(); }
 
 private:
     ResourceManager() = default;
 
     inline static std::size_t nextID{ 0 };
-    std::unordered_map<std::size_t, std::unique_ptr<Resource>> m_resources;  
+    std::unordered_map<std::size_t, std::unique_ptr<Resource>> m_resources;
 };

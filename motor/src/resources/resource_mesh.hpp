@@ -27,8 +27,9 @@ public:
     Material* material;
 
     Mesh(std::size_t, std::vector<Vertex>, std::vector<u_int16_t>, Material*);
+    ~Mesh(){ unload(); };
 
-    bool load() override;
+    bool load(const char* ) override { return true; };
     void unload() override;
     bool isLoaded() const override;
 

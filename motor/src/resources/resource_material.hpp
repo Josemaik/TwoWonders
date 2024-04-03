@@ -12,19 +12,25 @@ public:
 
     Material();
     Material(std::size_t id, glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess){
-        this->id = id;
+        this->m_id = id;
         this->m_ambientColor = ambientColor;
         this->m_diffuseColor = diffuseColor;
         this->m_specularColor = specularColor;
         this->m_shininess = shininess;
     };
+    ~Material(){ unload(); };
 
-    bool load() override{ 
-        std::cout << "Load a material (ID:" << id << ")" << std::endl;
+    bool load(const char* ) override { 
+        std::cout << "Load a material (ID:" << m_id << ")" << std::endl;
         return true; 
     };
+
+    //bool load() override{ 
+    //    std::cout << "Load a material (ID:" << id << ")" << std::endl;
+    //    return true; 
+    //};
     void unload() override {
-        std::cout << "Unload a material (ID:" << id << ")" << std::endl;
+        std::cout << "Unload a material (ID:" << m_id << ")" << std::endl;
     };
     bool isLoaded() const override { return true; };
 

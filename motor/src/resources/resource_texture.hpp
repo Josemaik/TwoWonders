@@ -5,23 +5,23 @@
 
 struct Texture : public Resource{
 public:
-    GLuint texture;
-
     Texture(std::size_t);
+    ~Texture(){ unload(); };
 
-    bool load() override { return true; };
-    bool load(const char* filePath);
+    bool load(const char* filePath) override;
     void unload() override;
-    bool isLoaded() const override;
+    bool isLoaded() const{ return m_isLoad; }
 
-    int getWidth(){ return width; };
-    int getHeight(){ return height; };
+    // Getters
 
-    // void draw();
+    GLuint getIDTexture(){ return m_idTexture; };
+    int getWidth(){ return m_width; };
+    int getHeight(){ return m_height; };
+
 private:
-    GLuint id_texture;
-    int width, height, nrChannels;
-    bool isLoad { false };
+    GLuint m_idTexture;
+    int m_width, m_height, m_nrChannels;
+    bool m_isLoad { false };
 
-    void setupTexture(const char* filePath);
+    void setup(const char* filePath);
 };

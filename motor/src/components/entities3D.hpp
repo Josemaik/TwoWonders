@@ -57,7 +57,7 @@ struct Point3D : Entity {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Bind default texture
-        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
         // Draw the point
         glPointSize(pointSize);
@@ -129,7 +129,7 @@ struct Line3D : Entity {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Bind default texture
-        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
         // Draw the line
         glLineWidth(lineSize);
@@ -213,7 +213,7 @@ struct Grid : Entity {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Bind default texture
-        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
         // Draw the grid
         glBindVertexArray(VAO);
@@ -294,7 +294,7 @@ struct Plane : Entity {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Bind default texture
-        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
         // Draw the plane
         glBindVertexArray(VAO);
@@ -390,7 +390,7 @@ struct Cube : Entity {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Bind default texture
-        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
         // Draw cube
         glBindVertexArray(VAO);
@@ -487,7 +487,7 @@ struct CubeWires : Entity {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Bind default texture
-        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
         // Draw the wireframe cube
         glBindVertexArray(VAO);

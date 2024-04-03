@@ -361,7 +361,7 @@ struct Texture2D : Entity{
         //glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transMatrix));
 
         // Draw Texture
-        glBindTexture(GL_TEXTURE_2D, texture->texture);
+        glBindTexture(GL_TEXTURE_2D, texture->getIDTexture());
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

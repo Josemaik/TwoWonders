@@ -7,10 +7,10 @@
 
 struct Font : public Resource {
 public:
-    Font(std::size_t id){ this->id = id; }
+    Font(std::size_t id){ this->m_id = id; };
+    ~Font(){ unload(); };
 
-    bool load() override { return true; };
-    bool load(const char* filePath);
+    bool load(const char* ) override;
     void unload() override;
     bool isLoaded() const override { return isLoad; };
 

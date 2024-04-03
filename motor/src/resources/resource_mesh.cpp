@@ -1,27 +1,27 @@
 #include "resource_mesh.hpp"
 
 Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<u_int16_t> indices, Material* material){
-    this->id = id;
+    this->m_id = id;
     this->vertices = vertices;
     this->indices = indices;
     this->material = material;
 }
 
-bool Mesh::load(){ 
-
-    setupMesh();
-
-    isLoaded() ? std::cout << "Load a mesh (ID: " << id <<")" << std::endl : std::cout << "Error loading a mesh" << std::endl;
-    
-    return isLoaded();
-}
+//bool Mesh::load(){ 
+//
+//    setupMesh();
+//
+//    isLoaded() ? std::cout << "Load a mesh (ID: " << id <<")" << std::endl : std::cout << "Error loading a mesh" << std::endl;
+//    
+//    return isLoaded();
+//}
 
 void Mesh::unload(){ 
     // Delete buffers
     glDeleteVertexArrays(1, &m_VAO);
     glDeleteBuffers(1, &m_VBO);
     glDeleteBuffers(1, &m_EBO);
-    std::cout << "Unload a mesh (ID: " << id <<")" << std::endl; 
+    std::cout << "Unload a mesh (ID: " << m_id <<")" << std::endl; 
 }
 
 bool Mesh::isLoaded() const{ 
@@ -80,9 +80,9 @@ void Mesh::draw(glm::mat4 transMatrix, Color color){
     
     // Texture
     if(material->texture)
-        glBindTexture(GL_TEXTURE_2D, material->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, material->texture->getIDTexture());
     else // Bind default texture
-        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
     // Material - TODO
     // Lights - TODO

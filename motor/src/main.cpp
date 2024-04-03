@@ -1,5 +1,5 @@
 #include "darkmoon.hpp"
-
+/*
 Node* createHUD(DarkMoonEngine& engine){
     // Node HUD
     auto p_nodeHUD = engine.CreateNode("HUD", engine.GetRootNode());
@@ -124,13 +124,16 @@ void inputManager(DarkMoonEngine& engine, Node* nodeCharacter){
         nodeCharacter->setRotation({0.0f, 1.0f, 0.0f}, 225.0f);
     }
 }
-
+*/
 
 int main(){
     DarkMoonEngine engine;
 
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
+        engine.LoadTexture("assets/koromaru.png");
+
+        /*
         createScene3D(engine);
         createHUD(engine);
         auto mainCharacter = createMainCharacter(engine);
@@ -139,19 +142,21 @@ int main(){
         std::cout << "│ Tree │" << std::endl;
         std::cout << "└──────┘" << std::endl;
         engine.GetRootNode()->drawTree();
+        */
 
         while(!engine.WindowShouldClose()){
-
+            /*
             // Logic
 
             inputManager(engine, mainCharacter);
 
             // Draw
+            */
 
             engine.BeginDrawing();
 
             engine.ClearBackground(WHITE);
-            engine.GetRootNode()->traverse(glm::mat4());
+            //engine.GetRootNode()->traverse(glm::mat4());
 
             engine.EndDrawing();
         }

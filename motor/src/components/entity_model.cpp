@@ -1,5 +1,6 @@
 #include "entity_model.hpp"
 
+/*
 void Model::load(const char* filePath, ResourceManager& rm){
     // Read file
     Assimp::Importer importer;
@@ -150,3 +151,4 @@ void Model::processTextures(aiMaterial* aiMaterial, Material* material, Resource
         material->texture = texture;
     }
 }
+*/

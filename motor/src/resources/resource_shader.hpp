@@ -18,12 +18,14 @@ public:
     ShaderType type;
 
     // reads and build the shader
-    Shader();
+    Shader() {};
+    ~Shader() { unload(); };
     Shader(std::size_t, const char*, const char*, ShaderType);
 
     void use();
 
-    bool load() override { return true; };
+    //bool load() override { return true; };
+    bool load(const char* ) override { return true; };
     void unload() override;
     bool isLoaded() const override { return true; };
 };

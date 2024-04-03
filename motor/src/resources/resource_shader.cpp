@@ -1,7 +1,7 @@
 #include "resource_shader.hpp"
 
 Shader::Shader(std::size_t id, const char* vertexPath, const char* fragmentPath, ShaderType type){
-    this->id = id;
+    this->m_id = id;
     this->type = type;
 
     //----- Retrieve the vertex/fragment source code from filePath -----//
@@ -81,7 +81,7 @@ Shader::Shader(std::size_t id, const char* vertexPath, const char* fragmentPath,
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 
-    std::cout << "Load a shader (ID: " << id <<") -> " << vertexPath << " - " << fragmentPath << std::endl; 
+    std::cout << "Load a shader (ID: " << m_id <<") -> " << vertexPath << " - " << fragmentPath << std::endl; 
 }
 
 void Shader::use(){
@@ -89,6 +89,6 @@ void Shader::use(){
 }
 
 void Shader::unload(){
-    std::cout << "Unload a shader (ID: " << id <<")" << std::endl; 
+    std::cout << "Unload a shader (ID: " << m_id <<")" << std::endl; 
     glDeleteProgram(id_shader);
 }

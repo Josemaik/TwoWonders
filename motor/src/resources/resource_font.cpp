@@ -3,7 +3,7 @@
 bool Font::load(const char* filePath){
     setupFont(filePath);
 
-    isLoaded() ? std::cout << "Load a font (ID: " << id <<") -> " << filePath << std::endl : std::cout << "Error loading a font" << std::endl;
+    isLoaded() ? std::cout << "Load a font (ID: " << m_id <<") -> " << filePath << std::endl : std::cout << "Error loading a font" << std::endl;
 
     return isLoaded();
 }
@@ -19,7 +19,7 @@ void Font::unload(){
         FT_Done_FreeType(library);
         library = nullptr;
     }
-    std::cout << "Unload a font (ID: " << id <<")" << std::endl; 
+    std::cout << "Unload a font (ID: " << m_id <<")" << std::endl; 
 }
 
 // PRIVATE
