@@ -56,7 +56,7 @@ public:
     // ChangeShader
     void useShader(Shader* shader){
         m_shaderProgram = shader;
-        glUseProgram(m_shaderProgram->id_shader);
+        glUseProgram(m_shaderProgram->getIDShader());
     };
 
     Shader* getShader(){ return m_shaderProgram; };

@@ -192,8 +192,17 @@ public:
 
     // Load font from file into GPU memory
     Font* LoadFont(const char* filePath);
+    // TODO: unloadFont
+
     // Load shader from file into GPU memory
-    Shader* LoadShader(const char* vsFilePath, const char* fsFilePath);
+    Shader* LoadShader(const char* idShader, const char* vsFilePath, const char* fsFilePath);
+    // Unload shader from CPU and GPU
+    void UnloadShader(Shader* shader);
+
+    // Load material from file into GPU memory
+    Material* LoadMaterial(const char* filePath);
+    // Unload material from CPU and GPU
+    void UnloadMaterial(Material* material);
 
     // ------ //
     // Camera //

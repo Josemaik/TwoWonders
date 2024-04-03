@@ -10,7 +10,7 @@ struct Material : public Resource{
 public:
     Texture* texture;
 
-    Material();
+    Material(std::size_t id){ this->m_id = id; };
     Material(std::size_t id, glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess){
         this->m_id = id;
         this->m_ambientColor = ambientColor;
@@ -20,19 +20,16 @@ public:
     };
     ~Material(){ unload(); };
 
-    bool load(const char* ) override { 
-        std::cout << "Load a material (ID:" << m_id << ")" << std::endl;
+    bool load(const char* filePath) override { 
+        this->m_filePath = filePath;
+        std::cout << "Load a material (ID:" << m_id << ") -> " << m_filePath << std::endl;
         m_isLoad = true;
         return isLoaded(); 
     };
 
-    //bool load() override{ 
-    //    std::cout << "Load a material (ID:" << id << ")" << std::endl;
-    //    return true; 
-    //};
     void unload() override {
         m_isLoad = false;
-        std::cout << "Unload a material (ID:" << m_id << ")" << std::endl;
+        std::cout << "Unload a material (ID:" << m_id << ") -> " << m_filePath << std::endl;
     };
 
 private:

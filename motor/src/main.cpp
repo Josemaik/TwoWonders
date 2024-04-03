@@ -136,12 +136,12 @@ int main(){
         /*
         createScene3D(engine);
         auto mainCharacter = createMainCharacter(engine);
+        */
 
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Tree │" << std::endl;
         std::cout << "└──────┘" << std::endl;
         engine.GetRootNode()->drawTree();
-        */
 
         while(!engine.WindowShouldClose()){
             /*

@@ -65,8 +65,8 @@ void Mesh::draw(glm::mat4 transMatrix, Color color){
     rm.beginMode3D();
 
     // Set the uniform color in the shader
-    GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-    glUseProgram(rm.getShader()->id_shader);
+    GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+    glUseProgram(rm.getShader()->getIDShader());
     glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
     // Transform
@@ -74,9 +74,9 @@ void Mesh::draw(glm::mat4 transMatrix, Color color){
     glm::mat4 view       = rm.m_camera->getViewMatrix();
     glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
     
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
     
     // Texture
     if(material->texture)
@@ -105,8 +105,8 @@ void Mesh::drawLines(glm::mat4 transMatrix, Color color){
 
     rm.beginMode3D();
 
-    GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-    glUseProgram(rm.getShader()->id_shader);
+    GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+    glUseProgram(rm.getShader()->getIDShader());
     glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
     // Transform
@@ -114,9 +114,9 @@ void Mesh::drawLines(glm::mat4 transMatrix, Color color){
     glm::mat4 view       = rm.m_camera->getViewMatrix();
     glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
     
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     // Draw the lines of mesh
     glBindVertexArray(m_VAO);

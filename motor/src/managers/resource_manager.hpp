@@ -35,9 +35,11 @@ public:
     template<typename T, typename... Args> 
     T* loadResource(const char* filePath, Args&&... args){
         // Search if the resource is already loaded
-        for (auto& pair : m_resources)
+        for (auto& pair : m_resources){
+            //std::cout << "-----> " << pair.second->getFilePath() << " | " << filePath << std::endl;
             if (pair.second->getFilePath() == filePath)
                 return dynamic_cast<T*>(pair.second.get());
+        }
 
         // If the resource is not in memory, load it
         nextID++;

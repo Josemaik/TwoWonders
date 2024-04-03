@@ -236,17 +236,17 @@ bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
         std::cout << "└──────┘" << std::endl;
 
         //----- Default Material -----//
-        m_renderManager.defaultMaterial = m_resourceManager.loadResource<Material>("hola",
+        m_renderManager.defaultMaterial = m_resourceManager.loadResource<Material>("defaultMaterial",
                                                                                    glm::vec3(0.2f, 0.2f, 0.2f), 
                                                                                    glm::vec3(0.8f, 0.8f, 0.8f), 
                                                                                    glm::vec3(0.0f, 0.0f, 0.0f), 
                                                                                    0.0f);
         m_renderManager.defaultMaterial->texture = LoadTexture("assets/defaultTexture.png");
 
-        //----- Shaders -----//
-        m_renderManager.shaderColor = LoadShader("src/shaders/color.vs", "src/shaders/color.fs");
-        m_renderManager.shaderTexture = LoadShader("src/shaders/texture.vs", "src/shaders/texture.fs");
-        m_renderManager.shader3D = LoadShader("src/shaders/3D.vs", "src/shaders/3D.fs");
+        //----- Shaders -----// (std::string(vsFilePath) + " - " + std::string(fsFilePath)).c_str()
+        m_renderManager.shaderColor = LoadShader("shaderColor", "src/shaders/color.vs", "src/shaders/color.fs");
+        m_renderManager.shaderTexture = LoadShader("shaderTexture", "src/shaders/texture.vs", "src/shaders/texture.fs");
+        m_renderManager.shader3D = LoadShader("shader3D", "src/shaders/3D.vs", "src/shaders/3D.fs");
 
         //----- Font -----//
         m_renderManager.setDefaultFont(LoadFont("assets/fonts/roboto.ttf"));
@@ -451,15 +451,30 @@ float DarkMoonEngine::GetGamepadAxisMovement(int gamepad, int axis){
 // Load font from file into GPU memory
 Font* DarkMoonEngine::LoadFont(const char* filePath){
     auto font = m_resourceManager.loadResource<Font>(filePath);
-    //font->load(filePath);
 
     return font;
 }
 
 // Load shader from file into GPU memory
-Shader* DarkMoonEngine::LoadShader(const char* vsFilePath, const char* fsFilePath){
-    return m_resourceManager.loadResource<Shader>("hola", vsFilePath, fsFilePath, ShaderType::COLOR);
+Shader* DarkMoonEngine::LoadShader(const char* idShader, const char* vsFilePath, const char* fsFilePath){
+    return m_resourceManager.loadResource<Shader>(idShader, vsFilePath, fsFilePath);
 }
+
+// Unload shader from CPU and GPU
+void DarkMoonEngine::UnloadShader(Shader* shader){
+    m_resourceManager.unloadResource(shader->getID());
+}
+
+// Load material from file into GPU memory
+Material* DarkMoonEngine::LoadMaterial(const char* filePath){
+    return m_resourceManager.loadResource<Material>(filePath);
+}
+
+// Unload material from CPU and GPU
+void DarkMoonEngine::UnloadMaterial(Material* material){
+    m_resourceManager.unloadResource(material->getID());
+}
+
 
 // ---------------------- //
 // Text drawing functions //

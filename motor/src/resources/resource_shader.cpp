@@ -1,8 +1,34 @@
 #include "resource_shader.hpp"
 
-Shader::Shader(std::size_t id, const char* vertexPath, const char* fragmentPath, ShaderType type){
-    this->m_id = id;
-    this->type = type;
+Shader::Shader(std::size_t id, const char* vertexPath, const char* fragmentPath){ 
+    this->m_id = id; 
+    this->m_vertexPath = vertexPath;
+    this->m_fragmentPath = fragmentPath;
+};
+
+bool Shader::load(const char* filePath){
+    this->m_filePath = filePath;
+
+    setup();
+
+    std::cout << "Load a shader (ID: " << m_id <<") -> " << m_filePath << std::endl;
+    m_isLoad = true;
+
+    return isLoaded(); 
+}
+
+void Shader::use(){ glUseProgram(m_idShader); }
+
+void Shader::unload(){
+    if(isLoaded())
+        std::cout << "Unload a shader (ID: " << m_id <<") -> " << m_filePath << std::endl; 
+    glDeleteProgram(m_idShader);
+    m_isLoad = false;
+}
+
+// PRIVATE
+
+void Shader::setup(){
 
     //----- Retrieve the vertex/fragment source code from filePath -----//
     std::string vertexCode;
@@ -15,8 +41,8 @@ Shader::Shader(std::size_t id, const char* vertexPath, const char* fragmentPath,
 
     try {
         // open files
-        vShaderFile.open(vertexPath);
-        fShaderFile.open(fragmentPath);
+        vShaderFile.open(m_vertexPath);
+        fShaderFile.open(m_fragmentPath);
         std::stringstream vShaderStream, fShaderStream;
         // read file's buffer contents into streams
         vShaderStream << vShaderFile.rdbuf();
@@ -68,30 +94,16 @@ Shader::Shader(std::size_t id, const char* vertexPath, const char* fragmentPath,
 
     // Link Shaders
     // ------------
-    id_shader = glCreateProgram();
-    glAttachShader(id_shader, vertex);
-    glAttachShader(id_shader, fragment);
-    glLinkProgram(id_shader);
+    m_idShader = glCreateProgram();
+    glAttachShader(m_idShader, vertex);
+    glAttachShader(m_idShader, fragment);
+    glLinkProgram(m_idShader);
     // check for linking errors
-    glGetProgramiv(id_shader, GL_LINK_STATUS, &success);
+    glGetProgramiv(m_idShader, GL_LINK_STATUS, &success);
     if(!success){
-        glGetProgramInfoLog(id_shader, 512, NULL, infoLog);
+        glGetProgramInfoLog(m_idShader, 512, NULL, infoLog);
         std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
     glDeleteShader(vertex);
     glDeleteShader(fragment);
-
-    m_isLoad = true;
-
-    std::cout << "Load a shader (ID: " << m_id <<") -> " << vertexPath << " - " << fragmentPath << std::endl; 
-}
-
-void Shader::use(){
-    glUseProgram(id_shader);
-}
-
-void Shader::unload(){
-    std::cout << "Unload a shader (ID: " << m_id <<")" << std::endl; 
-    m_isLoad = false;
-    glDeleteProgram(id_shader);
 }
