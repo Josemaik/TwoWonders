@@ -18,7 +18,6 @@ public:
     int getHeight(){ return height; };
 
     // void draw();
-
 private:
     GLuint id_texture;
     int width, height, nrChannels;

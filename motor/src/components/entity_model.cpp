@@ -24,57 +24,34 @@ void Model::unload(ResourceManager& rm){
 }
 
 void Model::draw(glm::mat4 transMatrix){
-    RenderManager rm = RenderManager::getInstance();
-
-    rm.beginMode3D();
-
-    // Set the uniform color in the shader
-    GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-    glUseProgram(rm.getShader()->id_shader);
-    glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
-
-    // Transform
-    glm::mat4 model = transMatrix;
-    glm::mat4 view       = rm.m_camera->getViewMatrix();
-    glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
-    
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     // Draw meshes
     if(drawModel)
-        for (const auto& mesh : m_meshes) {
-            GLuint VAO = mesh->getVAO();
-            glBindVertexArray(VAO);
-            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->getNumIndices()), GL_UNSIGNED_SHORT, 0);
-            glBindVertexArray(0);
-        }
+        for (const auto& mesh : m_meshes)
+            mesh->draw(transMatrix, color);
 
     // Draw wires
-    if(drawWires){
-        colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-        glUseProgram(rm.getShader()->id_shader);
-        glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(BLACK)));
+    if(drawWires)
+        for (const auto& mesh : m_meshes)
+            mesh->drawLines(transMatrix);
 
-        for (const auto& mesh : m_meshes) {
-            GLuint VAO = mesh->getVAO();
-            glBindVertexArray(VAO);
-            glDrawElements(GL_LINES, static_cast<GLsizei>(mesh->getNumIndices()), GL_UNSIGNED_SHORT, 0);
-            glBindVertexArray(0);
-        }
-    }
-
-    rm.endMode3D();
 };
 
 // PRIVATE
 
 void Model::processNode(aiNode* node, const aiScene* scene, ResourceManager& rm) {
+    // Find the directory of the obj file
+    std::string directory = m_name;
+    size_t last_slash_idx = directory.find_last_of('/');
+    if (std::string::npos != last_slash_idx)
+        directory = directory.substr(0, last_slash_idx);
+
     // Process all the node's meshes
     for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        processMesh(mesh, scene, rm);
+        aiMaterial* aiMaterial = scene->mMaterials[mesh->mMaterialIndex];
+        //std::cout << "Material: " << aiMaterial->GetName().C_Str() << std::endl;
+        processMesh(mesh, aiMaterial, scene, rm);
     }
 
     // Recursively process each of the node's children
@@ -83,19 +60,19 @@ void Model::processNode(aiNode* node, const aiScene* scene, ResourceManager& rm)
     }
 }
 
-void Model::processMesh(aiMesh* mesh, const aiScene*, ResourceManager& rm) {
-    std::vector<Vertex> vertices(mesh->mNumVertices);
-    std::vector<u_int16_t> indices;
-    std::vector<Texture*> textures;
-
+void Model::processMesh(aiMesh* mesh, aiMaterial* aiMaterial, const aiScene*, ResourceManager& rm) {
     // Process the vertices
+    std::vector<Vertex> vertices(mesh->mNumVertices);
+
     for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
         Vertex vertex;
 
         // Position
-        vertex.position.x = mesh->mVertices[i].x;
-        vertex.position.y = mesh->mVertices[i].y;
-        vertex.position.z = mesh->mVertices[i].z;
+        if (mesh->HasPositions()) {
+            vertex.position.x = mesh->mVertices[i].x;
+            vertex.position.y = mesh->mVertices[i].y;
+            vertex.position.z = mesh->mVertices[i].z;
+        }
 
         // Normal
         if (mesh->HasNormals()) {
@@ -109,11 +86,15 @@ void Model::processMesh(aiMesh* mesh, const aiScene*, ResourceManager& rm) {
             vertex.textCoords.x = mesh->mTextureCoords[0][i].x;
             vertex.textCoords.y = mesh->mTextureCoords[0][i].y;
         }
+        else // Default Texture Coords
+            vertex.textCoords = glm::vec2(0.0f, 0.0f);
 
         vertices[i] = vertex;
     }
 
     // Process the indices
+    std::vector<u_int16_t> indices;
+
     for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
         aiFace face = mesh->mFaces[i];
         for (unsigned int j = 0; j < face.mNumIndices; ++j) {
@@ -121,7 +102,51 @@ void Model::processMesh(aiMesh* mesh, const aiScene*, ResourceManager& rm) {
         }
     }
 
-    auto currentMesh = rm.loadResource<Mesh>(vertices, indices, textures);
+    // Process material
+    auto material = processMaterial(aiMaterial, rm);
+    processTextures(aiMaterial, material, rm);
+
+    auto currentMesh = rm.loadResource<Mesh>(vertices, indices, material);
     
     m_meshes.push_back(currentMesh);
+}
+
+Material* Model::processMaterial(aiMaterial* aiMaterial, ResourceManager& rm){
+    aiColor4D ambient(0.0f, 0.0f, 0.0f, 1.0f);
+    aiColor4D diffuse(0.0f, 0.0f, 0.0f, 1.0f);
+    aiColor4D specular(0.0f, 0.0f, 0.0f, 1.0f);
+    float shininess = 0.0f;
+
+    // Retrieve material properties
+    aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_AMBIENT, &ambient);
+    aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
+    aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_SPECULAR, &specular);
+    aiGetMaterialFloat(aiMaterial, AI_MATKEY_SHININESS, &shininess);
+
+    // Create and return Material object
+    auto material = rm.loadResource<Material>(glm::vec3(ambient.r, ambient.g, ambient.b),
+                                              glm::vec3(diffuse.r, diffuse.g, diffuse.b),
+                                              glm::vec3(specular.r, specular.g, specular.b),
+                                              shininess);
+                                              
+    return material;
+}
+
+void Model::processTextures(aiMaterial* aiMaterial, Material* material, ResourceManager& rm){
+    aiString aiTexturePath;
+    aiReturn texFound = aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aiTexturePath);
+    if (texFound == AI_SUCCESS) {
+        std::string texturePath = aiTexturePath.C_Str();
+        std::string modelDirectory = m_name;
+        size_t lastSlashIndex = modelDirectory.find_last_of('/');
+        if (lastSlashIndex != std::string::npos) {
+            modelDirectory = modelDirectory.substr(0, lastSlashIndex);
+        }
+        texturePath = modelDirectory + "/" + texturePath;
+        
+        auto texture = rm.loadResource<Texture>();
+        texture->load(texturePath.c_str());
+
+        material->texture = texture;
+    }
 }

@@ -29,6 +29,7 @@ private:
 
 public:
     Camera* m_camera;
+    Material* defaultMaterial;
 
     // Shaders
     Shader* shaderColor;
