@@ -35,5 +35,5 @@ void Font::setupFont(const char* filePath){
         std::cerr << "Error loading the font" << std::endl;
     }
 
-    isLoad = (library != nullptr) && (face != nullptr);
+    m_isLoad = (library != nullptr) && (face != nullptr);
 }

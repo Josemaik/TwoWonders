@@ -12,14 +12,12 @@ public:
 
     bool load(const char* ) override;
     void unload() override;
-    bool isLoaded() const override { return isLoad; };
 
     FT_Face getFace(){ return face; };
 
 private:
     FT_Library library;
     FT_Face face;
-    bool isLoad { false };
 
     void setupFont(const char* filePath);
 };

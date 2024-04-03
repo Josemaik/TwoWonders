@@ -31,7 +31,6 @@ public:
 
     bool load(const char* ) override { return true; };
     void unload() override;
-    bool isLoaded() const override;
 
     void draw(glm::mat4 transMatrix, Color color = GRAY);
     void drawLines(glm::mat4 transMatrix, Color color = BLACK);

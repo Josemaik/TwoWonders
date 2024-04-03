@@ -22,7 +22,8 @@ public:
 
     bool load(const char* ) override { 
         std::cout << "Load a material (ID:" << m_id << ")" << std::endl;
-        return true; 
+        m_isLoad = true;
+        return isLoaded(); 
     };
 
     //bool load() override{ 
@@ -30,9 +31,9 @@ public:
     //    return true; 
     //};
     void unload() override {
+        m_isLoad = false;
         std::cout << "Unload a material (ID:" << m_id << ")" << std::endl;
     };
-    bool isLoaded() const override { return true; };
 
 private:
     glm::vec3 m_ambientColor;

@@ -81,6 +81,8 @@ Shader::Shader(std::size_t id, const char* vertexPath, const char* fragmentPath,
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 
+    m_isLoad = true;
+
     std::cout << "Load a shader (ID: " << m_id <<") -> " << vertexPath << " - " << fragmentPath << std::endl; 
 }
 
@@ -90,5 +92,6 @@ void Shader::use(){
 
 void Shader::unload(){
     std::cout << "Unload a shader (ID: " << m_id <<")" << std::endl; 
+    m_isLoad = false;
     glDeleteProgram(id_shader);
 }

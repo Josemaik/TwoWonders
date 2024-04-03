@@ -21,11 +21,8 @@ void Mesh::unload(){
     glDeleteVertexArrays(1, &m_VAO);
     glDeleteBuffers(1, &m_VBO);
     glDeleteBuffers(1, &m_EBO);
+    m_isLoad = false;
     std::cout << "Unload a mesh (ID: " << m_id <<")" << std::endl; 
-}
-
-bool Mesh::isLoaded() const{ 
-    return m_VAO != 0 && m_VBO != 0 && m_EBO != 0;
 }
 
 void Mesh::setupMesh(){
@@ -57,6 +54,9 @@ void Mesh::setupMesh(){
 
     // Unbind vertex array
     glBindVertexArray(0);
+
+    if(m_VAO != 0 && m_VBO != 0 && m_EBO != 0)
+        m_isLoad = true;
 }
 
 void Mesh::draw(glm::mat4 transMatrix, Color color){ 

@@ -10,7 +10,6 @@ public:
 
     bool load(const char* filePath) override;
     void unload() override;
-    bool isLoaded() const{ return m_isLoad; }
 
     // Getters
 
@@ -21,7 +20,6 @@ public:
 private:
     GLuint m_idTexture;
     int m_width, m_height, m_nrChannels;
-    bool m_isLoad { false };
 
     void setup() override;
 };
