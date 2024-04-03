@@ -137,7 +137,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     case AttackType::Spiderweb: {
         //createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack,1.0);
         auto& e{ em.newEntity() };
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 3.0f, 0.1f, 3.0f }, .color = GREEN });
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 6.0f, 0.1f, 6.0f }, .color = GREEN });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Spiderweb, .life_time = 2.0f });
         ElementalType tipoElemental;
@@ -306,7 +306,7 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
         if (ent.hasTag<GolemTag>()) {
             c.attackType = AttackType::GollemAttack;
         }
-        if (ent.hasTag<SpiderTag>()) {
+        if (ent.hasTag<SpiderTag>() && isRanged) {
             em.addComponent<AttackComponent>(e);
             c.attackType = AttackType::Spiderweb;
         }

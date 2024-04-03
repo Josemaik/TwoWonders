@@ -6,11 +6,11 @@
 #include <utils/sb/steeringbehaviour.hpp>
 
 static double radius_evade { 3.0 };
-static double radius_centro_masas { 6.0 };
+//static double radius_centro_masas { 6.0 };
 // Peso para la influencia de la dirección hacia el jugador
 //double playerWeight = 0.8; 
 // Peso para la influencia de la dirección hacia el centro de masas
-static double centerOfMassWeight = 0.2;
+//static double centerOfMassWeight = 0.2;
 
 struct BTAction_Seek : BTNode_t {
     // BTActionPatrol() = default;
@@ -26,10 +26,10 @@ struct BTAction_Seek : BTNode_t {
         Steer_t steering = STBH::Seek(ectx.phy, { ectx.ai->tx,0.0,ectx.ai->tz });
         //Calcule Flocking
         // Comprobamos si tiene enemigos en un radio cercano
-        double suma_cm_x{};
-        double suma_cm_z{};
-        double numenemigos_cm{};
-        vec3d cm{};
+        // double suma_cm_x{};
+        // double suma_cm_z{};
+        // double numenemigos_cm{};
+        // vec3d cm{};
         auto& bb = ectx.em.getSingleton<BlackBoard_t>();
         for(auto& pos : bb.positions){
             //check enemies to evade
@@ -41,19 +41,19 @@ struct BTAction_Seek : BTNode_t {
                 steering.v_z += steeringEvade.v_z;
             }
             //Calculate mass center
-            if(ectx.phy.position.calculatePointDistance(pos) < radius_centro_masas){
-                suma_cm_x += pos.x();
-                suma_cm_z += pos.z();
-                numenemigos_cm++;
-            }
+            // if(ectx.phy.position.calculatePointDistance(pos) < radius_centro_masas){
+            //     suma_cm_x += pos.x();
+            //     suma_cm_z += pos.z();
+            //     numenemigos_cm++;
+            // }
         }
         // add center of mass direction to toplayer direction
-        cm = vec3d{suma_cm_x/numenemigos_cm,0.0,suma_cm_z/numenemigos_cm};
-        vec3d dirToCenterOfMass = cm - ectx.phy.position;
-        // Dirección final, combinando las direcciones hacia el jugador y hacia el centro de masas
-        // Dirección final, combinando las direcciones hacia el jugador y hacia el centro de masas
-        steering.v_x += std::clamp(dirToCenterOfMass.x() * centerOfMassWeight, -ectx.phy.max_speed, ectx.phy.max_speed);
-        steering.v_z += std::clamp(dirToCenterOfMass.z() * centerOfMassWeight, -ectx.phy.max_speed, ectx.phy.max_speed);
+        // cm = vec3d{suma_cm_x/numenemigos_cm,0.0,suma_cm_z/numenemigos_cm};
+        // vec3d dirToCenterOfMass = cm - ectx.phy.position;
+        // // Dirección final, combinando las direcciones hacia el jugador y hacia el centro de masas
+        // // Dirección final, combinando las direcciones hacia el jugador y hacia el centro de masas
+        // steering.v_x += std::clamp(dirToCenterOfMass.x() * centerOfMassWeight, -ectx.phy.max_speed, ectx.phy.max_speed);
+        // steering.v_z += std::clamp(dirToCenterOfMass.z() * centerOfMassWeight, -ectx.phy.max_speed, ectx.phy.max_speed);
         //Almacenar posiciones de eenemigos en un radio mas grande
         //Para radio pequeño-> evade de estos y restarselo al vector velocidad ( evitar)
         //Para radio grande -> calcular centro de masas y sumar a la velocidad (cohesionar)
