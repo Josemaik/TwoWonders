@@ -20,7 +20,7 @@ bool Texture::load(const char* filePath){
 void Texture::unload(){
     glDeleteTextures(1, &m_idTexture);
     if(isLoaded())
-        std::cout << "Unload a texture (ID: " << m_id <<") -> " << m_filePath << std::endl; 
+        std::cout << "Unload a texture (ID: " << m_id <<")" << std::endl; 
     m_isLoad = false;
 }
 

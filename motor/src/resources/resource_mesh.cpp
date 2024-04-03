@@ -7,14 +7,14 @@ Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<u_int16_t> 
     this->material = material;
 }
 
-//bool Mesh::load(){ 
-//
-//    setupMesh();
-//
-//    isLoaded() ? std::cout << "Load a mesh (ID: " << id <<")" << std::endl : std::cout << "Error loading a mesh" << std::endl;
-//    
-//    return isLoaded();
-//}
+bool Mesh::load(const char*){ 
+
+    setupMesh();
+
+    isLoaded() ? std::cout << "Load a mesh (ID: " << m_id <<")" << std::endl : std::cout << "Error loading a mesh" << std::endl;
+    
+    return isLoaded();
+}
 
 void Mesh::unload(){ 
     // Delete buffers

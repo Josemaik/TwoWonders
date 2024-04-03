@@ -29,7 +29,7 @@ public:
 
     void unload() override {
         m_isLoad = false;
-        std::cout << "Unload a material (ID:" << m_id << ") -> " << m_filePath << std::endl;
+        std::cout << "Unload a material (ID:" << m_id << ")" << std::endl;
     };
 
 private:

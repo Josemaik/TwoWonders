@@ -1,6 +1,5 @@
 #include "entity_model.hpp"
 
-/*
 void Model::load(const char* filePath, ResourceManager& rm){
     // Read file
     Assimp::Importer importer;
@@ -21,7 +20,7 @@ void Model::load(const char* filePath, ResourceManager& rm){
 void Model::unload(ResourceManager& rm){
     std::cout << "Unload -> " << this->m_name << std::endl; 
     for(int i=0; i<static_cast<int>(m_meshes.size()); i++)
-        rm.unloadResource(m_meshes[i]->id);
+        rm.unloadResource(m_meshes[i]->getID());
 }
 
 void Model::draw(glm::mat4 transMatrix){
@@ -107,7 +106,7 @@ void Model::processMesh(aiMesh* mesh, aiMaterial* aiMaterial, const aiScene*, Re
     auto material = processMaterial(aiMaterial, rm);
     processTextures(aiMaterial, material, rm);
 
-    auto currentMesh = rm.loadResource<Mesh>(vertices, indices, material);
+    auto currentMesh = rm.loadResource<Mesh>(mesh->mName.C_Str(), vertices, indices, material);
     
     m_meshes.push_back(currentMesh);
 }
@@ -125,10 +124,12 @@ Material* Model::processMaterial(aiMaterial* aiMaterial, ResourceManager& rm){
     aiGetMaterialFloat(aiMaterial, AI_MATKEY_SHININESS, &shininess);
 
     // Create and return Material object
-    auto material = rm.loadResource<Material>(glm::vec3(ambient.r, ambient.g, ambient.b),
-                                              glm::vec3(diffuse.r, diffuse.g, diffuse.b),
-                                              glm::vec3(specular.r, specular.g, specular.b),
-                                              shininess);
+    auto material = rm.loadResource<Material>(aiMaterial->GetName().C_Str());
+    //auto material = rm.loadResource<Material>(aiMaterial->GetName(),
+    //                                          glm::vec3(ambient.r, ambient.g, ambient.b),
+    //                                          glm::vec3(diffuse.r, diffuse.g, diffuse.b),
+    //                                          glm::vec3(specular.r, specular.g, specular.b),
+    //                                          shininess);
                                               
     return material;
 }
@@ -145,10 +146,9 @@ void Model::processTextures(aiMaterial* aiMaterial, Material* material, Resource
         }
         texturePath = modelDirectory + "/" + texturePath;
         
-        auto texture = rm.loadResource<Texture>();
-        texture->load(texturePath.c_str());
+        auto texture = rm.loadResource<Texture>(texturePath.c_str());
+        //texture->load(texturePath.c_str());
 
         material->texture = texture;
     }
 }
-*/

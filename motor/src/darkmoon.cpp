@@ -175,15 +175,15 @@ Node* DarkMoonEngine::CreateCubeWires(glm::vec3 position, glm::vec3 size, Color 
 }
 
 // Create model in node
-Node* DarkMoonEngine::CreateModel(const char* , Color , const char* nodeName, Node* parentNode){
+Node* DarkMoonEngine::CreateModel(const char* filePath, Color tint, const char* nodeName, Node* parentNode){
     auto p_nodeModel = CreateNode(nodeName, parentNode);
 
     // Load model
-    //auto model = std::make_unique<Model>();
-    //model->load(filePath, m_resourceManager);
-    //model->setColor(tint);
-//
-    //p_nodeModel->setEntity(std::move(model));
+    auto model = std::make_unique<Model>();
+    model->load(filePath, m_resourceManager);
+    model->setColor(tint);
+
+    p_nodeModel->setEntity(std::move(model));
 
     return p_nodeModel;
 }

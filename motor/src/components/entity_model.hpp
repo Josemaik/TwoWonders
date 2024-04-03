@@ -14,7 +14,7 @@
 #include <assimp/postprocess.h>
 
 struct Model : Entity{
-/*
+
 private:
     const char* m_name;
     std::vector<Mesh*> m_meshes; 
@@ -36,5 +36,5 @@ public:
 
     bool isLoaded(){ return m_loaded; };
     void setColor(Color c){ color = c; };
-    */
+
 };

@@ -25,7 +25,6 @@ Node* createHUD(DarkMoonEngine& engine){
     return p_nodeHUD;
 }
 
-/*
 Node* createScene3D(DarkMoonEngine& engine){
     // Node Scene 3D
     auto p_node3D = engine.CreateNode("Scene 3D", engine.GetRootNode());
@@ -125,7 +124,7 @@ void inputManager(DarkMoonEngine& engine, Node* nodeCharacter){
         nodeCharacter->setRotation({0.0f, 1.0f, 0.0f}, 225.0f);
     }
 }
-*/
+
 
 int main(){
     DarkMoonEngine engine;
@@ -133,10 +132,8 @@ int main(){
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
         createHUD(engine);
-        /*
         createScene3D(engine);
         auto mainCharacter = createMainCharacter(engine);
-        */
 
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Tree │" << std::endl;
@@ -144,13 +141,12 @@ int main(){
         engine.GetRootNode()->drawTree();
 
         while(!engine.WindowShouldClose()){
-            /*
+    
             // Logic
 
             inputManager(engine, mainCharacter);
 
             // Draw
-            */
 
             engine.BeginDrawing();
 
