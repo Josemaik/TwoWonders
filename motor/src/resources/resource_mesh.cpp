@@ -79,16 +79,13 @@ void Mesh::draw(glm::mat4 transMatrix, Color color){
     glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
     
     // Texture
-    // if(material->texture){
-    //     glActiveTexture(GL_TEXTURE0);
-    //     glUniform1i(glGetUniformLocation(rm.getShader()->id_shader, "texture0"), 0);
-    // }
-    glBindTexture(GL_TEXTURE_2D, material->texture->texture);
+    if(material->texture)
+        glBindTexture(GL_TEXTURE_2D, material->texture->texture);
+    else // Bind default texture
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
 
-    // light
-
-    // Bind default texture
-    //glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+    // Material - TODO
+    // Lights - TODO
 
     // Draw the triangle of mesh
     glBindVertexArray(m_VAO);
@@ -96,7 +93,8 @@ void Mesh::draw(glm::mat4 transMatrix, Color color){
     glBindVertexArray(0);
 
     // Unbind default texture
-    glBindTexture(GL_TEXTURE_2D, 0);
+    //glBindTexture(GL_TEXTURE_2D, 0);
+    //glActiveTexture(GL_TEXTURE0);
 
     rm.endMode3D();
 }

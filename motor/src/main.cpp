@@ -41,18 +41,37 @@ Node* createScene3D(DarkMoonEngine& engine){
     engine.CreatePlane({0.0f, 0.0f, 0.0f}, {2.0f, 2.0f}, PINK, "Plano rosita", p_node3D);
 
     // Node: Cubo
-    engine.CreateCube({-3.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, AQUA_DARK, "Cubo azulito", p_node3D);
+    engine.CreateCube({-3.0f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, AQUA_DARK, "Cubo azulito", p_node3D);
+    engine.CreateCubeWires({-3.0f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, BLACK, "Wireframe", p_node3D);
     // Node: Wireframe
-    engine.CreateCubeWires({2.0f, 0.0f, -3.0f}, {1.0f, 1.0f, 1.0f}, BLACK, "Wireframe", p_node3D);
+    engine.CreateCubeWires({2.0f, 0.5f, -3.0f}, {1.0f, 1.0f, 1.0f}, BLACK, "Wireframe", p_node3D);
+
+    // Node: Modelo Dummy 1
+    auto modelDummy = engine.CreateModel("assets/Dummy.obj", WHITE, "Modelo: Dummy 1", p_node3D);
+    modelDummy->scale({0.2f, 0.2f, 0.2f});
+    modelDummy->translate({0.0f, -0.5f, -3.0f});
+
+    // Node: Modelo Dummy 2
+    auto modelDummy2 = engine.CreateModel("assets/Dummy.obj", WHITE, "Modelo: Dummy 2", p_node3D);
+    modelDummy2->scale({0.2f, 0.2f, 0.2f});
+    modelDummy2->translate({0.0f, -0.5f, 3.0f});
+    modelDummy2->rotate({0.0f, 1.0f, 0.0f}, 180.0f);
+
+    // Node: Modelo Dummy 3
+    auto modelDummy3 = engine.CreateModel("assets/Dummy.obj", WHITE, "Modelo: Dummy 3", p_node3D);
+    modelDummy3->scale({0.2f, 0.2f, 0.2f});
+    modelDummy3->translate({3.0f, -0.5f, 0.0f});
+    modelDummy3->rotate({0.0f, 1.0f, 0.0f}, 270.0f);
 
     return p_node3D;
 }
 
 Node* createMainCharacter(DarkMoonEngine& engine){
     // Node: Modelo
-    auto model = engine.CreateModel("assets/Dummy.obj", GRAY, "Modelo: Main Character", engine.GetRootNode());
+    auto model = engine.CreateModel("assets/Nomada.obj", WHITE, "Modelo: Main Character", engine.GetRootNode());
     model->scale({0.2f, 0.2f, 0.2f});
-    model->translate({0.0f, -0.5f, 0.0f});
+    model->translate({0.0f, 0.0f, 0.0f});
+    model->rotate({0.0f, 1.0f, 0.0f}, 225.0f);
 
     auto eModel = dynamic_cast<Model*>(model->getEntity());
     eModel->drawModel = true;
@@ -113,8 +132,8 @@ int main(){
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
         createScene3D(engine);
-        auto mainCharacter = createMainCharacter(engine);
         createHUD(engine);
+        auto mainCharacter = createMainCharacter(engine);
 
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Tree │" << std::endl;

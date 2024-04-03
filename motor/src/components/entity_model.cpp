@@ -68,9 +68,11 @@ void Model::processMesh(aiMesh* mesh, aiMaterial* aiMaterial, const aiScene*, Re
         Vertex vertex;
 
         // Position
-        vertex.position.x = mesh->mVertices[i].x;
-        vertex.position.y = mesh->mVertices[i].y;
-        vertex.position.z = mesh->mVertices[i].z;
+        if (mesh->HasPositions()) {
+            vertex.position.x = mesh->mVertices[i].x;
+            vertex.position.y = mesh->mVertices[i].y;
+            vertex.position.z = mesh->mVertices[i].z;
+        }
 
         // Normal
         if (mesh->HasNormals()) {
@@ -84,6 +86,8 @@ void Model::processMesh(aiMesh* mesh, aiMaterial* aiMaterial, const aiScene*, Re
             vertex.textCoords.x = mesh->mTextureCoords[0][i].x;
             vertex.textCoords.y = mesh->mTextureCoords[0][i].y;
         }
+        else // Default Texture Coords
+            vertex.textCoords = glm::vec2(0.0f, 0.0f);
 
         vertices[i] = vertex;
     }
@@ -118,11 +122,6 @@ Material* Model::processMaterial(aiMaterial* aiMaterial, ResourceManager& rm){
     aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
     aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_SPECULAR, &specular);
     aiGetMaterialFloat(aiMaterial, AI_MATKEY_SHININESS, &shininess);
-
-    // std::cout << "ambient: " << ambient.r << " - " << ambient.g << " - " << ambient.b << std::endl;
-    // std::cout << "diffuse: " << diffuse.r << " - " << diffuse.g << " - " << diffuse.b << std::endl;
-    // std::cout << "specular: " << specular.r << " - " << specular.g << " - " << specular.b << std::endl;
-    // std::cout << "shininess: " << shininess << std::endl;
 
     // Create and return Material object
     auto material = rm.loadResource<Material>(glm::vec3(ambient.r, ambient.g, ambient.b),
