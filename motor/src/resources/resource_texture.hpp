@@ -5,7 +5,7 @@
 
 struct Texture : public Resource{
 public:
-    Texture(std::size_t);
+    Texture(std::size_t id){ this->m_id = id; };
     ~Texture(){ unload(); };
 
     bool load(const char* filePath) override;
@@ -23,5 +23,5 @@ private:
     int m_width, m_height, m_nrChannels;
     bool m_isLoad { false };
 
-    void setup(const char* filePath);
+    void setup() override;
 };

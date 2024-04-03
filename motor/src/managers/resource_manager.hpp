@@ -47,8 +47,10 @@ public:
             m_resources[nextID] = std::move(resource);
             return rawPtr;
         }
-        else
-            throw std::runtime_error("Error loading resource");
+        else{
+            nextID--;
+            return nullptr;
+        }
     }
 
     void unloadResource(const std::size_t& id){

@@ -1,5 +1,5 @@
 #include "darkmoon.hpp"
-/*
+
 Node* createHUD(DarkMoonEngine& engine){
     // Node HUD
     auto p_nodeHUD = engine.CreateNode("HUD", engine.GetRootNode());
@@ -25,6 +25,7 @@ Node* createHUD(DarkMoonEngine& engine){
     return p_nodeHUD;
 }
 
+/*
 Node* createScene3D(DarkMoonEngine& engine){
     // Node Scene 3D
     auto p_node3D = engine.CreateNode("Scene 3D", engine.GetRootNode());
@@ -131,11 +132,9 @@ int main(){
 
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
-        engine.LoadTexture("assets/koromaru.png");
-
+        createHUD(engine);
         /*
         createScene3D(engine);
-        createHUD(engine);
         auto mainCharacter = createMainCharacter(engine);
 
         std::cout << "┌──────┐" << std::endl;
@@ -156,7 +155,7 @@ int main(){
             engine.BeginDrawing();
 
             engine.ClearBackground(WHITE);
-            //engine.GetRootNode()->traverse(glm::mat4());
+            engine.GetRootNode()->traverse(glm::mat4());
 
             engine.EndDrawing();
         }

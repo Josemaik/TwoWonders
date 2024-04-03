@@ -7,28 +7,26 @@
 
 // PUBLIC
 
-Texture::Texture(std::size_t id){
-    this->m_id = id;
-}
-
 bool Texture::load(const char* filePath){
     this->m_filePath = filePath;
-    setup(m_filePath);
+    setup();
 
-    isLoaded() ? std::cout << "Load a texture (ID: " << m_id <<") -> " << m_filePath << std::endl : std::cout << "Error loading a texture" << std::endl;
+    isLoaded() ? std::cout << "Load a texture (ID: " << m_id <<") -> " << m_filePath << std::endl 
+               : std::cout << "Error loading a texture -> " << m_filePath << std::endl;
 
     return isLoaded();
 }
 
 void Texture::unload(){
     glDeleteTextures(1, &m_idTexture);
+    if(isLoaded())
+        std::cout << "Unload a texture (ID: " << m_id <<") -> " << m_filePath << std::endl; 
     m_isLoad = false;
-    std::cout << "Unload a texture (ID: " << m_id <<") -> " << m_filePath << std::endl; 
 }
 
 // PRIVATE
 
-void Texture::setup(const char* filePath){
+void Texture::setup(){
     glGenTextures(1, &m_idTexture);
     glBindTexture(GL_TEXTURE_2D, m_idTexture);
 
@@ -41,7 +39,7 @@ void Texture::setup(const char* filePath){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // Load image, create texture and generate mipmaps
-    unsigned char* data = stbi_load(filePath, &m_width, &m_height, &m_nrChannels, 0);
+    unsigned char* data = stbi_load(m_filePath, &m_width, &m_height, &m_nrChannels, 0);
     if(data){
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);

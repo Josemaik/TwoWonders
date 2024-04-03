@@ -6,8 +6,10 @@ protected:
     std::size_t m_id;        // ID of ResourceManager
     const char* m_filePath;  // FilePath of Resource
 
+    virtual void setup(){};
+
 public:
-    virtual ~Resource() {};
+    virtual ~Resource(){};
     virtual bool load(const char* fileName) = 0;
     virtual void unload() = 0;
     virtual bool isLoaded() const = 0;
