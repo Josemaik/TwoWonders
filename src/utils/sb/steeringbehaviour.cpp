@@ -132,23 +132,32 @@ Steer_t STBH::Avoid(PhysicsComponent const& phyTarget, PhysicsComponent const& p
         vec3d avoidDirection = target - predicted_avoider;
         return Seek(phyTarget, target + avoidDirection);
 }
-Steer_t STBH::Evade(PhysicsComponent const& phyEvader,vec3d const& postoevade){
+Steer_t STBH::Evade(PhysicsComponent const& phyEvader,PhysicsComponent const& phytoevade){
         Steer_t steering;
+        //Calculamos vector de la pos a evadir hacia el player
 
         // Calcula la dirección hacia la que queremos evadirnos
-        vec3d evadeDirection = postoevade - phyEvader.position;
+        vec3d evadeDirection = phytoevade.position - phyEvader.position;
         // Normaliza la dirección de la evasión
         // vec3d normalizedEvadeDirection = evadeDirection.normalized();
-
         // Calcula el vector director para evadirse (invertido)
         vec3d evadeVector = evadeDirection * -1;
 
         // Asigna la dirección del vector de evasión a la orientación
         steering.orientation = atan2(evadeVector.x(), evadeVector.z());
+        // Calcula la distancia entre el evasor y el objetivo a evadir
+        double distance = evadeDirection.length();
+
+        // double distance = phyEvader.position.distance(postoevade);
+        // double separationForce = (1.0 / distance) * 15;
+        //double separationForce = 0.5;
+        // Calcula la fuerza de evasión en función de la distancia
+        double maxSeparationForce = 5.0; // Ajusta este valor según sea necesario
+        double separationForce = std::clamp((maxSeparationForce / distance), 0.0, maxSeparationForce);
 
         // Asigna la velocidad máxima al vector de evasión
-        steering.v_x = std::clamp(evadeVector.x() * 0.1, -phyEvader.max_speed, phyEvader.max_speed);
-        steering.v_z = std::clamp(evadeVector.z() * 0.1, -phyEvader.max_speed, phyEvader.max_speed);
+        steering.v_x = std::clamp(evadeVector.x() * separationForce, -phyEvader.max_speed, phyEvader.max_speed);
+        steering.v_z = std::clamp(evadeVector.z() * separationForce, -phyEvader.max_speed, phyEvader.max_speed);
 
         return steering;
 }

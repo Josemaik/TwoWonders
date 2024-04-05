@@ -1478,7 +1478,7 @@
 							],
 							"countdown_stop": 2.5,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
+							"countdown_perception": 1.5,
 							"scale_to_respawn_attack": 7.0
 						},
 						{
@@ -1507,7 +1507,7 @@
 							],
 							"countdown_stop": 2.5,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
+							"countdown_perception": 1.0,
 							"scale_to_respawn_attack": 7.0
 						},
 						{

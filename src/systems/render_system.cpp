@@ -1224,8 +1224,8 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
             engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
             engine.endMode3D();
             engine.drawText("Node active:", posText, 110, 20, BLACK);
-            std::cout << debugsnglt.elapsed << "\n";
-             std::cout << debugsnglt.countdown << "\n";
+           // std::cout << debugsnglt.elapsed << "\n";
+            // std::cout << debugsnglt.countdown << "\n";
             if (debugsnglt.elapsed >= debugsnglt.countdown) {
                 debugsnglt.elapsed = 0;
                 debugsnglt.text = aic.bh;
