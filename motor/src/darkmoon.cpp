@@ -461,6 +461,11 @@ Font* DarkMoonEngine::LoadFont(const char* filePath){
     return font;
 }
 
+// Unload font from CPU and GPU
+void DarkMoonEngine::UnloadFont(Font* font){
+    m_resourceManager.unloadResource(font->getID());
+}
+
 // Load shader from file into GPU memory
 Shader* DarkMoonEngine::LoadShader(const char* idShader, const char* vsFilePath, const char* fsFilePath){
     return m_resourceManager.loadResource<Shader>(idShader, vsFilePath, fsFilePath);

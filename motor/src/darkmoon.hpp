@@ -192,7 +192,8 @@ public:
 
     // Load font from file into GPU memory
     Font* LoadFont(const char* filePath);
-    // TODO: unloadFont
+    // Unload font from CPU and GPU
+    void UnloadFont(Font* font);
 
     // Load shader from file into GPU memory
     Shader* LoadShader(const char* idShader, const char* vsFilePath, const char* fsFilePath);
