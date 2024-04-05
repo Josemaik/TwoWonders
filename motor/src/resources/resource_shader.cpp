@@ -21,7 +21,7 @@ void Shader::use(){ glUseProgram(m_idShader); }
 
 void Shader::unload(){
     if(isLoaded())
-        std::cout << "Unload a shader (ID: " << m_id <<") -> " << m_filePath << std::endl; 
+        std::cout << "Unload a shader (ID: " << m_id <<")" << std::endl; 
     glDeleteProgram(m_idShader);
     m_isLoad = false;
 }

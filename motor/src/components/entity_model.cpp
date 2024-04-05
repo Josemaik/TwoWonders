@@ -12,15 +12,16 @@ void Model::load(const char* filePath, ResourceManager& rm){
     m_loaded = true;
     m_name = filePath;
 
-    std::cout << "Load -> " << m_name << std::endl;
+    std::cout << " - Load a model -> " << m_name << std::endl;
 
     processNode(scene->mRootNode, scene, rm);
 };
 
-void Model::unload(ResourceManager& rm){
-    std::cout << "Unload -> " << this->m_name << std::endl; 
-    for(int i=0; i<static_cast<int>(m_meshes.size()); i++)
-        rm.unloadResource(m_meshes[i]->getID());
+void Model::unload(){
+    //ResourceManager rm = ResourceManager::getInstance();
+    //std::cout << "Unload -> " << this->m_name << std::endl; 
+    //for(int i=0; i<static_cast<int>(m_meshes.size()); i++)
+    //    rm.unloadResource(m_meshes[i]->getID());
 }
 
 void Model::draw(glm::mat4 transMatrix){

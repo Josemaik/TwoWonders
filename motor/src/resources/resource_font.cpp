@@ -20,7 +20,7 @@ void Font::unload(){
         FT_Done_FreeType(library);
         library = nullptr;
     }
-    std::cout << "Unload a font (ID: " << m_id <<") -> " << m_filePath << std::endl; 
+    std::cout << "Unload a font (ID: " << m_id <<")" << std::endl; 
 }
 
 // PRIVATE

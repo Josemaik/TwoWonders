@@ -131,9 +131,15 @@ int main(){
 
     if(engine.InitWindow(800, 600, "DarkMoon Engine")){
 
+        std::cout << "┌────────────────┐" << std::endl;
+        std::cout << "│ Load Resources │" << std::endl;
+        std::cout << "└────────────────┘" << std::endl;
+
         createHUD(engine);
         createScene3D(engine);
         auto mainCharacter = createMainCharacter(engine);
+
+        //scene3D->getParent()->removeChild(scene3D);
 
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Tree │" << std::endl;

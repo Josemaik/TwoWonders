@@ -179,8 +179,7 @@ Node* DarkMoonEngine::CreateModel(const char* filePath, Color tint, const char* 
     auto p_nodeModel = CreateNode(nodeName, parentNode);
 
     // Load model
-    auto model = std::make_unique<Model>();
-    model->load(filePath, m_resourceManager);
+    auto model = LoadModel(filePath);
     model->setColor(tint);
 
     p_nodeModel->setEntity(std::move(model));
@@ -231,9 +230,9 @@ bool DarkMoonEngine::InitWindow(int width, int height, const char* title){
         glfwSetKeyCallback(m_windowsManager.getWindow(), InputManager::keyCallback);
         glfwSetMouseButtonCallback(m_windowsManager.getWindow(), InputManager::mouseButtonCallback);
 
-        std::cout << "┌──────┐" << std::endl;
-        std::cout << "│ Load │" << std::endl;
-        std::cout << "└──────┘" << std::endl;
+        std::cout << "┌────────────────────────┐" << std::endl;
+        std::cout << "│ Load Default Resources │" << std::endl;
+        std::cout << "└────────────────────────┘" << std::endl;
 
         //----- Default Material -----//
         m_renderManager.defaultMaterial = m_resourceManager.loadResource<Material>("defaultMaterial",
@@ -325,6 +324,13 @@ void DarkMoonEngine::UnloadTexture(Texture* texture){
 // -------------------------------------- //
 // Model 3D Loading and Drawing functions //
 // -------------------------------------- //
+
+std::unique_ptr<Model> DarkMoonEngine::LoadModel(const char* filePath){
+    auto model = std::make_unique<Model>();
+    model->load(filePath, m_resourceManager);
+
+    return model;
+}
 
 // Unload model data from CPU and GPU
 void DarkMoonEngine::UnloadModel(Model*){

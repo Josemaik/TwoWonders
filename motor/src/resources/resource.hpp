@@ -5,7 +5,7 @@ struct Resource{
 protected:
     std::size_t m_id;        // ID of ResourceManager
     const char* m_filePath;  // FilePath of Resource
-    bool m_isLoad;
+    bool m_isLoad { false };
 
     virtual void setup(){};
 

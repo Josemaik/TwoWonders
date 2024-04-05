@@ -20,18 +20,17 @@ private:
     std::vector<Mesh*> m_meshes; 
     bool m_loaded { false };
 
-    Color color = WHITE;
-
     void processNode(aiNode*, const aiScene*, ResourceManager& rm);
     void processMesh(aiMesh*, aiMaterial*, const aiScene*, ResourceManager& rm);
     Material* processMaterial(aiMaterial*, ResourceManager& rm);
     void processTextures(aiMaterial*, Material*, ResourceManager& rm);
 
 public:
+    Color color = WHITE;
     bool drawModel { true }, drawWires { false };
 
     void load(const char* filePath, ResourceManager& rm);
-    void unload(ResourceManager& rm);
+    void unload() override;
     void draw(glm::mat4) override;
 
     bool isLoaded(){ return m_loaded; };

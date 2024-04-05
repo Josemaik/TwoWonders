@@ -111,7 +111,7 @@ public:
     // -------------------------------------- //
 
     // Load model from file into GPU memory
-    // Model* LoadModel(const char* filePath);
+    std::unique_ptr<Model> LoadModel(const char* filePath);
     // Load model from generated mesh ? TODO
 
     // Unload model data from CPU and GPU
