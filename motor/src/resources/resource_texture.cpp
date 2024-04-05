@@ -5,31 +5,30 @@
 #include "../libs/stb_image.h"
 #pragma GCC diagnostic warning "-Wconversion"
 
-Texture::Texture(std::size_t id){
-    this->id = id;
-}
+// PUBLIC
 
 bool Texture::load(const char* filePath){
-    setupTexture(filePath);
+    this->m_filePath = filePath;
+    setup();
 
-    isLoaded() ? std::cout << "Load a texture (ID: " << id <<") -> " << filePath << std::endl : std::cout << "Error loading a texture" << std::endl;
+    isLoaded() ? std::cout << "Load a texture (ID: " << m_id <<") -> " << m_filePath << std::endl 
+               : std::cout << "Error loading a texture -> " << m_filePath << std::endl;
 
     return isLoaded();
 }
 
 void Texture::unload(){
-    glDeleteTextures(1, &id_texture);
-    isLoad = false;
-    std::cout << "Unload a texture (ID: " << id <<")" << std::endl; 
+    glDeleteTextures(1, &m_idTexture);
+    if(isLoaded())
+        std::cout << "Unload a texture (ID: " << m_id <<")" << std::endl; 
+    m_isLoad = false;
 }
-
-bool Texture::isLoaded() const{ return isLoad; }
 
 // PRIVATE
 
-void Texture::setupTexture(const char* filePath){
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+void Texture::setup(){
+    glGenTextures(1, &m_idTexture);
+    glBindTexture(GL_TEXTURE_2D, m_idTexture);
 
     // Set the texture wrapping parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -40,11 +39,11 @@ void Texture::setupTexture(const char* filePath){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // Load image, create texture and generate mipmaps
-    unsigned char* data = stbi_load(filePath, &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load(m_filePath, &m_width, &m_height, &m_nrChannels, 0);
     if(data){
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
-        isLoad = true;
+        m_isLoad = true;
     }
     stbi_image_free(data);
 }

@@ -45,19 +45,19 @@ struct Point3D : Entity {
         glEnableVertexAttribArray(1);
 
         // Colors
-        GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
         glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
         // Transform
         glm::mat4 model      = transMatrix; // Apply transformation matrix
         glm::mat4 view       = rm.m_camera->getViewMatrix();
         glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Bind default texture
-        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
         // Draw the point
         glPointSize(pointSize);
@@ -117,19 +117,19 @@ struct Line3D : Entity {
         glEnableVertexAttribArray(1);
 
         // Colors
-        GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
         glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
         // Transform
         glm::mat4 model      = transMatrix; // Apply Transformation Matrix
         glm::mat4 view       = rm.m_camera->getViewMatrix();
         glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Bind default texture
-        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
         // Draw the line
         glLineWidth(lineSize);
@@ -201,19 +201,19 @@ struct Grid : Entity {
         glEnableVertexAttribArray(1);
 
         // Colors
-        GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
         glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
         // Transform
         glm::mat4 model      = transMatrix; // Apply Transformation Matrix
         glm::mat4 view       = rm.m_camera->getViewMatrix();
         glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Bind default texture
-        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
         // Draw the grid
         glBindVertexArray(VAO);
@@ -282,19 +282,19 @@ struct Plane : Entity {
         glEnableVertexAttribArray(1);
 
         // Colors
-        GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
         glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
         // Transform
         glm::mat4 model      = transMatrix;
         glm::mat4 view       = rm.m_camera->getViewMatrix();
         glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Bind default texture
-        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
         // Draw the plane
         glBindVertexArray(VAO);
@@ -376,8 +376,8 @@ struct Cube : Entity {
         glBindVertexArray(0);
 
         // Set the uniform color in the shader
-        GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-        glUseProgram(rm.getShader()->id_shader);
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+        glUseProgram(rm.getShader()->getIDShader());
         glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
         // Transform
@@ -385,12 +385,12 @@ struct Cube : Entity {
         glm::mat4 view       = rm.m_camera->getViewMatrix();
         glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
         
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Bind default texture
-        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
         // Draw cube
         glBindVertexArray(VAO);
@@ -473,8 +473,8 @@ struct CubeWires : Entity {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         // Set the uniform color in the shader
-        GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-        glUseProgram(rm.getShader()->id_shader);
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+        glUseProgram(rm.getShader()->getIDShader());
         glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
         // Transform
@@ -482,12 +482,12 @@ struct CubeWires : Entity {
         glm::mat4 view       = rm.m_camera->getViewMatrix();
         glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
         
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Bind default texture
-        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
         // Draw the wireframe cube
         glBindVertexArray(VAO);

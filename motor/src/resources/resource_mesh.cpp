@@ -1,17 +1,17 @@
 #include "resource_mesh.hpp"
 
 Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<u_int16_t> indices, Material* material){
-    this->id = id;
+    this->m_id = id;
     this->vertices = vertices;
     this->indices = indices;
     this->material = material;
 }
 
-bool Mesh::load(){ 
+bool Mesh::load(const char* filePath){ 
 
     setupMesh();
 
-    isLoaded() ? std::cout << "Load a mesh (ID: " << id <<")" << std::endl : std::cout << "Error loading a mesh" << std::endl;
+    isLoaded() ? std::cout << "Load a mesh (ID: " << m_id <<") -> " << filePath << std::endl : std::cout << "Error loading a mesh" << std::endl;
     
     return isLoaded();
 }
@@ -21,11 +21,8 @@ void Mesh::unload(){
     glDeleteVertexArrays(1, &m_VAO);
     glDeleteBuffers(1, &m_VBO);
     glDeleteBuffers(1, &m_EBO);
-    std::cout << "Unload a mesh (ID: " << id <<")" << std::endl; 
-}
-
-bool Mesh::isLoaded() const{ 
-    return m_VAO != 0 && m_VBO != 0 && m_EBO != 0;
+    m_isLoad = false;
+    std::cout << "Unload a mesh (ID: " << m_id <<")" << std::endl; 
 }
 
 void Mesh::setupMesh(){
@@ -57,6 +54,9 @@ void Mesh::setupMesh(){
 
     // Unbind vertex array
     glBindVertexArray(0);
+
+    if(m_VAO != 0 && m_VBO != 0 && m_EBO != 0)
+        m_isLoad = true;
 }
 
 void Mesh::draw(glm::mat4 transMatrix, Color color){ 
@@ -65,8 +65,8 @@ void Mesh::draw(glm::mat4 transMatrix, Color color){
     rm.beginMode3D();
 
     // Set the uniform color in the shader
-    GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-    glUseProgram(rm.getShader()->id_shader);
+    GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+    glUseProgram(rm.getShader()->getIDShader());
     glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
     // Transform
@@ -74,15 +74,15 @@ void Mesh::draw(glm::mat4 transMatrix, Color color){
     glm::mat4 view       = rm.m_camera->getViewMatrix();
     glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
     
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
     
     // Texture
     if(material->texture)
-        glBindTexture(GL_TEXTURE_2D, material->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, material->texture->getIDTexture());
     else // Bind default texture
-        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->texture);
+        glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
     // Material - TODO
     // Lights - TODO
@@ -105,8 +105,8 @@ void Mesh::drawLines(glm::mat4 transMatrix, Color color){
 
     rm.beginMode3D();
 
-    GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-    glUseProgram(rm.getShader()->id_shader);
+    GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+    glUseProgram(rm.getShader()->getIDShader());
     glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
     // Transform
@@ -114,9 +114,9 @@ void Mesh::drawLines(glm::mat4 transMatrix, Color color){
     glm::mat4 view       = rm.m_camera->getViewMatrix();
     glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
     
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->id_shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     // Draw the lines of mesh
     glBindVertexArray(m_VAO);

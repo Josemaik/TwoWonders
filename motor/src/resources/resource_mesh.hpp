@@ -27,10 +27,10 @@ public:
     Material* material;
 
     Mesh(std::size_t, std::vector<Vertex>, std::vector<u_int16_t>, Material*);
+    ~Mesh(){ unload(); };
 
-    bool load() override;
+    bool load(const char* ) override;
     void unload() override;
-    bool isLoaded() const override;
 
     void draw(glm::mat4 transMatrix, Color color = GRAY);
     void drawLines(glm::mat4 transMatrix, Color color = BLACK);
