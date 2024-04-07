@@ -25,7 +25,7 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
         }
         case 2:
             li.mapID = 2;
-            map = loadMap("assets/levels/caves_level.json");
+            map = loadMap("assets/levels/maps/lvl2.kaiwa");
             break;
 
         default:
