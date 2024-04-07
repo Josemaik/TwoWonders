@@ -49,7 +49,7 @@ struct AIComponent
     double slimex{}, slimez{};
     std::size_t slimetarget{};
     //flocking
-    bool ia_front_of_you{false};
+    bool ispushed{false};
     //area
     bool attackbeforedie{ false };
     //PATH

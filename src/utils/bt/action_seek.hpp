@@ -23,7 +23,8 @@ struct BTAction_Seek : BTNode_t {
             return BTNodeStatus_t::fail;
         }
         ectx.ai->bh = "seeking";
-        ectx.ai->ia_front_of_you = false;
+        ectx.ai->ispushed = false;
+        // ectx.ai->ia_front_of_you = false;
         //Seek
         Steer_t steering = STBH::Seek(ectx.phy, { ectx.ai->tx,0.0,ectx.ai->tz });
         // steering.v_x = steering.v_x * 0.7;
@@ -56,32 +57,18 @@ struct BTAction_Seek : BTNode_t {
                         auto& phytoevade = ectx.em.getComponent<PhysicsComponent>(*ectx.em.getEntityByID(pt.first));
                         auto& aitoevade = ectx.em.getComponent<AIComponent>(*ectx.em.getEntityByID(pt.first));
                         //Mientras se muevan se mantiene una separación entre ellos
-                        //phytoevade.velocity.x() != 0.0 && phytoevade.velocity.z() != 0.0
-                        //crear booleano que indique si estas seeking
-                        if(strcmp(aitoevade.bh, "seeking") != 0){
-                            //vector de orientacion del enemigo a evitar
-                            // vec3d evadeorientation = vec3d(std::sin(phytoevade.orientation), 0.0, std::cos(phytoevade.orientation));
-                            // evadeorientation.normalize();
-                            // direction.normalize();
-                            // double angle = acos(direction.dotProduct(evadeorientation));
-                            // // Convierte el ángulo de radianes a grados
-                            // double angleDegrees = angle * (180.0 / PI);
-
-                            // if(angleDegrees >= 20 && angleDegrees <= 50){
-                                 maxsepforce = 1.0;
-                            // }else{
-                            //     maxsepforce = 0.3;
-                            // }
-
+                        if(phytoevade.velocity.x() != 0.0 && phytoevade.velocity.z() != 0.0 && !aitoevade.ispushed){        
+                            maxsepforce = 1.0;
                             Steer_t steeringEvade = STBH::Evade(ectx.phy, phytoevade,maxsepforce);
                             steering.v_x += steeringEvade.v_x;
                             steering.v_z += steeringEvade.v_z;
                             steering.orientation += steeringEvade.orientation;
                         }else{
-                            //si está parado atacando, le empujo con una fuerza para separarlo
+                            //si está parado atacando y se arcerca otro enemigo se separa
                             Steer_t steeringEvade = STBH::Evade(phytoevade,ectx.phy,1.0);
                             phytoevade.velocity = vec3d{ steeringEvade.v_x*0.8, 0.0, steeringEvade.v_z*0.8 };
                             phytoevade.orientation += steeringEvade.orientation;
+                            aitoevade.ispushed = true;
                         }
                     }   
                 } 
@@ -93,10 +80,7 @@ struct BTAction_Seek : BTNode_t {
                 } 
             }
         }
-            
-        // }
-        //std::cout << "Contaor: " << contador << "\n";
-        //add center of mass direction to toplayer direction
+        //make cohesion between enemies with center of mass addition
         if(numenemigos_cm >= 2){
             cm = vec3d{suma_cm_x/numenemigos_cm,0.0,suma_cm_z/numenemigos_cm};
             vec3d dirToCenterOfMass = cm - ectx.phy.position;

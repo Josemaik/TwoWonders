@@ -20,7 +20,7 @@ struct BTDecisionReadyforAttack : BTNode_t {
         //Compruebo si esta dentro del radio de ataque y se acabo el culldown
         //ectx.phy.orientated_before = false;
         if (ectx.ai->playerdetected) {
-            if (distance < (ectx.ai->attack_radius * ectx.ai->attack_radius) && !ectx.ai->ia_front_of_you){
+            if (distance < (ectx.ai->attack_radius * ectx.ai->attack_radius)){
                 ectx.ai->on_attack_radius = true;
 
                 //Oriento hacia el jugador
