@@ -15,5 +15,5 @@ namespace STBH {
     Steer_t Flee(PhysicsComponent const& phy, vec3d const& enemy);
     Steer_t Pursue(PhysicsComponent const& phyTarget, PhysicsComponent const& phyPursuer);
     Steer_t Avoid(PhysicsComponent const& phyTarget, PhysicsComponent const& phyPursuer);
-    Steer_t Evade(PhysicsComponent const& phyEvader,PhysicsComponent const& phytoevade);
+    Steer_t Evade(PhysicsComponent const& phyEvader,PhysicsComponent const& phytoevade,double maxSeparationForce);
 } //STBH

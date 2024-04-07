@@ -3,9 +3,10 @@
 #include <cmath>
 #include <numbers>
 #include <algorithm>
+#include <cstring>
 #include <utils/sb/steeringbehaviour.hpp>
 
-static double threshold { 15.0 };
+static double threshold { 20.0 };
 static double radius_centro_masas { 30.0 };
 // Peso para la influencia de la dirección hacia el jugador
 //double playerWeight = 0.8; 
@@ -48,18 +49,40 @@ struct BTAction_Seek : BTNode_t {
                 double distance = direction.length();
                 //Si esta dentro del límite
                 if(distance < threshold){
+                    double maxsepforce{0.0};
                     // // Si no hay otro enemigo más cerca del objetivo dentro del umbral, aplicar la lógica de evasión
                     if ((*ectx.em.getEntityByID(pt.first)).hasComponent<PhysicsComponent>() &&
-                    (*ectx.em.getEntityByID(pt.first)).hasComponent<ColliderComponent>()) {
+                    (*ectx.em.getEntityByID(pt.first)).hasComponent<AIComponent>()) {
                         auto& phytoevade = ectx.em.getComponent<PhysicsComponent>(*ectx.em.getEntityByID(pt.first));
+                        auto& aitoevade = ectx.em.getComponent<AIComponent>(*ectx.em.getEntityByID(pt.first));
                         //Mientras se muevan se mantiene una separación entre ellos
-                        if(phytoevade.velocity.x() != 0.0 && phytoevade.velocity.z() != 0.0){
-                            Steer_t steeringEvade = STBH::Evade(ectx.phy, phytoevade);
+                        //phytoevade.velocity.x() != 0.0 && phytoevade.velocity.z() != 0.0
+                        //crear booleano que indique si estas seeking
+                        if(strcmp(aitoevade.bh, "seeking") != 0){
+                            //vector de orientacion del enemigo a evitar
+                            // vec3d evadeorientation = vec3d(std::sin(phytoevade.orientation), 0.0, std::cos(phytoevade.orientation));
+                            // evadeorientation.normalize();
+                            // direction.normalize();
+                            // double angle = acos(direction.dotProduct(evadeorientation));
+                            // // Convierte el ángulo de radianes a grados
+                            // double angleDegrees = angle * (180.0 / PI);
+
+                            // if(angleDegrees >= 20 && angleDegrees <= 50){
+                                 maxsepforce = 1.0;
+                            // }else{
+                            //     maxsepforce = 0.3;
+                            // }
+
+                            Steer_t steeringEvade = STBH::Evade(ectx.phy, phytoevade,maxsepforce);
                             steering.v_x += steeringEvade.v_x;
                             steering.v_z += steeringEvade.v_z;
                             steering.orientation += steeringEvade.orientation;
+                        }else{
+                            //si está parado atacando, le empujo con una fuerza para separarlo
+                            Steer_t steeringEvade = STBH::Evade(phytoevade,ectx.phy,1.0);
+                            phytoevade.velocity = vec3d{ steeringEvade.v_x*0.8, 0.0, steeringEvade.v_z*0.8 };
+                            phytoevade.orientation += steeringEvade.orientation;
                         }
-                      
                     }   
                 } 
                 //Calculate mass center

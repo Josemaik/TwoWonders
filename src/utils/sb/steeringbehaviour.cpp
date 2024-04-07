@@ -132,7 +132,7 @@ Steer_t STBH::Avoid(PhysicsComponent const& phyTarget, PhysicsComponent const& p
         vec3d avoidDirection = target - predicted_avoider;
         return Seek(phyTarget, target + avoidDirection);
 }
-Steer_t STBH::Evade(PhysicsComponent const& phyEvader,PhysicsComponent const& phytoevade){
+Steer_t STBH::Evade(PhysicsComponent const& phyEvader,PhysicsComponent const& phytoevade,double maxSeparationForce){
         Steer_t steering;
         //Calculamos vector de la pos a evadir hacia el player
 
@@ -142,7 +142,7 @@ Steer_t STBH::Evade(PhysicsComponent const& phyEvader,PhysicsComponent const& ph
         // vec3d normalizedEvadeDirection = evadeDirection.normalized();
         // Calcula el vector director para evadirse (invertido)
         evadeDirection.normalize();
-        
+
         vec3d evadeVector = evadeDirection * -1;
 
         // Asigna la dirección del vector de evasión a la orientación
@@ -154,7 +154,7 @@ Steer_t STBH::Evade(PhysicsComponent const& phyEvader,PhysicsComponent const& ph
         // double separationForce = (1.0 / distance) * 15;
         //double separationForce = 0.5;
         // Calcula la fuerza de evasión en función de la distancia
-        double maxSeparationForce = 1.0; // Ajusta este valor según sea necesario
+        //double maxSeparationForce = 1.0; // Ajusta este valor según sea necesario
         double separationForce = std::clamp((maxSeparationForce / distance), 0.0, maxSeparationForce);
 
         // Asigna la velocidad máxima al vector de evasión
