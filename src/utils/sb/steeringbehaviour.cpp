@@ -141,6 +141,8 @@ Steer_t STBH::Evade(PhysicsComponent const& phyEvader,PhysicsComponent const& ph
         // Normaliza la dirección de la evasión
         // vec3d normalizedEvadeDirection = evadeDirection.normalized();
         // Calcula el vector director para evadirse (invertido)
+        evadeDirection.normalize();
+        
         vec3d evadeVector = evadeDirection * -1;
 
         // Asigna la dirección del vector de evasión a la orientación
