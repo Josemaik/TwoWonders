@@ -40,8 +40,8 @@ struct Pixel : Entity{
         glBindVertexArray(0);
 
         // Set the uniform color in the shader
-        GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-        glUseProgram(rm.getShader()->id_shader);
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+        glUseProgram(rm.getShader()->getIDShader());
         glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
         // Draw the pixel
@@ -93,8 +93,8 @@ struct Line : Entity{
         glBindVertexArray(0);
 
         // Set the uniform color in the shader
-        GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-        glUseProgram(rm.getShader()->id_shader);
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+        glUseProgram(rm.getShader()->getIDShader());
         glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
         // Draw the line
@@ -154,8 +154,8 @@ struct Triangle : Entity{
         glBindVertexArray(0);
 
         // Set the uniform color in the shader
-        GLuint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-        glUseProgram(rm.getShader()->id_shader);
+        GLuint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+        glUseProgram(rm.getShader()->getIDShader());
         glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
         // Draw the triangle
@@ -218,12 +218,12 @@ struct Rectangle : Entity{
         glBindVertexArray(0);
 
         // Set the uniform color in the shader
-        GLuint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-        glUseProgram(rm.getShader()->id_shader);
+        GLuint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+        glUseProgram(rm.getShader()->getIDShader());
         glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
         // Set model matrix uniform
-        //GLuint modelUniform = glGetUniformLocation(rm.getShader()->id_shader, "model");
+        //GLuint modelUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "model");
         //glUniformMatrix4fv(modelUniform, 1, GL_FALSE, glm::value_ptr(transMatrix));
 
         // Draw the rectangle
@@ -280,8 +280,8 @@ struct Circle : Entity{
         glBindVertexArray(0);
 
         // Set the uniform color in the shader
-        GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
-        glUseProgram(rm.getShader()->id_shader);
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+        glUseProgram(rm.getShader()->getIDShader());
         glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
         // Draw the circle
@@ -353,17 +353,20 @@ struct Texture2D : Entity{
         glEnableVertexAttribArray(2);
 
         // Colors
-        GLint colorUniform = glGetUniformLocation(rm.getShader()->id_shader, "customColor");
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
         glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
         // Apply Transformation Matrix
-        //GLuint transformLoc = glGetUniformLocation(rm.getShader()->id_shader, "transform");
+        //GLuint transformLoc = glGetUniformLocation(rm.getShader()->getIDShader(), "transform");
         //glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transMatrix));
 
         // Draw Texture
-        glBindTexture(GL_TEXTURE_2D, texture->texture);
+        glBindTexture(GL_TEXTURE_2D, texture->getIDTexture());
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        // Unbind texture
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         // Clean up resources
         glDeleteVertexArrays(1, &VAO);

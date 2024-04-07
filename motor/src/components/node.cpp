@@ -23,6 +23,7 @@ int Node::removeChild(Node* child) {
 
     if(it != m_children.end()){
         m_children.erase(it);
+        child->getEntity()->unload();
         child->m_parent = nullptr;
 
         return 0;
