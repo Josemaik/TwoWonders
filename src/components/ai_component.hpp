@@ -48,6 +48,8 @@ struct AIComponent
     bool healbeforedie{ false };
     double slimex{}, slimez{};
     std::size_t slimetarget{};
+    //flocking
+    bool ispushed{false};
     //area
     bool attackbeforedie{ false };
     //PATH

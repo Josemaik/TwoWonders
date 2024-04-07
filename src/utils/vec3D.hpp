@@ -285,6 +285,12 @@ struct vec3D
     {
         archive(x_, y_, z_);
     }
+    //Calculate point distance
+    constexpr DataT calculatePointDistance(vec3D const& target) const {
+        auto dx{ target.x_ - x_ };
+        auto dz{ target.z_ - z_ };
+        return std::sqrt(dx * dx + dz * dz);
+    }
 
 private:
     DataT x_{}, y_{}, z_{};

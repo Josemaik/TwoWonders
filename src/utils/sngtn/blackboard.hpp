@@ -70,4 +70,6 @@ struct BlackBoard_t {
     //cone
     vec3d pos_enemy{};
     double horizontalFOV{},VerticalFOV{},orientation_enemy{};
+    //store positions and ids of potencial targets to claculate flocking
+    std::vector<std::pair<std::size_t,vec3d>> potencial_targets;
 };

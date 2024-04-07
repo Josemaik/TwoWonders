@@ -173,8 +173,9 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         em.addTag<SpiderTag>(e);
         auto* d_p_h = &tree.createNode<BTDecisionPlayerHunted>();
         auto* d_s_1 = &tree.createNode<BTAction_Seek>();
+        auto* d_rax = &tree.createNode<BTDecisionReadyforAttack>();
         auto* a_a_6 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee, vec3d{});
-        auto* sequence0 = &tree.createNode<BTNodeSequence_t>(d_p_h, d_s_1, a_a_6);
+        auto* sequence0 = &tree.createNode<BTNodeSequence_t>(d_p_h, d_s_1,d_rax, a_a_6);
 
         auto* d_1_7 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* d_ra = &tree.createNode<BTDecisionReadyforAttack>();
