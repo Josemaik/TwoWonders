@@ -25,7 +25,7 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
         }
         case 2:
             li.mapID = 2;
-            map = loadMap("assets/levels/maps/lvl2.kaiwa");
+            map = loadMap("assets/levels/maps/lvl_2.kaiwa");
             break;
 
         default:
@@ -102,7 +102,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             {
                 const valueType& overworld = chunk[0]["overworld"];
                 const valueType& interactablesArray = overworld["Interactive"];
-                generateInteractables(em, interactablesArray);
+                // generateInteractables(em, interactablesArray);
                 break;
             }
             case LoadState::LOAD_OBJECTS:
@@ -174,7 +174,7 @@ void MapManager::generateChunkModel(EntityManager& em, mapSizeType& i)
         em.addTag<Chunk6Tag>(modelEntity);
         break;
     }
-        em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = vec3d::zero(), .scale = vec3d::zero(), .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, -1.0, 0.0 } });
+    em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = vec3d::zero(), .scale = vec3d::zero(), .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, -1.0, 0.0 } });
 }
 
 void MapManager::generateGround(EntityManager& em, const valueType& groundArray, int& j)

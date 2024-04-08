@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
+        plfi.spawnPoint = { -23.0, 60.0, -23.9 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -63,6 +63,7 @@ void Game::createEntities()
     em.addTag<PlayerTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
+    p.gravity = 0;
 
     auto& lis = em.addComponent<ListenerComponent>(e);
     em.addComponent<InputComponent>(e);

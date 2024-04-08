@@ -33,10 +33,10 @@ struct BlackBoard_t {
     bool activate_shield{ false };
     //Posicion Boss Final
     vec3d boss_position{};
-    uint16_t boss_fase{1};
-    double countdown_change_fase{8.0}, elapsed_change_fase{1.0};
+    uint16_t boss_fase{ 1 };
+    double countdown_change_fase{ 8.0 }, elapsed_change_fase{ 1.0 };
     //apisonadora
-    bool playerdamagebycrusher{false};
+    bool playerdamagebycrusher{ false };
     //Path
     // Path_t<4> path { vec3d{8.0, 0.0, 4.0} , {3.0,0.0,4.0} , {3.0,0.0,5.0}, {8.0,0.0,5.0} };
     //Actualizar información IA slimes
@@ -65,11 +65,11 @@ struct BlackBoard_t {
     std::vector<size_t> idsubditos;
 
     //ray
-    vec3d position_origin{},direction{};
-    bool launched{false};
+    vec3d position_origin{}, direction{};
+    bool launched{ false };
     //cone
     vec3d pos_enemy{};
-    double horizontalFOV{},VerticalFOV{},orientation_enemy{};
+    double horizontalFOV{}, VerticalFOV{}, orientation_enemy{};
     //store positions and ids of potencial targets to claculate flocking
-    std::vector<std::pair<std::size_t,vec3d>> potencial_targets;
+    std::vector<std::pair<std::size_t, vec3d>> potencial_targets;
 };

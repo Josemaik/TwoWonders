@@ -8,7 +8,7 @@
 struct Graph
 {
     /* data */
-    void createGraph(std::vector<Conection> conexiones,std::set<std::pair<uint16_t, vec3d>> nodes){
+    void createGraph(std::vector<Conection> conexiones, std::set<std::pair<uint16_t, vec3d>> nodes) {
         //navmesh-----------------
         //TENDRE QUE PASAR EL JSON CON LOS NAVMESHES
         // CALCULAR PUNTOS DE CADA NAVMESH Y CALCULAR CONEXIONES
@@ -29,7 +29,7 @@ struct Graph
         }
 
         // Rellenar Nodes
-        for (const auto& node: nodes) {
+        for (const auto& node : nodes) {
             Nodes.insert(node);
         }
 
@@ -47,8 +47,8 @@ struct Graph
         //-------------------------------
     }
     //Nos devuelve las conexiones que salen de un nodo
-    std::vector<Conection> getConections(uint16_t FromNode){
-       std::vector<Conection> connections;
+    std::vector<Conection> getConections(uint16_t FromNode) {
+        std::vector<Conection> connections;
 
         // Iterar sobre todas las conexiones almacenadas en ArrayConections
         for (const auto& connection : ArrayConections) {
@@ -62,9 +62,9 @@ struct Graph
     }
     //Calcula el path con algoritmo A* y lo devuelve dado un start node y un target ndoe
     std::vector<vec3d> PathFindAStar(uint16_t startNode, uint16_t endNode);
-    
+
     //heuristic - Calcula la distancia Euclídea
-    double Heuristic(uint16_t currentNode,uint16_t endNode){
+    double Heuristic(uint16_t currentNode, uint16_t endNode) {
         // Verificar si los nodos existen en el mapa
         if (Nodes.find(currentNode) == Nodes.end() || Nodes.find(endNode) == Nodes.end()) {
             // Manejar el caso en que uno o ambos nodos no existen
@@ -81,9 +81,9 @@ struct Graph
 
         return distance;
     }
-    private:
-        //array de conexiones
-        std::vector<Conection> ArrayConections;
-        // número de nodo y su posición
-        std::map<uint16_t, vec3d> Nodes;
+private:
+    //array de conexiones
+    std::vector<Conection> ArrayConections;
+    // número de nodo y su posición
+    std::map<uint16_t, vec3d> Nodes;
 };

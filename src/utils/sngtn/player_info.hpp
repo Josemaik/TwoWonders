@@ -135,7 +135,7 @@ struct PlayerInfo
         max_mana = 100.0;
         mana = max_mana;
         mana_width = 0;
-        hasKey = false;
+        hasKey = true;
         // spawnPoint = { 33.0, 4.0, -25.9 };
     }
 };

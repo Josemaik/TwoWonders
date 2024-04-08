@@ -796,6 +796,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         case 1:
             r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_0.obj");
             break;
+        case 2:
+            r.model = engine.loadModel("assets/levels/Zona_2-Volcan/objs/lvl_2-cnk_0.obj");
+            break;
         }
 
         loadShaders(r.model);
@@ -811,6 +814,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         case 1:
             r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_1.obj");
             break;
+        case 2:
+            r.model = engine.loadModel("assets/levels/Zona_2-Volcan/objs/lvl_2-cnk_1.obj");
+            break;
         }
         loadShaders(r.model);
     }
@@ -825,6 +831,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         case 1:
             r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_2.obj");
             break;
+        case 2:
+            r.model = engine.loadModel("assets/levels/Zona_2-Volcan/objs/lvl_2-cnk_2.obj");
+            break;
         }
         loadShaders(r.model);
     }
@@ -838,6 +847,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
 
         case 1:
             r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_3.obj");
+            break;
+        case 2:
+            r.model = engine.loadModel("assets/levels/Zona_2-Volcan/objs/lvl_2-cnk_3.obj");
             break;
         }
         loadShaders(r.model);
@@ -1226,8 +1238,8 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
             engine.drawText("ID:", posText, 110, 20, BLACK);
             engine.drawTextEx(engine.getFontDefault(), std::to_string(e.getID()).c_str(), vec2d{ static_cast<double>(posText) + 90.0,110 }, 20, 1, DARKGRAY);
             engine.drawText("Node active:", posText, 130, 20, BLACK);
-           // std::cout << debugsnglt.elapsed << "\n";
-            // std::cout << debugsnglt.countdown << "\n";
+            // std::cout << debugsnglt.elapsed << "\n";
+             // std::cout << debugsnglt.countdown << "\n";
             if (debugsnglt.elapsed >= debugsnglt.countdown) {
                 debugsnglt.elapsed = 0;
                 debugsnglt.text = aic.bh;

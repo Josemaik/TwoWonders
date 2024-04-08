@@ -6,7 +6,7 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
     static constexpr vec3d cameraPosSum = { -60.f, 66.f, -60.f };
     static constexpr vec3d cameraPosDetected = { -62.f, 76.f, -56.f };
     static constexpr vec3d cameraPosLocked = { -56.f, 80.f, -56.f };
-    static constexpr float cameraFovyNormal = 60.f;
+    static constexpr float cameraFovyNormal = 260.f;
     static constexpr float cameraFovyDetected = 50.f;
     static constexpr float cameraFovyLocked = 47.5f;
     static constexpr float cameraFovyCinematic = 40.f;
@@ -17,14 +17,14 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
 
     // Velocidad de la transición
     float t = 0.1f;
+    auto& playerEn = *em.getEntityByID(li.playerID);
 
-    if (li.viewPoint == vec3d::zero())
+    if (playerEn.hasTag<PlayerTag>())
     {
-        auto& playerEn = *em.getEntityByID(li.playerID);
-
-        if (playerEn.hasTag<PlayerTag>())
+        auto& phy = em.getComponent<PhysicsComponent>(playerEn);
+        if (li.viewPoint == vec3d::zero())
         {
-            auto& phy = em.getComponent<RenderComponent>(playerEn);
+
             cameraPos = phy.position + cameraPosSum;
             cameraTar = phy.position;
             cameraFovy = cameraFovyNormal;
@@ -70,34 +70,39 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
                 cameraFovy = cameraFovyLocked;
             }
         }
-    }
-    else
-    {
-        // Asignamos el punto de vista a la cámara para señalar ahí
-        cameraPos = li.viewPoint + cameraPosSum;
-        cameraTar = li.viewPoint;
-        cameraFovy = cameraFovyCinematic;
-
-        if (li.viewPointSound)
+        else
         {
-            em.getSingleton<SoundSystem>().sonido_movimiento_camara();
-            li.viewPointSound = false;
-        }
-        // La cinematica se desactiva cuando pasan 4 segundos
-        viewPointTime += timeStep;
-        if (viewPointTime >= viewPointLimit)
-        {
-            viewPointTime = 0.f;
-            li.viewPoint = vec3d::zero();
+            // Asignamos el punto de vista a la cámara para señalar ahí
+            cameraPos = li.viewPoint + cameraPosSum;
+            cameraTar = li.viewPoint;
+            cameraFovy = cameraFovyCinematic;
 
-            if (li.eventNPCPrison)
+            if (li.viewPointSound)
             {
-                evm.scheduleEvent(Event{ EventCodes::NPCDialog });
-                li.eventNPCPrison = false;
+                em.getSingleton<SoundSystem>().sonido_movimiento_camara();
+                li.viewPointSound = false;
             }
-        }
 
-        t = 0.05f;
+            if (!phy.notMove)
+                phy.notMove = true;
+
+            // La cinematica se desactiva cuando pasan 4 segundos
+            viewPointTime += timeStep;
+            if (viewPointTime >= viewPointLimit)
+            {
+                viewPointTime = 0.f;
+                li.viewPoint = vec3d::zero();
+                phy.notMove = false;
+
+                if (li.eventNPCPrison)
+                {
+                    evm.scheduleEvent(Event{ EventCodes::NPCDialog });
+                    li.eventNPCPrison = false;
+                }
+            }
+
+            t = 0.05f;
+        }
     }
 
     if (li.transition)
