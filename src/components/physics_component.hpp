@@ -43,6 +43,7 @@ struct PhysicsComponent
 
     // Ángulo del vector con respecto al eje de origen
     double orientation{ 0.0 };
+    double orientationonrespawn{0.0};
     //vector de rotacion
     vec3d rotationVec{ 0.0, 0.1, 0.0 };
 

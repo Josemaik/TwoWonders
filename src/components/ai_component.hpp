@@ -56,6 +56,7 @@ struct AIComponent
     Path_t<4> path{ };
     Path_t<4>::iterator pathIt{ };
     bool path_initialized{ false };
+    bool followpatrol{true};
     // SB behaviour {SB::Arrive};
     double txp{}, tzp{};
     bool target_obtained{ false };

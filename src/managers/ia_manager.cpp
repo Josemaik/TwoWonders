@@ -30,6 +30,14 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     //     path[i] = vec3d{ point[0], point[1], point[2] };
     //     i++;
     // }
+    //check if ai have to follow or no patrol
+    bool followpatrol{true};
+    vec3d firstpathpos = {json["path"][0][0].GetDouble(), json["path"][0][1].GetDouble(), json["path"][0][2].GetDouble()};
+    if(firstpathpos.x() == position.x() && firstpathpos.z() == position.z()){
+        followpatrol = false;
+    }   
+
+
     double countdown_stop = json["countdown_stop"].GetDouble();
     double countdown_shoot = json["countdown_shoot"].GetDouble();
     double countdown_perception = json["countdown_perception"].GetDouble();
@@ -42,7 +50,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     em.addTag<EnemyTag>(e);
 
     auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = position, .scale = scale, .color = color,.orientation = rot,.rotationVec = rotationVec });
-    auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.rotationVec = rotationVec, .max_speed = max_speed });
+    auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.orientationonrespawn = rot,.rotationVec = rotationVec, .max_speed = max_speed });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
     auto& wl = em.addComponent<LifeComponent>(e, LifeComponent{ .life = life });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = element });
@@ -222,7 +230,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
 
     // Creamos el componente IA
     auto& ai = em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = arrival_radius, .detect_radius = detect_radius, .attack_radius = attack_radius, .tx = tx, .tz = tz,.time2arrive = time2arrive, .tactive = tactive, .perceptionTime = static_cast<float>(perceptionTime),
-        .path = path, .countdown_stop = countdown_stop, .countdown_shoot = countdown_shoot, .countdown_perception = countdown_perception, .behaviourTree = &tree });
+        .path = path,.followpatrol = followpatrol ,.countdown_stop = countdown_stop, .countdown_shoot = countdown_shoot, .countdown_perception = countdown_perception, .behaviourTree = &tree });
 
     em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = static_cast<float>(scale_to_respawn_attack) });
 
