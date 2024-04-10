@@ -42,7 +42,8 @@ void AISystem::update(EntityManager& em)
         AIComponent* aiptr = &ai;
         LifeComponent* lcptr = &lc;
         //percibir el entorno
-        perception(bb, ai);
+        if(e.hasTag<SnowmanTag>())
+            perception(bb, ai);
 
         //Actualizar posiciones de la IAs o potenciales targets para calcular Flocking
         // Comprobamos si el elemento debe procesarse
