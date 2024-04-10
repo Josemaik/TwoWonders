@@ -129,7 +129,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
                 for (Entity& ent : ectx.em.getEntities()) {
                     // Comprobamos entidades Pared y que tengan colisión component
                     if (ent.hasComponent<ColliderComponent>()) {
-                        if (ent.hasTag<WallTag>()) {
+                        if (ent.hasTag<WallTag>() || ent.hasTag<GroundTag>()) {
                             auto& col = ectx.em.getComponent<ColliderComponent>(ent);
                             if (col.boundingBox.intersectsRay(ray.origin, ray.direction)) {
                                 col.boundingBox.intersectsRay(ray.origin, ray.direction,intersection_wall);
