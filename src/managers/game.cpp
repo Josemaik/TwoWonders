@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -23.0, 60.0, -23.9 };
+        plfi.spawnPoint = { -95.0, 22.0, -105.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -56,18 +56,22 @@ void Game::createEntities()
     // 30.0, 13.0, 213.0 - Segundo campamento lvl1
     // -26.0, 4.0, 235.0 - NPC lvl1
     // -113.0, 13.0, 236.0 - Final lvl1
-    //46.0, 13.0, 86.9 pasillo nivel 1
+    // 46.0, 13.0, 86.9 - pasillo nivel 1
+    // 34.0, 29.0, -60.0 - Segunda rampa lvl2
+    // -7.55, 40.0, 16.0 - Lugar donde muñeco de nieve lvl2
+    // 37.0, 13.0, -104.0 - Desp segunda lava lvl2
+    // -95.0, 22.0, -135.0 - Spawn lvl2
 
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
-    p.gravity = 0;
+    // p.gravity = 0;
 
     auto& lis = em.addComponent<ListenerComponent>(e);
     em.addComponent<InputComponent>(e);
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 77 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<AttackComponent>(e);
 

@@ -18,6 +18,7 @@ struct PlayerInfo
     bool hasStaff{ false };
     bool onSpawn{ false };
     bool minusCoins{ false };
+    bool onLadder{ false };
     std::vector<std::unique_ptr<Item>> inventory{};
     std::vector<Spell> spells{};
     Spell currentSpell{ "None", "No spell", Spells::None, 0.0, 0 };
@@ -135,6 +136,7 @@ struct PlayerInfo
         max_mana = 100.0;
         mana = max_mana;
         mana_width = 0;
+        onLadder = false;
         hasKey = true;
         // spawnPoint = { 33.0, 4.0, -25.9 };
     }

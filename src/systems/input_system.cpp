@@ -93,7 +93,6 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
 
     auto& in = em.getComponent<InputComponent>(player);
 
-
     // Actualizar la velocidad
     int keysPressed = 0;
 
@@ -112,75 +111,126 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
 
         if (!li.replay)
         {
-            if (ge.isKeyDown(in.right))
-            {
-                vel.setX(vel.x() - INP_SPEED);
-                vel.setZ(vel.z() + INP_SPEED);
-
-                // velTime = gami.getTime();
-                keysPressed++;
-            }
-            if (ge.isKeyDown(in.left))
-            {
-                vel.setX(vel.x() + INP_SPEED);
-                vel.setZ(vel.z() - INP_SPEED);
-
-                // velTime = gami.getTime();
-                keysPressed++;
-            }
-            if (ge.isKeyDown(in.up))
-            {
-                vel.setX(vel.x() + INP_SPEED);
-                vel.setZ(vel.z() + INP_SPEED);
-
-                // velTime = gami.getTime();
-                keysPressed++;
-            }
-            if (ge.isKeyDown(in.down))
+            if (!plfi.onLadder)
             {
 
-                vel.setX(vel.x() - INP_SPEED);
-                vel.setZ(vel.z() - INP_SPEED);
+                if (ge.isKeyDown(in.right))
+                {
+                    vel.setX(vel.x() - INP_SPEED);
+                    vel.setZ(vel.z() + INP_SPEED);
 
-                // velTime = gami.getTime();
-                keysPressed++;
-            }
+                    // velTime = gami.getTime();
+                    keysPressed++;
+                }
+                if (ge.isKeyDown(in.left))
+                {
+                    vel.setX(vel.x() + INP_SPEED);
+                    vel.setZ(vel.z() - INP_SPEED);
 
-            if (keysPressed == 2)
-            {
-                vel.normalize();
-                vel *= INP_SPEED;
-            }
+                    // velTime = gami.getTime();
+                    keysPressed++;
+                }
+                if (ge.isKeyDown(in.up))
+                {
+                    vel.setX(vel.x() + INP_SPEED);
+                    vel.setZ(vel.z() + INP_SPEED);
 
-            if (ge.isGamepadAvailable(0))
-            {
-                // Obtén el movimiento del joystick
-                auto& joystick_x = in.m_joystickX;
-                auto& joystick_y = in.m_joystickY;
+                    // velTime = gami.getTime();
+                    keysPressed++;
+                }
+                if (ge.isKeyDown(in.down))
+                {
 
-                joystick_x = ge.getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * -1;
-                joystick_y = ge.getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
+                    vel.setX(vel.x() - INP_SPEED);
+                    vel.setZ(vel.z() - INP_SPEED);
 
-                float deadzone = 0.3f;
-                float slowzone = 0.8f;
+                    // velTime = gami.getTime();
+                    keysPressed++;
+                }
 
-                // Deadzone
-                if (joystick_x < deadzone && joystick_x > -deadzone)
-                    joystick_x = 0.0f;
-
-                if (joystick_y < deadzone && joystick_y > -deadzone)
-                    joystick_y = 0.0f;
-
-                // Ajusta la velocidad basándose en el movimiento del joystick
-                float speed = (std::abs(joystick_x) > slowzone || std::abs(joystick_y) > slowzone) ? INP_SPEED : INP_SPEED / 4;
-
-                vel.setX(vel.x() + (-joystick_y + joystick_x) * speed);
-                vel.setZ(vel.z() + (-joystick_y - joystick_x) * speed);
-
-                // velTime = gami.getTime();
-
-                if (in.m_joystickX != 0 && in.m_joystickY != 0)
+                if (keysPressed == 2)
+                {
                     vel.normalize();
+                    vel *= INP_SPEED;
+                }
+
+                if (ge.isGamepadAvailable(0))
+                {
+                    // Obtén el movimiento del joystick
+                    auto& joystick_x = in.m_joystickX;
+                    auto& joystick_y = in.m_joystickY;
+
+                    joystick_x = ge.getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * -1;
+                    joystick_y = ge.getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
+
+                    float deadzone = 0.3f;
+                    float slowzone = 0.8f;
+
+                    // Deadzone
+                    if (joystick_x < deadzone && joystick_x > -deadzone)
+                        joystick_x = 0.0f;
+
+                    if (joystick_y < deadzone && joystick_y > -deadzone)
+                        joystick_y = 0.0f;
+
+                    // Ajusta la velocidad basándose en el movimiento del joystick
+                    float speed = (std::abs(joystick_x) > slowzone || std::abs(joystick_y) > slowzone) ? INP_SPEED : INP_SPEED / 4;
+
+                    vel.setX(vel.x() + (-joystick_y + joystick_x) * speed);
+                    vel.setZ(vel.z() + (-joystick_y - joystick_x) * speed);
+
+                    // velTime = gami.getTime();
+
+                    if (in.m_joystickX != 0 && in.m_joystickY != 0)
+                        vel.normalize();
+                }
+            }
+            else
+            {
+                if (ge.isKeyDown(in.up))
+                {
+                    vel.setY(vel.y() + INP_SPEED);
+                    keysPressed++;
+                }
+                if (ge.isKeyDown(in.down))
+                {
+                    vel.setY(vel.y() - INP_SPEED);
+                    keysPressed++;
+                }
+
+                if (keysPressed == 2)
+                {
+                    vel.normalize();
+                    vel *= INP_SPEED;
+                }
+
+                if (ge.isGamepadAvailable(0))
+                {
+                    // Obtén el movimiento del joystick
+                    auto& joystick_x = in.m_joystickX;
+                    auto& joystick_y = in.m_joystickY;
+
+                    joystick_x = ge.getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * -1;
+                    joystick_y = ge.getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
+
+                    float deadzone = 0.3f;
+                    float slowzone = 0.8f;
+
+                    // Deadzone
+                    if (joystick_x < deadzone && joystick_x > -deadzone)
+                        joystick_x = 0.0f;
+
+                    if (joystick_y < deadzone && joystick_y > -deadzone)
+                        joystick_y = 0.0f;
+
+                    // Ajusta la velocidad basándose en el movimiento del joystick
+                    float speed = (std::abs(joystick_x) > slowzone || std::abs(joystick_y) > slowzone) ? INP_SPEED : INP_SPEED / 4;
+
+                    vel.setY(vel.y() + (-joystick_y) * speed);
+
+                    if (in.m_joystickX != 0 && in.m_joystickY != 0)
+                        vel.normalize();
+                }
             }
 
             // Normalizar la velocidad si se está moviendo en diagonal
@@ -235,6 +285,14 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     // Codigo para curarse // DEBUG
     if (ge.isKeyDown(KEY_Z) && player.hasComponent<LifeComponent>())
         em.getComponent<LifeComponent>(player).increaseLife();
+
+    if (ge.isKeyReleased(KEY_F12))
+    {
+        if (phy.gravity == 0)
+            phy.gravity = 1.0;
+        else
+            phy.gravity = 0;
+    }
 
 }
 

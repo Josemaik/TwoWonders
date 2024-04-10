@@ -102,7 +102,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             {
                 const valueType& overworld = chunk[0]["overworld"];
                 const valueType& interactablesArray = overworld["Interactive"];
-                // generateInteractables(em, interactablesArray);
+                generateInteractables(em, interactablesArray);
                 break;
             }
             case LoadState::LOAD_OBJECTS:
@@ -232,8 +232,13 @@ void MapManager::generateGround(EntityManager& em, const valueType& groundArray,
     // Sacamos la posición del centro del chunk
     vec3d center = { (min.x + max.x) / 2, minHeigth, (min.y + max.y) / 2 };
 
+    auto& li = em.getSingleton<LevelInfo>();
+    double zoneHeight = 20.0;
+    if (li.mapID == 2)
+        zoneHeight = 65.0;
+
     // Creamos 4 zonas para el chunk
-    vec3d zoneScale = { (max.x - min.x) / 2, 20, (max.y - min.y) / 2 };
+    vec3d zoneScale = { (max.x - min.x) / 2, zoneHeight, (max.y - min.y) / 2 };
     int k = 0;
     int limit = j + 4;
     for (; j < limit; j++)
@@ -296,7 +301,7 @@ void MapManager::generateRamps(EntityManager& em, const valueType& rampArray)
         RampType type{ static_cast<RampType>(ramp["type"].GetUint()) };
 
         // Creamos las dimensiones de la rampa y su posición
-        vec3d rmin = { min.x, offset.y() - 20, min.y };
+        vec3d rmin = { min.x, offset.y() - 5, min.y };
         vec3d rmax = { max.x, offset.y() + 20, max.y };
 
         vec3d rampPos = (rmin + rmax) / 2;
@@ -399,6 +404,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             }
 
             checkDispatcher(em, entity, interactable);
+            addToZone(em, entity, type);
             break;
         }
         case InteractableType::Destructible:
@@ -441,6 +447,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             if (interactable.HasMember("noKey"))
                 em.addTag<NoKeyTag>(entity);
 
+            addToZone(em, entity, type);
             break;
         }
         case InteractableType::Level:
@@ -479,12 +486,38 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             em.addTag<WallTag>(entity);
             em.addTag<LeverTag>(entity);
             em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
+            addToZone(em, entity, type);
+            break;
+        }
+        case InteractableType::DamageObj:
+        {
+            em.addTag<LavaTag>(entity);
+            if (interactable.HasMember("offsetZ"))
+            {
+                r.offset = interactable["offsetZ"][0].GetDouble();
+            }
+            break;
+        }
+        case InteractableType::Roca:
+            r.visible = false;
+            break;
+        case InteractableType::Ladder:
+        {
+            em.addTag<LadderTag>(entity);
+            r.visible = false;
+            c.behaviorType = BehaviorType::LADDER;
+            addToZone(em, entity, type);
+
+            auto yMin = c.boundingBox.min.y();
+            auto yMax = c.boundingBox.max.y();
+            auto rot2 = (orientation - 90.0) * DEGTORAD;
+            em.addComponent<LadderComponent>(entity, LadderComponent{ .orientation = rot2, .yMin = yMin, .yMax = yMax });
+
             break;
         }
         default:
             break;
         }
-        addToZone(em, entity, type);
     }
 }
 

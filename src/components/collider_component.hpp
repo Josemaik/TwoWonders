@@ -22,6 +22,7 @@ enum BehaviorType
     AREADAMAGECRUSHER = 0x2000,
     SPAWN = 0x4000,
     RAMP = 0x8000,
+    LADDER = 0x10000,
 };
 
 struct ColliderComponent

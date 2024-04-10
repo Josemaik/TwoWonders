@@ -692,7 +692,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     pos.setY(pos.y() - r.offset / 1.5);
                     in = true;
                 }
-                else if (e.hasTag<SpawnTag>())
+                else if (e.hasTag<SpawnTag>() || e.hasTag<LavaTag>())
                 {
                     pos.setY(pos.y() - r.offset);
                     in = true;
@@ -993,6 +993,12 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<NomadTag>())
     {
         r.model = engine.loadModel("assets/characters/NPCs/Nomada/Nomada.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<LavaTag>())
+    {
+        r.model = engine.loadModel("assets/models/Charco_lava.obj");
 
         loadShaders(r.model);
     }
@@ -1834,8 +1840,12 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
         {
             // Dibujamos el rectángulo de la rampa
             auto& phy = em.getComponent<PhysicsComponent>(e);
-
+            auto& rc = em.getComponent<RampComponent>(e);
             // La rampa solo tiene vec2d mínimos y máximos, vamos a dibujar el rectángulo que los une
+            engine.drawText(std::to_string(rc.offset.y()).c_str(),
+                static_cast<int>(engine.getWorldToScreenX(phy.position) - 5),
+                static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 5),
+                20, RED);
             engine.beginMode3D();
             engine.drawCubeWires(phy.position, static_cast<float>(phy.scale.x()), static_cast<float>(phy.scale.y()), static_cast<float>(phy.scale.z()), RED);
             engine.endMode3D();

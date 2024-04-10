@@ -7,9 +7,16 @@ enum struct InteractableType : uint8_t
     Destructible = 2,
     Door = 3,
     Level = 4,
-    Spawn = 5,
-    Lever = 6,
-    NPC = 7
+    Spawn = 6,
+    Lever = 7,
+    DamageObj = 8,
+    Roca = 9,
+    MissionOBJ = 10,
+    Table = 11,
+    Ladder = 12,
+    Sign = 13,
+    Camp = 14,
+    NPC = 17,
 };
 
 struct InteractiveComponent

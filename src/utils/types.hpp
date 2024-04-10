@@ -17,6 +17,7 @@
 #include "../components/angrybush_component.hpp"
 #include "../components/dispatcher_component.hpp"
 #include "../components/oneuse_component.hpp"
+#include "../components/ladder_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
 #include "../components/navmesh_component.hpp"
@@ -102,6 +103,8 @@ struct LevelChangeTag {};
 struct CoinTag {};
 struct WaterBombTag {};
 struct NomadTag {};
+struct LavaTag {};
+struct LadderTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -127,7 +130,8 @@ using CL = MP::TypeList <
     DispatcherComponent,
     Navmesh,
     OneUseComponent,
-    NPCComponent
+    NPCComponent,
+    LadderComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,
@@ -168,7 +172,9 @@ using TL = MP::TypeList <
     LevelChangeTag,
     CoinTag,
     WaterBombTag,
-    NomadTag
+    NomadTag,
+    LavaTag,
+    LadderTag
 > ;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

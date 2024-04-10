@@ -99,8 +99,14 @@ void CollisionSystem::handleRampCollision(EntityManager& em)
 
     for (auto [rID, eID] : checkedPairsRamp)
     {
-        auto& r = *em.getEntityByID(rID);
-        auto& e = *em.getEntityByID(eID);
+        auto* rPtr = em.getEntityByID(rID);
+        auto* ePtr = em.getEntityByID(eID);
+
+        if (ePtr->hasComponent<RampComponent>())
+            std::swap(rPtr, ePtr);
+
+        auto& r = *rPtr;
+        auto& e = *ePtr;
 
         auto& phy = em.getComponent<PhysicsComponent>(e);
         previousEntsOnRamp.push_back(&phy);
@@ -196,6 +202,8 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     }
 
     // Rampas
+    if (behaviorType1 & BehaviorType::RAMP && behaviorType2 & BehaviorType::RAMP)
+        return;
     if (behaviorType1 & BehaviorType::RAMP || behaviorType2 & BehaviorType::RAMP)
     {
         auto* staticEntPtr = &staticEnt;
@@ -229,11 +237,53 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
             }
         }
 
-        checkedPairsRamp.insert({ staticEntPtr->getID(), otherEntPtr->getID() });
+        auto id1 = staticEntPtr->getID();
+        auto id2 = otherEntPtr->getID();
+
+        if (id1 > id2)
+            std::swap(id1, id2);
+
+        checkedPairsRamp.insert({ id1, id2 });
         return;
     }
 
-    //BOMBA DE CURACION
+    // ESCALERA
+    if (behaviorType1 & BehaviorType::LADDER || behaviorType2 & BehaviorType::LADDER)
+    {
+        auto* staticEntPtr = &staticEnt;
+        auto* otherEntPtr = &otherEnt;
+
+        auto* staticPhyPtr = &staticPhy;
+        auto* otherPhyPtr = &otherPhy;
+
+        if (behaviorType2 & BehaviorType::LADDER)
+        {
+            std::swap(staticEntPtr, otherEntPtr);
+            std::swap(staticPhyPtr, otherPhyPtr);
+        }
+
+        if (otherEntPtr->hasTag<PlayerTag>())
+        {
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            if (plfi.onLadder)
+            {
+                auto& ldc = em.getComponent<LadderComponent>(*staticEntPtr);
+                auto& col = em.getComponent<ColliderComponent>(*otherEntPtr);
+                if (col.boundingBox.min.y() > ldc.yMax || col.boundingBox.min.y() <= ldc.yMin)
+                {
+                    auto& phy = em.getComponent<PhysicsComponent>(*otherEntPtr);
+                    phy.gravity = 1.0;
+                    plfi.onLadder = false;
+                }
+                return;
+            }
+        }
+
+        staticCollision(*otherPhyPtr, *staticPhyPtr, minOverlap);
+        return;
+    }
+
+    // BOMBA DE CURACION
     if (behaviorType2 & BehaviorType::HEAL || behaviorType1 & BehaviorType::HEAL)
     {
         if (staticEnt.hasComponent<LifeComponent>() && staticEnt.hasTag<SlimeTag>()) {
@@ -422,7 +472,8 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
 
     if (behaviorType2 & BehaviorType::SPIDERWEB ||
         behaviorType2 & BehaviorType::WARNINGZONE ||
-        behaviorType2 & BehaviorType::AREADAMAGECRUSHER)
+        behaviorType2 & BehaviorType::AREADAMAGECRUSHER ||
+        behaviorType2 & BehaviorType::LADDER)
         return;
 
     if (behaviorType2 & BehaviorType::METEORITE)

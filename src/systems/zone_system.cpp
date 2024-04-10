@@ -90,13 +90,13 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
         }
     }
 
-
     auto& zchi = em.getSingleton<ZoneCheckInfo>();
 
     checkZones(em, evm, zchi.getChestZones(), [&](EntityManager& em, EventManager& evm) { checkChests(em, evm); });
     checkZones(em, evm, zchi.getLeverZones(), [&](EntityManager& em, EventManager& evm) { checkLevers(em, evm); });
     checkZones(em, evm, zchi.getDoorZones(), [&](EntityManager& em, EventManager& evm) { checkDoors(em, evm); });
     checkZones(em, evm, zchi.getNpcZones(), [&](EntityManager& em, EventManager& evm) { checkNPCs(em, evm); });
+    checkZones(em, evm, zchi.getLadderZones(), [&](EntityManager& em, EventManager&) { checkLadders(em); });
 }
 
 void ZoneSystem::checkZones(EntityManager& em, EventManager& evm, checkType zones, checkFuncType checkFunction)
@@ -344,6 +344,45 @@ void ZoneSystem::checkTutorialEnemies(EntityManager& em)
     // Si el jugador se choca con el primer golem, se le va a señalar el cofre con el bastón
     // if (!playerEnt.hasComponent<AttackComponent>() && playerPhy.stopped)
     //     li.viewPoint = { -33.714, 7.0, -43.494 };
+}
+
+void ZoneSystem::checkLadders(EntityManager& em)
+{
+    auto& plfi = em.getSingleton<PlayerInfo>();
+    if (plfi.onLadder)
+        return;
+
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& playerEnt = *em.getEntityByID(li.playerID);
+    auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
+    auto& playerPos = playerPhy.position;
+    using noCMP = MP::TypeList<PhysicsComponent, InteractiveComponent, LadderComponent>;
+    using npcTag = MP::TypeList<LadderTag>;
+
+    em.forEach<noCMP, npcTag>([&](Entity&, PhysicsComponent& phy, InteractiveComponent& ic, LadderComponent& ldc)
+    {
+        double distance = playerPos.distance(phy.position);
+        double range = 12.0;
+
+        auto& inpi = em.getSingleton<InputInfo>();
+
+        if (distance < range && !ic.showButton)
+            ic.showButton = true;
+
+        else if (distance > range && ic.showButton)
+            ic.showButton = false;
+
+        if (inpi.interact && ic.showButton)
+        {
+            playerPos.setX(phy.position.x());
+            playerPos.setZ(phy.position.z());
+            playerPhy.gravity = 0;
+            playerPhy.orientation = ldc.orientation;
+
+            plfi.onLadder = true;
+            inpi.interact = false;
+        }
+    });
 }
 
 void ZoneSystem::checkNPCs(EntityManager& em, EventManager& evm)
