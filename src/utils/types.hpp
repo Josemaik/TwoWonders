@@ -108,6 +108,8 @@ struct LavaTag {};
 struct LadderTag {};
 struct SignTag {};
 struct TableTag {};
+struct InvestigatorTag{};
+
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -180,7 +182,8 @@ using TL = MP::TypeList <
     LavaTag,
     LadderTag,
     SignTag,
-    TableTag    
+    TableTag,
+    InvestigatorTag    
 > ;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

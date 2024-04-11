@@ -67,6 +67,7 @@ private:
     std::vector<const valueType*> chunksVec{};
     uint8_t unique_ids{ 0 };
     bool reSpawn{ false };
+    Graph graph{};
 
     template <typename... Tags>
     void destroyParts(EntityManager& em)

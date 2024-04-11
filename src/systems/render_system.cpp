@@ -991,6 +991,10 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
 
         loadShaders(r.model);
     }
+    else if (e.hasTag<InvestigatorTag>())
+    {
+        r.model = engine.loadModel("assets/Personajes/NPCs/Nomada/Nomada.obj");
+    }
     else if (e.hasTag<LavaTag>())
     {
         r.model = engine.loadModel("assets/Assets/Charco_lava/Charco_lava.obj");
@@ -1049,7 +1053,7 @@ void RenderSystem::beginFrame(GameEngine& engine, EntityManager& em)
     engine.beginMode3D();
     //engine.drawGrid(50, 1.f);
 }
-//dibujar rayo 3d 
+//dibujar rayo 3d
 void RenderSystem::drawRay(vec3d origin, vec3d dir) {
     BeginDrawing();
     DrawLine3D(origin.toRaylib(), (origin + dir * 100).toRaylib(), RED);
@@ -1111,6 +1115,7 @@ double SelectValue(GameEngine& engine, double value, float posx, float posy, flo
 void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     auto& debug = em.getSingleton<Debug_t>();
     auto& navs = em.getSingleton<NavmeshInfo>();
+    auto& li = em.getSingleton<LevelInfo>();
     //Dibujado de titulo y ventana
     Rectangle windowRect = { 470, 300, 330, 430 };
     engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
@@ -1145,77 +1150,88 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     Rectangle btn2Rec = { posX + 30, posY + 80, buttonWidth, buttonHeight };
     // Botón
     if (GuiButton(btn1Rec, "CALCULATE")) {
-        std::vector<vec3d> nodes;
-        nodes.push_back({ -106.9, 4.0, 116.0 });
-        nodes.push_back({ -119.0, 4.0, 114.0 });
-        nodes.push_back({ -131.0, 4.0, 105.1 });
-        nodes.push_back({ -105.0, 4.0, 97.3 });
-        nodes.push_back({ -118.0, 4.0, 92.0 });
-        nodes.push_back({ -132.0, 4.0, 87.0 });
-        nodes.push_back({ -117.0, 4.0, 78.0 });
-        nodes.push_back({ -127.4, 4.0, 69.6 });
-        //Creamos puntos y conexiones
-        std::vector<Conection> conexiones;
-        Conection cone12(1, 1, 2);
-        conexiones.push_back(cone12);
-        Conection cone14(1, 1, 4);
-        conexiones.push_back(cone14);
-        Conection cone15(1, 1, 5);
-        conexiones.push_back(cone15);
-        Conection cone25(1, 2, 5);
-        conexiones.push_back(cone25);
-        Conection cone23(1, 2, 3);
-        conexiones.push_back(cone23);
-        Conection cone36(1, 3, 6);
-        conexiones.push_back(cone36);
-        Conection cone45(1, 4, 5);
-        conexiones.push_back(cone45);
-        Conection cone56(1, 5, 6);
-        conexiones.push_back(cone56);
-        Conection cone57(1, 5, 7);
-        conexiones.push_back(cone57);
-        Conection cone58(1, 5, 8);
-        conexiones.push_back(cone58);
-        Conection cone68(1, 6, 8);
-        conexiones.push_back(cone68);
-        Conection cone78(1, 7, 8);
-        conexiones.push_back(cone78);
-        //Lammamos a creargrafo
-        //Creamos el grafo
-        Graph graph{};
-        graph.createGraph(navs.conexiones, navs.nodes);
-        // graph.createGraph(conexiones,nodes);
-        //Calcular pathfinding
-        std::cout << static_cast<uint16_t>(debug.startnode) << static_cast<uint16_t>(debug.goalnode) << "\n";
-        std::vector<vec3d> path = graph.PathFindAStar(static_cast<uint16_t>(debug.startnode), static_cast<uint16_t>(debug.goalnode));
-        // if(path.size() == 0){
-        //     std::cout << "CAGUEEEEEEEE \n";
+        BBox& playerbbox{};
+        // if(em.getEntityByID(li.playerID).hasComponent<RenderComponent>()){
+        //     playerbbox = em.getComponent<RenderComponent>(*em.getEntityByID(li.playerID)).bbox;
         // }
-        // Copiar el path devuelto por PathFindAStar() a debug.path
-        debug.path.resize(path.size());
-        //Rellenamos
-        std::copy(path.begin(), path.end(), debug.path.begin());
-        // Mostrar el camino copiado
-       //std::cout << "Camino en debug.path:" << std::endl;
-       // for (const auto& node : debug.path) {
-       //     std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
-       // }
-       // debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
-       // std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
+        for (auto it = navs.NavMeshes.begin(); it != std::prev(navs.NavMeshes.end()); ++it){
+            //auto center = it->centerpoint.second;
+            auto& currentbbox = it->box;
+            if(currentbbox.intersects(playerbbox)){
+
+            }
+        }
+    //     std::vector<vec3d> nodes;
+    //     nodes.push_back({ -106.9, 4.0, 116.0 });
+    //     nodes.push_back({ -119.0, 4.0, 114.0 });
+    //     nodes.push_back({ -131.0, 4.0, 105.1 });
+    //     nodes.push_back({ -105.0, 4.0, 97.3 });
+    //     nodes.push_back({ -118.0, 4.0, 92.0 });
+    //     nodes.push_back({ -132.0, 4.0, 87.0 });
+    //     nodes.push_back({ -117.0, 4.0, 78.0 });
+    //     nodes.push_back({ -127.4, 4.0, 69.6 });
+    //     //Creamos puntos y conexiones
+    //     std::vector<Conection> conexiones;
+    //     Conection cone12(1, 1, 2);
+    //     conexiones.push_back(cone12);
+    //     Conection cone14(1, 1, 4);
+    //     conexiones.push_back(cone14);
+    //     Conection cone15(1, 1, 5);
+    //     conexiones.push_back(cone15);
+    //     Conection cone25(1, 2, 5);
+    //     conexiones.push_back(cone25);
+    //     Conection cone23(1, 2, 3);
+    //     conexiones.push_back(cone23);
+    //     Conection cone36(1, 3, 6);
+    //     conexiones.push_back(cone36);
+    //     Conection cone45(1, 4, 5);
+    //     conexiones.push_back(cone45);
+    //     Conection cone56(1, 5, 6);
+    //     conexiones.push_back(cone56);
+    //     Conection cone57(1, 5, 7);
+    //     conexiones.push_back(cone57);
+    //     Conection cone58(1, 5, 8);
+    //     conexiones.push_back(cone58);
+    //     Conection cone68(1, 6, 8);
+    //     conexiones.push_back(cone68);
+    //     Conection cone78(1, 7, 8);
+    //     conexiones.push_back(cone78);
+    //     Lammamos a creargrafo
+    //     Creamos el grafo
+    //     Graph graph{};
+    //     graph.createGraph(navs.conexiones, navs.nodes);
+    //     graph.createGraph(conexiones,nodes);
+    //     Calcular pathfinding
+    //     std::cout << static_cast<uint16_t>(debug.startnode) << static_cast<uint16_t>(debug.goalnode) << "\n";
+    //     std::vector<vec3d> path = graph.PathFindAStar(static_cast<uint16_t>(debug.startnode), static_cast<uint16_t>(debug.goalnode));
+    //     if(path.size() == 0){
+    //         std::cout << "CAGUEEEEEEEE \n";
+    //     }
+    //     // Copiar el path devuelto por PathFindAStar() a debug.path
+    //     debug.path.resize(path.size());
+    //     //Rellenamos
+    //     std::copy(path.begin(), path.end(), debug.path.begin());
+    //     Mostrar el camino copiado
+    //    std::cout << "Camino en debug.path:" << std::endl;
+    //    for (const auto& node : debug.path) {
+    //        std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
+    //    }
+    //    debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
+    //    std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
     }
-    if (GuiButton(btn2Rec, "CLEAR")) {
-        debug.path.clear();
-    }
-    // resultado
-    vec2d textPositionInfo2 = { 480, 480 };
-    engine.drawTextEx(GetFontDefault(), "PATH RESULT", textPositionInfo2, 20, 1, RED);
-    //Dibujar path
-    float posyt = 510.0f;
-    for (auto pos : debug.path) {
-        std::string text = std::to_string(pos.x()) + " " + std::to_string(pos.y()) + " " + std::to_string(pos.z());
-        engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{ 480,posyt }, 20, 1, RED);
-        posyt += 20.0f;
-    }
+    // if (GuiButton(btn2Rec, "CLEAR")) {
+    //     debug.path.clear();
+    // }
+    // //resultado
+    // vec2d textPositionInfo2 = { 480, 480 };
+    // engine.drawTextEx(GetFontDefault(), "PATH RESULT", textPositionInfo2, 20, 1, RED);
+    // //Dibujar path
+    // float posyt = 510.0f;
+    // for (auto pos : debug.path) {
+    //     std::string text = std::to_string(pos.x()) + " " + std::to_string(pos.y()) + " " + std::to_string(pos.z());
+    //engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{ 480,posyt }, 20, 1, RED);
+    //     posyt += 20.0f;
+    // }
 }
 //Debugger visual in-game
 void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
@@ -1430,7 +1446,7 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
 
             vec2d center = { barX, barY - 120.0f };
             if (aic.alert_state) {
-                //Se escuahn pasos 
+                //Se escuahn pasos
                 if (aic.listen_steps) {
                     aic.endangle -= aic.increase_angle;
                 }

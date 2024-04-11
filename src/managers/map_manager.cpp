@@ -572,6 +572,9 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
         case 0:
             em.addTag<NomadTag>(entity);
             break;
+        case 1:
+            em.addTag<InvestigatorTag>(entity);
+            break;
         default:
             break;
         }
@@ -593,7 +596,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
 void MapManager::generateNavmeshes(EntityManager& em)
 {
     auto& navs = em.getSingleton<NavmeshInfo>();
-    mapType navmeshkaiwa = loadMap("assets/levels/navmeshtest/lvl_2-nav.kaiwa");
+    mapType navmeshkaiwa = loadMap("assets/levels/navmeshtest/Lvl_2-navmeshes.kaiwa");
 
     const valueType& navmeshes = navmeshkaiwa["NavMesh"];
     for (mapSizeType i = 0; i < navmeshes.Size(); i++) {
@@ -638,16 +641,22 @@ void MapManager::generateNavmeshes(EntityManager& em)
             navs.midpoints.insert(vecnodes[k + 4]);
         }
 
-        //Creamos NavMesh
+        //Creamos NavMesh BBox
         BBox b{ min,max };
-        Navmesh nav{ .box = b };
+        //Creamos NavMesh
+        Navmesh nav{ .box = b};
+        //Rellenamos los nodos
         for (auto& n : vecnodes) {
             auto pair = std::make_pair(navs.num_nodes, n);
+            //Se añade al navinfo
             navs.nodes.insert(pair);
+            //si es el centro, se guarda
+            if(n.x() == vecnodes[0].x() && n.z() == vecnodes[0].z()){
+                nav.centerpoint = pair;
+            }
             nav.nodes.insert(pair);
             navs.num_nodes++;
         }
-
         // Guardamos info
         navs.NavMeshes.push_back(nav);
 
@@ -686,6 +695,9 @@ void MapManager::generateNavmeshes(EntityManager& em)
             }
         }
     }
+
+    //Creamos Grafo
+    graph.createGraph(navs.conexiones, navs.nodes);
 }
 
 void MapManager::destroyMap(EntityManager& em)
