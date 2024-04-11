@@ -5,6 +5,9 @@ void PhysicsSystem::update(EntityManager& em)
 {
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, PhysicsComponent& phy)
     {
+        if(ent.hasTag<PlayerTag>()){
+            std::cout <<"X:"<< phy.position.x() <<"Z:"<< phy.position.z() <<"\n";
+        }
         if (phy.notMove)
         {
             if (phy.velocity != vec3d::zero() && phy.target != vec3d::zero())
