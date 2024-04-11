@@ -1111,6 +1111,20 @@ double SelectValue(GameEngine& engine, double value, float posx, float posy, flo
     return static_cast<double>(floatvalue);
 }
 
+uint16_t findNearestNode(const vec3d& position, const std::set<std::pair<uint16_t, vec3d>>& nodes) {
+    uint16_t nearestNodeId = 0; // Suponemos que el primer nodo es el más cercano inicialmente
+    double minDistance = std::numeric_limits<double>::max(); // Inicializamos la distancia mínima con un valor muy grande
+    vec3d nearestpos{};
+    for (const auto& node : nodes) {
+        double dist = position.distance(node.second); // Calculamos la distancia entre la posición y el nodo actual
+        if (dist < minDistance) { // Si encontramos un nodo más cercano
+            minDistance = dist;
+            nearestNodeId = node.first;
+            nearestpos = node.second;
+        }
+    }
+    return nearestNodeId;
+}
 //Interfaz para probar el pathfinding
 void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     auto& debug = em.getSingleton<Debug_t>();
@@ -1150,17 +1164,36 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     Rectangle btn2Rec = { posX + 30, posY + 80, buttonWidth, buttonHeight };
     // Botón
     if (GuiButton(btn1Rec, "CALCULATE")) {
-        BBox& playerbbox{};
-        // if(em.getEntityByID(li.playerID).hasComponent<RenderComponent>()){
-        //     playerbbox = em.getComponent<RenderComponent>(*em.getEntityByID(li.playerID)).bbox;
+        //std::size_t idcenter{};
+        // if(em.getEntityByID(li.playerID)->hasComponent<ColliderComponent>()){
+        //     auto& playerbbox = em.getComponent<ColliderComponent>(*em.getEntityByID(li.playerID)).boundingBox;
+        //     for (auto& navmesh : navs.NavMeshes){
+        //         //auto center = it->centerpoint.second;
+        //         auto& currentbbox = navmesh.box;
+        //         if(currentbbox.intersects(playerbbox)){
+        //             vec3d center = {navmesh.centerpoint.second.x(),navmesh.centerpoint.second.y(),navmesh.centerpoint.second.z()};
+        //             idcenter = navmesh.centerpoint.first;
+        //             break;
+        //             // DrawCube(Vector3{static_cast<float>(center.x()),
+        //             // static_cast<float>(center.y()),
+        //             // static_cast<float>(center.z())},500,500,500,RED);
+        //         }
+        //     }
         // }
-        for (auto it = navs.NavMeshes.begin(); it != std::prev(navs.NavMeshes.end()); ++it){
-            //auto center = it->centerpoint.second;
-            auto& currentbbox = it->box;
-            if(currentbbox.intersects(playerbbox)){
+        //Recorre navs.nodes //    std::set<std::pair<uint16_t, vec3d>> nodes;
+        // recorrelos y devuelve
+        // Función para encontrar el nodo más cercano a una posición dada
+        vec3d posplayer = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
+        uint16_t startnode = findNearestNode(posplayer, navs.nodes);
+        uint16_t targetnode = findNearestNode(vec3d{-12.33, 40.0, 22.41}, navs.nodes);
+        //Creamos Grafo
+        Graph graph{};
+        graph.createGraph(navs.conexiones, navs.nodes);
+        std::vector<vec3d> path = graph.PathFindAStar(startnode,targetnode);
+        std::size_t lengthpath = path.size();
+        std::cout << lengthpath;
+        //calcular camnino desde el centro hasta un punto
 
-            }
-        }
     //     std::vector<vec3d> nodes;
     //     nodes.push_back({ -106.9, 4.0, 116.0 });
     //     nodes.push_back({ -119.0, 4.0, 114.0 });
@@ -1204,34 +1237,34 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     //     Calcular pathfinding
     //     std::cout << static_cast<uint16_t>(debug.startnode) << static_cast<uint16_t>(debug.goalnode) << "\n";
     //     std::vector<vec3d> path = graph.PathFindAStar(static_cast<uint16_t>(debug.startnode), static_cast<uint16_t>(debug.goalnode));
-    //     if(path.size() == 0){
-    //         std::cout << "CAGUEEEEEEEE \n";
-    //     }
+        if(path.size() == 0){
+            std::cout << "CAGUEEEEEEEE \n";
+        }
     //     // Copiar el path devuelto por PathFindAStar() a debug.path
-    //     debug.path.resize(path.size());
+        debug.path.resize(path.size());
     //     //Rellenamos
-    //     std::copy(path.begin(), path.end(), debug.path.begin());
+        std::copy(path.begin(), path.end(), debug.path.begin());
     //     Mostrar el camino copiado
     //    std::cout << "Camino en debug.path:" << std::endl;
-    //    for (const auto& node : debug.path) {
-    //        std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
-    //    }
+       for (const auto& node : debug.path) {
+           std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
+       }
     //    debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
     //    std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
     }
-    // if (GuiButton(btn2Rec, "CLEAR")) {
-    //     debug.path.clear();
-    // }
-    // //resultado
-    // vec2d textPositionInfo2 = { 480, 480 };
-    // engine.drawTextEx(GetFontDefault(), "PATH RESULT", textPositionInfo2, 20, 1, RED);
+    if (GuiButton(btn2Rec, "CLEAR")) {
+        debug.path.clear();
+    }
+    //resultado
+    vec2d textPositionInfo2 = { 480, 480 };
+    engine.drawTextEx(GetFontDefault(), "PATH RESULT", textPositionInfo2, 20, 1, RED);
     // //Dibujar path
-    // float posyt = 510.0f;
-    // for (auto pos : debug.path) {
-    //     std::string text = std::to_string(pos.x()) + " " + std::to_string(pos.y()) + " " + std::to_string(pos.z());
-    //engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{ 480,posyt }, 20, 1, RED);
-    //     posyt += 20.0f;
-    // }
+    float posyt = 510.0f;
+    for (auto pos : debug.path) {
+        std::string text = std::to_string(pos.x()) + " " + std::to_string(pos.y()) + " " + std::to_string(pos.z());
+        engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{ 480,posyt }, 20, 1, RED);
+        posyt += 20.0f;
+    }
 }
 //Debugger visual in-game
 void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)

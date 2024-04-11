@@ -695,9 +695,6 @@ void MapManager::generateNavmeshes(EntityManager& em)
             }
         }
     }
-
-    //Creamos Grafo
-    graph.createGraph(navs.conexiones, navs.nodes);
 }
 
 void MapManager::destroyMap(EntityManager& em)

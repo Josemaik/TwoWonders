@@ -292,6 +292,7 @@ struct vec3D
         return std::sqrt(dx * dx + dz * dz);
     }
 
+
 private:
     DataT x_{}, y_{}, z_{};
     mutable std::optional<DataT> length_{};
