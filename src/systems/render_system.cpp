@@ -1478,7 +1478,10 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             // Dibujamos el número de monedas en pantalla
             drawCoinBar(engine, em);
 
-            // drawFPSCounter(engine);
+            drawFPSCounter(engine);
+
+            // Dibujar el bastón
+            drawStaff(engine, em);
 
             // Dibujar espacios de hechizos
             drawSpellSlots(engine, em);
@@ -1562,31 +1565,23 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             {
                 auto& phy{ em.getComponent<PhysicsComponent>(e) };
 
-                // Mostramos gif de joystick para moverse o texto WASD
+                GameEngine::Gif* gif;
+                Texture2D gifCopy;
                 if (engine.isGamepadAvailable(0))
-                {
-                    auto& joysitck_gif = engine.gifs.at("joystick_izq");
-                    auto copy = joysitck_gif.texture;
-
-                    // Redimensionamos la copia
-                    copy.width = static_cast<int>(copy.width / 2.0);
-                    copy.height = static_cast<int>(copy.height / 2.0);
-
-                    int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - copy.width / 2;
-                    int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 37);
-
-                    displayGif(engine, copy, joysitck_gif, posX, posY);
-                }
+                    gif = &engine.gifs.at("joystick_izq");
                 else
-                {
-                    std::string text = "WASD para moverse";
+                    gif = &engine.gifs.at("wasd");
 
-                    engine.drawText(text.c_str(),
-                        static_cast<int>(engine.getWorldToScreenX(phy.position) - 120),
-                        static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 25),
-                        20,
-                        WHITE);
-                }
+                gifCopy = gif->texture;
+
+                // Redimensionamos la copia
+                gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
+                gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
+
+                int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - gifCopy.width / 2;
+                int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 37);
+
+                displayGif(engine, gifCopy, *gif, posX, posY);
 
                 elapsed_WASD += 1.0f / 60.0f;
             }
@@ -2229,29 +2224,129 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
 {
     auto& plfi{ em.getSingleton<PlayerInfo>() };
 
-    if (plfi.spells.empty())
-        return;
-    else
+    if (!plfi.spells.empty())
     {
         auto& current = plfi.currentSpell;
+        std::string exp_name = "";
 
         switch (current.spell)
         {
         case Spells::WaterBomb:
         {
-            if (animatedTextures.find("agua_holder") == animatedTextures.end())
+            if (animatedTextures.find("hechizo") == animatedTextures.end())
             {
-                animatedTextures["agua_holder"] = { "agua_holder", engine.getScreenWidth() - 150, 20,
-                engine.textures["agua_holder"].width, engine.textures["agua_holder"].height, 3.0f };
+                if (!plfi.showBook)
+                {
+                    animatedTextures["1_placeholder"] = { "placeholder", engine.getScreenWidth() - 150, 20,
+                    engine.textures["placeholder"].width, engine.textures["placeholder"].height, 2.5f };
 
-                animatedTextures["pompas"] = { "pompas", engine.getScreenWidth() - 140, 35,
-                engine.textures["pompas"].width, engine.textures["pompas"].height, 3.0f };
+                    animatedTextures["hechizo"] = { "pompas", engine.getScreenWidth() - 140, 35,
+                    engine.textures["pompas"].width, engine.textures["pompas"].height, 2.5f };
+                }
+                else
+                    exp_name = "exp_pompa";
             }
+            break;
+        }
+        case Spells::WaterDash:
+        {
+            if (animatedTextures.find("hechizo") == animatedTextures.end())
+            {
+                if (!plfi.showBook)
+                {
+                    animatedTextures["1_placeholder"] = { "placeholder", engine.getScreenWidth() - 150, 20,
+                    engine.textures["placeholder"].width, engine.textures["placeholder"].height, 2.5f };
 
+                    animatedTextures["hechizo"] = { "dash", engine.getScreenWidth() - 140, 35,
+                    engine.textures["dash"].width, engine.textures["dash"].height, 2.65f };
+                }
+                else
+                    exp_name = "exp_pompa";
+            }
             break;
         }
         default:
             break;
+        }
+
+        if (plfi.showBook)
+        {
+            drawSpellExp(engine, exp_name);
+
+            auto& inpi = em.getSingleton<InputInfo>();
+            auto& txti = em.getSingleton<TextInfo>();
+
+            if (inpi.interact && elapsed_book >= 1.0f)
+            {
+
+                txti.notPass = false;
+                plfi.showBook = false;
+                inpi.interact = false;
+                elapsed_book = 0.f;
+            }
+            else
+                txti.notPass = true;
+        }
+    }
+
+}
+
+void RenderSystem::drawSpellExp(GameEngine& engine, std::string name)
+{
+    // Dibujamos textura del libro
+    auto& libroText = engine.textures["libro"];
+
+    // Calculamos la posición inicial fuera de la pantalla
+    int initialPosY = -libroText.height;
+    int posX = engine.getScreenWidth() / 2 - libroText.width / 2;
+
+    // Calculamos la posición final en el centro de la pantalla
+    int finalPosY = engine.getScreenHeight() / 2 - libroText.height / 2;
+
+    // Animamos la posición Y
+    int posY = initialPosY + static_cast<int>(static_cast<float>(finalPosY - initialPosY) * elapsed_book);
+
+    engine.drawTexture(libroText, posX, posY, { 255, 255, 255, 255 });
+
+    // Dibujamos el gif de la explicación por encima
+    auto& gif = engine.gifs.at(name);
+    auto copy = gif.texture;
+
+    // Redimensionamos la copia
+    copy.width = static_cast<int>(copy.width / gif.reScaleX);
+    copy.height = static_cast<int>(copy.height / gif.reScaleY);
+
+    // Calculamos la posición inicial y final para el gif
+    initialPosY = -copy.height;
+    finalPosY = engine.getScreenHeight() / 2 - copy.height / 2;
+
+    // Animamos la posición Y del gif
+    posY = initialPosY + static_cast<int>(static_cast<float>(finalPosY - initialPosY) * elapsed_book);
+
+    posX = engine.getScreenWidth() / 2 - copy.width / 2;
+
+    displayGif(engine, copy, gif, posX, posY);
+
+    // Incremento
+    elapsed_book += timeStep * 0.5f;
+
+    if (elapsed_book > 1.0f)
+        elapsed_book = 1.0f;
+}
+
+void RenderSystem::drawStaff(GameEngine& engine, EntityManager& em)
+{
+    auto& plfi{ em.getSingleton<PlayerInfo>() };
+
+    if (plfi.hasStaff)
+    {
+        if (animatedTextures.find("palo") == animatedTextures.end())
+        {
+            animatedTextures[std::to_string(animatedTextures.size())] = { "placeholder", engine.getScreenWidth() - 230, 25,
+            engine.textures["placeholder"].width, engine.textures["placeholder"].height, 2.75f };
+
+            animatedTextures["palo"] = { "palo", engine.getScreenWidth() - 215, 40,
+            engine.textures["palo"].width, engine.textures["palo"].height, 2.85f };
         }
     }
 }
@@ -2261,7 +2356,7 @@ void RenderSystem::drawAnimatedTextures(GameEngine& engine)
     for (auto& [_, textureInfo] : animatedTextures)
     {
         // Calculamos el factor de escala
-        textureInfo.scaleFactor = 3.5f - 2.5f * textureInfo.lerpFactor;
+        textureInfo.scaleFactor = 3.5f - textureInfo.scaleChange * textureInfo.lerpFactor;
 
         // Calcula la posición del centro de la pantalla
         int centerX = static_cast<int>(static_cast<float>(engine.getScreenWidth() / 2) - static_cast<float>(textureInfo.width) * textureInfo.scaleFactor / 2);
@@ -2313,7 +2408,7 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     GuiTextBox({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.size()), false);
 
     auto& inpi = em.getSingleton<InputInfo>();
-    if (inpi.interact)
+    if (inpi.interact && !txti.notPass)
     {
         txti.popText();
         inpi.interact = false;

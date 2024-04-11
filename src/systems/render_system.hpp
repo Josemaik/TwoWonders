@@ -16,7 +16,8 @@ struct RenderSystem
         int targetPosY;
         int width;
         int height;
-        float scaleFactor;
+        float scaleChange;
+        float scaleFactor{};
         float lerpFactor{ 0.0f };
         float lerpSpeed{ 0.01f };
         float elapsed{ 0.0f };
@@ -58,6 +59,8 @@ private:
     void drawHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
     void drawManaBar(GameEngine& engine, EntityManager& em);
     void drawSpellSlots(GameEngine& engine, EntityManager& em);
+    void drawSpellExp(GameEngine& engine, std::string name);
+    void drawStaff(GameEngine& engine, EntityManager& em);
     void drawAnimatedTextures(GameEngine& engine);
     void drawAlerts_IA(EntityManager& em, GameEngine& engine);
     void drawFPSCounter(GameEngine& engine);
@@ -80,6 +83,7 @@ private:
     float elapsed_CoinBar{ 0.0f }, elapsed_limit_CoinBar{ 5.0f };
     float elapsed_Lock{ 0.0f }, elapsed_limit_Lock{ 5.0f };
     float elapsed_spell{ 0.0f }, elapsed_limit_spell{ 5.0f };
+    float elapsed_book{ 0.0f };
 
     int coinBarX{}, coinNumberX{};
 };

@@ -103,7 +103,6 @@ public:
                             }
                         }
 
-
                         break;
                     }
                     case EventCodes::SetSpawn:
@@ -181,6 +180,7 @@ public:
                         // Le damos el hechizo
                         Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 4 };
                         plfi.addSpell(spell);
+                        plfi.showBook = true;
 
                         // Metemos el texto en el stack de texto
                         for (std::size_t i = 0; i < msgs.size(); i++)

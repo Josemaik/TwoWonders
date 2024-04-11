@@ -1,14 +1,6 @@
 #pragma once
 #include "utils/vec3D.hpp"
 
-struct PreviousPhysicsState
-{
-    vec3d position{};
-    vec3d velocity{};
-    vec3d scale{};
-    double orientation{ 0.0 };
-};
-
 struct PhysicsComponent
 {
     static constexpr double KGravity{ 1.0 };
@@ -34,8 +26,6 @@ struct PhysicsComponent
     vec3d position{};
     vec3d velocity{};
     vec3d scale{};
-
-    PreviousPhysicsState previousState{};
 
     double gravity{ KGravity };
     bool alreadyGrounded{ false };

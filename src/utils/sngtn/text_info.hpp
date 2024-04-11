@@ -24,6 +24,7 @@ struct TextInfo
     {
         return textQueue;
     }
+    bool notPass{ false };
 private:
     // Cola para los textos
     std::queue<std::string> textQueue{};

@@ -209,15 +209,19 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         auto* staticEntPtr = &staticEnt;
         auto* otherEntPtr = &otherEnt;
 
+        auto* staticPhyPtr = &staticPhy;
+        auto* otherPhyPtr = &otherPhy;
+
         if (behaviorType2 & BehaviorType::RAMP)
+        {
             std::swap(staticEntPtr, otherEntPtr);
+            std::swap(staticPhyPtr, otherPhyPtr);
+            std::swap(behaviorType1, behaviorType2);
+        }
 
         // Entidades que no queremos que colisionen con rampas
-        if (otherEntPtr->hasTag<WaterBombTag>())
+        if (otherEntPtr->hasTag<WaterBombTag>() || behaviorType2 & BehaviorType::AREADAMAGECRUSHER || behaviorType2 & BehaviorType::AREADAMAGE)
             return;
-
-        auto* staticPhyPtr = &em.getComponent<PhysicsComponent>(*staticEntPtr);
-        auto* otherPhyPtr = &em.getComponent<PhysicsComponent>(*otherEntPtr);
 
         auto& offSet = em.getComponent<RampComponent>(*staticEntPtr).offset;
         auto& pos = otherPhyPtr->position;
@@ -280,6 +284,44 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         }
 
         staticCollision(*otherPhyPtr, *staticPhyPtr, minOverlap);
+        return;
+    }
+
+    // LAVA
+    if (behaviorType1 & BehaviorType::LAVA || behaviorType2 & BehaviorType::LAVA)
+    {
+        auto* staticEntPtr = &staticEnt;
+        auto* otherEntPtr = &otherEnt;
+
+        auto* staticPhyPtr = &staticPhy;
+        auto* otherPhyPtr = &otherPhy;
+
+        if (behaviorType2 & BehaviorType::LAVA)
+        {
+            std::swap(staticEntPtr, otherEntPtr);
+            std::swap(staticPhyPtr, otherPhyPtr);
+        }
+
+        if (otherEntPtr->hasComponent<TypeComponent>())
+        {
+            auto& type = em.getComponent<TypeComponent>(*otherEntPtr);
+
+            if (type.type != ElementalType::Fire && otherEntPtr->hasComponent<LifeComponent>())
+            {
+                auto& life = em.getComponent<LifeComponent>(*otherEntPtr);
+                life.decreaseLife();
+
+                resolvePlayerDirection(*otherPhyPtr, *staticPhyPtr, false);
+            }
+        }
+        else if (otherEntPtr->hasTag<PlayerTag>() && otherEntPtr->hasComponent<LifeComponent>())
+        {
+            auto& life = em.getComponent<LifeComponent>(*otherEntPtr);
+            life.decreaseLife();
+
+            resolvePlayerDirection(*otherPhyPtr, *staticPhyPtr, false);
+        }
+
         return;
     }
 
@@ -484,7 +526,8 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::SPIDERWEB ||
         behaviorType2 & BehaviorType::WARNINGZONE ||
         behaviorType2 & BehaviorType::AREADAMAGECRUSHER ||
-        behaviorType2 & BehaviorType::LADDER)
+        behaviorType2 & BehaviorType::LADDER ||
+        behaviorType2 & BehaviorType::LAVA)
         return;
 
     if (behaviorType2 & BehaviorType::METEORITE)
@@ -709,7 +752,7 @@ void CollisionSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, Physic
         multiplier = 7;
     }
     else
-        playerPhy.gravity = playerPhy.gravity / 2.5;
+        playerPhy.gravity = playerPhy.gravity / 1.5;
 
     playerPhy.velocity = dir * multiplier;
     playerPhy.stopped = true;
@@ -902,51 +945,49 @@ bool CollisionSystem::resolveCollision(PhysicsComponent& phy1, PhysicsComponent&
     }
 }
 
-bool CollisionSystem::checkWallCollision(EntityManager& em, vec3d& pos)
+bool CollisionSystem::checkWallCollision(EntityManager& em, vec3d& pos, vec3d& normalDir)
 {
+    // Queremos saber si hay una pared en la dirección de la normal
+    // Creamos un rayo que salga de la posición en la dirección de la normal
+    RayCast ray{ pos, normalDir };
+
     // Buscamos todas las paredes cercanas a la posición
-    using noCMPs = MP::TypeList<PhysicsComponent, ColliderComponent>;
-    using wallTag = MP::TypeList<WallTag>;
+    using noCMPs = MP::TypeList<ColliderComponent>;
+    using wallTag = MP::TypeList<>;
     bool collision = false;
+    vec3d colPoint{};
 
-    // Creamos una caja de colisión de 1x1x1 centrada en la posición
-    BBox box{ pos, {2, 4, 2} };
-
-    em.forEach<noCMPs, wallTag>([&](Entity&, PhysicsComponent& phy, ColliderComponent& col)
+    em.forEach<noCMPs, wallTag>([&](Entity& e, ColliderComponent& col)
     {
         if (collision)
             return;
-
-        auto& bbox = col.boundingBox;
-        if (bbox.intersects(box))
+        else if (col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::LAVA)
         {
-            collision = true;
-
-            // Calculamos el mínimo solape entre las dos entidades
-            vec3d minOverlap = BBox::minOverlap(bbox, box);
-
-            // Sacamos cuál sería la posición de la entidad después de la colisión
-            //std::cout << pos << std::endl;
-            auto newPos = pos;
-            //std::cout << newPos << std::endl;
-            if (minOverlap.x() < minOverlap.y() && minOverlap.x() < minOverlap.z())
+            auto& bbox = col.boundingBox;
+            if (e.hasTag<LavaTag>())
             {
-                if (phy.position.x() < pos.x())
-                    newPos.setX(pos.x() + minOverlap.x());
-                else
-                    newPos.setX(pos.x() - minOverlap.x());
-            }
-            else if (minOverlap.z() < minOverlap.y())
-            {
-                if (phy.position.z() < pos.z())
-                    newPos.setZ(pos.z() + minOverlap.z());
-                else
-                    newPos.setZ(pos.z() - minOverlap.z());
-            }
+                if (bbox.intersectsRay2(ray.origin, ray.direction, colPoint))
+                {
+                    auto& phy = em.getComponent<PhysicsComponent>(e);
 
-            pos = newPos;
+                    // Pillamos el centro de la caja para asegurarnos que no se quede en la lava o atraviese paredes
+                    auto centreDir = (vec3d{ phy.position.x(), pos.y(), phy.position.z() } - pos).normalize();
+                    ray.direction = centreDir;
+
+                    bbox.intersectsRay2(ray.origin, ray.direction, colPoint);
+                    auto newPos = colPoint + centreDir * 2.0;
+
+                    collision = true;
+
+                    pos = newPos;
+                }
+            }
+            else if (bbox.intersectsRay(ray.origin, ray.direction, colPoint) && colPoint.distance(pos) < 10.0)
+            {
+                collision = true;
+                pos = colPoint;
+            }
         }
-
     });
 
     return collision;

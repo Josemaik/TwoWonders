@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -95.0, 22.0, -135.0 };
+        plfi.spawnPoint = { 37.0, 13.0, -104.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -87,8 +87,8 @@ void Game::createEntities()
     lis.addCode(EventCodes::ViewPointNPCPrison);
 
     // Código de añadir un hechizo al jugador
-    // Spell spell{ "Fireball", "Shoots a fireball", Spells::WaterBomb, 20.0, 2 };
-    // plfi.addSpell(spell);
+    Spell spell{ "Fireball", "Shoots a fireball", Spells::WaterDash, 20.0, 2 };
+    plfi.addSpell(spell);
 
     // Código de añadir un objeto poción al inventario
     // Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };

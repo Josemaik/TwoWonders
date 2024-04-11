@@ -23,6 +23,7 @@ enum BehaviorType
     SPAWN = 0x4000,
     RAMP = 0x8000,
     LADDER = 0x10000,
+    LAVA = 0x20000,
 };
 
 struct ColliderComponent

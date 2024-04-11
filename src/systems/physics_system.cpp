@@ -38,12 +38,6 @@ void PhysicsSystem::update(EntityManager& em)
         auto& pos = phy.position;
         auto& vel = phy.velocity;
 
-        // Actualizamos el estado anterior
-        phy.previousState.position = pos;
-        phy.previousState.velocity = vel;
-        phy.previousState.scale = phy.scale;
-        phy.previousState.orientation = phy.orientation;
-
         // Aplicar gravedad y hacer Clamp
         vel.setY(vel.y() - phy.gravity);
 

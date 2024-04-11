@@ -374,11 +374,16 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
 
         vec3d originalPos = phy.position;
         vec3d posCopy = phy.position;
-        posCopy += { std::sin(ori) * 8.0, 0, std::cos(ori) * 8.0 };
+        posCopy += { std::sin(ori) * 10.0, 0, std::cos(ori) * 10.0 };
 
-        if (col_sys->checkWallCollision(em, posCopy))
-            posCopy -= { std::sin(ori) * 4.5, 0, std::cos(ori) * 4.5 };
-        phy.position = posCopy;
+        // Sacamos la normal entre la posición original y la nueva
+        auto normal = (posCopy - originalPos).normalize();
+        if (!col_sys->checkWallCollision(em, phy.position, normal))
+        {
+            phy.position = posCopy;
+        }
+        else
+            posCopy = phy.position;
 
         // Creamos una capa de agua entre la posición original y la nueva
         auto distance = (originalPos - posCopy).length();

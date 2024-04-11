@@ -52,10 +52,19 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImage("sig", "assets/HUD/dialog_siguiente.png");
 
     // Espacio para hechizos de agua HUD
-    loadAndResizeImage("agua_holder", "assets/HUD/item_agua.png");
+    loadAndResizeImage("placeholder", "assets/HUD/item_agua.png");
+
+    // Icono de palo HUD
+    loadAndResizeImage("palo", "assets/HUD/palo.png");
 
     // Icono para las pompas de agua HUD
     loadAndResizeImage("pompas", "assets/HUD/pompas.png", 1.5, 1.5);
+
+    // Icono para el dash de agua HUD
+    loadAndResizeImage("dash", "assets/HUD/dash.png");
+
+    // Libro para enseñar hechizos HUD
+    loadAndResizeImage("libro", "assets/HUD/Libro.png");
 
     // NÚMEROS
     //
@@ -104,6 +113,12 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Pantalla de carga
     loadAndResizeImageGif("carga", "assets/HUD/gifs/carga_elementos.gif", 0, 55);
+
+    // Teclas WASD
+    loadAndResizeImageGif("wasd", "assets/HUD/teclas/WASD.gif", 0, 55);
+
+    // Ejemplo pompa
+    loadAndResizeImageGif("exp_pompa", "assets/HUD/gifs/hechizos/exp_pompa.gif", 0, 55);
 
     SetExitKey(KEY_F8);
 }

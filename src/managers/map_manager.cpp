@@ -492,6 +492,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         case InteractableType::DamageObj:
         {
             em.addTag<LavaTag>(entity);
+            c.behaviorType = BehaviorType::LAVA;
             if (interactable.HasMember("offsetZ"))
             {
                 r.offset = interactable["offsetZ"][0].GetDouble();

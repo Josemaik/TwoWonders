@@ -234,6 +234,9 @@ void ObjectSystem::createObjects(EntityManager& em)
             scl = { 10.5, 10.3, 10.3 };
             inmortal = true;
             visible = false;
+
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            plfi.hasStaff = true;
             break;
         }
         case ObjectType::Key:
