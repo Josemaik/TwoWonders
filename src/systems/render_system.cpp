@@ -956,49 +956,49 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     else if (e.hasTag<BarricadeTag>())
     {
-        r.model = engine.loadModel("assets/models/Barricada_arboles.obj");
+        r.model = engine.loadModel("assets/Assets/Barricada_arboles/Barricada_arboles.obj");
 
         loadShaders(r.model);
     }
     else if (e.hasTag<SpawnTag>())
     {
-        r.model = engine.loadModel("assets/models/Checkpoint.obj");
+        r.model = engine.loadModel("assets/Assets/Checkpoint/Checkpoint.obj");
 
         loadShaders(r.model);
     }
     else if (e.hasTag<LevelChangeTag>())
     {
-        r.model = engine.loadModel("assets/models/Tp.obj");
+        r.model = engine.loadModel("assets/Assets/Tp/Tp.obj");
 
         loadShaders(r.model);
     }
     else if (e.hasTag<LeverTag>())
     {
-        r.model = engine.loadModel("assets/models/Palanca-prision.obj");
+        r.model = engine.loadModel("assets/Assets/Palanca/Palanca-prision.obj");
 
         loadShaders(r.model);
     }
     else if (e.hasTag<CoinTag>())
     {
-        r.model = engine.loadModel("assets/models/props/Destellos.obj");
+        r.model = engine.loadModel("assets/Assets/Props/Destellos.obj");
 
         loadShaders(r.model);
     }
     else if (e.hasTag<WaterBombTag>())
     {
-        r.model = engine.loadModel("assets/models/props/Hechizos/Agua_1.obj");
+        r.model = engine.loadModel("assets/Assets/Props/Hechizos/Agua_1.obj");
 
         loadShaders(r.model);
     }
     else if (e.hasTag<NomadTag>())
     {
-        r.model = engine.loadModel("assets/characters/NPCs/Nomada/Nomada.obj");
+        r.model = engine.loadModel("assets/Personajes/NPCs/Nomada/Nomada.obj");
 
         loadShaders(r.model);
     }
     else if (e.hasTag<LavaTag>())
     {
-        r.model = engine.loadModel("assets/models/Charco_lava.obj");
+        r.model = engine.loadModel("assets/Assets/Charco_lava/Charco_lava.obj");
 
         loadShaders(r.model);
     }

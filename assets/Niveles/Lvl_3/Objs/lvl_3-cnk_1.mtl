@@ -1,0 +1,52 @@
+# Blender 4.0.2 MTL File: 'Lvl_3-Pradera_Preri.blend'
+# www.blender.org
+
+newmtl Casa_1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd ../../../Assets/Texturas/casa-texture.png
+
+newmtl lvl3
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd ../Texturas/lvl_3-texture.png
+
+newmtl lvl3-extras
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd ../Texturas/lvl_3_extras-texture.png
+
+newmtl lvl3-extras-metal
+Ns 490.000000
+Ka 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd ../../Assets/Texturas/lvl_3_extras-texture.png
+
+newmtl lvl3_extras_water
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 0.600000
+illum 9
+map_Kd ../Texturas/lvl_3_extras-texture.png

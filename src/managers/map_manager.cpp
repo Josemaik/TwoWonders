@@ -516,6 +516,11 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
 
             break;
         }
+        case InteractableType::Sign:
+        {
+            em.addTag<SignTag>(entity);
+            break;
+        }
         default:
             break;
         }
