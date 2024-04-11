@@ -682,7 +682,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     //pos.setY(pos.y() - 0.5);
                     in = true;
                 }
-                else if (e.hasTag<ChestTag>())
+                else if (e.hasTag<ChestTag>() || e.hasTag<SpawnTag>() || e.hasTag<LavaTag>() || e.hasTag<SignTag>() || e.hasTag<TableTag>())
                 {
                     pos.setY(pos.y() - r.offset);
                     in = true;
@@ -690,11 +690,6 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 else if (e.hasTag<DestructibleTag>())
                 {
                     pos.setY(pos.y() - r.offset / 1.5);
-                    in = true;
-                }
-                else if (e.hasTag<SpawnTag>() || e.hasTag<LavaTag>())
-                {
-                    pos.setY(pos.y() - r.offset);
                     in = true;
                 }
                 else if (e.hasTag<NomadTag>())
@@ -999,6 +994,18 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<LavaTag>())
     {
         r.model = engine.loadModel("assets/Assets/Charco_lava/Charco_lava.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<SignTag>())
+    {
+        r.model = engine.loadModel("assets/Assets/Cartel/Cartel.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<TableTag>())
+    {
+        r.model = engine.loadModel("assets/Assets/Mesa_investigador/Mesa-investigador.obj");
 
         loadShaders(r.model);
     }

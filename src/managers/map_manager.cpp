@@ -384,14 +384,10 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             em.addTag<WallTag>(entity);
             ObjectType content{ static_cast<ObjectType>(interactable["content"].GetInt()) };
 
-            std::queue<std::string> messages;
-            for (mapSizeType j = 0; j < interactable["message"].Size(); j++)
-            {
-                messages.emplace(interactable["message"][j].GetString());
-            }
+            addMessageCmp(em, entity, interactable);
 
             em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
-            [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .dropPosition = { vec3d::zero() }, .content = content, .messages = messages });
+            [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .dropPosition = { vec3d::zero() }, .content = content });
 
             if (interactable.HasMember("offsetZ"))
             {
@@ -513,12 +509,27 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             auto yMax = c.boundingBox.max.y();
             auto rot2 = (orientation - 90.0) * DEGTORAD;
             em.addComponent<LadderComponent>(entity, LadderComponent{ .orientation = rot2, .yMin = yMin, .yMax = yMax });
-
             break;
         }
         case InteractableType::Sign:
         {
             em.addTag<SignTag>(entity);
+
+            addMessageCmp(em, entity, interactable);
+            addToZone(em, entity, type);
+            if (interactable.HasMember("offsetZ"))
+            {
+                r.offset = interactable["offsetZ"][0].GetDouble();
+            }
+            break;
+        }
+        case InteractableType::Table:
+        {
+            em.addTag<TableTag>(entity);
+            if (interactable.HasMember("offsetZ"))
+            {
+                r.offset = interactable["offsetZ"][0].GetDouble();
+            }
             break;
         }
         default:
@@ -730,6 +741,16 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
         }
         reSpawn = false;
     }
+}
+
+void MapManager::addMessageCmp(EntityManager& em, Entity& e, const valueType& value)
+{
+    std::queue<std::string> messages;
+    for (mapSizeType j = 0; j < value["message"].Size(); j++)
+    {
+        messages.emplace(value["message"][j].GetString());
+    }
+    em.addComponent<MessageComponent>(e, MessageComponent{ .messages = messages });
 }
 
 // template<>

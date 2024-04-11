@@ -24,6 +24,7 @@ private:
     void checkLevers(EntityManager& em, EventManager& evm);
     void checkSpawns(EntityManager& em, EventManager& evm);
     void checkLadders(EntityManager& em);
+    void checkSigns(EntityManager& em);
     void checkNPCs(EntityManager& em, EventManager& evm);
     void checkDoors(EntityManager& em, EventManager& evm);
     // void checkDungeonSlimes(EntityManager& em, EventManager& evm);

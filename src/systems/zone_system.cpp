@@ -92,11 +92,12 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
 
     auto& zchi = em.getSingleton<ZoneCheckInfo>();
 
-    checkZones(em, evm, zchi.getChestZones(), [&](EntityManager& em, EventManager& evm) { checkChests(em, evm); });
-    checkZones(em, evm, zchi.getLeverZones(), [&](EntityManager& em, EventManager& evm) { checkLevers(em, evm); });
-    checkZones(em, evm, zchi.getDoorZones(), [&](EntityManager& em, EventManager& evm) { checkDoors(em, evm); });
-    checkZones(em, evm, zchi.getNpcZones(), [&](EntityManager& em, EventManager& evm) { checkNPCs(em, evm); });
-    checkZones(em, evm, zchi.getLadderZones(), [&](EntityManager& em, EventManager&) { checkLadders(em); });
+    checkZones(em, evm, zchi.getZones(InteractableType::Chest), [&](EntityManager& em, EventManager& evm) { checkChests(em, evm); });
+    checkZones(em, evm, zchi.getZones(InteractableType::Lever), [&](EntityManager& em, EventManager& evm) { checkLevers(em, evm); });
+    checkZones(em, evm, zchi.getZones(InteractableType::Door), [&](EntityManager& em, EventManager& evm) { checkDoors(em, evm); });
+    checkZones(em, evm, zchi.getZones(InteractableType::NPC), [&](EntityManager& em, EventManager& evm) { checkNPCs(em, evm); });
+    checkZones(em, evm, zchi.getZones(InteractableType::Ladder), [&](EntityManager& em, EventManager&) { checkLadders(em); });
+    checkZones(em, evm, zchi.getZones(InteractableType::Sign), [&](EntityManager& em, EventManager&) { checkSigns(em); });
 }
 
 void ZoneSystem::checkZones(EntityManager& em, EventManager& evm, checkType zones, checkFuncType checkFunction)
@@ -380,6 +381,44 @@ void ZoneSystem::checkLadders(EntityManager& em)
             playerPhy.orientation = ldc.orientation;
 
             plfi.onLadder = true;
+            inpi.interact = false;
+        }
+    });
+}
+
+void ZoneSystem::checkSigns(EntityManager& em)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& playerEnt = *em.getEntityByID(li.playerID);
+    auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
+    auto& playerPos = playerPhy.position;
+    using noCMP = MP::TypeList<PhysicsComponent, InteractiveComponent, MessageComponent>;
+    using npcTag = MP::TypeList<SignTag>;
+
+    em.forEach<noCMP, npcTag>([&](Entity&, PhysicsComponent& phy, InteractiveComponent& ic, MessageComponent& msg)
+    {
+        double distance = playerPos.distance(phy.position);
+        double range = 12.0;
+
+        auto& inpi = em.getSingleton<InputInfo>();
+
+        if (distance < range && !ic.showButton)
+            ic.showButton = true;
+
+        else if (distance > range && ic.showButton)
+            ic.showButton = false;
+
+        if (inpi.interact && ic.showButton)
+        {
+            auto& txti = em.getSingleton<TextInfo>();
+            auto msgs = msg.messages;
+
+            while (!msgs.empty())
+            {
+                txti.addText(msgs.front());
+                msgs.pop();
+            }
+
             inpi.interact = false;
         }
     });

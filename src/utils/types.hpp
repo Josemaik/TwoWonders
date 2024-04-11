@@ -18,6 +18,7 @@
 #include "../components/dispatcher_component.hpp"
 #include "../components/oneuse_component.hpp"
 #include "../components/ladder_component.hpp"
+#include "../components/message_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
 #include "../components/navmesh_component.hpp"
@@ -106,6 +107,7 @@ struct NomadTag {};
 struct LavaTag {};
 struct LadderTag {};
 struct SignTag {};
+struct TableTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -132,7 +134,8 @@ using CL = MP::TypeList <
     Navmesh,
     OneUseComponent,
     NPCComponent,
-    LadderComponent
+    LadderComponent,
+    MessageComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,
@@ -176,7 +179,8 @@ using TL = MP::TypeList <
     NomadTag,
     LavaTag,
     LadderTag,
-    SignTag
+    SignTag,
+    TableTag    
 > ;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

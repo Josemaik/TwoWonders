@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 37.0, 13.0, -104.0 };
+        plfi.spawnPoint = { -28.0, 49.0, -30.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -57,6 +57,7 @@ void Game::createEntities()
     // -26.0, 4.0, 235.0 - NPC lvl1
     // -113.0, 13.0, 236.0 - Final lvl1
     // 46.0, 13.0, 86.9 - pasillo nivel 1
+    // -28.0, 49.0, -30.0 - Posición Incial lvl2
     // 34.0, 29.0, -60.0 - Segunda rampa lvl2
     // -7.55, 40.0, 16.0 - Lugar donde muñeco de nieve lvl2
     // 37.0, 13.0, -104.0 - Desp segunda lava lvl2

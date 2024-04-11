@@ -205,7 +205,10 @@
 							"position":[-45.824, -17.415, 52.0],
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
-							"rotVector":[0.0, 0.0, 1.0]
+							"rotVector":[0.0, 0.0, 1.0],
+							"message": [
+								"Volcán Igni - Nos gustan las visitas cortas"
+							]
 						}
 					]
 				}

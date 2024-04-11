@@ -58,6 +58,7 @@ private:
     void generateNavmeshes(EntityManager& em);
     void addToZone(EntityManager& em, Entity& e, InteractableType type);
     void checkDispatcher(EntityManager& em, Entity& e, const valueType& value);
+    void addMessageCmp(EntityManager& em, Entity& e, const valueType& value);
 
     std::string fileMap{};
     std::map<uint8_t, BBox> zoneBounds{};

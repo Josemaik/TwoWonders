@@ -82,7 +82,9 @@ public:
                         ss.sonido_abrir_cofre();
 
                         os.addObject(cc.content, playerPos);
-                        auto& msgs = cc.messages;
+
+                        auto& msc = em.getComponent<MessageComponent>(e);
+                        auto& msgs = msc.messages;
                         while (!msgs.empty())
                         {
                             txti.addText(msgs.front());
