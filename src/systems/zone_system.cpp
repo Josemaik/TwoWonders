@@ -98,6 +98,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     checkZones(em, evm, zchi.getZones(InteractableType::NPC), [&](EntityManager& em, EventManager& evm) { checkNPCs(em, evm); });
     checkZones(em, evm, zchi.getZones(InteractableType::Ladder), [&](EntityManager& em, EventManager&) { checkLadders(em); });
     checkZones(em, evm, zchi.getZones(InteractableType::Sign), [&](EntityManager& em, EventManager&) { checkSigns(em); });
+    checkZones(em, evm, zchi.getZones(InteractableType::MissionOBJ), [&](EntityManager& em, EventManager& evm) { checkMissionObjs(em, evm); });
 }
 
 void ZoneSystem::checkZones(EntityManager& em, EventManager& evm, checkType zones, checkFuncType checkFunction)
@@ -418,6 +419,38 @@ void ZoneSystem::checkSigns(EntityManager& em)
                 txti.addText(msgs.front());
                 msgs.pop();
             }
+
+            inpi.interact = false;
+        }
+    });
+}
+
+void ZoneSystem::checkMissionObjs(EntityManager& em, EventManager& evm)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& playerEnt = *em.getEntityByID(li.playerID);
+    auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
+    auto& playerPos = playerPhy.position;
+    using noCMP = MP::TypeList<PhysicsComponent, InteractiveComponent>;
+    using npcTag = MP::TypeList<MissionObjTag>;
+
+    em.forEach<noCMP, npcTag>([&](Entity& e, PhysicsComponent& phy, InteractiveComponent& ic)
+    {
+        double distance = playerPos.distance(phy.position);
+        double range = 7.0;
+
+        auto& inpi = em.getSingleton<InputInfo>();
+
+        if (distance < range && !ic.showButton)
+            ic.showButton = true;
+
+        else if (distance > range && ic.showButton)
+            ic.showButton = false;
+
+        if (inpi.interact && ic.showButton)
+        {
+            li.boatPartFound = e.getID();
+            evm.scheduleEvent(Event{ EventCodes::BoatPartFound });
 
             inpi.interact = false;
         }

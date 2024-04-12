@@ -259,18 +259,19 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     if (player.hasComponent<AttackComponent>())
     {
         auto& atc = em.getComponent<AttackComponent>(player);
-        if (atc.elapsed >= atc.countdown)
-        {
-            if ((ge.isKeyDown(in.space) || ge.isGamepadButtonPressed(0, in.m_space)))
-                em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
-            else if (plfi.mana < plfi.max_mana)
-            {
-                plfi.mana += .07;
+        if ((ge.isKeyDown(in.space) || ge.isGamepadButtonPressed(0, in.m_space)))
+            em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
 
-                if (plfi.mana > plfi.max_mana)
-                    plfi.mana = plfi.max_mana;
-            }
+        if (plfi.mana < plfi.max_mana)
+        {
+            if (!plfi.hasHat)
+                plfi.mana += .07;
+            else plfi.mana += .20;
+
+            if (plfi.mana > plfi.max_mana)
+                plfi.mana = plfi.max_mana;
         }
+
     }
 
     if (ge.isKeyPressed(in.interact) || ge.isGamepadButtonPressed(0, in.m_interact))

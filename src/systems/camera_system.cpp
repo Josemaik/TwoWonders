@@ -99,6 +99,12 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
                     evm.scheduleEvent(Event{ EventCodes::NPCDialog });
                     li.eventNPCPrison = false;
                 }
+
+                if (li.eventBoatDialog)
+                {
+                    evm.scheduleEvent(Event{ EventCodes::BoatDialog });
+                    li.eventBoatDialog = false;
+                }
             }
 
             t = 0.05f;

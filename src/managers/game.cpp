@@ -86,6 +86,8 @@ void Game::createEntities()
     lis.addCode(EventCodes::NPCDialog);
     lis.addCode(EventCodes::DialogFirstSpawn);
     lis.addCode(EventCodes::ViewPointNPCPrison);
+    lis.addCode(EventCodes::BoatPartFound);
+    lis.addCode(EventCodes::BoatDialog);
 
     // Código de añadir un hechizo al jugador
     Spell spell{ "Fireball", "Shoots a fireball", Spells::WaterDash, 20.0, 2 };

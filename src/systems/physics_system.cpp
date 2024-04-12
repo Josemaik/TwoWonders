@@ -65,6 +65,12 @@ void PhysicsSystem::update(EntityManager& em)
                 // si el player no esta siendo ralentizado-> no esta siendo capturado por tearaña
                 em.getSingleton<BlackBoard_t>().playerhunted = false;
             }
+
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            if (plfi.hasBoots)
+            {
+                phy.max_speed += 0.5;
+            }
         }
 
         // Si estamos en una rampa queremos ir un poco más lento

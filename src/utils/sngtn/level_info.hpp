@@ -68,9 +68,10 @@ struct LevelInfo
     std::size_t chestToOpen{ max };
     std::size_t doorToOpen{ max };
     std::size_t npcToTalk{ max };
+    std::size_t boatPartFound{ max };
     bool dungeonKeyCreated{ false };
     vec3d enemyToChestPos{};
-    bool door_open{ false }, eventNPCPrison{ false };
+    bool door_open{ false }, eventNPCPrison{ false }, eventBoatDialog{ false };
 
     // Variables de debug
     bool debugIA2{ false };

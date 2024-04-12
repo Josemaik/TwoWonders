@@ -494,10 +494,10 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
             if (otherEntPtr->hasComponent<TypeComponent>())
             {
                 auto& bulletType = em.getComponent<TypeComponent>(*otherEntPtr);
-                if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(bulletType.type)){
+                if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(bulletType.type)) {
                     em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
-                    if(staticEntPtr->hasTag<EnemyTag>()){
-                        if(staticEntPtr->hasComponent<AIComponent>()){
+                    if (staticEntPtr->hasTag<EnemyTag>()) {
+                        if (staticEntPtr->hasComponent<AIComponent>()) {
                             em.getComponent<AIComponent>(*staticEntPtr).playerdetected = true;
                         }
                     }
@@ -814,9 +814,9 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                 if (balaCol.behaviorType & BehaviorType::ATK_PLAYER)
                 {
                     //Si pegamos a un enemmigo nos detecta directamente
-                    if(ent2Ptr->hasTag<GolemTag>() || ent2Ptr->hasTag<SnowmanTag>())
+                    if (ent2Ptr->hasTag<GolemTag>() || ent2Ptr->hasTag<SnowmanTag>())
                         em.getComponent<AIComponent>(*ent2Ptr).playerdetected = true;
-                    
+
                     auto& plfi = em.getSingleton<PlayerInfo>();
                     damage = plfi.currentSpell.damage;
 
@@ -985,7 +985,7 @@ bool CollisionSystem::checkWallCollision(EntityManager& em, vec3d& pos, vec3d& n
             else if (bbox.intersectsRay(ray.origin, ray.direction, colPoint) && colPoint.distance(pos) < 10.0)
             {
                 collision = true;
-                pos = colPoint;
+                pos = colPoint - normalDir * 1.5;
             }
         }
     });

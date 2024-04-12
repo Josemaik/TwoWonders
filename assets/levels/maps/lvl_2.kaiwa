@@ -159,10 +159,10 @@
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 1.0],
-							"content": 10,
+							"content": 22,
 							"message": [
-								"¡Encontraste una llave!", 
-								"Parece que es de un solo uso..."
+								"¡Encontraste un sombrero de brujo!",
+								"Te ayudará a canalizar tu magia."
 							]
 						},
 						{
@@ -621,7 +621,7 @@
 						},
 						{
 							"type":1,
-							"offsetZ":[21.562252044677734],
+							"offsetZ":[3.562252044677734],
 							"position":[-53.763, 42.036, 34.0],
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
@@ -724,7 +724,7 @@
 						},
 						{
 							"type":10,
-							"offsetZ":[],
+							"offsetZ":[0],
 							"position":[-60.296, -43.078, 25.0],
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
@@ -732,7 +732,7 @@
 						},
 						{
 							"type":10,
-							"offsetZ":[],
+							"offsetZ":[0],
 							"position":[-134.806, -43.078, 25.0],
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
@@ -1203,7 +1203,7 @@
 						},
 						{
 							"type":10,
-							"offsetZ":[],
+							"offsetZ":[0],
 							"position":[-139.56, -61.164, 16.0],
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
@@ -1211,7 +1211,7 @@
 						},
 						{
 							"type":10,
-							"offsetZ":[],
+							"offsetZ":[0],
 							"position":[38.796, -61.558, 34.0],
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
@@ -1219,8 +1219,8 @@
 						},
 						{
 							"type":11,
-							"offsetZ":[-7.095317840576172],
-							"position":[45.465, -93.282, 7.0],
+							"offsetZ":[1.9046821594238281],
+							"position":[40.465, -93.282, 4.0],
 							"scale":[14.395, 5.463, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, -1.0]

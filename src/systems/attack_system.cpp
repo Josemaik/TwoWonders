@@ -132,8 +132,8 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             //em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f });
             em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::AREADAMAGE });
         }
+        break;
     }
-                               break;
     case AttackType::Spiderweb: {
         //createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack,1.0);
         auto& e{ em.newEntity() };

@@ -532,6 +532,29 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             }
             break;
         }
+        case InteractableType::MissionOBJ:
+        {
+            auto& li = em.getSingleton<LevelInfo>();
+            switch (li.mapID)
+            {
+            case 2:
+            {
+                em.addTag<MissionObjTag>(entity);
+                auto& bc = em.addComponent<BoatComponent>(entity);
+                bc.setPart();
+
+                addToZone(em, entity, type);
+                if (interactable.HasMember("offsetZ"))
+                {
+                    r.offset = interactable["offsetZ"][0].GetDouble();
+                }
+                break;
+            }
+            default:
+                break;
+            }
+            break;
+        }
         default:
             break;
         }
@@ -621,11 +644,17 @@ void MapManager::generateNavmeshes(EntityManager& em)
                 if (max.x() < vecnodes[j + 1].x()) {
                     max.setX(vecnodes[j + 1].x());
                 }
+                if (max.y() < vecnodes[j + 1].y()) {
+                    max.setY(vecnodes[j + 1].y());
+                }
                 if (max.z() < vecnodes[j + 1].z()) {
                     max.setZ(vecnodes[j + 1].z());
                 }
                 if (min.x() > vecnodes[j + 1].x()) {
                     min.setX(vecnodes[j + 1].x());
+                }
+                if (min.y() > vecnodes[j + 1].y()) {
+                    min.setY(vecnodes[j + 1].y());
                 }
                 if (min.z() > vecnodes[j + 1].z()) {
                     min.setZ(vecnodes[j + 1].z());
@@ -645,14 +674,14 @@ void MapManager::generateNavmeshes(EntityManager& em)
         BBox b{ min,max };
         navs.boundingnavmesh.push_back(b);
         //Creamos NavMesh
-        Navmesh nav{ .box = b};
+        Navmesh nav{ .box = b };
         //Rellenamos los nodos
         for (auto& n : vecnodes) {
             auto pair = std::make_pair(navs.num_nodes, n);
             //Se añade al navinfo
             navs.nodes.insert(pair);
             //si es el centro, se guarda
-            if(n.x() == vecnodes[0].x() && n.z() == vecnodes[0].z()){
+            if (n.x() == vecnodes[0].x() && n.z() == vecnodes[0].z()) {
                 nav.centerpoint = pair;
             }
             nav.nodes.insert(pair);

@@ -19,10 +19,10 @@ void LifeComponent::decreaseLife(int minusLife) {
 }
 
 void LifeComponent::increaseLife(int i) {
-    if (life < maxLife) {
+    if (life < (maxLife + maxLifeAdd)) {
         life += i;
-        if (life > maxLife)
-            life = maxLife;
+        if (life > (maxLife + maxLifeAdd))
+            life = (maxLife + maxLifeAdd);
     }
 }
 

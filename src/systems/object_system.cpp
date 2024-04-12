@@ -194,7 +194,6 @@ void ObjectSystem::addObject(ObjectType type, vec3d pos)
 
 void ObjectSystem::createObjects(EntityManager& em)
 {
-
     // Se crean los objetos del vector
     for (auto& [obj, pos] : toCreate)
     {
@@ -268,6 +267,32 @@ void ObjectSystem::createObjects(EntityManager& em)
             color = RED;
             scl = { 1.5, 0.3, 0.3 };
             inmortal = true;
+            break;
+        }
+        case ObjectType::GoodBoots:
+        {
+            color = GREEN;
+            scl = { 10.5, 10.5, 10.5 };
+            inmortal = true;
+            visible = false;
+
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            plfi.hasBoots = true;
+
+            Item boots = { "Botas de la suerte", "Botas que te hacen correr más rápido" };
+            break;
+        }
+        case ObjectType::RegularHat:
+        {
+            color = GREEN;
+            scl = { 10.5, 10.5, 10.5 };
+            inmortal = true;
+            visible = false;
+
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            plfi.hasHat = true;
+
+            Item boots = { "Sombrero de Mago", "Te ayuda a canalizar mejor tu uso de magia" };
             break;
         }
 

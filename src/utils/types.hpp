@@ -19,6 +19,7 @@
 #include "../components/oneuse_component.hpp"
 #include "../components/ladder_component.hpp"
 #include "../components/message_component.hpp"
+#include "../components/boat_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
 #include "../components/navmesh_component.hpp"
@@ -108,8 +109,9 @@ struct LavaTag {};
 struct LadderTag {};
 struct SignTag {};
 struct TableTag {};
-struct InvestigatorTag{};
-
+struct InvestigatorTag {};
+struct MissionObjTag {};
+struct BoatTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -137,7 +139,8 @@ using CL = MP::TypeList <
     OneUseComponent,
     NPCComponent,
     LadderComponent,
-    MessageComponent
+    MessageComponent,
+    BoatComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,
@@ -183,7 +186,9 @@ using TL = MP::TypeList <
     LadderTag,
     SignTag,
     TableTag,
-    InvestigatorTag    
+    InvestigatorTag,
+    MissionObjTag,
+    BoatTag
 > ;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

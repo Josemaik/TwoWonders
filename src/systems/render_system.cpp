@@ -682,7 +682,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     //pos.setY(pos.y() - 0.5);
                     in = true;
                 }
-                else if (e.hasTag<ChestTag>() || e.hasTag<SpawnTag>() || e.hasTag<LavaTag>() || e.hasTag<SignTag>() || e.hasTag<TableTag>())
+                else if (e.hasTag<ChestTag>() || e.hasTag<SpawnTag>() || e.hasTag<LavaTag>() || e.hasTag<SignTag>() || e.hasTag<TableTag>() || e.hasTag<MissionObjTag>())
                 {
                     pos.setY(pos.y() - r.offset);
                     in = true;
@@ -698,7 +698,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     in = true;
                 }
                 else if (e.hasTag<GroundTag>() || e.hasTag<DoorTag>() || e.hasTag<LeverTag>()
-                    || e.hasTag<CoinTag>() || e.hasTag<WaterBombTag>())
+                    || e.hasTag<CoinTag>() || e.hasTag<WaterBombTag>() || e.hasTag<BoatTag>())
                 {
                     in = true;
                 }
@@ -1013,6 +1013,54 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
 
         loadShaders(r.model);
     }
+    else if (e.hasTag<MissionObjTag>())
+    {
+        switch (li.mapID)
+        {
+        case 2:
+        {
+            if (e.hasComponent<BoatComponent>())
+            {
+                auto& bc = em.getComponent<BoatComponent>(e);
+
+                switch (bc.part)
+                {
+                case BoatParts::Base:
+                {
+                    r.model = engine.loadModel("assets/Assets/Barca/Barca_base.obj");
+                    break;
+                }
+                case BoatParts::Motor:
+                {
+                    r.model = engine.loadModel("assets/Assets/Barca/Barca_motor.obj");
+                    break;
+                }
+                case BoatParts::SteeringWheel:
+                {
+                    r.model = engine.loadModel("assets/Assets/Barca/Barca_volante.obj");
+                    break;
+                }
+                case BoatParts::Propeller:
+                {
+                    r.model = engine.loadModel("assets/Assets/Barca/Barca_helice.obj");
+                    break;
+                }
+                }
+            }
+        }
+
+        default:
+            break;
+        }
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<BoatTag>())
+    {
+        r.model = engine.loadModel("assets/Assets/Barca/Barca_completa.obj");
+
+        loadShaders(r.model);
+    }
     else
     {
         r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
@@ -1111,7 +1159,7 @@ double SelectValue(GameEngine& engine, double value, float posx, float posy, flo
     return static_cast<double>(floatvalue);
 }
 
-uint16_t findNearestNode(EntityManager& em,const vec3d& position, const std::set<std::pair<uint16_t, vec3d>>& nodes) {
+uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::set<std::pair<uint16_t, vec3d>>& nodes) {
     uint16_t nearestNodeId = 0; // Suponemos que el primer nodo es el más cercano inicialmente
     double minDistance = std::numeric_limits<double>::max(); // Inicializamos la distancia mínima con un valor muy grande
     vec3d nearestpos{};
@@ -1187,13 +1235,13 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         // recorrelos y devuelve
         // Función para encontrar el nodo más cercano a una posición dada
         vec3d posplayer = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
-        uint16_t startnode = findNearestNode(em,posplayer, navs.nodes);
-        uint16_t targetnode = findNearestNode(em,vec3d{-12.33, 40.0, 22.41}, navs.nodes);
+        uint16_t startnode = findNearestNode(em, posplayer, navs.nodes);
+        uint16_t targetnode = findNearestNode(em, vec3d{ -12.33, 40.0, 22.41 }, navs.nodes);
         //Creamos Grafo
         Graph graph{};
         graph.createGraph(navs.conexiones, navs.nodes);
-        std::vector<vec3d> path = graph.PathFindAStar(debug,startnode,targetnode);
-        
+        std::vector<vec3d> path = graph.PathFindAStar(debug, startnode, targetnode);
+
         std::size_t lengthpath = path.size();
         std::cout << lengthpath;
         //calcular camnino desde el centro hasta un punto
@@ -1241,31 +1289,32 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     //     Calcular pathfinding
     //     std::cout << static_cast<uint16_t>(debug.startnode) << static_cast<uint16_t>(debug.goalnode) << "\n";
     //     std::vector<vec3d> path = graph.PathFindAStar(static_cast<uint16_t>(debug.startnode), static_cast<uint16_t>(debug.goalnode));
-        if(path.size() == 0){
+        if (path.size() == 0) {
             std::cout << "CAGUEEEEEEEE \n";
-        }else{
-        //     // Copiar el path devuelto por PathFindAStar() a debug.path
+        }
+        else {
+            //     // Copiar el path devuelto por PathFindAStar() a debug.path
             debug.path.resize(path.size());
-        //     //Rellenamos
+            //     //Rellenamos
             std::copy(path.begin(), path.end(), debug.path.begin());
-        //     Mostrar el camino copiado
-            //    std::cout << "Camino en debug.path:" << std::endl;
+            //     Mostrar el camino copiado
+                //    std::cout << "Camino en debug.path:" << std::endl;
             for (const auto& node : debug.path) {
                 std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
                 debug.nodes.push_back(node);
             }
         }
-    //    debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
-    //    std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
+        //    debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
+        //    std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
     }
     if (GuiButton(btn2Rec, "CLEAR")) {
         debug.path.clear();
         debug.nodes.clear();
         debug.closedlist.clear();
     }
-     if (GuiButton(btn3Rec, "SEE NAVMESH")) {
+    if (GuiButton(btn3Rec, "SEE NAVMESH")) {
         debug.seenavmesh = !debug.seenavmesh;
-     }
+    }
     //resultado
     vec2d textPositionInfo2 = { engine.getScreenWidth() - 370, 480 };
     engine.drawTextEx(GetFontDefault(), "PATH RESULT", textPositionInfo2, 20, 1, RED);
@@ -1277,40 +1326,40 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         posyt += 20.0f;
     }
     engine.beginMode3D();
-    for(auto& closenode : debug.closedlist){
-        engine.drawCube(closenode,2,2,2,YELLOW);
+    for (auto& closenode : debug.closedlist) {
+        engine.drawCube(closenode, 2, 2, 2, YELLOW);
     }
-    for(auto& node : debug.nodes){
-        engine.drawCube(node,2,2,2,GREEN);
+    for (auto& node : debug.nodes) {
+        engine.drawCube(node, 2, 2, 2, GREEN);
     }
-    if(debug.seenavmesh){
-        for(auto& node : navs.nodes){
-                engine.drawCube(node.second,2,2,2,RED);
+    if (debug.seenavmesh) {
+        for (auto& node : navs.nodes) {
+            engine.drawCube(node.second, 2, 2, 2, RED);
         }
-        for(auto& conex : navs.conexpos){
-            engine.drawLine3D(conex.first,conex.second,GREEN);
+        for (auto& conex : navs.conexpos) {
+            engine.drawLine3D(conex.first, conex.second, GREEN);
         }
-        for(auto& bbox : navs.boundingnavmesh){
+        for (auto& bbox : navs.boundingnavmesh) {
             auto boxSize = bbox.max - bbox.min;
             vec3d boxPosition = (bbox.min + bbox.max) / 2;
             engine.drawCubeWires(boxPosition,
-                    static_cast<float>(boxSize.x()),
-                    static_cast<float>(boxSize.y()),
-                    static_cast<float>(boxSize.z()),
-                    PURPLE);
+                static_cast<float>(boxSize.x()),
+                static_cast<float>(boxSize.y()),
+                static_cast<float>(boxSize.z()),
+                PURPLE);
         }
     }
     engine.endMode3D();
     engine.beginDrawing();
-    for(auto& node : debug.nodes){
+    for (auto& node : debug.nodes) {
         std::string text = std::to_string(node.x()) + " " + std::to_string(node.y()) + " " + std::to_string(node.z());
         float posx = engine.getWorldToScreenX(node);
         float posy = engine.getWorldToScreenY(node);
         engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{ static_cast<double>(posx),static_cast<double>(posy) }, 15, 1, RED);
     }
-    
+
     //engine.endDrawing();
-    
+
 }
 //Debugger visual in-game
 void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
@@ -1663,7 +1712,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                 }
             }
 
-            if (li.num_zone == 1 && elapsed_WASD < elapsed_limit_WASD)
+            if (li.mapID == 0 && li.num_zone == 1 && elapsed_WASD < elapsed_limit_WASD)
             {
                 auto& phy{ em.getComponent<PhysicsComponent>(e) };
 

@@ -24,7 +24,9 @@ enum EventCodes : uint16_t
     DialogPrisonNomad2,
     DialogFirstSpawn,
     ViewPointDoor,
-    ViewPointNPCPrison
+    ViewPointNPCPrison,
+    BoatPartFound,
+    BoatDialog
 };
 
 struct Event {
@@ -83,7 +85,7 @@ public:
 
                         os.addObject(cc.content, playerPos);
 
-                        auto& msc = em.getComponent<MessageComponent>(e);
+                        auto& msc = em.getComponent<MessageComponent>(chest);
                         auto& msgs = msc.messages;
                         while (!msgs.empty())
                         {
@@ -242,6 +244,71 @@ public:
                         li.eventNPCPrison = true;
                         li.viewPointSound = true;
                         break;
+                    }
+                    case EventCodes::BoatPartFound:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+                        auto& txti = em.getSingleton<TextInfo>();
+
+                        auto& boatPart = *em.getEntityByID(li.boatPartFound);
+                        auto& bc = em.getComponent<BoatComponent>(boatPart);
+
+                        plfi.boatParts.push_back(bc.part);
+                        std::string part;
+                        switch (bc.part)
+                        {
+                        case BoatParts::Base:
+                        {
+                            part = "el casco";
+                            break;
+                        }
+                        case BoatParts::Motor:
+                        {
+                            part = "el motor";
+                            break;
+                        }
+                        case BoatParts::Propeller:
+                        {
+                            part = "la hélice";
+                            break;
+                        }
+                        case BoatParts::SteeringWheel:
+                        {
+                            part = "el timón";
+                            break;
+                        }
+                        }
+                        std::string msg = "¡Has encontrado " + part + " de la barca!";
+                        txti.addText(msg);
+
+                        li.insertDeath(li.boatPartFound);
+
+                        if (plfi.boatParts.size() == 4)
+                        {
+                            vec3d pos{ -126.872, 7.0, 24.918 };
+                            li.viewPoint = pos;
+                            li.eventBoatDialog = true;
+
+                            auto& newBoat{ em.newEntity() };
+                            em.addTag<BoatTag>(newBoat);
+                            em.addComponent<RenderComponent>(newBoat, RenderComponent{ .position = pos, .scale = { 1.0, 1.0, 1.0 }, .color = WHITE, .orientation = 0.0, .rotationVec = { 0.0, 1.0, 0.0 } });
+                        }
+
+                        break;
+                    }
+                    case EventCodes::BoatDialog:
+                    {
+                        auto& txti = em.getSingleton<TextInfo>();
+
+                        std::array<std::string, 2> msgs =
+                        {
+                            "¡Has encontrado todas las partes de la barca!",
+                            "¡Ahora podréis salir del volcán!"
+                        };
+
+                        for (const auto& msg : msgs)
+                            txti.addText(msg);
                     }
                     }
                 }

@@ -16,6 +16,8 @@ struct PlayerInfo
     int mana_width{}, armor{};
     bool hasKey{ false };
     bool hasStaff{ false };
+    bool hasBoots{ false };
+    bool hasHat{ false };
     bool onSpawn{ false };
     bool minusCoins{ false };
     bool onLadder{ false };
@@ -25,6 +27,7 @@ struct PlayerInfo
     Spell currentSpell{ "None", "No spell", Spells::None, 0.0, 0 };
     std::size_t selectedItem{ max };
     vec3d spawnPoint{};
+    std::vector<BoatParts> boatParts{};
 
     void addSpell(Spell spell) { spells.push_back(spell); currentSpell = spell; }
     void changeCurrentSpell()
