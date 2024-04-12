@@ -19,6 +19,8 @@ struct NavmeshInfo
     std::set<vec3d> midpoints{};
     //Conexiones
     std::vector<Conection> conexiones;
+    //Conexiones pero con pos
+    std::set<std::pair<vec3d, vec3d>> conexpos{};
 
 
     // recorrer navmeshes y rellenar array de nodos sin repetir

@@ -670,6 +670,9 @@ void MapManager::generateNavmeshes(EntityManager& em)
                 navs.checkmidpoints(currentNode, nextNode)) {
                 Conection c{ 1, it->first, std::next(it)->first };
                 navs.conexiones.push_back(c);
+                //debug
+                auto pair = std::make_pair(it->second, std::next(it)->second);
+                navs.conexpos.insert(pair);
             }
         }
     }
@@ -690,6 +693,9 @@ void MapManager::generateNavmeshes(EntityManager& em)
                     if (navs.insert_ids(currentNode->first, nextNode->first)) {
                         Conection c{ 1, currentNode->first, nextNode->first };
                         navs.conexiones.push_back(c);
+                        //debug
+                        auto pair = std::make_pair(currentNode->second, nextNode->second);
+                        navs.conexpos.insert(pair);
                     }
                 }
             }

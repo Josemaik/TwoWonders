@@ -40,9 +40,9 @@ std::vector<NodeRecord>::iterator findRecordit(std::vector<NodeRecord>& list, ui
     });
 }
 
-std::vector<vec3d> CompilePath(std::vector<NodeRecord>& closed, uint16_t startNode,  std::map<uint16_t, vec3d>& Nodes) {
+std::vector<vec3d> CompilePath(std::vector<NodeRecord>& closed,NodeRecord& current,uint16_t startNode,  std::map<uint16_t, vec3d>& Nodes) {
     std::vector<vec3d> path;
-    NodeRecord current = closed.back(); // Empezar desde el último nodo cerrado (el objetivo)
+    //NodeRecord current = closed.back(); // Empezar desde el último nodo cerrado (el objetivo)
     while (current.node != startNode) {
         // Agregar el punto de conexión al camino
         // Suponiendo que haya un método para obtener la posición de un nodo
@@ -57,7 +57,7 @@ std::vector<vec3d> CompilePath(std::vector<NodeRecord>& closed, uint16_t startNo
     return path;
 }
 
-std::vector<vec3d> Graph::PathFindAStar(uint16_t startNode, uint16_t goalNode){
+std::vector<vec3d> Graph::PathFindAStar(Debug_t& debug,uint16_t startNode, uint16_t goalNode){
     //Estructuras de datos para almacenar nodos abiertos y cerrados
     std::vector<NodeRecord> open;
     std::vector<NodeRecord> closed;
@@ -79,7 +79,7 @@ std::vector<vec3d> Graph::PathFindAStar(uint16_t startNode, uint16_t goalNode){
         //Comprobar si es el goal node -> en ese caso terminamos
         if(current.node == goalNode){
            //Compilar la lista de conexiones en el camino
-            return CompilePath(closed, startNode, Nodes);
+            return CompilePath(closed,current,startNode, Nodes);
         }
 
         // Obtenemos las conexiones salientes
@@ -135,13 +135,15 @@ std::vector<vec3d> Graph::PathFindAStar(uint16_t startNode, uint16_t goalNode){
         //eliminamos de la open list y añadimos a la closed
         open.erase(findRecordit(open,current.node));
         closed.push_back(current);
+        //debug
+        debug.closedlist.push_back(Nodes[current.node]);
     }
 
     if(current.node != goalNode){
             return std::vector<vec3d>{};
     }else{
             //Compilar la lista de conexiones en el camino
-            return CompilePath(closed, startNode, Nodes);
+            return CompilePath(closed,current,startNode, Nodes);
     }
     //Si llega al final sin encontrar path se devuelve uno vacio
     return std::vector<vec3d>();

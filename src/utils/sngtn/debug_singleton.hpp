@@ -14,4 +14,7 @@ struct Debug_t {
     //start node
     float startnode{ 0.0f };
     float goalnode{ 0.0f };
+    std::vector<vec3d> nodes{};
+    bool seenavmesh{false};
+    std::vector<vec3d> closedlist{};
 };

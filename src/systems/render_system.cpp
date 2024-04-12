@@ -1111,7 +1111,7 @@ double SelectValue(GameEngine& engine, double value, float posx, float posy, flo
     return static_cast<double>(floatvalue);
 }
 
-uint16_t findNearestNode(const vec3d& position, const std::set<std::pair<uint16_t, vec3d>>& nodes) {
+uint16_t findNearestNode(EntityManager& em,const vec3d& position, const std::set<std::pair<uint16_t, vec3d>>& nodes) {
     uint16_t nearestNodeId = 0; // Suponemos que el primer nodo es el más cercano inicialmente
     double minDistance = std::numeric_limits<double>::max(); // Inicializamos la distancia mínima con un valor muy grande
     vec3d nearestpos{};
@@ -1123,6 +1123,8 @@ uint16_t findNearestNode(const vec3d& position, const std::set<std::pair<uint16_
             nearestpos = node.second;
         }
     }
+    auto& debug = em.getSingleton<Debug_t>();
+    debug.nodes.push_back(nearestpos);
     return nearestNodeId;
 }
 //Interfaz para probar el pathfinding
@@ -1162,6 +1164,7 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
 
     Rectangle btn1Rec = { posX - 130, posY + 80, buttonWidth, buttonHeight };
     Rectangle btn2Rec = { posX + 30, posY + 80, buttonWidth, buttonHeight };
+    Rectangle btn3Rec = { posX - 30, posY - 80, buttonWidth, buttonHeight };
     // Botón
     if (GuiButton(btn1Rec, "CALCULATE")) {
         //std::size_t idcenter{};
@@ -1184,12 +1187,13 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         // recorrelos y devuelve
         // Función para encontrar el nodo más cercano a una posición dada
         vec3d posplayer = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
-        uint16_t startnode = findNearestNode(posplayer, navs.nodes);
-        uint16_t targetnode = findNearestNode(vec3d{-12.33, 40.0, 22.41}, navs.nodes);
+        uint16_t startnode = findNearestNode(em,posplayer, navs.nodes);
+        uint16_t targetnode = findNearestNode(em,vec3d{-12.33, 40.0, 22.41}, navs.nodes);
         //Creamos Grafo
         Graph graph{};
         graph.createGraph(navs.conexiones, navs.nodes);
-        std::vector<vec3d> path = graph.PathFindAStar(startnode,targetnode);
+        std::vector<vec3d> path = graph.PathFindAStar(debug,startnode,targetnode);
+        
         std::size_t lengthpath = path.size();
         std::cout << lengthpath;
         //calcular camnino desde el centro hasta un punto
@@ -1239,22 +1243,29 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     //     std::vector<vec3d> path = graph.PathFindAStar(static_cast<uint16_t>(debug.startnode), static_cast<uint16_t>(debug.goalnode));
         if(path.size() == 0){
             std::cout << "CAGUEEEEEEEE \n";
+        }else{
+        //     // Copiar el path devuelto por PathFindAStar() a debug.path
+            debug.path.resize(path.size());
+        //     //Rellenamos
+            std::copy(path.begin(), path.end(), debug.path.begin());
+        //     Mostrar el camino copiado
+            //    std::cout << "Camino en debug.path:" << std::endl;
+            for (const auto& node : debug.path) {
+                std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
+                debug.nodes.push_back(node);
+            }
         }
-    //     // Copiar el path devuelto por PathFindAStar() a debug.path
-        debug.path.resize(path.size());
-    //     //Rellenamos
-        std::copy(path.begin(), path.end(), debug.path.begin());
-    //     Mostrar el camino copiado
-    //    std::cout << "Camino en debug.path:" << std::endl;
-       for (const auto& node : debug.path) {
-           std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
-       }
     //    debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
     //    std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
     }
     if (GuiButton(btn2Rec, "CLEAR")) {
         debug.path.clear();
+        debug.nodes.clear();
+        debug.closedlist.clear();
     }
+     if (GuiButton(btn3Rec, "SEE NAVMESH")) {
+        debug.seenavmesh = !debug.seenavmesh;
+     }
     //resultado
     vec2d textPositionInfo2 = { 480, 480 };
     engine.drawTextEx(GetFontDefault(), "PATH RESULT", textPositionInfo2, 20, 1, RED);
@@ -1265,6 +1276,32 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{ 480,posyt }, 20, 1, RED);
         posyt += 20.0f;
     }
+    engine.beginMode3D();
+    for(auto& closenode : debug.closedlist){
+        engine.drawCube(closenode,2,2,2,YELLOW);
+    }
+    for(auto& node : debug.nodes){
+        engine.drawCube(node,2,2,2,GREEN);
+    }
+    if(debug.seenavmesh){
+        for(auto& node : navs.nodes){
+                engine.drawCube(node.second,2,2,2,RED);
+        }
+        for(auto& conex : navs.conexpos){
+            engine.drawLine3D(conex.first,conex.second,GREEN);
+        }
+    }
+    engine.endMode3D();
+    engine.beginDrawing();
+    for(auto& node : debug.nodes){
+        std::string text = std::to_string(node.x()) + " " + std::to_string(node.y()) + " " + std::to_string(node.z());
+        float posx = engine.getWorldToScreenX(node);
+        float posy = engine.getWorldToScreenY(node);
+        engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{ static_cast<double>(posx),static_cast<double>(posy) }, 15, 1, RED);
+    }
+    
+    //engine.endDrawing();
+    
 }
 //Debugger visual in-game
 void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)

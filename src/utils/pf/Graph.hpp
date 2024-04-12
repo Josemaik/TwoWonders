@@ -61,7 +61,7 @@ struct Graph
         return connections;
     }
     //Calcula el path con algoritmo A* y lo devuelve dado un start node y un target ndoe
-    std::vector<vec3d> PathFindAStar(uint16_t startNode, uint16_t endNode);
+    std::vector<vec3d> PathFindAStar(Debug_t& debug,uint16_t startNode, uint16_t endNode);
 
     //heuristic - Calcula la distancia Euclídea
     double Heuristic(uint16_t currentNode, uint16_t endNode) {
