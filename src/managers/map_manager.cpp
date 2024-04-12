@@ -643,6 +643,7 @@ void MapManager::generateNavmeshes(EntityManager& em)
 
         //Creamos NavMesh BBox
         BBox b{ min,max };
+        navs.boundingnavmesh.push_back(b);
         //Creamos NavMesh
         Navmesh nav{ .box = b};
         //Rellenamos los nodos

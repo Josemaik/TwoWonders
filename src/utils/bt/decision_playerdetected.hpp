@@ -109,8 +109,13 @@ struct BTDecisionPlayerDetected : BTNode_t {
             // Raycast
                 vec3d intersection_wall{}, intersection_player{};
                 // Realiza un raycast en la dirección en la que el enemigo está mirando para detectar obstáculos
-                vec3d dir = getplayerphy(ectx).position - ectx.phy.position;
-                RayCast ray = { ectx.phy.position,  dir };
+                auto& phyplayer = getplayerphy(ectx);
+                auto& plpos = phyplayer.position;
+                auto& plscle = phyplayer.scale;
+                vec3d dir = vec3d{ plpos.x(),plpos.y(),plpos.z() } - ectx.phy.position;
+                //vec3d dir = plpos - ectx.phy.position;
+                dir.normalize();
+                RayCast ray = { vec3d{ectx.phy.position.x(),ectx.phy.position.y(),ectx.phy.position.z()},  dir };
 
                 // dibujado de raycast
                 auto& bb = ectx.em.getSingleton<BlackBoard_t>();
@@ -121,9 +126,9 @@ struct BTDecisionPlayerDetected : BTNode_t {
                 auto& bbox = getplayercollider(ectx).boundingBox;
 
                 // Calculo punto de intersección con player
-                if (bbox.intersectsRay(ray.origin, ray.direction)) {
-                    bbox.intersectsRay(ray.origin, ray.direction,intersection_player);
-                }
+                // if (bbox.intersectsRay(ray.origin, ray.direction,intersection_player)) {
+                bbox.intersectsRay(ray.origin, ray.direction,intersection_player);
+                // }
 
                 // Compruebo si la caja de colisión de un obstaculo ha colisionado con el rayo
                 for (Entity& ent : ectx.em.getEntities()) {
@@ -131,8 +136,8 @@ struct BTDecisionPlayerDetected : BTNode_t {
                     if (ent.hasComponent<ColliderComponent>()) {
                         if (ent.hasTag<WallTag>() || ent.hasTag<GroundTag>()) {
                             auto& col = ectx.em.getComponent<ColliderComponent>(ent);
-                            if (col.boundingBox.intersectsRay(ray.origin, ray.direction)) {
-                                col.boundingBox.intersectsRay(ray.origin, ray.direction,intersection_wall);
+                            if (col.boundingBox.intersectsRay(ray.origin, ray.direction,intersection_wall)) {
+                                //col.boundingBox.intersectsRay(ray.origin, ray.direction,intersection_wall);
                                 // Evitamos intersecciones de rayos que se han ido muy lejos
                                 // Damos más importancia a los obstáculos cercanos
                                 if(intersection_wall.distance(ectx.phy.position) < MinRayDistance){

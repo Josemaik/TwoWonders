@@ -21,7 +21,8 @@ struct NavmeshInfo
     std::vector<Conection> conexiones;
     //Conexiones pero con pos
     std::set<std::pair<vec3d, vec3d>> conexpos{};
-
+    //vector de boxes
+    std::vector<BBox> boundingnavmesh{};
 
     // recorrer navmeshes y rellenar array de nodos sin repetir
     // cojo el componente collider y compruebo si colisiona con otra entidad navmes
