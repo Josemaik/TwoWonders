@@ -42,8 +42,9 @@ void AISystem::update(EntityManager& em)
         AIComponent* aiptr = &ai;
         LifeComponent* lcptr = &lc;
         //percibir el entorno
-        if(e.hasTag<SnowmanTag>())
+        if(e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()){
             perception(bb, ai);
+        }
 
         //Actualizar posiciones de la IAs o potenciales targets para calcular Flocking
         // Comprobamos si el elemento debe procesarse
@@ -89,11 +90,17 @@ void AISystem::update(EntityManager& em)
         }
 
         //visual debug cone
-        if (e.hasTag<SpiderTag>() && e.hasTag<SnowmanTag>()) {
-            bb.pos_enemy = phy.position;
-            bb.orientation_enemy = phy.orientation;
-            bb.horizontalFOV = 200.0;
-            bb.VerticalFOV = 80.0;
+        if(e.hasTag<SnowmanTag>()){
+            bb.conesnow.first = phy.position;
+            bb.conesnow.second = phy.orientation;
+        }
+        if(e.hasTag<GolemTag>()){
+            bb.conegolem.first = phy.position;
+            bb.conegolem.second = phy.orientation;
+        }
+        if(e.hasTag<SpiderTag>()){
+            bb.conespider.first = phy.position;
+            bb.conespider.second = phy.orientation;
         }
 
         if (!isDetected && ai.playerdetected)

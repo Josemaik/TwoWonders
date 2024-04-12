@@ -6,7 +6,7 @@
 struct BTDecisionPlayerDetected : BTNode_t {
     // Constantes para ángulos de visión
     const double verticalFOV = 60.0; // Ángulo vertical de visión en grados
-    const double horizontalFOV = 170.0; // Ángulo horizontal de visión en grados
+    const double horizontalFOV = 250.0; // Ángulo horizontal de visión en grados
     const double MinRayDistance = 10.0; // Mínima distancia de detección por vista
 
     BTDecisionPlayerDetected() {}
@@ -111,7 +111,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
                 // Realiza un raycast en la dirección en la que el enemigo está mirando para detectar obstáculos
                 auto& phyplayer = getplayerphy(ectx);
                 auto& plpos = phyplayer.position;
-                auto& plscle = phyplayer.scale;
+                //auto& plscle = phyplayer.scale;
                 vec3d dir = vec3d{ plpos.x(),plpos.y(),plpos.z() } - ectx.phy.position;
                 //vec3d dir = plpos - ectx.phy.position;
                 dir.normalize();

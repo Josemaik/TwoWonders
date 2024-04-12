@@ -1181,16 +1181,16 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     auto& navs = em.getSingleton<NavmeshInfo>();
     auto& li = em.getSingleton<LevelInfo>();
     //Dibujado de titulo y ventana
-    Rectangle windowRect = { engine.getScreenWidth() - 400, 300, 330, 430 };
+    Rectangle windowRect = { static_cast<float>(engine.getScreenWidth() - 400), 300, 330, 430 };
     engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
     engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
-    vec2d textPositionInfo = { engine.getScreenWidth() - 370, 320 };
+    vec2d textPositionInfo = { static_cast<float>(engine.getScreenWidth() - 370), 320 };
     engine.drawTextEx(GetFontDefault(), "PATHFINDING", textPositionInfo, 20, 1, RED);
 
     // Datos de los botones
     float buttonWidth = 150.0f;
     float buttonHeight = 30.0f;
-    float posX = engine.getScreenWidth() - 370;
+    float posX = static_cast<float>(engine.getScreenWidth() - 370);
     float posY = 350.0f;
 
     // Slider para startnode
@@ -1316,13 +1316,13 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         debug.seenavmesh = !debug.seenavmesh;
     }
     //resultado
-    vec2d textPositionInfo2 = { engine.getScreenWidth() - 370, 480 };
+    vec2d textPositionInfo2 = { static_cast<double>(engine.getScreenWidth() - 370), 480 };
     engine.drawTextEx(GetFontDefault(), "PATH RESULT", textPositionInfo2, 20, 1, RED);
     // //Dibujar path
     float posyt = 510.0f;
     for (auto pos : debug.path) {
         std::string text = std::to_string(pos.x()) + " " + std::to_string(pos.y()) + " " + std::to_string(pos.z());
-        engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{ engine.getScreenWidth() - 370,posyt }, 20, 1, RED);
+        engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{ static_cast<double>(engine.getScreenWidth() - 370),posyt }, 20, 1, RED);
         posyt += 20.0f;
     }
     engine.beginMode3D();
@@ -1435,7 +1435,11 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
                 bb.launched = false;
             }
             //Cone
-            drawVisionCone(bb.pos_enemy, bb.orientation_enemy, bb.horizontalFOV);
+            //if(e.hasTag<SnowmanTag>())
+            auto& phy = em.getComponent<PhysicsComponent>(e);
+            drawVisionCone(phy.position,phy.orientation,bb.horizontalFOV);
+            // if(e.hasTag<GolemTag>())
+            //     drawVisionCone(bb.conegolem.first, bb.conegolem.second, bb.horizontalFOV);
             engine.endMode3D();
         }
     });
@@ -1458,8 +1462,8 @@ void RenderSystem::drawVisionCone(vec3d pos_enemy, double orientation, double ho
     Vector3 end2 = { start2.x + direction2.x * 10.0f, start2.y + direction2.y * 10.0f, start2.z + direction2.z * 10.0f };
 
     // Dibuja las líneas
-    DrawLine3D(start1, end1, RED);
-    DrawLine3D(start2, end2, RED);
+    DrawLine3D(start1, end1, PURPLE);
+    DrawLine3D(start2, end2, PURPLE);
 }
 
 //Editor In-Game
