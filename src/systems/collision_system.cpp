@@ -19,8 +19,7 @@ void CollisionSystem::update(EntityManager& em)
         }
 
         // Actualizar bounding box
-        auto& scl = phy.scale;
-        col.updateBox(pos, scl, phy.gravity, phy.orientation, phy.rotationVec);
+        col.updateBox(pos, phy.scale, phy.gravity, phy.orientation, phy.rotationVec);
 
         // Insertar en el Octree
         octree.insert(e, col);
@@ -273,11 +272,28 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
             {
                 auto& ldc = em.getComponent<LadderComponent>(*staticEntPtr);
                 auto& col = em.getComponent<ColliderComponent>(*otherEntPtr);
-                if (col.boundingBox.min.y() > ldc.yMax || col.boundingBox.min.y() <= ldc.yMin)
+                if ((col.boundingBox.min.y() + 1) >= ldc.yMax || col.boundingBox.min.y() <= ldc.yMin)
                 {
                     auto& phy = em.getComponent<PhysicsComponent>(*otherEntPtr);
                     phy.gravity = 1.0;
                     plfi.onLadder = false;
+
+                    vec3d newPos = phy.position;
+                    auto& ori = phy.orientation;
+
+                    // Si el jugador está por encima de la escalera, lo ponemos un poco más adelante de su posición
+                    if ((col.boundingBox.min.y() + 1) >= ldc.yMax)
+                    {
+                        newPos.setX(newPos.x() + sin(ori) * 2);
+                        newPos.setZ(newPos.z() + cos(ori) * 2);
+                    }
+                    else
+                    {
+                        newPos.setX(newPos.x() - sin(ori) * 2);
+                        newPos.setZ(newPos.z() - cos(ori) * 2);
+                    }
+
+                    phy.position = newPos;
                 }
                 return;
             }
@@ -825,6 +841,9 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
 
                     if (damage == 0)
                         damage = 2;
+
+                    if (plfi.attackUpgrade)
+                        damage += 1;
                 }
 
                 if (li.invulnerable)

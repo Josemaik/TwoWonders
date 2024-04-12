@@ -67,9 +67,9 @@ void PhysicsSystem::update(EntityManager& em)
             }
 
             auto& plfi = em.getSingleton<PlayerInfo>();
-            if (plfi.hasBoots)
+            if (plfi.hasBoots && !phy.stopped)
             {
-                phy.max_speed += 0.5;
+                vel *= 1.15;
             }
         }
 

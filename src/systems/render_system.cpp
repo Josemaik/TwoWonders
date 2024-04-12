@@ -697,7 +697,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     pos.setY(pos.y() - 3.54);
                     in = true;
                 }
-                else if (e.hasTag<GroundTag>() || e.hasTag<DoorTag>() || e.hasTag<LeverTag>()
+                else if (e.hasTag<DoorTag>() || e.hasTag<LeverTag>()
                     || e.hasTag<CoinTag>() || e.hasTag<WaterBombTag>() || e.hasTag<BoatTag>())
                 {
                     in = true;

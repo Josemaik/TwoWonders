@@ -24,7 +24,8 @@ enum struct ObjectType
     Basic_Staff,
     CrusherAttack,
     GoodBoots,
-    RegularHat
+    RegularHat,
+    AttackUpgrade
 };
 
 struct ObjectComponent

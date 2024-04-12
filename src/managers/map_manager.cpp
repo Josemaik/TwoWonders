@@ -496,8 +496,11 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             break;
         }
         case InteractableType::Roca:
+        {
+            em.addTag<WallTag>(entity);
             r.visible = false;
             break;
+        }
         case InteractableType::Ladder:
         {
             em.addTag<LadderTag>(entity);

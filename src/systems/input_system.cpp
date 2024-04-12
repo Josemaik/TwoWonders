@@ -258,7 +258,6 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     // Codigo para el ataque
     if (player.hasComponent<AttackComponent>())
     {
-        //auto& atc = em.getComponent<AttackComponent>(player);
         if ((ge.isKeyDown(in.space) || ge.isGamepadButtonPressed(0, in.m_space)))
             em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
 

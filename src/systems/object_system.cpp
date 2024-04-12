@@ -295,6 +295,17 @@ void ObjectSystem::createObjects(EntityManager& em)
             Item boots = { "Sombrero de Mago", "Te ayuda a canalizar mejor tu uso de magia" };
             break;
         }
+        case ObjectType::AttackUpgrade:
+        {
+            color = RED;
+            scl = { 10.5, 10.5, 10.5 };
+            inmortal = true;
+            visible = false;
+
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            plfi.attackUpgrade = true;
+            break;
+        }
 
         default:
             break;

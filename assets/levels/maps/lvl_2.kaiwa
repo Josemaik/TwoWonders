@@ -166,10 +166,10 @@
 							]
 						},
 						{
-							"type":9,
-							"offsetZ":[],
+							"type":6,
+							"offsetZ":[7.828592300415039],
 							"position":[27.74, 29.894, 52.733],
-							"scale":[5.726, 5.798, 10.0],
+							"scale":[25.101, 25.101, 6.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 2.0]
 						},
@@ -626,11 +626,8 @@
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 2.0],
-							"content": 10,
-							"message": [
-								"¡Encontraste una llave!", 
-								"Parece que es de un solo uso..."
-							]
+							"content": 6,
+							"message": ["¡Encontraste 30 destellos!"]
 						},
 						{
 							"type":12,
@@ -647,10 +644,10 @@
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, -1.0],
-							"content": 10,
+							"content": 8,
 							"message": [
-								"¡Encontraste una llave!", 
-								"Parece que es de un solo uso..."
+								"¡Encontraste una poción de vitalidad superior!", 
+								"Ahora te sientes mucho más vigoroso que antes."
 							]
 						},
 						{
@@ -716,11 +713,8 @@
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 2.0],
-							"content": 10,
-							"message": [
-								"¡Encontraste una llave!", 
-								"Parece que es de un solo uso..."
-							]
+							"content": 6,
+							"message": ["¡Encontraste 30 destellos!"]
 						},
 						{
 							"type":10,
@@ -1137,11 +1131,8 @@
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, -1.0],
-							"content": 10,
-							"message": [
-								"¡Encontraste una llave!", 
-								"Parece que es de un solo uso..."
-							]
+							"content": 6,
+							"message": ["¡Encontraste 30 destellos!"]
 						},
 						{
 							"type":1,
@@ -1150,10 +1141,10 @@
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, -1.0],
-							"content": 10,
+							"content": 23,
 							"message": [
-								"¡Encontraste una llave!", 
-								"Parece que es de un solo uso..."
+								"¡Encontraste una poción de fuerza!", 
+								"Sientes que tu magia y tus músculos son más poderosos..."
 							]
 						},
 						{
@@ -1163,17 +1154,17 @@
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, -1.0],
-							"content": 10,
+							"content": 21,
 							"message": [
-								"¡Encontraste una llave!", 
-								"Parece que es de un solo uso..."
+								"¡Encontraste unas botas de la suerte!", 
+								"Te protegen y te hacen sentir más rápido..."
 							]
 						},
 						{
 							"type":6,
 							"offsetZ":[7.828592300415039],
 							"position":[-87.837, -82.021, 16.0],
-							"scale":[5.726, 5.463, 10.0],
+							"scale":[25.101, 25.101, 6.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, -1.0]
 						},
@@ -1204,7 +1195,7 @@
 						{
 							"type":10,
 							"offsetZ":[0],
-							"position":[-139.56, -61.164, 16.0],
+							"position":[-139.56, -66.164, 16.0],
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 2.0]
