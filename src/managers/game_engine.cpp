@@ -65,9 +65,17 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Libro para enseñar hechizos HUD
     loadAndResizeImage("libro", "assets/HUD/Libro.png");
-    //Load detection icon
+
+    // Icono de detección HUD
     loadAndResizeImage("detectionicon", "assets/HUD/detectionicon.png");
-    // NÚMEROS
+
+    // Barco para el nivel del volcán HUD
+    loadAndResizeImage("barco", "assets/HUD/barco_piezas.png");
+
+    // Icono Batalla HUD
+    loadAndResizeImage("batalla", "assets/HUD/batalla.png");
+
+    // NÚMEROS Y SÍMBOLOS NUMÉRICOS
     //
     loadAndResizeImage("0", "assets/HUD/numeros/0.png");
     loadAndResizeImage("1", "assets/HUD/numeros/1.png");
@@ -79,6 +87,9 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImage("7", "assets/HUD/numeros/7.png");
     loadAndResizeImage("8", "assets/HUD/numeros/8.png");
     loadAndResizeImage("9", "assets/HUD/numeros/9.png");
+    loadAndResizeImage("+", "assets/HUD/numeros/mas.png");
+    loadAndResizeImage("-", "assets/HUD/numeros/-.png");
+    loadAndResizeImage("barra", "assets/HUD/barra.png");
 
     // GIFS
     //

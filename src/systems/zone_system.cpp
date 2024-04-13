@@ -133,33 +133,35 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
 
             double distance = playerPos.distance(phy.position);
             double range = ic.range;
-            bool crusherClose = false;
 
-            if (ch.checkCrushers)
+            // if (ch.checkCrushers)
+            // {
+            using crusherCMP = MP::TypeList<PhysicsComponent>;
+            using crusherTag = MP::TypeList<EnemyTag>;
+
+            ch.closeEnemies = 0;
+            em.forEach<crusherCMP, crusherTag>([&](Entity& e, PhysicsComponent& phyC)
             {
-                using crusherCMP = MP::TypeList<PhysicsComponent>;
-                using crusherTag = MP::TypeList<CrusherTag>;
-
-                em.forEach<crusherCMP, crusherTag>([&](Entity&, PhysicsComponent& phyC)
+                if (e.hasTag<AngryBushTag>() || e.hasTag<DummyTag>())
+                    return;
+                if (phy.position.distance(phyC.position) < 50.0)
                 {
-                    if (phy.position.distance(phyC.position) < 50.0)
-                    {
-                        crusherClose = true;
-                    }
+                    ch.closeEnemies += 1;
+                }
+            });
 
-                    if (crusherClose)
-                        return;
-                });
-            }
+            if (ch.closeEnemies > ch.maxEnemies)
+                ch.maxEnemies = ch.closeEnemies;
+            // }
 
             // Si el cofre se encuentra a menos de 2 unidades de distancia del se muestra el mensaje de abrir cofre
-            if (distance < range && !ch.isOpen && !ic.showButton && !li.playerDetected && !crusherClose)
+            if (distance < range && !ch.isOpen && !ic.showButton && !li.playerDetected && ch.closeEnemies == 0)
                 ic.showButton = true;
 
             else if ((distance > range && ic.showButton) || li.playerDetected)
                 ic.showButton = false;
 
-            if (distance < range && !ic.showButton && (li.playerDetected || crusherClose))
+            if (distance < range && !ic.showButton && (li.playerDetected || ch.closeEnemies > 0))
                 ic.showLock = true;
 
             else if ((distance > range && ic.showLock) || !li.playerDetected)
@@ -428,7 +430,7 @@ void ZoneSystem::checkMissionObjs(EntityManager& em, EventManager& evm)
     });
 }
 
-void ZoneSystem::checkNPCs(EntityManager& em, EventManager& evm)
+void ZoneSystem::checkNPCs(EntityManager& em, EventManager&)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto& playerEnt = *em.getEntityByID(li.playerID);
@@ -458,8 +460,10 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager& evm)
             playerPhy.moveAt(phy.position);
             phy.lookAt(playerPhy.position);
 
-            if (dc.eventCodes.size() > 0)
-                evm.scheduleEvent({ static_cast<EventCodes>(dc.eventCodes[0]) });
+            li.viewPoint = phy.position;
+            li.events.insert(dc.eventCodes.begin(), dc.eventCodes.end());
+            // if (dc.eventCodes.size() > 0)
+            //     evm.scheduleEvent({ static_cast<EventCodes>(dc.eventCodes[0]) });
         }
     });
 }

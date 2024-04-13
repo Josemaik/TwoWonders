@@ -24,12 +24,12 @@ enum EventCodes : uint16_t
     DialogPrisonNomad2,
     DialogFirstSpawn,
     ViewPointDoor,
-    ViewPointNPCPrison,
     BoatPartFound,
     BoatDialog,
-    ViewPointNomadVolcano,
-    DialogNomadVolcano,
+    DialogNomadVolcano1,
     DialogNomadVolcano2,
+    DialogCatVolcano1,
+    InitBoatParts,
     MAX
 };
 
@@ -166,22 +166,6 @@ public:
                     {
                         auto& li = em.getSingleton<LevelInfo>();
                         li.viewPoint = { 15.153, 18.593, 85.767 };
-                        li.viewPointSound = true;
-                        break;
-                    }
-                    case EventCodes::ViewPointNPCPrison:
-                    {
-                        auto& li = em.getSingleton<LevelInfo>();
-                        li.viewPoint = { -23.08, 4.0, 244.7 };
-                        li.events.insert(EventCodes::NPCDialog);
-                        li.viewPointSound = true;
-                        break;
-                    }
-                    case EventCodes::ViewPointNomadVolcano:
-                    {
-                        auto& li = em.getSingleton<LevelInfo>();
-                        li.viewPoint = { 40.0, 50.0, -33.0 };
-                        li.events.insert(EventCodes::NPCDialog);
                         li.viewPointSound = true;
                         break;
                     }
@@ -326,7 +310,7 @@ public:
                         playerPhy.notMove = false;
                         break;
                     }
-                    case EventCodes::DialogNomadVolcano:
+                    case EventCodes::DialogNomadVolcano1:
                     {
                         auto& txti = em.getSingleton<TextInfo>();
                         std::array<std::string, 3> msgs =
@@ -367,6 +351,41 @@ public:
 
                         auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
                         playerPhy.notMove = false;
+                        break;
+                    }
+                    case EventCodes::DialogCatVolcano1:
+                    {
+                        auto& txti = em.getSingleton<TextInfo>();
+
+                        std::array<std::string, 12> msgs =
+                        {
+                            "Gato: \n¡Miau! ¡Miau! ¡Miau!",
+                            "Mago: \n¿Qué dices? ¿Qué quieres decirme?",
+                            "Gato: \n¿Acaso no hablas gatuno? Qué falta de respeto",
+                            "Mago: \nLo siento, le pediré a mi maestro que me lo enseñe.",
+                            "Gato: \nNo te preocupes niño, si me estaba quedando contigo. \nSoy un investigador",
+                            "Mago: \n¡Ah vale! Oye, ¿sabes cómo salir de aquí? \nTengo que encontrar a mi maestro.",
+                            "Investigador: \nNo eres el único que quiere salir de aquí, \npero igual deberías preocuparte más por el volcán \n a punto de estallar que de tu maestro.",
+                            "Mago: \n¿¡Quéeeee!? ¡¿Estallar!? ¡¿Cómo?!",
+                            "Investigador: \nAsí es, pero no te alarmes, porque me vas a ayudar a \nreconstruir mi barca para salir de aquí.",
+                            "Mago: \n¿Una barca?",
+                            "Investigador: \nEfectivamente, los monstruos me desperdigaron \nlas piezas por todo el lugar, ayúdame a recuperarlas\ny saldremos de aquí antes de la explosión.",
+                            "Mago: \n¡Entiendo, déjalo en mis manos!"
+                        };
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        scheduleEvent(Event{ EventCodes::InitBoatParts });
+                        out = true;
+                        break;
+                    }
+                    case EventCodes::InitBoatParts:
+                    {
+                        // Ponemos a true la variable de enseñar número las piezas de barco
+                        auto& li = em.getSingleton<LevelInfo>();
+                        li.volcanoMission = true;
                         break;
                     }
                     default:

@@ -98,6 +98,8 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
                 {
                     for (auto& e : li.events)
                         evm.scheduleEvent(Event{ static_cast<EventCodes>(e) });
+
+                    li.events.clear();
                 }
             }
 

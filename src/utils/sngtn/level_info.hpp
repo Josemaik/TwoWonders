@@ -94,6 +94,9 @@ struct LevelInfo
     // Replay de inputs
     bool replay{ false };
 
+    // Misiones
+    bool volcanoMission{ false };
+
     // Estado del juego
     GameScreen currentScreen = GameScreen::GAMEPLAY;
     GameScreen previousScreen = GameScreen::LOGO;

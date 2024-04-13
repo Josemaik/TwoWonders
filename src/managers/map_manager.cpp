@@ -392,7 +392,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
 
             ic.range = 7.5;
             em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
-            [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .dropPosition = { vec3d::zero() }, .content = content });
+            [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .content = content });
 
             if (interactable.HasMember("offsetZ"))
             {
@@ -625,7 +625,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
             break;
         case 1:
             em.addTag<InvestigatorTag>(entity);
-            range = 7.5;
+            range = 18.0;
             break;
         default:
             break;

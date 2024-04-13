@@ -692,7 +692,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     pos.setY(pos.y() - r.offset / 1.5);
                     in = true;
                 }
-                else if (e.hasTag<NomadTag>())
+                else if (e.hasTag<NomadTag>() || e.hasTag<InvestigatorTag>())
                 {
                     pos.setY(pos.y() - 3.54);
                     in = true;
@@ -1679,6 +1679,11 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
 
             drawAnimatedTextures(engine);
 
+            if (li.mapID == 2 && li.volcanoMission)
+            {
+                drawBoatParts(engine, em);
+            }
+
             // Dibujar el tipo de ataque que tiene equipado
             if (e.hasComponent<TypeComponent>())
             {
@@ -1924,20 +1929,46 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
 
                 if (e.hasTag<DoorTag>())
                 {
-                    auto& candado = engine.textures["candado_abierto"];
-                    engine.drawTexture(candado,
-                        static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(candado.width / 2)),
+                    auto& lock = engine.textures["candado_abierto"];
+                    engine.drawTexture(lock,
+                        static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(lock.width / 2)),
                         static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13),
                         { 255, 255, 255, 255 });
                 }
             }
             else if (inter.showLock)
             {
-                auto& candado = engine.textures["candado_cerrado"];
-                engine.drawTexture(candado,
-                    static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(candado.width / 2)),
+                auto& lock = engine.textures["candado_cerrado"];
+                engine.drawTexture(lock,
+                    static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(lock.width / 2)),
                     static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13),
                     { 255, 255, 255, 255 });
+
+                if (e.hasTag<ChestTag>())
+                {
+                    auto& swordText = engine.textures["batalla"];
+                    engine.drawTexture(swordText,
+                        static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(swordText.width / 2)),
+                        static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13),
+                        { 255, 255, 255, 255 });
+
+                    auto& ch = em.getComponent<ChestComponent>(e);
+                    if (ch.closeEnemies > 0)
+                    {
+                        // Dibujamos el número de partes de barco encontradas
+                        auto& textureNum = engine.textures.at(std::to_string(ch.closeEnemies));
+                        auto& textureMax = engine.textures.at(std::to_string(ch.maxEnemies));
+                        auto& textureBar = engine.textures.at("barra");
+
+                        auto posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(textureNum.width / 2) - 100);
+                        auto posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 12);
+
+                        // Dibujamos el num / 4
+                        engine.drawTexture(textureNum, posX, posY, { 255, 255, 255, 255 });
+                        engine.drawTexture(textureBar, posX + textureNum.width / 3, posY, { 255, 255, 255, 255 });
+                        engine.drawTexture(textureMax, posX + textureNum.width / 2 + textureBar.width / 2, posY + 20, { 255, 255, 255, 255 });
+                    }
+                }
             }
 
             if (e.hasTag<ChestTag>() && li.enemyToChestPos != vec3d::zero() && !li.playerDetected)
@@ -1950,9 +1981,9 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                     {
                         if (elapsed_Lock < elapsed_limit_Lock)
                         {
-                            auto& candado = engine.textures["candado_abierto"];
-                            engine.drawTexture(candado,
-                                static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(candado.width / 2)),
+                            auto& openLock = engine.textures["candado_abierto"];
+                            engine.drawTexture(openLock,
+                                static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(openLock.width / 2)),
                                 static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9),
                                 { 255, 255, 255, 255 });
 
@@ -2686,4 +2717,38 @@ void RenderSystem::drawFPSCounter(GameEngine& engine)
     // Dibuja el FPS
     std::string fpsStr = "FPS: " + std::to_string(fps);
     engine.drawText(fpsStr.c_str(), engine.getScreenWidth() - 100, 10, 20, RED);
+}
+
+void RenderSystem::drawBoatParts(GameEngine& ge, EntityManager& em)
+{
+    auto& plfi = em.getSingleton<PlayerInfo>();
+
+    if (elapsed_boat < elapsed_limit_boat)
+    {
+        elapsed_boat += timeStep;
+        if (elapsed_boat > elapsed_limit_boat) elapsed_boat = elapsed_limit_boat;
+    }
+
+    // Dibujamos la textura de la barra que sale desde la derecha
+    auto& barca = ge.textures["barco"];
+
+    // Calculamos la posición inicial y final de la barra
+    int initialPosX = ge.getScreenWidth();
+    int finalPosX = ge.getScreenWidth() - barca.width;
+
+    // Interpolamos la posición X
+    int posX = initialPosX - static_cast<int>(static_cast<float>(initialPosX - finalPosX) * elapsed_boat);
+
+    // Dibujamos la barra
+    ge.drawTexture(barca, posX, ge.getScreenHeight() / 6, { 255, 255, 255, 255 });
+
+    // Dibujamos el número de partes de barco encontradas
+    auto& textureNum = ge.textures.at(std::to_string(plfi.boatParts.size()));
+    auto& texture4 = ge.textures.at("4");
+    auto& textureBar = ge.textures.at("barra");
+
+    // Dibujamos el num / 4
+    ge.drawTexture(textureNum, posX + 115, ge.getScreenHeight() / 6 + 2, { 255, 255, 255, 255 });
+    ge.drawTexture(textureBar, posX + 100 + textureNum.width / 2, ge.getScreenHeight() / 6 + 2, { 255, 255, 255, 255 });
+    ge.drawTexture(texture4, posX + 105 + textureNum.width / 2 + textureBar.width / 2, ge.getScreenHeight() / 6 + 20, { 255, 255, 255, 255 });
 }
