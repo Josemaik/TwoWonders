@@ -7,7 +7,7 @@
 struct NodeRecord
 {
     NodeRecord(uint16_t n, Conection c, double cost, double totalCost) : node(n), connection(c), costSoFar(cost), estimatedTotalCost(totalCost) {}
-    
+
     uint16_t node{};
     Conection connection;
     double costSoFar{};
@@ -40,7 +40,7 @@ std::vector<NodeRecord>::iterator findRecordit(std::vector<NodeRecord>& list, ui
     });
 }
 
-std::vector<vec3d> CompilePath(std::vector<NodeRecord>& closed,NodeRecord& current,uint16_t startNode,  std::map<uint16_t, vec3d>& Nodes) {
+std::vector<vec3d> CompilePath(std::vector<NodeRecord>& closed, NodeRecord& current, uint16_t startNode, std::map<uint16_t, vec3d>& Nodes) {
     std::vector<vec3d> path;
     //NodeRecord current = closed.back(); // Empezar desde el último nodo cerrado (el objetivo)
     while (current.node != startNode) {
@@ -57,29 +57,29 @@ std::vector<vec3d> CompilePath(std::vector<NodeRecord>& closed,NodeRecord& curre
     return path;
 }
 
-std::vector<vec3d> Graph::PathFindAStar(Debug_t& debug,uint16_t startNode, uint16_t goalNode){
+std::vector<vec3d> Graph::PathFindAStar(Debug_t& debug, uint16_t startNode, uint16_t goalNode) {
     //Estructuras de datos para almacenar nodos abiertos y cerrados
     std::vector<NodeRecord> open;
     std::vector<NodeRecord> closed;
-    
+
     //Inicializar record desde el start node
-    NodeRecord startRecord(startNode,Conection(0,0,0),0.0,Heuristic(startNode,goalNode));
+    NodeRecord startRecord(startNode, Conection(0, 0, 0), 0.0, Heuristic(startNode, goalNode));
 
     //Inicializar open y closed list
     open.push_back(startRecord);
-    
-    NodeRecord current(0,Conection(0,0,0),0.0,0.0);
+
+    NodeRecord current(0, Conection(0, 0, 0), 0.0, 0.0);
     //Iteramos a través de cada nodo
-    while(!open.empty()){
+    while (!open.empty()) {
         //Encontrar el elemento más pequeño en la lista abierta (usando estimatedTotalCost)
         auto currentIt = std::min_element(open.begin(), open.end(), [](const NodeRecord& a, const NodeRecord& b) {
             return a.estimatedTotalCost < b.estimatedTotalCost;
         });
         current = *currentIt;
         //Comprobar si es el goal node -> en ese caso terminamos
-        if(current.node == goalNode){
-           //Compilar la lista de conexiones en el camino
-            return CompilePath(closed,current,startNode, Nodes);
+        if (current.node == goalNode) {
+            //Compilar la lista de conexiones en el camino
+            return CompilePath(closed, current, startNode, Nodes);
         }
 
         // Obtenemos las conexiones salientes
@@ -92,56 +92,59 @@ std::vector<vec3d> Graph::PathFindAStar(Debug_t& debug,uint16_t startNode, uint1
             double endNodeCost = current.costSoFar + connection.cost;
 
             // Creamos endNodeRecord
-            NodeRecord endNodeRecord(startNode,Conection(0,0,0),0.0,0.0); //= *findRecord(open, endNode);
+            NodeRecord endNodeRecord(startNode, Conection(0, 0, 0), 0.0, 0.0); //= *findRecord(open, endNode);
             //inicializo el heuristic
             double endNodeHeuristic{};
             //Comprobamos si esta en la lista cerrada
-            if(findRecord_b(closed,endNode)){
+            if (findRecord_b(closed, endNode)) {
                 endNodeRecord = *findRecord(closed, endNode);
                 //si no encontramos una ruta más corta - skip
-                if(endNodeRecord.costSoFar <= endNodeCost){
+                if (endNodeRecord.costSoFar <= endNodeCost) {
                     continue;
                 }
                 //Borramos de la closed list
-                closed.erase(findRecordit(closed,endNode));
-                
+                closed.erase(findRecordit(closed, endNode));
+
                 // obtenemos el heuristic - dist euclidea
-                endNodeHeuristic = Heuristic(endNode,goalNode);
-            } else if(findRecord_b(open,endNode)){
-                    endNodeRecord = *findRecord(open, endNode);
-                    if(endNodeRecord.costSoFar <= endNodeCost){
-                        continue;
-                    }
-                    endNodeHeuristic = Heuristic(endNode,goalNode);
-            } else{
-                        NodeRecord endNodeRecordcopy(0,Conection(0,0,0),0.0,0.0);
-                        endNodeRecord = endNodeRecordcopy;
-                        endNodeRecord.node = endNode;
-                        endNodeHeuristic = Heuristic(endNode,goalNode);
+                endNodeHeuristic = Heuristic(endNode, goalNode);
             }
-            
+            else if (findRecord_b(open, endNode)) {
+                endNodeRecord = *findRecord(open, endNode);
+                if (endNodeRecord.costSoFar <= endNodeCost) {
+                    continue;
+                }
+                endNodeHeuristic = Heuristic(endNode, goalNode);
+            }
+            else {
+                NodeRecord endNodeRecordcopy(0, Conection(0, 0, 0), 0.0, 0.0);
+                endNodeRecord = endNodeRecordcopy;
+                endNodeRecord.node = endNode;
+                endNodeHeuristic = Heuristic(endNode, goalNode);
+            }
+
             //update node
             endNodeRecord.costSoFar = endNodeCost;
             endNodeRecord.connection = connection;
             endNodeRecord.estimatedTotalCost = endNodeCost + endNodeHeuristic;
             //add to the open list
-            if(!findRecord_b(open,endNode)){
+            if (!findRecord_b(open, endNode)) {
                 open.push_back(endNodeRecord);
             }
         }
         //Terminamos de buscar conexiones
         //eliminamos de la open list y añadimos a la closed
-        open.erase(findRecordit(open,current.node));
+        open.erase(findRecordit(open, current.node));
         closed.push_back(current);
         //debug
         debug.closedlist.push_back(Nodes[current.node]);
     }
 
-    if(current.node != goalNode){
-            return std::vector<vec3d>{};
-    }else{
-            //Compilar la lista de conexiones en el camino
-            return CompilePath(closed,current,startNode, Nodes);
+    if (current.node != goalNode) {
+        return std::vector<vec3d>{};
+    }
+    else {
+        //Compilar la lista de conexiones en el camino
+        return CompilePath(closed, current, startNode, Nodes);
     }
     //Si llega al final sin encontrar path se devuelve uno vacio
     return std::vector<vec3d>();

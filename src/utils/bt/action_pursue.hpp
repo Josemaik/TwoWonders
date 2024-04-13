@@ -16,6 +16,28 @@ struct BTAction_Pursue : BTNode_t {
         Steer_t steering = STBH::Pursue(phyTarget, ectx.phy);
         // ectx.phy.a_linear = steering.linear;
         // ectx.phy.v_angular = steering.angular;
+
+        // using noCMP = MP::TypeList<PhysicsComponent>;
+        // using obstacleTag = MP::TypeList<ObstacleTag>;
+
+        // auto& pos = ectx.phy.position;
+        // ectx.em.forEach<noCMP, obstacleTag>([&](Entity& e, PhysicsComponent& phy) {
+        //     if (pos.distance(phy.position) < 15.0)
+        //     {
+        //         // Calculate a vector perpendicular to the orientation
+        //         double angle = phy.orientation + M_PI / 2; // Add 90 degrees to the orientation
+        //         vec3d perpendicular(cos(angle), 0, sin(angle));
+
+        //         // Scale the perpendicular vector by a factor that depends on the distance to the obstacle
+        //         float scale = 1.0 - (pos.distance(phy.position) / 15.0);
+        //         vec3d avoidanceForce = perpendicular * scale;
+
+        //         // Add the avoidance force to the steering velocity
+        //         steering.v_x += avoidanceForce.x();
+        //         steering.v_z += avoidanceForce.z();
+        //     }
+        // });
+
         ectx.phy.velocity = vec3d{ steering.v_x,0.0,steering.v_z };
         return BTNodeStatus_t::success;
     }

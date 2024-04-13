@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 34.0, 29.0, -60.0 };
+        plfi.spawnPoint = { 40.0, 50.0, -3.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -64,6 +64,7 @@ void Game::createEntities()
     // -95.0, 22.0, -135.0 - Spawn lvl2
     // -30.24, 49.0, -26.59 - Spawn crater lvl2
     // -58.26,31.0,16.54 - spawn ramp muñeco
+    // 40.0, 50.0, -3.0 - Nomada lvl2
 
     // Player
     auto& e{ em.newEntity() };
@@ -72,26 +73,19 @@ void Game::createEntities()
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
     // p.gravity = 0;
 
-    auto& lis = em.addComponent<ListenerComponent>(e);
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<AttackComponent>(e);
+    auto& lis = em.addComponent<ListenerComponent>(e);
 
     // Listeners de eventos para el jugador
-    lis.addCode(EventCodes::SpawnDungeonKey);
-    lis.addCode(EventCodes::OpenChest);
-    lis.addCode(EventCodes::SetSpawn);
-    lis.addCode(EventCodes::OpenDoor);
-    lis.addCode(EventCodes::NPCDialog);
-    lis.addCode(EventCodes::DialogFirstSpawn);
-    lis.addCode(EventCodes::ViewPointNPCPrison);
-    lis.addCode(EventCodes::BoatPartFound);
-    lis.addCode(EventCodes::BoatDialog);
+    for (auto i = 0; i < EventCodes::MAX; i++)
+        lis.addCode(static_cast<EventCodes>(i));
 
     // Código de añadir un hechizo al jugador
-    Spell spell{ "Fireball", "Shoots a fireball", Spells::WaterDash, 20.0, 2 };
-    plfi.addSpell(spell);
+    // Spell spell{ "Fireball", "Shoots a fireball", Spells::WaterDash, 20.0, 2 };
+    // plfi.addSpell(spell);
 
     // Código de añadir un objeto poción al inventario
     // Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };

@@ -132,7 +132,7 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
             auto& playerPos = playerPhy.position;
 
             double distance = playerPos.distance(phy.position);
-            double range = 7.5;
+            double range = ic.range;
             bool crusherClose = false;
 
             if (ch.checkCrushers)
@@ -204,7 +204,7 @@ void ZoneSystem::checkLevers(EntityManager& em, EventManager& evm)
             auto& playerPos = playerPhy.position;
 
             double distance = playerPos.distance(phy.position);
-            double range = 7.5;
+            double range = ic.range;
 
             // Si la palanca se encuentra a menos de 7.5 unidades de distancia del se muestra el mensaje de activar palanca
             if (distance < range && !ic.showButton)
@@ -228,35 +228,6 @@ void ZoneSystem::checkLevers(EntityManager& em, EventManager& evm)
     });
 }
 
-void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
-{
-    auto& li = em.getSingleton<LevelInfo>();
-    using CMPs = MP::TypeList<InteractiveComponent, PhysicsComponent>;
-    using spawnTag = MP::TypeList<SpawnTag>;
-
-    em.forEach<CMPs, spawnTag>([&](Entity&, InteractiveComponent& ic, PhysicsComponent& phy)
-    {
-        auto& playerEnt = *em.getEntityByID(li.playerID);
-        auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
-        auto& playerPos = playerPhy.position;
-
-        double distance = playerPos.distance(phy.position);
-        double range = 4.5;
-        if (distance < range && !ic.showButton && !li.playerDetected)
-            ic.showButton = true;
-
-        else if (distance > range && ic.showButton)
-            ic.showButton = false;
-
-        auto& inpi = em.getSingleton<InputInfo>();
-
-        if (inpi.interact && ic.showButton && !li.playerDetected)
-        {
-            evm.scheduleEvent(Event{ EventCodes::SetSpawn });
-        }
-    });
-}
-
 void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
 {
     auto& li = em.getSingleton<LevelInfo>();
@@ -272,7 +243,7 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
         auto& playerPos = playerPhy.position;
 
         double distance = playerPos.distance(phy.position);
-        double range = 8.5;
+        double range = ic.range;
 
         auto& inpi = em.getSingleton<InputInfo>();
         auto& plfi = em.getSingleton<PlayerInfo>();
@@ -364,7 +335,7 @@ void ZoneSystem::checkLadders(EntityManager& em)
     em.forEach<noCMP, npcTag>([&](Entity&, PhysicsComponent& phy, InteractiveComponent& ic, LadderComponent& ldc)
     {
         double distance = playerPos.distance(phy.position);
-        double range = 12.0;
+        double range = ic.range;
 
         auto& inpi = em.getSingleton<InputInfo>();
 
@@ -399,7 +370,7 @@ void ZoneSystem::checkSigns(EntityManager& em)
     em.forEach<noCMP, npcTag>([&](Entity&, PhysicsComponent& phy, InteractiveComponent& ic, MessageComponent& msg)
     {
         double distance = playerPos.distance(phy.position);
-        double range = 12.0;
+        double range = ic.range;
 
         auto& inpi = em.getSingleton<InputInfo>();
 
@@ -437,7 +408,7 @@ void ZoneSystem::checkMissionObjs(EntityManager& em, EventManager& evm)
     em.forEach<noCMP, npcTag>([&](Entity& e, PhysicsComponent& phy, InteractiveComponent& ic)
     {
         double distance = playerPos.distance(phy.position);
-        double range = 7.0;
+        double range = ic.range;
 
         auto& inpi = em.getSingleton<InputInfo>();
 
@@ -463,10 +434,10 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager& evm)
     auto& playerEnt = *em.getEntityByID(li.playerID);
     auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
     auto& playerPos = playerPhy.position;
-    using noCMP = MP::TypeList<PhysicsComponent, InteractiveComponent, OneUseComponent>;
+    using noCMP = MP::TypeList<PhysicsComponent, InteractiveComponent, OneUseComponent, DispatcherComponent>;
     using npcTag = MP::TypeList<NPCTag>;
 
-    em.forEach<noCMP, npcTag>([&](Entity& e, PhysicsComponent& phy, InteractiveComponent&, OneUseComponent& ouc)
+    em.forEach<noCMP, npcTag>([&](Entity& e, PhysicsComponent& phy, InteractiveComponent& ic, OneUseComponent& ouc, DispatcherComponent& dc)
     {
         // Revisamos si ya se ha hablado con el npc
         std::pair<uint8_t, uint8_t> pair{ li.mapID, ouc.id };
@@ -476,7 +447,7 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager& evm)
 
         double distance = playerPos.distance(phy.position);
         double distanceY = std::abs(playerPos.y() - phy.position.y());
-        double range = 17.0;
+        double range = ic.range;
 
         if (distance < range && distanceY < 2.0 && !li.playerDetected)
         {
@@ -487,10 +458,40 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager& evm)
             playerPhy.moveAt(phy.position);
             phy.lookAt(playerPhy.position);
 
-            evm.scheduleEvent(Event{ EventCodes::ViewPointNPCPrison });
+            if (dc.eventCodes.size() > 0)
+                evm.scheduleEvent({ static_cast<EventCodes>(dc.eventCodes[0]) });
         }
     });
 }
+
+// void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
+// {
+//     auto& li = em.getSingleton<LevelInfo>();
+//     using CMPs = MP::TypeList<InteractiveComponent, PhysicsComponent>;
+//     using spawnTag = MP::TypeList<SpawnTag>;
+
+//     em.forEach<CMPs, spawnTag>([&](Entity&, InteractiveComponent& ic, PhysicsComponent& phy)
+//     {
+//         auto& playerEnt = *em.getEntityByID(li.playerID);
+//         auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
+//         auto& playerPos = playerPhy.position;
+
+//         double distance = playerPos.distance(phy.position);
+//         double range = 4.5;
+//         if (distance < range && !ic.showButton && !li.playerDetected)
+//             ic.showButton = true;
+
+//         else if (distance > range && ic.showButton)
+//             ic.showButton = false;
+
+//         auto& inpi = em.getSingleton<InputInfo>();
+
+//         if (inpi.interact && ic.showButton && !li.playerDetected)
+//         {
+//             evm.scheduleEvent(Event{ EventCodes::SetSpawn });
+//         }
+//     });
+// }
 
 // void ZoneSystem::checkDungeonSlimes(EntityManager& em, EventManager& evm)
 // {

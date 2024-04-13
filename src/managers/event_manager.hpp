@@ -26,7 +26,11 @@ enum EventCodes : uint16_t
     ViewPointDoor,
     ViewPointNPCPrison,
     BoatPartFound,
-    BoatDialog
+    BoatDialog,
+    ViewPointNomadVolcano,
+    DialogNomadVolcano,
+    DialogNomadVolcano2,
+    MAX
 };
 
 struct Event {
@@ -143,78 +147,6 @@ public:
                         li.viewPointSound = true;
                         break;
                     }
-                    case EventCodes::DialogPrisonNomad1:
-                    {
-                        auto& txti = em.getSingleton<TextInfo>();
-
-                        std::array<std::string, 9> msgs =
-                        {
-                            "Nómada: \nSaludos, no esperaba encontrarme a un \naprendiz de mago por aquí.",
-                            "Mago: \nBuenas! Sabes qué son todos estos enemigos?\nNo aparecían en los libros que estudié.",
-                            "Nómada: \nCuanto más se debilita la barrera más enemigos \nentran al mundo, cosa del viejo.",
-                            "Mago: \n¿Qué viejo?",
-                            "Nómada: \nEl pellejo.",
-                            "Mago: \nEspera, ¿¿no será el gran mago??",
-                            "Nómada: \nEse mismo",
-                            "Mago: \nEse es mi maestro! \nMe abandonó y me encomendó que lo encontrara.",
-                            "Nómada: \nSi eres el aprendiz del viejo sabrás utilizar esto."
-                        };
-
-                        // Metemos el texto en el array de texto
-                        for (std::size_t i = 0; i < msgs.size(); i++)
-                            txti.addText(msgs[i]);
-
-                        em.getComponent<ListenerComponent>(e).addCode(EventCodes::DialogPrisonNomad2);
-                        events.push_back(Event{ EventCodes::DialogPrisonNomad2 });
-                        out = true;
-                        break;
-                    }
-                    case EventCodes::DialogPrisonNomad2:
-                    {
-                        auto& li = em.getSingleton<LevelInfo>();
-                        auto& txti = em.getSingleton<TextInfo>();
-                        auto& plfi = em.getSingleton<PlayerInfo>();
-
-                        std::array<std::string, 2> msgs =
-                        {
-                            "¡Haz recibido un pergamino con la formulación \npara crear una pompa de agua!",
-                            "Nómada: \nCon esto podremos salir de aquí por si disparas a esa puerta. \nLos muñecos de por medio te servirán de práctica."
-                        };
-
-                        // Le damos el hechizo
-                        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 4 };
-                        plfi.addSpell(spell);
-                        plfi.showBook = true;
-
-                        // Metemos el texto en el stack de texto
-                        for (std::size_t i = 0; i < msgs.size(); i++)
-                            txti.addText(msgs[i]);
-
-                        li.viewPoint = { -84.847, 8.0, 234.267 };
-
-                        auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
-                        playerPhy.notMove = false;
-                        break;
-                    }
-                    case EventCodes::NPCDialog:
-                    {
-                        auto& li = em.getSingleton<LevelInfo>();
-                        if (li.npcToTalk == li.max)
-                            break;
-
-                        auto& npc = *em.getEntityByID(li.npcToTalk);
-                        auto& dc = em.getComponent<DispatcherComponent>(npc);
-                        auto& lc = em.getComponent<ListenerComponent>(e);
-
-                        for (std::size_t i = 0; i < dc.eventCodes.size(); i++)
-                        {
-                            scheduleEvent(Event{ static_cast<EventCodes>(dc.eventCodes[i]) });
-                            lc.addCode(static_cast<EventCodes>(dc.eventCodes[i]));
-                        }
-
-                        li.npcToTalk = li.max;
-                        break;
-                    }
                     case EventCodes::DialogFirstSpawn:
                     {
                         auto& txti = em.getSingleton<TextInfo>();
@@ -241,7 +173,15 @@ public:
                     {
                         auto& li = em.getSingleton<LevelInfo>();
                         li.viewPoint = { -23.08, 4.0, 244.7 };
-                        li.eventNPCPrison = true;
+                        li.events.insert(EventCodes::NPCDialog);
+                        li.viewPointSound = true;
+                        break;
+                    }
+                    case EventCodes::ViewPointNomadVolcano:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        li.viewPoint = { 40.0, 50.0, -33.0 };
+                        li.events.insert(EventCodes::NPCDialog);
                         li.viewPointSound = true;
                         break;
                     }
@@ -288,7 +228,7 @@ public:
                         {
                             vec3d pos{ -126.872, 7.0, 24.918 };
                             li.viewPoint = pos;
-                            li.eventBoatDialog = true;
+                            li.events.insert(EventCodes::BoatDialog);
 
                             auto& newBoat{ em.newEntity() };
                             em.addTag<BoatTag>(newBoat);
@@ -309,7 +249,128 @@ public:
 
                         for (const auto& msg : msgs)
                             txti.addText(msg);
+
+                        break;
                     }
+                    case EventCodes::NPCDialog:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        if (li.npcToTalk == li.max)
+                            break;
+
+                        auto& npc = *em.getEntityByID(li.npcToTalk);
+                        auto& dc = em.getComponent<DispatcherComponent>(npc);
+
+                        if (dc.eventCodes.size() > 1)
+                        {
+                            auto& lc = em.getComponent<ListenerComponent>(e);
+                            for (std::size_t i = 1; i < dc.eventCodes.size(); i++)
+                            {
+                                scheduleEvent(Event{ static_cast<EventCodes>(dc.eventCodes[i]) });
+                                lc.addCode(static_cast<EventCodes>(dc.eventCodes[i]));
+                            }
+                        }
+
+                        li.npcToTalk = li.max;
+                        break;
+                    }
+                    case EventCodes::DialogPrisonNomad1:
+                    {
+                        auto& txti = em.getSingleton<TextInfo>();
+
+                        std::array<std::string, 9> msgs =
+                        {
+                            "Nómada: \nSaludos, no esperaba encontrarme a un \naprendiz de mago por aquí.",
+                            "Mago: \nBuenas! Sabes qué son todos estos enemigos?\nNo aparecían en los libros que estudié.",
+                            "Nómada: \nCuanto más se debilita la barrera más enemigos \nentran al mundo, cosa del viejo.",
+                            "Mago: \n¿Qué viejo?",
+                            "Nómada: \nEl pellejo.",
+                            "Mago: \nEspera, ¿¿no será el gran mago??",
+                            "Nómada: \nEse mismo",
+                            "Mago: \nEse es mi maestro! \nMe abandonó y me encomendó que lo encontrara.",
+                            "Nómada: \nSi eres el aprendiz del viejo sabrás utilizar esto."
+                        };
+
+                        // Metemos el texto en el array de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        events.push_back(Event{ EventCodes::DialogPrisonNomad2 });
+                        out = true;
+                        break;
+                    }
+                    case EventCodes::DialogPrisonNomad2:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        auto& txti = em.getSingleton<TextInfo>();
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+
+                        std::array<std::string, 2> msgs =
+                        {
+                            "¡Haz recibido un pergamino con la formulación \npara crear una pompa de agua!",
+                            "Nómada: \nCon esto podremos salir de aquí por si disparas a esa puerta. \nLos muñecos de por medio te servirán de práctica."
+                        };
+
+                        // Le damos el hechizo
+                        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 4 };
+                        plfi.addSpell(spell);
+                        plfi.showBook = true;
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        li.viewPoint = { -84.847, 8.0, 234.267 };
+
+                        auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+                        playerPhy.notMove = false;
+                        break;
+                    }
+                    case EventCodes::DialogNomadVolcano:
+                    {
+                        auto& txti = em.getSingleton<TextInfo>();
+                        std::array<std::string, 3> msgs =
+                        {
+                            "Nómada: \nTú de nuevo, gracias por sacarme de esa mazmorra.\n ¿Ves los charcos de lava de alrededor?",
+                            "Mago: \nSí, pero no puedo apagarlos con mi agua. Y tengo que cruzarlos.",
+                            "Nómada: \n¿Qué te enseñó el viejo ese? \n Toma, usa esto te ayudará con la lava."
+                        };
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        events.push_back(Event{ EventCodes::DialogNomadVolcano2 });
+                        out = true;
+                        break;
+                    }
+                    case EventCodes::DialogNomadVolcano2:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        auto& txti = em.getSingleton<TextInfo>();
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+
+                        std::array<std::string, 2> msgs =
+                        {
+                            "¡Haz recibido un pergamino con la formulación \npara hacer una esquiva de agua!",
+                            "Nómada: \nCon esto podrás cruzar los charcos de lava. \n¡Buena suerte, yo solo necesito mis buenas patas para cruzar!"
+                        };
+
+                        // Le damos el hechizo
+                        Spell spell{ "Dash de agua", "Esquivas a la velocidad de la marea", Spells::WaterDash, 20.0, 4 };
+                        plfi.addSpell(spell);
+                        plfi.showBook = true;
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+                        playerPhy.notMove = false;
+                        break;
+                    }
+                    default:
+                        break;
                     }
                 }
             });

@@ -1346,27 +1346,27 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     for (auto& node : debug.nodes) {
         engine.drawCube(node, 2, 2, 2, GREEN);
     }
-    
-        // for (auto& node : navs.nodes) {
-        //     engine.drawCube(node.second, 2, 2, 2, RED);
-        // }
-    //Dibujar corners
-    if(debug.seecorners) {
+
+    // for (auto& node : navs.nodes) {
+    //     engine.drawCube(node.second, 2, 2, 2, RED);
+    // }
+//Dibujar corners
+    if (debug.seecorners) {
         for (auto& node : navs.corners) {
             engine.drawCube(node, 2, 2, 2, RED);
         }
     }
-    if(debug.seecenters) {
+    if (debug.seecenters) {
         for (auto it = navs.centers.begin(); it != std::prev(navs.centers.end()); ++it) {
             engine.drawCube(it->second, 2, 2, 2, BLUE);
         }
     }
-    if(debug.seemidpoint) {
+    if (debug.seemidpoint) {
         for (auto& node : navs.midpoints) {
             engine.drawCube(node, 2, 2, 2, PURPLE);
         }
     }
-    if(debug.seeconex) {
+    if (debug.seeconex) {
         for (auto& conex : navs.conexpos) {
             engine.drawLine3D(conex.first, conex.second, GREEN);
         }
@@ -1381,7 +1381,7 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
                 PURPLE);
         }
     }
-    
+
     engine.endMode3D();
     engine.beginDrawing();
     for (auto& node : debug.nodes) {
@@ -1470,7 +1470,7 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
             //Cone
             //if(e.hasTag<SnowmanTag>())
             auto& phy = em.getComponent<PhysicsComponent>(e);
-            drawVisionCone(phy.position,phy.orientation,bb.horizontalFOV);
+            drawVisionCone(phy.position, phy.orientation, bb.horizontalFOV);
             // if(e.hasTag<GolemTag>())
             //     drawVisionCone(bb.conegolem.first, bb.conegolem.second, bb.horizontalFOV);
             engine.endMode3D();

@@ -94,16 +94,10 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
                 li.viewPoint = vec3d::zero();
                 phy.notMove = false;
 
-                if (li.eventNPCPrison)
+                if (!li.events.empty())
                 {
-                    evm.scheduleEvent(Event{ EventCodes::NPCDialog });
-                    li.eventNPCPrison = false;
-                }
-
-                if (li.eventBoatDialog)
-                {
-                    evm.scheduleEvent(Event{ EventCodes::BoatDialog });
-                    li.eventBoatDialog = false;
+                    for (auto& e : li.events)
+                        evm.scheduleEvent(Event{ static_cast<EventCodes>(e) });
                 }
             }
 

@@ -21,6 +21,7 @@ enum struct InteractableType : uint8_t
 
 struct InteractiveComponent
 {
+    double range{ 0.0 };
     bool showButton{ false };
     bool showLock{ false };
 };

@@ -21,7 +21,7 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
             li.mapID = 1;
             map = loadMap("assets/levels/maps/lvl_1.kaiwa");
             em.getSingleton<SoundSystem>().sonido_mazmorra();
-            em.getSingleton<SoundSystem>().sonido_music_mazmorra();
+            // em.getSingleton<SoundSystem>().sonido_music_mazmorra();
             break;
         }
         case 2:
@@ -378,7 +378,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .orientation = rot, .rotationVec = rotationVec });
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = 0, .orientation = rot, .rotationVec = r.rotationVec });
         auto& c = em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-        em.addComponent<InteractiveComponent>(entity);
+        auto& ic = em.addComponent<InteractiveComponent>(entity);
 
         switch (type)
         {
@@ -390,6 +390,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
 
             addMessageCmp(em, entity, interactable);
 
+            ic.range = 7.5;
             em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
             [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .dropPosition = { vec3d::zero() }, .content = content });
 
@@ -411,6 +412,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         {
             em.addTag<DestructibleTag>(entity);
             em.addTag<WallTag>(entity);
+
             int life{ interactable["life"].GetInt() };
             em.addComponent<LifeComponent>(entity, LifeComponent{ .life = life });
             auto& d = em.addComponent<DestructibleComponent>(entity);
@@ -444,6 +446,8 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             }
             em.addTag<DoorTag>(entity);
             em.addTag<WallTag>(entity);
+
+            ic.range = 8.5;
             if (interactable.HasMember("noKey"))
                 em.addTag<NoKeyTag>(entity);
 
@@ -487,6 +491,8 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             em.addTag<LeverTag>(entity);
             em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
             addToZone(em, entity, type);
+
+            ic.range = 7.5;
             break;
         }
         case InteractableType::DamageObj:
@@ -502,7 +508,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         case InteractableType::Roca:
         {
             //em.addTag<WallTag>(entity);
-            em.addTag<Obstacle>(entity);
+            em.addTag<ObstacleTag>(entity);
             r.visible = false;
             break;
         }
@@ -511,6 +517,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             em.addTag<LadderTag>(entity);
             r.visible = false;
             c.behaviorType = BehaviorType::LADDER;
+            ic.range = 12.0;
             addToZone(em, entity, type);
 
             auto yMin = c.boundingBox.min.y();
@@ -523,6 +530,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         {
             em.addTag<SignTag>(entity);
 
+            ic.range = 12.0;
             addMessageCmp(em, entity, interactable);
             addToZone(em, entity, type);
             if (interactable.HasMember("offsetZ"))
@@ -550,6 +558,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 em.addTag<MissionObjTag>(entity);
                 auto& bc = em.addComponent<BoatComponent>(entity);
                 bc.setPart();
+                ic.range = 7.0;
 
                 addToZone(em, entity, type);
                 if (interactable.HasMember("offsetZ"))
@@ -572,6 +581,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
 
 void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
 {
+    auto& li = em.getSingleton<LevelInfo>();
     for (mapSizeType i = 0; i < npcArray.Size(); i++)
     {
         const valueType& npc = npcArray[i];
@@ -598,13 +608,24 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
         auto& entity{ em.newEntity() };
         em.addTag<NPCTag>(entity);
 
+        double range = 0.0;
         switch (npcType)
         {
         case 0:
             em.addTag<NomadTag>(entity);
+            switch (li.mapID)
+            {
+            case 1:
+                range = 17.0;
+                break;
+            case 2:
+                range = 7.5;
+                break;
+            }
             break;
         case 1:
             em.addTag<InvestigatorTag>(entity);
+            range = 7.5;
             break;
         default:
             break;
@@ -613,7 +634,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
         auto& wr = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color,.orientation = rot,.rotationVec = rotationVec });
         auto& wp = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.rotationVec = rotationVec, .max_speed = max_speed });
         em.addComponent<ColliderComponent>(entity, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
-        em.addComponent<InteractiveComponent>(entity);
+        em.addComponent<InteractiveComponent>(entity, InteractiveComponent{ .range = range });
         em.addComponent<NPCComponent>(entity, NPCComponent{ .path = path,.behaviourTree = &tree,.arrival_radius = arrival_radius });
 
         em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
@@ -636,13 +657,14 @@ void MapManager::generateNavmeshes(EntityManager& em)
         //Obtenemos el centro
         const valueType& navmesh = navmeshes[i];
         vecnodes[0] = { navmesh["center"][1].GetDouble(), navmesh["center"][2].GetDouble(), navmesh["center"][0].GetDouble() };
+
         //Recorremos vertices
         vec3d min{}, max{};
         const valueType& vertices = navmesh["vertices"];
         for (mapSizeType j = 0; j < vertices.Size(); j++)
         {
             vecnodes[j + 1] = { vertices[j][1].GetDouble(),  vertices[j][2].GetDouble(),  vertices[j][0].GetDouble() };
-            navs.corners.insert(vecnodes[j+1]);
+            navs.corners.insert(vecnodes[j + 1]);
             if (j == 0)
             {
                 max = vecnodes[j + 1];
@@ -679,12 +701,12 @@ void MapManager::generateNavmeshes(EntityManager& em)
         }
 
         //Creamos NavMesh BBox
-        double scalex{},scalez{};
-        double dis{ vecnodes[0].distance(vecnodes[5]) },disdifernte{};
-        bool issquare{true},x_difference_is_greater{false};
-        for(int i = 5; i < 9;i++){
+        double scalex{}, scalez{};
+        double dis{ vecnodes[0].distance(vecnodes[5]) }, disdifernte{};
+        bool issquare{ true }, x_difference_is_greater{ false };
+        for (int i = 5; i < 9;i++) {
             auto disaux = vecnodes[0].distance(vecnodes[i]);
-            if(std::abs(dis - disaux) > 1.0){
+            if (std::abs(dis - disaux) > 1.0) {
                 issquare = false;
                 disdifernte = disaux;
                 // Compara las coordenadas x y z de los puntos medios
@@ -693,7 +715,8 @@ void MapManager::generateNavmeshes(EntityManager& em)
                 if (dx > dz) {
                     // La diferencia es mayor en el eje x
                     x_difference_is_greater = true;
-                } else {
+                }
+                else {
                     // La diferencia es mayor en el eje z
                     x_difference_is_greater = false;
                 }
@@ -701,18 +724,22 @@ void MapManager::generateNavmeshes(EntityManager& em)
                 break;
             }
         }
-        if(issquare){
+        if (issquare) {
             scalex = scalez = dis;
-        }else{
-                if(x_difference_is_greater){
-                    scalex = disdifernte;
-                    scalez = dis;
-                }else{
-                    scalex = dis;
-                    scalez = disdifernte;
-                }
         }
-        BBox b(vecnodes[0],vec3d{scalex * 2.0,3.0,scalez * 2.0});
+        else {
+            if (x_difference_is_greater) {
+                scalex = disdifernte;
+                scalez = dis;
+            }
+            else {
+                scalex = dis;
+                scalez = disdifernte;
+            }
+        }
+        scalex = (max.x() - min.x()) + 1.0;
+        scalez = (max.z() - min.z()) + 1.0;
+        BBox b(vecnodes[0], vec3d{ scalex, (max.y() - min.y()) + 0.5, scalez });
         //BBox b{ min,max };
         navs.boundingnavmesh.push_back(b);
         //Creamos NavMesh
@@ -749,36 +776,72 @@ void MapManager::generateNavmeshes(EntityManager& em)
             }
         }
     }
-    //Crear conexiones de navmesh con otros con los que colisiona
-    for (auto it = navs.NavMeshes.begin(); it != std::prev(navs.NavMeshes.end()); ++it) {
-        auto  nextnavmesh = std::next(it);
-        auto& currentbbox = it->box;
-        auto& nextbbox = nextnavmesh->box;
-        //Conexiones con navmeshes colisionables
-        if (currentbbox.intersects(nextbbox)  || nextbbox.intersects(currentbbox)) {
-            //unimos centros
-            // auto pair = std::make_pair(it->centerpoint.second, nextnavmesh->centerpoint.second);
-            // navs.conexpos.insert(pair);
-            // Conection c{ 1, it->centerpoint.first,  nextnavmesh->centerpoint.first };
-            // navs.conexiones.push_back(c);
-            //Recorremos nodos del primer navmesh
-            for (auto it2 = it->nodes.begin(); it2 != std::prev(it->nodes.end()); ++it2) {
-                const auto& currentNode = it2;
-                //Recorremos nodos del segundo navmesh
-                for (auto it3 = nextnavmesh->nodes.begin(); it3 != std::prev(nextnavmesh->nodes.end()); ++it3) {
-                    const auto& nextNode = it3;
-                    //Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
-                    if (navs.insert_ids(currentNode->first, nextNode->first)) {
-                        Conection c{ 1, currentNode->first, nextNode->first };
-                        navs.conexiones.push_back(c);
-                        //debug
-                        auto pair = std::make_pair(currentNode->second, nextNode->second);
-                        navs.conexpos.insert(pair);
+
+    // Crear conexiones de navmesh con otros con los que colisiona
+    // for (auto it = navs.NavMeshes.begin(); it != navs.NavMeshes.end(); ++it) {
+    //     for (auto nextnavmesh = std::next(it); nextnavmesh != navs.NavMeshes.end(); ++nextnavmesh) {
+    //         auto& currentbbox = it->box;
+    //         auto& nextbbox = nextnavmesh->box;
+
+    //         // Conexiones con navmeshes colisionables
+    //         if (currentbbox.intersects(nextbbox)) {
+    //             // Obtenemos el centro (primer nodo) del primer navmesh
+    //             const auto& currentNode = it->nodes.begin();
+
+    //             // Obtenemos el centro (primer nodo) del segundo navmesh
+    //             const auto& nextNode = nextnavmesh->nodes.begin();
+
+    //             // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
+    //             if (navs.insert_ids(currentNode->first, nextNode->first)) {
+    //                 Conection c{ 1, currentNode->first, nextNode->first };
+    //                 navs.conexiones.push_back(c);
+    //                 // debug
+    //                 auto pair = std::make_pair(currentNode->second, nextNode->second);
+    //                 navs.conexpos.insert(pair);
+    //             }
+    //         }
+    //     }
+    // }
+
+    // Crear conexiones de navmesh con otros con los que colisiona
+    for (auto it = navs.NavMeshes.begin(); it != navs.NavMeshes.end(); ++it) {
+        for (auto nextnavmesh = std::next(it); nextnavmesh != navs.NavMeshes.end(); ++nextnavmesh) {
+            auto& currentbbox = it->box;
+            auto& nextbbox = nextnavmesh->box;
+
+            // Conexiones con navmeshes colisionables
+            if (currentbbox.intersects(nextbbox)) {
+
+                // Recorremos nodos del primer navmesh
+                for (auto it2 = it->nodes.begin(); it2 != it->nodes.end(); ++it2) {
+                    const auto& currentNode = it2;
+
+                    // Solo consideramos nodos en el borde de la intersección
+                    if (!nextbbox.intersects(currentNode->second)
+                        && currentNode != it->nodes.begin()) continue;
+
+                    // Recorremos nodos del segundo navmesh
+                    for (auto it3 = nextnavmesh->nodes.begin(); it3 != nextnavmesh->nodes.end(); ++it3) {
+                        const auto& nextNode = it3;
+
+                        // Solo consideramos nodos en el borde de la intersección
+                        if (!currentbbox.intersects(nextNode->second)
+                            && nextNode != nextnavmesh->nodes.begin()) continue;
+
+                        // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
+                        if (navs.insert_ids(currentNode->first, nextNode->first)) {
+                            Conection c{ 1, currentNode->first, nextNode->first };
+                            navs.conexiones.push_back(c);
+                            // debug
+                            auto pair = std::make_pair(currentNode->second, nextNode->second);
+                            navs.conexpos.insert(pair);
+                        }
                     }
                 }
             }
         }
     }
+
     //Crear conexiones entre los centros
     // Crear conexiones entre los centros
     // for (auto it = navs.centers.begin(); it != navs.centers.end(); ++it) {
@@ -787,7 +850,7 @@ void MapManager::generateNavmeshes(EntityManager& em)
     //     // Recorrer todos los centros nuevamente para encontrar conexiones
     //     for (auto nextCenter = std::next(it); nextCenter != navs.centers.end(); ++nextCenter) {
     //         double distance = currentcenterpos.distance(nextCenter->second);
-            
+
     //         // Establecer la distancia máxima para crear una conexión (ajusta el valor según sea necesario)
     //         double maxDistance = 60.0; // Por ejemplo, 10 unidades
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <set>
 #include <unordered_set>
 #include <limits>
 #include "utils/types.hpp"
@@ -71,7 +72,8 @@ struct LevelInfo
     std::size_t boatPartFound{ max };
     bool dungeonKeyCreated{ false };
     vec3d enemyToChestPos{};
-    bool door_open{ false }, eventNPCPrison{ false }, eventBoatDialog{ false };
+    bool door_open{ false };
+    std::set<uint16_t> events{};
 
     // Variables de debug
     bool debugIA2{ false };

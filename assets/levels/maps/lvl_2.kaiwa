@@ -332,7 +332,6 @@
 							"countdown_perception": 0.5,
 							"scale_to_respawn_attack": 7.0
 						},
-						
 						{
 							"position": [6.05,49.0,33.5],
 							"rotVector": [0.0, 0.0, 1.0],
@@ -469,13 +468,13 @@
 							"npc": 1
 						},
 						{
-							"position": [38.6,55.0,-42.5],
+							"position": [40.08, 50.0, -40.7],
 							"scale": [3.0, 7.0, 3.0],
-							"rotation": 0.0,
+							"rotation": 225.0,
 							"rotVector": [0.0, 0.0, 1.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.3,
-							"events": [9],
+							"events": [16, 17],
 							"path": [
 								[-51.8, 4.0,  238.9],
 								[-86.8, 4.0, 234.6],
@@ -1236,7 +1235,7 @@
 						{
 							"type":10,
 							"offsetZ":[0],
-							"position":[38.796, -61.558, 34.0],
+							"position":[38.796, -65.558, 34.0],
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 2.0]

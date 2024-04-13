@@ -32,6 +32,7 @@ struct BBox
     constexpr vec3d size() const { return max - min; }
     constexpr vec3d center() const { return (min + max) / 2.0; }
     bool intersects(const BBox& other) const { return !(max < other.min || min > other.max); }
+    bool intersects(const vec3d& point) const { return point >= min && point <= max; }
 
     // Función para comprobar si un rayo intersecta con la caja delimitadora
     bool intersectsRay(vec3d& rayOrigin, vec3d& rayDirection) const {
