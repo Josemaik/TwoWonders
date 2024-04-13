@@ -234,6 +234,8 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 1.0f });
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Fire });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+        em.getSingleton<SoundSystem>().sonido_h_bola_fuego();
+
         break;
     }
     default:
@@ -375,6 +377,8 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
         vec3d originalPos = phy.position;
         vec3d posCopy = phy.position;
         posCopy += { std::sin(ori) * 10.0, 0, std::cos(ori) * 10.0 };
+
+        em.getSingleton<SoundSystem>().sonido_h_dash();
 
         // Sacamos la normal entre la posición original y la nueva
         auto normal = (posCopy - originalPos).normalize();

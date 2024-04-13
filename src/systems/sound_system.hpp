@@ -39,19 +39,76 @@ struct SoundSystem {
     void sonido_recoger_vida();         //a futuro
 
     void sonido_llave();                
-    void sonido_h_pompa();              //comprobar
+    void sonido_h_pompa();              
     void sonido_checkpoint();           
     void sonido_palanca();              
     void sonido_recibir_danyo();         
     void sonido_aum_vida_max();         
 
-    //poner sonido de golpe dummy a romper las maderas
-    //bajar volumen de ambiente
-    ///subir SFX
-    //bajar interacción
+
+    //SONIDOS PENDIENTES
+    void sonido_music_mazmorra();   //por integrar
+    //dialogos
+    void sonido_DInvestigador();    //por integrar
+    void sonido_DPlayer();          //por integrar
+    void sonido_DCalabaza();        //por integrar
+    void sonido_DEsquimal();        //por integrar
+    void sonido_DPescador();        //por integrar
+    void sonido_DSacerdotisa();     //por integrar
+    void sonido_DEspiritu();        //por integrar
+    void sonido_DGuerrera();        //por integrar    
+
+   //sonidos de zona volcan
+
+    void sonido_music_volcan();     //falla
+    void sonido_h_dash();                  
+    void sonido_h_bola_fuego();     //por comprobar
+    void sonido_amb_volcan();       //falla
+    void sonido_pasos_volcan();     //por integrar
+    void sonido_golem_mov();        //por integrar
+    void sonido_golem_ataque();     //por integrar
+    void sonido_golem_danyo();      //por integrar
+    void sonido_golem_muere();      //por integrar
+    void sonido_munyeco_mov();      //por integrar
+    void sonido_munyeco_ataque();   //por integrar
+    void sonido_munyeco_danyo();    //por integrar
+    void sonido_munyeco_muere();    //por integrar
+    void sonido_abrir_puerta_magica();  //por integrar
+    void sonido_recoger_pieza();    //por integrar
+    void sonido_equipar_botas();    //por integrar
+    void sonido_equipar_gorro();    //por integrar
+
+
+
+   //sonidos de zona monte
+
+    void sonido_amb_monte();        //por integrar   
+    void sonido_music_monte();      //por integrar
+    void sonido_pasos_nieve();      //por integrar
+    void sonido_h_estacas();        //por integrar
+    void sonido_equipar_escudo();   //por integrar
+    void sonido_activar_baliza();   //por integrar
+    void sonido_portal();           //por integrar
+    void sonido_pesca();            //por integrar
+
+   //sonidos de zona pradera
+
+   void sonido_amb_pradera();           //por integrar
+   void sonido_music_pradera();         //por integrar
+   void sonido_h_escudo();              //por integrar
+   void sonido_slime_ataque();          //por integrar
+   void sonido_slime_danyo();           //por integrar
+   void sonido_slime_mov();             //por integrar
+   void sonido_slime_muere();           //por integrar
+   void sonido_slime_curar();           //por integrar    
+   void sonido_crear_pociones();        //por integrar    
+   void sonido_campamento_derrotado1(); //por integrar          
+   void sonido_equipar_lanza();         //por integrar    
+   
 
     void play();
     void play_pasos();
+    void play_music();
     void music_stop();
     void ambient_stop();
     void SFX_stop();
