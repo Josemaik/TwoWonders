@@ -993,7 +993,8 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     else if (e.hasTag<InvestigatorTag>())
     {
-        r.model = engine.loadModel("assets/Personajes/NPCs/Nomada/Nomada.obj");
+        r.model = engine.loadModel("assets/Personajes/NPCs/Investigador/Investigador.obj");
+        loadShaders(r.model);
     }
     else if (e.hasTag<LavaTag>())
     {
