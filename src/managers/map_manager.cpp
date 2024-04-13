@@ -628,13 +628,14 @@ void MapManager::generateNavmeshes(EntityManager& em)
         //Obtenemos el centro
         const valueType& navmesh = navmeshes[i];
         vecnodes[0] = { navmesh["center"][1].GetDouble(), navmesh["center"][2].GetDouble(), navmesh["center"][0].GetDouble() };
-
+        navs.centers.insert(vecnodes[0]);
         //Recorremos vertices
         vec3d min{}, max{};
         const valueType& vertices = navmesh["vertices"];
         for (mapSizeType j = 0; j < vertices.Size(); j++)
         {
             vecnodes[j + 1] = { vertices[j][1].GetDouble(),  vertices[j][2].GetDouble(),  vertices[j][0].GetDouble() };
+            navs.corners.insert(vecnodes[j+1]);
             if (j == 0)
             {
                 max = vecnodes[j + 1];

@@ -17,6 +17,10 @@ struct NavmeshInfo
     std::set<std::pair<uint16_t, uint16_t>> conexids;
     //Puntos medios de los nodos
     std::set<vec3d> midpoints{};
+    //centers
+    std::set<vec3d> centers{};
+    //only nodes og quads
+    std::set<vec3d> corners{};
     //Conexiones
     std::vector<Conection> conexiones;
     //Conexiones pero con pos

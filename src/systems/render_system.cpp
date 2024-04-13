@@ -1210,9 +1210,12 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     // engine.drawText(std::to_string(static_cast<int>(debug.goalnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY + 40), 20, BLUE);
     // goalnodenew += 1;
 
-    Rectangle btn1Rec = { posX - 40, posY + 80, buttonWidth, buttonHeight };
-    Rectangle btn2Rec = { posX + 150, posY + 80, buttonWidth, buttonHeight };
-    Rectangle btn3Rec = { posX - 30, posY - 80, buttonWidth, buttonHeight };
+    Rectangle btn1Rec = { posX - 10, posY + 80, buttonWidth, buttonHeight };
+    Rectangle btn2Rec = { posX + 140, posY + 80, buttonWidth, buttonHeight };
+    Rectangle btn3Rec = { posX + 140, posY  , buttonWidth, buttonHeight };
+    Rectangle btn4Rec = { posX - 10, posY  , buttonWidth, buttonHeight };
+    Rectangle btn5Rec = { posX + 140, posY + 40, buttonWidth, buttonHeight };
+    Rectangle btn6Rec = { posX - 10, posY + 40, buttonWidth, buttonHeight };
     // Botón
     if (GuiButton(btn1Rec, "CALCULATE")) {
         //std::size_t idcenter{};
@@ -1312,13 +1315,22 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         debug.nodes.clear();
         debug.closedlist.clear();
     }
-    if (GuiButton(btn3Rec, "SEE NAVMESH")) {
-        debug.seenavmesh = !debug.seenavmesh;
+    if (GuiButton(btn3Rec, "CORNERS")) {
+        debug.seecorners = !debug.seecorners;
+    }
+    if (GuiButton(btn4Rec, "CENTERS")) {
+        debug.seecenters = !debug.seecenters;
+    }
+    if (GuiButton(btn5Rec, "MIDPOINTS")) {
+        debug.seemidpoint = !debug.seemidpoint;
+    }
+    if (GuiButton(btn6Rec, "CONEXIONES")) {
+        debug.seeconex = !debug.seeconex;
     }
     //resultado
     vec2d textPositionInfo2 = { static_cast<double>(engine.getScreenWidth() - 370), 480 };
     engine.drawTextEx(GetFontDefault(), "PATH RESULT", textPositionInfo2, 20, 1, RED);
-    // //Dibujar path
+    //Dibujar path
     float posyt = 510.0f;
     for (auto pos : debug.path) {
         std::string text = std::to_string(pos.x()) + " " + std::to_string(pos.y()) + " " + std::to_string(pos.z());
@@ -1326,16 +1338,34 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         posyt += 20.0f;
     }
     engine.beginMode3D();
+    //DIbujar nodos de la lista cerrada y nodos del path resultado
     for (auto& closenode : debug.closedlist) {
         engine.drawCube(closenode, 2, 2, 2, YELLOW);
     }
     for (auto& node : debug.nodes) {
         engine.drawCube(node, 2, 2, 2, GREEN);
     }
-    if (debug.seenavmesh) {
-        for (auto& node : navs.nodes) {
-            engine.drawCube(node.second, 2, 2, 2, RED);
+    
+        // for (auto& node : navs.nodes) {
+        //     engine.drawCube(node.second, 2, 2, 2, RED);
+        // }
+    //Dibujar corners
+    if(debug.seecorners) {
+        for (auto& node : navs.corners) {
+            engine.drawCube(node, 2, 2, 2, RED);
         }
+    }
+    if(debug.seecenters) {
+        for (auto& node : navs.centers) {
+            engine.drawCube(node, 2, 2, 2, BLUE);
+        }
+    }
+    if(debug.seemidpoint) {
+        for (auto& node : navs.midpoints) {
+            engine.drawCube(node, 2, 2, 2, PURPLE);
+        }
+    }
+    if(debug.seeconex) {
         for (auto& conex : navs.conexpos) {
             engine.drawLine3D(conex.first, conex.second, GREEN);
         }
@@ -1349,6 +1379,7 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
                 PURPLE);
         }
     }
+    
     engine.endMode3D();
     engine.beginDrawing();
     for (auto& node : debug.nodes) {
