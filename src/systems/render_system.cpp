@@ -1302,10 +1302,10 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
             std::copy(path.begin(), path.end(), debug.path.begin());
             //     Mostrar el camino copiado
                 //    std::cout << "Camino en debug.path:" << std::endl;
-            for (const auto& node : debug.path) {
-                std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
-                debug.nodes.push_back(node);
-            }
+            // for (const auto& node : debug.path) {
+            //     std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
+            //     debug.nodes.push_back(node);
+            // }
         }
         //    debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
         //    std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
@@ -1356,8 +1356,8 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         }
     }
     if(debug.seecenters) {
-        for (auto& node : navs.centers) {
-            engine.drawCube(node, 2, 2, 2, BLUE);
+        for (auto it = navs.centers.begin(); it != std::prev(navs.centers.end()); ++it) {
+            engine.drawCube(it->second, 2, 2, 2, BLUE);
         }
     }
     if(debug.seemidpoint) {
@@ -1372,6 +1372,7 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         for (auto& bbox : navs.boundingnavmesh) {
             auto boxSize = bbox.max - bbox.min;
             vec3d boxPosition = (bbox.min + bbox.max) / 2;
+            //boxPosition.setY(boxPosition.y + 20.0);
             engine.drawCubeWires(boxPosition,
                 static_cast<float>(boxSize.x()),
                 static_cast<float>(boxSize.y()),

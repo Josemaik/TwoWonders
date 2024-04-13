@@ -106,15 +106,13 @@ std::vector<vec3d> Graph::PathFindAStar(Debug_t& debug,uint16_t startNode, uint1
                 closed.erase(findRecordit(closed,endNode));
                 
                 // obtenemos el heuristic - dist euclidea
-                endNodeHeuristic = endNodeCost - endNodeRecord.costSoFar;
-                // endNodeHeuristic = Heuristic(endNode,goalNode);
+                endNodeHeuristic = Heuristic(endNode,goalNode);
             } else if(findRecord_b(open,endNode)){
                     endNodeRecord = *findRecord(open, endNode);
                     if(endNodeRecord.costSoFar <= endNodeCost){
                         continue;
                     }
-                    endNodeHeuristic = endNodeCost - endNodeRecord.costSoFar;
-                    // endNodeHeuristic = Heuristic(endNode,goalNode);
+                    endNodeHeuristic = Heuristic(endNode,goalNode);
             } else{
                         NodeRecord endNodeRecordcopy(0,Conection(0,0,0),0.0,0.0);
                         endNodeRecord = endNodeRecordcopy;

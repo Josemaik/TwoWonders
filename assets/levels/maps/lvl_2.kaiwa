@@ -1472,7 +1472,7 @@
 							"life": 6,
 							"type": 0,
 							"element": 1,
-							"arrival_radius": 1.0,
+							"arrival_radius": 4.0,
 							"detect_radius": 40.0,
 							"attack_radius": 7.5,
 							"tx": 0.0,
@@ -1488,7 +1488,7 @@
 							],
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.17,
+							"countdown_perception": 0.01,
 							"scale_to_respawn_attack": 7.0
 						},
 						{

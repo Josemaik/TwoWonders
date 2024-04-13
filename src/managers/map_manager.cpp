@@ -497,7 +497,8 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         }
         case InteractableType::Roca:
         {
-            em.addTag<WallTag>(entity);
+            //em.addTag<WallTag>(entity);
+            em.addTag<Obstacle>(entity);
             r.visible = false;
             break;
         }
@@ -631,7 +632,6 @@ void MapManager::generateNavmeshes(EntityManager& em)
         //Obtenemos el centro
         const valueType& navmesh = navmeshes[i];
         vecnodes[0] = { navmesh["center"][1].GetDouble(), navmesh["center"][2].GetDouble(), navmesh["center"][0].GetDouble() };
-        navs.centers.insert(vecnodes[0]);
         //Recorremos vertices
         vec3d min{}, max{};
         const valueType& vertices = navmesh["vertices"];
@@ -670,12 +670,46 @@ void MapManager::generateNavmeshes(EntityManager& em)
         const valueType& midpoints = navmesh["puntos medios"];
         for (mapSizeType k = 0; k < midpoints.Size(); k++)
         {
-            vecnodes[k + 4] = { midpoints[k][1].GetDouble(),  midpoints[k][2].GetDouble(),  midpoints[k][0].GetDouble() };
-            navs.midpoints.insert(vecnodes[k + 4]);
+            vecnodes[k + 5] = { midpoints[k][1].GetDouble(),  midpoints[k][2].GetDouble(),  midpoints[k][0].GetDouble() };
+            navs.midpoints.insert(vecnodes[k + 5]);
         }
 
         //Creamos NavMesh BBox
-        BBox b{ min,max };
+        double scalex{},scalez{};
+        double dis{ vecnodes[0].distance(vecnodes[5]) },disdifernte{};
+        bool issquare{true},x_difference_is_greater{false};
+        for(int i = 5; i < 9;i++){
+            auto disaux = vecnodes[0].distance(vecnodes[i]);
+            if(std::abs(dis - disaux) > 1.0){
+                issquare = false;
+                disdifernte = disaux;
+                // Compara las coordenadas x y z de los puntos medios
+                double dx = std::abs(vecnodes[i].x() - vecnodes[0].x());
+                double dz = std::abs(vecnodes[i].z() - vecnodes[0].z());
+                if (dx > dz) {
+                    // La diferencia es mayor en el eje x
+                    x_difference_is_greater = true;
+                } else {
+                    // La diferencia es mayor en el eje z
+                    x_difference_is_greater = false;
+                }
+
+                break;
+            }
+        }
+        if(issquare){
+            scalex = scalez = dis;
+        }else{
+                if(x_difference_is_greater){
+                    scalex = disdifernte;
+                    scalez = dis;
+                }else{
+                    scalex = dis;
+                    scalez = disdifernte;
+                }
+        }
+        BBox b(vecnodes[0],vec3d{scalex * 2.0,3.0,scalez * 2.0});
+        //BBox b{ min,max };
         navs.boundingnavmesh.push_back(b);
         //Creamos NavMesh
         Navmesh nav{ .box = b };
@@ -687,6 +721,7 @@ void MapManager::generateNavmeshes(EntityManager& em)
             //si es el centro, se guarda
             if (n.x() == vecnodes[0].x() && n.z() == vecnodes[0].z()) {
                 nav.centerpoint = pair;
+                navs.centers.insert(pair);
             }
             nav.nodes.insert(pair);
             navs.num_nodes++;
@@ -716,7 +751,12 @@ void MapManager::generateNavmeshes(EntityManager& em)
         auto& currentbbox = it->box;
         auto& nextbbox = nextnavmesh->box;
         //Conexiones con navmeshes colisionables
-        if (currentbbox.intersects(nextbbox)) {
+        if (currentbbox.intersects(nextbbox)  || nextbbox.intersects(currentbbox)) {
+            //unimos centros
+            // auto pair = std::make_pair(it->centerpoint.second, nextnavmesh->centerpoint.second);
+            // navs.conexpos.insert(pair);
+            // Conection c{ 1, it->centerpoint.first,  nextnavmesh->centerpoint.first };
+            // navs.conexiones.push_back(c);
             //Recorremos nodos del primer navmesh
             for (auto it2 = it->nodes.begin(); it2 != std::prev(it->nodes.end()); ++it2) {
                 const auto& currentNode = it2;
@@ -735,6 +775,30 @@ void MapManager::generateNavmeshes(EntityManager& em)
             }
         }
     }
+    //Crear conexiones entre los centros
+    // Crear conexiones entre los centros
+    // for (auto it = navs.centers.begin(); it != navs.centers.end(); ++it) {
+    //     auto currentCenter = it->first;
+    //     auto currentcenterpos = it->second;
+    //     // Recorrer todos los centros nuevamente para encontrar conexiones
+    //     for (auto nextCenter = std::next(it); nextCenter != navs.centers.end(); ++nextCenter) {
+    //         double distance = currentcenterpos.distance(nextCenter->second);
+            
+    //         // Establecer la distancia máxima para crear una conexión (ajusta el valor según sea necesario)
+    //         double maxDistance = 60.0; // Por ejemplo, 10 unidades
+
+    //         // Si la distancia entre los centros es menor o igual a la distancia máxima, crear una conexión
+    //         if (distance <= maxDistance) {
+    //             // Crea la conexión si no existe ya
+    //             // if (navs.insert_ids(currentCenter, nextCenter->first)) {
+    //                 Conection c{ 1, currentCenter, nextCenter->first };
+    //                 navs.conexiones.push_back(c);
+    //                 auto pair = std::make_pair(currentcenterpos, nextCenter->second);
+    //                 navs.conexpos.insert(pair);
+    //             // }
+    //        }
+    //     }
+    // }
 }
 
 void MapManager::destroyMap(EntityManager& em)
