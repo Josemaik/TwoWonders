@@ -378,7 +378,7 @@ public:
                     case EventCodes::DialogCatVolcano1:
                     {
                         auto& txti = em.getSingleton<TextInfo>();
-                        std::array<std::string, 12> msgs =
+                        std::array<std::string, 14> msgs =
                         {
                             "Gato: \n¡Miau! ¡Miau! ¡Miau!",
                             "Mago: \n¿Qué dices? ¿Qué quieres decirme?",
@@ -386,11 +386,13 @@ public:
                             "Mago: \nLo siento, le pediré a mi maestro que me lo enseñe.",
                             "Gato: \nNo te preocupes niño, si me estaba quedando contigo. \nSoy un investigador",
                             "Mago: \n¡Ah vale! Oye, ¿sabes cómo salir de aquí? \nTengo que encontrar a mi maestro.",
-                            "Investigador: \nNo eres el único que quiere salir de aquí, \npero igual deberías preocuparte más por el volcán \n a punto de estallar que de tu maestro.",
+                            "Investigador: \nNo eres el único que quiere salir de aquí.",
+                            "Investigador: \nIgual deberías de preocuparte más por el volcán\n a punto de estallar que de tu maestro.",
                             "Mago: \n¿¡Quéeeee!? ¡¿Estallar!? ¡¿Cómo?!",
                             "Investigador: \nAsí es, pero no te alarmes, porque me vas a ayudar a \nreconstruir mi barca para salir de aquí.",
                             "Mago: \n¿Una barca?",
-                            "Investigador: \nEfectivamente, los monstruos me desperdigaron \nlas piezas por todo el lugar, ayúdame a recuperarlas\ny saldremos de aquí antes de la explosión.",
+                            "Investigador: \nEfectivamente, los monstruos me desperdigaron \nlas piezas por todo el lugar.", 
+                            "Investigador: \nAyúdame a recuperarlas\ny saldremos de aquí antes de la explosión.",
                             "Mago: \n¡Entiendo, déjalo en mis manos!"
                         };
 
