@@ -246,7 +246,7 @@
 							"scale_to_respawn_attack": 7.0
 						},
 						{
-							"position": [23.52, 45.0, -40.78],
+							"position": [19.52, 45.0, -40.78],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 180.0,
 							"scale": [7.0, 12.0, 7.0],
@@ -1489,8 +1489,8 @@
 								[-133.8,13.0,-16.85],
 								[-133.80,13.0,-4.67]
 							],
-							"countdown_stop": 0.8,
-							"countdown_shoot": 0.5,
+							"countdown_stop": 0.2,
+							"countdown_shoot": 0.3,
 							"countdown_perception": 0.11,
 							"scale_to_respawn_attack": 7.0
 						},
@@ -1518,8 +1518,8 @@
 								[-80.8,7.0,7.2],
 								[-80.8,7.0,7.2]
 							],
-							"countdown_stop": 0.8,
-							"countdown_shoot": 0.5,
+							"countdown_stop": 0.2,
+							"countdown_shoot": 0.3,
 							"countdown_perception": 0.01,
 							"scale_to_respawn_attack": 7.0
 						},

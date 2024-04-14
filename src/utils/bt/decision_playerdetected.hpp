@@ -15,8 +15,11 @@ struct BTDecisionPlayerDetected : BTNode_t {
         ectx.ai->bh = "detecting player";
 
         if(ectx.ent.hasTag<CrusherTag>()){
-            auto const distance = (ectx.phy.position - getplayerphy(ectx).position).lengthSQ();
-            if(distance < (ectx.ai->detect_radius * ectx.ai->detect_radius)){
+            auto& plpos = getplayerphy(ectx).position;
+            auto const distance = (ectx.phy.position - plpos).lengthSQ();
+            auto const diferrencey = std::abs(ectx.phy.position.y() - plpos.y());
+            if(distance < (ectx.ai->detect_radius * ectx.ai->detect_radius) &&
+            diferrencey < 4.0){
                 ectx.ai->playerdetected = true;
                 return BTNodeStatus_t::success;
             }  else{

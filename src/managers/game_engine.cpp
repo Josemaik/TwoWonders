@@ -65,7 +65,8 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Libro para enseñar hechizos HUD
     loadAndResizeImage("libro", "assets/HUD/Libro.png");
-
+    //Load detection icon
+    loadAndResizeImage("detectionicon", "assets/HUD/detectionicon.png");
     // NÚMEROS
     //
     loadAndResizeImage("0", "assets/HUD/numeros/0.png");

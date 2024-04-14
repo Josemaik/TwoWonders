@@ -1579,7 +1579,7 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
     for (auto const& e : em.getEntities())
     {
         //Alert state
-        if (e.hasTag<EnemyTag>() && !e.hasTag<CrusherTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>()) {
+        if (e.hasTag<EnemyTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>()) {
             auto& aic = em.getComponent<AIComponent>(e);
             auto& r = em.getComponent<RenderComponent>(e);
 
@@ -1591,14 +1591,17 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
             }
 
             if (aic.playerdetected && aic.show_icon) {
-                vec2d point1 = { barX, barY - 120.0f };
-                vec2d point2 = { barX - 30.0f, barY - 50.0f };
-                vec2d point3 = { barX + 30.0f, barY - 50.0f };
-                //dibujar icono alerta
-                // Dibuja el triángulo
-                engine.drawTriangle(point1, point2, point3, BLACK);
-                // Dibuja el signo de exclamación dentro del triángulo
-                engine.drawText("!", static_cast<int>(barX - 2), static_cast<int>(barY - 100), 50, YELLOW);
+                // vec2d point1 = { barX, barY - 120.0f };
+                // vec2d point2 = { barX - 30.0f, barY - 50.0f };
+                // vec2d point3 = { barX + 30.0f, barY - 50.0f };
+                // //dibujar icono alerta
+                // // Dibuja el triángulo
+                // engine.drawTriangle(point1, point2, point3, BLACK);
+                // // Dibuja el signo de exclamación dentro del triángulo
+                // engine.drawText("!", static_cast<int>(barX - 2), static_cast<int>(barY - 100), 50, YELLOW);
+                auto& icon = engine.textures["detectionicon"];
+                engine.drawTexture(icon,barX - 15.0f,barY - 135.0f,WHITE);
+
                 //emepezar contador para borrar
                 if (aic.elapsed_show_icon >= aic.countdown_show_icon) {
                     aic.elapsed_show_icon = 0.0;
