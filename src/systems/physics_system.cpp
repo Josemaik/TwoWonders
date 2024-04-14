@@ -71,7 +71,7 @@ void PhysicsSystem::update(EntityManager& em)
             {
                 vel *= 1.15;
             }
-            std::cout << pos.x() <<","<< pos.y() <<","<< pos.z() << "\n";
+           // std::cout << pos.x() <<","<< pos.y() <<","<< pos.z() << "\n";
         }
 
         // Si estamos en una rampa queremos ir un poco más lento

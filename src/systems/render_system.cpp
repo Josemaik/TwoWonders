@@ -1618,8 +1618,13 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
                 }
             }
 
-            vec2d center = { barX, barY - 120.0f };
+            //vec2d center = { barX, barY - 120.0f };
+            int centerx = static_cast<int>(barX - 25.0f);
+            int centery = static_cast<int>(barY - 150.0f);
             if (aic.alert_state) {
+                // if(e.getID() == 148){
+                //     std::cout << aic.endangle << "\n";
+                // }
                 //Se escuahn pasos
                 if (aic.listen_steps) {
                     aic.endangle -= aic.increase_angle;
@@ -1630,8 +1635,19 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
                         aic.endangle += aic.increase_angle;
                     }
                 }
-                //std::cout << endangle << "\n";
-                engine.drawCircleSector(center, 30.0f, 0.0f, aic.endangle, 30, RED);
+                ENGI::GameEngine::Gif *oido{nullptr};
+                Texture2D copy{};
+                if(std::abs(aic.endangle) >= 0.0 && std::abs(aic.endangle) <= 180.0){
+                    oido = &engine.gifs.at("Oido_parp1");
+                    copy = oido->texture;
+                }else if(std::abs(aic.endangle) >= 180.0 && std::abs(aic.endangle <= 360.0)){
+                    oido = &engine.gifs.at("Oido_parp2");
+                    copy = oido->texture; 
+                }
+                copy.width = static_cast<int>(copy.width / oido->reScaleX);
+                copy.height = static_cast<int>(copy.height / oido->reScaleY);
+                displayGif(engine, copy, *oido, centerx, centery);
+                //engine.drawCircleSector(center, 30.0f, 0.0f, aic.endangle, 30, RED);
             }
             else {
                 if (aic.endangle != 0.0f) {

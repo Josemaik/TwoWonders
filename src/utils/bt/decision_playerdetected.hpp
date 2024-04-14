@@ -88,6 +88,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
             if(ectx.ent.hasTag<SnowmanTag>()){
                 if(std::abs(getplayerphy(ectx).position.y() - ectx.phy.position.y()) > 7.0){
                             ectx.ai->playerdetected = false;
+                            ectx.ai->alert_state = false;
                             return BTNodeStatus_t::fail;
                 }
             }

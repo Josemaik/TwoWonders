@@ -185,6 +185,10 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Botón R1
     loadAndResizeImageGif("r1", "assets/HUD/botones/R1.gif", 0, 55);
+    
+    //Detección por oído
+    loadAndResizeImageGif("Oido_parp1", "assets/HUD/gifs/Oido_parp1.gif", 0, 55);
+    loadAndResizeImageGif("Oido_parp2", "assets/HUD/gifs/Oido_parp2.gif", 0, 55);
 
     SetExitKey(KEY_F8);
 }
