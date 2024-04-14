@@ -89,6 +89,51 @@ struct BTAction_Seek : BTNode_t {
             steering.v_x += std::clamp(dirToCenterOfMass.x() * centerOfMassWeight, -ectx.phy.max_speed, ectx.phy.max_speed);
             steering.v_z += std::clamp(dirToCenterOfMass.z() * centerOfMassWeight, -ectx.phy.max_speed, ectx.phy.max_speed);
         }
+
+        using noCMP = MP::TypeList<PhysicsComponent,ColliderComponent>;
+        using obstacleTag = MP::TypeList<ObstacleTag>;
+
+        auto& pos = ectx.phy.position;
+        double mindistance{100.0};
+        PhysicsComponent *ptrphy{};
+        ColliderComponent *ptrcol{};
+        ectx.em.forEach<noCMP, obstacleTag>([&](Entity& e, PhysicsComponent& phy,ColliderComponent& col) {
+                e.getID();
+                auto auxdis = pos.distance(phy.position);
+                if(auxdis < mindistance){
+                    mindistance = auxdis;
+                    ptrphy = &phy;
+                    ptrcol = &col;
+                }
+        });
+        if(mindistance <= 15.0){
+                auto dirtoobstacle = ptrphy->position - pos;
+                dirtoobstacle.normalize();
+                RayCast ray {pos,dirtoobstacle};
+                auto& bboxobstacle = ptrcol->boundingBox;
+                if(bboxobstacle.intersectsRay(ray.origin,ray.direction)){
+                    double angle = ectx.phy.orientation + M_PI / 2; // Add 90 degrees to the orientation
+                    vec3d perpendicular(sin(angle), 0, cos(angle));
+
+                    auto maxseparate{0.1};
+                    if(mindistance < 5.0){
+                        maxseparate = 1.7;
+                    }else if(mindistance < 10.0){
+                        maxseparate = 0.8;
+                    }else{
+                        maxseparate = 0.5;
+                        maxevade = 0.5;
+                    }
+                    vec3d avoidanceForce = perpendicular * maxseparate;
+                    // Steer_t steeringEvade = STBH::Evade(ectx.phy,*ptrphy,maxevade);
+                    // steering.v_x += steeringEvade.v_x;
+                    // steering.v_z += steeringEvade.v_z;
+                    steering.v_x += steering.v_x * 0.5;
+                    steering.v_z += steering.v_z * 0.5;
+                    steering.v_x += avoidanceForce.x();
+                    steering.v_z += avoidanceForce.z();
+                }
+        }
         // set velocity and orientation
         ectx.phy.velocity = vec3d{ steering.v_x, 0.0, steering.v_z };
         ectx.phy.orientation = steering.orientation;

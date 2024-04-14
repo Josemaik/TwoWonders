@@ -90,7 +90,7 @@ void PhysicsSystem::update(EntityManager& em)
         }
 
         //Orientamos a enemigos hacia el player si están parados
-        if (ent.hasTag<SpiderTag>() || ent.hasTag<SnowmanTag>()) {
+        if (ent.hasTag<SpiderTag>() || ent.hasTag<SnowmanTag>() || ent.hasTag<GolemTag>()) {
             if (ent.hasComponent<AIComponent>())
             {
                 auto& ia = em.getComponent<AIComponent>(ent);

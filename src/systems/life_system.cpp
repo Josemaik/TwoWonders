@@ -93,9 +93,9 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 }
                 else
                     lif.decreaseNextFrame = false;
-                 if (ent.hasComponent<AttackComponent>()) {
-                    em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
-                 }
+                //  if (ent.hasComponent<AttackComponent>()) {
+                //     em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
+                //  }
             }
 
             //si es un snowman

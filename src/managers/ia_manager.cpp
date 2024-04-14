@@ -77,7 +77,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* sequence1_1 = &tree.createNode<BTNodeSequence_t>(d_a_1, a_a_1, d_r_1);
 
         auto* d_1_1 = &tree.createNode<BTDecisionPlayerDetected>();
-        auto* a_s_1 = &tree.createNode<BTAction_Pursue>();
+        auto* a_s_1 = &tree.createNode<BTAction_Seek>();
         auto* sequence1_2 = &tree.createNode<BTNodeSequence_t>(d_1_1, a_s_1);
 
 
