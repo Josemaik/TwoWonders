@@ -120,7 +120,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         if (ent.hasTag<GolemTag>()) {
             auto& e{ em.newEntity() };
             em.addTag<HitPlayerTag>(e);
-            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 18.0f, 0.1f, 18.0f }, .color = GREEN });
+            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 18.0f, 18.0f, 18.0f }, .color = GREEN });
             auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
             em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::AreaAttack, .life_time = 3.5f });
             ElementalType tipoElemental;

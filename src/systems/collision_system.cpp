@@ -855,14 +855,15 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                 {
                     li.decreaseLife(static_cast<int>(damage * 1.5));
                 }
-                else if (typeBala == ElementalType::Neutral)
+                else if (typeBala == ElementalType::Neutral){
                     li.decreaseLife(damage);
-                else
+                    em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
+                }else
                 {
                     li.decreaseLife(damage / 2);
-                    if (balaCol.attackType & AttackType::GollemAttack) {
-                        em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
-                    }
+                    // if (balaCol.attackType & AttackType::GollemAttack) {
+                    //     em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
+                    // }
                 }
             }
         }

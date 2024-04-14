@@ -83,8 +83,9 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                     lif.decreaseNextFrame = true;
                 else
                     lif.decreaseNextFrame = false;
-
-                //em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
+                 if (ent.hasComponent<AttackComponent>()) {
+                    em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
+                 }
             }
 
             //Si es una bala

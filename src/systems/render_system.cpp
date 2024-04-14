@@ -1600,7 +1600,7 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
                 // // Dibuja el signo de exclamación dentro del triángulo
                 // engine.drawText("!", static_cast<int>(barX - 2), static_cast<int>(barY - 100), 50, YELLOW);
                 auto& icon = engine.textures["detectionicon"];
-                engine.drawTexture(icon,barX - 15.0f,barY - 135.0f,WHITE);
+                engine.drawTexture(icon,static_cast<int>(barX - 15.0f),static_cast<int>(barY - 135.0f),WHITE);
 
                 //emepezar contador para borrar
                 if (aic.elapsed_show_icon >= aic.countdown_show_icon) {
