@@ -63,18 +63,18 @@ struct SoundSystem {
     void sonido_music_volcan();     //falla
     void sonido_h_dash();                  
     void sonido_h_bola_fuego();     //por comprobar
-    void sonido_amb_volcan();       //falla
+    void sonido_amb_volcan();       //por integrar
     void sonido_pasos_volcan();     //por integrar
     void sonido_golem_mov();        //por integrar
     void sonido_golem_ataque();     //por integrar
-    void sonido_golem_danyo();      //por integrar
-    void sonido_golem_muere();      //por integrar
+    void sonido_golem_danyo();      
+    void sonido_golem_muere();      
     void sonido_munyeco_mov();      //por integrar
     void sonido_munyeco_ataque();   //por integrar
-    void sonido_munyeco_danyo();    //por integrar
-    void sonido_munyeco_muere();    //por integrar
+    void sonido_munyeco_danyo();    
+    void sonido_munyeco_muere();    
     void sonido_abrir_puerta_magica();  //por integrar
-    void sonido_recoger_pieza();    //por integrar
+    void sonido_recoger_pieza();    
     void sonido_equipar_botas();    //por integrar
     void sonido_equipar_gorro();    //por integrar
 

@@ -178,6 +178,8 @@ public:
                         auto& boatPart = *em.getEntityByID(li.boatPartFound);
                         auto& bc = em.getComponent<BoatComponent>(boatPart);
 
+                        em.getSingleton<SoundSystem>().sonido_recoger_pieza();
+
                         plfi.boatParts.push_back(bc.part);
                         std::string part;
                         switch (bc.part)

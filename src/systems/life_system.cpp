@@ -44,6 +44,14 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             {
                 em.getSingleton<SoundSystem>().sonido_apisonadora_danyo();
             }
+            else if (ent.hasTag<GolemTag>())
+            {
+                em.getSingleton<SoundSystem>().sonido_golem_danyo();
+            }
+            else if (ent.hasTag<SnowmanTag>())
+            {
+                em.getSingleton<SoundSystem>().sonido_munyeco_danyo();
+            }
 
             lif.lifeLost = 0;
         }
@@ -79,13 +87,21 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             }
             //si es un golem
             if (ent.hasTag<GolemTag>()) {
-                if (!lif.decreaseNextFrame)
+                if (!lif.decreaseNextFrame){
                     lif.decreaseNextFrame = true;
+                    em.getSingleton<SoundSystem>().sonido_golem_muere();
+                }
                 else
                     lif.decreaseNextFrame = false;
                  if (ent.hasComponent<AttackComponent>()) {
                     em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
                  }
+            }
+
+            //si es un snowman
+            if (ent.hasTag<SnowmanTag>()){
+                if (!lif.decreaseNextFrame)
+                    em.getSingleton<SoundSystem>().sonido_munyeco_muere();
             }
 
             //Si es una bala
@@ -130,6 +146,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 li.lockedEnemy = li.max;
 
             lif.markedForDeletion = true;
+
         }
 
         // Para cuando se recoge una poción de vida
