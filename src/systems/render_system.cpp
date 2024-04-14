@@ -1751,10 +1751,26 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                                 }
                                 else
                                 {
-                                    if (engine.isGamepadAvailable(0))
-                                        gif = &engine.gifs.at("r2");
-                                    else
-                                        gif = &engine.gifs.at("espacio");
+                                    switch(li.mapID)
+                                    {
+                                        case 0:
+                                        {
+                                        if (engine.isGamepadAvailable(0))
+                                            gif = &engine.gifs.at("r2");
+                                        else
+                                            gif = &engine.gifs.at("espacio");
+
+                                            break;
+                                        }
+                                        case 1:
+                                        {
+                                            if (engine.isGamepadAvailable(0))
+                                                gif = &engine.gifs.at("cuadrado");
+                                            else
+                                                gif = &engine.gifs.at("j");
+                                            break;
+                                        }
+                                    }
                                 }
 
                                 gifCopy = gif->texture;

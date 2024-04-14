@@ -100,7 +100,7 @@ struct LevelInfo
     //npc huya
     bool npcflee{false},investigatorstartwalk{false};
     // Estado del juego
-    GameScreen currentScreen = GameScreen::GAMEPLAY;
+    GameScreen currentScreen = GameScreen::LOGO;
     GameScreen previousScreen = GameScreen::LOGO;
 
     bool isCharging()
@@ -158,7 +158,7 @@ struct LevelInfo
         debugIA2 = false;
         resetGame = false;
         num_zone = 0;
-        mapID = 2;
+        mapID = 0;
         chestToOpen = max;
         dungeonKeyCreated = false;
         openChest = false;

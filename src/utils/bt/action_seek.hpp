@@ -113,7 +113,7 @@ struct BTAction_Seek : BTNode_t {
             RayCast ray{ pos,dirtoobstacle };
             auto& bboxobstacle = ptrcol->boundingBox;
             if (bboxobstacle.intersectsRay(ray.origin, ray.direction)) {
-                double angle = ectx.phy.orientation + M_PI / 2; // Add 90 degrees to the orientation
+                double angle = ectx.phy.orientation + K_PI / 2; // Add 90 degrees to the orientation
                 vec3d perpendicular(sin(angle), 0, cos(angle));
 
                 auto maxseparate{ 0.1 };

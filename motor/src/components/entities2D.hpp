@@ -259,7 +259,7 @@ struct Circle : Entity{
         std::vector<float> vertices(vertexCount);
 
         for (int i = 0; i < vertexCount; i += 2) {
-            float theta = static_cast<float>((i / 2) * (2.0f * M_PI / segments));
+            float theta = static_cast<float>((i / 2) * (2.0f * K_PI / segments));
             vertices[i] = rm.normalizeX(position.x + (radius * scale) * std::cos(theta));
             vertices[i + 1] = rm.normalizeY(position.y + (radius * scale) * std::sin(theta));
         }

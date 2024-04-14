@@ -30,7 +30,7 @@ struct BTAction_Pursue : BTNode_t {
                     RayCast ray {pos,dirtoobstacle};
                     auto& bboxobstacle = col.boundingBox;
                     if(bboxobstacle.intersectsRay(ray.origin,ray.direction)){
-                        double angle = ectx.phy.orientation + M_PI / 2; // Add 90 degrees to the orientation
+                        double angle = ectx.phy.orientation + K_PI / 2; // Add 90 degrees to the orientation
                         vec3d perpendicular(cos(angle), 0, sin(angle));
 
                         auto maxseparate = 0.5;
@@ -47,7 +47,7 @@ struct BTAction_Pursue : BTNode_t {
                         steering.v_z += avoidanceForce.z();
                     }
                 // // Calculate a vector perpendicular to the orientation
-                // double angle = phy.orientation + M_PI / 2; // Add 90 degrees to the orientation
+                // double angle = phy.orientation + K_PI / 2; // Add 90 degrees to the orientation
                 // vec3d perpendicular(cos(angle), 0, sin(angle));
 
                 // // Scale the perpendicular vector by a factor that depends on the distance to the obstacle
