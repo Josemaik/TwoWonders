@@ -246,9 +246,36 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             gami.setVel(vel);
     }
 
+    if (ge.isKeyReleased(KEY_Z))
+    {
+        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 4 };
+        plfi.addSpell(spell);
+    }
+
+    if (ge.isKeyReleased(KEY_X))
+    {
+        Spell spell{ "Pompa de fuego", "Disparas una potente concentración de fuego que explota al impacto", Spells::WaterDash, 20.0, 4 };
+        plfi.addSpell(spell);
+    }
+
+    if (ge.isKeyReleased(KEY_C))
+    {
+        Spell spell{ "Pompa de aire", "Disparas una potente concentración de aire que explota al impacto", Spells::FireBall, 20.0, 4 };
+        plfi.addSpell(spell);
+    }
+
+    if (ge.isKeyReleased(KEY_V))
+    {
+        plfi.hasStaff = true;
+    }
+
     // Código para el lock-in
-    if (ge.isKeyReleased(in.lockIn) || ge.isGamepadButtonReleased(0, in.m_lockIn))
+    if ((ge.isKeyReleased(in.lockIn) || ge.getGamepadAxisMovement(0, in.m_lockIn) > 0.5) && elapsedLockIn >= elapsedLockInLimit)
+    {
         inpi.lockOn = !inpi.lockOn;
+        elapsedLockIn = 0.f;
+    }
+    elapsedLockIn += timeStep;
 
     bb.tx = phy.position.x();
     bb.tz = phy.position.z();
@@ -258,8 +285,26 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     // Codigo para el ataque
     if (player.hasComponent<AttackComponent>())
     {
-        if ((ge.isKeyDown(in.space) || ge.isGamepadButtonPressed(0, in.m_space)))
+        if (ge.isKeyDown(in.space) || ge.getGamepadAxisMovement(0, in.m_space) > -0.1 && ge.getGamepadAxisMovement(0, in.m_space) != 0.0)
+        {
+            inpi.melee = true;
             em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
+        }
+        else if ((ge.isKeyDown(in.spell1) || ge.isGamepadButtonPressed(0, in.m_spell1)) && plfi.spellSlots[0] != plfi.noSpell)
+        {
+            inpi.spell1 = true;
+            em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
+        }
+        else if ((ge.isKeyDown(in.spell2) || ge.isGamepadButtonPressed(0, in.m_spell2)) && plfi.spellSlots[1] != plfi.noSpell)
+        {
+            inpi.spell2 = true;
+            em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
+        }
+        else if ((ge.isKeyDown(in.spell3) || ge.isGamepadButtonPressed(0, in.m_spell3)) && plfi.spellSlots[2] != plfi.noSpell)
+        {
+            inpi.spell3 = true;
+            em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
+        }
 
         if (plfi.mana < plfi.max_mana)
         {
@@ -270,7 +315,6 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             if (plfi.mana > plfi.max_mana)
                 plfi.mana = plfi.max_mana;
         }
-
     }
 
     if (ge.isKeyPressed(in.interact) || ge.isGamepadButtonPressed(0, in.m_interact))
@@ -279,8 +323,8 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         inpi.interact = false;
 
     // Codigo para cambiar de tipo de ataque
-    if (ge.isKeyReleased(KEY_Q))
-        plfi.changeCurrentSpell();
+    // if (ge.isKeyReleased(KEY_Q))
+    //     plfi.changeCurrentSpell();
 
     // Codigo para curarse // DEBUG
     if (ge.isKeyDown(KEY_Z) && player.hasComponent<LifeComponent>())

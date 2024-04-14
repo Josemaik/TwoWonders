@@ -25,12 +25,34 @@ struct PlayerInfo
     bool attackUpgrade{ false };
     std::vector<std::unique_ptr<Item>> inventory{};
     std::vector<Spell> spells{};
-    Spell currentSpell{ "None", "No spell", Spells::None, 0.0, 0 };
+    Spell noSpell{ "None", "No spell", Spells::None, 0.0, 0 };
+    Spell currentSpell{ noSpell };
+    std::array<Spell, 3> spellSlots{ noSpell, noSpell, noSpell };
     std::size_t selectedItem{ max };
     vec3d spawnPoint{};
     std::vector<BoatParts> boatParts{};
 
-    void addSpell(Spell spell) { spells.push_back(spell); currentSpell = spell; }
+    void addSpell(Spell spell)
+    {
+        spells.push_back(spell);
+
+        bool noCurrent{ false };
+        for (auto& slot : spellSlots)
+        {
+            if (slot == noSpell)
+            {
+                slot = spell;
+                noCurrent = true;
+            }
+
+            if (noCurrent)
+                break;
+        }
+
+        if (!noCurrent)
+            spellSlots[0] = spell;
+    }
+
     void changeCurrentSpell()
     {
         auto it = std::find(spells.begin(), spells.end(), currentSpell);

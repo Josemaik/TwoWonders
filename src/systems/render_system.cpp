@@ -1600,7 +1600,7 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
                 // // Dibuja el signo de exclamación dentro del triángulo
                 // engine.drawText("!", static_cast<int>(barX - 2), static_cast<int>(barY - 100), 50, YELLOW);
                 auto& icon = engine.textures["detectionicon"];
-                engine.drawTexture(icon,static_cast<int>(barX - 15.0f),static_cast<int>(barY - 135.0f),WHITE);
+                engine.drawTexture(icon, static_cast<int>(barX - 15.0f), static_cast<int>(barY - 135.0f), WHITE);
 
                 //emepezar contador para borrar
                 if (aic.elapsed_show_icon >= aic.countdown_show_icon) {
@@ -1679,10 +1679,8 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
 
             drawAnimatedTextures(engine);
 
-            if (li.mapID == 2 && li.volcanoMission)
-            {
+            if (li.mapID == 2)
                 drawBoatParts(engine, em);
-            }
 
             // Dibujar el tipo de ataque que tiene equipado
             if (e.hasComponent<TypeComponent>())
@@ -1722,14 +1720,14 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                                 if (li.lockedEnemy == li.max)
                                 {
                                     if (engine.isGamepadAvailable(0))
-                                        gif = &engine.gifs.at("circulo");
+                                        gif = &engine.gifs.at("l2");
                                     else
-                                        gif = &engine.gifs.at("f");
+                                        gif = &engine.gifs.at("q");
                                 }
                                 else
                                 {
                                     if (engine.isGamepadAvailable(0))
-                                        gif = &engine.gifs.at("cuadrado");
+                                        gif = &engine.gifs.at("r2");
                                     else
                                         gif = &engine.gifs.at("espacio");
                                 }
@@ -1780,6 +1778,59 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                 displayGif(engine, gifCopy, *gif, posX, posY);
 
                 elapsed_WASD += 1.0f / 60.0f;
+            }
+
+            if (li.mapID == 2 && e.hasComponent<AttackComponent>() && !li.volcanoLava.empty())
+            {
+                auto& plfi = em.getSingleton<PlayerInfo>();
+                uint8_t spellID{ 5 };
+
+                // Mapear los IDs de los hechizos a los nombres de los gifs
+                static std::map<uint8_t, std::pair<std::string, std::string>> spellToGif = {
+                    {0, {"cuadrado", "j"}},
+                    {1, {"circulo", "k"}},
+                    {2, {"triangulo", "l"}}
+                };
+
+                for (std::size_t i = 0; i < plfi.spellSlots.size(); ++i)
+                {
+                    if (plfi.spellSlots[i].spell == Spells::WaterDash)
+                    {
+                        spellID = i;
+                        break;
+                    }
+                }
+
+                if (spellID != 5)
+                {
+
+                    // Ponemos un gif del botón del dash encima de la lava
+                    for (auto& lava : li.volcanoLava)
+                    {
+                        auto& lav = *em.getEntityByID(lava);
+                        auto& phy{ em.getComponent<PhysicsComponent>(lav) };
+
+                        GameEngine::Gif* gif;
+                        Texture2D gifCopy;
+
+                        // Usar el mapa para obtener el nombre del gif
+                        if (engine.isGamepadAvailable(0))
+                            gif = &engine.gifs.at(spellToGif[spellID].first);
+                        else
+                            gif = &engine.gifs.at(spellToGif[spellID].second);
+
+                        gifCopy = gif->texture;
+
+                        // Redimensionamos la copia
+                        gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
+                        gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
+
+                        int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - gifCopy.width / 2;
+                        int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 10);
+
+                        displayGif(engine, gifCopy, *gif, posX, posY);
+                    }
+                }
             }
         }
 
@@ -2442,75 +2493,76 @@ void RenderSystem::drawManaBar(GameEngine& engine, EntityManager& em)
     plfi.mana_width = manaWidth;
 }
 
+void RenderSystem::handleAnimatedTexture(const std::string& name, const std::string& textureName, int x, int y, const Texture2D& texture, float scaleFactor)
+{
+    if (animatedTextures.find(name) == animatedTextures.end())
+    {
+        animatedTextures[name] = { textureName, x, y, texture.width, texture.height, scaleFactor };
+    }
+    else
+    {
+        animatedTextures[name].targetPosX = x;
+        animatedTextures[name].targetPosY = y;
+    }
+}
+
 void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
 {
     auto& plfi{ em.getSingleton<PlayerInfo>() };
 
     if (!plfi.spells.empty())
     {
-        auto& current = plfi.currentSpell;
-        std::string exp_name = "";
+        static std::map<int, std::pair<int, int>> spellPositions = {
+            {0, {engine.getScreenWidth() - 270, 20}},
+            {1, {engine.getScreenWidth() - 210, 110}},
+            {2, {engine.getScreenWidth() - 110, 150}}
+        };
 
-        switch (current.spell)
+        static std::map<Spells, std::tuple<std::string, std::string, int, int, float>> spellToTexture = {
+            {Spells::WaterBomb, {"pompas", "exp_pompa", 10, 15, 2.5f}},
+            {Spells::WaterDash, {"dash", "exp_pompa", 15, 17, 2.75f}},
+            {Spells::FireBall, {"bola_fuego", "exp_pompa", 17, 22, 2.75f}},
+            {Spells::FireMeteorites, {"meteoritos", "exp_pompa", 15, 17, 2.75f}},
+            {Spells::IceShards, {"estacas", "exp_pompa", 15, 17, 2.75f}},
+            {Spells::IceShield, {"escudo", "exp_pompa", 15, 17, 2.75f}},
+        };
+
+        for (std::size_t i = 0; i < plfi.spellSlots.size(); i++)
         {
-        case Spells::WaterBomb:
-        {
-            if (animatedTextures.find("hechizo") == animatedTextures.end())
+            auto& spell = plfi.spellSlots[i];
+            if (spell.spell != plfi.noSpell)
             {
                 if (!plfi.showBook)
                 {
-                    animatedTextures["1_placeholder"] = { "placeholder", engine.getScreenWidth() - 150, 20,
-                    engine.textures["placeholder"].width, engine.textures["placeholder"].height, 2.5f };
+                    std::string spellName = "hechizo" + std::to_string(i + 1);
+                    handleAnimatedTexture(std::to_string(i + 1) + "_pl", "placeholder", spellPositions[i].first, spellPositions[i].second, engine.textures["placeholder"], 2.5f);
 
-                    animatedTextures["hechizo"] = { "pompas", engine.getScreenWidth() - 140, 35,
-                    engine.textures["pompas"].width, engine.textures["pompas"].height, 2.5f };
+                    // Usar el mapa para obtener el nombre de la textura, posiciones y factor de escala
+                    auto textureDetails = spellToTexture[spell.spell];
+                    handleAnimatedTexture(spellName, std::get<0>(textureDetails), spellPositions[i].first + std::get<2>(textureDetails), spellPositions[i].second + std::get<3>(textureDetails), engine.textures[std::get<0>(textureDetails)], std::get<4>(textureDetails));
                 }
                 else
-                    exp_name = "exp_pompa";
-            }
-            break;
-        }
-        case Spells::WaterDash:
-        {
-            if (animatedTextures.find("hechizo") == animatedTextures.end())
-            {
-                if (!plfi.showBook)
                 {
-                    animatedTextures["1_placeholder"] = { "placeholder", engine.getScreenWidth() - 150, 20,
-                    engine.textures["placeholder"].width, engine.textures["placeholder"].height, 2.5f };
+                    // Usar el mapa para obtener el nombre de la textura de explosión
+                    auto textureDetails = spellToTexture[spell.spell];
+                    drawSpellExp(engine, std::get<1>(textureDetails));
 
-                    animatedTextures["hechizo"] = { "dash", engine.getScreenWidth() - 140, 35,
-                    engine.textures["dash"].width, engine.textures["dash"].height, 2.65f };
+                    auto& inpi = em.getSingleton<InputInfo>();
+                    auto& txti = em.getSingleton<TextInfo>();
+
+                    if (inpi.interact && elapsed_book >= 1.0f)
+                    {
+                        txti.notPass = false;
+                        plfi.showBook = false;
+                        inpi.interact = false;
+                        elapsed_book = 0.f;
+                    }
+                    else
+                        txti.notPass = true;
                 }
-                else
-                    exp_name = "exp_pompa";
             }
-            break;
-        }
-        default:
-            break;
-        }
-
-        if (plfi.showBook)
-        {
-            drawSpellExp(engine, exp_name);
-
-            auto& inpi = em.getSingleton<InputInfo>();
-            auto& txti = em.getSingleton<TextInfo>();
-
-            if (inpi.interact && elapsed_book >= 1.0f)
-            {
-
-                txti.notPass = false;
-                plfi.showBook = false;
-                inpi.interact = false;
-                elapsed_book = 0.f;
-            }
-            else
-                txti.notPass = true;
         }
     }
-
 }
 
 void RenderSystem::drawSpellExp(GameEngine& engine, std::string name)
@@ -2562,14 +2614,8 @@ void RenderSystem::drawStaff(GameEngine& engine, EntityManager& em)
 
     if (plfi.hasStaff)
     {
-        if (animatedTextures.find("palo") == animatedTextures.end())
-        {
-            animatedTextures[std::to_string(animatedTextures.size())] = { "placeholder", engine.getScreenWidth() - 230, 25,
-            engine.textures["placeholder"].width, engine.textures["placeholder"].height, 2.75f };
-
-            animatedTextures["palo"] = { "palo", engine.getScreenWidth() - 215, 40,
-            engine.textures["palo"].width, engine.textures["palo"].height, 2.85f };
-        }
+        handleAnimatedTexture("4_pl", "placeholder", engine.getScreenWidth() - 140, 45, engine.textures["placeholder"], 2.75f);
+        handleAnimatedTexture("palo", "palo", engine.getScreenWidth() - 125, 60, engine.textures["palo"], 2.85f);
     }
 }
 
@@ -2733,14 +2779,15 @@ void RenderSystem::drawBoatParts(GameEngine& ge, EntityManager& em)
     auto& barca = ge.textures["barco"];
 
     // Calculamos la posición inicial y final de la barra
-    int initialPosX = ge.getScreenWidth();
-    int finalPosX = ge.getScreenWidth() - barca.width;
+    int initialPosX = 0 - barca.width;
+    int finalPosX = 0;
 
     // Interpolamos la posición X
     int posX = initialPosX - static_cast<int>(static_cast<float>(initialPosX - finalPosX) * elapsed_boat);
+    int posY = ge.getScreenHeight() / 4;
 
     // Dibujamos la barra
-    ge.drawTexture(barca, posX, ge.getScreenHeight() / 6, { 255, 255, 255, 255 });
+    ge.drawTexture(barca, posX, posY, { 255, 255, 255, 255 });
 
     // Dibujamos el número de partes de barco encontradas
     auto& textureNum = ge.textures.at(std::to_string(plfi.boatParts.size()));
@@ -2748,7 +2795,164 @@ void RenderSystem::drawBoatParts(GameEngine& ge, EntityManager& em)
     auto& textureBar = ge.textures.at("barra");
 
     // Dibujamos el num / 4
-    ge.drawTexture(textureNum, posX + 115, ge.getScreenHeight() / 6 + 2, { 255, 255, 255, 255 });
-    ge.drawTexture(textureBar, posX + 100 + textureNum.width / 2, ge.getScreenHeight() / 6 + 2, { 255, 255, 255, 255 });
-    ge.drawTexture(texture4, posX + 105 + textureNum.width / 2 + textureBar.width / 2, ge.getScreenHeight() / 6 + 20, { 255, 255, 255, 255 });
+    ge.drawTexture(textureNum, posX + 35, posY + 2, { 255, 255, 255, 255 });
+    ge.drawTexture(textureBar, posX + 20 + textureNum.width / 2, posY + 2, { 255, 255, 255, 255 });
+    ge.drawTexture(texture4, posX + 25 + textureNum.width / 2 + textureBar.width / 2, posY + 20, { 255, 255, 255, 255 });
 }
+
+// void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
+// {
+//     auto& plfi{ em.getSingleton<PlayerInfo>() };
+
+//     if (!plfi.spells.empty())
+//     {
+//         std::string exp_name = "";
+//         std::map<int, std::pair<int, int>> spellPositions = {
+//             {0, {engine.getScreenWidth() - 260, 35}},
+//             {1, {engine.getScreenWidth() - 200, 125}},
+//             {2, {engine.getScreenWidth() - 100, 165}}
+//         };
+
+//         for (std::size_t i = 0; i < plfi.spellSlots.size(); i++)
+//         {
+//             auto& spell = plfi.spellSlots[i];
+//             if (spell.spell != plfi.noSpell)
+//             {
+//                 int spellX, spellY;
+//                 std::string spellName = "hechizo" + std::to_string(i + 1);
+//                 switch (i)
+//                 {
+//                 case 0:
+//                 {
+//                     if (animatedTextures.find("1_pl") == animatedTextures.end())
+//                     {
+//                         animatedTextures["1_pl"] = { "placeholder", engine.getScreenWidth() - 270, 20,
+//                         engine.textures["placeholder"].width, engine.textures["placeholder"].height, 2.5f };
+//                     }
+//                     else
+//                     {
+//                         animatedTextures["1_pl"].targetPosX = engine.getScreenWidth() - 270;
+//                     }
+//                     spellX = engine.getScreenWidth() - 260;
+//                     spellY = 35;
+//                     break;
+//                 }
+//                 case 1:
+//                 {
+//                     if (animatedTextures.find("2_pl") == animatedTextures.end())
+//                     {
+//                         animatedTextures["2_pl"] = { "placeholder", engine.getScreenWidth() - 210, 110,
+//                         engine.textures["placeholder"].width, engine.textures["placeholder"].height, 2.5f };
+//                     }
+//                     else
+//                     {
+//                         animatedTextures["2_pl"].targetPosX = engine.getScreenWidth() - 210;
+//                     }
+//                     spellX = engine.getScreenWidth() - 200;
+//                     spellY = 125;
+//                     break;
+//                 }
+//                 case 2:
+//                 {
+//                     if (animatedTextures.find("3_pl") == animatedTextures.end())
+//                     {
+//                         animatedTextures["3_pl"] = { "placeholder", engine.getScreenWidth() - 110, 150,
+//                         engine.textures["placeholder"].width, engine.textures["placeholder"].height, 2.5f };
+//                     }
+//                     else
+//                     {
+//                         animatedTextures["3_pl"].targetPosX = engine.getScreenWidth() - 110;
+//                     }
+//                     spellX = engine.getScreenWidth() - 100;
+//                     spellY = 165;
+//                     break;
+//                 }
+//                 default:
+//                     break;
+//                 }
+
+//                 switch (spell.spell)
+//                 {
+//                 case Spells::WaterBomb:
+//                 {
+//                     if (animatedTextures.find(spellName) == animatedTextures.end())
+//                     {
+//                         if (!plfi.showBook)
+//                         {
+//                             animatedTextures[spellName] = { "pompas", spellX, spellY,
+//                             engine.textures["pompas"].width, engine.textures["pompas"].height, 2.5f };
+//                         }
+//                         else
+//                             exp_name = "exp_pompa";
+//                     }
+//                     else
+//                     {
+//                         animatedTextures[spellName].targetPosX = spellX;
+//                         animatedTextures[spellName].targetPosY = spellY;
+//                     }
+//                     break;
+//                 }
+//                 case Spells::WaterDash:
+//                 {
+//                     if (animatedTextures.find(spellName) == animatedTextures.end())
+//                     {
+//                         if (!plfi.showBook)
+//                         {
+//                             animatedTextures[spellName] = { "dash", spellX + 10, spellY,
+//                             engine.textures["dash"].width, engine.textures["dash"].height, 2.75f };
+//                         }
+//                         else
+//                             exp_name = "exp_pompa";
+//                     }
+//                     else
+//                     {
+//                         animatedTextures[spellName].targetPosX = spellX + 10;
+//                         animatedTextures[spellName].targetPosY = spellY + 5;
+//                     }
+//                     break;
+//                 }
+//                 case Spells::FireBall:
+//                 {
+//                     if (animatedTextures.find(spellName) == animatedTextures.end())
+//                     {
+//                         if (!plfi.showBook)
+//                         {
+//                             animatedTextures[spellName] = { "bola_fuego", spellX + 10, spellY + 5,
+//                             engine.textures["bola_fuego"].width, engine.textures["bola_fuego"].height, 2.75f };
+//                         }
+//                         else
+//                             exp_name = "exp_pompa";
+//                     }
+//                     else
+//                     {
+//                         animatedTextures[spellName].targetPosX = spellX + 10;
+//                         animatedTextures[spellName].targetPosY = spellY + 5;
+//                     }
+//                     break;
+//                 }
+//                 default:
+//                     break;
+//                 }
+
+//                 if (plfi.showBook)
+//                 {
+//                     drawSpellExp(engine, exp_name);
+
+//                     auto& inpi = em.getSingleton<InputInfo>();
+//                     auto& txti = em.getSingleton<TextInfo>();
+
+//                     if (inpi.interact && elapsed_book >= 1.0f)
+//                     {
+
+//                         txti.notPass = false;
+//                         plfi.showBook = false;
+//                         inpi.interact = false;
+//                         elapsed_book = 0.f;
+//                     }
+//                     else
+//                         txti.notPass = true;
+//                 }
+//             }
+//         }
+//     }
+// }

@@ -45,8 +45,11 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     });
 
     // Cosas que hacer en cada zona
-    if (li.mapID == 0)
+    switch (li.mapID)
     {
+    case 0:
+    {
+
         switch (li.num_zone)
         {
         case 4:
@@ -72,8 +75,9 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
         default:
             break;
         }
+        break;
     }
-    else if (li.mapID == 1)
+    case 1:
     {
         switch (li.num_zone)
         {
@@ -88,6 +92,34 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
             break;
         }
         }
+        break;
+    }
+    case 2:
+    {
+        switch (li.num_zone)
+        {
+        case 0:
+        {
+            checkVolcanoLava(em);
+            break;
+        }
+        case 1:
+        {
+            checkVolcanoLava(em);
+            break;
+        }
+        case 5:
+        {
+            checkVolcanoLava(em);
+            break;
+        }
+        case 7:
+        {
+            checkVolcanoLava(em);
+            break;
+        }
+        }
+    }
     }
 
     auto& zchi = em.getSingleton<ZoneCheckInfo>();
@@ -315,10 +347,30 @@ void ZoneSystem::checkTutorialEnemies(EntityManager& em)
             li.tutorialEnemies.push_back(e.getID());
         }
     });
+}
 
-    // Si el jugador se choca con el primer golem, se le va a señalar el cofre con el bastón
-    // if (!playerEnt.hasComponent<AttackComponent>() && playerPhy.stopped)
-    //     li.viewPoint = { -33.714, 7.0, -43.494 };
+void ZoneSystem::checkVolcanoLava(EntityManager& em)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& playerEnt = *em.getEntityByID(li.playerID);
+    auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
+    auto& playerPos = playerPhy.position;
+    using noCMP = MP::TypeList<>;
+    using enemyTag = MP::TypeList<LavaTag>;
+    li.volcanoLava.clear();
+
+    em.forEachAny<noCMP, enemyTag>([&](Entity& e)
+    {
+        auto& phy = em.getComponent<PhysicsComponent>(e);
+        double distance = playerPos.distance(phy.position);
+
+        double range = 15.0;
+
+        if (distance < range)
+        {
+            li.volcanoLava.push_back(e.getID());
+        }
+    });
 }
 
 void ZoneSystem::checkLadders(EntityManager& em)

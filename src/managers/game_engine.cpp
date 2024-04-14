@@ -63,6 +63,18 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // Icono para el dash de agua HUD
     loadAndResizeImage("dash", "assets/HUD/dash.png");
 
+    // Icono para la bola de fuego HUD
+    loadAndResizeImage("bola_fuego", "assets/HUD/bolafuego.png");
+
+    // Icono para meteoritos HUD
+    loadAndResizeImage("meteoritos", "assets/HUD/meteoritos.png");
+
+    // Icono para escudo de hielo HUD
+    loadAndResizeImage("escudo_hielo", "assets/HUD/escudo.png");
+
+    // Icono para las estacas de hielo HUD
+    loadAndResizeImage("estacas", "assets/HUD/estacas.png");
+
     // Libro para enseñar hechizos HUD
     loadAndResizeImage("libro", "assets/HUD/Libro.png");
 
@@ -120,6 +132,30 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // Tecla F
     loadAndResizeImageGif("f", "assets/HUD/teclas/f.gif", 0, 55);
 
+    // Tecla Q
+    loadAndResizeImageGif("q", "assets/HUD/teclas/q.gif", 0, 55);
+
+    // Tecla I
+    loadAndResizeImageGif("i", "assets/HUD/teclas/i.gif", 0, 55);
+
+    // Tecla H
+    loadAndResizeImageGif("h", "assets/HUD/teclas/H.gif", 0, 55);
+
+    // Tecla L
+    loadAndResizeImageGif("l", "assets/HUD/teclas/L.gif", 0, 55);
+
+    // Tecla J
+    loadAndResizeImageGif("j", "assets/HUD/teclas/J.gif", 0, 55);
+
+    // Tecla K
+    loadAndResizeImageGif("k", "assets/HUD/teclas/k.gif", 0, 55);
+
+    // Tecla O
+    loadAndResizeImageGif("o", "assets/HUD/teclas/o.gif", 0, 55);
+
+    // Tecla U
+    loadAndResizeImageGif("u", "assets/HUD/teclas/u.gif", 0, 55);
+
     // Tecla Espacio
     loadAndResizeImageGif("espacio", "assets/HUD/teclas/espacio.gif", 0, 55);
 
@@ -131,6 +167,18 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Ejemplo pompa
     loadAndResizeImageGif("exp_pompa", "assets/HUD/gifs/hechizos/exp_pompa.gif", 0, 55);
+
+    // Botón L2
+    loadAndResizeImageGif("l2", "assets/HUD/botones/L2.gif", 0, 55);
+
+    // Botón R2
+    loadAndResizeImageGif("r2", "assets/HUD/botones/R2.gif", 0, 55);
+
+    // Botón L1
+    loadAndResizeImageGif("l1", "assets/HUD/botones/L1.gif", 0, 55);
+
+    // Botón R1
+    loadAndResizeImageGif("r1", "assets/HUD/botones/R1.gif", 0, 55);
 
     SetExitKey(KEY_F8);
 }

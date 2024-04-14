@@ -52,6 +52,16 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         if (att.type == AttackType::AttackPlayer)
         {
             auto& plfi = em.getSingleton<PlayerInfo>();
+            auto& inpi = em.getSingleton<InputInfo>();
+
+            if (inpi.spell1)
+                plfi.currentSpell = plfi.spells[0];
+            else if (inpi.spell2)
+                plfi.currentSpell = plfi.spells[1];
+            else if (inpi.spell3)
+                plfi.currentSpell = plfi.spells[2];
+            else if (inpi.melee)
+                plfi.currentSpell = plfi.noSpell;
 
             if (plfi.currentSpell == Spells::None)
             {
@@ -64,6 +74,8 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
                 att.createAttack = false;
                 return;
             }
+
+            inpi.setAttackFalse();
         }
     }
 

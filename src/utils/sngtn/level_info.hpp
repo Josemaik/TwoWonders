@@ -90,6 +90,7 @@ struct LevelInfo
 
     // Tutorial
     std::vector<std::size_t> tutorialEnemies{};
+    std::vector<std::size_t> volcanoLava{};
 
     // Replay de inputs
     bool replay{ false };

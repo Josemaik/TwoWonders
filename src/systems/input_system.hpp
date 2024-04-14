@@ -15,6 +15,9 @@ struct InputSystem
     void update(EntityManager& em, GameEngine& ge);
 
     bool pressEnter(GameEngine& ge);
+
+private:
+    float elapsedLockInLimit{ 1.0f }, elapsedLockIn{ elapsedLockInLimit };
 };
 
 #endif // !INPUT_MANAGER

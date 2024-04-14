@@ -30,6 +30,7 @@ private:
     // void checkSpawns(EntityManager& em, EventManager& evm);
     // void checkDungeonSlimes(EntityManager& em, EventManager& evm);
     void checkTutorialEnemies(EntityManager& em);
+    void checkVolcanoLava(EntityManager& em);
     void openDoorsZone(EntityManager& em, EventManager& evm, vec3d& leverPos);
 };
 

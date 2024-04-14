@@ -625,7 +625,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
             break;
         case 1:
             em.addTag<InvestigatorTag>(entity);
-            range = 18.0;
+            range = 21.0;
             break;
         default:
             break;
