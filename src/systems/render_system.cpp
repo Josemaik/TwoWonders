@@ -1679,7 +1679,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
 
             drawAnimatedTextures(engine);
 
-            if (li.mapID == 2)
+            if (li.mapID == 2 && li.volcanoMission)
                 drawBoatParts(engine, em);
 
             // Dibujar el tipo de ataque que tiene equipado
@@ -1783,10 +1783,10 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             if (li.mapID == 2 && e.hasComponent<AttackComponent>() && !li.volcanoLava.empty())
             {
                 auto& plfi = em.getSingleton<PlayerInfo>();
-                uint8_t spellID{ 5 };
+                std::size_t spellID{ 5 };
 
                 // Mapear los IDs de los hechizos a los nombres de los gifs
-                static std::map<uint8_t, std::pair<std::string, std::string>> spellToGif = {
+                static std::map<std::size_t, std::pair<std::string, std::string>> spellToGif = {
                     {0, {"cuadrado", "j"}},
                     {1, {"circulo", "k"}},
                     {2, {"triangulo", "l"}}
@@ -2512,7 +2512,7 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
 
     if (!plfi.spells.empty())
     {
-        static std::map<int, std::pair<int, int>> spellPositions = {
+        static std::map<std::size_t, std::pair<int, int>> spellPositions = {
             {0, {engine.getScreenWidth() - 270, 20}},
             {1, {engine.getScreenWidth() - 210, 110}},
             {2, {engine.getScreenWidth() - 110, 150}}

@@ -285,7 +285,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     // Codigo para el ataque
     if (player.hasComponent<AttackComponent>())
     {
-        if (ge.isKeyDown(in.space) || ge.getGamepadAxisMovement(0, in.m_space) > -0.1 && ge.getGamepadAxisMovement(0, in.m_space) != 0.0)
+        if ((ge.isKeyDown(in.space) || ge.getGamepadAxisMovement(0, in.m_space) > -0.1) && ge.getGamepadAxisMovement(0, in.m_space) != 0.0)
         {
             inpi.melee = true;
             em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
