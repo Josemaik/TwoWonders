@@ -136,7 +136,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             {
                 auto& li = em.getSingleton<LevelInfo>();
                 if (li.mapID != 0 || li.mapID != 1)
-                    generateNavmeshes(em);
+                    //generateNavmeshes(em);
                 break;
             }
             default:
