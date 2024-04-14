@@ -85,12 +85,12 @@ struct BTDecisionPlayerDetected : BTNode_t {
 
             // Si el player se encuentra a una altura mayor o menor que el enemigo
             // que sea superior a 1 metro no puede ser visto por el enemigo
-            // if(getplayerphy(ectx).position.y() - ectx.phy.position.y() > 1.0){
-            //     if(getplayerphy(ectx).position.y() > ectx.phy.position.y()){
-            //             ectx.ai->playerdetected = false;
-            //             return BTNodeStatus_t::fail;
-            //     }
-            // }
+            if(ectx.ent.hasTag<SnowmanTag>()){
+                if(std::abs(getplayerphy(ectx).position.y() - ectx.phy.position.y()) > 7.0){
+                            ectx.ai->playerdetected = false;
+                            return BTNodeStatus_t::fail;
+                }
+            }
 
 
             //Calcula la dirección de visión del enemigo utilizando su orientación

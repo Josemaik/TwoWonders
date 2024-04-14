@@ -176,7 +176,8 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
             {
                 if (e.hasTag<AngryBushTag>() || e.hasTag<DummyTag>())
                     return;
-                if (phy.position.distance(phyC.position) < 50.0)
+                if (phy.position.distance(phyC.position) < 50.0 && 
+                std::abs(phy.position.y() - phyC.position.y()) < 4.0)
                 {
                     ch.closeEnemies += 1;
                 }
