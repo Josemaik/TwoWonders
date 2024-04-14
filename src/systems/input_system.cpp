@@ -285,25 +285,28 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     // Codigo para el ataque
     if (player.hasComponent<AttackComponent>())
     {
-        if ((ge.isKeyDown(in.space) || ge.getGamepadAxisMovement(0, in.m_space) > -0.1) && ge.getGamepadAxisMovement(0, in.m_space) != 0.0)
-        {
-            inpi.melee = true;
-            em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
-        }
-        else if ((ge.isKeyDown(in.spell1) || ge.isGamepadButtonPressed(0, in.m_spell1)) && plfi.spellSlots[0] != plfi.noSpell)
-        {
-            inpi.spell1 = true;
-            em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
-        }
-        else if ((ge.isKeyDown(in.spell2) || ge.isGamepadButtonPressed(0, in.m_spell2)) && plfi.spellSlots[1] != plfi.noSpell)
-        {
-            inpi.spell2 = true;
-            em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
-        }
-        else if ((ge.isKeyDown(in.spell3) || ge.isGamepadButtonPressed(0, in.m_spell3)) && plfi.spellSlots[2] != plfi.noSpell)
-        {
-            inpi.spell3 = true;
-            em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
+        auto& atc = em.getComponent<AttackComponent>(player);
+        if (atc.isAttackReady()) {
+            if ((ge.isKeyDown(in.space) || ge.getGamepadAxisMovement(0, in.m_space) > 0.1))
+            {
+                inpi.melee = true;
+                em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
+            }
+            else if ((ge.isKeyDown(in.spell1) || ge.isGamepadButtonPressed(0, in.m_spell1)) && plfi.spellSlots[0] != plfi.noSpell)
+            {
+                inpi.spell1 = true;
+                em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
+            }
+            else if ((ge.isKeyDown(in.spell2) || ge.isGamepadButtonPressed(0, in.m_spell2)) && plfi.spellSlots[1] != plfi.noSpell)
+            {
+                inpi.spell2 = true;
+                em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
+            }
+            else if ((ge.isKeyDown(in.spell3) || ge.isGamepadButtonPressed(0, in.m_spell3)) && plfi.spellSlots[2] != plfi.noSpell)
+            {
+                inpi.spell3 = true;
+                em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
+            }
         }
 
         if (plfi.mana < plfi.max_mana)
@@ -337,7 +340,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         else
             phy.gravity = 0;
     }
-    if(ge.isKeyDown(KEY_M)){
+    if (ge.isKeyDown(KEY_M)) {
         li.npcflee = true;
     }
 

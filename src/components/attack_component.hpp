@@ -36,11 +36,15 @@ struct AttackComponent
     vec3d pos_respawn_air_attack{}, pos_respawn_crush_attack{};
 
     void attack(AttackType typeAttack) {
-        if (elapsed >= countdown) {
+        if (isAttackReady()) {
             createAttack = true;
             elapsed = 0;
             type = typeAttack;
         }
+    }
+
+    bool isAttackReady() {
+        return elapsed >= countdown;
     }
 
     void decreaseCountdown(float deltaTime, float& elapsed) { elapsed += deltaTime; }; // delta time

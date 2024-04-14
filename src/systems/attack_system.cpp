@@ -72,7 +72,6 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             {
                 createSpellAttack(em, ent, att);
                 att.createAttack = false;
-                inpi.setAttackFalse();
                 return;
             }
 
@@ -459,6 +458,10 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
             break;
         }
     }
+
+    auto& inpi = em.getSingleton<InputInfo>();
+    plfi.currentSpell = plfi.noSpell;
+    inpi.setAttackFalse();
 }
 
 void AttackSystem::setCollisionSystem(CollisionSystem* col)
