@@ -178,9 +178,9 @@ public:
                         auto& boatPart = *em.getEntityByID(li.boatPartFound);
                         auto& bc = em.getComponent<BoatComponent>(boatPart);
 
-                        em.getSingleton<SoundSystem>().sonido_recoger_pieza();
 
                         plfi.boatParts.push_back(bc.part);
+                        em.getSingleton<SoundSystem>().sonido_recoger_pieza();
                         std::string part;
                         switch (bc.part)
                         {
@@ -210,8 +210,9 @@ public:
 
                         li.insertDeath(li.boatPartFound);
 
-                        if (plfi.boatParts.size() == 1)
+                        if (plfi.boatParts.size() == 4)
                         {
+                            //em.getSingleton<SoundSystem>().sonido_recoger_pieza();
                             vec3d pos{ -126.872, 7.0, 24.918 };
                             li.viewPoint = pos;
                             li.events.insert(EventCodes::BoatDialog);

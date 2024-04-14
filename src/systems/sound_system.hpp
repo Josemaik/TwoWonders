@@ -15,6 +15,7 @@ struct SoundSystem {
     void createEventInstance();
     void playMusicMenu();
     void playAmbient();
+    void sonido_amb_bosque();
     void sonido_mazmorra();
     void seleccion_menu();
     void sonido_config();
@@ -62,19 +63,19 @@ struct SoundSystem {
 
     void sonido_music_volcan();     //falla
     void sonido_h_dash();                  
-    void sonido_h_bola_fuego();     //por comprobar
+    void sonido_h_bola_fuego();     
     void sonido_amb_volcan();       //por integrar
     void sonido_pasos_volcan();     //por integrar
     void sonido_golem_mov();        //por integrar
-    void sonido_golem_ataque();     //por integrar
+    void sonido_golem_ataque();     
     void sonido_golem_danyo();      
     void sonido_golem_muere();      
     void sonido_munyeco_mov();      //por integrar
-    void sonido_munyeco_ataque();   //por integrar
+    void sonido_munyeco_ataque();   
     void sonido_munyeco_danyo();    
     void sonido_munyeco_muere();    
     void sonido_abrir_puerta_magica();  //por integrar
-    void sonido_recoger_pieza();    
+    void sonido_recoger_pieza();    //ahora no suena
     void sonido_equipar_botas();    //por integrar
     void sonido_equipar_gorro();    //por integrar
 

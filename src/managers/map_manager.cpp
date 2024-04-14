@@ -13,7 +13,7 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
         {
             li.mapID = 0;
             map = loadMap("assets/levels/maps/lvl_0.kaiwa");
-            em.getSingleton<SoundSystem>().playAmbient();
+            em.getSingleton<SoundSystem>().sonido_amb_bosque();
             break;
         }
         case 1:
@@ -355,7 +355,7 @@ void MapManager::generateEnemies(EntityManager& em, const valueType& enemyArray,
     for (mapSizeType i = 0; i < enemyArray.Size(); i++)
     {
         const valueType& enemy = enemyArray[i];
-        // iam.createEnemy(em, enemy);
+        iam.createEnemy(em, enemy);
     }
 }
 

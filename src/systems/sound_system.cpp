@@ -84,22 +84,28 @@ void SoundSystem::seleccion_menu() {
     FMOD_Studio_EventInstance_Start(eventInstance);
     update();
 }
+
 void SoundSystem::playAmbient() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_bosque", &eventDescription_Ambiente));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Ambiente, &eventInstance_Ambiente));
     FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
     FMOD_Studio_System_Update(soundSystem);
-    play();
-    update();
+}
+
+void SoundSystem::sonido_amb_bosque() {
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_bosque", &eventDescription_Ambiente));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Ambiente, &eventInstance_Ambiente));
+    //FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
+    // FMOD_Studio_System_Update(soundSystem);
+    playAmbient();
+    //update();
 }
 
 void SoundSystem::sonido_mazmorra() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_mazmorra", &eventDescription_Ambiente));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Ambiente, &eventInstance_Ambiente));
-    FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
-    FMOD_Studio_System_Update(soundSystem);
-    play();
-    update();
+    //FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
+    //FMOD_Studio_System_Update(soundSystem);
+    playAmbient();
+    //update();
 }
 
 void SoundSystem::sonido_amb_volcan() {

@@ -41,6 +41,9 @@ struct BTActionShoot : BTNode_t {
             case  AIComponent::TypeShoot::OneShoottoPlayer: {
                 att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai->SPEED_AI;
                 att.attack(AttackType::Ranged);
+                if ( ectx.ent.hasTag<SnowmanTag>() ){
+                    ectx.em.getSingleton<SoundSystem>().sonido_munyeco_ataque();
+                }
                 return BTNodeStatus_t::success;
                 break;
             }
@@ -54,6 +57,9 @@ struct BTActionShoot : BTNode_t {
                 //shoot three time
                 att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai->SPEED_AI;
                 att.attack(AttackType::Melee);
+                if ( ectx.ent.hasTag<GolemTag>() ){
+                    ectx.em.getSingleton<SoundSystem>().sonido_golem_ataque();
+                }
                 return BTNodeStatus_t::success;
                 break;
             }
