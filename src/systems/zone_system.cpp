@@ -203,7 +203,7 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
             ch.closeEnemies = 0;
             em.forEach<crusherCMP, crusherTag>([&](Entity& e, PhysicsComponent& phyC)
             {
-                if (e.hasTag<AngryBushTag>() || e.hasTag<DummyTag>())
+                if (e.hasTag<AngryBushTag>() || e.hasTag<DummyTag>() || e.hasTag<AngryBushTag2>())
                     return;
                 if (phy.position.distance(phyC.position) < 50.0 &&
                     std::abs(phy.position.y() - phyC.position.y()) < 4.0)
