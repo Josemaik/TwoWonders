@@ -51,16 +51,16 @@ void SoundSystem::playMusicMenu() {
 
 void SoundSystem::sonido_music_volcan() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_volcan", &eventDescription_Musica));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_Musica));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica));
     
     play_music();
 }
 
 void SoundSystem::sonido_music_mazmorra() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/Mazmorra/music_mazmorra", &eventDescription_Musica));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_Musica));
-    
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica));
     play_music();
+
 }
 void SoundSystem::sonido_music_monte() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_monte", &eventDescription_Musica));
@@ -74,6 +74,7 @@ void SoundSystem::sonido_music_pradera() {
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_Musica));
     
     play_music();
+    update();
 }
 
 
@@ -109,12 +110,12 @@ void SoundSystem::sonido_mazmorra() {
 }
 
 void SoundSystem::sonido_amb_volcan() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_volcan", &eventDescription_Ambiente));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_Ambiente));
-    FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
-    FMOD_Studio_System_Update(soundSystem);
-    play();
-    update();
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_volcan_2", &eventDescription_Ambiente));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Ambiente, &eventInstance_Ambiente));
+    //FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
+    //FMOD_Studio_System_Update(soundSystem);
+    playAmbient();
+    //update();
 }
 
 void SoundSystem::sonido_amb_monte() {

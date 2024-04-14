@@ -49,6 +49,7 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine)
 
 void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss) {
     ss.ambient_stop();
+    ss.music_stop();
     ss.ambient_started = false;
 
     engine.beginDrawing();
@@ -280,6 +281,8 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em)
         {
             inpi.pause = false;
             ss.seleccion_menu();
+            ss.playAmbient();
+            ss.play_music();
             break;
         }
         case 1: // "OPCIONES"

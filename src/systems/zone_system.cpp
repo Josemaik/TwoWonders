@@ -16,18 +16,21 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
 
                 if (e.hasTag<LevelChangeTag>())
                 {
+                    em.getSingleton<SoundSystem>().ambient_stop();
+                    em.getSingleton<SoundSystem>().music_stop();
                     switch (li.mapID)
                     {
                     case 0:
                     {
                         map.changeMap(em, 1, iam);
                         li.transition = true;
-                        em.getSingleton<SoundSystem>().ambient_stop();
+                        
 
                         auto& plfi = em.getSingleton<PlayerInfo>();
                         vec3d spawnPoint = { 7.0, 22.0, -21.0 };
                         plfi.spawnPoint = spawnPoint;
                         p.position = spawnPoint;
+                        em.getSingleton<SoundSystem>().update();
                         break;
                     }
                     case 1:
@@ -35,6 +38,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         map.changeMap(em, 2, iam);
                         li.transition = true;
                         // em.getSingleton<SoundSystem>().ambient_stop();
+                        em.getSingleton<SoundSystem>().update();
 
                         auto& plfi = em.getSingleton<PlayerInfo>();
                         vec3d spawnPoint = { -28.0, 49.0, -30.0 };
