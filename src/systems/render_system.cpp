@@ -985,6 +985,12 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
 
         loadShaders(r.model);
     }
+    else if (e.hasTag<FireBallTag>())
+    {
+        r.model = engine.loadModel("assets/Assets/Props/Hechizos/Fuego_1.obj");
+
+        loadShaders(r.model);
+    }
     else if (e.hasTag<NomadTag>())
     {
         r.model = engine.loadModel("assets/Personajes/NPCs/Nomada/Nomada.obj");
@@ -2520,8 +2526,8 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
 
         static std::map<Spells, std::tuple<std::string, std::string, int, int, float>> spellToTexture = {
             {Spells::WaterBomb, {"pompas", "exp_pompa", 10, 15, 2.5f}},
-            {Spells::WaterDash, {"dash", "exp_pompa", 15, 17, 2.75f}},
-            {Spells::FireBall, {"bola_fuego", "exp_pompa", 17, 22, 2.75f}},
+            {Spells::WaterDash, {"dash", "exp_dash", 15, 17, 2.75f}},
+            {Spells::FireBall, {"bola_fuego", "exp_bola_f", 17, 22, 2.75f}},
             {Spells::FireMeteorites, {"meteoritos", "exp_pompa", 15, 17, 2.75f}},
             {Spells::IceShards, {"estacas", "exp_pompa", 15, 17, 2.75f}},
             {Spells::IceShield, {"escudo", "exp_pompa", 15, 17, 2.75f}},

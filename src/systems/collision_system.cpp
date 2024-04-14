@@ -219,7 +219,10 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         }
 
         // Entidades que no queremos que colisionen con rampas
-        if (otherEntPtr->hasTag<WaterBombTag>() || behaviorType2 & BehaviorType::AREADAMAGECRUSHER || behaviorType2 & BehaviorType::AREADAMAGE)
+        if (otherEntPtr->hasTag<WaterBombTag>() ||
+            otherEntPtr->hasTag<FireBallTag>() ||
+            behaviorType2 & BehaviorType::AREADAMAGECRUSHER ||
+            behaviorType2 & BehaviorType::AREADAMAGE)
             return;
 
         auto& offSet = em.getComponent<RampComponent>(*staticEntPtr).offset;
@@ -543,7 +546,8 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         behaviorType2 & BehaviorType::WARNINGZONE ||
         behaviorType2 & BehaviorType::AREADAMAGECRUSHER ||
         behaviorType2 & BehaviorType::LADDER ||
-        behaviorType2 & BehaviorType::LAVA)
+        behaviorType2 & BehaviorType::LAVA ||
+        behaviorType2 & BehaviorType::SPAWN)
         return;
 
     if (behaviorType2 & BehaviorType::METEORITE)
@@ -855,12 +859,13 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                 {
                     li.decreaseLife(static_cast<int>(damage * 1.5));
                 }
-                else if (typeBala == ElementalType::Neutral){
+                else if (typeBala == ElementalType::Neutral) {
                     li.decreaseLife(damage);
                     if (balaCol.attackType & AttackType::GollemAttack) {
                         em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
                     }
-                }else
+                }
+                else
                 {
                     li.decreaseLife(damage / 2);
                     // if(ent2Ptr->hasTag<GolemTag>()){

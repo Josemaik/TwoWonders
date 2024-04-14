@@ -113,7 +113,7 @@ struct InvestigatorTag {};
 struct MissionObjTag {};
 struct BoatTag {};
 struct ObstacleTag {};
-
+struct FireBallTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -183,6 +183,7 @@ using TL = MP::TypeList <
     LevelChangeTag,
     CoinTag,
     WaterBombTag,
+    FireBallTag,
     NomadTag,
     LavaTag,
     LadderTag,

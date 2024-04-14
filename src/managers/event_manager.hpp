@@ -210,7 +210,7 @@ public:
 
                         li.insertDeath(li.boatPartFound);
 
-                        if (plfi.boatParts.size() == 4)
+                        if (plfi.boatParts.size() == 1)
                         {
                             vec3d pos{ -126.872, 7.0, 24.918 };
                             li.viewPoint = pos;
@@ -235,6 +235,21 @@ public:
 
                         for (const auto& msg : msgs)
                             txti.addText(msg);
+
+                        // using CMPs = MP::TypeList<PhysicsComponent, NPCComponent>;
+                        // using npcTAG = MP::TypeList<NPCTag>;
+
+                        // em.forEach<CMPs, npcTAG>([&](Entity&, PhysicsComponent& phy, NPCComponent& npc)
+                        // {
+                        //     if (npc.type == NPCType::INVESTIGATOR)
+                        //     {
+                        //         phy.position = { -93.282, 4.0, 42.465 };
+                        //     }
+                        //     else if (npc.type == NPCType::NOMAD)
+                        //     {
+                        //         phy.position = { -89.282, 4.0, 36.465 };
+                        //     }
+                        // });
 
                         break;
                     }

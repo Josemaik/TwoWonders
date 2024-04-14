@@ -133,7 +133,9 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             }
             case LoadState::LOAD_NAVMESHES:
             {
-                generateNavmeshes(em);
+                auto& li = em.getSingleton<LevelInfo>();
+                if (li.mapID != 0 || li.mapID != 1)
+                    generateNavmeshes(em);
                 break;
             }
             default:
@@ -353,7 +355,7 @@ void MapManager::generateEnemies(EntityManager& em, const valueType& enemyArray,
     for (mapSizeType i = 0; i < enemyArray.Size(); i++)
     {
         const valueType& enemy = enemyArray[i];
-        iam.createEnemy(em, enemy);
+        // iam.createEnemy(em, enemy);
     }
 }
 
@@ -482,6 +484,36 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 r.offset = interactable["offsetZ"][0].GetDouble();
             }
 
+            auto& pos = p.position;
+            auto posY = pos.y() - 2.0;
+            auto rotCopy = rot;
+
+            if (rotationVec[1] > 0.0)
+                rotCopy *= -1;
+
+            std::map<std::size_t, std::pair<vec3d, vec3d>> wallPoints = {
+                {0, {rotateAroundPoint(vec3d{pos.x() + 9.5, posY, pos.z() + 14.5}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
+                {1, {rotateAroundPoint(vec3d{pos.x() + 6.0, posY, pos.z() - 10.0}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
+                {2, {rotateAroundPoint(vec3d{pos.x() - 17.5, posY, pos.z() + 15.0}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
+                {3, {rotateAroundPoint(vec3d{pos.x() - 15.5, posY, pos.z() - 11.5}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
+                {4, {rotateAroundPoint(vec3d{pos.x() - 3.5, posY, pos.z() + 14.0}, pos, rotCopy), rotateScale(vec3d{ 14.0, 4.0, 4.0 }, rotCopy)}},
+                {5, {rotateAroundPoint(vec3d{pos.x() - 16.0, posY, pos.z() - 3.0}, pos, rotCopy), rotateScale(vec3d{ 5.0, 4.0, 13.0 }, rotCopy)}},
+                {6, {rotateAroundPoint(vec3d{pos.x() - 3.5, posY - 2.0, pos.z() + 3.5}, pos, rotCopy), rotateScale(vec3d{ 4.0, 2.0, 4.0 }, rotCopy)}},
+                {7, {rotateAroundPoint(vec3d{pos.x() + 7.0, posY, pos.z() + 8.0}, pos, rotCopy), rotateScale(vec3d{ 6.0, 7.0, 6.0 }, rotCopy)}},
+                {8, {rotateAroundPoint(vec3d{pos.x() - 11.5, posY, pos.z() + 7.5}, pos, rotCopy), rotateScale(vec3d{ 1.5, 4.0, 1.5 }, rotCopy)}},
+            };
+
+            // Creamos 4 paredes para el spawn
+            for (std::size_t j = 0; j < wallPoints.size(); j++)
+            {
+                std::cout << wallPoints[j].second << std::endl;
+                auto& wall{ em.newEntity() };
+                em.addTag<WallTag>(wall);
+                em.addComponent<RenderComponent>(wall, RenderComponent{ .position = wallPoints[j].first, .scale = wallPoints[j].second, .color = color, .visible = false, .orientation = 0.0, .rotationVec = rotationVec });
+                em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = wallPoints[j].first, .velocity = vec3d::zero(), .scale = wallPoints[j].second, .gravity = 0, .orientation = 0.0, .rotationVec = rotationVec });
+                em.addComponent<ColliderComponent>(wall, ColliderComponent{ position, scale, BehaviorType::STATIC });
+            }
+
             checkDispatcher(em, entity, interactable);
             break;
         }
@@ -598,7 +630,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
                        vec3d{npc["path"][2][0].GetDouble(), npc["path"][2][1].GetDouble(), npc["path"][2][2].GetDouble()},
                        vec3d{npc["path"][3][0].GetDouble(), npc["path"][3][1].GetDouble(), npc["path"][3][2].GetDouble()} };
         double arrival_radius = npc["arrival_radius"].GetDouble();
-        uint8_t npcType = static_cast<uint8_t>(npc["npc"].GetUint());
+        NPCType npcType = static_cast<NPCType>(npc["npc"].GetUint());
 
         vec_t.push_back(std::make_unique<BehaviourTree_t>());
         auto& tree = *vec_t.back();
@@ -611,7 +643,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
         double range = 0.0;
         switch (npcType)
         {
-        case 0:
+        case NPCType::NOMAD:
             em.addTag<NomadTag>(entity);
             switch (li.mapID)
             {
@@ -623,7 +655,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
                 break;
             }
             break;
-        case 1:
+        case NPCType::INVESTIGATOR:
             em.addTag<InvestigatorTag>(entity);
             range = 21.0;
             break;
@@ -633,9 +665,9 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
 
         auto& wr = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color,.orientation = rot,.rotationVec = rotationVec });
         auto& wp = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.rotationVec = rotationVec, .max_speed = max_speed });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ wp.position, wp.scale, BehaviorType::STATIC });
         em.addComponent<InteractiveComponent>(entity, InteractiveComponent{ .range = range });
-        em.addComponent<NPCComponent>(entity, NPCComponent{ .path = path,.behaviourTree = &tree,.arrival_radius = arrival_radius });
+        em.addComponent<NPCComponent>(entity, NPCComponent{ .path = path, .type = npcType, .behaviourTree = &tree,.arrival_radius = arrival_radius });
 
         em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
 
@@ -866,6 +898,37 @@ void MapManager::generateNavmeshes(EntityManager& em)
     //        }
     //     }
     // }
+}
+
+vec3d MapManager::rotateY(const vec3d& v, double angle) {
+    double cosTheta = cos(angle);
+    double sinTheta = sin(angle);
+    return vec3d{
+        cosTheta * v.x() - sinTheta * v.z(),
+        v.y(),
+        sinTheta * v.x() + cosTheta * v.z()
+    };
+}
+
+vec3d MapManager::rotateAroundPoint(const vec3d& point, const vec3d& pivot, double angle) {
+    // Translate point back to origin
+    vec3d p = point - pivot;
+
+    // Rotate point
+    vec3d rotated = rotateY(p, angle);
+
+    // Translate point back
+    return rotated + pivot;
+}
+
+vec3d MapManager::rotateScale(const vec3d& v, double angle) {
+    double cosTheta = cos(angle);
+    double sinTheta = sin(angle);
+    return vec3d{
+        std::abs(cosTheta * v.x() + sinTheta * v.z()),
+        v.y(),
+        std::abs(-sinTheta * v.x() + cosTheta * v.z())
+    };
 }
 
 void MapManager::destroyMap(EntityManager& em)

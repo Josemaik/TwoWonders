@@ -2,7 +2,12 @@
 #include <utils/path.hpp>
 #include <array>
 
-// template<std::size_t N>
+enum struct NPCType : uint8_t
+{
+    NOMAD,
+    INVESTIGATOR,
+};
+
 struct NPCComponent
 {
     //path tamaño 4
@@ -17,9 +22,11 @@ struct NPCComponent
         vec3d{-83.5963,5,12.6932},
         vec3d{-110.859,5,25.9958} };
     Path_t<5>::iterator pathIt_inestigador{ };
-    bool path_investigador_finalized{false};
-    bool tp{false};
-    
+    bool path_investigador_finalized{ false };
+    bool tp{ false };
+
+
+    NPCType type{ NPCType::NOMAD };
     const char* bh{};
     BehaviourTree_t* behaviourTree{ nullptr };
     double arrival_radius{ 1.0 };

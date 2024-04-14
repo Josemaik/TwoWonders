@@ -168,6 +168,12 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // Ejemplo pompa
     loadAndResizeImageGif("exp_pompa", "assets/HUD/gifs/hechizos/exp_pompa.gif", 0, 55);
 
+    // Ejemplo dash de agua
+    loadAndResizeImageGif("exp_dash", "assets/HUD/gifs/hechizos/exp_dash.gif", 0, 55);
+
+    // Ejemplo bola de fuego
+    loadAndResizeImageGif("exp_bola_f", "assets/HUD/gifs/hechizos/exp_bola_f.gif", 0, 55);
+
     // Botón L2
     loadAndResizeImageGif("l2", "assets/HUD/botones/L2.gif", 0, 55);
 

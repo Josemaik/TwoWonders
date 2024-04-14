@@ -72,6 +72,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             {
                 createSpellAttack(em, ent, att);
                 att.createAttack = false;
+                inpi.setAttackFalse();
                 return;
             }
 
@@ -438,6 +439,9 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
         {
         case Spells::WaterBomb:
             em.addTag<WaterBombTag>(e);
+            break;
+        case Spells::FireBall:
+            em.addTag<FireBallTag>(e);
             break;
         default:
             break;

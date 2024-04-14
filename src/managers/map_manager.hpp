@@ -59,6 +59,9 @@ private:
     void addToZone(EntityManager& em, Entity& e, InteractableType type);
     void checkDispatcher(EntityManager& em, Entity& e, const valueType& value);
     void addMessageCmp(EntityManager& em, Entity& e, const valueType& value);
+    vec3d rotateY(const vec3d& v, double angle);
+    vec3d rotateAroundPoint(const vec3d& point, const vec3d& pivot, double angle);
+    vec3d rotateScale(const vec3d& v, double angle);
 
     std::string fileMap{};
     std::map<uint8_t, BBox> zoneBounds{};
