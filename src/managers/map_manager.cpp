@@ -264,7 +264,9 @@ void MapManager::generateGround(EntityManager& em, const valueType& groundArray,
         auto& rz = em.addComponent<RenderComponent>(zoneEntity, RenderComponent{ .position = zonePosition, .scale = zoneScale, .visible = false });
         auto& pz = em.addComponent<PhysicsComponent>(zoneEntity, PhysicsComponent{ .position = rz.position, .velocity = vec3d::zero(), .scale = rz.scale, .gravity = .0 });
         auto& cz = em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ pz.position, rz.scale, BehaviorType::ZONE });
-        zoneBounds.insert({ j, cz.boundingBox });
+
+        auto& zchi = em.getSingleton<ZoneCheckInfo>();
+        zchi.zoneBounds.insert({ j, cz.boundingBox });
         k += 1;
     }
 }
@@ -471,9 +473,10 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             em.addTag<LevelChangeTag>(entity);
             c.behaviorType = BehaviorType::ZONE;
 
-            zoneBounds.insert({ zoneBounds.size(), c.boundingBox });
+            auto& zchi = em.getSingleton<ZoneCheckInfo>();
+            zchi.zoneBounds.insert({ zchi.zoneBounds.size(), c.boundingBox });
 
-            em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = static_cast<uint16_t>(zoneBounds.size() - 1) });
+            em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = static_cast<uint16_t>(zchi.zoneBounds.size() - 1) });
             break;
         }
         case InteractableType::Spawn:
@@ -507,7 +510,6 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             // Creamos 4 paredes para el spawn
             for (std::size_t j = 0; j < wallPoints.size(); j++)
             {
-                std::cout << wallPoints[j].second << std::endl;
                 auto& wall{ em.newEntity() };
                 em.addTag<WallTag>(wall);
                 em.addComponent<RenderComponent>(wall, RenderComponent{ .position = wallPoints[j].first, .scale = wallPoints[j].second, .color = color, .visible = false, .orientation = 0.0, .rotationVec = rotationVec });
@@ -947,7 +949,7 @@ void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
 {
     auto& zchi = em.getSingleton<ZoneCheckInfo>();
     auto& c = em.getComponent<ColliderComponent>(e);
-    for (auto [num, bbox] : zoneBounds)
+    for (auto [num, bbox] : zchi.zoneBounds)
         if (bbox.intersects(c.boundingBox))
         {
             zchi.insertZone(num, type);
@@ -965,9 +967,9 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
     if (!reSpawn)
     {
         using TAGs = MP::TypeList<EnemyTag>;
-        using TAGs2 = MP::TypeList<NPCTag>;
+        // using TAGs2 = MP::TypeList<NPCTag>;
         destroyParts<TAGs>(em);
-        destroyParts<TAGs2>(em);
+        // destroyParts<TAGs2>(em);
         reSpawn = true;
     }
     else
@@ -978,10 +980,10 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
             std::string chunkName = "Chunk" + std::to_string(i);
             const valueType& chunk = chunks[i][chunkName.c_str()];
             const valueType& enemyArray = chunk[1]["underworld"]["Enemies"];
-            const valueType& npcArray = chunk[1]["underworld"]["NPCs"];
+            // const valueType& npcArray = chunk[1]["underworld"]["NPCs"];
 
             generateEnemies(em, enemyArray, iam);
-            generateNPCs(em, npcArray);
+            // generateNPCs(em, npcArray);
         }
         reSpawn = false;
     }
@@ -1090,7 +1092,7 @@ void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man& iam)
     li.loading = false;
     state = LoadState::LOAD_CHUNKS;
     zchi.clearSets();
-    zoneBounds.clear();
+    zchi.zoneBounds.clear();
     chunksVec.clear();
 }
 

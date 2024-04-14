@@ -64,7 +64,6 @@ private:
     vec3d rotateScale(const vec3d& v, double angle);
 
     std::string fileMap{};
-    std::map<uint8_t, BBox> zoneBounds{};
     LoadState state{ LoadState::LOAD_CHUNKS };
     mapType map{};
     std::vector<const valueType*> chunksVec{};

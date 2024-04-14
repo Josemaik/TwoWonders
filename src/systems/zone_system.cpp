@@ -46,6 +46,24 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         p.position = spawnPoint;
                         break;
                     }
+                    case 2:
+                    {
+                        if (elapsedEnding < countdownEnding) {
+                            elapsedEnding += timeStep;
+                            return;
+                        }
+                        li.currentScreen = GameScreen::ENDING;
+                        elapsedEnding = 0.0f;
+                        // map.changeMap(em, 2, iam);
+                        // li.transition = true;
+                        // // em.getSingleton<SoundSystem>().ambient_stop();
+
+                        // auto& plfi = em.getSingleton<PlayerInfo>();
+                        // vec3d spawnPoint = { -28.0, 49.0, -30.0 };
+                        // plfi.spawnPoint = spawnPoint;
+                        // p.position = spawnPoint;
+                        break;
+                    }
 
                     }
                 }
@@ -187,8 +205,8 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
             {
                 if (e.hasTag<AngryBushTag>() || e.hasTag<DummyTag>())
                     return;
-                if (phy.position.distance(phyC.position) < 50.0 && 
-                std::abs(phy.position.y() - phyC.position.y()) < 4.0)
+                if (phy.position.distance(phyC.position) < 50.0 &&
+                    std::abs(phy.position.y() - phyC.position.y()) < 4.0)
                 {
                     ch.closeEnemies += 1;
                 }
@@ -526,6 +544,7 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager&)
 
             li.viewPoint = phy.position;
             li.events.insert(dc.eventCodes.begin(), dc.eventCodes.end());
+            dc.eventCodes.clear();
             // if (dc.eventCodes.size() > 0)
             //     evm.scheduleEvent({ static_cast<EventCodes>(dc.eventCodes[0]) });
         }

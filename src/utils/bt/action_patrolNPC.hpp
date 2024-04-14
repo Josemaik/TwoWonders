@@ -14,7 +14,8 @@ struct BTAction_PatrolNPC : BTNode_t {
             if (*pathIt == *path.end()) {
                 ectx.npc->path_finaliced = true;
                 return true;
-            } else {
+            }
+            else {
                 ++pathIt;
             }
         }
@@ -32,35 +33,49 @@ struct BTAction_PatrolNPC : BTNode_t {
 
         //Do patrol
         auto& li = ectx.em.getSingleton<LevelInfo>();
-        if(ectx.ent.hasTag<NomadTag>()){
-            if(!ectx.npc->path_finaliced && (li.door_open || ectx.npc->tp)){
-               if(calculateSteering<4>(ectx, ectx.npc->pathIt, ectx.npc->path)){
+        if (ectx.ent.hasTag<NomadTag>()) {
+            if (!ectx.npc->path_finaliced && (li.door_open || ectx.npc->tp)) {
+                if (calculateSteering<4>(ectx, ectx.npc->pathIt, ectx.npc->path)) {
                     ectx.npc->tp = false;
                     ectx.npc->path_finaliced = true;
-               }
+
+                    if (li.mapID == 2)
+                        addDialogEvent(ectx, 21);
+                }
             }
         }
-        if(ectx.ent.hasTag<InvestigatorTag>()){
-             if(!ectx.npc->path_finaliced && li.investigatorstartwalk && !ectx.npc->tp){
-               if(calculateSteering<4>(ectx, ectx.npc->pathIt, ectx.npc->path)){
-                    //Si ha terminado la primera vex hace tp
-                    ectx.phy.position = vec3d{ 27.2022,14,-104.252};
-                    ectx.npc->tp = true;
-                    ectx.npc->path_finaliced = true;
-                    ectx.npc->pathIt_inestigador = ectx.npc->path_investigador.begin();
-               }
-             }else{
-                if( ectx.npc->tp == true && !ectx.npc->path_investigador_finalized){
-                    if(calculateSteering<5>(ectx, ectx.npc->pathIt_inestigador, ectx.npc->path_investigador)){
-                        std::cout << "he terminado";
-                        ectx.npc->path_investigador_finalized = true;
-                        //rotar al npc
-                        //quitar mas adelante
-                        li.npcflee = true;
-                    }
+        if (ectx.ent.hasTag<InvestigatorTag>()) {
+            if (li.investigatorstartwalk && !ectx.npc->path_investigador_finalized) {
+                if (calculateSteering<7>(ectx, ectx.npc->pathIt_inestigador, ectx.npc->path_investigador)) {
+                    ectx.npc->path_investigador_finalized = true;
+
+                    if (li.mapID == 2)
+                        addDialogEvent(ectx, 19);
                 }
-             }
+            }
         }
         return BTNodeStatus_t::success;
+    }
+
+    void addDialogEvent(EntityContext_t& ectx, int event) noexcept
+    {
+        auto& zchi = ectx.em.getSingleton<ZoneCheckInfo>();
+        auto& c = ectx.em.getComponent<ColliderComponent>(ectx.ent);
+        for (auto [num, bbox] : zchi.zoneBounds)
+        {
+            if (bbox.intersects(c.boundingBox))
+            {
+                zchi.insertZone(num, InteractableType::NPC);
+            }
+        }
+
+        auto& li = ectx.em.getSingleton<LevelInfo>();
+        auto& ouc = ectx.em.getComponent<OneUseComponent>(ectx.ent);
+        auto& dc = ectx.em.getComponent<DispatcherComponent>(ectx.ent);
+        dc.eventCodes.push_back(event);
+
+        std::pair<uint8_t, uint8_t> pair = { li.mapID, ouc.id };
+        if (li.dontLoad.find(pair) != li.dontLoad.end())
+            li.dontLoad.erase(pair);
     }
 };

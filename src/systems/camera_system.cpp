@@ -9,7 +9,7 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
     static constexpr float cameraFovyNormal = 60.f;
     static constexpr float cameraFovyDetected = 50.f;
     static constexpr float cameraFovyLocked = 47.5f;
-    static constexpr float cameraFovyCinematic = 140.f;
+    static constexpr float cameraFovyCinematic = 40.f;
 
     auto& li = em.getSingleton<LevelInfo>();
     if (li.isDead)

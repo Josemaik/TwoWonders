@@ -32,6 +32,8 @@ private:
     void checkTutorialEnemies(EntityManager& em);
     void checkVolcanoLava(EntityManager& em);
     void openDoorsZone(EntityManager& em, EventManager& evm, vec3d& leverPos);
+
+    float elapsedEnding{}, countdownEnding{ 1.5f };
 };
 
 #endif // !ZONE_SYSTEM

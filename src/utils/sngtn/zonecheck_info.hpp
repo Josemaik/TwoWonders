@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include <unordered_set>
 #include <unordered_map>
 #include <cstdint>
@@ -29,6 +30,7 @@ struct ZoneCheckInfo
         return zones.at(type);
     }
 
+    std::map<uint8_t, BBox> zoneBounds{};
 private:
     std::unordered_map<InteractableType, std::unordered_set<uint8_t>> zones;
     const std::unordered_set<uint8_t> emptySet;

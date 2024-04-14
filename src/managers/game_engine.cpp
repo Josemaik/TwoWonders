@@ -18,11 +18,20 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // Corazones HUD
     loadAndResizeImage("heart", "assets/HUD/corazon.png");
 
+    // Medio Corazón HUD
+    loadAndResizeImage("half_heart", "assets/HUD/corazon_medio.png");
+
     // Corazones vacíos HUD
     loadAndResizeImage("empty_heart", "assets/HUD/corazon_vacio.png");
 
     // Corazones Hielo HUD
-    loadAndResizeImage("ice_heart", "assets/HUD/corazon_escudo.png");
+    loadAndResizeImage("ice_heart", "assets/HUD/corazon_escudo2.png");
+
+    // Medio Corazón Hielo HUD
+    loadAndResizeImage("half_ice_heart", "assets/HUD/corazon_escudo_medio2.png");
+
+    // Corazones vacíos Hielo HUD
+    loadAndResizeImage("empty_ice_heart", "assets/HUD/corazon_escudo_v2.png");
 
     // Mago Happy HUD
     loadAndResizeImage("mago_happy", "assets/HUD/mago_happy.png");

@@ -30,6 +30,10 @@ enum EventCodes : uint16_t
     DialogNomadVolcano2,
     DialogCatVolcano1,
     InitBoatParts,
+    DialogCatVolcano2,
+    DialogCatVolcano3,
+    DialogNomadVolcano3,
+    TPBoat,
     MAX
 };
 
@@ -237,20 +241,20 @@ public:
                         for (const auto& msg : msgs)
                             txti.addText(msg);
 
-                        // using CMPs = MP::TypeList<PhysicsComponent, NPCComponent>;
-                        // using npcTAG = MP::TypeList<NPCTag>;
+                        auto& li = em.getSingleton<LevelInfo>();
+                        li.investigatorstartwalk = true;
+                        using CMPs = MP::TypeList<PhysicsComponent, NPCComponent>;
+                        using npcTAG = MP::TypeList<NPCTag>;
 
-                        // em.forEach<CMPs, npcTAG>([&](Entity&, PhysicsComponent& phy, NPCComponent& npc)
-                        // {
-                        //     if (npc.type == NPCType::INVESTIGATOR)
-                        //     {
-                        //         phy.position = { -93.282, 4.0, 42.465 };
-                        //     }
-                        //     else if (npc.type == NPCType::NOMAD)
-                        //     {
-                        //         phy.position = { -89.282, 4.0, 36.465 };
-                        //     }
-                        // });
+                        em.forEach<CMPs, npcTAG>([&](Entity&, PhysicsComponent& phy, NPCComponent& npc)
+                        {
+                            if (npc.type == NPCType::INVESTIGATOR)
+                            {
+                                npc.pathIt_inestigador = npc.path_investigador.begin();
+                                phy.position = { 27.2022,14,-104.252 };
+                                npc.tp = true;
+                            }
+                        });
 
                         break;
                     }
@@ -374,7 +378,6 @@ public:
                     case EventCodes::DialogCatVolcano1:
                     {
                         auto& txti = em.getSingleton<TextInfo>();
-                        auto& li = em.getSingleton<LevelInfo>();
                         std::array<std::string, 12> msgs =
                         {
                             "Gato: \n¡Miau! ¡Miau! ¡Miau!",
@@ -397,7 +400,76 @@ public:
 
                         scheduleEvent(Event{ EventCodes::InitBoatParts });
                         out = true;
-                        li.investigatorstartwalk = true;
+                        break;
+                    }
+                    case EventCodes::DialogCatVolcano2:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        auto& txti = em.getSingleton<TextInfo>();
+                        std::array<std::string, 5> msgs =
+                        {
+                            "Investigador: \n¡Miau! ¡Miau! ¡Miau!",
+                            "Mago: \nNo me vuelves a pillar con esa",
+                            "Investigador: \nBuen trabajo, ahora vamos a salir de aquí\n He terminado las reparaciones",
+                            "Mago: \n¡Perfecto!",
+                            "Investigador: \nPero antes toma una recompensa por tu trabajo",
+                        };
+
+                        li.npcflee = true;
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        scheduleEvent(Event{ EventCodes::DialogCatVolcano3 });
+                        out = true;
+                        break;
+                    }
+                    case EventCodes::DialogCatVolcano3:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        auto& txti = em.getSingleton<TextInfo>();
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+
+                        std::array<std::string, 2> msgs =
+                        {
+                            "¡Haz recibido un pergamino con la formulación \npara hacer una bola de fuego!",
+                            "Investigador: \nCon esto y un bizcocho, nos largamos de aquí."
+                        };
+
+                        // Le damos el hechizo
+                        Spell spell{ "Bola de fuego", "Tiras una poderosa bola de destrucción", Spells::FireBall, 20.0, 4 };
+                        plfi.addSpell(spell);
+                        plfi.showBook = true;
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+                        playerPhy.notMove = false;
+                        break;
+                    }
+                    case EventCodes::DialogNomadVolcano3:
+                    {
+                        auto& txti = em.getSingleton<TextInfo>();
+
+                        std::array<std::string, 6> msgs =
+                        {
+                            "Nómada: \nYa os queríais largar sin mi, ¿eh?\n¿Acaso no os importa mi vida?",
+                            "Mago: \n¡Lo siento! Iba a buscarte cuando has aparecido.",
+                            "Nómada: \nCasi se me queman las semillas \npasando por la lava, a ver \n si tenéis un poco de respeto.",
+                            "Mago: \nLo siento mucho por tus semillas :(",
+                            "Nómada: \nBueno venga, vámonos de aquí.",
+                            "Investigador: \n¡Miau! ¡Miau! ¡Miau!"
+                        };
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        scheduleEvent(Event{ EventCodes::TPBoat });
+                        out = true;
                         break;
                     }
                     case EventCodes::InitBoatParts:
@@ -405,6 +477,23 @@ public:
                         // Ponemos a true la variable de enseñar número las piezas de barco
                         auto& li = em.getSingleton<LevelInfo>();
                         li.volcanoMission = true;
+                        break;
+                    }
+                    case EventCodes::TPBoat:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+
+                        using CMPs = MP::TypeList<PhysicsComponent>;
+                        using npcTAG = MP::TypeList<NPCTag>;
+
+                        em.forEach<CMPs, npcTAG>([&](Entity&, PhysicsComponent& phy)
+                        {
+                            phy.position = { -126.872, 7.0, 24.918 };
+                        });
+
+                        auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+                        playerPhy.position = { -126.872, 7.0, 24.918 };
+
                         break;
                     }
                     default:

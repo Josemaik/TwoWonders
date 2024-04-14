@@ -221,6 +221,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         // Entidades que no queremos que colisionen con rampas
         if (otherEntPtr->hasTag<WaterBombTag>() ||
             otherEntPtr->hasTag<FireBallTag>() ||
+            otherEntPtr->hasTag<HitPlayerTag>() ||
             behaviorType2 & BehaviorType::AREADAMAGECRUSHER ||
             behaviorType2 & BehaviorType::AREADAMAGE)
             return;
@@ -892,19 +893,6 @@ void CollisionSystem::groundCollision(PhysicsComponent& playerPhysics, vec3d& pl
         playerPhysics.alreadyGrounded = true;
 
     }
-    // else if (minOverlap.y() > 2.0)
-    // {
-        // minOverlap -= vec3d{ playerEsc.x() / 2, 0.f, playerEsc.z() / 2 };
-    // std::cout << "alooo\n";
-    // else if (minOverlap.x() < minOverlap.z())
-    // {
-    //     pos1.setX(pos1.x() + minOverlap.x());
-    // }
-    // else
-    // {
-    //     pos1.setZ(pos1.z() + minOverlap.z());
-    // }
-    // }
 }
 
 // Si el suelo choca contra el suelo, solo se desplaza en X o Z (también se usa para paredes con paredes)

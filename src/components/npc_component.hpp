@@ -16,15 +16,17 @@ struct NPCComponent
     bool path_initialized{ false };
     bool path_finaliced{ false };
     //path para investigador
-    Path_t<5> path_investigador{ vec3d{-57.6809,14,-109.053},
+    Path_t<7> path_investigador{ vec3d{-57.6809,14,-109.053},
         vec3d{-98.2402,14,-68.1948},
         vec3d{-79.1414,5,-31.3527},
         vec3d{-83.5963,5,12.6932},
-        vec3d{-110.859,5,25.9958} };
-    Path_t<5>::iterator pathIt_inestigador{ };
+        vec3d{-80.0, 5.0, 45.0},
+        vec3d{-93.282, 5.0, 45.0},
+        vec3d{ -93.282, 5.0, 42.465 } };
+
+    Path_t<7>::iterator pathIt_inestigador{ };
     bool path_investigador_finalized{ false };
     bool tp{ false };
-
 
     NPCType type{ NPCType::NOMAD };
     const char* bh{};
