@@ -97,7 +97,8 @@ struct LevelInfo
 
     // Misiones
     bool volcanoMission{ false };
-
+    //npc huya
+    bool npcflee{false},investigatorstartwalk{false};
     // Estado del juego
     GameScreen currentScreen = GameScreen::GAMEPLAY;
     GameScreen previousScreen = GameScreen::LOGO;

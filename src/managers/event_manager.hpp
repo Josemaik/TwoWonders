@@ -358,7 +358,7 @@ public:
                     case EventCodes::DialogCatVolcano1:
                     {
                         auto& txti = em.getSingleton<TextInfo>();
-
+                        auto& li = em.getSingleton<LevelInfo>();
                         std::array<std::string, 12> msgs =
                         {
                             "Gato: \n¡Miau! ¡Miau! ¡Miau!",
@@ -381,6 +381,7 @@ public:
 
                         scheduleEvent(Event{ EventCodes::InitBoatParts });
                         out = true;
+                        li.investigatorstartwalk = true;
                         break;
                     }
                     case EventCodes::InitBoatParts:

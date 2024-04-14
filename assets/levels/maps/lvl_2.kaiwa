@@ -459,10 +459,10 @@
 							"max_speed": 0.3,
 							"events": [17],
 							"path": [
-								[-51.8, 4.0,  238.9],
-								[-86.8, 4.0, 234.6],
-								[-122.2, 4.0, 233.9],
-								[-129.3, 4.0, 219.9]
+								[ 8.70264,32,-55.1775],
+								[12.9313,32,-69.1525],
+								[25.5826,32,-68.6507],
+								[37.7674,32,-71.5]
 							],
 							"arrival_radius": 2.0,
 							"npc": 1
@@ -476,10 +476,10 @@
 							"max_speed": 0.3,
 							"events": [15],
 							"path": [
-								[-51.8, 4.0,  238.9],
-								[-86.8, 4.0, 234.6],
-								[-122.2, 4.0, 233.9],
-								[-129.3, 4.0, 219.9]
+								[-80.0192,5,-25.493],
+								[-82.1127,5,2.52919],
+								[-94.7152,5,20.0346],
+								[-110.159,5,25.8586]
 							],
 							"arrival_radius": 2.0,
 							"npc": 0
@@ -1492,64 +1492,6 @@
 							"countdown_stop": 0.2,
 							"countdown_shoot": 0.3,
 							"countdown_perception": 0.11,
-							"scale_to_respawn_attack": 7.0
-						},
-						{
-							"position": [-80.8,7.0,7.2],
-							"rotVector": [0.0, 0.0, 1.0],
-							"rotation": 180.0,
-							"scale": [5.0, 10.0, 5.0],
-							"color": [0, 121, 241, 255],
-							"max_speed": 0.4,
-							"life": 6,
-							"type": 0,
-							"element": 1,
-							"arrival_radius": 4.0,
-							"detect_radius": 40.0,
-							"attack_radius": 7.5,
-							"tx": 0.0,
-							"tz": 0.0,
-							"time2arrive": 1.0,
-							"tactive": true,
-							"perceptionTime": 0.2,
-							"path": [
-								[-80.8,7.0,7.2],
-								[-80.8,7.0,7.2],
-								[-80.8,7.0,7.2],
-								[-80.8,7.0,7.2]
-							],
-							"countdown_stop": 0.2,
-							"countdown_shoot": 0.3,
-							"countdown_perception": 0.01,
-							"scale_to_respawn_attack": 7.0
-						},
-						{
-							"position": [-94.0,4.0,8.6],
-							"rotVector": [0.0, 0.0, 1.0],
-							"rotation": 180.0,
-							"scale": [4.0, 3.0, 4.0],
-							"color": [0, 121, 241, 255],
-							"max_speed": 0.8,
-							"life": 10,
-							"type": 1,
-							"element": 1,
-							"arrival_radius": 2.0,
-							"detect_radius": 40.0,
-							"attack_radius": 20.5,
-							"tx": 0.0,
-							"tz": 0.0,
-							"time2arrive": 1.0,
-							"tactive": true,
-							"perceptionTime": 0.2,
-							"path": [
-								[-94.0,4.0,8.6],
-								[-94.0,4.0,8.6],
-								[-94.0,4.0,8.6],
-								[-94.0,4.0,8.6]
-							],
-							"countdown_stop": 0.6,
-							"countdown_shoot": 0.1,
-							"countdown_perception": 0.06,
 							"scale_to_respawn_attack": 7.0
 						}
 					],

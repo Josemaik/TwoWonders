@@ -337,6 +337,9 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         else
             phy.gravity = 0;
     }
+    if(ge.isKeyDown(KEY_M)){
+        li.npcflee = true;
+    }
 
 }
 

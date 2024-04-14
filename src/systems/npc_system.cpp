@@ -3,9 +3,15 @@
 // Actualizar las IA
 void NPCSystem::update(EntityManager& em)
 {
+    auto& li = em.getSingleton<LevelInfo>();
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren, NPCComponent& npc)
     {
         NPCComponent* npcptr = &npc;
+        if(e.hasTag<NomadTag>() && li.npcflee){
+            npc.tp = true;
+            phy.position = vec3d{-80.0192,5,-25.493};
+            li.npcflee = false;
+        }
         if (npc.behaviourTree) {
             npc.behaviourTree->run({ em, e, nullptr, npcptr, phy, ren, nullptr, timeStep });
             return;
