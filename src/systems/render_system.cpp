@@ -168,11 +168,13 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
 
     // Slider del volumen
     Rectangle volumenSlider = { 100, 100, 200, 20 };
-    float volumen = 50;
-    float nuevoValor = static_cast<float>(GuiSliderBar(volumenSlider, "Volumen", NULL, &volumen, 0, 100));
+   
+    float volumen = em.getSingleton<SoundSystem>().getVolumeMaster() * 100;
+    em.getSingleton<SoundSystem>().setVolumeMaster(static_cast<float>(GuiSliderBar(volumenSlider, "Volumen", NULL, &volumen, 0, 100)) / 100);
+
+
 
     // Ahora asignamos el nuevo valor al puntero volumen
-    volumen = nuevoValor;
 
     // Posición del botón de volver
     float posX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2);

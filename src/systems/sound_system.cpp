@@ -657,6 +657,10 @@ void SoundSystem::setVolumeMaster(float volumen){
 
     result = FMOD_ChannelGroup_SetVolume(masterGroup, volumen);
 
+     if(result != FMOD_OK){
+        fprintf(stderr, "%s\n", FMOD_ErrorString(result));
+        exit(-1);
+    }
 
 }
 
