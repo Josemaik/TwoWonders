@@ -168,9 +168,11 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
 
     // Slider del volumen
     Rectangle volumenSlider = { 100, 100, 200, 20 };
-   
-    float volumen = em.getSingleton<SoundSystem>().getVolumeMaster() * 100;
-    em.getSingleton<SoundSystem>().setVolumeMaster(static_cast<float>(GuiSliderBar(volumenSlider, "Volumen", NULL, &volumen, 0, 100)) / 100);
+    auto& sosy = em.getSingleton<SoundSystem>();
+    float volumen =sosy.getVolumeMaster() * 100;
+    float * vol = &volumen;
+    GuiSliderBar(volumenSlider, "Volumen", NULL, vol , 0, 100);
+    ss.setVolumeMaster(*vol/100.0f);
 
 
 
