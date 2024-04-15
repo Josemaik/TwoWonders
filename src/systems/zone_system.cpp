@@ -24,7 +24,6 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                     {
                         map.changeMap(em, 1, iam);
                         li.transition = true;
-                        
 
                         auto& plfi = em.getSingleton<PlayerInfo>();
                         vec3d spawnPoint = { 7.0, 22.0, -21.0 };
@@ -180,7 +179,7 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
 
     em.forEach<chestCMP, chestTag>([&](Entity& e, ChestComponent& ch, InteractiveComponent& ic, PhysicsComponent& phy, OneUseComponent& ouc)
     {
-        if (ouc.zone == li.num_zone)
+        if (ouc.zones.find(li.num_zone) != ouc.zones.end())
         {
             // Revisamos si el cofre ha sido abierto
             std::pair<uint8_t, uint8_t> pair{ li.mapID, ouc.id };
@@ -255,7 +254,7 @@ void ZoneSystem::checkLevers(EntityManager& em, EventManager& evm)
 
     em.forEach<leverCMP, leverTAG>([&](Entity&, InteractiveComponent& ic, PhysicsComponent& phy, OneUseComponent& ouc)
     {
-        if (ouc.zone == li.num_zone)
+        if (ouc.zones.find(li.num_zone) != ouc.zones.end())
         {
             // Revisamos si la palanca ha sido activada
             std::pair<uint8_t, uint8_t> pair{ li.mapID, ouc.id };
@@ -471,7 +470,7 @@ void ZoneSystem::checkSigns(EntityManager& em)
 
             while (!msgs.empty())
             {
-                txti.addText(msgs.front());
+                txti.addText({ SpeakerType::NONE, msgs.front() });
                 msgs.pop();
             }
 

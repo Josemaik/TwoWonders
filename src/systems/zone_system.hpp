@@ -33,7 +33,7 @@ private:
     void checkVolcanoLava(EntityManager& em);
     void openDoorsZone(EntityManager& em, EventManager& evm, vec3d& leverPos);
 
-    float elapsedEnding{}, countdownEnding{ 1.5f };
+    float elapsedEnding{}, countdownEnding{ 0.5f };
 };
 
 #endif // !ZONE_SYSTEM

@@ -169,10 +169,10 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     // Slider del volumen
     Rectangle volumenSlider = { 100, 100, 200, 20 };
     auto& sosy = em.getSingleton<SoundSystem>();
-    float volumen =sosy.getVolumeMaster() * 100;
-    float * vol = &volumen;
-    GuiSliderBar(volumenSlider, "Volumen", NULL, vol , 0, 100);
-    ss.setVolumeMaster(*vol/100.0f);
+    float volumen = sosy.getVolumeMaster() * 100;
+    float* vol = &volumen;
+    GuiSliderBar(volumenSlider, "Volumen", NULL, vol, 0, 100);
+    ss.setVolumeMaster(*vol / 100.0f);
 
 
 
@@ -792,14 +792,14 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         switch (li.mapID)
         {
         case 0:
-            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_0.obj");
+            r.model = engine.loadModel("assets/Niveles/Lvl_0/Objs/lvl_0-cnk_0.obj");
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_0.obj");
+            r.model = engine.loadModel("assets/Niveles/Lvl_1/Objs/lvl_1-cnk_0.obj");
             break;
         case 2:
-            r.model = engine.loadModel("assets/levels/Zona_2-Volcan/objs/lvl_2-cnk_0.obj");
+            r.model = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_0.obj");
             break;
         }
 
@@ -810,14 +810,14 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         switch (li.mapID)
         {
         case 0:
-            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_1.obj");
+            r.model = engine.loadModel("assets/Niveles/Lvl_0/Objs/lvl_0-cnk_1.obj");
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_1.obj");
+            r.model = engine.loadModel("assets/Niveles/Lvl_1/Objs/lvl_1-cnk_1.obj");
             break;
         case 2:
-            r.model = engine.loadModel("assets/levels/Zona_2-Volcan/objs/lvl_2-cnk_1.obj");
+            r.model = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_1.obj");
             break;
         }
         loadShaders(r.model);
@@ -827,14 +827,14 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         switch (li.mapID)
         {
         case 0:
-            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_2.obj");
+            r.model = engine.loadModel("assets/Niveles/Lvl_0/Objs/lvl_0-cnk_2.obj");
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_2.obj");
+            r.model = engine.loadModel("assets/Niveles/Lvl_1/Objs/lvl_1-cnk_2.obj");
             break;
         case 2:
-            r.model = engine.loadModel("assets/levels/Zona_2-Volcan/objs/lvl_2-cnk_2.obj");
+            r.model = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_2.obj");
             break;
         }
         loadShaders(r.model);
@@ -848,10 +848,10 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_3.obj");
+            r.model = engine.loadModel("assets/Niveles/Lvl_1/Objs/lvl_1-cnk_3.obj");
             break;
         case 2:
-            r.model = engine.loadModel("assets/levels/Zona_2-Volcan/objs/lvl_2-cnk_3.obj");
+            r.model = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_3.obj");
             break;
         }
         loadShaders(r.model);
@@ -865,7 +865,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_4.obj");
+            r.model = engine.loadModel("assets/Niveles/Lvl_1/Objs/lvl_1-cnk_4.obj");
             break;
         }
         loadShaders(r.model);
@@ -879,7 +879,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_5.obj");
+            r.model = engine.loadModel("assets/Niveles/Lvl_1/Objs/lvl_1-cnk_5.obj");
             break;
         }
         loadShaders(r.model);
@@ -893,7 +893,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_6.obj");
+            r.model = engine.loadModel("assets/Niveles/Lvl_1/Objs/lvl_1-cnk_6.obj");
             break;
         }
         loadShaders(r.model);
@@ -1023,7 +1023,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     else if (e.hasTag<TableTag>())
     {
-        // r.model = engine.loadModel("assets/Assets/Mesa_investigador/Mesa-investigador.obj");
+        r.model = engine.loadModel("assets/Assets/Mesa_investigador/Mesa-investigador.obj");
 
         loadShaders(r.model);
     }
@@ -1699,7 +1699,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             // Dibujamos el número de monedas en pantalla
             drawCoinBar(engine, em);
 
-            drawFPSCounter(engine);
+            // drawFPSCounter(engine);
 
             // Dibujar el bastón
             drawStaff(engine, em);
@@ -2672,7 +2672,6 @@ void RenderSystem::drawAnimatedTextures(GameEngine& engine)
 {
     for (auto& [_, textureInfo] : animatedTextures)
     {
-        bool a = false;
         // Calculamos el factor de escala
         textureInfo.scaleFactor = 3.5f - textureInfo.scaleChange * textureInfo.lerpFactor;
         int& width = textureInfo.width;
@@ -2712,8 +2711,8 @@ void RenderSystem::drawAnimatedTextures(GameEngine& engine)
 void RenderSystem::drawSmallButtons(GameEngine& engine, const std::string& name, int posX, int posY, int width, int height)
 {
     std::string texture = "";
-    posX += width / 1.6;
-    posY += height / 1.4;
+    posX += static_cast<int>(width / 1.6);
+    posY += static_cast<int>(height / 1.4);
 
     if (name == "1_pl")
     {
@@ -2739,12 +2738,16 @@ void RenderSystem::drawSmallButtons(GameEngine& engine, const std::string& name,
     else if (name == "4_pl")
     {
         if (engine.isGamepadAvailable(0))
+        {
             texture = "boton_r2";
+            posX -= static_cast<int>(width / 2.5);
+            posY -= static_cast<int>(height / 6.5);
+        }
         else
         {
             texture = "tecla_espacio";
-            posX -= width / 1.6;
-            posY -= height / 6.5;
+            posX -= static_cast<int>(width / 1.6);
+            posY -= static_cast<int>(height / 6.5);
         }
     }
 
@@ -2767,13 +2770,40 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
 
     // Sacamos el texto en formatos para GuiTextBox
     auto& str = textQueue.front();
-    auto text = const_cast<char*>(str.c_str());
+    auto text = const_cast<char*>(str.second.c_str());
 
     GuiSetStyle(DEFAULT, TEXT_LINE_SPACING, 20);
 
     // Dibujamos el cuadro de diálogo con RayGui
     engine.drawRectangle(static_cast<int>(posX), static_cast<int>(posY), static_cast<int>(boxWidth), static_cast<int>(boxHeight), WHITE);
-    GuiTextBox({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.size()), false);
+    GuiTextBox({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.second.size()), false);
+
+    float offSetX = 40.0;
+    switch (str.first)
+    {
+    case SpeakerType::NONE:
+        break;
+    case SpeakerType::PLAYER:
+        engine.drawTexture(engine.textures["mago_happy"], static_cast<int>(posX - offSetX), static_cast<int>(posY - 50), { 255, 255, 255, 255 });
+        break;
+    case SpeakerType::PLAYER_SAD:
+        engine.drawTexture(engine.textures["mago_meh"], static_cast<int>(posX - offSetX), static_cast<int>(posY - 50), { 255, 255, 255, 255 });
+        break;
+    case SpeakerType::PLAYER_DANGER:
+        engine.drawTexture(engine.textures["mago_sos"], static_cast<int>(posX - offSetX), static_cast<int>(posY - 50), { 255, 255, 255, 255 });
+        break;
+    case SpeakerType::CAT:
+        engine.drawTexture(engine.textures["investigador"], static_cast<int>(posX - offSetX), static_cast<int>(posY - 50), { 255, 255, 255, 255 });
+        break;
+    case SpeakerType::NOMAD:
+        engine.drawTexture(engine.textures["nomada"], static_cast<int>(posX - offSetX), static_cast<int>(posY - 50), { 255, 255, 255, 255 });
+        break;
+    case SpeakerType::INVESTIGATOR:
+        engine.drawTexture(engine.textures["investigador"], static_cast<int>(posX - offSetX), static_cast<int>(posY - 50), { 255, 255, 255, 255 });
+        break;
+    default:
+        break;
+    }
 
     auto& inpi = em.getSingleton<InputInfo>();
     if (inpi.interact && !txti.notPass)

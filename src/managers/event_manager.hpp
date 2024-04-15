@@ -96,9 +96,11 @@ public:
 
                         auto& msc = em.getComponent<MessageComponent>(chest);
                         auto& msgs = msc.messages;
+
                         while (!msgs.empty())
                         {
-                            txti.addText(msgs.front());
+
+                            txti.addText({ SpeakerType::NONE, msgs.front() });
                             msgs.pop();
                         }
 
@@ -164,7 +166,7 @@ public:
 
                         // Metemos el texto en el stack de texto
                         for (std::size_t i = 0; i < msgs.size(); i++)
-                            txti.addText(msgs[i]);
+                            txti.addText({ SpeakerType::NONE, msgs[i] });
                         break;
                     }
                     case EventCodes::ViewPointDoor:
@@ -218,7 +220,7 @@ public:
                         }
                         }
                         std::string msg = "¡Has encontrado " + part + " de la barca!";
-                        txti.addText(msg);
+                        txti.addText({ SpeakerType::NONE, msg });
 
                         li.insertDeath(li.boatPartFound);
 
@@ -247,7 +249,7 @@ public:
                         };
 
                         for (const auto& msg : msgs)
-                            txti.addText(msg);
+                            txti.addText({ SpeakerType::NONE, msg });
 
                         auto& li = em.getSingleton<LevelInfo>();
                         li.investigatorstartwalk = true;
@@ -292,17 +294,17 @@ public:
                     {
                         auto& txti = em.getSingleton<TextInfo>();
 
-                        std::array<std::string, 9> msgs =
+                        std::array<std::pair<SpeakerType, std::string>, 9> msgs =
                         {
-                            "Nómada: \nSaludos, no esperaba encontrarme a un \naprendiz de mago por aquí.",
-                            "Mago: \nBuenas! Sabes qué son todos estos enemigos?\nNo aparecían en los libros que estudié.",
-                            "Nómada: \nCuanto más se debilita la barrera más enemigos \nentran al mundo, cosa del viejo.",
-                            "Mago: \n¿Qué viejo?",
-                            "Nómada: \nEl pellejo.",
-                            "Mago: \nEspera, ¿¿no será el gran mago??",
-                            "Nómada: \nEse mismo",
-                            "Mago: \nEse es mi maestro! \nMe abandonó y me encomendó que lo encontrara.",
-                            "Nómada: \nSi eres el aprendiz del viejo sabrás utilizar esto."
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nSaludos, no esperaba encontrarme a un \naprendiz de mago por aquí."),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \nBuenas! Sabes qué son todos estos enemigos?\nNo aparecían en los libros que estudié."),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nCuanto más se debilita la barrera más enemigos \nentran al mundo, cosa del viejo."),
+                            std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \n¿Qué viejo?"),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nEl pellejo."),
+                            std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \nEspera, ¿¿no será el gran mago??"),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nEse mismo"),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \nEse es mi maestro! \nMe abandonó y me encomendó que lo encontrara."),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nSi eres el aprendiz del viejo sabrás utilizar esto.")
                         };
 
                         // Metemos el texto en el array de texto
@@ -319,10 +321,10 @@ public:
                         auto& txti = em.getSingleton<TextInfo>();
                         auto& plfi = em.getSingleton<PlayerInfo>();
 
-                        std::array<std::string, 2> msgs =
+                        std::array<std::pair<SpeakerType, std::string>, 2> msgs =
                         {
-                            "¡Haz recibido un pergamino con la formulación \npara crear una pompa de agua!",
-                            "Nómada: \nCon esto podremos salir de aquí por si disparas a esa puerta. \nLos muñecos de por medio te servirán de práctica."
+                            std::make_pair(SpeakerType::NONE, "¡Haz recibido un pergamino con la formulación \npara crear una pompa de agua!"),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nCon esto podremos salir de aquí por si disparas a esa puerta. \nLos muñecos de por medio te servirán de práctica.")
                         };
 
                         // Le damos el hechizo
@@ -343,11 +345,11 @@ public:
                     case EventCodes::DialogNomadVolcano1:
                     {
                         auto& txti = em.getSingleton<TextInfo>();
-                        std::array<std::string, 3> msgs =
+                        std::array<std::pair<SpeakerType, std::string>, 3> msgs =
                         {
-                            "Nómada: \nTú de nuevo, gracias por sacarme de esa mazmorra.\n ¿Ves los charcos de lava de alrededor?",
-                            "Mago: \nSí, pero no puedo apagarlos con mi agua. Y tengo que cruzarlos.",
-                            "Nómada: \n¿Qué te enseñó el viejo ese? \n Toma, usa esto te ayudará con la lava."
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nTú de nuevo, gracias por sacarme de esa mazmorra.\n ¿Ves los charcos de lava de alrededor?"),
+                            std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \nSí, pero no puedo apagarlos con mi agua. Y tengo que cruzarlos."),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \n¿Qué te enseñó el viejo ese? \n Toma, usa esto te ayudará con la lava.")
                         };
 
                         // Metemos el texto en el stack de texto
@@ -364,10 +366,10 @@ public:
                         auto& txti = em.getSingleton<TextInfo>();
                         auto& plfi = em.getSingleton<PlayerInfo>();
 
-                        std::array<std::string, 2> msgs =
+                        std::array<std::pair<SpeakerType, std::string>, 2> msgs =
                         {
-                            "¡Haz recibido un pergamino con la formulación \npara hacer una esquiva de agua!",
-                            "Nómada: \nCon esto podrás cruzar los charcos de lava. \n¡Buena suerte, yo solo necesito mis buenas patas para cruzar!"
+                            std::make_pair(SpeakerType::NONE, "¡Haz recibido un pergamino con la formulación \npara hacer una esquiva de agua!"),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nCon esto podrás cruzar los charcos de lava. \n¡Buena suerte, yo solo necesito mis buenas patas para cruzar!")
                         };
 
                         // Le damos el hechizo
@@ -386,22 +388,22 @@ public:
                     case EventCodes::DialogCatVolcano1:
                     {
                         auto& txti = em.getSingleton<TextInfo>();
-                        std::array<std::string, 14> msgs =
+                        std::array<std::pair<SpeakerType, std::string>, 14> msgs =
                         {
-                            "Gato: \n¡Miau! ¡Miau! ¡Miau!",
-                            "Mago: \n¿Qué dices? ¿Qué quieres decirme?",
-                            "Gato: \n¿Acaso no hablas gatuno? Qué falta de respeto",
-                            "Mago: \nLo siento, le pediré a mi maestro que me lo enseñe.",
-                            "Gato: \nNo te preocupes niño, si me estaba quedando contigo. \nSoy un investigador",
-                            "Mago: \n¡Ah vale! Oye, ¿sabes cómo salir de aquí? \nTengo que encontrar a mi maestro.",
-                            "Investigador: \nNo eres el único que quiere salir de aquí.",
-                            "Investigador: \nIgual deberías de preocuparte más por el volcán\n a punto de estallar que de tu maestro.",
-                            "Mago: \n¿¡Quéeeee!? ¡¿Estallar!? ¡¿Cómo?!",
-                            "Investigador: \nAsí es, pero no te alarmes, porque me vas a ayudar a \nreconstruir mi barca para salir de aquí.",
-                            "Mago: \n¿Una barca?",
-                            "Investigador: \nEfectivamente, los monstruos me desperdigaron \nlas piezas por todo el lugar.",
-                            "Investigador: \nAyúdame a recuperarlas\ny saldremos de aquí antes de la explosión.",
-                            "Mago: \n¡Entiendo, déjalo en mis manos!"
+                            std::make_pair(SpeakerType::CAT, "Gato: \n¡Miau! ¡Miau! ¡Miau!"),
+                            std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \n¿Qué dices? ¿Qué quieres decirme?"),
+                            std::make_pair(SpeakerType::CAT, "Gato: \n¿Acaso no hablas gatuno? Qué falta de respeto"),
+                            std::make_pair(SpeakerType::PLAYER_DANGER, "Mago: \nLo siento, le pediré a mi maestro que me lo enseñe."),
+                            std::make_pair(SpeakerType::CAT, "Gato: \nNo te preocupes niño, si me estaba quedando contigo. \nSoy un investigador"),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \n¡Ah vale! Oye, ¿sabes cómo salir de aquí? \nTengo que encontrar a mi maestro."),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nNo eres el único que quiere salir de aquí."),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nIgual deberías de preocuparte más por el volcán\n a punto de estallar que de tu maestro."),
+                            std::make_pair(SpeakerType::PLAYER_DANGER, "Mago: \n¿¡Quéeeee!? ¡¿Estallar!? ¡¿Cómo?!"),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nAsí es, pero no te alarmes, porque me vas a ayudar a \nreconstruir mi barca para salir de aquí."),
+                            std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \n¿Una barca?"),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nEfectivamente, los monstruos me desperdigaron \nlas piezas por todo el lugar."),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nAyúdame a recuperarlas\ny saldremos de aquí antes de la explosión."),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \n¡Entiendo, déjalo en mis manos!")
                         };
 
                         // Metemos el texto en el stack de texto
@@ -416,13 +418,13 @@ public:
                     {
                         auto& li = em.getSingleton<LevelInfo>();
                         auto& txti = em.getSingleton<TextInfo>();
-                        std::array<std::string, 5> msgs =
+                        std::array<std::pair<SpeakerType, std::string>, 5> msgs =
                         {
-                            "Investigador: \n¡Miau! ¡Miau! ¡Miau!",
-                            "Mago: \nNo me vuelves a pillar con esa",
-                            "Investigador: \nBuen trabajo, ahora vamos a salir de aquí\n He terminado las reparaciones",
-                            "Mago: \n¡Perfecto!",
-                            "Investigador: \nPero antes toma una recompensa por tu trabajo",
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \n¡Miau! ¡Miau! ¡Miau!"),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \nNo me vuelves a pillar con esa"),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nBuen trabajo, ahora vamos a salir de aquí\n He terminado las reparaciones"),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \n¡Perfecto!"),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nPero antes toma una recompensa por tu trabajo")
                         };
 
                         li.npcflee = true;
@@ -441,10 +443,10 @@ public:
                         auto& txti = em.getSingleton<TextInfo>();
                         auto& plfi = em.getSingleton<PlayerInfo>();
 
-                        std::array<std::string, 2> msgs =
+                        std::array<std::pair<SpeakerType, std::string>, 2> msgs =
                         {
-                            "¡Haz recibido un pergamino con la formulación \npara hacer una bola de fuego!",
-                            "Investigador: \nCon esto y un bizcocho, nos largamos de aquí."
+                            std::make_pair(SpeakerType::NONE, "¡Haz recibido un pergamino con la formulación \npara hacer una bola de fuego!"),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nCon esto y un bizcocho, nos largamos de aquí.")
                         };
 
                         // Le damos el hechizo
@@ -464,14 +466,14 @@ public:
                     {
                         auto& txti = em.getSingleton<TextInfo>();
 
-                        std::array<std::string, 6> msgs =
+                        std::array<std::pair<SpeakerType, std::string>, 6> msgs =
                         {
-                            "Nómada: \nYa os queríais largar sin mi, ¿eh?\n¿Acaso no os importa mi vida?",
-                            "Mago: \n¡Lo siento! Iba a buscarte cuando has aparecido.",
-                            "Nómada: \nCasi se me queman las semillas \npasando por la lava, a ver \n si tenéis un poco de respeto.",
-                            "Mago: \nLo siento mucho por tus semillas :(",
-                            "Nómada: \nBueno venga, vámonos de aquí.",
-                            "Investigador: \n¡Miau! ¡Miau! ¡Miau!"
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nYa os queríais largar sin mi, ¿eh?\n¿Acaso no os importa mi vida?"),
+                            std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \n¡Lo siento! Iba a buscarte cuando has aparecido."),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nCasi se me queman las semillas \npasando por la lava, a ver \n si tenéis un poco de respeto."),
+                            std::make_pair(SpeakerType::PLAYER_DANGER, "Mago: \nLo siento mucho por tus semillas."),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nBueno venga, vámonos de aquí."),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \n¡Miau! ¡Miau! ¡Miau!")
                         };
 
                         // Metemos el texto en el stack de texto

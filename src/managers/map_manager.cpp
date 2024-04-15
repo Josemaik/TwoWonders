@@ -12,22 +12,22 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
         case 0:
         {
             li.mapID = 0;
-            map = loadMap("assets/levels/maps/lvl_0.kaiwa");
+            map = loadMap("assets/Niveles/Lvl_0/Lvl_0.kaiwa");
             em.getSingleton<SoundSystem>().sonido_amb_bosque();
             break;
         }
         case 1:
         {
             li.mapID = 1;
-            map = loadMap("assets/levels/maps/lvl_1.kaiwa");
-            
+            map = loadMap("assets/Niveles/Lvl_1/Lvl_1.kaiwa");
+
             em.getSingleton<SoundSystem>().sonido_mazmorra();
             em.getSingleton<SoundSystem>().sonido_music_mazmorra();
             break;
         }
         case 2:
             li.mapID = 2;
-            map = loadMap("assets/levels/maps/lvl_2.kaiwa");
+            map = loadMap("assets/Niveles/Lvl_2/Lvl_2.kaiwa");
             em.getSingleton<SoundSystem>().sonido_amb_volcan();
             em.getSingleton<SoundSystem>().sonido_music_volcan();
 
@@ -136,8 +136,8 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             {
                 auto& li = em.getSingleton<LevelInfo>();
                 if (li.mapID != 0 || li.mapID != 1)
-                   // generateNavmeshes(em);
-                break;
+                    // generateNavmeshes(em);
+                    break;
             }
             default:
                 break;
@@ -683,7 +683,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
 void MapManager::generateNavmeshes(EntityManager& em)
 {
     auto& navs = em.getSingleton<NavmeshInfo>();
-    mapType navmeshkaiwa = loadMap("assets/levels/navmeshtest/Lvl_2-navmeshes.kaiwa");
+    mapType navmeshkaiwa = loadMap("assets/Niveles/Lvl_2/Lvl_2-navmeshes.kaiwa");
 
     const valueType& navmeshes = navmeshkaiwa["NavMesh"];
     for (mapSizeType i = 0; i < navmeshes.Size(); i++) {
@@ -737,41 +737,7 @@ void MapManager::generateNavmeshes(EntityManager& em)
 
         //Creamos NavMesh BBox
         double scalex{}, scalez{};
-        double dis{ vecnodes[0].distance(vecnodes[5]) }, disdifernte{};
-        bool issquare{ true }, x_difference_is_greater{ false };
-        for (int i = 5; i < 9;i++) {
-            auto disaux = vecnodes[0].distance(vecnodes[i]);
-            if (std::abs(dis - disaux) > 1.0) {
-                issquare = false;
-                disdifernte = disaux;
-                // Compara las coordenadas x y z de los puntos medios
-                double dx = std::abs(vecnodes[i].x() - vecnodes[0].x());
-                double dz = std::abs(vecnodes[i].z() - vecnodes[0].z());
-                if (dx > dz) {
-                    // La diferencia es mayor en el eje x
-                    x_difference_is_greater = true;
-                }
-                else {
-                    // La diferencia es mayor en el eje z
-                    x_difference_is_greater = false;
-                }
 
-                break;
-            }
-        }
-        if (issquare) {
-            scalex = scalez = dis;
-        }
-        else {
-            if (x_difference_is_greater) {
-                scalex = disdifernte;
-                scalez = dis;
-            }
-            else {
-                scalex = dis;
-                scalez = disdifernte;
-            }
-        }
         scalex = (max.x() - min.x()) + 1.0;
         scalez = (max.z() - min.z()) + 1.0;
         BBox b(vecnodes[0], vec3d{ scalex, (max.y() - min.y()) + 0.5, scalez });
@@ -957,7 +923,7 @@ void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
             if (e.hasComponent<OneUseComponent>())
             {
                 auto& ouc = em.getComponent<OneUseComponent>(e);
-                ouc.zone = num;
+                ouc.zones.insert(num);
             }
         }
 }
