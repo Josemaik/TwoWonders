@@ -862,9 +862,9 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                 }
                 else if (typeBala == ElementalType::Neutral) {
                     li.decreaseLife(damage);
-                    if (balaCol.attackType & AttackType::GollemAttack) {
-                        em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
-                    }
+                    // if (balaCol.attackType & AttackType::GollemAttack) {
+                    //     em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
+                    // }
                 }
                 else
                 {
@@ -872,9 +872,9 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                     // if(ent2Ptr->hasTag<GolemTag>()){
                     //     em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
                     // }
-                    // if (balaCol.attackType & AttackType::GollemAttack) {
-                    //     em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
-                    // }
+                    if (balaCol.attackType & AttackType::GollemAttack) {
+                        em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
+                    }
                 }
             }
         }

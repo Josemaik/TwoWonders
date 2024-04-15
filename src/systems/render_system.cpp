@@ -636,7 +636,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 else if (e.hasTag<SnowmanTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
-                    pos.setY(pos.y() - 1.1);
+                    pos.setY(pos.y() - 2.0);
                     in = true;
                 }
                 else if (e.hasTag<SpiderTag>())
