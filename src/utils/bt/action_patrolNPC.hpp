@@ -38,6 +38,9 @@ struct BTAction_PatrolNPC : BTNode_t {
                 if (calculateSteering<4>(ectx, ectx.npc->pathIt, ectx.npc->path)) {
                     ectx.npc->tp = false;
                     ectx.npc->path_finaliced = true;
+                    
+                    if(li.mapID == 1)
+                        li.insertDeath(ectx.ent.getID());
 
                     if (li.mapID == 2)
                         addDialogEvent(ectx, 21);
