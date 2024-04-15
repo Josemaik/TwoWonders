@@ -116,8 +116,8 @@ struct SoundSystem {
 
     void update();
     void clear();
-    //float getVolume();
-    //void setVolume(float volumen);
+    float getVolumeMaster();
+    void setVolumeMaster(float volumen);
     bool pushed{ false };
     bool music_started{ false };
     bool ambient_started{ false};
@@ -140,6 +140,10 @@ private:
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_SFX;
+    FMOD_STUDIO_BUS* bus;
+    FMOD_CHANNELGROUP *masterGroup;
+    
+    
      
     FMOD_RESULT res;
     float* volume;

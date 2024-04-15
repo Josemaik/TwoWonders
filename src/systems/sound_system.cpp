@@ -17,6 +17,7 @@ SoundSystem::SoundSystem() {
     ERRCHECK(FMOD_System_SetSoftwareFormat(coreSystem, 0, FMOD_SPEAKERMODE_5POINT1, 0));
     ERRCHECK(FMOD_System_SetOutput(coreSystem, FMOD_OUTPUTTYPE_AUTODETECT));
     ERRCHECK(FMOD_Studio_System_Initialize(soundSystem, 512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0));
+
 }
 
 void SoundSystem::initBanks(const char* master_bank_location, const char* master_string_location, const char* ui_bank_location, const char* ambient_bank_location, const char* music_bank_location, const char* SFX_bank_location)
@@ -630,11 +631,32 @@ void SoundSystem::SFX_stop() {
     update();
 }
 
-/*float SoundSystem::getVolume(){
-    eventInstance_Musica->getVolume(volume, finalvolume);
-    float volumen = volume;
-    return volumen;
+float SoundSystem::getVolumeMaster(){
+    
+    FMOD_RESULT result;
+
+    result = FMOD_System_GetMasterChannelGroup( coreSystem, &masterGroup );
+
+    if(result != FMOD_OK){
+        fprintf(stderr, "%s\n", FMOD_ErrorString(result));
+        exit(-1);
+    }
+
+    float currentVolume;
+    result = FMOD_ChannelGroup_GetVolume(masterGroup, &currentVolume);
+    if(result != FMOD_OK){
+        fprintf(stderr, "%s\n", FMOD_ErrorString(result));
+        exit(-1);
+    }
+    return currentVolume;
 }
-void SoundSystem::setVolume(float volumen){
-    eventInstance_Musica->setVolume(volumen);
-}*/
+void SoundSystem::setVolumeMaster(float volumen){
+    FMOD_System_GetMasterChannelGroup( coreSystem, &masterGroup );
+
+    FMOD_RESULT result;
+
+    result = FMOD_ChannelGroup_SetVolume(masterGroup, volumen);
+
+
+}
+
