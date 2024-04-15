@@ -85,7 +85,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
 
             // Si el player se encuentra a una altura mayor o menor que el enemigo
             // que sea superior a 1 metro no puede ser visto por el enemigo
-            if(ectx.ent.hasTag<SnowmanTag>()){
+            if(ectx.ent.hasTag<SnowmanTag>() || ectx.ent.hasTag<GolemTag>()){
                 if(std::abs(getplayerphy(ectx).position.y() - ectx.phy.position.y()) > 7.0){
                             ectx.ai->playerdetected = false;
                             ectx.ai->alert_state = false;

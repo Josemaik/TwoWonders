@@ -1757,9 +1757,9 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                                         {
                                         if (engine.isGamepadAvailable(0))
                                             gif = &engine.gifs.at("r2");
-                                        else
+                                        else{
                                             gif = &engine.gifs.at("espacio");
-
+                                        }
                                             break;
                                         }
                                         case 1:
