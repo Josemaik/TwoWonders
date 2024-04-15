@@ -759,7 +759,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     else if (e.hasTag<GolemTag>())
     {
-        r.model = engine.loadModel("assets/models/Golem.obj");
+        r.model = engine.loadModel("assets/Personajes/Enemigos/Golem/Golem.obj");
         loadShaders(r.model);
     }
     else if (e.hasTag<SpiderTag>())
