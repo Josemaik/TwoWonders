@@ -168,6 +168,6 @@ struct PlayerInfo
         hasBoots = false;
         hasHat = false;
         hasKey = false;
-        //spawnPoint = { -30.24, 49.0, -26.59};
+        // spawnPoint = { 33.0, 4.0, -25.9 };
     }
 };

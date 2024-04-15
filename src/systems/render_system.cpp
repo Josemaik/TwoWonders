@@ -1023,7 +1023,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     else if (e.hasTag<TableTag>())
     {
-        r.model = engine.loadModel("assets/Assets/Mesa_investigador/Mesa-investigador.obj");
+        // r.model = engine.loadModel("assets/Assets/Mesa_investigador/Mesa-investigador.obj");
 
         loadShaders(r.model);
     }
@@ -1642,14 +1642,15 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
                         aic.endangle += aic.increase_angle;
                     }
                 }
-                ENGI::GameEngine::Gif *oido{nullptr};
+                ENGI::GameEngine::Gif* oido{ nullptr };
                 Texture2D copy{};
-                if(std::abs(aic.endangle) >= 0.0 && std::abs(aic.endangle) <= 180.0){
+                if (std::abs(aic.endangle) >= 0.0 && std::abs(aic.endangle) <= 180.0) {
                     oido = &engine.gifs.at("Oido_parp1");
                     copy = oido->texture;
-                }else if(std::abs(aic.endangle) >= 180.0 && std::abs(aic.endangle <= 360.0)){
+                }
+                else if (std::abs(aic.endangle) >= 180.0 && std::abs(aic.endangle <= 360.0)) {
                     oido = &engine.gifs.at("Oido_parp2");
-                    copy = oido->texture; 
+                    copy = oido->texture;
                 }
                 copy.width = static_cast<int>(copy.width / oido->reScaleX);
                 copy.height = static_cast<int>(copy.height / oido->reScaleY);
@@ -1755,25 +1756,25 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                                 }
                                 else
                                 {
-                                    switch(li.mapID)
+                                    switch (li.mapID)
                                     {
-                                        case 0:
-                                        {
+                                    case 0:
+                                    {
                                         if (engine.isGamepadAvailable(0))
                                             gif = &engine.gifs.at("r2");
-                                        else{
+                                        else {
                                             gif = &engine.gifs.at("espacio");
                                         }
-                                            break;
-                                        }
-                                        case 1:
-                                        {
-                                            if (engine.isGamepadAvailable(0))
-                                                gif = &engine.gifs.at("cuadrado");
-                                            else
-                                                gif = &engine.gifs.at("j");
-                                            break;
-                                        }
+                                        break;
+                                    }
+                                    case 1:
+                                    {
+                                        if (engine.isGamepadAvailable(0))
+                                            gif = &engine.gifs.at("cuadrado");
+                                        else
+                                            gif = &engine.gifs.at("j");
+                                        break;
+                                    }
                                     }
                                 }
 
@@ -2042,10 +2043,12 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
 
                 if (e.hasTag<ChestTag>())
                 {
-                    auto& swordText = engine.textures["batalla"];
+                    auto swordText = engine.textures["batalla"];
+                    swordText.width = static_cast<int>(swordText.width / 2);
+                    swordText.height = static_cast<int>(swordText.height / 2);
                     engine.drawTexture(swordText,
                         static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(swordText.width / 2)),
-                        static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13),
+                        static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9.5),
                         { 255, 255, 255, 255 });
 
                     auto& ch = em.getComponent<ChestComponent>(e);
@@ -2060,7 +2063,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                         auto posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 12);
 
                         // Dibujamos el num / 4
-                        engine.drawTexture(textureNum, posX, posY, { 255, 255, 255, 255 });
+                        engine.drawTexture(textureNum, posX + 3, posY, { 255, 255, 255, 255 });
                         engine.drawTexture(textureBar, posX + textureNum.width / 3, posY, { 255, 255, 255, 255 });
                         engine.drawTexture(textureMax, posX + textureNum.width / 2 + textureBar.width / 2, posY + 20, { 255, 255, 255, 255 });
                     }
@@ -2073,7 +2076,8 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                 if (!chest.isOpen)
                 {
                     auto& phy = em.getComponent<PhysicsComponent>(e);
-                    if (phy.position.distance(li.enemyToChestPos) < 50.0)
+                    auto& ch = em.getComponent<ChestComponent>(e);
+                    if (phy.position.distance(li.enemyToChestPos) < 50.0 && ch.closeEnemies == 0)
                     {
                         if (elapsed_Lock < elapsed_limit_Lock)
                         {
@@ -2558,18 +2562,18 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
     if (!plfi.spells.empty())
     {
         static std::map<std::size_t, std::pair<int, int>> spellPositions = {
-            {0, {engine.getScreenWidth() - 270, 20}},
-            {1, {engine.getScreenWidth() - 210, 110}},
-            {2, {engine.getScreenWidth() - 110, 150}}
+            {0, {engine.getScreenWidth() - 280, 20}},
+            {1, {engine.getScreenWidth() - 210, 125}},
+            {2, {engine.getScreenWidth() - 110, 165}}
         };
 
         static std::map<Spells, std::tuple<std::string, std::string, int, int, float>> spellToTexture = {
             {Spells::WaterBomb, {"pompas", "exp_pompa", 10, 15, 2.5f}},
-            {Spells::WaterDash, {"dash", "exp_dash", 15, 17, 2.75f}},
-            {Spells::FireBall, {"bola_fuego", "exp_bola_f", 17, 22, 2.75f}},
-            {Spells::FireMeteorites, {"meteoritos", "exp_pompa", 15, 17, 2.75f}},
-            {Spells::IceShards, {"estacas", "exp_pompa", 15, 17, 2.75f}},
-            {Spells::IceShield, {"escudo", "exp_pompa", 15, 17, 2.75f}},
+            {Spells::WaterDash, {"dash", "exp_dash", 5, 5, 2.5f}},
+            {Spells::FireBall, {"bola_fuego", "exp_bola_f", 15, 17, 2.55f}},
+            {Spells::FireMeteorites, {"meteoritos", "exp_pompa", 15, 17, 2.5f}},
+            {Spells::IceShards, {"estacas", "exp_pompa", 15, 17, 2.5f}},
+            {Spells::IceShield, {"escudo", "exp_pompa", 15, 17, 2.5f}},
         };
 
         for (std::size_t i = 0; i < plfi.spellSlots.size(); i++)
@@ -2659,8 +2663,8 @@ void RenderSystem::drawStaff(GameEngine& engine, EntityManager& em)
 
     if (plfi.hasStaff)
     {
-        handleAnimatedTexture("4_pl", "placeholder", engine.getScreenWidth() - 140, 45, engine.textures["placeholder"], 2.75f);
-        handleAnimatedTexture("palo", "palo", engine.getScreenWidth() - 125, 60, engine.textures["palo"], 2.85f);
+        handleAnimatedTexture("4_pl", "placeholder", engine.getScreenWidth() - 110, 45, engine.textures["placeholder"], 2.75f);
+        handleAnimatedTexture("palo", "palo", engine.getScreenWidth() - 95, 60, engine.textures["palo"], 2.85f);
     }
 }
 
@@ -2668,16 +2672,21 @@ void RenderSystem::drawAnimatedTextures(GameEngine& engine)
 {
     for (auto& [_, textureInfo] : animatedTextures)
     {
+        bool a = false;
         // Calculamos el factor de escala
         textureInfo.scaleFactor = 3.5f - textureInfo.scaleChange * textureInfo.lerpFactor;
+        int& width = textureInfo.width;
+        int& height = textureInfo.height;
 
         // Calcula la posición del centro de la pantalla
-        int centerX = static_cast<int>(static_cast<float>(engine.getScreenWidth() / 2) - static_cast<float>(textureInfo.width) * textureInfo.scaleFactor / 2);
-        int centerY = static_cast<int>(static_cast<float>(engine.getScreenHeight() / 2 - (50)) - static_cast<float>(textureInfo.height) * textureInfo.scaleFactor / 2);
+        int centerX = static_cast<int>(static_cast<float>(engine.getScreenWidth() / 2) - static_cast<float>(width) * textureInfo.scaleFactor / 2);
+        int centerY = static_cast<int>(static_cast<float>(engine.getScreenHeight() / 2 - (50)) - static_cast<float>(width) * textureInfo.scaleFactor / 2);
 
         // Interpola entre el centro de la pantalla y la posición objetivo
         int posX = static_cast<int>(static_cast<float>(centerX) + textureInfo.lerpFactor * static_cast<float>(textureInfo.targetPosX - centerX));
         int posY = static_cast<int>(static_cast<float>(centerY) + textureInfo.lerpFactor * static_cast<float>(textureInfo.targetPosY - centerY));
+
+        engine.drawTexture(engine.textures[textureInfo.textureName], posX, posY, { 255, 255, 255, 255 }, textureInfo.scaleFactor);
 
         // Si el tiempo transcurrido es menor que 1.5 segundos, no hagas nada
         if (textureInfo.elapsed < 2.5f)
@@ -2691,10 +2700,56 @@ void RenderSystem::drawAnimatedTextures(GameEngine& engine)
             textureInfo.lerpFactor += textureInfo.lerpSpeed;
             if (textureInfo.lerpFactor > 1.0f)
                 textureInfo.lerpFactor = 1.0f;
-        }
 
-        engine.drawTexture(engine.textures[textureInfo.textureName], posX, posY, { 255, 255, 255, 255 }, textureInfo.scaleFactor);
+            if (textureInfo.textureName == "placeholder")
+            {
+                drawSmallButtons(engine, _, posX, posY, width, height);
+            }
+        }
     }
+}
+
+void RenderSystem::drawSmallButtons(GameEngine& engine, const std::string& name, int posX, int posY, int width, int height)
+{
+    std::string texture = "";
+    posX += width / 1.6;
+    posY += height / 1.4;
+
+    if (name == "1_pl")
+    {
+        if (engine.isGamepadAvailable(0))
+            texture = "boton_cuadrado";
+        else
+            texture = "tecla_j";
+    }
+    else if (name == "2_pl")
+    {
+        if (engine.isGamepadAvailable(0))
+            texture = "boton_circulo";
+        else
+            texture = "tecla_k";
+    }
+    else if (name == "3_pl")
+    {
+        if (engine.isGamepadAvailable(0))
+            texture = "boton_triangulo";
+        else
+            texture = "tecla_l";
+    }
+    else if (name == "4_pl")
+    {
+        if (engine.isGamepadAvailable(0))
+            texture = "boton_r2";
+        else
+        {
+            texture = "tecla_espacio";
+            posX -= width / 1.6;
+            posY -= height / 6.5;
+        }
+    }
+
+
+    engine.drawTexture(engine.textures[texture], posX, posY, { 255, 255, 255, 255 });
 }
 
 void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)

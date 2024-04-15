@@ -38,7 +38,7 @@ void SoundSystem::createEventInstance() {
 }
 
 
-void SoundSystem::play_music(){
+void SoundSystem::play_music() {
     FMOD_Studio_EventInstance_Start(eventInstance_Musica);
     update();
 }
@@ -46,14 +46,14 @@ void SoundSystem::play_music(){
 void SoundSystem::playMusicMenu() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/Menu/menu_music", &eventDescription_Musica));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica));
-   play_music();
+    play_music();
 }
 
 
 void SoundSystem::sonido_music_volcan() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_volcan", &eventDescription_Musica));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica));
-    
+
     play_music();
 }
 
@@ -66,14 +66,14 @@ void SoundSystem::sonido_music_mazmorra() {
 void SoundSystem::sonido_music_monte() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_monte", &eventDescription_Musica));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_Musica));
-    
+
     play_music();
 }
 
 void SoundSystem::sonido_music_pradera() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_pradera", &eventDescription_Musica));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_Musica));
-    
+
     play_music();
     update();
 }
@@ -631,33 +631,33 @@ void SoundSystem::SFX_stop() {
     update();
 }
 
-float SoundSystem::getVolumeMaster(){
-    
+float SoundSystem::getVolumeMaster() {
+
     FMOD_RESULT result;
 
-    result = FMOD_System_GetMasterChannelGroup( coreSystem, &masterGroup );
+    result = FMOD_System_GetMasterChannelGroup(coreSystem, &masterGroup);
 
-    if(result != FMOD_OK){
+    if (result != FMOD_OK) {
         fprintf(stderr, "%s\n", FMOD_ErrorString(result));
         exit(-1);
     }
 
     float currentVolume;
     result = FMOD_ChannelGroup_GetVolume(masterGroup, &currentVolume);
-    if(result != FMOD_OK){
+    if (result != FMOD_OK) {
         fprintf(stderr, "%s\n", FMOD_ErrorString(result));
         exit(-1);
     }
     return currentVolume;
 }
-void SoundSystem::setVolumeMaster(float volumen){
-    FMOD_System_GetMasterChannelGroup( coreSystem, &masterGroup );
+void SoundSystem::setVolumeMaster(float volumen) {
+    FMOD_System_GetMasterChannelGroup(coreSystem, &masterGroup);
 
-    FMOD_RESULT result;
+    [[maybe_unused]] FMOD_RESULT result;
 
     result = FMOD_ChannelGroup_SetVolume(masterGroup, volumen);
 
-     if(result != FMOD_OK){
+    if (result != FMOD_OK) {
         fprintf(stderr, "%s\n", FMOD_ErrorString(result));
         exit(-1);
     }

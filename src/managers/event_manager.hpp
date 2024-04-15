@@ -34,6 +34,7 @@ enum EventCodes : uint16_t
     DialogCatVolcano3,
     DialogNomadVolcano3,
     TPBoat,
+    ViewPointNomadDoor,
     MAX
 };
 
@@ -170,6 +171,13 @@ public:
                     {
                         auto& li = em.getSingleton<LevelInfo>();
                         li.viewPoint = { 15.153, 18.593, 85.767 };
+                        li.viewPointSound = true;
+                        break;
+                    }
+                    case EventCodes::ViewPointNomadDoor:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        li.viewPoint = { -15.847, 16.593, 234.267 };
                         li.viewPointSound = true;
                         break;
                     }
@@ -391,7 +399,7 @@ public:
                             "Mago: \n¿¡Quéeeee!? ¡¿Estallar!? ¡¿Cómo?!",
                             "Investigador: \nAsí es, pero no te alarmes, porque me vas a ayudar a \nreconstruir mi barca para salir de aquí.",
                             "Mago: \n¿Una barca?",
-                            "Investigador: \nEfectivamente, los monstruos me desperdigaron \nlas piezas por todo el lugar.", 
+                            "Investigador: \nEfectivamente, los monstruos me desperdigaron \nlas piezas por todo el lugar.",
                             "Investigador: \nAyúdame a recuperarlas\ny saldremos de aquí antes de la explosión.",
                             "Mago: \n¡Entiendo, déjalo en mis manos!"
                         };

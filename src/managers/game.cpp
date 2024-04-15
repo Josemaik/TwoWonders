@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = {-30.24, 49.0, -26.59};
+        plfi.spawnPoint = { -7.55, 40.0, 16.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -242,9 +242,6 @@ void Game::run()
             if (em.getEntities().empty() || li.resetGame)
                 resetGame();
 
-            if (li.resetFromDeath)
-                resetDeath();
-
             if (!map.isComplete())
             {
                 if (!li.isCharging() && li.loading)
@@ -264,6 +261,9 @@ void Game::run()
 
             if (li.isCharging())
                 render_system.drawChargeScreen(engine, em);
+
+            if (li.resetFromDeath)
+                resetDeath();
 
             input_system.update(em, engine);
             debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();

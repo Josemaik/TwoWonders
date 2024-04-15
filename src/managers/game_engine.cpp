@@ -34,13 +34,19 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImage("empty_ice_heart", "assets/HUD/corazon_escudo_v2.png");
 
     // Mago Happy HUD
-    loadAndResizeImage("mago_happy", "assets/HUD/mago_happy.png");
+    loadAndResizeImage("mago_happy", "assets/HUD/caras/mago_happy.png");
 
     // Mago Meh HUD
-    loadAndResizeImage("mago_meh", "assets/HUD/mago_meh.png");
+    loadAndResizeImage("mago_meh", "assets/HUD/caras/mago_meh.png");
 
     // Mago SOS HUD
-    loadAndResizeImage("mago_sos", "assets/HUD/mago_sos.png");
+    loadAndResizeImage("mago_sos", "assets/HUD/caras/mago_sos.png");
+
+    // Nómada HUD
+    loadAndResizeImage("nomada", "assets/HUD/caras/calabaza3.png");
+
+    // Investigador HUD
+    loadAndResizeImage("investigador", "assets/HUD/caras/investigador.png");
 
     // Barra de maná HUD
     loadAndResizeImage("mana", "assets/HUD/mana_bar.png");
@@ -95,6 +101,30 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Icono Batalla HUD
     loadAndResizeImage("batalla", "assets/HUD/batalla.png");
+
+    // Botón círculo HUD 
+    loadAndResizeImage("boton_circulo", "assets/HUD/botones/cont_circulo.png");
+
+    // Botón cuadrado HUD
+    loadAndResizeImage("boton_cuadrado", "assets/HUD/botones/cont_cuadrado.png");
+
+    // Botón triángulo HUD
+    loadAndResizeImage("boton_triangulo", "assets/HUD/botones/cont_triangulo.png");
+
+    // Botón R2 HUD
+    loadAndResizeImage("boton_r2", "assets/HUD/botones/cont_R2.png");
+
+    // Tecla J HUD
+    loadAndResizeImage("tecla_j", "assets/HUD/teclas/cont_J.png");
+
+    // Tecla K HUD
+    loadAndResizeImage("tecla_k", "assets/HUD/teclas/cont_K.png");
+
+    // Tecla L HUD
+    loadAndResizeImage("tecla_l", "assets/HUD/teclas/cont_L.png");
+
+    // Tecla Espacio HUD
+    loadAndResizeImage("tecla_espacio", "assets/HUD/teclas/cont_space.png");
 
     // NÚMEROS Y SÍMBOLOS NUMÉRICOS
     //
@@ -194,7 +224,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Botón R1
     loadAndResizeImageGif("r1", "assets/HUD/botones/R1.gif", 0, 55);
-    
+
     //Detección por oído
     loadAndResizeImageGif("Oido_parp1", "assets/HUD/gifs/Oido_parp1.gif", 0, 55);
     loadAndResizeImageGif("Oido_parp2", "assets/HUD/gifs/Oido_parp2.gif", 0, 55);
