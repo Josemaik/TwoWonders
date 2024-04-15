@@ -796,7 +796,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/Niveles/Lvl_1/Objs/lvl_1-cnk_0.obj");
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_0.obj");
             break;
         case 2:
             r.model = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_0.obj");
@@ -814,7 +814,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/Niveles/Lvl_1/Objs/lvl_1-cnk_1.obj");
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_1.obj");
             break;
         case 2:
             r.model = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_1.obj");
@@ -831,7 +831,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/Niveles/Lvl_1/Objs/lvl_1-cnk_2.obj");
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_2.obj");
             break;
         case 2:
             r.model = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_2.obj");
@@ -848,7 +848,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/Niveles/Lvl_1/Objs/lvl_1-cnk_3.obj");
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_3.obj");
             break;
         case 2:
             r.model = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_3.obj");
@@ -865,7 +865,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/Niveles/Lvl_1/Objs/lvl_1-cnk_4.obj");
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_4.obj");
             break;
         }
         loadShaders(r.model);
@@ -879,7 +879,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/Niveles/Lvl_1/Objs/lvl_1-cnk_5.obj");
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_5.obj");
             break;
         }
         loadShaders(r.model);
@@ -893,7 +893,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/Niveles/Lvl_1/Objs/lvl_1-cnk_6.obj");
+            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_6.obj");
             break;
         }
         loadShaders(r.model);
