@@ -39,8 +39,8 @@ void PhysicsSystem::update(EntityManager& em)
         vel.setY(vel.y() - phy.gravity);
 
         // Normalizamos la velocidad
-        if (std::abs(vel.x()) > phy.max_speed || std::abs(vel.y()) > phy.max_speed || std::abs(vel.z()) > phy.max_speed)
-            vel.normalize();
+        // if (std::abs(vel.x()) > phy.max_speed || std::abs(vel.y()) > phy.max_speed || std::abs(vel.z()) > phy.max_speed)
+        vel.normalize();
 
         //Stuneo al jugador durante un tiempo provocado por el golpe de un golem
         if (phy.dragActivatedTime) {
@@ -69,7 +69,8 @@ void PhysicsSystem::update(EntityManager& em)
             auto& plfi = em.getSingleton<PlayerInfo>();
             if (plfi.hasBoots && !phy.stopped)
             {
-                vel *= 1.15;
+                auto multiplier = 1.4;
+                vel *= { multiplier, 0, multiplier };
             }
         }
 
@@ -102,10 +103,6 @@ void PhysicsSystem::update(EntityManager& em)
                 }
             }
         }
-
-        // comprobar si están en el suelo
-        if (phy.alreadyGrounded)
-            phy.alreadyGrounded = false;
 
         // auto& ss = em.getSingleton<SoundSystem>();
         if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {

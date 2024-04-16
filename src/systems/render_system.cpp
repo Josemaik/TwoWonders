@@ -1699,7 +1699,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             // Dibujamos el número de monedas en pantalla
             drawCoinBar(engine, em);
 
-            // drawFPSCounter(engine);
+            drawFPSCounter(engine);
 
             // Dibujar el bastón
             drawStaff(engine, em);

@@ -61,7 +61,7 @@ private:
     void enemyCollision(EntityManager& em, Entity& damagedEntity);
     void staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3d& minOverlap);
     void nonStaticCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3d& minOverlap);
-    void groundCollision(PhysicsComponent& playerPhysics, vec3d& playerEsc, vec3d& minOverlap);
+    void groundCollision(PhysicsComponent& playerPhysics, PhysicsComponent& groundPhy, vec3d& minOverlap);
     void floorCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3d& minOverlap);
     void handleCollision(EntityManager& em, Entity& entity1, Entity& entity2, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
     void handleStaticCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);

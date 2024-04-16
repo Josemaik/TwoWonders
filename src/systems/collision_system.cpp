@@ -80,6 +80,13 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree)
 
                     // Marcamos la colisión entre ambas entidades como comprobada
                     checkedPairs[id1][id2] = true;
+
+                    auto& phy1 = em.getComponent<PhysicsComponent>(*e);
+                    auto& phy2 = em.getComponent<PhysicsComponent>(*nEnt);
+
+                    // Actualizamos las cajas de las entidades
+                    c->updateBox(phy1.position, phy1.scale, phy1.gravity, phy1.orientation, phy1.rotationVec);
+                    nCol->updateBox(phy2.position, phy2.scale, phy2.gravity, phy2.orientation, phy2.rotationVec);
                 }
             }
         }
@@ -492,11 +499,8 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Colisiones con el suelo
     if (staticEntPtr->hasTag<GroundTag>() && !otherEntPtr->hasTag<HitPlayerTag>())
     {
-        if (minOverlap.y() <= 1.0 || otherPhy->onRamp || otherPhy->stopped)
-        {
-            groundCollision(*otherPhy, otherPhy->scale, minOverlap);
-            return;
-        }
+        groundCollision(*otherPhy, *staticPhy, minOverlap);
+        return;
     }
 
     // Si el objeto estático es un objeto
@@ -882,16 +886,23 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
 }
 
 // Si chocamos contra el suelo, solo se desplaza en Y
-void CollisionSystem::groundCollision(PhysicsComponent& playerPhysics, vec3d& playerEsc, vec3d& minOverlap)
+void CollisionSystem::groundCollision(PhysicsComponent& playerPhysics, PhysicsComponent& groundPhy, vec3d& minOverlap)
 {
     auto& pos1 = playerPhysics.position;
+    auto& playerEsc = playerPhysics.scale;
 
-    minOverlap += vec3d{ playerEsc.x() / 2, 0.f, playerEsc.z() / 2 };
-    if (!playerPhysics.alreadyGrounded && minOverlap.y() < minOverlap.x() && minOverlap.y() < minOverlap.z())
+    minOverlap += vec3d{ playerEsc.x() / 3.0, 0.f, playerEsc.z() / 3.0 };
+    if ((minOverlap.y() < minOverlap.x() && minOverlap.y() < minOverlap.z()) || playerPhysics.onRamp)
     {
         pos1.setY(pos1.y() + minOverlap.y());
-        playerPhysics.alreadyGrounded = true;
-
+    }
+    else if (minOverlap.x() < minOverlap.z())
+    {
+        resolveCollision<&vec3d::x, &vec3d::setX>(playerPhysics, groundPhy, minOverlap.x());
+    }
+    else
+    {
+        resolveCollision<&vec3d::z, &vec3d::setZ>(playerPhysics, groundPhy, minOverlap.z());
     }
 }
 

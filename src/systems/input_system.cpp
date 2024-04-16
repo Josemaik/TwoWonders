@@ -44,48 +44,48 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         return;
     }
 
-    // // DEBUG PHYSICS
-    // if (ge.isKeyReleased(KEY_F1))
-    // {
-    //     inpi.debugPhy = !inpi.debugPhy;
-    //     inpi.debugAI1 = false;
-    //     inpi.debugAI2 = false;
-    //     inpi.pause = false;
-    //     inpi.inventory = false;
-    //     return;
-    // }
+    // DEBUG PHYSICS
+    if (ge.isKeyReleased(KEY_F1))
+    {
+        inpi.debugPhy = !inpi.debugPhy;
+        inpi.debugAI1 = false;
+        inpi.debugAI2 = false;
+        inpi.pause = false;
+        inpi.inventory = false;
+        return;
+    }
 
-    // //DEBUG AI - Stop Game
-    // if (ge.isKeyReleased(KEY_F2))
-    // {
-    //     inpi.debugAI1 = !inpi.debugAI1;
-    //     inpi.debugPhy = false;
-    //     inpi.debugAI2 = false;
-    //     inpi.pause = false;
-    //     inpi.inventory = false;
-    //     return;
-    // }
+    //DEBUG AI - Stop Game
+    if (ge.isKeyReleased(KEY_F2))
+    {
+        inpi.debugAI1 = !inpi.debugAI1;
+        inpi.debugPhy = false;
+        inpi.debugAI2 = false;
+        inpi.pause = false;
+        inpi.inventory = false;
+        return;
+    }
 
-    // // DEBUG AI - Real Time
-    // if (ge.isKeyReleased(KEY_F3))
-    // {
-    //     inpi.debugAI2 = !inpi.debugAI2;
-    //     inpi.debugPhy = false;
-    //     inpi.debugAI1 = false;
-    //     inpi.pause = false;
-    //     return;
-    // }
+    // DEBUG AI - Real Time
+    if (ge.isKeyReleased(KEY_F3))
+    {
+        inpi.debugAI2 = !inpi.debugAI2;
+        inpi.debugPhy = false;
+        inpi.debugAI1 = false;
+        inpi.pause = false;
+        return;
+    }
 
-    // // DEBUG NAVMESH
-    // if (ge.isKeyReleased(KEY_F4))
-    // {
-    //     inpi.pathfind = !inpi.pathfind;
-    //     inpi.debugPhy = false;
-    //     inpi.debugAI1 = false;
-    //     inpi.debugAI2 = false;
-    //     inpi.pause = false;
-    //     return;
-    // }
+    // DEBUG NAVMESH
+    if (ge.isKeyReleased(KEY_F4))
+    {
+        inpi.pathfind = !inpi.pathfind;
+        inpi.debugPhy = false;
+        inpi.debugAI1 = false;
+        inpi.debugAI2 = false;
+        inpi.pause = false;
+        return;
+    }
 
     // Sacamos las físicas y el input del jugador
     auto& phy = em.getComponent<PhysicsComponent>(player);
@@ -151,8 +151,8 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
 
                 if (keysPressed == 2)
                 {
-                    vel.normalize();
-                    vel *= INP_SPEED;
+                    // vel.normalize();
+                    // vel *= INP_SPEED;
                 }
 
                 if (ge.isGamepadAvailable(0))
@@ -182,8 +182,8 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
 
                     // velTime = gami.getTime();
 
-                    if (in.m_joystickX != 0 && in.m_joystickY != 0)
-                        vel.normalize();
+                    // if (in.m_joystickX != 0 && in.m_joystickY != 0)
+                    //     vel.normalize();
                 }
             }
             else
@@ -229,16 +229,16 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
 
                     vel.setY(vel.y() + (-joystick_y) * speed);
 
-                    if (in.m_joystickX != 0 && in.m_joystickY != 0)
-                        vel.normalize();
+                    // if (in.m_joystickX != 0 && in.m_joystickY != 0)
+                    //     vel.normalize();
                 }
             }
 
             // Normalizar la velocidad si se está moviendo en diagonal
-            if (vel.x() > 1.0 && vel.z() > 1.0)
-            {
-                vel.normalize();
-            }
+            // if (vel.x() > 1.0 && vel.z() > 1.0)
+            // {
+            //     vel.normalize();
+            // }
 
             // Guardamos el registro de la velocidad
             gami.addMovementEvent(vel);
