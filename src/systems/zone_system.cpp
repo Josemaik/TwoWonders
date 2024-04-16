@@ -437,6 +437,7 @@ void ZoneSystem::checkLadders(EntityManager& em)
 
             plfi.onLadder = true;
             inpi.interact = false;
+            ic.showButton = false;
         }
     });
 }

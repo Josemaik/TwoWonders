@@ -39,8 +39,8 @@ void PhysicsSystem::update(EntityManager& em)
         vel.setY(vel.y() - phy.gravity);
 
         // Normalizamos la velocidad
-        // if (std::abs(vel.x()) > phy.max_speed || std::abs(vel.y()) > phy.max_speed || std::abs(vel.z()) > phy.max_speed)
-        vel.normalize();
+        if (std::abs(vel.x()) > phy.max_speed || std::abs(vel.y()) > phy.max_speed || std::abs(vel.z()) > phy.max_speed)
+            vel.normalize();
 
         //Stuneo al jugador durante un tiempo provocado por el golpe de un golem
         if (phy.dragActivatedTime) {
@@ -66,8 +66,12 @@ void PhysicsSystem::update(EntityManager& em)
                 em.getSingleton<BlackBoard_t>().playerhunted = false;
             }
 
+            // Normalizamos la velocidad del jugador siempre
             auto& plfi = em.getSingleton<PlayerInfo>();
-            if (plfi.hasBoots && !phy.stopped)
+            if (!plfi.onLadder)
+                vel.normalize();
+
+            if (plfi.hasBoots && !phy.stopped && !plfi.onLadder)
             {
                 auto multiplier = 1.4;
                 vel *= { multiplier, 0, multiplier };

@@ -233,7 +233,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         auto& e{ em.newEntity() };
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 10.0f, 0.1f, 10.0f }, .color = BLUE });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.001 });
-        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 0.5f });
+        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 0.4f });
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Water });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
         break;
@@ -408,8 +408,8 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
             auto pos = originalPos + (posCopy - originalPos) * (i / distance);
             auto& e{ em.newEntity() };
             auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = { 2.0f, 0.1f, 2.0f }, .color = BLUE });
-            auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.1 });
-            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 4.0f });
+            auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.5 });
+            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 0.5f });
             em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Water });
             em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
         }
@@ -425,11 +425,11 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
         // Creamos el hechizo
         auto& e{ em.newEntity() };
         em.addTag<HitPlayerTag>(e);
-        att.vel.setY(0.3);
+        att.vel.setY(0.7);
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
         em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f });
+        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.07f });
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = eleType });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
 

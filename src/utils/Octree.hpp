@@ -1,14 +1,14 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include <unordered_map>
+#include <map>
 #include "../utils/types.hpp"
 #include "../utils/BBox.hpp"
 #include "../components/collider_component.hpp"
 
 struct Octree
 {
-    using OctMap = std::unordered_map<Entity*, ColliderComponent*>;
+    using OctMap = std::map<Entity*, ColliderComponent*>;
 
     Octree(uint8_t depth, const BBox& bounds, const Octree* parent = nullptr, std::size_t max = MAX_ENTITIES)
         : bounds_(bounds), depth_(depth), parent_(const_cast<Octree*>(parent)), max_ent_(max)

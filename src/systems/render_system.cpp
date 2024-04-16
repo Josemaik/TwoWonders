@@ -2778,31 +2778,21 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     engine.drawRectangle(static_cast<int>(posX), static_cast<int>(posY), static_cast<int>(boxWidth), static_cast<int>(boxHeight), WHITE);
     GuiTextBox({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.second.size()), false);
 
+    std::map<SpeakerType, std::string> speakerTextures = {
+        {SpeakerType::PLAYER, "mago_happy"},
+        {SpeakerType::PLAYER_SAD, "mago_meh"},
+        {SpeakerType::PLAYER_DANGER, "mago_sos"},
+        {SpeakerType::CAT, "investigador"},
+        {SpeakerType::NOMAD, "nomada"},
+        {SpeakerType::INVESTIGATOR, "investigador"}
+    };
+
+    engine.drawRectangle(static_cast<int>(posX), static_cast<int>(posY), static_cast<int>(boxWidth), static_cast<int>(boxHeight), WHITE);
+    GuiTextBox({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.second.size()), false);
+
     float offSetX = 40.0;
-    switch (str.first)
-    {
-    case SpeakerType::NONE:
-        break;
-    case SpeakerType::PLAYER:
-        engine.drawTexture(engine.textures["mago_happy"], static_cast<int>(posX - offSetX), static_cast<int>(posY - 50), { 255, 255, 255, 255 });
-        break;
-    case SpeakerType::PLAYER_SAD:
-        engine.drawTexture(engine.textures["mago_meh"], static_cast<int>(posX - offSetX), static_cast<int>(posY - 50), { 255, 255, 255, 255 });
-        break;
-    case SpeakerType::PLAYER_DANGER:
-        engine.drawTexture(engine.textures["mago_sos"], static_cast<int>(posX - offSetX), static_cast<int>(posY - 50), { 255, 255, 255, 255 });
-        break;
-    case SpeakerType::CAT:
-        engine.drawTexture(engine.textures["investigador"], static_cast<int>(posX - offSetX), static_cast<int>(posY - 50), { 255, 255, 255, 255 });
-        break;
-    case SpeakerType::NOMAD:
-        engine.drawTexture(engine.textures["nomada"], static_cast<int>(posX - offSetX), static_cast<int>(posY - 50), { 255, 255, 255, 255 });
-        break;
-    case SpeakerType::INVESTIGATOR:
-        engine.drawTexture(engine.textures["investigador"], static_cast<int>(posX - offSetX), static_cast<int>(posY - 50), { 255, 255, 255, 255 });
-        break;
-    default:
-        break;
+    if (speakerTextures.count(str.first) > 0) {
+        engine.drawTexture(engine.textures[speakerTextures[str.first]], static_cast<int>(posX - offSetX), static_cast<int>(posY - 50), { 255, 255, 255, 255 });
     }
 
     auto& inpi = em.getSingleton<InputInfo>();

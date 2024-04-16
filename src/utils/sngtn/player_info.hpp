@@ -165,7 +165,7 @@ struct PlayerInfo
         mana_width = 0;
         onLadder = false;
         hasStaff = false;
-        hasBoots = false;
+        hasBoots = true;
         hasHat = false;
         hasKey = false;
         // spawnPoint = { 33.0, 4.0, -25.9 };

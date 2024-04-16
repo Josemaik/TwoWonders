@@ -120,7 +120,6 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
                     vel.setX(vel.x() - INP_SPEED);
                     vel.setZ(vel.z() + INP_SPEED);
 
-                    // velTime = gami.getTime();
                     keysPressed++;
                 }
                 if (ge.isKeyDown(in.left))
@@ -128,7 +127,6 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
                     vel.setX(vel.x() + INP_SPEED);
                     vel.setZ(vel.z() - INP_SPEED);
 
-                    // velTime = gami.getTime();
                     keysPressed++;
                 }
                 if (ge.isKeyDown(in.up))
@@ -136,7 +134,6 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
                     vel.setX(vel.x() + INP_SPEED);
                     vel.setZ(vel.z() + INP_SPEED);
 
-                    // velTime = gami.getTime();
                     keysPressed++;
                 }
                 if (ge.isKeyDown(in.down))
@@ -145,14 +142,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
                     vel.setX(vel.x() - INP_SPEED);
                     vel.setZ(vel.z() - INP_SPEED);
 
-                    // velTime = gami.getTime();
                     keysPressed++;
-                }
-
-                if (keysPressed == 2)
-                {
-                    // vel.normalize();
-                    // vel *= INP_SPEED;
                 }
 
                 if (ge.isGamepadAvailable(0))
@@ -179,11 +169,6 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
 
                     vel.setX(vel.x() + (-joystick_y + joystick_x) * speed);
                     vel.setZ(vel.z() + (-joystick_y - joystick_x) * speed);
-
-                    // velTime = gami.getTime();
-
-                    // if (in.m_joystickX != 0 && in.m_joystickY != 0)
-                    //     vel.normalize();
                 }
             }
             else
@@ -197,12 +182,6 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
                 {
                     vel.setY(vel.y() - INP_SPEED);
                     keysPressed++;
-                }
-
-                if (keysPressed == 2)
-                {
-                    vel.normalize();
-                    vel *= INP_SPEED;
                 }
 
                 if (ge.isGamepadAvailable(0))
@@ -228,17 +207,8 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
                     float speed = (std::abs(joystick_x) > slowzone || std::abs(joystick_y) > slowzone) ? INP_SPEED : INP_SPEED / 4;
 
                     vel.setY(vel.y() + (-joystick_y) * speed);
-
-                    // if (in.m_joystickX != 0 && in.m_joystickY != 0)
-                    //     vel.normalize();
                 }
             }
-
-            // Normalizar la velocidad si se está moviendo en diagonal
-            // if (vel.x() > 1.0 && vel.z() > 1.0)
-            // {
-            //     vel.normalize();
-            // }
 
             // Guardamos el registro de la velocidad
             gami.addMovementEvent(vel);
