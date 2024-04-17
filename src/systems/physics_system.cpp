@@ -74,7 +74,7 @@ void PhysicsSystem::update(EntityManager& em)
             if (plfi.hasBoots && !phy.stopped && !plfi.onLadder)
             {
                 auto multiplier = 1.4;
-                vel *= { multiplier, 0, multiplier };
+                vel *= multiplier;
             }
         }
 

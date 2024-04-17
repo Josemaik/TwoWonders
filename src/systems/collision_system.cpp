@@ -487,10 +487,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         std::swap(behaviorType1, behaviorType2);
 
         if (otherEntPtr->hasTag<GroundTag>())
-        {
-            // floorCollision(*staticPhy, *otherPhy, minOverlap);
             return;
-        }
 
         if (otherEntPtr->hasTag<WallTag>())
             return;
@@ -645,7 +642,9 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         {
             resolvePlayerDirection(*staticPhy, *otherPhy, true);
             em.getSingleton<SoundSystem>().sonido_rebote();
-            return;
+
+            if (!otherEntPtr->hasTag<AngryBushTag>())
+                return;
         }
         else if (otherEntPtr->hasTag<CrusherTag>() || otherEntPtr->hasTag<DummyTag>())
             return;

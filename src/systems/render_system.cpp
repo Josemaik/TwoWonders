@@ -934,13 +934,16 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     else if (e.hasTag<AngryBushTag>())
     {
-        r.model = engine.loadModel("assets/models/Piedra.obj");
+        if (li.mapID == 0)
+            r.model = engine.loadModel("assets/Personajes/Enemigos/Piedra/Piedra_1.obj");
+        else
+            r.model = engine.loadModel("assets/Personajes/Enemigos/Piedra/Piedra_3.obj");
 
         loadShaders(r.model);
     }
     else if (e.hasTag<AngryBushTag2>())
     {
-        r.model = engine.loadModel("assets/models/PiedraV2.obj");
+        r.model = engine.loadModel("assets/Personajes/Enemigos/Piedra/Piedra_2.obj");
 
         loadShaders(r.model);
     }

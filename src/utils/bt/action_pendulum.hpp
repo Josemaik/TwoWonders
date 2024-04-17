@@ -40,7 +40,9 @@ struct BTAction_Pendulum : BTNode_t {
                 }
 
                 ectx.phy.velocity = { abc.vel.x() * ectx.phy.max_speed, 0.0, abc.vel.z() * ectx.phy.max_speed };
-                ectx.phy.max_speed += 0.1;
+
+                if (ectx.phy.max_speed < 3.0)
+                    ectx.phy.max_speed += 0.1;
                 return BTNodeStatus_t::success;
             }
 
