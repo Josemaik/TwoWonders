@@ -23,6 +23,7 @@ struct BTAction_Seek : BTNode_t {
             return BTNodeStatus_t::fail;
         }
         ectx.ai->bh = "seeking";
+        ectx.ai->seeking = true;
         ectx.ai->ispushed = false;
         // ectx.ai->ia_front_of_you = false;
         //Seek

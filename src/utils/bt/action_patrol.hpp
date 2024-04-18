@@ -29,15 +29,18 @@ struct BTAction_Patrol : BTNode_t {
         }
 
         //Pathfinding
+        auto& li = ectx.em.getSingleton<LevelInfo>();
         auto& navs = ectx.em.getSingleton<NavmeshInfo>();
         //check distance
-        if(!ectx.ai->check_distance){
-            auto disaux = ectx.phy.position.distance(*ectx.ai->path.begin());
-            if(disaux >= dist_to_spawn){
+        if(!ectx.ai->check_distance && li.mapID == 2){
+            vec3d begin = *ectx.ai->path.begin();
+            double disaux = ectx.phy.position.distance(begin);
+            // double dify = std::abs((ectx.phy.position.y()-2.0)  - begin.y());
+            if(ectx.ai->seeking && disaux >= 3.0){
                 ectx.ai->check_distance = true;
                 ectx.ai->pathfind_active = true;
+                ectx.ai->seeking = false;
                 //calculate path 
-                auto& li = ectx.em.getSingleton<LevelInfo>();
                 auto& debug = ectx.em.getSingleton<Debug_t>();
                 uint16_t startnode = findNearestNode(ectx.em,ectx.phy.position,navs.selectednodes);
                 uint16_t endnode = findNearestNode(ectx.em,*ectx.ai->path.begin(),navs.selectednodes);
@@ -49,7 +52,7 @@ struct BTAction_Patrol : BTNode_t {
         }
         //find path
         Steer_t steering{};
-        if(ectx.ai->pathfind_active){
+        if(ectx.ai->pathfind_active && ectx.ai->found_path.size() != 0){
                 //run found path
                 steering = STBH::Arrive(ectx.phy, *ectx.ai->it_path, ectx.ai->arrival_radius);
                 
