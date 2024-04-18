@@ -200,7 +200,16 @@ void Game::run()
         // CODIGO DE LA PANTALLA DE OPCIONES
         case GameScreen::OPTIONS:
         {
+            input_system.update(em, engine);
             render_system.drawOptions(engine, em, sound_system);
+            break;
+        }
+
+        // CODIGO DE LA PANTALLA DE CONTROLES
+        case GameScreen::CONTROLS:
+        {
+            input_system.update(em, engine);
+            render_system.drawControls(em, engine);
             break;
         }
 

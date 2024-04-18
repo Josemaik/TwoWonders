@@ -78,60 +78,58 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
 
     // Define the current button selection
     auto& currentButton = inpi.currentButton;
+    bool buttonTouched = false;
 
-    // Get the gamepad input
-    if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) { // A on Xbox, X on PlayStation
-        // Press the currently selected button
-        switch (currentButton) {
-        case 0: // "JUGAR"
-            li.currentScreen = GameScreen::STORY;
-            ss.seleccion_menu();
-            ss.music_stop();
-            break;
-        case 1: // "CONFIGURACION"
-            li.currentScreen = GameScreen::OPTIONS;
-            li.previousScreen = GameScreen::TITLE;
-            ss.seleccion_menu();
-            break;
+    // Define the buttons
+    ButtonRect buttons[] = {
+        { btn1Rec, "JUGAR", 0 },
+        { btn2Rec, "CONFIGURACION", 1 },
+    };
+
+    // Control de botones de mando para cambiar el botón seleccionado
+    if (inpi.up || inpi.left) {
+        currentButton = (currentButton > 0) ? currentButton - 1 : sizeof(buttons) / sizeof(ButtonRect) - 1;
+        ss.sonido_mov();
+    }
+    if (inpi.down || inpi.right) {
+        currentButton = (currentButton < sizeof(buttons) / sizeof(ButtonRect) - 1) ? currentButton + 1 : 0;
+        ss.sonido_mov();
+    }
+
+    for (std::size_t i = 0; i < sizeof(buttons) / sizeof(ButtonRect); i++) {
+        ButtonRect& button = buttons[i];
+        bool isCurrent = (currentButton == i);
+        if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
+            (isCurrent && inpi.interact)) {
+            currentButton = i;
+            // Handle the button action
+            switch (button.action) {
+            case 0: // "JUGAR"
+                li.currentScreen = GameScreen::STORY;
+                ss.seleccion_menu();
+                ss.music_stop();
+                break;
+            case 1: // "CONFIGURACION"
+                li.currentScreen = GameScreen::OPTIONS;
+                li.previousScreen = GameScreen::TITLE;
+                ss.seleccion_menu();
+                break;
+            }
+
+            inpi.interact = false;
         }
-    }
-    else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) { // D-Pad Up
-        // Move the selection up
-        currentButton = (currentButton > 0) ? currentButton - 1 : 1;
-        ss.sonido_mov();
-    }
-    else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) { // D-Pad Down
-        // Move the selection down
-        currentButton = (currentButton < 1) ? currentButton + 1 : 0;
-        ss.sonido_mov();
+
+        if (engine.checkCollisionPointRec(GetMousePosition(), button.rect) && !buttonTouched)
+            buttonTouched = true;
     }
 
-    // Draw the buttons
-    if (GuiButton(btn1Rec, (currentButton == 0) ? "[JUGAR]" : "JUGAR") || li.replay) {
-        li.currentScreen = GameScreen::STORY;
-        ss.seleccion_menu();
-        ss.music_stop();
-    }
-
-    if (!li.replay)
+    if (buttonTouched && !ss.pushed)
     {
-        auto& gami = em.getSingleton<GameData>();
-        gami.updateFrameDown();
-    }
-
-    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec)) {
-        if (ss.pushed == false)
-            ss.sonido_mov();
+        ss.sonido_mov();
         ss.pushed = true;
     }
-    else
+    else if (!buttonTouched && ss.pushed)
         ss.pushed = false;
-
-    if (GuiButton(btn2Rec, (currentButton == 1) ? "[CONFIGURACION]" : "CONFIGURACION")) {
-        li.currentScreen = GameScreen::OPTIONS;
-        li.previousScreen = GameScreen::TITLE;
-        ss.seleccion_menu();
-    }
 
     engine.endDrawing();
 }
@@ -155,7 +153,28 @@ void RenderSystem::drawChargeScreen(GameEngine& engine, EntityManager& em)
     auto& li = em.getSingleton<LevelInfo>();
     li.loadingTime += timeStep;
 
+    engine.endDrawing();
+}
 
+void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& inpi = em.getSingleton<InputInfo>();
+
+    if (inpi.interact)
+    {
+        li.currentScreen = li.previousScreen;
+        inpi.interact = false;
+    }
+
+    engine.beginDrawing();
+    engine.clearBackground(Color({ 113, 75, 146, 255 }));
+    engine.textures["mando_explicacion"].width = engine.getScreenWidth() / 1.3;
+    engine.textures["mando_explicacion"].height = static_cast<int>(engine.getScreenHeight() / 1.6);
+    engine.drawTexture(engine.textures["mando_explicacion"],
+        engine.getScreenWidth() / 2 - engine.textures["mando_explicacion"].width / 2,
+        engine.getScreenHeight() / 2 - engine.textures["mando_explicacion"].height / 2,
+        WHITE);
     engine.endDrawing();
 }
 
@@ -163,6 +182,7 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     engine.beginDrawing();
     engine.clearBackground(WHITE);
     auto& li = em.getSingleton<LevelInfo>();
+    auto& inpi = em.getSingleton<InputInfo>();
 
     float buttonWidth = 200.0f;
     float buttonHeight = 50.0f;
@@ -172,16 +192,10 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     auto& sosy = em.getSingleton<SoundSystem>();
     float volumen = sosy.getVolumeMaster() * 100;
     float* vol = &volumen;
-    GuiSliderBar(volumenSlider, "Volumen", NULL, vol, 0, 100);
-    ss.setVolumeMaster(*vol / 100.0f);
-
-
-
-    // Ahora asignamos el nuevo valor al puntero volumen
 
     // Posición del botón de volver
     float posX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2);
-    float posY = static_cast<float>(engine.getScreenHeight() / 2) - (buttonHeight / .5f);
+    float posY = static_cast<float>(engine.getScreenHeight() / 1.2) - (buttonHeight / .5f);
 
     // Botones de resolución
     float posResX = static_cast<float>(100) - (buttonWidth / 2);
@@ -195,50 +209,110 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     Rectangle btn3Rec = { posResX + 250, posResY, buttonWidth, buttonHeight };
     Rectangle btn4Rec = { posResX + 500, posResY, buttonWidth, buttonHeight };
     Rectangle btn5Rec = { posResX + 750, posResY, buttonWidth, buttonHeight };
+    Rectangle btn6Rec = { posX, posY - 150, buttonWidth, buttonHeight };
 
-    if (GuiButton(btn1Rec, "VOLVER")) {
-        li.currentScreen = li.previousScreen;
-        ss.seleccion_menu();
+    // Define the current button selection
+    auto& currentButton = inpi.currentButton;
+    bool buttonTouched = false;
+    bool inpiCheck1 = inpi.up || inpi.left;
+    bool inpiCheck2 = inpi.down || inpi.right;
+
+    // Define the buttons
+    ButtonRect buttons[] = {
+        { btn1Rec, "VOLVER", 0 },
+        { btn2Rec, "800x600", 1 },
+        { btn3Rec, "1280x720", 2 },
+        { btn4Rec, "1920x1080", 3 },
+        { btn5Rec, "FULLSCREEN", 4 },
+        { volumenSlider, "Volumen", 5 },
+        { btn6Rec, "CONTROLES", 6}
+    };
+
+    std::string volName = "Volumen";
+    for (std::size_t i = 0; i < sizeof(buttons) / sizeof(ButtonRect); i++) {
+        ButtonRect& button = buttons[i];
+        bool isCurrent = (currentButton == i);
+        if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
+            (isCurrent && inpi.interact)) {
+            currentButton = i;
+            // Handle the button action
+            switch (button.action) {
+            case 0: // "VOLVER"
+                li.currentScreen = li.previousScreen;
+                ss.seleccion_menu();
+                break;
+            case 1: // "800x600"
+                engine.setWindowSize(800, 600);
+                ss.seleccion_menu();
+                break;
+            case 2: // "1280x720"
+                engine.setWindowSize(1280, 720);
+                ss.seleccion_menu();
+                break;
+            case 3: // "1920x1080"
+                engine.setWindowSize(1920, 1080);
+                ss.seleccion_menu();
+                break;
+            case 4: // "FULLSCREEN"
+                engine.setWindowSize(1920, 1080);
+                fullScreen = true;
+                ss.seleccion_menu();
+                break;
+            case 5: // "Volumen"
+                break;
+            case 6: // "CONTROLES"
+                li.currentScreen = GameScreen::CONTROLS;
+                li.previousScreen = GameScreen::OPTIONS;
+                break;
+            }
+
+            inpi.interact = false;
+        }
+        if (i == 5 && currentButton == i)
+        {
+            if (engine.isGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) {
+                *vol = (*vol < 100) ? *vol + 1 : 100;
+                // ss.sonido_mov();
+            }
+            if (engine.isGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT)) {
+                *vol = (*vol > 0) ? *vol - 1 : 0;
+                // ss.sonido_mov();
+            }
+
+            inpiCheck1 = inpi.up;
+            inpiCheck2 = inpi.down;
+            volName = "[Volumen]";
+        }
+
+        if (engine.checkCollisionPointRec(GetMousePosition(), button.rect) && !buttonTouched)
+            buttonTouched = true;
+    }
+    GuiSliderBar(volumenSlider, NULL, volName.c_str(), vol, 0, 100);
+    ss.setVolumeMaster(*vol / 100.0f);
+
+    // Control de botones de mando para cambiar el botón seleccionado
+    if (inpiCheck1) {
+        currentButton = (currentButton > 0) ? currentButton - 1 : sizeof(buttons) / sizeof(ButtonRect) - 1;
+        ss.sonido_mov();
+    }
+    else if (inpiCheck2) {
+        currentButton = (currentButton < sizeof(buttons) / sizeof(ButtonRect) - 1) ? currentButton + 1 : 0;
+        ss.sonido_mov();
     }
 
-    if (GuiButton(btn2Rec, "800x600"))
+    if (buttonTouched && !ss.pushed)
     {
-        engine.setWindowSize(800, 600);
-        ss.seleccion_menu();
+        ss.sonido_mov();
+        ss.pushed = true;
     }
-
-    if (GuiButton(btn3Rec, "1280x720"))
-    {
-        engine.setWindowSize(1280, 720);
-        ss.seleccion_menu();
-    }
-
-    if (GuiButton(btn4Rec, "1920x1080"))
-    {
-        engine.setWindowSize(1920, 1080);
-        ss.seleccion_menu();
-    }
+    else if (!buttonTouched && ss.pushed)
+        ss.pushed = false;
 
     if (fullScreen)
     {
         engine.setWindowFullScreen();
         fullScreen = false;
     }
-
-    if (GuiButton(btn5Rec, "FULLSCREEN"))
-    {
-        engine.setWindowSize(1920, 1080);
-        fullScreen = true;
-        ss.seleccion_menu();
-    }
-
-    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn3Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn4Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn5Rec)) {
-        if (ss.pushed == false)
-            ss.sonido_mov();
-        ss.pushed = true;
-    }
-    else
-        ss.pushed = false;
 
     engine.endDrawing();
 }
@@ -265,95 +339,83 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em)
     float posX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2.0f);
     float posY = static_cast<float>(engine.getScreenHeight() / 2) - (buttonHeight / .5f);
 
-    // Boton de volver al inicio
-    Rectangle btn1Rec = { posX, posY, buttonWidth, buttonHeight };
-    Rectangle btn2Rec = { posX, posY + 70, buttonWidth, buttonHeight };
-    Rectangle btn3Rec = { posX, posY + 140, buttonWidth, buttonHeight };
-    Rectangle btn4Rec = { posX, posY + 210, buttonWidth, buttonHeight };
-
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
 
     // Define the current button selection
     auto& currentButton = inpi.currentButton;
+    bool buttonTouched = false;
 
-    // Get the gamepad input
-    if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)
-        || inpi.mouseClick) {
-        // Press the currently selected button
-        switch (currentButton) {
-        case 0: // "CONTINUAR"
-        {
-            inpi.pause = false;
-            ss.seleccion_menu();
-            ss.playAmbient();
-            ss.play_music();
-            break;
-        }
-        case 1: // "OPCIONES"
-        {
-            li.currentScreen = GameScreen::OPTIONS;
-            li.previousScreen = GameScreen::GAMEPLAY;
-            ss.seleccion_menu();
-            break;
-        }
-        case 2: // "VOLVER AL INICIO"
-        {
-            li.currentScreen = GameScreen::TITLE;
-            ss.seleccion_menu();
-            break;
-        }
-        case 3: // "SALIR"
-        {
-            ss.sonido_salir();
-            li.gameShouldEnd = true;
-            return;
-        }
+    ButtonRect buttons[] = {
+    { { posX, posY, buttonWidth, buttonHeight }, "CONTINUAR", 0 },
+    { { posX, posY + 70, buttonWidth, buttonHeight }, "OPCIONES", 1 },
+    { { posX, posY + 140, buttonWidth, buttonHeight }, "VOLVER AL INICIO", 2 },
+    { { posX, posY + 210, buttonWidth, buttonHeight }, "SALIR", 3 },
+    };
+
+    for (std::size_t i = 0; i < sizeof(buttons) / sizeof(ButtonRect); i++) {
+        ButtonRect& button = buttons[i];
+        bool isCurrent = (currentButton == i);
+        if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
+            (isCurrent && inpi.interact)) {
+            currentButton = i;
+            inpi.mouseClick = true;
+            // Aquí puedes manejar la acción del botón
+            switch (button.action) {
+            case 0: // "CONTINUAR"
+            {
+                inpi.pause = false;
+                ss.seleccion_menu();
+                ss.playAmbient();
+                ss.play_music();
+                break;
+            }
+            case 1: // "OPCIONES"
+            {
+                inpi.currentButton = 0;
+                li.currentScreen = GameScreen::OPTIONS;
+                li.previousScreen = GameScreen::GAMEPLAY;
+                ss.seleccion_menu();
+                break;
+            }
+            case 2: // "VOLVER AL INICIO"
+            {
+                li.currentScreen = GameScreen::TITLE;
+                ss.seleccion_menu();
+                break;
+            }
+            case 3: // "SALIR"
+            {
+                ss.sonido_salir();
+                li.gameShouldEnd = true;
+                return;
+            }
+            }
+
+            inpi.interact = false;
         }
 
-        currentButton = 0;
-        inpi.mouseClick = false;
+        if (engine.checkCollisionPointRec(GetMousePosition(), button.rect) && !buttonTouched)
+            buttonTouched = true;
     }
-    else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) { // D-Pad Up
-        // Move the selection up
-        currentButton = (currentButton > 0) ? currentButton - 1 : 3;
+
+    if (buttonTouched && !ss.pushed)
+    {
         ss.sonido_mov();
-    }
-    else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) { // D-Pad Down
-        // Move the selection down
-        currentButton = (currentButton < 3) ? currentButton + 1 : 0;
-        ss.sonido_mov();
-    }
-
-    // Draw the buttons
-    if (GuiButton(btn1Rec, (currentButton == 0) ? "[CONTINUAR]" : "CONTINUAR"))
-    {
-        currentButton = 0;
-        inpi.mouseClick = true;
-    }
-    if (GuiButton(btn2Rec, (currentButton == 1) ? "[OPCIONES]" : "OPCIONES"))
-    {
-        currentButton = 1;
-        inpi.mouseClick = true;
-    }
-    if (GuiButton(btn3Rec, (currentButton == 2) ? "[VOLVER AL INICIO]" : "VOLVER AL INICIO"))
-    {
-        currentButton = 2;
-        inpi.mouseClick = true;
-    }
-    if (GuiButton(btn4Rec, (currentButton == 3) ? "[SALIR]" : "SALIR"))
-    {
-        currentButton = 3;
-        inpi.mouseClick = true;
-    }
-
-    if (engine.checkCollisionPointRec(GetMousePosition(), btn1Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn2Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn3Rec) || engine.checkCollisionPointRec(GetMousePosition(), btn4Rec)) {
-        if (ss.pushed == false)
-            ss.sonido_mov();
         ss.pushed = true;
     }
-    else
+    else if (!buttonTouched && ss.pushed)
         ss.pushed = false;
+
+    // Control de botones de mando para cambiar el botón seleccionado
+    if (inpi.up || inpi.left) {
+        currentButton = (currentButton > 0) ? currentButton - 1 : sizeof(buttons) / sizeof(ButtonRect) - 1;
+        ss.sonido_mov();
+    }
+    if (inpi.down || inpi.right) {
+        currentButton = (currentButton < sizeof(buttons) / sizeof(ButtonRect) - 1) ? currentButton + 1 : 0;
+        ss.sonido_mov();
+    }
 }
 
 void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
@@ -366,7 +428,7 @@ void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
     float posButtonY = static_cast<float>(engine.getScreenHeight() / 2) - (buttonHeight / 2);
     float posX = static_cast<float>(engine.getScreenWidth() / 2) - (windowWidth / 2);
     float posY = static_cast<float>(engine.getScreenHeight() / 2) - (windowHeight / 2);
-    float augment = 55.f;
+    // float augment = 55.f;
 
     Rectangle windowRect = {
         posX,
@@ -383,49 +445,45 @@ void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
 
     auto& currentButton = inpi.currentButton;
 
+    // Definimos los botones
+    auto size = plfi.inventory.size() + 1;
+    std::vector<ButtonRect> buttons(size);
+    for (std::size_t i = 0; i < plfi.inventory.size(); i++) {
+        buttons[i] = { { posButtonX, posButtonY + 50 * static_cast<float>(i), buttonWidth, buttonHeight }, plfi.inventory[i]->name.c_str(), static_cast<int>(i) };
+    }
+    buttons[plfi.inventory.size() - 1] = { { posButtonX, posButtonY + 50 * static_cast<float>(plfi.inventory.size()), buttonWidth, buttonHeight }, "VOLVER", static_cast<int>(plfi.inventory.size()) };
+
     if (plfi.selectedItem == plfi.max)
     {
-        // Get the gamepad input
-        if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) {
-            // Press the currently selected button
-            if (static_cast<std::size_t>(currentButton) < plfi.inventory.size()) {
-                // Select an item from the inventory
-                plfi.selectedItem = plfi.inventory[currentButton]->getID();
-                currentButton = 0;
-                return;
-            }
-            else {
-                // "VOLVER" button
-                auto& inpi = em.getSingleton<InputInfo>();
-                inpi.inventory = false;
-            }
+        // Control de botones de mando para cambiar el botón seleccionado
+        if (inpi.up || inpi.left) {
+            currentButton = (currentButton > 0) ? currentButton - 1 : plfi.inventory.size();
         }
-        else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
-            // Move the selection up
-            currentButton = (currentButton > 0) ? currentButton - 1 : static_cast<int>(plfi.inventory.size());
-        }
-        else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
-            // Move the selection down
-            currentButton = (currentButton < static_cast<int>(plfi.inventory.size())) ? currentButton + 1 : 0;
-        }
-        int buttonIndex = 0;
-        for (auto& item : plfi.inventory)
-        {
-            Rectangle btnRec = { posButtonX, posButtonY + 50, buttonWidth, buttonHeight };
-            if (GuiButton(btnRec, (buttonIndex == currentButton) ? ("[" + item->name + "]").c_str() : item->name.c_str())) {
-                plfi.selectedItem = item->getID();
-                currentButton = 0;
-                return;
-            }
-            posButtonY += augment;
-            buttonIndex++;
+        else if (inpi.down || inpi.right) {
+            currentButton = (currentButton < plfi.inventory.size()) ? currentButton + 1 : 0;
         }
 
-        // Botón de volver al juego
-        Rectangle btn2Rec = { posButtonX, posButtonY + 70, buttonWidth, buttonHeight };
-        if (GuiButton(btn2Rec, (currentButton == static_cast<int>(plfi.inventory.size())) ? "[VOLVER]" : "VOLVER")) {
-            auto& inpi = em.getSingleton<InputInfo>();
-            inpi.inventory = false;
+        for (std::size_t i = 0; i < sizeof(buttons) / sizeof(ButtonRect); i++) {
+            ButtonRect& button = buttons[i];
+            bool isCurrent = (currentButton == i);
+            if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
+                (isCurrent && inpi.interact)) {
+                currentButton = i;
+                // Aquí puedes manejar la acción del botón
+                if (i < plfi.inventory.size()) {
+                    // Select an item from the inventory
+                    plfi.selectedItem = plfi.inventory[i]->getID();
+                    currentButton = 0;
+                    return;
+                }
+                else {
+                    // "VOLVER" button
+                    auto& inpi = em.getSingleton<InputInfo>();
+                    inpi.inventory = false;
+                }
+
+                inpi.interact = false;
+            }
         }
     }
     else
@@ -441,7 +499,7 @@ void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
         float posDescY = static_cast<float>(engine.getScreenHeight() / 2) - (descHeight / 1.25f);
         GuiTextBox({ posDescX, posDescY, descWidth, descHeight }, text, static_cast<int>(item.description.size()), false);
 
-        if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) {
+        if (inpi.interact) {
             // Press the currently selected button
             switch (currentButton) {
             case 0: // "USAR"
@@ -461,11 +519,11 @@ void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
                 break;
             }
         }
-        else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
+        else if (inpi.up || inpi.left) {
             // Move the selection up
             currentButton = (currentButton > 0) ? currentButton - 1 : 1;
         }
-        else if (engine.isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
+        else if (inpi.down || inpi.right) {
             // Move the selection down
             currentButton = (currentButton < 1) ? currentButton + 1 : 0;
         }

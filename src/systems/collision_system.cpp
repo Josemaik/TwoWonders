@@ -287,7 +287,6 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
                 auto& ldc = em.getComponent<LadderComponent>(*staticEntPtr);
                 auto& col = em.getComponent<ColliderComponent>(*otherEntPtr);
                 auto& box = col.boundingBox;
-                std::cout << box.min.y() << ", " << ldc.yMin << "\n";
 
                 if ((col.boundingBox.min.y() + 1) >= ldc.yMax || (col.boundingBox.min.y() - 1) <= ldc.yMin)
                 {
