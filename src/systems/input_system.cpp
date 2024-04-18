@@ -296,6 +296,26 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     else if (ge.isKeyReleased(in.interact) || ge.isGamepadButtonReleased(0, in.m_interact))
         inpi.interact = false;
 
+    if (ge.isGamepadButtonPressed(0, in.m_right))
+        inpi.right = true;
+    else
+        inpi.right = false;
+
+    if (ge.isGamepadButtonPressed(0, in.m_left))
+        inpi.left = true;
+    else
+        inpi.left = false;
+
+    if (ge.isGamepadButtonPressed(0, in.m_up))
+        inpi.up = true;
+    else
+        inpi.up = false;
+
+    if (ge.isGamepadButtonPressed(0, in.m_down))
+        inpi.down = true;
+    else
+        inpi.down = false;
+
     // Codigo para cambiar de tipo de ataque
     // if (ge.isKeyReleased(KEY_Q))
     //     plfi.changeCurrentSpell();

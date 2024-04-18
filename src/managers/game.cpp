@@ -74,7 +74,7 @@ void Game::createEntities()
     // p.gravity = 0;
 
     em.addComponent<InputComponent>(e);
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<AttackComponent>(e);
     auto& lis = em.addComponent<ListenerComponent>(e);
@@ -200,7 +200,16 @@ void Game::run()
         // CODIGO DE LA PANTALLA DE OPCIONES
         case GameScreen::OPTIONS:
         {
+            input_system.update(em, engine);
             render_system.drawOptions(engine, em, sound_system);
+            break;
+        }
+
+        // CODIGO DE LA PANTALLA DE CONTROLES
+        case GameScreen::CONTROLS:
+        {
+            input_system.update(em, engine);
+            render_system.drawControls(em, engine);
             break;
         }
 

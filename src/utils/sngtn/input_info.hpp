@@ -39,6 +39,6 @@ struct InputInfo
     bool spell3{ false };
 
     // Menú
-    int currentButton{ 0 };
+    std::size_t currentButton{ 0 };
     bool mouseClick{ false };
 };

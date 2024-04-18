@@ -23,6 +23,13 @@ struct RenderSystem
         float elapsed{ 0.0f };
     };
 
+    struct ButtonRect
+    {
+        Rectangle rect{};
+        const char* text{};
+        int action{};
+    };
+
     // Se van a buscar las entidad que tengan estos componentes y tags
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
@@ -36,6 +43,7 @@ struct RenderSystem
     void drawEnding(GameEngine& engine);
     void drawStory(GameEngine& engine);
     void drawChargeScreen(GameEngine& engine, EntityManager& em);
+    void drawControls(EntityManager& em, GameEngine& engine);
     void unloadModels(EntityManager& em, GameEngine& engine);
     void drawEditorInGameIA(GameEngine& engine, EntityManager& em);
     void drawDebuggerInGameIA(GameEngine& engine, EntityManager& em);

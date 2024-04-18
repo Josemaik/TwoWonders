@@ -9,7 +9,7 @@
 #include "../../systems/sound_system.hpp"
 
 // Enum que representa el estado del juego
-enum struct GameScreen { LOGO, TITLE, STORY, GAMEPLAY, /*DEAD,*/ OPTIONS, ENDING, PAUSE };
+enum struct GameScreen { LOGO, TITLE, STORY, GAMEPLAY, /*DEAD,*/ OPTIONS, ENDING, PAUSE, CONTROLS };
 
 //Memoria global de nivel
 struct LevelInfo
