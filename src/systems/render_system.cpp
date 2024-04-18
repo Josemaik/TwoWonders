@@ -632,8 +632,10 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
         if (r.meshLoaded && e.hasComponent<ColliderComponent>())
         {
             auto& col = em.getComponent<ColliderComponent>(e);
-            if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
-                return;
+            if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE){
+                if(!e.hasTag<NPCTag>())
+                    return;
+            }
         }
 
         if (r.visible) {

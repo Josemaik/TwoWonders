@@ -6,8 +6,12 @@ void PhysicsSystem::update(EntityManager& em)
     auto& frti = em.getSingleton<FrustumInfo>();
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, PhysicsComponent& phy, ColliderComponent& col)
     {
-        if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
-            return;
+        if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE){
+            if(ent.hasTag<NPCTag>()){
+                phy.gravity = 0;
+            }else
+                return;
+        }
         if (phy.notMove)
         {
             if (phy.velocity != vec3d::zero() && phy.target != vec3d::zero())
