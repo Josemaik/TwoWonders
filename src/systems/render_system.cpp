@@ -1295,6 +1295,7 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         vec3d posplayer = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
         uint16_t startnode = findNearestNode(em, posplayer, navs.nodes);
         uint16_t targetnode = findNearestNode(em, vec3d{ -12.33, 40.0, 22.41 }, navs.nodes);
+        std::cout << startnode << "\n";
         //Creamos Grafo
         Graph graph{};
         graph.createGraph(navs.conexiones, navs.nodes);

@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <limits>
 #include "utils/types.hpp"
+#include "utils/pf/Graph.hpp"
 #include "../../systems/sound_system.hpp"
 
 // Enum que representa el estado del juego
@@ -78,7 +79,10 @@ struct LevelInfo
     // Variables de debug
     bool debugIA2{ false };
     bool resetGame{ false };
-
+    
+    //grafo referencia
+    Graph level_graph{};
+    
     // Variables de zona y el nivel
     uint16_t num_zone{};
     uint8_t mapID{ 0 };

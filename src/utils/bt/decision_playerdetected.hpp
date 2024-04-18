@@ -85,13 +85,13 @@ struct BTDecisionPlayerDetected : BTNode_t {
 
             // Si el player se encuentra a una altura mayor o menor que el enemigo
             // que sea superior a 1 metro no puede ser visto por el enemigo
-            if(ectx.ent.hasTag<SnowmanTag>() || ectx.ent.hasTag<GolemTag>()){
-                if(std::abs(getplayerphy(ectx).position.y() - ectx.phy.position.y()) > 7.0){
-                            ectx.ai->playerdetected = false;
-                            ectx.ai->alert_state = false;
-                            return BTNodeStatus_t::fail;
-                }
-            }
+            // if(ectx.ent.hasTag<SnowmanTag>() || ectx.ent.hasTag<GolemTag>()){
+            //     if(std::abs(getplayerphy(ectx).position.y() - ectx.phy.position.y()) > 7.0){
+            //                 ectx.ai->playerdetected = false;
+            //                 ectx.ai->alert_state = false;
+            //                 return BTNodeStatus_t::fail;
+            //     }
+            // }
 
 
             //Calcula la dirección de visión del enemigo utilizando su orientación
@@ -138,7 +138,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
                 for (Entity& ent : ectx.em.getEntities()) {
                     // Comprobamos entidades Pared y que tengan colisión component
                     if (ent.hasComponent<ColliderComponent>()) {
-                        if (ent.hasTag<WallTag>() || ent.hasTag<GroundTag>()) {
+                        if (ent.hasTag<WallTag>()) {
                             auto& col = ectx.em.getComponent<ColliderComponent>(ent);
                             if (col.boundingBox.intersectsRay(ray.origin, ray.direction,intersection_wall)) {
                                 //col.boundingBox.intersectsRay(ray.origin, ray.direction,intersection_wall);

@@ -2,8 +2,12 @@
 
 #include <vector>
 #include "Conection.hpp"
+#include <set>
+#include <vector>
 #include <map>
-#include <utils/types.hpp>
+#include "../sngtn/debug_singleton.hpp"
+#include "../vec3D.hpp"
+// #include <utils/types.hpp>
 
 struct Graph
 {
@@ -45,6 +49,11 @@ struct Graph
         // }
         ///
         //-------------------------------
+    }
+    //borramos el grafo
+    void cleanGraph(){
+        ArrayConections.clear();
+        Nodes.clear();
     }
     //Nos devuelve las conexiones que salen de un nodo
     std::vector<Conection> getConections(uint16_t FromNode) {

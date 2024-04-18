@@ -5,7 +5,6 @@
 #include <map>
 #include "../utils/types.hpp"
 #include "ia_manager.hpp"
-#include "../utils/pf/Graph.hpp"
 #include "../utils/bt/behaviourtree.hpp"
 #include "../utils/bt/action_patrolNPC.hpp"
 
@@ -69,7 +68,6 @@ private:
     std::vector<const valueType*> chunksVec{};
     uint8_t unique_ids{ 0 };
     bool reSpawn{ false };
-    Graph graph{};
 
     template <typename... Tags>
     void destroyParts(EntityManager& em)
