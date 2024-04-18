@@ -3,8 +3,11 @@
 
 void PhysicsSystem::update(EntityManager& em)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, PhysicsComponent& phy)
+    auto& frti = em.getSingleton<FrustumInfo>();
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, PhysicsComponent& phy, ColliderComponent& col)
     {
+        if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
+            return;
         if (phy.notMove)
         {
             if (phy.velocity != vec3d::zero() && phy.target != vec3d::zero())
@@ -128,6 +131,6 @@ void PhysicsSystem::update(EntityManager& em)
             playerWalking = false;
             //ss.SFX_stop();
         }
-
+        // }
     });
 }

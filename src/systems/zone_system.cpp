@@ -430,8 +430,7 @@ void ZoneSystem::checkLadders(EntityManager& em)
 
         if (inpi.interact && ic.showButton)
         {
-            playerPos.setX(phy.position.x());
-            playerPos.setZ(phy.position.z());
+            playerPos = { phy.position.x(), playerPos.y() + 0.5, phy.position.z() };
             playerPhy.gravity = 0;
             playerPhy.orientation = ldc.orientation;
 

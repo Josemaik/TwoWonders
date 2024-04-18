@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 7.0, 22.0, -21.0 };
+        plfi.spawnPoint = { -28.0, 49.0, -30.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -138,7 +138,7 @@ void Game::run()
     auto& sound_system = em.getSingleton<SoundSystem>();
 
     // Incializamos FPSs
-    engine.setTargetFPS(120);
+    engine.setTargetFPS(60);
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
@@ -168,7 +168,7 @@ void Game::run()
 
     while (!li.gameShouldEnd)
     {
-        elapsed += timeStep240;
+        elapsed += timeStep120;
         gami.updateFrame();
 
         switch (li.currentScreen)

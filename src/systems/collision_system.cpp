@@ -5,11 +5,14 @@
 void CollisionSystem::update(EntityManager& em)
 {
     auto& li = em.getSingleton<LevelInfo>();
+    auto& frti = em.getSingleton<FrustumInfo>();
 
     // Liberar el octree
     octree.clear();
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
     {
+        if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
+            return;
         // Si la entidad está por debajo del suelo, se destruye
         auto& pos = phy.position;
         if (pos.y() < -20.)
@@ -283,7 +286,10 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
             {
                 auto& ldc = em.getComponent<LadderComponent>(*staticEntPtr);
                 auto& col = em.getComponent<ColliderComponent>(*otherEntPtr);
-                if ((col.boundingBox.min.y() + 1) >= ldc.yMax || col.boundingBox.min.y() <= ldc.yMin)
+                auto& box = col.boundingBox;
+                std::cout << box.min.y() << ", " << ldc.yMin << "\n";
+
+                if ((col.boundingBox.min.y() + 1) >= ldc.yMax || (col.boundingBox.min.y() - 1) <= ldc.yMin)
                 {
                     auto& phy = em.getComponent<PhysicsComponent>(*otherEntPtr);
                     phy.gravity = 1.0;
@@ -293,7 +299,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
                     auto& ori = phy.orientation;
 
                     // Si el jugador está por encima de la escalera, lo ponemos un poco más adelante de su posición
-                    if ((col.boundingBox.min.y() + 1) >= ldc.yMax)
+                    if ((box.min.y() + 1) >= ldc.yMax)
                     {
                         newPos.setX(newPos.x() + sin(ori) * 2);
                         newPos.setZ(newPos.z() + cos(ori) * 2);
@@ -982,14 +988,15 @@ bool CollisionSystem::checkWallCollision(EntityManager& em, vec3d& pos, vec3d& n
     // Buscamos todas las paredes cercanas a la posición
     using noCMPs = MP::TypeList<ColliderComponent>;
     using wallTag = MP::TypeList<>;
-    bool collision = false;
+    bool collision{ false };
     vec3d colPoint{};
 
+    auto& frti = em.getSingleton<FrustumInfo>();
     em.forEach<noCMPs, wallTag>([&](Entity& e, ColliderComponent& col)
     {
-        if (collision)
+        if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
             return;
-        else if (col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::LAVA)
+        if (col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::LAVA)
         {
             auto& bbox = col.boundingBox;
             if (e.hasTag<LavaTag>())
@@ -1005,15 +1012,18 @@ bool CollisionSystem::checkWallCollision(EntityManager& em, vec3d& pos, vec3d& n
                     bbox.intersectsRay2(ray.origin, ray.direction, colPoint);
                     auto newPos = colPoint + centreDir * 2.0;
 
-                    collision = true;
-
                     pos = newPos;
+
+                    collision = true;
+                    return;
                 }
             }
             else if (bbox.intersectsRay(ray.origin, ray.direction, colPoint) && colPoint.distance(pos) < 10.0)
             {
-                collision = true;
                 pos = colPoint - normalDir * 1.5;
+
+                collision = true;
+                return;
             }
         }
     });

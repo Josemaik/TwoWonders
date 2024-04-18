@@ -2,8 +2,8 @@
 #include <vector>
 #include <memory>
 #include <map>
-#include "../utils/types.hpp"
-#include "../utils/BBox.hpp"
+#include "types.hpp"
+#include "BBox.hpp"
 #include "../components/collider_component.hpp"
 
 struct Octree
@@ -57,7 +57,7 @@ struct Octree
     // Función que nos devuelve el número máximo de entidades en el nodo
     [[nodiscard]] std::size_t getMaxEntities() const noexcept { return max_ent_; }
 
-    static const std::size_t MAX_ENTITIES = 25;
+    static const std::size_t MAX_ENTITIES = 15;
     static const std::size_t MAX_DEPTH = 10;
     static constexpr std::array<vec3d, 8> offsets =
     {

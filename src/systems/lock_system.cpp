@@ -7,19 +7,22 @@ void LockSystem::update(EntityManager& em)
 
     if (player.hasComponent<PhysicsComponent>())
     {
+        auto& frti = em.getSingleton<FrustumInfo>();
         auto& inpi = em.getSingleton<InputInfo>();
         auto& playerPhy = em.getComponent<PhysicsComponent>(player);
         auto& playerPos = playerPhy.position;
         enemies.clear();
 
-        em.forEachAny<SYSCMPs, SYSTAGs>([&](Entity& e)
+        em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
         {
-            if (e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>())
-                return;
-
-            if (e.hasComponent<PhysicsComponent>())
+            if (e.hasTag<EnemyTag>() || e.hasTag<DestructibleTag>())
             {
-                auto& phy = em.getComponent<PhysicsComponent>(e);
+                if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
+                    return;
+
+                if (e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>())
+                    return;
+
                 auto& pos = phy.position;
 
                 // Calcula la distancia entre la posición del jugador y la posición del enemigo

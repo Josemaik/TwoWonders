@@ -32,6 +32,11 @@ struct vec3D
         return *this + (-rhs);
     }
 
+    constexpr vec3D operator-(DataT const s) const
+    {
+        return { x_ - s, y_ - s, z_ - s };
+    }
+
     constexpr DataT dotProduct(vec3D const& rhs) const
     {
         return { x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_ };
@@ -249,7 +254,6 @@ struct vec3D
         return vec3D<float>{ static_cast<float>(x_), static_cast<float>(y_), static_cast<float>(z_) };
     }
 
-
     void updateLowest(vec3D const& v) noexcept
     {
         if (x_ <= y_ && x_ <= z_) {
@@ -285,6 +289,7 @@ struct vec3D
     {
         archive(x_, y_, z_);
     }
+
     //Calculate point distance
     constexpr DataT calculatePointDistance(vec3D const& target) const {
         auto dx{ target.x_ - x_ };
@@ -292,6 +297,11 @@ struct vec3D
         return std::sqrt(dx * dx + dz * dz);
     }
 
+    // Función para pasar de double a float o de float a double
+    template<typename OtherT>
+    vec3D<OtherT> to_other() const {
+        return vec3D<OtherT>(static_cast<OtherT>(x_), static_cast<OtherT>(y_), static_cast<OtherT>(z_));
+    }
 
 private:
     DataT x_{}, y_{}, z_{};

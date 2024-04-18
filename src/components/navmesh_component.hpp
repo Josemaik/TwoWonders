@@ -3,7 +3,7 @@
 #include "../utils/BBox.hpp"
 #include <set>
 
-struct  Navmesh
+struct Navmesh
 {
     /* data */
     //array de nodos std::array<vec3d>

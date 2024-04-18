@@ -134,6 +134,7 @@ namespace ENGI {
         void unloadGifsAndTextures();
         void setReplayMode(bool replay, GameData& gd);
         double getTime();
+        float getAspectRat();
 
         std::map<std::string, Texture2D> textures;
         std::map<std::string, Gif> gifs;

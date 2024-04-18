@@ -99,5 +99,18 @@ struct BBox
         if (normal.z() >= 0) res.setZ(min.z());
         return res;
     }
+
+    const std::array<vec3f, 8> getCorners() const {
+        return {
+            vec3d(min.x(), min.y(), min.z()).to_other<float>(),
+            vec3d(max.x(), min.y(), min.z()).to_other<float>(),
+            vec3d(max.x(), max.y(), min.z()).to_other<float>(),
+            vec3d(min.x(), max.y(), min.z()).to_other<float>(),
+            vec3d(min.x(), min.y(), max.z()).to_other<float>(),
+            vec3d(max.x(), min.y(), max.z()).to_other<float>(),
+            vec3d(max.x(), max.y(), max.z()).to_other<float>(),
+            vec3d(min.x(), max.y(), max.z()).to_other<float>()
+        };
+    }
 };
 
