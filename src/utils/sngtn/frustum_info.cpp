@@ -31,10 +31,16 @@ void FrustumInfo::setFrustum(float left, float right, float bottom, float top, f
     planes[static_cast<uint8_t>(Plane::RIGHT)] = { normal.normalize(), aux };
 
     fr_ents.clear();
+    outside_ents.clear();
 }
 
 FrustumInfo::Position FrustumInfo::bboxInFrustum(const BBox& bbox)
 {
+    // Comprobar si la caja delimitadora ya ha sido comprobada y está fuera del frustum
+    if (outside_ents.find(&bbox) != outside_ents.end())
+        return Position::OUTSIDE;
+
+    // Comprobar si la caja delimitadora ya ha sido comprobada
     if (fr_ents.find(&bbox) != fr_ents.end())
         return Position::INSIDE;
 
@@ -61,6 +67,7 @@ FrustumInfo::Position FrustumInfo::bboxInFrustum(const BBox& bbox)
         }
     }
 
+    outside_ents.insert(&bbox);
     return Position::OUTSIDE;
 }
 

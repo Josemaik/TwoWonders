@@ -46,4 +46,5 @@ struct FrustumInfo
 private:
     std::array<Plane_t, 6> planes{};
     std::set<const BBox*> fr_ents{};
+    std::set<const BBox*> outside_ents{};
 };

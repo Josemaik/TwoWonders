@@ -138,7 +138,7 @@ void Game::run()
     auto& sound_system = em.getSingleton<SoundSystem>();
 
     // Incializamos FPSs
-    engine.setTargetFPS(120);
+    engine.setTargetFPS(60);
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
@@ -168,7 +168,7 @@ void Game::run()
 
     while (!li.gameShouldEnd)
     {
-        elapsed += timeStep240;
+        elapsed += timeStep120;
         gami.updateFrame();
 
         switch (li.currentScreen)
