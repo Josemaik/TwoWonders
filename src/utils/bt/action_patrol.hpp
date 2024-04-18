@@ -37,17 +37,23 @@ struct BTAction_Patrol : BTNode_t {
             double disaux = ectx.phy.position.distance(begin);
             // double dify = std::abs((ectx.phy.position.y()-2.0)  - begin.y());
             if(ectx.ai->seeking && disaux >= 3.0){
-                ectx.ai->check_distance = true;
-                ectx.ai->pathfind_active = true;
-                ectx.ai->seeking = false;
                 //calculate path 
                 auto& debug = ectx.em.getSingleton<Debug_t>();
                 uint16_t startnode = findNearestNode(ectx.em,ectx.phy.position,navs.selectednodes);
                 uint16_t endnode = findNearestNode(ectx.em,*ectx.ai->path.begin(),navs.selectednodes);
-                ectx.ai->found_path = li.level_graph.PathFindAStar(debug, 
-                startnode,endnode);
-                //creamos iterador que apunte a la primera posición
-                ectx.ai->it_path = &ectx.ai->found_path[0];
+                if(startnode != endnode){
+                    ectx.ai->found_path = li.level_graph.PathFindAStar(debug, 
+                    startnode,endnode);
+                    //creamos iterador que apunte a la primera posición
+                    ectx.ai->it_path = &ectx.ai->found_path[0];
+                    ectx.ai->check_distance = true;
+                    ectx.ai->pathfind_active = true;
+                    ectx.ai->seeking = false;
+                }else{
+                    ectx.ai->pathfind_active = false;
+                    ectx.ai->seeking = true;
+                    ectx.ai->check_distance = false;
+                }
             }
         }
         //find path
@@ -56,7 +62,7 @@ struct BTAction_Patrol : BTNode_t {
                 //run found path
                 steering = STBH::Arrive(ectx.phy, *ectx.ai->it_path, ectx.ai->arrival_radius);
                 
-                if(*ectx.ai->it_path == *ectx.ai->found_path.end()){
+                if(*ectx.ai->it_path == ectx.ai->found_path[ectx.ai->found_path.size() - 1]){
                     ectx.ai->pathfind_active = false;
                     ectx.ai->check_distance = false;
                     ectx.ai->found_path.clear();
