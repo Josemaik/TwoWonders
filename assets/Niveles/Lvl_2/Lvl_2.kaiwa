@@ -418,36 +418,8 @@
 							"countdown_shoot": 0.5,
 							"countdown_perception": 0.0,
 							"scale_to_respawn_attack": 7.0
-						},
-						{
-							"position": [-23.81,50.0,23.11],
-							"rotVector": [0.0, 0.0, 1.0],
-							"rotation": 0.0,
-							"scale": [4.0, 9.0, 4.0],
-							"color": [0, 121, 241, 255],
-							"max_speed": 0.8,
-							"life": 10,
-							"type": 1,
-							"element": 3,
-							"arrival_radius": 2.0,
-							"detect_radius": 40.0,
-							"attack_radius": 20.5,
-							"tx": 0.0,
-							"tz": 0.0,
-							"time2arrive": 1.0,
-							"tactive": true,
-							"perceptionTime": 0.2,
-							"path": [
-								[-12.33, 50.0, 22.41],
-								[-15.13, 50.0, 10.23],
-								[-23.81, 50.0, 10.23],
-								[-23.81,50.0,23.11]
-							],
-							"countdown_stop": 0.6,
-							"countdown_shoot": 0.1,
-							"countdown_perception": 0.2,
-							"scale_to_respawn_attack": 7.0
 						}
+						
 					],
 					"NPCs":[
 						{
@@ -942,6 +914,35 @@
 							"countdown_stop": 0.6,
 							"countdown_shoot": 0.1,
 							"countdown_perception": 0.07,
+							"scale_to_respawn_attack": 7.0
+						},
+						{
+							"position": [-23.81,50.0,23.11],
+							"rotVector": [0.0, 0.0, 1.0],
+							"rotation": 0.0,
+							"scale": [4.0, 9.0, 4.0],
+							"color": [0, 121, 241, 255],
+							"max_speed": 0.8,
+							"life": 10,
+							"type": 1,
+							"element": 3,
+							"arrival_radius": 2.0,
+							"detect_radius": 40.0,
+							"attack_radius": 20.5,
+							"tx": 0.0,
+							"tz": 0.0,
+							"time2arrive": 1.0,
+							"tactive": true,
+							"perceptionTime": 0.2,
+							"path": [
+								[-12.33, 50.0, 22.41],
+								[-15.13, 50.0, 10.23],
+								[-23.81, 50.0, 10.23],
+								[-23.81,50.0,23.11]
+							],
+							"countdown_stop": 0.6,
+							"countdown_shoot": 0.1,
+							"countdown_perception": 0.2,
 							"scale_to_respawn_attack": 7.0
 						}
 					],
@@ -1553,6 +1554,7 @@
 							"countdown_perception": 0.06,
 							"scale_to_respawn_attack": 7.0
 						}
+						
 					],
 					"NPCs":[],
 					"Objects":[]

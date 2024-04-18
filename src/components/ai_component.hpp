@@ -58,6 +58,11 @@ struct AIComponent
     Path_t<4>::iterator pathIt{ };
     bool path_initialized{ false };
     bool followpatrol{true};
+    //pathfinding
+    bool pathfind_active{false},check_distance{false};
+    std::vector<vec3d> found_path{};
+    vec3d *it_path{nullptr};
+    
     // SB behaviour {SB::Arrive};
     double txp{}, tzp{};
     bool target_obtained{ false };

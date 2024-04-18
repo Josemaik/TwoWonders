@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include "../vec3D.hpp"
 // #include "../path.hpp"
 // #include "ai_component.hpp"
 
