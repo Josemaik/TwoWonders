@@ -74,7 +74,7 @@ void Game::createEntities()
     // p.gravity = 0;
 
     em.addComponent<InputComponent>(e);
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<AttackComponent>(e);
     auto& lis = em.addComponent<ListenerComponent>(e);

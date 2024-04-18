@@ -13,7 +13,7 @@ struct PlayerInfo
     uint16_t coins{}, coinsAdded{}, bombs{}, max_bombs{ 8 };
     float elapsed_limit_coins{ 5.0f }, elapsed_coins{ elapsed_limit_coins };
     double max_mana{ 100.0 }, mana{ max_mana };
-    int mana_width{}, armor{};
+    int mana_width{}, max_armor{ 4 }, armor{};
     bool hasKey{ false };
     bool hasStaff{ false };
     bool hasBoots{ false };
@@ -157,7 +157,7 @@ struct PlayerInfo
         inventory.clear();
         spells.clear();
         increaseLife = 0.0;
-        armor = 0;
+        armor = max_armor;
         coins = 0;
         bombs = 0;
         max_mana = 100.0;

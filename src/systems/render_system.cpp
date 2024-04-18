@@ -169,7 +169,7 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
 
     engine.beginDrawing();
     engine.clearBackground(Color({ 113, 75, 146, 255 }));
-    engine.textures["mando_explicacion"].width = engine.getScreenWidth() / 1.3;
+    engine.textures["mando_explicacion"].width = static_cast<int>(engine.getScreenWidth() / 1.3);
     engine.textures["mando_explicacion"].height = static_cast<int>(engine.getScreenHeight() / 1.6);
     engine.drawTexture(engine.textures["mando_explicacion"],
         engine.getScreenWidth() / 2 - engine.textures["mando_explicacion"].width / 2,
@@ -2476,13 +2476,10 @@ void RenderSystem::drawHealthBar(GameEngine& engine, EntityManager& em, const En
 
     // Datos de la barra de vida
     int barWidth = 40;
-    // int barHeight = 20;
     int barX = 155;
     int barY = 30;
     int spacing = 10;
-
-    // Rectángulo de fondo para la barra de vida
-    // engine.drawRectangle(barX - 3, barY - 2, (barWidth + spacing) * (l.maxLife + plfi.armor) + 2, barHeight + 4, DARKGRAY);
+    int currentX = 0;
 
     // Dibujamos cara del maguito
     if (l.life > l.maxLife / 2)
@@ -2494,36 +2491,79 @@ void RenderSystem::drawHealthBar(GameEngine& engine, EntityManager& em, const En
 
     // Dibujamos cada parte de la barra de vida
     int i{};
-    for (; i < l.life; ++i)
+    for (; i < l.life / 2; ++i)
     {
         // Posición X de cada trozo
-        int currentX = barX + i * (barWidth + spacing);
+        currentX = barX + i * (barWidth + spacing);
 
         // Dibujamos el corazón
-        // engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
         engine.drawTexture(engine.textures["heart"], currentX, barY, { 255, 255, 255, 255 });
     }
 
-    for (; i < l.maxLife; ++i)
+    // Si la vida es impar, dibujamos un medio corazón
+    if (l.life & 1)
+    {
+        currentX = barX + i * (barWidth + spacing);
+        engine.drawTexture(engine.textures["half_heart"], currentX, barY, { 255, 255, 255, 255 });
+        ++i;
+    }
+
+    for (; i < l.maxLife / 2; ++i)
     {
         // Posición X de cada trozo
-        int currentX = barX + i * (barWidth + spacing);
+        currentX = barX + i * (barWidth + spacing);
 
         // Dibujamos el corazón vacío
-        // engine.drawRectangle(currentX, barY, barWidth, barHeight, RED);
         engine.drawTexture(engine.textures["empty_heart"], currentX, barY, { 255, 255, 255, 255 });
+    }
+
+    // Si la vida máxima es impar, dibujamos un corazón vacío
+    if ((l.maxLife & 1) && l.life < l.maxLife)
+    {
+        currentX = barX + i * (barWidth + spacing);
+        engine.drawTexture(engine.textures["empty_heart"], currentX, barY, { 255, 255, 255, 255 });
+        ++i;
     }
 
     // Dibujamos la armadura
     if (plfi.armor > 0)
-        for (; i < l.maxLife + plfi.armor; ++i)
+    {
+        auto& armor = plfi.armor;
+        int armorLife = l.maxLife + plfi.armor;
+        int maxArmorLife = l.maxLife + plfi.max_armor;
+        for (; i < armorLife / 2; ++i)
         {
             // Posición X de cada trozo
-            int currentX = barX + i * (barWidth + spacing);
+            currentX = barX + i * (barWidth + spacing);
 
             // Dibujamos el corazón
             engine.drawTexture(engine.textures["ice_heart"], currentX, barY, SKYBLUE);
         }
+
+        // Si la vida es impar, dibujamos un medio corazón
+        if (armor & 1)
+        {
+            currentX = barX + i * (barWidth + spacing);
+            engine.drawTexture(engine.textures["half_ice_heart"], currentX, barY, SKYBLUE);
+            ++i;
+        }
+
+        for (; i < maxArmorLife / 2; ++i)
+        {
+            // Posición X de cada trozo
+            currentX = barX + i * (barWidth + spacing);
+
+            // Dibujamos el corazón vacío
+            engine.drawTexture(engine.textures["empty_ice_heart"], currentX, barY, SKYBLUE);
+        }
+
+        // Si la vida máxima es impar, dibujamos un corazón vacío
+        if ((maxArmorLife & 1) && armor < plfi.max_armor)
+        {
+            currentX = barX + i * (barWidth + spacing);
+            engine.drawTexture(engine.textures["empty_ice_heart"], currentX, barY, SKYBLUE);
+        }
+    }
 }
 
 void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
@@ -2849,7 +2889,6 @@ void RenderSystem::drawSmallButtons(GameEngine& engine, const std::string& name,
             posY -= static_cast<int>(height / 6.5);
         }
     }
-
 
     engine.drawTexture(engine.textures[texture], posX, posY, { 255, 255, 255, 255 });
 }

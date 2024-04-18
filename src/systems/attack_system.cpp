@@ -382,8 +382,8 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
     }
     case Spells::IceShield:
     {
-        if (plfi.armor < 3)
-            plfi.armor += 3;
+        if (plfi.armor < plfi.max_armor)
+            plfi.armor = plfi.max_armor;
         else
             return;
         break;
