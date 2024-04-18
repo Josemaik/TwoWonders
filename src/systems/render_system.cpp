@@ -164,6 +164,7 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
     if (inpi.interact)
     {
         li.currentScreen = li.previousScreen;
+        li.previousScreen = li.evenMorePreviousScreen;
         inpi.interact = false;
     }
 
@@ -261,6 +262,7 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
             case 5: // "Volumen"
                 break;
             case 6: // "CONTROLES"
+                li.evenMorePreviousScreen = li.previousScreen;
                 li.currentScreen = GameScreen::CONTROLS;
                 li.previousScreen = GameScreen::OPTIONS;
                 break;
@@ -1793,13 +1795,10 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                 drawHealthBar(engine, em, e);
             }
 
-            // Dibujamos la cantidad de mana restante del player en el HUD
-            drawManaBar(engine, em);
-
             // Dibujamos el número de monedas en pantalla
             drawCoinBar(engine, em);
 
-            drawFPSCounter(engine);
+            // drawFPSCounter(engine);
 
             // Dibujar el bastón
             drawStaff(engine, em);
@@ -1809,7 +1808,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
 
             drawAnimatedTextures(engine);
 
-            if (li.mapID == 2 && li.volcanoMission)
+            if (li.mapID == 2)
                 drawBoatParts(engine, em);
 
             // Dibujar el tipo de ataque que tiene equipado
@@ -2701,6 +2700,9 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
 
     if (!plfi.spells.empty())
     {
+        // Dibujamos la cantidad de mana restante del player en el HUD
+        drawManaBar(engine, em);
+
         std::map<std::size_t, std::pair<int, int>> spellPositions = {
             {0, {engine.getScreenWidth() - 280, 20}},
             {1, {engine.getScreenWidth() - 210, 125}},
@@ -3052,9 +3054,10 @@ void RenderSystem::drawBoatParts(GameEngine& ge, EntityManager& em)
     auto& textureNum = ge.textures.at(std::to_string(plfi.boatParts.size()));
     auto& texture4 = ge.textures.at("4");
     auto& textureBar = ge.textures.at("barra");
+    int offSetX = 105;
 
     // Dibujamos el num / 4
-    ge.drawTexture(textureNum, posX + 35, posY + 2, { 255, 255, 255, 255 });
-    ge.drawTexture(textureBar, posX + 20 + textureNum.width / 2, posY + 2, { 255, 255, 255, 255 });
-    ge.drawTexture(texture4, posX + 25 + textureNum.width / 2 + textureBar.width / 2, posY + 20, { 255, 255, 255, 255 });
+    ge.drawTexture(textureNum, posX + offSetX, posY + 2, { 255, 255, 255, 255 });
+    ge.drawTexture(textureBar, posX + (offSetX - 15) + textureNum.width / 2, posY + 2, { 255, 255, 255, 255 });
+    ge.drawTexture(texture4, posX + (offSetX - 10) + textureNum.width / 2 + textureBar.width / 2, posY + 20, { 255, 255, 255, 255 });
 }

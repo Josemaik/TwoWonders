@@ -79,10 +79,10 @@ struct LevelInfo
     // Variables de debug
     bool debugIA2{ false };
     bool resetGame{ false };
-    
+
     //grafo referencia
     Graph level_graph{};
-    
+
     // Variables de zona y el nivel
     uint16_t num_zone{};
     uint8_t mapID{ 0 };
@@ -106,6 +106,7 @@ struct LevelInfo
     // Estado del juego
     GameScreen currentScreen = GameScreen::GAMEPLAY;
     GameScreen previousScreen = GameScreen::LOGO;
+    GameScreen evenMorePreviousScreen = GameScreen::LOGO;
 
     bool isCharging()
     {

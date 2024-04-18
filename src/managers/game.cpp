@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -7.55, 40.0, 16.0 };
+        plfi.spawnPoint = { -95.0, 22.0, -135.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -183,6 +183,8 @@ void Game::run()
                 currentTime = 0;
             }
             render_system.drawLogoKaiwa(engine);
+            if (li.playerID == li.max)
+                createEntities();
             break;
         }
 
@@ -193,7 +195,10 @@ void Game::run()
                 sound_system.playMusicMenu();
                 sound_system.music_started = true;
             }
+            input_system.update(em, engine);
             render_system.drawLogoGame(engine, em, sound_system);
+            if (li.playerID == li.max)
+                createEntities();
             break;
         }
 
@@ -230,9 +235,6 @@ void Game::run()
 
             if (li.replay)
                 gami.update();
-
-            if (li.playerID == li.max)
-                createEntities();
 
             // TODO - Cuando se implemente el sistema de guardado, cargar el nivel en el que se quedó
             if (!map.isComplete())

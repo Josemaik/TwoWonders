@@ -157,7 +157,7 @@ struct PlayerInfo
         inventory.clear();
         spells.clear();
         increaseLife = 0.0;
-        armor = max_armor;
+        armor = 0;
         coins = 0;
         bombs = 0;
         max_mana = 100.0;

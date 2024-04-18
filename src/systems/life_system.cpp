@@ -87,7 +87,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             }
             //si es un golem
             if (ent.hasTag<GolemTag>()) {
-                if (!lif.decreaseNextFrame){
+                if (!lif.decreaseNextFrame) {
                     lif.decreaseNextFrame = true;
                     em.getSingleton<SoundSystem>().sonido_golem_muere();
                 }
@@ -99,7 +99,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             }
 
             //si es un snowman
-            if (ent.hasTag<SnowmanTag>()){
+            if (ent.hasTag<SnowmanTag>()) {
                 if (!lif.decreaseNextFrame)
                     em.getSingleton<SoundSystem>().sonido_munyeco_muere();
             }

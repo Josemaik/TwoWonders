@@ -36,13 +36,12 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                     {
                         map.changeMap(em, 2, iam);
                         li.transition = true;
-                        // em.getSingleton<SoundSystem>().ambient_stop();
-                        em.getSingleton<SoundSystem>().update();
 
                         auto& plfi = em.getSingleton<PlayerInfo>();
                         vec3d spawnPoint = { -28.0, 49.0, -30.0 };
                         plfi.spawnPoint = spawnPoint;
                         p.position = spawnPoint;
+                        em.getSingleton<SoundSystem>().update();
                         break;
                     }
                     case 2:

@@ -713,7 +713,7 @@ vec3d getNodeVec3d(uint16_t nodeId, const std::map<uint16_t, vec3d>& nodes) {
         }
     }
     // Si no se encuentra el nodo, se devuelve un vec3d con valores predeterminados o se maneja el error de alguna otra manera
-    return {0.0f, 0.0f, 0.0f};
+    return { 0.0f, 0.0f, 0.0f };
 }
 void MapManager::generateNavmeshes(EntityManager& em)
 {
@@ -773,7 +773,7 @@ void MapManager::generateNavmeshes(EntityManager& em)
         //Creamos NavMesh BBox
         double scalex{}, scalez{};
 
-        scalex = (max.x() - min.x() );
+        scalex = (max.x() - min.x());
         scalez = (max.z() - min.z());
         BBox b(vecnodes[0], vec3d{ scalex, (max.y() - min.y()) + 0.5, scalez });
         //BBox b{ min,max };
@@ -783,7 +783,7 @@ void MapManager::generateNavmeshes(EntityManager& em)
         //Rellenamos los nodos
         for (auto& n : vecnodes) {
             auto pair = std::make_pair(navs.num_nodes, n);
-            
+
             //si es el centro, se guarda
             if (n.x() == vecnodes[0].x() && n.z() == vecnodes[0].z()) {
                 //Se añade al navinfo
@@ -816,53 +816,53 @@ void MapManager::generateNavmeshes(EntityManager& em)
     }
     // Guardamos info 
     std::vector<Conection> auxconex;
-    auxconex.push_back(Conection{1,27,7});
-    auxconex.push_back(Conection{1,7,26});
-    auxconex.push_back(Conection{1,26,45});
-    auxconex.push_back(Conection{1,45,50});
-    auxconex.push_back(Conection{1,10,26});
-    auxconex.push_back(Conection{1,0,26});
-    auxconex.push_back(Conection{1,44,0});
-    auxconex.push_back(Conection{1,54,50});
-    auxconex.push_back(Conection{1,59,54});
-    auxconex.push_back(Conection{1,98,59});
-    auxconex.push_back(Conection{1,116,98});
-    auxconex.push_back(Conection{1,124,116});
-    auxconex.push_back(Conection{1,123,124});
-    auxconex.push_back(Conection{1,134,123});
-    auxconex.push_back(Conection{1,242,134});
-    auxconex.push_back(Conection{1,468,473});
-    auxconex.push_back(Conection{1,583,572});
-    auxconex.push_back(Conection{1,473,583});
-    auxconex.push_back(Conection{1,637,816});
-    auxconex.push_back(Conection{1,637,639});
-    auxconex.push_back(Conection{1,639,643});
-    auxconex.push_back(Conection{1,643,837});
-    auxconex.push_back(Conection{1,837,846});
-    auxconex.push_back(Conection{1,639,620});
-    auxconex.push_back(Conection{1,620,639});
-    auxconex.push_back(Conection{1,846,895});
-    auxconex.push_back(Conection{1,816,827});
-    auxconex.push_back(Conection{1,822,827});
-    auxconex.push_back(Conection{1,288,297});
-    auxconex.push_back(Conection{1,297,320});
-    auxconex.push_back(Conection{1,320,333});
+    auxconex.push_back(Conection{ 1,27,7 });
+    auxconex.push_back(Conection{ 1,7,26 });
+    auxconex.push_back(Conection{ 1,26,45 });
+    auxconex.push_back(Conection{ 1,45,50 });
+    auxconex.push_back(Conection{ 1,10,26 });
+    auxconex.push_back(Conection{ 1,0,26 });
+    auxconex.push_back(Conection{ 1,44,0 });
+    auxconex.push_back(Conection{ 1,54,50 });
+    auxconex.push_back(Conection{ 1,59,54 });
+    auxconex.push_back(Conection{ 1,98,59 });
+    auxconex.push_back(Conection{ 1,116,98 });
+    auxconex.push_back(Conection{ 1,124,116 });
+    auxconex.push_back(Conection{ 1,123,124 });
+    auxconex.push_back(Conection{ 1,134,123 });
+    auxconex.push_back(Conection{ 1,242,134 });
+    auxconex.push_back(Conection{ 1,468,473 });
+    auxconex.push_back(Conection{ 1,583,572 });
+    auxconex.push_back(Conection{ 1,473,583 });
+    auxconex.push_back(Conection{ 1,637,816 });
+    auxconex.push_back(Conection{ 1,637,639 });
+    auxconex.push_back(Conection{ 1,639,643 });
+    auxconex.push_back(Conection{ 1,643,837 });
+    auxconex.push_back(Conection{ 1,837,846 });
+    auxconex.push_back(Conection{ 1,639,620 });
+    auxconex.push_back(Conection{ 1,620,639 });
+    auxconex.push_back(Conection{ 1,846,895 });
+    auxconex.push_back(Conection{ 1,816,827 });
+    auxconex.push_back(Conection{ 1,822,827 });
+    auxconex.push_back(Conection{ 1,288,297 });
+    auxconex.push_back(Conection{ 1,297,320 });
+    auxconex.push_back(Conection{ 1,320,333 });
 
-    for(auto& c: auxconex){
+    for (auto& c : auxconex) {
         navs.conexiones.push_back(c);
         //debug
-        auto pair = std::make_pair(getNodeVec3d(c.fromNode,navs.nodes),getNodeVec3d(c.toNode,navs.nodes));
+        auto pair = std::make_pair(getNodeVec3d(c.fromNode, navs.nodes), getNodeVec3d(c.toNode, navs.nodes));
         navs.conexpos.insert(pair);
         //nodes
-        for(auto& [n,vec] : navs.nodes){
+        for (auto& [n, vec] : navs.nodes) {
             // if(n == 583){
             //     vec = vec3d{vec.x(),vec.y(),vec.z()+10.0};
             // }
-            if(n == c.toNode){
-                navs.selectednodes.insert(std::make_pair(n,vec));
+            if (n == c.toNode) {
+                navs.selectednodes.insert(std::make_pair(n, vec));
             }
-            if(n == c.fromNode){
-                navs.selectednodes.insert(std::make_pair(n,vec));
+            if (n == c.fromNode) {
+                navs.selectednodes.insert(std::make_pair(n, vec));
             }
         }
     }
