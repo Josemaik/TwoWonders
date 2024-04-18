@@ -50,7 +50,8 @@ struct AIComponent
     std::size_t slimetarget{};
     //flocking
     bool ispushed{false};
-    
+    //dejar de ver
+    bool seeking{false};
     //area
     bool attackbeforedie{ false };
     //PATH

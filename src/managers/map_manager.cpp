@@ -706,7 +706,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
         addToZone(em, entity, InteractableType::NPC);
     }
 }
-vec3d getNodeVec3d(uint16_t nodeId, const std::set<std::pair<uint16_t, vec3d>>& nodes) {
+vec3d getNodeVec3d(uint16_t nodeId, const std::map<uint16_t, vec3d>& nodes) {
     for (const auto& node : nodes) {
         if (node.first == nodeId) {
             return node.second;
@@ -823,35 +823,46 @@ void MapManager::generateNavmeshes(EntityManager& em)
     auxconex.push_back(Conection{1,10,26});
     auxconex.push_back(Conection{1,0,26});
     auxconex.push_back(Conection{1,44,0});
-    auxconex.push_back(Conection{1,50,54});
-    auxconex.push_back(Conection{1,54,59});
-    auxconex.push_back(Conection{1,59,98});
-    auxconex.push_back(Conection{1,98,116});
-    auxconex.push_back(Conection{1,116,124});
-    auxconex.push_back(Conection{1,124,123});
-    auxconex.push_back(Conection{1,123,134});
-    auxconex.push_back(Conection{1,134,242});
+    auxconex.push_back(Conection{1,54,50});
+    auxconex.push_back(Conection{1,59,54});
+    auxconex.push_back(Conection{1,98,59});
+    auxconex.push_back(Conection{1,116,98});
+    auxconex.push_back(Conection{1,124,116});
+    auxconex.push_back(Conection{1,123,124});
+    auxconex.push_back(Conection{1,134,123});
+    auxconex.push_back(Conection{1,242,134});
+    auxconex.push_back(Conection{1,468,473});
+    auxconex.push_back(Conection{1,583,572});
+    auxconex.push_back(Conection{1,473,583});
+    auxconex.push_back(Conection{1,637,816});
+    auxconex.push_back(Conection{1,637,639});
     auxconex.push_back(Conection{1,639,643});
     auxconex.push_back(Conection{1,643,837});
     auxconex.push_back(Conection{1,837,846});
+    auxconex.push_back(Conection{1,639,620});
+    auxconex.push_back(Conection{1,620,639});
     auxconex.push_back(Conection{1,846,895});
-    auxconex.push_back(Conection{1,637,816});
-    auxconex.push_back(Conection{1,637,639});
-    auxconex.push_back(Conection{1,572,620});
-    auxconex.push_back(Conection{1,620,473});
-    auxconex.push_back(Conection{1,473,468});
+    auxconex.push_back(Conection{1,816,827});
+    auxconex.push_back(Conection{1,822,827});
+    auxconex.push_back(Conection{1,288,297});
+    auxconex.push_back(Conection{1,297,320});
+    auxconex.push_back(Conection{1,320,333});
+
     for(auto& c: auxconex){
         navs.conexiones.push_back(c);
         //debug
         auto pair = std::make_pair(getNodeVec3d(c.fromNode,navs.nodes),getNodeVec3d(c.toNode,navs.nodes));
         navs.conexpos.insert(pair);
         //nodes
-        for(auto& n : navs.nodes){
-            if(n.first == c.toNode){
-                navs.selectednodes.insert(std::make_pair(n.first,n.second));
+        for(auto& [n,vec] : navs.nodes){
+            // if(n == 583){
+            //     vec = vec3d{vec.x(),vec.y(),vec.z()+10.0};
+            // }
+            if(n == c.toNode){
+                navs.selectednodes.insert(std::make_pair(n,vec));
             }
-            if(n.first == c.fromNode){
-                navs.selectednodes.insert(std::make_pair(n.first,n.second));
+            if(n == c.fromNode){
+                navs.selectednodes.insert(std::make_pair(n,vec));
             }
         }
     }

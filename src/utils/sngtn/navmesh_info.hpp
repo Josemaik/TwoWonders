@@ -3,6 +3,7 @@
 #include "../../components/navmesh_component.hpp"
 #include "../pf/Conection.hpp"
 #include <vector>
+#include <map>
 
 struct NavmeshInfo
 {
@@ -13,9 +14,9 @@ struct NavmeshInfo
     std::vector<Navmesh> NavMeshes{};
     //Nodos
     //todos
-    std::set<std::pair<uint16_t, vec3d>> nodes;
+    std::map<uint16_t, vec3d> nodes{};
     //seleccionados
-    std::set<std::pair<uint16_t, vec3d>> selectednodes;
+    std::map<uint16_t, vec3d> selectednodes;
     //Pares de ndos que forman una conexion
     std::set<std::pair<uint16_t, uint16_t>> conexids;
     //Puntos medios de los nodos

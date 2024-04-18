@@ -12,7 +12,7 @@
 struct Graph
 {
     /* data */
-    void createGraph(std::vector<Conection> conexiones, std::set<std::pair<uint16_t, vec3d>> nodes) {
+    void createGraph(std::vector<Conection> conexiones, std::map<uint16_t, vec3d> nodes) {
         //navmesh-----------------
         //TENDRE QUE PASAR EL JSON CON LOS NAVMESHES
         // CALCULAR PUNTOS DE CADA NAVMESH Y CALCULAR CONEXIONES
