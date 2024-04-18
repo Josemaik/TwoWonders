@@ -93,7 +93,7 @@ struct BTAction_Patrol : BTNode_t {
     }
 
     private:
-            uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::set<std::pair<uint16_t, vec3d>>& nodes) {
+            uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::map<uint16_t, vec3d>& nodes) {
                 uint16_t nearestNodeId = 0; // Suponemos que el primer nodo es el más cercano inicialmente
                 double minDistance = std::numeric_limits<double>::max(); // Inicializamos la distancia mínima con un valor muy grande
                 vec3d nearestpos{};

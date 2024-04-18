@@ -679,7 +679,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
         addToZone(em, entity, InteractableType::NPC);
     }
 }
-vec3d getNodeVec3d(uint16_t nodeId, const std::set<std::pair<uint16_t, vec3d>>& nodes) {
+vec3d getNodeVec3d(uint16_t nodeId, const std::map<uint16_t, vec3d>& nodes) {
     for (const auto& node : nodes) {
         if (node.first == nodeId) {
             return node.second;
@@ -828,18 +828,13 @@ void MapManager::generateNavmeshes(EntityManager& em)
         navs.conexpos.insert(pair);
         //nodes
         for(auto& [n,vec] : navs.nodes){
+            // if(n == 583){
+            //     vec = vec3d{vec.x(),vec.y(),vec.z()+10.0};
+            // }
             if(n == c.toNode){
-                if(n == 583){
-                    // double newp = n.second.z()+10.0;
-                    vec.setZ(10.0);
-                }
                 navs.selectednodes.insert(std::make_pair(n,vec));
             }
             if(n == c.fromNode){
-                // if(n.first == 583){
-                //     double newp = n.second.z()+10.0;
-                //     n.second.setZ(newp);
-                // }
                 navs.selectednodes.insert(std::make_pair(n,vec));
             }
         }
