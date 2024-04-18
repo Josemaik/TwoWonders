@@ -4,10 +4,8 @@
 void ColliderComponent::updateBox(vec3d pos, vec3d scale, double, double orientation, vec3d& rotationVec)
 {
     orientation *= std::abs(rotationVec.y());
-    float orientationInDegrees = static_cast<float>(orientation * (180.0f / K_PI));
-    int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
 
-    if (std::abs(orientationInDegreesInt) == 270 || std::abs(orientationInDegreesInt) == 90)
+    if (std::abs(std::sin(orientation)) == 1)
     {
         scale = { scale.z(), scale.y(), scale.x() };
     }
@@ -18,9 +16,6 @@ void ColliderComponent::updateBox(vec3d pos, vec3d scale, double, double orienta
     // Para tomar en cuenta la gravedad, se aumenta la altura de la bounding box
     // if (gravity > 0.)
     //     max.setY(max.y() + 0.5);
-
-    // float orientationInDegrees = static_cast<float>(orientation * (180.0f / K_PI));
-    // int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
 
     // if (std::abs(orientationInDegreesInt) == 270 || std::abs(orientationInDegreesInt) == 90)
     // {

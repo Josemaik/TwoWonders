@@ -11,7 +11,7 @@ struct CameraSystem
     void update(EntityManager& em, GameEngine& ge, EventManager& evm);
 
 private:
-    void updateFrustum(EntityManager& em, GameEngine& ge);
+    void updateFrustum(EntityManager& em, GameEngine& ge, vec3d& cameraPos, vec3d& cameraTar, float cameraFovy);
 
     vec3d cameraPos{}, cameraTar{};
     float cameraFovy{ 20.f }, transitionTime{ 0.f }, transitionLimit{ 0.4f }, viewPointTime{ 0.f }, viewPointLimit{ 1.35f };

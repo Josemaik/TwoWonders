@@ -298,6 +298,10 @@ void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color) {
     DrawLine3D(startPos.toRaylib(), endPos.toRaylib(), color);
 }
 
+void ENGI::GameEngine::drawPoint3D(vec3d pos, Color color) {
+    DrawPoint3D(pos.toRaylib(), color);
+}
+
 void ENGI::GameEngine::drawCube(vec3d pos, float width, float height, float lenght, Color color) {
     DrawCube(pos.toRaylib(), width, height, lenght, color);
 }

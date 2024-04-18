@@ -19,7 +19,7 @@ struct RenderSystem
         float scaleChange;
         float scaleFactor{};
         float lerpFactor{ 0.0f };
-        float lerpSpeed{ 0.01f };
+        float lerpSpeed{ 0.02f };
         float elapsed{ 0.0f };
     };
 
@@ -54,6 +54,7 @@ private:
     void endFrame(GameEngine& engine, EntityManager& em);
     void drawHUD(EntityManager& em, GameEngine& engine, bool debugphy);
     void drawEntities(EntityManager& em, GameEngine& engine);
+    void drawParticles(EntityManager& em, GameEngine& engine);
     void drawDeath(GameEngine& engine);
     void drawCoinBar(GameEngine& engine, EntityManager& em);
     void drawHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);

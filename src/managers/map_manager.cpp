@@ -241,7 +241,9 @@ void MapManager::generateGround(EntityManager& em, const valueType& groundArray,
 
     auto& li = em.getSingleton<LevelInfo>();
     double zoneHeight = 20.0;
-    if (li.mapID == 2)
+    if (li.mapID == 1)
+        zoneHeight = 30.0;
+    else if (li.mapID == 2)
         zoneHeight = 65.0;
 
     // Creamos 4 zonas para el chunk
@@ -397,6 +399,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
 
             ic.range = 7.5;
             em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
+            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
             [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .content = content });
 
             if (interactable.HasMember("offsetZ"))
@@ -482,7 +485,11 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         case InteractableType::Spawn:
         {
             em.addTag<SpawnTag>(entity);
+
+            auto& spc = em.addComponent<SpawnComponent>(entity);
             c.behaviorType = BehaviorType::SPAWN;
+            ic.range = 12.5;
+
             if (interactable.HasMember("offsetZ"))
             {
                 r.offset = interactable["offsetZ"][0].GetDouble();
@@ -502,9 +509,19 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 {3, {rotateAroundPoint(vec3d{pos.x() - 15.5, posY, pos.z() - 11.5}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
                 {4, {rotateAroundPoint(vec3d{pos.x() - 3.5, posY, pos.z() + 14.0}, pos, rotCopy), rotateScale(vec3d{ 14.0, 4.0, 4.0 }, rotCopy)}},
                 {5, {rotateAroundPoint(vec3d{pos.x() - 16.0, posY, pos.z() - 3.0}, pos, rotCopy), rotateScale(vec3d{ 5.0, 4.0, 13.0 }, rotCopy)}},
-                {6, {rotateAroundPoint(vec3d{pos.x() - 3.5, posY - 2.0, pos.z() + 3.5}, pos, rotCopy), rotateScale(vec3d{ 4.0, 2.0, 4.0 }, rotCopy)}},
+                {6, {rotateAroundPoint(vec3d{pos.x() - 3.0, posY - 2.0, pos.z() + 3.5}, pos, rotCopy), rotateScale(vec3d{ 4.5, 2.0, 4.5 }, rotCopy)}},
                 {7, {rotateAroundPoint(vec3d{pos.x() + 7.0, posY, pos.z() + 8.0}, pos, rotCopy), rotateScale(vec3d{ 6.0, 7.0, 6.0 }, rotCopy)}},
-                {8, {rotateAroundPoint(vec3d{pos.x() - 11.5, posY, pos.z() + 7.5}, pos, rotCopy), rotateScale(vec3d{ 1.5, 4.0, 1.5 }, rotCopy)}},
+                {8, {rotateAroundPoint(vec3d{pos.x() - 10.5, posY, pos.z() + 8.0}, pos, rotCopy), rotateScale(vec3d{ 1.5, 4.0, 1.5 }, rotCopy)}},
+                {9, {rotateAroundPoint(vec3d{pos.x() + 4.2, posY + 2.0, pos.z() - 6.0}, pos, rotCopy), rotateScale(vec3d{ .5, 2.0, .5 }, rotCopy)}},
+                {10, {rotateAroundPoint(vec3d{pos.x() - 17.5, posY + 2.0, pos.z() - 9.5}, pos, rotCopy), rotateScale(vec3d{ .5, 2.0, .5 }, rotCopy)}}
+            };
+
+            std::map<std::size_t, std::tuple<Effects, uint8_t, float, float>> particleParts = {
+                {6, {Effects::FIRE, 10, 0.1f, 0.3f}},
+                {7, {Effects::SMOKE, 10, 0.1f, 0.3f}},
+                {8, {Effects::PURPLEM, 4, 0.1f, 0.3f}},
+                {9, {Effects::SPARKLES, 3, 0.05f, 0.3f}},
+                {10, {Effects::SPARKLES, 3, 0.05f, 0.3f}},
             };
 
             // Creamos 4 paredes para el spawn
@@ -515,8 +532,15 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 em.addComponent<RenderComponent>(wall, RenderComponent{ .position = wallPoints[j].first, .scale = wallPoints[j].second, .color = color, .visible = false, .orientation = 0.0, .rotationVec = rotationVec });
                 em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = wallPoints[j].first, .velocity = vec3d::zero(), .scale = wallPoints[j].second, .gravity = 0, .orientation = 0.0, .rotationVec = rotationVec });
                 em.addComponent<ColliderComponent>(wall, ColliderComponent{ position, scale, BehaviorType::STATIC });
+
+                if (j > 5)
+                {
+                    auto& p = em.addComponent<ParticleMakerComponent>(wall, ParticleMakerComponent{ .active = true, .effect = std::get<0>(particleParts[j]), .maxParticles = std::get<1>(particleParts[j]), .spawnRate = std::get<2>(particleParts[j]), .lifeTime = std::get<3>(particleParts[j]) });
+                    spc.parts[static_cast<SpawnComponent::SpawnParts>(j)] = &p;
+                }
             }
 
+            addToZone(em, entity, type);
             checkDispatcher(em, entity, interactable);
             break;
         }
@@ -533,7 +557,9 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         case InteractableType::DamageObj:
         {
             em.addTag<LavaTag>(entity);
+            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::LAVA, .maxParticles = 20, .spawnRate = 0.1f });
             c.behaviorType = BehaviorType::LAVA;
+
             if (interactable.HasMember("offsetZ"))
             {
                 r.offset = interactable["offsetZ"][0].GetDouble();
@@ -591,6 +617,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             case 2:
             {
                 em.addTag<MissionObjTag>(entity);
+                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
                 auto& bc = em.addComponent<BoatComponent>(entity);
                 bc.setPart();
                 ic.range = 7.0;

@@ -291,6 +291,7 @@ void Game::run()
                     // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     camera_system.update(em, engine, evm);
                     event_system.update(em, evm, iam, map, object_system, sound_system);
+                    particle_system.update(em);
 
                     if (!li.getDeath().empty())
                     {

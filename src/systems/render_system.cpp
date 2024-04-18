@@ -42,6 +42,7 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine)
 
     // Dibuja todas las entidades con componente de render
     drawEntities(em, engine);
+    drawParticles(em, engine);
 
     // Terminamos el frame
     endFrame(engine, em);
@@ -1101,6 +1102,35 @@ void RenderSystem::loadShaders(Model& model)
         model.materials[i].shader = *shaderPtr;
     }
 
+}
+
+void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
+{
+    using partCMPs = MP::TypeList<ColliderComponent, ParticleMakerComponent>;
+    using noTAGs = MP::TypeList<>;
+
+    auto& frti = em.getSingleton<FrustumInfo>();
+    em.forEach<partCMPs, noTAGs>([&](Entity&, ColliderComponent& col, ParticleMakerComponent& pmc)
+    {
+        if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
+            return;
+
+        if (pmc.active)
+        {
+            for (auto& p : pmc.particles)
+            {
+                if (p.type == Particle::ParticleType::Pixel)
+                {
+                    // Dibujamos 4 partćulas arriba, abajo, izquierda y derecha de la posición
+                    engine.drawPoint3D(p.position.to_other<double>(), { p.r, p.g, p.b, p.a });
+                    engine.drawPoint3D((p.position + vec3f{ 0.0f, 0.1f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
+                    engine.drawPoint3D((p.position + vec3f{ 0.1f, 0.0f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
+                    engine.drawPoint3D((p.position + vec3f{ 0.0f, -0.1f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
+                    engine.drawPoint3D((p.position + vec3f{ -0.1f, 0.0f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
+                }
+            }
+        }
+    });
 }
 
 // Empieza el dibujado y se limpia la pantalla
@@ -2702,7 +2732,7 @@ void RenderSystem::drawAnimatedTextures(GameEngine& engine)
         if (textureInfo.elapsed < 2.5f)
         {
             // Incrementamos el tiempo transcurrido
-            textureInfo.elapsed += timeStep;
+            textureInfo.elapsed += timeStep30;
         }
         else
         {
