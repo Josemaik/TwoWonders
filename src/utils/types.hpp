@@ -20,6 +20,8 @@
 #include "../components/ladder_component.hpp"
 #include "../components/message_component.hpp"
 #include "../components/boat_component.hpp"
+#include "../components/particle_component.hpp"
+#include "../components/spawn_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
 #include "../components/navmesh_component.hpp"
@@ -143,7 +145,9 @@ using CL = MP::TypeList <
     NPCComponent,
     LadderComponent,
     MessageComponent,
-    BoatComponent
+    BoatComponent,
+    ParticleMakerComponent,
+    SpawnComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,
@@ -203,3 +207,4 @@ using deathSet = std::set<std::size_t, std::greater<std::size_t>>;
 using mapType = rapidjson::Document;
 using valueType = rapidjson::Value;
 using mapSizeType = rapidjson::SizeType;
+using Effects = ParticleMakerComponent::ParticleEffect;

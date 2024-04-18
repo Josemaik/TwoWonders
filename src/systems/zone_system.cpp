@@ -159,6 +159,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     checkZones(em, evm, zchi.getZones(InteractableType::Ladder), [&](EntityManager& em, EventManager&) { checkLadders(em); });
     checkZones(em, evm, zchi.getZones(InteractableType::Sign), [&](EntityManager& em, EventManager&) { checkSigns(em); });
     checkZones(em, evm, zchi.getZones(InteractableType::MissionOBJ), [&](EntityManager& em, EventManager& evm) { checkMissionObjs(em, evm); });
+    checkZones(em, evm, zchi.getZones(InteractableType::Spawn), [&](EntityManager& em, EventManager&) { checkSpawns(em); });
 }
 
 void ZoneSystem::checkZones(EntityManager& em, EventManager& evm, checkType zones, checkFuncType checkFunction)
@@ -174,10 +175,13 @@ void ZoneSystem::checkZones(EntityManager& em, EventManager& evm, checkType zone
 void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
 {
     auto& li = em.getSingleton<LevelInfo>();
-    using chestCMP = MP::TypeList<ChestComponent, InteractiveComponent, PhysicsComponent, OneUseComponent>;
+    auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+    auto& playerPos = playerPhy.position;
+
+    using chestCMP = MP::TypeList<ChestComponent, InteractiveComponent, PhysicsComponent, OneUseComponent, ParticleMakerComponent>;
     using chestTag = MP::TypeList<ChestTag>;
 
-    em.forEach<chestCMP, chestTag>([&](Entity& e, ChestComponent& ch, InteractiveComponent& ic, PhysicsComponent& phy, OneUseComponent& ouc)
+    em.forEach<chestCMP, chestTag>([&](Entity& e, ChestComponent& ch, InteractiveComponent& ic, PhysicsComponent& phy, OneUseComponent& ouc, ParticleMakerComponent& pmc)
     {
         if (ouc.zones.find(li.num_zone) != ouc.zones.end())
         {
@@ -188,14 +192,9 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
                 return;
 
             // Calcula la distancia entre la posición del jugador y la posición del cofre
-            auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
-            auto& playerPos = playerPhy.position;
-
             double distance = playerPos.distance(phy.position);
             double range = ic.range;
 
-            // if (ch.checkCrushers)
-            // {
             using crusherCMP = MP::TypeList<PhysicsComponent>;
             using crusherTag = MP::TypeList<EnemyTag>;
 
@@ -213,7 +212,6 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
 
             if (ch.closeEnemies > ch.maxEnemies)
                 ch.maxEnemies = ch.closeEnemies;
-            // }
 
             // Si el cofre se encuentra a menos de 2 unidades de distancia del se muestra el mensaje de abrir cofre
             if (distance < range && !ch.isOpen && !ic.showButton && !li.playerDetected && ch.closeEnemies == 0)
@@ -235,6 +233,8 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
                 ch.isOpen = true;
                 ic.showButton = false;
                 li.chestToOpen = e.getID();
+                pmc.active = false;
+
                 evm.scheduleEvent(Event{ EventCodes::OpenChest });
                 li.dontLoad.insert(pair);
                 em.getSingleton<SoundSystem>().sonido_interaccion_e();
@@ -249,6 +249,9 @@ void ZoneSystem::checkLevers(EntityManager& em, EventManager& evm)
     auto& li = em.getSingleton<LevelInfo>();
     if (li.playerDetected)
         return;
+    auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+    auto& playerPos = playerPhy.position;
+
     using leverCMP = MP::TypeList<InteractiveComponent, PhysicsComponent, OneUseComponent>;
     using leverTAG = MP::TypeList<LeverTag>;
 
@@ -263,9 +266,6 @@ void ZoneSystem::checkLevers(EntityManager& em, EventManager& evm)
                 return;
 
             // Calcula la distancia entre la posición del jugador y la posición de la palanca
-            auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
-            auto& playerPos = playerPhy.position;
-
             double distance = playerPos.distance(phy.position);
             double range = ic.range;
 
@@ -294,6 +294,9 @@ void ZoneSystem::checkLevers(EntityManager& em, EventManager& evm)
 void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
 {
     auto& li = em.getSingleton<LevelInfo>();
+    auto& playerEnt = *em.getEntityByID(li.playerID);
+    auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
+    auto& playerPos = playerPhy.position;
     using CMPs = MP::TypeList<InteractiveComponent, PhysicsComponent>;
     using doorTag = MP::TypeList<DoorTag>;
 
@@ -301,9 +304,6 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
     {
         if (e.hasTag<NoKeyTag>())
             return;
-        auto& playerEnt = *em.getEntityByID(li.playerID);
-        auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
-        auto& playerPos = playerPhy.position;
 
         double distance = playerPos.distance(phy.position);
         double range = ic.range;
@@ -550,34 +550,42 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager&)
     });
 }
 
-// void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
-// {
-//     auto& li = em.getSingleton<LevelInfo>();
-//     using CMPs = MP::TypeList<InteractiveComponent, PhysicsComponent>;
-//     using spawnTag = MP::TypeList<SpawnTag>;
+void ZoneSystem::checkSpawns(EntityManager& em)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& playerEnt = *em.getEntityByID(li.playerID);
+    auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
+    auto& playerPos = playerPhy.position;
+    using CMPs = MP::TypeList<PhysicsComponent, ColliderComponent, InteractiveComponent, SpawnComponent>;
+    using spawnTag = MP::TypeList<SpawnTag>;
 
-//     em.forEach<CMPs, spawnTag>([&](Entity&, InteractiveComponent& ic, PhysicsComponent& phy)
-//     {
-//         auto& playerEnt = *em.getEntityByID(li.playerID);
-//         auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
-//         auto& playerPos = playerPhy.position;
+    auto& frti = em.getSingleton<FrustumInfo>();
+    em.forEach<CMPs, spawnTag>([&](Entity&, PhysicsComponent& phy, ColliderComponent& col, InteractiveComponent& ic, SpawnComponent& sc)
+    {
+        if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
+            return;
 
-//         double distance = playerPos.distance(phy.position);
-//         double range = 4.5;
-//         if (distance < range && !ic.showButton && !li.playerDetected)
-//             ic.showButton = true;
+        // Calculamos la distancia entre el jugador y el spawn
+        double distance = playerPos.distance(phy.position);
 
-//         else if (distance > range && ic.showButton)
-//             ic.showButton = false;
-
-//         auto& inpi = em.getSingleton<InputInfo>();
-
-//         if (inpi.interact && ic.showButton && !li.playerDetected)
-//         {
-//             evm.scheduleEvent(Event{ EventCodes::SetSpawn });
-//         }
-//     });
-// }
+        if (distance < ic.range && !sc.active)
+        {
+            for (auto& [_, part] : sc.parts)
+            {
+                part->multiply = true;
+            }
+            sc.active = true;
+        }
+        else if (distance > ic.range && sc.active)
+        {
+            for (auto& [_, part] : sc.parts)
+            {
+                part->multiply = false;
+            }
+            sc.active = false;
+        }
+    });
+}
 
 // void ZoneSystem::checkDungeonSlimes(EntityManager& em, EventManager& evm)
 // {

@@ -415,11 +415,11 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
         {
             auto pos = originalPos + (posCopy - originalPos) * (i / distance);
             auto& e{ em.newEntity() };
-            auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = { 2.0f, 0.1f, 2.0f }, .color = BLUE });
-            auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.5 });
+            auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ pos }, .scale = { 2.0f, 0.1f, 2.0f }, .gravity = 0.05 });
             em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 0.5f });
             em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Water });
-            em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+            em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, p.scale, BehaviorType::ATK_PLAYER });
+            em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::WATER, .maxParticles = 10, .spawnRate = 0.01f, .lifeTime = 0.1f, });
         }
         break;
     }
@@ -446,9 +446,11 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
         {
         case Spells::WaterBomb:
             em.addTag<WaterBombTag>(e);
+            em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::WATER, .maxParticles = 10, .spawnRate = 0.01f, .lifeTime = 0.5f, });
             break;
         case Spells::FireBall:
             em.addTag<FireBallTag>(e);
+            em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::FIREBALL, .maxParticles = 20, .spawnRate = 0.01f, .lifeTime = 0.2f, });
             break;
         default:
             break;

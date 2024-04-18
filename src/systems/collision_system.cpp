@@ -665,14 +665,18 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::SPAWN)
     {
         auto& plfi = em.getSingleton<PlayerInfo>();;
+        auto& life = em.getComponent<LifeComponent>(*staticEntPtr);
+
+        if (life.life < life.maxLife)
+            life.life = life.maxLife;
+
+        if (plfi.mana < plfi.max_mana - 3.0)
+            plfi.mana = plfi.max_mana - 3.0;
+
         if (evm != nullptr && plfi.spawnPoint != otherPhy->position)
         {
-            evm->scheduleEvent(Event{ EventCodes::SetSpawn });
-
             plfi.spawnPoint = otherPhy->position;
-            auto& life = em.getComponent<LifeComponent>(*staticEntPtr);
-            life.life = life.maxLife;
-            plfi.mana = plfi.max_mana - 3.0;
+            evm->scheduleEvent(Event{ EventCodes::SetSpawn });
 
             em.getSingleton<SoundSystem>().sonido_checkpoint();
 
@@ -687,7 +691,6 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
                 }
             }
         }
-
         return;
     }
 
