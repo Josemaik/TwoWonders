@@ -1,11 +1,11 @@
 #pragma once
 #ifndef RENDER_SYSTEM
 #define RENDER_SYSTEM
+#include <map>
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
 #include "../systems/sound_system.hpp"
 #include "../utils/pf/Graph.hpp"
-#include <map>
 
 struct RenderSystem
 {

@@ -564,9 +564,17 @@ void RenderSystem::drawStory(GameEngine& engine) {
 void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
 {
     using SYSCMPs = MP::TypeList<RenderComponent>;
+    auto& frti = em.getSingleton<FrustumInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, RenderComponent& r)
     {
+        if (r.meshLoaded && e.hasComponent<ColliderComponent>())
+        {
+            auto& col = em.getComponent<ColliderComponent>(e);
+            if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
+                return;
+        }
+
         if (r.visible) {
             Color colorEntidad = r.color;
 

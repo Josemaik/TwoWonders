@@ -2,8 +2,8 @@
 #include <vector>
 #include <memory>
 #include <map>
-#include "../utils/types.hpp"
-#include "../utils/BBox.hpp"
+#include "types.hpp"
+#include "BBox.hpp"
 #include "../components/collider_component.hpp"
 
 struct Octree

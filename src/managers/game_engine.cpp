@@ -6,7 +6,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 {
     ENGI::GameEngine::initWindow(width_, height_, "Two Wonders");
 
-    ENGI::GameEngine::setUpCamera({ 0.0f, 01.0f, 0.0f });
+    ENGI::GameEngine::setUpCamera({ 0.0f, 1.0f, 0.0f });
     ENGI::GameEngine::setProjectionCamera(CAMERA_ORTHOGRAPHIC);
 
     // Logo Two Wonders
@@ -782,4 +782,9 @@ double ENGI::GameEngine::getTime()
     auto duration = now.time_since_epoch();
     auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
     return static_cast<double>(microseconds.count()) / 1e6;
+}
+
+float ENGI::GameEngine::getAspectRat()
+{
+    return static_cast<float>(width_) / static_cast<float>(height_);
 }

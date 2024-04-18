@@ -133,4 +133,31 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
     ge.setPositionCamera(newCameraPos);
     ge.setTargetCamera(newCameraTarget);
     ge.setFovyCamera(newCameraFovy);
+
+    updateFrustum(em, ge);
+}
+
+void CameraSystem::updateFrustum(EntityManager& em, GameEngine& ge)
+{
+    // Actualizamos el FrustumInfo de la cámara
+    auto& frustum = em.getSingleton<FrustumInfo>();
+    auto cameraPos = ge.getPositionCamera().to_other<float>();
+    auto cameraTarget = ge.getTargetCamera().to_other<float>();
+    auto cameraFovy = ge.getFovyCamera();
+    vec3f cameraUp = ge.getUpCamera().to_other<float>();
+    float aspectRatio = ge.getAspectRat();
+
+    float halfHeight = static_cast<float>(std::tan(((cameraFovy) / 2.0f) * DEGTORAD) * cameraPos.distance(cameraTarget));
+    float halfWidth = aspectRatio * halfHeight;
+
+    // Calculate the bounds of the orthographic projection
+    float left = -halfWidth;
+    float right = halfWidth;
+    float bottom = -halfHeight;
+    float top = halfHeight;
+
+    float nearPlane = 0.1f;
+    float farPlane = 100.0f;
+
+    frustum.setFrustum(left, right, bottom, top, nearPlane, farPlane, cameraPos, cameraTarget, cameraUp);
 }
