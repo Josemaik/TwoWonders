@@ -39,7 +39,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
                     }
                 }
             });
-
+            //La apisonadora ataca todo el tiempo ( estes o no detectado)
             if (distance < (ectx.ai->detect_radius * ectx.ai->detect_radius) &&
                 !collision) {
                 ectx.ai->playerdetected = true;
@@ -47,7 +47,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
             }
             else {
                 ectx.ai->playerdetected = false;
-                return BTNodeStatus_t::fail;
+                return BTNodeStatus_t::success;
             }
         }
         else {

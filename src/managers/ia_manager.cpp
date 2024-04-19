@@ -220,7 +220,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* pdc = &tree.createNode<BTDecisionPlayerDetected>();
         auto* rfca = &tree.createNode<BTDecisionReadyforCrusherAttk>();
         auto* ash = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::CrusherAttack, wp.position);
-        tree.createNode<BTNodeSequence_t>(pdc, rfca, ash);
+        tree.createNode<BTNodeSequence_t>(pdc,rfca, ash);
     }
           break;
     default:

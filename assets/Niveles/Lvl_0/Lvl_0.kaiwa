@@ -860,8 +860,8 @@
 								[101.0, 3.0, -128.0],
 								[90.0, 3.0, -138.0]
 							],
-							"countdown_stop": 0.4,
-							"countdown_shoot": 1.5,
+							"countdown_stop": 0.0,
+							"countdown_shoot": 1.0,
 							"countdown_perception": 0.2,
 							"scale_to_respawn_attack": 7.0
 						}

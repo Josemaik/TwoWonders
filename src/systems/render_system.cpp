@@ -1803,11 +1803,11 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             auto& ai = em.getComponent<AIComponent>(e);
             int posx = static_cast<int>(engine.getWorldToScreenX(phy.position) + 30);
             int posz = static_cast<int>(engine.getWorldToScreenY(phy.position) - 70);
-            if (ai.playerdetected) {
+            // if (ai.playerdetected) {
                 engine.drawRectangle(posx, posz, 10, 100, BLACK);
                 int barHeight = static_cast<int>((ai.elapsed_shoot / ai.countdown_shoot) * 100);
                 engine.drawRectangle(posx, posz, 10, barHeight, BLUE);
-            }
+            // }
         }
 
         // Vidas HUD
