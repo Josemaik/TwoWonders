@@ -616,9 +616,9 @@ void RenderSystem::drawStory(GameEngine& engine) {
     GuiLabel({ posX, posY + 100, boxWidth, boxHeight }, "debes encontrar a tu maestro.");
     GuiLabel({ posX, posY + 150, boxWidth, boxHeight }, "¡Mucha suerte!");
 
-    std::string text = "PRESS [ENTER] TO PLAY";
+    std::string text = "DALE A [E] PARA JUGAR";
     if (engine.isGamepadAvailable(0))
-        text = "PRESS [X] TO PLAY";
+        text = "DALE A [X] PARA JUGAR";
     GuiLabel({ posX, posY + 250, boxWidth, boxHeight }, text.c_str());
 
     init();
@@ -2194,8 +2194,8 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                         {
                             double multiplier = 28.0;
 
-                            GameEngine::Gif* gif;
-                            Texture2D gifCopy;
+                            GameEngine::Gif* gif{ nullptr };
+                            Texture2D gifCopy{};
                             if (li.lockedEnemy == li.max)
                             {
                                 if (engine.isGamepadAvailable(0))
