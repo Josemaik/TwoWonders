@@ -36,11 +36,11 @@ vec3d AttackSystem::getPosMeteorito(uint16_t fase, vec3d posplayer) {
 void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att) {
     // att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
 
-    auto& phy = em.getComponent<PhysicsComponent>(ent);
 
     // Se pone la direccion en la que este mirando el player
     if (ent.hasTag<PlayerTag>() && ent.hasComponent<InputComponent>()) {
         auto& plfi = em.getSingleton<PlayerInfo>();
+        auto& phy = em.getComponent<PhysicsComponent>(ent);
         if (plfi.mana <= MANA_CUT)
         {
             att.createAttack = false;
@@ -87,6 +87,12 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
         }
     }
 
+    createAttackType(em, ent, att);
+}
+
+void AttackSystem::createAttackType(EntityManager& em, Entity& ent, AttackComponent& att)
+{
+    auto& phy = em.getComponent<PhysicsComponent>(ent);
     bool is_air_attack{ false };
     // Tipo de ataque
     switch (att.type)
@@ -250,13 +256,59 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     case AttackType::FireBall:
     {
         auto& e{ em.newEntity() };
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 10.0f, 0.1f, 10.0f }, .color = BLUE });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
+        // auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 10.0f, 0.1f, 10.0f }, .color = BLUE });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ phy.position }, .scale = { 10.0f, 0.1f, 10.0f }, .gravity = 0.01 });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 1.0f });
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Fire });
-        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
-        em.getSingleton<SoundSystem>().sonido_h_bola_fuego();
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, p.scale, BehaviorType::ATK_PLAYER });
+        em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::FIRESPLASH, .maxParticles = 25, .spawnRate = 0.01f, .lifeTime = 0.3f, });
+        break;
+    }
+    case AttackType::FireBallShot:
+    {
+        // Creamos el hechizo
+        auto& e{ em.newEntity() };
+        em.addTag<HitPlayerTag>(e);
+        em.addTag<FireBallTag>(e);
 
+        BehaviorType type = BehaviorType::ATK_ENEMY;
+        if (ent.hasTag<PlayerTag>())
+        {
+            setPlayerAtkVel(em, ent, att);
+            type = BehaviorType::ATK_PLAYER;
+        }
+
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
+        em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
+        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.07f });
+        em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Fire });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, type });
+        em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::FIREBALL, .maxParticles = 20, .spawnRate = 0.01f, .lifeTime = 0.2f, });
+        em.getSingleton<SoundSystem>().sonido_h_bola_fuego();
+        break;
+    }
+    case AttackType::WaterBombShot:
+    {
+        // Creamos el hechizo
+        auto& e{ em.newEntity() };
+        em.addTag<HitPlayerTag>(e);
+        em.addTag<WaterBombTag>(e);
+
+        BehaviorType type = BehaviorType::ATK_ENEMY;
+        if (ent.hasTag<PlayerTag>())
+        {
+            setPlayerAtkVel(em, ent, att);
+            type = BehaviorType::ATK_PLAYER;
+        }
+
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
+        em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
+        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.07f });
+        em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Water });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, type });
+        em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::WATER, .maxParticles = 10, .spawnRate = 0.01f, .lifeTime = 0.5f, });
         break;
     }
     default:
@@ -265,7 +317,6 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     //if air attack not running reset createattack
     if (!is_air_attack)
         att.createAttack = false;
-
 }
 
 void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, AttackComponent& att, int numShots) {
@@ -345,6 +396,7 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
     switch (spell.spell)
     {
     case Spells::FireBall:
+        att.type = AttackType::FireBallShot;
         eleType = ElementalType::Fire;
         break;
     case Spells::IceShards:
@@ -356,6 +408,7 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
     }
     case Spells::WaterBomb:
     {
+        att.type = AttackType::WaterBombShot;
         eleType = ElementalType::Water;
         em.getSingleton<SoundSystem>().sonido_h_pompa();
         break;
@@ -431,42 +484,7 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
 
     if (eleType != ElementalType::Neutral)
     {
-        auto& li = em.getSingleton<LevelInfo>();
-        // Creamos el hechizo
-        auto& e{ em.newEntity() };
-        em.addTag<HitPlayerTag>(e);
-
-        if (li.lockedEnemy != li.max)
-        {
-            auto& lockedEnemy = *em.getEntityByID(li.lockedEnemy);
-            auto& lockedEnemyPos = em.getComponent<PhysicsComponent>(lockedEnemy).position;
-            att.vel = (lockedEnemyPos - em.getComponent<PhysicsComponent>(ent).position).normalize();
-            att.vel.setY(att.vel.y() + 0.7);
-        }
-        else
-            att.vel.setY(0.7);
-
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
-        em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.07f });
-        em.addComponent<TypeComponent>(e, TypeComponent{ .type = eleType });
-        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
-
-        // Asignamos tags para los modelos
-        switch (spell.spell)
-        {
-        case Spells::WaterBomb:
-            em.addTag<WaterBombTag>(e);
-            em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::WATER, .maxParticles = 10, .spawnRate = 0.01f, .lifeTime = 0.5f, });
-            break;
-        case Spells::FireBall:
-            em.addTag<FireBallTag>(e);
-            em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::FIREBALL, .maxParticles = 20, .spawnRate = 0.01f, .lifeTime = 0.2f, });
-            break;
-        default:
-            break;
-        }
+        createAttackType(em, ent, att);
     }
 
     for (auto& s : plfi.spells)
@@ -488,4 +506,18 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
 void AttackSystem::setCollisionSystem(CollisionSystem* col)
 {
     col_sys = col;
+}
+
+void AttackSystem::setPlayerAtkVel(EntityManager& em, Entity& e, AttackComponent& att)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    if (li.lockedEnemy != li.max)
+    {
+        auto& lockedEnemy = *em.getEntityByID(li.lockedEnemy);
+        auto& lockedEnemyPos = em.getComponent<PhysicsComponent>(lockedEnemy).position;
+        att.vel = (lockedEnemyPos - em.getComponent<PhysicsComponent>(e).position).normalize();
+        att.vel.setY(att.vel.y() + 0.7);
+    }
+    else
+        att.vel.setY(0.7);
 }

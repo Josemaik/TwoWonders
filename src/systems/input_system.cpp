@@ -89,7 +89,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
 
     // Sacamos las físicas y el input del jugador
     auto& phy = em.getComponent<PhysicsComponent>(player);
-    if (phy.stopped)
+    if (phy.stopped && phy.elapsed_afterStop >= phy.countdown_afterStop)
         return;
 
     auto& in = em.getComponent<InputComponent>(player);

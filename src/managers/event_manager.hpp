@@ -260,7 +260,7 @@ public:
                         {
                             if (npc.type == NPCType::INVESTIGATOR)
                             {
-                                npc.pathIt_investigadorIt = npc.path_investigador.begin();
+                                npc.pathIt_inestigador = npc.path_investigador.begin();
                                 phy.position = { 27.2022,14,-104.252 };
                                 npc.tp = true;
                             }
@@ -348,7 +348,7 @@ public:
                         std::array<std::pair<SpeakerType, std::string>, 3> msgs =
                         {
                             std::make_pair(SpeakerType::NOMAD, "Nómada: \nTú de nuevo, gracias por sacarme de esa mazmorra.\n ¿Ves los charcos de lava de alrededor?"),
-                            std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \nSí, pero no puedo apagarlos con mi agua. Y tengo que cruzarlos."),
+                            std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \nSí, pero no puedo apagarlos con mi agua. \nY tengo que cruzarlos."),
                             std::make_pair(SpeakerType::NOMAD, "Nómada: \n¿Qué te enseñó el viejo ese? \n Toma, usa esto te ayudará con la lava.")
                         };
 
@@ -460,9 +460,6 @@ public:
 
                         auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
                         playerPhy.notMove = false;
-                        ///////////////////////////////
-                        // li.investigador_boat = true;
-                        ///////////////////////////////
                         break;
                     }
                     case EventCodes::DialogNomadVolcano3:

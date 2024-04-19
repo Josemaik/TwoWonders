@@ -54,7 +54,7 @@ struct RenderSystem
     void drawInventory(GameEngine& engine, EntityManager& em);
     void drawItemDescription(GameEngine& engine, EntityManager& em, Item& item);
     void setShader(Shader& shader) { shaderPtr = &shader; }
-    void addAnimatedTexture(std::string textureName, int targetPosX, int targetPosY, float scaleFactor);
+    void resetAnimatedTexture() { animatedTextures.clear(); }
     // Funciones double dtprivadas para organizar el codigo
 private:
     void init();

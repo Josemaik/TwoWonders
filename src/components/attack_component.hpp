@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-
+#include "../utils/vec3D.hpp"
 
 enum AttackType
 {
@@ -18,6 +18,8 @@ enum AttackType
     CrusherAttack = 0x400,
     WaterBomb = 0x800,
     FireBall = 0x1000,
+    FireBallShot = 0x2000,
+    WaterBombShot = 0x4000,
 };
 
 struct AttackComponent

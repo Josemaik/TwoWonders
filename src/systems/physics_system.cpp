@@ -26,6 +26,8 @@ void PhysicsSystem::update(EntityManager& em)
         if (phy.elapsed_afterStop < phy.countdown_afterStop)
         {
             phy.plusDeltatime(timeStep30, phy.elapsed_afterStop);
+            if (phy.stopped)
+                phy.stopped = false;
         }
         else if (phy.stopped)
         {

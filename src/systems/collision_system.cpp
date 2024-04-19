@@ -631,8 +631,6 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
             plfi.spawnPoint = otherPhy->position;
             evm->scheduleEvent(Event{ EventCodes::SetSpawn });
 
-            em.getSingleton<SoundSystem>().sonido_checkpoint();
-
             if (otherEntPtr->hasComponent<DispatcherComponent>())
             {
                 auto& dc = em.getComponent<DispatcherComponent>(*otherEntPtr);

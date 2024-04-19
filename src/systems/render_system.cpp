@@ -67,11 +67,12 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
     float buttonWidth = 200.0f;
     float buttonHeight = 50.0f;
     float posX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2.f);
-    float posY = static_cast<float>(engine.getScreenHeight() / 1.25) - (buttonHeight / 2.f);
+    float posY = static_cast<float>(engine.getScreenHeight() / 1.30) - (buttonHeight / 2.f);
 
     // Funcionalidad de botones
     Rectangle btn1Rec = { posX, posY, buttonWidth, buttonHeight };
-    Rectangle btn2Rec = { posX, posY + 70, buttonWidth, buttonHeight };
+    Rectangle btn2Rec = { posX, posY + 55, buttonWidth, buttonHeight };
+    Rectangle btn3Rec = { posX, posY + 110, buttonWidth, buttonHeight };
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
@@ -84,6 +85,7 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
     ButtonRect buttons[] = {
         { btn1Rec, "JUGAR", 0 },
         { btn2Rec, "CONFIGURACION", 1 },
+        { btn3Rec, "SALIR", 2 }
     };
 
     // Control de botones de mando para cambiar el botón seleccionado
@@ -113,6 +115,10 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
                 li.currentScreen = GameScreen::OPTIONS;
                 li.previousScreen = GameScreen::TITLE;
                 ss.seleccion_menu();
+                break;
+            case 2: // "SALIR"
+                li.gameShouldEnd = true;
+                ss.sonido_salir();
                 break;
             }
 
@@ -161,7 +167,7 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
 
-    if (inpi.interact)
+    if (inpi.interact || engine.isKeyReleased(KEY_ESCAPE))
     {
         li.currentScreen = li.previousScreen;
         li.previousScreen = li.evenMorePreviousScreen;
@@ -203,6 +209,12 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     float posResX = static_cast<float>(middleScreen) - (buttonWidth / 2);
     float posResY = static_cast<float>(200) - (buttonHeight / 2);
     float offSetY = 150;
+
+    if (fullScreen)
+    {
+        engine.setWindowFullScreen();
+        fullScreen = false;
+    }
 
     // Boton de volver al inicio
     Rectangle btn1Rec = { posX, posY, buttonWidth, buttonHeight };
@@ -313,12 +325,6 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     else if (!buttonTouched && ss.pushed)
         ss.pushed = false;
 
-    if (fullScreen)
-    {
-        engine.setWindowFullScreen();
-        fullScreen = false;
-    }
-
     engine.endDrawing();
 }
 
@@ -386,6 +392,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em)
             case 2: // "VOLVER AL INICIO"
             {
                 li.currentScreen = GameScreen::TITLE;
+                li.resetGame = true;
                 ss.seleccion_menu();
                 break;
             }
@@ -430,7 +437,7 @@ void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
     float buttonWidth = 200.0f;
     float buttonHeight = 50.0f;
     float posButtonX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2);
-    float posButtonY = static_cast<float>(engine.getScreenHeight() / 2) - (buttonHeight / 2);
+    float posButtonY = static_cast<float>(engine.getScreenHeight() / 3) - (buttonHeight / 2);
     float posX = static_cast<float>(engine.getScreenWidth() / 2) - (windowWidth / 2);
     float posY = static_cast<float>(engine.getScreenHeight() / 2) - (windowHeight / 2);
     // float augment = 55.f;
@@ -454,9 +461,9 @@ void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
     auto size = plfi.inventory.size() + 1;
     std::vector<ButtonRect> buttons(size);
     for (std::size_t i = 0; i < plfi.inventory.size(); i++) {
-        buttons[i] = { { posButtonX, posButtonY + 50 * static_cast<float>(i), buttonWidth, buttonHeight }, plfi.inventory[i]->name.c_str(), static_cast<int>(i) };
+        buttons[i] = { { posButtonX, posButtonY + 55 * static_cast<float>(i), buttonWidth, buttonHeight }, plfi.inventory[i]->name.c_str(), static_cast<int>(i) };
     }
-    buttons[plfi.inventory.size() - 1] = { { posButtonX, posButtonY + 50 * static_cast<float>(plfi.inventory.size()), buttonWidth, buttonHeight }, "VOLVER", static_cast<int>(plfi.inventory.size()) };
+    buttons[plfi.inventory.size()] = { { posButtonX, posButtonY + 55 * static_cast<float>(plfi.inventory.size()), buttonWidth, buttonHeight }, "VOLVER", static_cast<int>(plfi.inventory.size()) };
 
     if (plfi.selectedItem == plfi.max)
     {
@@ -468,7 +475,7 @@ void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
             currentButton = (currentButton < plfi.inventory.size()) ? currentButton + 1 : 0;
         }
 
-        for (std::size_t i = 0; i < sizeof(buttons) / sizeof(ButtonRect); i++) {
+        for (std::size_t i = 0; i < buttons.size(); i++) {
             ButtonRect& button = buttons[i];
             bool isCurrent = (currentButton == i);
             if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
@@ -776,7 +783,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     pos.setY(pos.y() - 3.54);
                     in = true;
                 }
-                else if (e.hasTag<DoorTag>() || e.hasTag<LeverTag>()
+                else if (e.hasTag<DoorTag>() || e.hasTag<LeverTag>() || e.hasTag<FireBallTag>()
                     || e.hasTag<CoinTag>() || e.hasTag<WaterBombTag>() || e.hasTag<BoatTag>())
                 {
                     in = true;
@@ -1007,7 +1014,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<AngryBushTag>())
     {
         if (li.mapID == 0)
-            r.model = engine.loadModel("assets/Personajes/Enemigos/Piedra/Piedra_1.obj");
+            r.model = engine.loadModel("assets/Personajes/Enemigos/Piedra/Piedra_2.obj");
         else
             r.model = engine.loadModel("assets/Personajes/Enemigos/Piedra/Piedra_3.obj");
 
@@ -1015,7 +1022,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     else if (e.hasTag<AngryBushTag2>())
     {
-        r.model = engine.loadModel("assets/Personajes/Enemigos/Piedra/Piedra_2.obj");
+        r.model = engine.loadModel("assets/Personajes/Enemigos/Piedra/Piedra_1.obj");
 
         loadShaders(r.model);
     }
@@ -1804,9 +1811,9 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             int posx = static_cast<int>(engine.getWorldToScreenX(phy.position) + 30);
             int posz = static_cast<int>(engine.getWorldToScreenY(phy.position) - 70);
             // if (ai.playerdetected) {
-                engine.drawRectangle(posx, posz, 10, 100, BLACK);
-                int barHeight = static_cast<int>((ai.elapsed_shoot / ai.countdown_shoot) * 100);
-                engine.drawRectangle(posx, posz, 10, barHeight, BLUE);
+            engine.drawRectangle(posx, posz, 10, 100, BLACK);
+            int barHeight = static_cast<int>((ai.elapsed_shoot / ai.countdown_shoot) * 100);
+            engine.drawRectangle(posx, posz, 10, barHeight, BLUE);
             // }
         }
 
@@ -2233,7 +2240,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                             gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
                             gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
 
-                            multiplier = 55.0;
+                            multiplier = 20.0;
 
                             if (ene.hasTag<DestructibleTag>())
                                 multiplier = 8.0;

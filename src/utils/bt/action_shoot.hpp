@@ -39,8 +39,16 @@ struct BTActionShoot : BTNode_t {
                 break;
             }
             case  AIComponent::TypeShoot::OneShoottoPlayer: {
+                auto& li = ectx.em.getSingleton<LevelInfo>();
                 att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai->SPEED_AI;
-                att.attack(AttackType::Ranged);
+
+                if (ectx.ent.hasTag<SnowmanTag>() && li.mapID == 2) {
+                    att.attack(AttackType::FireBallShot);
+                    att.vel = { att.vel.x() * 1.2, att.vel.y() + 0.7, att.vel.z() * 1.2 };
+                }
+                else
+                    att.attack(AttackType::Ranged);
+
                 if (ectx.ent.hasTag<SnowmanTag>()) {
                     ectx.em.getSingleton<SoundSystem>().sonido_munyeco_ataque();
                 }

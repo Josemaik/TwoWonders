@@ -14,7 +14,8 @@ void ParticleSystem::update(EntityManager& em)
     { Effects::WATER, { { 2.0f, -0.5f, 2.0f }, { {0, 121, 241, 255}, { 102, 191, 255, 255 } } } },
     { Effects::FIREBALL, { { 2.0f, 0.5f, 2.0f }, { {255, 0, 0, 255}, {130, 129, 129, 255} } } },
     { Effects::OBJECT, { { 1.0f, 0.2f, 1.0f }, {  {255, 215, 0, 255}, { 255, 119, 0, 255 } } } },
-    { Effects::WATERSPLASH, { { 2.0f, 0.1f, 2.0f }, { {0, 121, 241, 255}, { 102, 191, 255, 255 } } } }
+    { Effects::WATERSPLASH, { { 2.0f, 0.1f, 2.0f }, { {0, 121, 241, 255}, { 102, 191, 255, 255 } } } },
+    { Effects::FIRESPLASH, { { 2.0f, 0.1f, 2.0f }, { {255, 0, 0, 255}, {156, 50, 52, 255} } } }
     };
 
     // La parte del motor gráfico será poder colocar puntos de luz desde donde se generen las partículas sjsjsj

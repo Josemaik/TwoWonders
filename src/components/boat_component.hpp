@@ -11,9 +11,6 @@ enum struct BoatParts : uint8_t
 
 struct BoatComponent
 {
-    void setPart() { part = static_cast<BoatParts>(nextPart++); }
+    void setPart(uint8_t& num) { part = static_cast<BoatParts>(num++); }
     BoatParts part{};
-
-private:
-    static uint8_t nextPart;
 };

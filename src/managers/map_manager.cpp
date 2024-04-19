@@ -59,6 +59,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
     mapSizeType size{};
     const valueType* chunks = nullptr;
     int j = 0;
+    auto& li = em.getSingleton<LevelInfo>();
 
     if (state == LoadState::LOAD_CHUNKS)
     {
@@ -91,6 +92,8 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             }
             case LoadState::LOAD_WALLS:
             {
+                if (li.loadingTime < 0.5f)
+                    return;
                 const valueType& overworld = chunk[0]["overworld"];
                 const valueType& wallArray = overworld["Walls"];
                 generateWalls(em, wallArray);
@@ -98,6 +101,8 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             }
             case LoadState::LOAD_RAMPS:
             {
+                if (li.loadingTime < 1.0f)
+                    return;
                 const valueType& overworld = chunk[0]["overworld"];
                 const valueType& rampArray = overworld["Ramps"];
                 generateRamps(em, rampArray);
@@ -105,6 +110,8 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             }
             case LoadState::LOAD_INTERACTABLES:
             {
+                if (li.loadingTime < 1.5f)
+                    return;
                 const valueType& overworld = chunk[0]["overworld"];
                 const valueType& interactablesArray = overworld["Interactive"];
                 generateInteractables(em, interactablesArray);
@@ -112,6 +119,8 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             }
             case LoadState::LOAD_OBJECTS:
             {
+                if (li.loadingTime < 2.0f)
+                    return;
                 auto& li = em.getSingleton<LevelInfo>();
                 const valueType& underworld = chunk[1]["underworld"];
                 const valueType& objectArray = underworld["Objects"];
@@ -120,6 +129,8 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             }
             case LoadState::LOAD_ENEMIES:
             {
+                if (li.loadingTime < 2.5f)
+                    return;
                 const valueType& underworld = chunk[1]["underworld"];
                 const valueType& enemyArray = underworld["Enemies"];
                 generateEnemies(em, enemyArray, iam);
@@ -134,7 +145,6 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             }
             case LoadState::LOAD_NAVMESHES:
             {
-                auto& li = em.getSingleton<LevelInfo>();
                 if (li.mapID != 0 || li.mapID != 1)
                     generateNavmeshes(em);
                 break;
@@ -619,7 +629,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 em.addTag<MissionObjTag>(entity);
                 em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
                 auto& bc = em.addComponent<BoatComponent>(entity);
-                bc.setPart();
+                bc.setPart(boatParts);
                 ic.range = 7.0;
 
                 addToZone(em, entity, type);
@@ -678,7 +688,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
             switch (li.mapID)
             {
             case 1:
-                range = 17.0;
+                range = 21.0;
                 break;
             case 2:
                 range = 7.5;
@@ -843,7 +853,7 @@ void MapManager::generateNavmeshes(EntityManager& em)
     auxconex.push_back(Conection{ 1,620,639 });
     auxconex.push_back(Conection{ 1,846,895 });
     auxconex.push_back(Conection{ 1,816,827 });
-    auxconex.push_back(Conection{ 1,799,827 });
+    auxconex.push_back(Conection{ 1,822,827 });
     auxconex.push_back(Conection{ 1,288,297 });
     auxconex.push_back(Conection{ 1,297,320 });
     auxconex.push_back(Conection{ 1,320,333 });
@@ -1155,6 +1165,7 @@ void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man& iam)
     li.npcflee = false;
     li.door_open = false;
     state = LoadState::LOAD_CHUNKS;
+    boatParts = 0;
     zchi.clearSets();
     zchi.zoneBounds.clear();
     chunksVec.clear();

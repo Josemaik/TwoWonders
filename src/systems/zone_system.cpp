@@ -574,6 +574,7 @@ void ZoneSystem::checkSpawns(EntityManager& em)
                 part->multiply = true;
             }
             sc.active = true;
+            em.getSingleton<SoundSystem>().sonido_checkpoint();
         }
         else if (distance > ic.range && sc.active)
         {

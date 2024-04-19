@@ -408,6 +408,7 @@ void Game::resetGame()
     li.reset();
     plfi.reset();
     lock_system.reset();
+    render_system.resetAnimatedTexture();
     map.reset(em, li.mapID, iam);
     createEntities();
 }

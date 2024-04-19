@@ -66,7 +66,7 @@ private:
     LoadState state{ LoadState::LOAD_CHUNKS };
     mapType map{};
     std::vector<const valueType*> chunksVec{};
-    uint8_t unique_ids{ 0 };
+    uint8_t unique_ids{ 0 }, boatParts{ 0 };
     bool reSpawn{ false };
 
     template <typename... Tags>

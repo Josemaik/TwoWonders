@@ -35,7 +35,7 @@ struct PlayerInfo
     void addSpell(Spell spell)
     {
         spells.push_back(spell);
-
+        inventory.push_back(std::make_unique<Item>(spell));
         bool noCurrent{ false };
         for (auto& slot : spellSlots)
         {
@@ -156,6 +156,7 @@ struct PlayerInfo
         selectedItem = max;
         inventory.clear();
         spells.clear();
+        spellSlots = { noSpell, noSpell, noSpell };
         increaseLife = 0.0;
         armor = 0;
         coins = 0;
