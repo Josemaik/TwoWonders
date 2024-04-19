@@ -166,7 +166,7 @@ struct PlayerInfo
         mana_width = 0;
         onLadder = false;
         hasStaff = false;
-        hasBoots = true;
+        hasBoots = false;
         hasHat = false;
         hasKey = false;
         onSpawn = false;

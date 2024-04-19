@@ -45,48 +45,48 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         return;
     }
 
-    // DEBUG PHYSICS
-    if (ge.isKeyReleased(KEY_F1))
-    {
-        inpi.debugPhy = !inpi.debugPhy;
-        inpi.debugAI1 = false;
-        inpi.debugAI2 = false;
-        inpi.pause = false;
-        inpi.inventory = false;
-        return;
-    }
+    // // DEBUG PHYSICS
+    // if (ge.isKeyReleased(KEY_F1))
+    // {
+    //     inpi.debugPhy = !inpi.debugPhy;
+    //     inpi.debugAI1 = false;
+    //     inpi.debugAI2 = false;
+    //     inpi.pause = false;
+    //     inpi.inventory = false;
+    //     return;
+    // }
 
-    //DEBUG AI - Stop Game
-    if (ge.isKeyReleased(KEY_F2))
-    {
-        inpi.debugAI1 = !inpi.debugAI1;
-        inpi.debugPhy = false;
-        inpi.debugAI2 = false;
-        inpi.pause = false;
-        inpi.inventory = false;
-        return;
-    }
+    // //DEBUG AI - Stop Game
+    // if (ge.isKeyReleased(KEY_F2))
+    // {
+    //     inpi.debugAI1 = !inpi.debugAI1;
+    //     inpi.debugPhy = false;
+    //     inpi.debugAI2 = false;
+    //     inpi.pause = false;
+    //     inpi.inventory = false;
+    //     return;
+    // }
 
-    // DEBUG AI - Real Time
-    if (ge.isKeyReleased(KEY_F3))
-    {
-        inpi.debugAI2 = !inpi.debugAI2;
-        inpi.debugPhy = false;
-        inpi.debugAI1 = false;
-        inpi.pause = false;
-        return;
-    }
+    // // DEBUG AI - Real Time
+    // if (ge.isKeyReleased(KEY_F3))
+    // {
+    //     inpi.debugAI2 = !inpi.debugAI2;
+    //     inpi.debugPhy = false;
+    //     inpi.debugAI1 = false;
+    //     inpi.pause = false;
+    //     return;
+    // }
 
-    // DEBUG NAVMESH
-    if (ge.isKeyReleased(KEY_F4))
-    {
-        inpi.pathfind = !inpi.pathfind;
-        inpi.debugPhy = false;
-        inpi.debugAI1 = false;
-        inpi.debugAI2 = false;
-        inpi.pause = false;
-        return;
-    }
+    // // DEBUG NAVMESH
+    // if (ge.isKeyReleased(KEY_F4))
+    // {
+    //     inpi.pathfind = !inpi.pathfind;
+    //     inpi.debugPhy = false;
+    //     inpi.debugAI1 = false;
+    //     inpi.debugAI2 = false;
+    //     inpi.pause = false;
+    //     return;
+    // }
 
     // Sacamos las físicas y el input del jugador
     auto& phy = em.getComponent<PhysicsComponent>(player);
@@ -218,28 +218,28 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             gami.setVel(vel);
     }
 
-    if (ge.isKeyReleased(KEY_Z))
-    {
-        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 4 };
-        plfi.addSpell(spell);
-    }
+    // if (ge.isKeyReleased(KEY_Z))
+    // {
+    //     Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 4 };
+    //     plfi.addSpell(spell);
+    // }
 
-    if (ge.isKeyReleased(KEY_X))
-    {
-        Spell spell{ "Pompa de fuego", "Disparas una potente concentración de fuego que explota al impacto", Spells::WaterDash, 20.0, 4 };
-        plfi.addSpell(spell);
-    }
+    // if (ge.isKeyReleased(KEY_X))
+    // {
+    //     Spell spell{ "Pompa de fuego", "Disparas una potente concentración de fuego que explota al impacto", Spells::WaterDash, 20.0, 4 };
+    //     plfi.addSpell(spell);
+    // }
 
-    if (ge.isKeyReleased(KEY_C))
-    {
-        Spell spell{ "Pompa de aire", "Disparas una potente concentración de aire que explota al impacto", Spells::FireBall, 20.0, 4 };
-        plfi.addSpell(spell);
-    }
+    // if (ge.isKeyReleased(KEY_C))
+    // {
+    //     Spell spell{ "Pompa de aire", "Disparas una potente concentración de aire que explota al impacto", Spells::FireBall, 20.0, 4 };
+    //     plfi.addSpell(spell);
+    // }
 
-    if (ge.isKeyReleased(KEY_V))
-    {
-        plfi.hasStaff = true;
-    }
+    // if (ge.isKeyReleased(KEY_V))
+    // {
+    //     plfi.hasStaff = true;
+    // }
 
     // Código para el lock-in
     if ((ge.isKeyReleased(in.lockIn) || ge.getGamepadAxisMovement(0, in.m_lockIn) > 0.5) && elapsedLockIn >= elapsedLockInLimit)

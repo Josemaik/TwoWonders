@@ -217,7 +217,8 @@ void Game::run()
         case GameScreen::CONTROLS:
         {
             input_system.update(em, engine);
-            render_system.update(em, engine);
+            // render_system.update(em, engine);
+            render_system.drawControls(em, engine);
             break;
         }
 
