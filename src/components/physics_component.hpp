@@ -49,8 +49,8 @@ struct PhysicsComponent
     float elapsed_stunned{ 0.5f };
 
     bool stopped{ false }, notMove{ false };
-    float countdown_stopped{ 0.35f };
-    float elapsed_stopped{ 0.0f };
+    float countdown_stopped{ 0.35f }, elapsed_stopped{ 0.0f };
+    float countdown_afterStop{ 0.5f }, elapsed_afterStop{ countdown_afterStop };
     vec3d target{};
 
     void plusDeltatime(float deltaTime, float& elapsed) { elapsed += deltaTime; };

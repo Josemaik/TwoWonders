@@ -47,8 +47,8 @@ void ColliderComponent::updateBox(vec3d pos, vec3d scale, double, double orienta
     //     }
     // }
 
-    boundingBox.min = min;
-    boundingBox.max = max;
+    bbox.min = min;
+    bbox.max = max;
 }
 
 void ColliderComponent::rotatePointY(vec3d& point, double cosAngle, double sinAngle)

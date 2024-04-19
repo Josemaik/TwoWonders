@@ -14,7 +14,7 @@ void Octree::insert(Entity& entity, ColliderComponent& collider)
         else
             for (auto& octant : octants_)
             {
-                if (octant->bounds_.intersects(collider.boundingBox))
+                if (octant->bounds_.intersects(collider.bbox))
                 {
                     octant->insert(entity, collider);
                 }
@@ -36,14 +36,14 @@ void Octree::subdivide(Entity& entity, ColliderComponent& collider)
 
         for (auto& entity : octEntities_)
         {
-            if (octants_[i]->bounds_.intersects(entity.second->boundingBox))
+            if (octants_[i]->bounds_.intersects(entity.second->bbox))
             {
                 octants_[i]->insert(*entity.first, *entity.second);
                 // break; // Leer el comentario grande de getNeighbors
             }
         }
 
-        if (octants_[i]->bounds_.intersects(collider.boundingBox))
+        if (octants_[i]->bounds_.intersects(collider.bbox))
         {
             octants_[i]->insert(entity, collider);
         }

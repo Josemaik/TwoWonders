@@ -314,7 +314,7 @@ void ObjectSystem::createObjects(EntityManager& em)
         em.addTag<ObjectTag>(e);
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = scl, .color = color, .visible = visible });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale });
-        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::OBJECT });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = obj, .inmortal = inmortal });
         if (visible)
             em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::OBJECT, .maxParticles = 6, .spawnRate = 0.1f, .lifeTime = 0.4f });

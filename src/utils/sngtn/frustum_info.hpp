@@ -41,7 +41,7 @@ struct FrustumInfo
 
     Position pointInFrustum(vec3f const& point) const;
     Position pointInFrustum(vec3f const& point, float radius) const;
-    Position bboxInFrustum(const BBox& bbox);
+    Position bboxIn(const BBox& bbox);
 
 private:
     std::array<Plane_t, 6> planes{};

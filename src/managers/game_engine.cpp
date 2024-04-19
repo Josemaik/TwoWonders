@@ -148,89 +148,89 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // GIFS
     //
     // Joystick Izquierdo
-    loadAndResizeImageGif("joystick_izq", "assets/HUD/botones/joystickL.gif", 0, 35);
+    loadAndResizeImageGif("joystick_izq", "assets/HUD/botones/joystickL.gif", 0, 18);
 
     // Fijador de cámara
-    loadAndResizeImageGif("fijado", "assets/HUD/gifs/fijado_trama.gif", 0, 35, 1.2, 1.2);
+    loadAndResizeImageGif("fijado", "assets/HUD/gifs/fijado_trama.gif", 0, 18, 1.2, 1.2);
 
     // Botón X
-    loadAndResizeImageGif("x", "assets/HUD/botones/x.gif", 0, 55);
+    loadAndResizeImageGif("x", "assets/HUD/botones/x.gif", 0, 28);
 
     // Botón Círculo
-    loadAndResizeImageGif("circulo", "assets/HUD/botones/circulo.gif", 0, 55);
+    loadAndResizeImageGif("circulo", "assets/HUD/botones/circulo.gif", 0, 28);
 
     // Botón Triángulo
     loadAndResizeImageGif("triangulo", "assets/HUD/botones/triangulo.gif", 0);
 
     // Botón Cuadrado
-    loadAndResizeImageGif("cuadrado", "assets/HUD/botones/cuadrado.gif", 0, 55);
+    loadAndResizeImageGif("cuadrado", "assets/HUD/botones/cuadrado.gif", 0, 28);
 
     // Botón Menú
     loadAndResizeImageGif("menu", "assets/HUD/botones/menu.gif", 0);
 
     // Tecla E
-    loadAndResizeImageGif("e", "assets/HUD/teclas/e.gif", 0, 55);
+    loadAndResizeImageGif("e", "assets/HUD/teclas/e.gif", 0, 28);
 
     // Tecla F
-    loadAndResizeImageGif("f", "assets/HUD/teclas/f.gif", 0, 55);
+    loadAndResizeImageGif("f", "assets/HUD/teclas/f.gif", 0, 28);
 
     // Tecla Q
-    loadAndResizeImageGif("q", "assets/HUD/teclas/q.gif", 0, 55);
+    loadAndResizeImageGif("q", "assets/HUD/teclas/q.gif", 0, 28);
 
     // Tecla I
-    loadAndResizeImageGif("i", "assets/HUD/teclas/i.gif", 0, 55);
+    loadAndResizeImageGif("i", "assets/HUD/teclas/i.gif", 0, 28);
 
     // Tecla H
-    loadAndResizeImageGif("h", "assets/HUD/teclas/H.gif", 0, 55);
+    loadAndResizeImageGif("h", "assets/HUD/teclas/H.gif", 0, 28);
 
     // Tecla L
-    loadAndResizeImageGif("l", "assets/HUD/teclas/L.gif", 0, 55);
+    loadAndResizeImageGif("l", "assets/HUD/teclas/L.gif", 0, 28);
 
     // Tecla J
-    loadAndResizeImageGif("j", "assets/HUD/teclas/J.gif", 0, 55);
+    loadAndResizeImageGif("j", "assets/HUD/teclas/J.gif", 0, 28);
 
     // Tecla K
-    loadAndResizeImageGif("k", "assets/HUD/teclas/k.gif", 0, 55);
+    loadAndResizeImageGif("k", "assets/HUD/teclas/k.gif", 0, 28);
 
     // Tecla O
-    loadAndResizeImageGif("o", "assets/HUD/teclas/o.gif", 0, 55);
+    loadAndResizeImageGif("o", "assets/HUD/teclas/o.gif", 0, 28);
 
     // Tecla U
-    loadAndResizeImageGif("u", "assets/HUD/teclas/u.gif", 0, 55);
+    loadAndResizeImageGif("u", "assets/HUD/teclas/u.gif", 0, 28);
 
     // Tecla Espacio
-    loadAndResizeImageGif("espacio", "assets/HUD/teclas/espacio.gif", 0, 55);
+    loadAndResizeImageGif("espacio", "assets/HUD/teclas/espacio.gif", 0, 28);
 
     // Pantalla de carga
-    loadAndResizeImageGif("carga", "assets/HUD/gifs/carga_elementos.gif", 0, 55);
+    loadAndResizeImageGif("carga", "assets/HUD/gifs/carga_elementos.gif", 0, 28);
 
     // Teclas WASD
-    loadAndResizeImageGif("wasd", "assets/HUD/teclas/WASD.gif", 0, 55);
+    loadAndResizeImageGif("wasd", "assets/HUD/teclas/WASD.gif", 0, 28);
 
     // Ejemplo pompa
-    loadAndResizeImageGif("exp_pompa", "assets/HUD/gifs/hechizos/exp_pompa.gif", 0, 55);
+    loadAndResizeImageGif("exp_pompa", "assets/HUD/gifs/hechizos/exp_pompa.gif", 0, 28);
 
     // Ejemplo dash de agua
-    loadAndResizeImageGif("exp_dash", "assets/HUD/gifs/hechizos/exp_dash.gif", 0, 55);
+    loadAndResizeImageGif("exp_dash", "assets/HUD/gifs/hechizos/exp_dash.gif", 0, 28);
 
     // Ejemplo bola de fuego
-    loadAndResizeImageGif("exp_bola_f", "assets/HUD/gifs/hechizos/exp_bola_f.gif", 0, 55);
+    loadAndResizeImageGif("exp_bola_f", "assets/HUD/gifs/hechizos/exp_bola_f.gif", 0, 28);
 
     // Botón L2
-    loadAndResizeImageGif("l2", "assets/HUD/botones/L2.gif", 0, 55);
+    loadAndResizeImageGif("l2", "assets/HUD/botones/L2.gif", 0, 28);
 
     // Botón R2
-    loadAndResizeImageGif("r2", "assets/HUD/botones/R2.gif", 0, 55);
+    loadAndResizeImageGif("r2", "assets/HUD/botones/R2.gif", 0, 28);
 
     // Botón L1
-    loadAndResizeImageGif("l1", "assets/HUD/botones/L1.gif", 0, 55);
+    loadAndResizeImageGif("l1", "assets/HUD/botones/L1.gif", 0, 28);
 
     // Botón R1
-    loadAndResizeImageGif("r1", "assets/HUD/botones/R1.gif", 0, 55);
+    loadAndResizeImageGif("r1", "assets/HUD/botones/R1.gif", 0, 28);
 
     //Detección por oído
-    loadAndResizeImageGif("Oido_parp1", "assets/HUD/gifs/Oido_parp1.gif", 0, 55);
-    loadAndResizeImageGif("Oido_parp2", "assets/HUD/gifs/Oido_parp2.gif", 0, 55);
+    loadAndResizeImageGif("Oido_parp1", "assets/HUD/gifs/Oido_parp1.gif", 0, 28);
+    loadAndResizeImageGif("Oido_parp2", "assets/HUD/gifs/Oido_parp2.gif", 0, 28);
 
     SetExitKey(KEY_F8);
 }

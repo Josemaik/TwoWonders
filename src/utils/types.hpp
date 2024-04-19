@@ -208,3 +208,5 @@ using mapType = rapidjson::Document;
 using valueType = rapidjson::Value;
 using mapSizeType = rapidjson::SizeType;
 using Effects = ParticleMakerComponent::ParticleEffect;
+using FrustPos = FrustumInfo::Position;
+using FrustOut = MP::TypeList<GroundTag, NPCTag>;

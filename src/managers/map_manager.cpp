@@ -268,7 +268,7 @@ void MapManager::generateGround(EntityManager& em, const valueType& groundArray,
         auto& cz = em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ pz.position, rz.scale, BehaviorType::ZONE });
 
         auto& zchi = em.getSingleton<ZoneCheckInfo>();
-        zchi.zoneBounds.insert({ j, cz.boundingBox });
+        zchi.zoneBounds.insert({ j, cz.bbox });
         k += 1;
     }
 }
@@ -477,7 +477,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             c.behaviorType = BehaviorType::ZONE;
 
             auto& zchi = em.getSingleton<ZoneCheckInfo>();
-            zchi.zoneBounds.insert({ zchi.zoneBounds.size(), c.boundingBox });
+            zchi.zoneBounds.insert({ zchi.zoneBounds.size(), c.bbox });
 
             em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = static_cast<uint16_t>(zchi.zoneBounds.size() - 1) });
             break;
@@ -581,8 +581,8 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             ic.range = 12.0;
             addToZone(em, entity, type);
 
-            auto yMin = c.boundingBox.min.y();
-            auto yMax = c.boundingBox.max.y();
+            auto yMin = c.bbox.min.y();
+            auto yMax = c.bbox.max.y();
             auto rot2 = (orientation - 90.0) * DEGTORAD;
             em.addComponent<LadderComponent>(entity, LadderComponent{ .orientation = rot2, .yMin = yMin, .yMax = yMax });
             break;
@@ -1012,7 +1012,7 @@ void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
     auto& zchi = em.getSingleton<ZoneCheckInfo>();
     auto& c = em.getComponent<ColliderComponent>(e);
     for (auto [num, bbox] : zchi.zoneBounds)
-        if (bbox.intersects(c.boundingBox))
+        if (bbox.intersects(c.bbox))
         {
             zchi.insertZone(num, type);
 
@@ -1152,6 +1152,8 @@ void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man& iam)
     li.mapID = mapID;
     li.levelChanged = true;
     li.loading = false;
+    li.npcflee = false;
+    li.door_open = false;
     state = LoadState::LOAD_CHUNKS;
     zchi.clearSets();
     zchi.zoneBounds.clear();

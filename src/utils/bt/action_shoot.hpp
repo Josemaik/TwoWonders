@@ -41,7 +41,7 @@ struct BTActionShoot : BTNode_t {
             case  AIComponent::TypeShoot::OneShoottoPlayer: {
                 att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai->SPEED_AI;
                 att.attack(AttackType::Ranged);
-                if ( ectx.ent.hasTag<SnowmanTag>() ){
+                if (ectx.ent.hasTag<SnowmanTag>()) {
                     ectx.em.getSingleton<SoundSystem>().sonido_munyeco_ataque();
                 }
                 return BTNodeStatus_t::success;
@@ -57,7 +57,7 @@ struct BTActionShoot : BTNode_t {
                 //shoot three time
                 att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai->SPEED_AI;
                 att.attack(AttackType::Melee);
-                if ( ectx.ent.hasTag<GolemTag>() ){
+                if (ectx.ent.hasTag<GolemTag>()) {
                     ectx.em.getSingleton<SoundSystem>().sonido_golem_ataque();
                 }
                 return BTNodeStatus_t::success;
@@ -77,7 +77,7 @@ struct BTActionShoot : BTNode_t {
                 if (ectx.ent.hasComponent<ColliderComponent>())
                 {
                     auto& col = ectx.em.getComponent<ColliderComponent>(ectx.ent);
-                    att.pos_respawn_crush_attack.setY(col.boundingBox.min.y() + 1);
+                    att.pos_respawn_crush_attack.setY(col.bbox.min.y() + 1);
                 }
                 att.attack(AttackType::CrusherAttack);
                 return BTNodeStatus_t::fail;

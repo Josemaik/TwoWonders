@@ -11,8 +11,9 @@ void CollisionSystem::update(EntityManager& em)
     octree.clear();
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
     {
-        if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
+        if (!e.hasTags(FrustOut{}) && frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
             return;
+
         // Si la entidad está por debajo del suelo, se destruye
         auto& pos = phy.position;
         if (pos.y() < -20.)
@@ -70,8 +71,8 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree)
 
             if (!checkedPairs[id1][id2] && e != nEnt)
             {
-                BBox& bbox1 = c->boundingBox;
-                BBox& bbox2 = nCol->boundingBox;
+                BBox& bbox1 = c->bbox;
+                BBox& bbox2 = nCol->bbox;
 
                 if (bbox1.intersects(bbox2))
                 {
@@ -264,61 +265,6 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         return;
     }
 
-    // ESCALERA
-    if (behaviorType1 & BehaviorType::LADDER || behaviorType2 & BehaviorType::LADDER)
-    {
-        auto* staticEntPtr = &staticEnt;
-        auto* otherEntPtr = &otherEnt;
-
-        auto* staticPhyPtr = &staticPhy;
-        auto* otherPhyPtr = &otherPhy;
-
-        if (behaviorType2 & BehaviorType::LADDER)
-        {
-            std::swap(staticEntPtr, otherEntPtr);
-            std::swap(staticPhyPtr, otherPhyPtr);
-        }
-
-        if (otherEntPtr->hasTag<PlayerTag>())
-        {
-            auto& plfi = em.getSingleton<PlayerInfo>();
-            if (plfi.onLadder)
-            {
-                auto& ldc = em.getComponent<LadderComponent>(*staticEntPtr);
-                auto& col = em.getComponent<ColliderComponent>(*otherEntPtr);
-                auto& box = col.boundingBox;
-
-                if ((col.boundingBox.min.y() + 1) >= ldc.yMax || (col.boundingBox.min.y() - 1) <= ldc.yMin)
-                {
-                    auto& phy = em.getComponent<PhysicsComponent>(*otherEntPtr);
-                    phy.gravity = 1.0;
-                    plfi.onLadder = false;
-
-                    vec3d newPos = phy.position;
-                    auto& ori = phy.orientation;
-
-                    // Si el jugador está por encima de la escalera, lo ponemos un poco más adelante de su posición
-                    if ((box.min.y() + 1) >= ldc.yMax)
-                    {
-                        newPos.setX(newPos.x() + sin(ori) * 2);
-                        newPos.setZ(newPos.z() + cos(ori) * 2);
-                    }
-                    else
-                    {
-                        newPos.setX(newPos.x() - sin(ori) * 2);
-                        newPos.setZ(newPos.z() - cos(ori) * 2);
-                    }
-
-                    phy.position = newPos;
-                }
-                return;
-            }
-        }
-
-        staticCollision(*otherPhyPtr, *staticPhyPtr, minOverlap);
-        return;
-    }
-
     // LAVA
     if (behaviorType1 & BehaviorType::LAVA || behaviorType2 & BehaviorType::LAVA)
     {
@@ -414,6 +360,10 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         return;
     }
 
+    // SPAWN
+    if (behaviorType1 & BehaviorType::SPAWN || behaviorType2 & BehaviorType::SPAWN)
+        return;
+
     if ((behaviorType2 & BehaviorType::SPIDERWEB || behaviorType1 & BehaviorType::SPIDERWEB) ||
         (behaviorType2 & BehaviorType::AREADAMAGECRUSHER || behaviorType1 & BehaviorType::AREADAMAGECRUSHER))
     {
@@ -439,7 +389,9 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     }
 
     if (behaviorType2 & BehaviorType::WARNINGZONE || behaviorType1 & BehaviorType::WARNINGZONE
-        || behaviorType2 & BehaviorType::AREADAMAGECRUSHER || behaviorType1 & BehaviorType::AREADAMAGECRUSHER)
+        || behaviorType2 & BehaviorType::AREADAMAGECRUSHER || behaviorType1 & BehaviorType::AREADAMAGECRUSHER
+        || behaviorType2 & BehaviorType::OBJECT || behaviorType1 & BehaviorType::OBJECT
+        || behaviorType2 & BehaviorType::LADDER || behaviorType1 & BehaviorType::LADDER)
         return;
 
     // Esto ya es cualquier colisión que no sea de player, paredes, zonas o ataques
@@ -505,13 +457,6 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         return;
     }
 
-    // Si el objeto estático es un objeto
-    if (otherEntPtr->hasTag<PlayerTag>() && staticEntPtr->hasTag<ObjectTag>())
-    {
-        em.getComponent<ObjectComponent>(*staticEntPtr).effect();
-        return;
-    }
-
     // Si cualquiera de los impactos es con una bala, se baja la vida del otro
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
@@ -554,7 +499,9 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         behaviorType2 & BehaviorType::AREADAMAGECRUSHER ||
         behaviorType2 & BehaviorType::LADDER ||
         behaviorType2 & BehaviorType::LAVA ||
-        behaviorType2 & BehaviorType::SPAWN)
+        behaviorType2 & BehaviorType::SPAWN ||
+        behaviorType2 & BehaviorType::RAMP ||
+        behaviorType2 & BehaviorType::OBJECT)
         return;
 
     if (behaviorType2 & BehaviorType::METEORITE)
@@ -639,6 +586,13 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         std::swap(behaviorType1, behaviorType2);
     }
 
+    if (behaviorType2 & BehaviorType::OBJECT)
+    {
+        // Colisión con un objeto
+        em.getComponent<ObjectComponent>(*otherEntPtr).effect();
+        return;
+    }
+
     if (behaviorType2 & BehaviorType::ENEMY)
     {
         classicCollision(*staticPhy, *otherPhy, minOverlap);
@@ -692,6 +646,48 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         }
         return;
     }
+
+    // ESCALERA
+    if (behaviorType2 & BehaviorType::LADDER)
+    {
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        if (plfi.onLadder)
+        {
+            auto& ldc = em.getComponent<LadderComponent>(*otherEntPtr);
+            auto& col = em.getComponent<ColliderComponent>(*staticEntPtr);
+            auto& box = col.bbox;
+
+            if ((col.bbox.min.y() + 1) >= ldc.yMax || (col.bbox.min.y() - 1) <= ldc.yMin)
+            {
+                auto& phy = em.getComponent<PhysicsComponent>(*staticEntPtr);
+                phy.gravity = 1.0;
+                plfi.onLadder = false;
+
+                vec3d newPos = phy.position;
+                auto& ori = phy.orientation;
+
+                // Si el jugador está por encima de la escalera, lo ponemos un poco más adelante de su posición
+                if ((box.min.y() + 1) >= ldc.yMax)
+                {
+                    newPos.setX(newPos.x() + sin(ori) * 2);
+                    newPos.setZ(newPos.z() + cos(ori) * 2);
+                }
+                else
+                {
+                    newPos.setX(newPos.x() - sin(ori) * 2);
+                    newPos.setZ(newPos.z() - cos(ori) * 2);
+                }
+
+                phy.position = newPos;
+            }
+            return;
+
+        }
+
+        staticCollision(*staticPhy, *otherPhy, minOverlap);
+        return;
+    }
+
 
     // Daño en área
     if (behaviorType2 & BehaviorType::AREADAMAGE)
@@ -996,14 +992,14 @@ bool CollisionSystem::checkWallCollision(EntityManager& em, vec3d& pos, vec3d& n
     auto& frti = em.getSingleton<FrustumInfo>();
     em.forEach<noCMPs, wallTag>([&](Entity& e, ColliderComponent& col)
     {
-        if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
+        if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
             return;
         if (col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::LAVA)
         {
-            auto& bbox = col.boundingBox;
+            auto& bbox = col.bbox;
             if (e.hasTag<LavaTag>())
             {
-                if (bbox.intersectsRay2(ray.origin, ray.direction, colPoint))
+                if (bbox.intersectsRay2(ray.origin, ray.direction, colPoint) && colPoint.distance(pos) < 23.0)
                 {
                     auto& phy = em.getComponent<PhysicsComponent>(e);
 

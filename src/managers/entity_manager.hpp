@@ -13,6 +13,7 @@
 #include <functional>
 #include "../utils/slotmap.hpp"
 #include "../utils/meta_program.hpp"
+#include "../components/render_component.hpp"
 
 // Plantilla para obtener la información de los tags
 template <typename TAGS>
@@ -88,6 +89,14 @@ namespace ETMG {
             {
                 // Devuelve true si la máscara de tags tiene el bit correspondiente al tag TAG
                 return tag_mask_ & tag_info::template mask<TAG>();
+            }
+
+            // Plantilla para saber si la entidad tiene alguno de los tags TAGs
+            template <typename... TAGs>
+            bool hasTags(MP::TypeList<TAGs...>) const noexcept
+            {
+                // Devuelve true si la máscara de tags tiene el bit correspondiente a cualquiera de los tags TAGs
+                return (... || (hasTag<TAGs>()));
             }
 
             std::size_t  getID() const noexcept { return id_; }

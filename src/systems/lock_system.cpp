@@ -17,7 +17,7 @@ void LockSystem::update(EntityManager& em)
         {
             if (e.hasTag<EnemyTag>() || e.hasTag<DestructibleTag>())
             {
-                if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
+                if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
                     return;
 
                 if (e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>())
@@ -26,6 +26,8 @@ void LockSystem::update(EntityManager& em)
                 auto& pos = phy.position;
 
                 // Calcula la distancia entre la posición del jugador y la posición del enemigo
+                if (std::abs(playerPos.y() - pos.y()) > 15.0)
+                    return;
                 double distance = playerPos.distance(pos);
 
                 // Si el enemigo se encuentra a menos de x unidades de distancia del jugador se inserta en el set

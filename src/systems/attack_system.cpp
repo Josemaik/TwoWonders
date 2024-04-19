@@ -3,17 +3,17 @@
 void AttackSystem::update(EntityManager& em) {
 
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, AttackComponent& att)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, AttackComponent& att)
     {
-        if (ent.hasComponent<ColliderComponent>())
+        if (!e.hasTags(FrustOut{}) && e.hasComponent<ColliderComponent>())
         {
-            auto& col = em.getComponent<ColliderComponent>(ent);
-            if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
+            auto& col = em.getComponent<ColliderComponent>(e);
+            if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
                 return;
         }
 
         if (att.createAttack)
-            createAttack(em, ent, att);
+            createAttack(em, e, att);
 
         att.decreaseCountdown(timeStep, att.elapsed);
     });
@@ -239,11 +239,12 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     case AttackType::WaterBomb:
     {
         auto& e{ em.newEntity() };
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 10.0f, 0.1f, 10.0f }, .color = BLUE });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.001 });
+        // auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 10.0f, 0.1f, 10.0f }, .color = SKYBLUE });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ phy.position }, .scale = { 10.0f, 0.1f, 10.0f }, .gravity = 0.001 });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 0.4f });
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Water });
-        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, p.scale, BehaviorType::ATK_PLAYER });
+        em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::WATERSPLASH, .maxParticles = 25, .spawnRate = 0.01f, .lifeTime = 0.3f, });
         break;
     }
     case AttackType::FireBall:
@@ -430,10 +431,21 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
 
     if (eleType != ElementalType::Neutral)
     {
+        auto& li = em.getSingleton<LevelInfo>();
         // Creamos el hechizo
         auto& e{ em.newEntity() };
         em.addTag<HitPlayerTag>(e);
-        att.vel.setY(0.7);
+
+        if (li.lockedEnemy != li.max)
+        {
+            auto& lockedEnemy = *em.getEntityByID(li.lockedEnemy);
+            auto& lockedEnemyPos = em.getComponent<PhysicsComponent>(lockedEnemy).position;
+            att.vel = (lockedEnemyPos - em.getComponent<PhysicsComponent>(ent).position).normalize();
+            att.vel.setY(att.vel.y() + 0.7);
+        }
+        else
+            att.vel.setY(0.7);
+
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
         em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
@@ -470,7 +482,6 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
     }
 
     auto& inpi = em.getSingleton<InputInfo>();
-    plfi.currentSpell = plfi.noSpell;
     inpi.setAttackFalse();
 }
 

@@ -38,8 +38,8 @@ struct BTAction_PatrolNPC : BTNode_t {
                 if (calculateSteering<4>(ectx, ectx.npc->pathIt, ectx.npc->path)) {
                     ectx.npc->tp = false;
                     ectx.npc->path_finaliced = true;
-                    
-                    if(li.mapID == 1)
+
+                    if (li.mapID == 1)
                         li.insertDeath(ectx.ent.getID());
 
                     if (li.mapID == 2)
@@ -66,7 +66,7 @@ struct BTAction_PatrolNPC : BTNode_t {
         auto& c = ectx.em.getComponent<ColliderComponent>(ectx.ent);
         for (auto [num, bbox] : zchi.zoneBounds)
         {
-            if (bbox.intersects(c.boundingBox))
+            if (bbox.intersects(c.bbox))
             {
                 zchi.insertZone(num, InteractableType::NPC);
             }

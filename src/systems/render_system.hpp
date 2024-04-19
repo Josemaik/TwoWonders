@@ -70,6 +70,7 @@ private:
     void drawSpellSlots(GameEngine& engine, EntityManager& em);
     void drawSpellExp(GameEngine& engine, std::string name);
     void drawStaff(GameEngine& engine, EntityManager& em);
+    void drawLockInfo(GameEngine& engine, EntityManager& em);
     void drawBoatParts(GameEngine& engine, EntityManager& em);
     void drawAnimatedTextures(GameEngine& engine);
     void drawSmallButtons(GameEngine& engine, const std::string& name, int posX, int posY, int width, int height);

@@ -4,14 +4,11 @@
 void PhysicsSystem::update(EntityManager& em)
 {
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, PhysicsComponent& phy, ColliderComponent& col)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
     {
-        if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE){
-            if(ent.hasTag<NPCTag>()){
-                phy.gravity = 0;
-            }else
-                return;
-        }
+        if (!e.hasTags(FrustOut{}) && frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+            return;
+
         if (phy.notMove)
         {
             if (phy.velocity != vec3d::zero() && phy.target != vec3d::zero())
@@ -26,18 +23,24 @@ void PhysicsSystem::update(EntityManager& em)
             return;
         }
         // Cuando el jugador se para por un tiempo determinado
-        if (phy.stopped)
+        if (phy.elapsed_afterStop < phy.countdown_afterStop)
+        {
+            phy.plusDeltatime(timeStep30, phy.elapsed_afterStop);
+        }
+        else if (phy.stopped)
         {
             if (phy.elapsed_stopped >= phy.countdown_stopped)
             {
                 phy.elapsed_stopped = 0;
                 phy.stopped = false;
                 phy.gravity = phy.KGravity;
+                phy.elapsed_afterStop = 0.0f;
                 return;
             }
             else
-                phy.plusDeltatime(timeStep, phy.elapsed_stopped);
+                phy.plusDeltatime(timeStep30, phy.elapsed_stopped);
         }
+
         // Sacamos referencias a la posición y velocidad
         auto& pos = phy.position;
         auto& vel = phy.velocity;
@@ -60,7 +63,7 @@ void PhysicsSystem::update(EntityManager& em)
         }
 
         //Stunear o Ralentizar al player
-        if (ent.hasTag<PlayerTag>())
+        if (e.hasTag<PlayerTag>())
         {
             if (phy.dragActivated) {
                 phy.dragActivated = false;
@@ -81,7 +84,7 @@ void PhysicsSystem::update(EntityManager& em)
             if (plfi.hasBoots && !phy.stopped && !plfi.onLadder)
             {
                 auto multiplier = 1.4;
-                vel *= multiplier;
+                vel *= {multiplier, 1.0, multiplier};
             }
         }
 
@@ -102,10 +105,10 @@ void PhysicsSystem::update(EntityManager& em)
         }
 
         //Orientamos a enemigos hacia el player si están parados
-        if (ent.hasTag<SpiderTag>() || ent.hasTag<SnowmanTag>() || ent.hasTag<GolemTag>()) {
-            if (ent.hasComponent<AIComponent>())
+        if (e.hasTag<SpiderTag>() || e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()) {
+            if (e.hasComponent<AIComponent>())
             {
-                auto& ia = em.getComponent<AIComponent>(ent);
+                auto& ia = em.getComponent<AIComponent>(e);
                 if (ia.playerdetected) {
                     auto& bb = em.getSingleton<BlackBoard_t>();
                     vec3d targetpos{ bb.tx,0.0,bb.tz };

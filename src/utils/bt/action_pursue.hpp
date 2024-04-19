@@ -17,35 +17,37 @@ struct BTAction_Pursue : BTNode_t {
         // ectx.phy.a_linear = steering.linear;
         // ectx.phy.v_angular = steering.angular;
 
-        using noCMP = MP::TypeList<PhysicsComponent,ColliderComponent>;
+        using noCMP = MP::TypeList<PhysicsComponent, ColliderComponent>;
         using obstacleTag = MP::TypeList<ObstacleTag>;
 
         auto& pos = ectx.phy.position;
-        ectx.em.forEach<noCMP, obstacleTag>([&](Entity& e, PhysicsComponent& phy,ColliderComponent& col) {
-                e.getID();
-                auto distance = pos.distance(phy.position);
-                if(distance <= 15.0){
-                    auto dirtoobstacle = phy.position - pos;
-                    dirtoobstacle.normalize();
-                    RayCast ray {pos,dirtoobstacle};
-                    auto& bboxobstacle = col.boundingBox;
-                    if(bboxobstacle.intersectsRay(ray.origin,ray.direction)){
-                        double angle = ectx.phy.orientation + K_PI / 2; // Add 90 degrees to the orientation
-                        vec3d perpendicular(cos(angle), 0, sin(angle));
+        ectx.em.forEach<noCMP, obstacleTag>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col) {
+            e.getID();
+            auto distance = pos.distance(phy.position);
+            if (distance <= 15.0) {
+                auto dirtoobstacle = phy.position - pos;
+                dirtoobstacle.normalize();
+                RayCast ray{ pos,dirtoobstacle };
+                auto& bboxobstacle = col.bbox;
+                if (bboxobstacle.intersectsRay(ray.origin, ray.direction)) {
+                    double angle = ectx.phy.orientation + K_PI / 2; // Add 90 degrees to the orientation
+                    vec3d perpendicular(cos(angle), 0, sin(angle));
 
-                        auto maxseparate = 0.5;
-                        if(distance <= 15.0){
-                            maxseparate = 1.5;
-                        }else if(distance < 10.0){
-                            maxseparate = 2.5;
-                        }else if( distance < 5.0){
-                            maxseparate = 3.5;
-                        }
-                        vec3d avoidanceForce = perpendicular * maxseparate;
-                        // Steer_t steeringEvade = STBH::Evade(ectx.phy,phy,maxseparate);
-                        steering.v_x += avoidanceForce.x();
-                        steering.v_z += avoidanceForce.z();
+                    auto maxseparate = 0.5;
+                    if (distance <= 15.0) {
+                        maxseparate = 1.5;
                     }
+                    else if (distance < 10.0) {
+                        maxseparate = 2.5;
+                    }
+                    else if (distance < 5.0) {
+                        maxseparate = 3.5;
+                    }
+                    vec3d avoidanceForce = perpendicular * maxseparate;
+                    // Steer_t steeringEvade = STBH::Evade(ectx.phy,phy,maxseparate);
+                    steering.v_x += avoidanceForce.x();
+                    steering.v_z += avoidanceForce.z();
+                }
                 // // Calculate a vector perpendicular to the orientation
                 // double angle = phy.orientation + K_PI / 2; // Add 90 degrees to the orientation
                 // vec3d perpendicular(cos(angle), 0, sin(angle));
@@ -57,7 +59,7 @@ struct BTAction_Pursue : BTNode_t {
                 // // Add the avoidance force to the steering velocity
                 // steering.v_x += avoidanceForce.x();
                 // steering.v_z += avoidanceForce.z();
-                }
+            }
         });
 
 

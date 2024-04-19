@@ -187,34 +187,37 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
 
     float buttonWidth = 200.0f;
     float buttonHeight = 50.0f;
+    float middleScreen = static_cast<float>(engine.getScreenWidth() / 2);
 
     // Slider del volumen
-    Rectangle volumenSlider = { 100, 100, 200, 20 };
+    Rectangle volumenSlider = { middleScreen - buttonWidth, 100, buttonWidth, 20 };
     auto& sosy = em.getSingleton<SoundSystem>();
     float volumen = sosy.getVolumeMaster() * 100;
     float* vol = &volumen;
 
     // Posición del botón de volver
-    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2);
-    float posY = static_cast<float>(engine.getScreenHeight() / 1.2) - (buttonHeight / .5f);
+    float posX = middleScreen - (buttonWidth / 2);
+    float posY = static_cast<float>(engine.getScreenHeight() / 1.1) - (buttonHeight / .5f);
 
     // Botones de resolución
-    float posResX = static_cast<float>(100) - (buttonWidth / 2);
+    float posResX = static_cast<float>(middleScreen) - (buttonWidth / 2);
     float posResY = static_cast<float>(200) - (buttonHeight / 2);
+    float offSetY = 150;
 
     // Boton de volver al inicio
     Rectangle btn1Rec = { posX, posY, buttonWidth, buttonHeight };
 
     // Botones de resolución
-    Rectangle btn2Rec = { posResX, posResY, buttonWidth, buttonHeight };
-    Rectangle btn3Rec = { posResX + 250, posResY, buttonWidth, buttonHeight };
-    Rectangle btn4Rec = { posResX + 500, posResY, buttonWidth, buttonHeight };
-    Rectangle btn5Rec = { posResX + 750, posResY, buttonWidth, buttonHeight };
-    Rectangle btn6Rec = { posX, posY - 150, buttonWidth, buttonHeight };
+    Rectangle btn2Rec = { posResX - offSetY, posResY, buttonWidth, buttonHeight };
+    Rectangle btn3Rec = { posResX + offSetY, posResY, buttonWidth, buttonHeight };
+    Rectangle btn4Rec = { posResX - offSetY, posResY + offSetY, buttonWidth, buttonHeight };
+    Rectangle btn5Rec = { posResX + offSetY, posResY + offSetY, buttonWidth, buttonHeight };
+    Rectangle btn6Rec = { posX, posY - 100, buttonWidth, buttonHeight };
 
     // Define the current button selection
     auto& currentButton = inpi.currentButton;
     bool buttonTouched = false;
+
     bool inpiCheck1 = inpi.up || inpi.left;
     bool inpiCheck2 = inpi.down || inpi.right;
 
@@ -629,13 +632,11 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, RenderComponent& r)
     {
-        if (r.meshLoaded && e.hasComponent<ColliderComponent>())
+        if (!e.hasTags(FrustOut{}) && r.meshLoaded && e.hasComponent<ColliderComponent>())
         {
             auto& col = em.getComponent<ColliderComponent>(e);
-            if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE){
-                if(!e.hasTag<NPCTag>())
-                    return;
-            }
+            if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+                return;
         }
 
         if (r.visible) {
@@ -697,7 +698,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 if (e.hasTag<PlayerTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
-                    pos.setY(pos.y() - 1.8);
+                    pos.setY(pos.y() - 2.4);
                     in = true;
                 }
                 else if (e.hasTag<SlimeTag>())
@@ -709,7 +710,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 else if (e.hasTag<SnowmanTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
-                    pos.setY(pos.y() - 2.0);
+                    pos.setY(pos.y() - 3.0);
                     in = true;
                 }
                 else if (e.hasTag<SpiderTag>())
@@ -727,7 +728,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 else if (e.hasTag<DummyTag>())
                 {
                     // scl = { 0.4, 0.4, 0.4 };
-                    pos.setY(pos.y() - 4.0);
+                    pos.setY(pos.y() - 5.7);
                     in = true;
                 }
                 else if (e.hasTag<BossFinalTag>())
@@ -746,7 +747,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 else if (e.hasTag<CrusherTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
-                    pos.setY(pos.y() - 4.8);
+                    pos.setY(pos.y() - 8.6);
                     in = true;
                 }
                 else if (e.hasTag<AngryBushTag>())
@@ -1028,6 +1029,15 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     {
         r.model = engine.loadModel("assets/models/Dummy.obj");
 
+        if (li.mapID == 2)
+        {
+            for (int j = 0; j < r.model.materialCount; j++)
+            {
+                for (int k = 0; k < 11; k++)
+                    r.model.materials[j].maps[k].texture = engine.loadTexture("assets/Personajes/Enemigos/Dummy/Dummy_fire-texture.png");
+            }
+        }
+
         loadShaders(r.model);
     }
     else if (e.hasTag<BarricadeTag>())
@@ -1174,7 +1184,7 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
     auto& frti = em.getSingleton<FrustumInfo>();
     em.forEach<partCMPs, noTAGs>([&](Entity&, ColliderComponent& col, ParticleMakerComponent& pmc)
     {
-        if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
+        if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
             return;
 
         if (pmc.active)
@@ -1531,7 +1541,7 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
     em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, ColliderComponent& col, RenderComponent& ren)
     {
         RayCast ray = engine.getMouseRay();
-        if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
+        if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
             if (engine.isMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                 isSelectedfordebug = !isSelectedfordebug;
                 debugsnglt.IA_id_debug = e.getID();
@@ -1652,7 +1662,7 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
     {
         RayCast ray = engine.getMouseRay();
         // Comprobar si el rayo intersecta con el collider
-        if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
+        if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
             if (engine.isMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                 isSelected = !isSelected;
                 debugsnglt.IA_id = e.getID();
@@ -1783,203 +1793,10 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
     if (debugphy)
         pointedEntity = std::numeric_limits<std::size_t>::max();
 
-    // Visualizar las vidas del player
     for (auto const& e : em.getEntities())
     {
         if (e.hasTag<PlayerTag>())
-        {
-            // Dibujar background HUD
-            // engine.drawRectangle(0, 0, 580, 60, WHITE);
-
-            // Dibujar vidas restantes del player en el HUD
-            if (e.hasComponent<LifeComponent>())
-            {
-                drawHealthBar(engine, em, e);
-            }
-
-            // Dibujamos el número de monedas en pantalla
-            drawCoinBar(engine, em);
-
-            // drawFPSCounter(engine);
-
-            // Dibujar el bastón
-            drawStaff(engine, em);
-
-            // Dibujar espacios de hechizos
-            drawSpellSlots(engine, em);
-
-            drawAnimatedTextures(engine);
-
-            if (li.mapID == 2)
-                drawBoatParts(engine, em);
-
-            // Dibujar el tipo de ataque que tiene equipado
-            if (e.hasComponent<TypeComponent>())
-            {
-                // Rectangulo del tipo de magia
-                engine.drawRectangle(7, 50, 100, 20, DARKGRAY);
-
-                auto const& t{ em.getComponent<TypeComponent>(e) };
-
-                if (t.type == ElementalType::Neutral)
-                    engine.drawText("Neutral", 17, 50, 18, WHITE);
-                else if (t.type == ElementalType::Water)
-                    engine.drawText("Agua", 17, 50, 18, BLUE);
-                else if (t.type == ElementalType::Fire)
-                    engine.drawText("Fuego", 17, 50, 18, RED);
-                else
-                    engine.drawText("Hielo", 17, 50, 18, SKYBLUE);
-            }
-
-            if ((li.mapID == 0 || li.mapID == 1) && e.hasComponent<AttackComponent>())
-            {
-                if (!li.tutorialEnemies.empty())
-                {
-                    for (auto& enemy : li.tutorialEnemies)
-                    {
-                        auto& ene = *em.getEntityByID(enemy);
-                        if (ene.hasComponent<RenderComponent>())
-                        {
-                            auto& ren{ em.getComponent<RenderComponent>(ene) };
-                            auto& phy{ em.getComponent<PhysicsComponent>(ene) };
-                            if (ren.visible && (ene.hasTag<DummyTag>() || ene.hasTag<DestructibleTag>()))
-                            {
-                                double multiplier = 28.0;
-
-                                GameEngine::Gif* gif;
-                                Texture2D gifCopy;
-                                if (li.lockedEnemy == li.max)
-                                {
-                                    if (engine.isGamepadAvailable(0))
-                                        gif = &engine.gifs.at("l2");
-                                    else
-                                        gif = &engine.gifs.at("q");
-                                }
-                                else
-                                {
-                                    switch (li.mapID)
-                                    {
-                                    case 0:
-                                    {
-                                        if (engine.isGamepadAvailable(0))
-                                            gif = &engine.gifs.at("r2");
-                                        else {
-                                            gif = &engine.gifs.at("espacio");
-                                        }
-                                        break;
-                                    }
-                                    case 1:
-                                    {
-                                        if (engine.isGamepadAvailable(0))
-                                            gif = &engine.gifs.at("cuadrado");
-                                        else
-                                            gif = &engine.gifs.at("j");
-                                        break;
-                                    }
-                                    }
-                                }
-
-                                gifCopy = gif->texture;
-
-                                // Redimensionamos la copia
-                                gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
-                                gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
-
-                                multiplier = 55.0;
-
-                                if (ene.hasTag<DestructibleTag>())
-                                    multiplier = 8.0;
-                                else if (li.mapID == 1)
-                                    multiplier = 25.0;
-
-                                int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - gifCopy.width / 2;
-                                int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * multiplier);
-
-                                displayGif(engine, gifCopy, *gif, posX, posY);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (li.mapID == 0 && li.num_zone == 1 && elapsed_WASD < elapsed_limit_WASD)
-            {
-                auto& phy{ em.getComponent<PhysicsComponent>(e) };
-
-                GameEngine::Gif* gif;
-                Texture2D gifCopy;
-                if (engine.isGamepadAvailable(0))
-                    gif = &engine.gifs.at("joystick_izq");
-                else
-                    gif = &engine.gifs.at("wasd");
-
-                gifCopy = gif->texture;
-
-                // Redimensionamos la copia
-                gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
-                gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
-
-                int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - gifCopy.width / 2;
-                int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 37);
-
-                displayGif(engine, gifCopy, *gif, posX, posY);
-
-                elapsed_WASD += 1.0f / 60.0f;
-            }
-
-            if (li.mapID == 2 && e.hasComponent<AttackComponent>() && !li.volcanoLava.empty())
-            {
-                auto& plfi = em.getSingleton<PlayerInfo>();
-                std::size_t spellID{ 5 };
-
-                // Mapear los IDs de los hechizos a los nombres de los gifs
-                static std::map<std::size_t, std::pair<std::string, std::string>> spellToGif = {
-                    {0, {"cuadrado", "j"}},
-                    {1, {"circulo", "k"}},
-                    {2, {"triangulo", "l"}}
-                };
-
-                for (std::size_t i = 0; i < plfi.spellSlots.size(); ++i)
-                {
-                    if (plfi.spellSlots[i].spell == Spells::WaterDash)
-                    {
-                        spellID = i;
-                        break;
-                    }
-                }
-
-                if (spellID != 5)
-                {
-
-                    // Ponemos un gif del botón del dash encima de la lava
-                    for (auto& lava : li.volcanoLava)
-                    {
-                        auto& lav = *em.getEntityByID(lava);
-                        auto& phy{ em.getComponent<PhysicsComponent>(lav) };
-
-                        GameEngine::Gif* gif;
-                        Texture2D gifCopy;
-
-                        // Usar el mapa para obtener el nombre del gif
-                        if (engine.isGamepadAvailable(0))
-                            gif = &engine.gifs.at(spellToGif[spellID].first);
-                        else
-                            gif = &engine.gifs.at(spellToGif[spellID].second);
-
-                        gifCopy = gif->texture;
-
-                        // Redimensionamos la copia
-                        gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
-                        gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
-
-                        int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - gifCopy.width / 2;
-                        int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 10);
-
-                        displayGif(engine, gifCopy, *gif, posX, posY);
-                    }
-                }
-            }
-        }
+            continue;
 
         if (e.hasTag<CrusherTag>()) {
             auto& phy = em.getComponent<PhysicsComponent>(e);
@@ -1993,33 +1810,6 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             }
         }
 
-        // Dibujar el precio d elos objetos de la tienda
-        // if (e.hasTag<ObjectTag>()) {
-        //     if (e.hasComponent<ObjectComponent>() && e.hasComponent<RenderComponent>())
-        //     {
-        //         auto& ren{ em.getComponent<RenderComponent>(e) };
-        //         auto& obj{ em.getComponent<ObjectComponent>(e) };
-        //         if (obj.type == ObjectType::ShopItem_Bomb)
-        //             engine.drawText("20",
-        //                 static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
-        //                 static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
-        //                 20,
-        //                 BLACK);
-        //         else if (obj.type == ObjectType::ShopItem_Life)
-        //             engine.drawText("10",
-        //                 static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
-        //                 static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
-        //                 20,
-        //                 BLACK);
-        //         else if (obj.type == ObjectType::ShopItem_ExtraLife)
-        //             engine.drawText("30",
-        //                 static_cast<int>(engine.getWorldToScreenX(ren.position) - 10),
-        //                 static_cast<int>(engine.getWorldToScreenY(ren.position) + ren.scale.y() * 50),
-        //                 20,
-        //                 BLACK);
-        //     }
-        // }
-
         // Vidas HUD
         if (e.hasTag<EnemyTag>() && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible &&
             !(e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>()))
@@ -2027,17 +1817,11 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             auto const& r{ em.getComponent<RenderComponent>(e) };
             auto& l{ em.getComponent<LifeComponent>(e) };
 
-            // engine.drawText(std::to_string(l.life).c_str(),
-            //     static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-            //     static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
-            //     20,
-            //     BLACK);
-
             // Datos para la barra para la barra de vida
             int barWidth = 40;
             int barHeight = 4;
             int barX = static_cast<int>(engine.getWorldToScreenX(r.position) - 18);
-            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 15);
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 10);
 
             engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
 
@@ -2274,8 +2058,8 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             auto& col{ em.getComponent<ColliderComponent>(e) };
 
             // Calcular la posición y el tamaño de la bounding box
-            vec3d boxPosition = (col.boundingBox.min + col.boundingBox.max) / 2;
-            vec3d boxSize = col.boundingBox.max - col.boundingBox.min;
+            vec3d boxPosition = (col.bbox.min + col.bbox.max) / 2;
+            vec3d boxSize = col.bbox.max - col.bbox.min;
 
             Color color = BLUE;
             if (col.behaviorType & BehaviorType::ZONE)
@@ -2300,15 +2084,15 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             bool notStatic = !(col.behaviorType & BehaviorType::ZONE);
             // Comprobar si el rayo intersecta con el collider
 
-            if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && notStatic && pointedEntity != li.playerID)
+            if (col.bbox.intersectsRay(ray.origin, ray.direction) && notStatic && pointedEntity != li.playerID)
             {
                 pointedEntity = e.getID();
 
                 auto& col{ em.getComponent<ColliderComponent>(e) };
 
                 // Calcular la posición y el tamaño de la bounding box
-                vec3d boxPosition = (col.boundingBox.min + col.boundingBox.max) / 2;
-                vec3d boxSize = col.boundingBox.max - col.boundingBox.min;
+                vec3d boxPosition = (col.bbox.min + col.bbox.max) / 2;
+                vec3d boxSize = col.bbox.max - col.bbox.min;
 
                 // Dibujar la bounding box
                 engine.beginMode3D();
@@ -2353,27 +2137,6 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                 engine.drawText(id.c_str(), 10, 385, 20, BLACK);
             }
         }
-        // Dibujar zona para mostrar ejemplo de uso del eventmanager
-
-        // auto& linfo = em.getSingleton<LevelInfo>();
-        // auto& bb = em.getSingleton<BlackBoard_t>();
-        // if (linfo.num_zone == 11) {
-        //     if (bb.boss_fase == 1) {
-        //         engine.drawText("FASE 1", 500, 10, 70, RED);
-        //     }
-        //     else {
-        //         engine.drawText("FASE 2", 500, 10, 70, ORANGE);
-        //     }
-
-        //     // if (linfo.segundos == 0) {
-        //     //     linfo.drawzone = false;
-        //     //     linfo.segundos = 1000;
-        //     // }
-        //     // linfo.segundos--;
-        // }
-        // else {
-        //     engine.drawText(("ZONA " + std::to_string(linfo.num_zone)).c_str(), 600, 10, 50, RED);
-        // }
 
         // Dibujar el ID de las entidades // DEBUG
         if (debugphy && e.hasComponent<RenderComponent>())
@@ -2387,6 +2150,190 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
         }
     }
 
+    auto& pl = *em.getEntityByID(li.playerID);
+    // Dibujar las cosas del jugador
+    if (pl.hasTag<PlayerTag>())
+    {
+        // Dibujar Lock In
+        drawLockInfo(engine, em);
+
+        // Dibujar vidas restantes del player en el HUD
+        if (pl.hasComponent<LifeComponent>())
+        {
+            drawHealthBar(engine, em, pl);
+        }
+
+        // Dibujamos el número de monedas en pantalla
+        drawCoinBar(engine, em);
+
+        // drawFPSCounter(engine);
+
+        // Dibujar el bastón
+        drawStaff(engine, em);
+
+        // Dibujar espacios de hechizos
+        drawSpellSlots(engine, em);
+
+        drawAnimatedTextures(engine);
+
+        if (li.mapID == 2 && li.volcanoMission)
+            drawBoatParts(engine, em);
+
+        if ((li.mapID == 0 || li.mapID == 1) && pl.hasComponent<AttackComponent>())
+        {
+            if (!li.tutorialEnemies.empty())
+            {
+                for (auto& enemy : li.tutorialEnemies)
+                {
+                    auto& ene = *em.getEntityByID(enemy);
+                    if (ene.hasComponent<RenderComponent>())
+                    {
+                        auto& ren{ em.getComponent<RenderComponent>(ene) };
+                        auto& phy{ em.getComponent<PhysicsComponent>(ene) };
+                        if (ren.visible && (ene.hasTag<DummyTag>() || ene.hasTag<DestructibleTag>()))
+                        {
+                            double multiplier = 28.0;
+
+                            GameEngine::Gif* gif;
+                            Texture2D gifCopy;
+                            if (li.lockedEnemy == li.max)
+                            {
+                                if (engine.isGamepadAvailable(0))
+                                    gif = &engine.gifs.at("l2");
+                                else
+                                    gif = &engine.gifs.at("q");
+                            }
+                            else
+                            {
+                                switch (li.mapID)
+                                {
+                                case 0:
+                                {
+                                    if (engine.isGamepadAvailable(0))
+                                        gif = &engine.gifs.at("r2");
+                                    else {
+                                        gif = &engine.gifs.at("espacio");
+                                    }
+                                    break;
+                                }
+                                case 1:
+                                {
+                                    if (engine.isGamepadAvailable(0))
+                                        gif = &engine.gifs.at("cuadrado");
+                                    else
+                                        gif = &engine.gifs.at("j");
+                                    break;
+                                }
+                                }
+                            }
+
+                            gifCopy = gif->texture;
+
+                            // Redimensionamos la copia
+                            gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
+                            gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
+
+                            multiplier = 55.0;
+
+                            if (ene.hasTag<DestructibleTag>())
+                                multiplier = 8.0;
+                            else if (li.mapID == 1)
+                                multiplier = 25.0;
+
+                            int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - gifCopy.width / 2;
+                            int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * multiplier);
+
+                            displayGif(engine, gifCopy, *gif, posX, posY);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (li.mapID == 0 && li.num_zone == 1 && elapsed_WASD < elapsed_limit_WASD)
+        {
+            auto& phy{ em.getComponent<PhysicsComponent>(pl) };
+
+            GameEngine::Gif* gif;
+            Texture2D gifCopy;
+            if (engine.isGamepadAvailable(0))
+                gif = &engine.gifs.at("joystick_izq");
+            else
+                gif = &engine.gifs.at("wasd");
+
+            gifCopy = gif->texture;
+
+            // Redimensionamos la copia
+            gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
+            gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
+
+            int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - gifCopy.width / 2;
+            int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 37);
+
+            displayGif(engine, gifCopy, *gif, posX, posY);
+
+            elapsed_WASD += 1.0f / 60.0f;
+        }
+
+        if (li.mapID == 2 && pl.hasComponent<AttackComponent>() && !li.volcanoLava.empty())
+        {
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            std::size_t spellID{ 5 };
+
+            // Mapear los IDs de los hechizos a los nombres de los gifs
+            static std::map<std::size_t, std::pair<std::string, std::string>> spellToGif = {
+                {0, {"cuadrado", "j"}},
+                {1, {"circulo", "k"}},
+                {2, {"triangulo", "l"}}
+            };
+
+            for (std::size_t i = 0; i < plfi.spellSlots.size(); ++i)
+            {
+                if (plfi.spellSlots[i].spell == Spells::WaterDash)
+                {
+                    spellID = i;
+                    break;
+                }
+            }
+
+            if (spellID != 5)
+            {
+                // Ponemos un gif del botón del dash encima de la lava
+                for (auto& lava : li.volcanoLava)
+                {
+                    auto& lav = *em.getEntityByID(lava);
+                    auto& phy{ em.getComponent<PhysicsComponent>(lav) };
+
+                    GameEngine::Gif* gif;
+                    Texture2D gifCopy;
+
+                    // Usar el mapa para obtener el nombre del gif
+                    if (engine.isGamepadAvailable(0))
+                        gif = &engine.gifs.at(spellToGif[spellID].first);
+                    else
+                        gif = &engine.gifs.at(spellToGif[spellID].second);
+
+                    gifCopy = gif->texture;
+
+                    // Redimensionamos la copia
+                    gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
+                    gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
+
+                    int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - gifCopy.width / 2;
+                    int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 10);
+
+                    displayGif(engine, gifCopy, *gif, posX, posY);
+                }
+            }
+        }
+    }
+}
+
+void RenderSystem::drawLockInfo(GameEngine& ge, EntityManager& em)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+
+    // Dibujar el lock in
     std::size_t enemyID = li.max;
     Color color;
 
@@ -2409,25 +2356,25 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
             auto& r = em.getComponent<RenderComponent>(enemy);
             if (color.a == 100)
             {
-                auto& destellin = engine.textures["destellin"];
-                engine.drawTexture(destellin,
-                    static_cast<int>(engine.getWorldToScreenX(r.position)) - destellin.width / 2,
-                    static_cast<int>(engine.getWorldToScreenY(r.position)) - destellin.height / 2,
+                auto& destellin = ge.textures["destellin"];
+                ge.drawTexture(destellin,
+                    static_cast<int>(ge.getWorldToScreenX(r.position)) - destellin.width / 2,
+                    static_cast<int>(ge.getWorldToScreenY(r.position)) - destellin.height / 2,
                     { 255, 255, 255, 255 });
             }
             else
             {
-                auto& fijado = engine.gifs.at("fijado");
+                auto& fijado = ge.gifs.at("fijado");
                 auto copy = fijado.texture;
 
                 // Redimensionamos la copia
                 copy.width = static_cast<int>(copy.width / fijado.reScaleX);
                 copy.height = static_cast<int>(copy.height / fijado.reScaleY);
 
-                int posX = static_cast<int>(engine.getWorldToScreenX(r.position)) - copy.width / 2;
-                int posY = static_cast<int>(engine.getWorldToScreenY(r.position)) - copy.height / 2;
+                int posX = static_cast<int>(ge.getWorldToScreenX(r.position)) - copy.width / 2;
+                int posY = static_cast<int>(ge.getWorldToScreenY(r.position)) - copy.height / 2;
 
-                displayGif(engine, copy, fijado, posX, posY);
+                displayGif(ge, copy, fijado, posX, posY);
             }
         }
     }
@@ -2577,14 +2524,14 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
     const float multip = 3.5f;
     if (plfi.elapsed_coins < plfi.elapsed_limit_coins)
     {
-        elapsed_CoinBar += timeStep * multip;
+        elapsed_CoinBar += timeStep30 * multip;
         if (elapsed_CoinBar > elapsed_limit_CoinBar) elapsed_CoinBar = elapsed_limit_CoinBar;
 
-        plfi.elapsed_coins += timeStep;
+        plfi.elapsed_coins += timeStep30;
     }
     else
     {
-        elapsed_CoinBar -= timeStep * multip;
+        elapsed_CoinBar -= timeStep30 * multip;
         if (elapsed_CoinBar < 0) elapsed_CoinBar = 0;
     }
 
@@ -2630,7 +2577,8 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
     // Dibujamos el número de destellos
     if (elapsed_CoinBar > 0 && plfi.coins > 0)
     {
-        engine.drawText(plusMinus.c_str(), coinNumberX - 10, posY - 25, 25, { 255, 255, 255, 255 });
+        // Dibujamos el número de monedas totales
+        engine.drawTexture(engine.textures[plusMinus.c_str()], coinNumberX - 15, posY - 40, { 255, 255, 255, 255 });
         for (std::size_t i = digits.size(); i-- > 0; )
         {
             auto& texture = engine.textures.at(std::to_string(digits[i]));
@@ -2638,11 +2586,10 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
             coinNumberX += static_cast<int>(texture.width / 1.7);
         }
 
-        // Dibujamos el número de monedas
         for (std::size_t i = digits2.size(); i-- > 0; )
         {
             auto& texture = engine.textures.at(std::to_string(digits2[i]));
-            engine.drawTexture(texture, coinNumberX2, posY - 30, { 255, 255, 255, 255 });
+            engine.drawTexture(texture, coinNumberX2, posY - 45, { 255, 255, 255, 255 });
             coinNumberX2 += static_cast<int>(texture.width / 1.7);
         }
     }

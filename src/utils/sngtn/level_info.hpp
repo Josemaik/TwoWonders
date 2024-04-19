@@ -104,7 +104,7 @@ struct LevelInfo
     //npc huya
     bool npcflee{ false }, investigatorstartwalk{ false };
     // Estado del juego
-    GameScreen currentScreen = GameScreen::GAMEPLAY;
+    GameScreen currentScreen = GameScreen::LOGO;
     GameScreen previousScreen = GameScreen::LOGO;
     GameScreen evenMorePreviousScreen = GameScreen::LOGO;
 
@@ -162,8 +162,22 @@ struct LevelInfo
         dead_entities.clear();
         debugIA2 = false;
         resetGame = false;
+        chestToOpen = max;
+        doorToOpen = max;
+        npcToTalk = max;
+        boatPartFound = max;
+        dungeonKeyCreated = false;
+        enemyToChestPos = {};
+        door_open = false;
+        events.clear();
+        tutorialEnemies.clear();
+        volcanoLava.clear();
+        replay = false;
+        volcanoMission = false;
+        npcflee = false;
+        investigatorstartwalk = false;
         num_zone = 0;
-        mapID = 2;
+        mapID = 0;
         chestToOpen = max;
         dungeonKeyCreated = false;
         openChest = false;

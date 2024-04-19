@@ -11,9 +11,10 @@ void ParticleSystem::update(EntityManager& em)
     { Effects::SMOKE, { { 3.0f, 0.01f, 3.0f }, { {56, 50, 52, 255}, {130, 129, 129, 255 } } } },
     { Effects::PURPLEM, { { 1.0f, 0.0001f, 1.0f }, { {128, 0, 0, 255} } } },
     { Effects::LAVA, { { 5.0f, 0.01f, 15.0f }, {{255, 0, 0, 255}, {156, 50, 52, 255}, { 130, 129, 129, 255 }} } },
-    { Effects::WATER, { { 2.0f, -0.5f, 2.0f }, { {0, 0, 255, 255} } } },
+    { Effects::WATER, { { 2.0f, -0.5f, 2.0f }, { {0, 121, 241, 255}, { 102, 191, 255, 255 } } } },
     { Effects::FIREBALL, { { 2.0f, 0.5f, 2.0f }, { {255, 0, 0, 255}, {130, 129, 129, 255} } } },
-    { Effects::OBJECT, { { 1.0f, 0.2f, 1.0f }, {  {255, 215, 0, 255}, { 255, 119, 0, 255 } } } }
+    { Effects::OBJECT, { { 1.0f, 0.2f, 1.0f }, {  {255, 215, 0, 255}, { 255, 119, 0, 255 } } } },
+    { Effects::WATERSPLASH, { { 2.0f, 0.1f, 2.0f }, { {0, 121, 241, 255}, { 102, 191, 255, 255 } } } }
     };
 
     // La parte del motor gráfico será poder colocar puntos de luz desde donde se generen las partículas sjsjsj
@@ -21,7 +22,7 @@ void ParticleSystem::update(EntityManager& em)
     auto& frti = em.getSingleton<FrustumInfo>();
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, PhysicsComponent& phy, ColliderComponent& col, ParticleMakerComponent& pmc)
     {
-        if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
+        if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
             return;
 
         // Si el componente tiene activo su efecto de partículas
@@ -90,8 +91,8 @@ void ParticleSystem::update(EntityManager& em)
                 }
                 else
                 {
-                    if (pmc.effect == Effects::WATER)
-                        std::cout << "Pos: " << p.position << "\n";
+                    if (pmc.effect == Effects::WATERSPLASH && p.remainingLife <= p.lifeTime / 1.3 && p.velocity.y() > 0)
+                        p.velocity.setY(-p.velocity.y() * 4);
                     // Movemos las partículas acorde con el efecto del creador de partículas
                     if (pmc.multiply)
                         p.position += p.velocity * 1.2f;

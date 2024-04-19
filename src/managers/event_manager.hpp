@@ -328,7 +328,7 @@ public:
                         };
 
                         // Le damos el hechizo
-                        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 4 };
+                        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 3 };
                         plfi.addSpell(spell);
                         plfi.showBook = true;
 

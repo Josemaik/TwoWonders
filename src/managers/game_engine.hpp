@@ -25,7 +25,7 @@ namespace ENGI {
 
             // Variable para el update del frame
             int frameCounter{ 0 };
-            int frameDelay{ 25 };
+            int frameDelay{ 13 };
         };
 
         using CL = MP::TypeList<PhysicsComponent, RenderComponent>;

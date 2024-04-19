@@ -561,7 +561,7 @@ void ZoneSystem::checkSpawns(EntityManager& em)
     auto& frti = em.getSingleton<FrustumInfo>();
     em.forEach<CMPs, spawnTag>([&](Entity&, PhysicsComponent& phy, ColliderComponent& col, InteractiveComponent& ic, SpawnComponent& sc)
     {
-        if (frti.bboxInFrustum(col.boundingBox) == FrustumInfo::Position::OUTSIDE)
+        if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
             return;
 
         // Calculamos la distancia entre el jugador y el spawn

@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = {-30.24, 49.0, -26.59};
+        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -76,7 +76,7 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e);
+    // em.addComponent<AttackComponent>(e);
     auto& lis = em.addComponent<ListenerComponent>(e);
 
     // Listeners de eventos para el jugador
@@ -157,6 +157,7 @@ void Game::run()
 
     gami.setRandomSeed(seed);
     engine.setReplayMode(li.replay, gami);
+    sound_system.setVolumeMaster(0.3f);
 
     // Inicializa una variable donde tener el tiempo entre frames
     float currentTime{};
@@ -176,15 +177,17 @@ void Game::run()
             // CODIGO DE LA PANTALLA DE LOGO DE EMPRESA
         case GameScreen::LOGO:
         {
-            // Contador para que pasen X segundos
-            currentTime += timeStep;
-            if (currentTime > 4.0) {
-                li.currentScreen = GameScreen::TITLE;
-                currentTime = 0;
-            }
-            render_system.drawLogoKaiwa(engine);
             if (li.playerID == li.max)
                 createEntities();
+            // Contador para que pasen X segundos
+            currentTime += timeStep;
+            if (currentTime > 4.0 || inpi.interact) {
+                li.currentScreen = GameScreen::TITLE;
+                currentTime = 0;
+                inpi.interact = false;
+            }
+            input_system.update(em, engine);
+            render_system.drawLogoKaiwa(engine);
             break;
         }
 
@@ -229,8 +232,12 @@ void Game::run()
         case GameScreen::STORY:
         {
             // Input del enter para empezar la partida
-            if (input_system.pressEnter(engine))
+            if (inpi.interact)
+            {
                 li.currentScreen = GameScreen::GAMEPLAY;
+                inpi.interact = false;
+            }
+            input_system.update(em, engine);
             render_system.drawStory(engine);
 
             if (li.replay)
