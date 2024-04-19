@@ -260,7 +260,7 @@ public:
                         {
                             if (npc.type == NPCType::INVESTIGATOR)
                             {
-                                npc.pathIt_inestigador = npc.path_investigador.begin();
+                                npc.pathIt_investigadorIt = npc.path_investigador.begin();
                                 phy.position = { 27.2022,14,-104.252 };
                                 npc.tp = true;
                             }
@@ -460,6 +460,9 @@ public:
 
                         auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
                         playerPhy.notMove = false;
+                        ///////////////////////////////
+                        // li.investigador_boat = true;
+                        ///////////////////////////////
                         break;
                     }
                     case EventCodes::DialogNomadVolcano3:

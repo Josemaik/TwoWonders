@@ -843,7 +843,7 @@ void MapManager::generateNavmeshes(EntityManager& em)
     auxconex.push_back(Conection{ 1,620,639 });
     auxconex.push_back(Conection{ 1,846,895 });
     auxconex.push_back(Conection{ 1,816,827 });
-    auxconex.push_back(Conection{ 1,822,827 });
+    auxconex.push_back(Conection{ 1,799,827 });
     auxconex.push_back(Conection{ 1,288,297 });
     auxconex.push_back(Conection{ 1,297,320 });
     auxconex.push_back(Conection{ 1,320,333 });

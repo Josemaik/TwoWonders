@@ -56,6 +56,12 @@ struct BTAction_PatrolNPC : BTNode_t {
                         addDialogEvent(ectx, 19);
                 }
             }
+            // if(ectx.npc->goto_boat){
+            //     if (calculateSteering<5>(ectx, ectx.npc->path_investigadorfinalIt, ectx.npc->path_investigadorfinal)) {
+            //         ectx.npc->path_investigador_finalized = true;
+            //         ectx.npc->goto_boat = false;
+            //     }
+            // }
         }
         return BTNodeStatus_t::success;
     }

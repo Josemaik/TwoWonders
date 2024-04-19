@@ -12,6 +12,11 @@ void NPCSystem::update(EntityManager& em)
             phy.position = vec3d{-80.0192,5,-25.493};
             li.npcflee = false;
         }
+        // if(e.hasTag<InvestigatorTag>() && li.investigador_boat){
+        //     npc.goto_boat = true;
+        //     npc.path_investigadorfinalIt = npc.path_investigadorfinal.begin();
+        //     li.investigador_boat = false;
+        // }
         if (npc.behaviourTree) {
             npc.behaviourTree->run({ em, e, nullptr, npcptr, phy, ren, nullptr, timeStep });
             return;
