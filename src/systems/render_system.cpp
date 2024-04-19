@@ -226,8 +226,8 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     // Botones de resolución
     Rectangle btn2Rec = { posResX - offSetY, posResY, buttonWidth, buttonHeight };
     Rectangle btn3Rec = { posResX + offSetY, posResY, buttonWidth, buttonHeight };
-    Rectangle btn4Rec = { posResX - offSetY, posResY + offSetY, buttonWidth, buttonHeight };
-    Rectangle btn5Rec = { posResX + offSetY, posResY + offSetY, buttonWidth, buttonHeight };
+    Rectangle btn4Rec = { posResX - offSetY, posResY + offSetY / 2.5f, buttonWidth, buttonHeight };
+    Rectangle btn5Rec = { posResX + offSetY, posResY + offSetY / 2.5f, buttonWidth, buttonHeight };
     Rectangle btn6Rec = { posX - offSetY - 40, posY - 100, buttonWidth + 50, buttonHeight };
     Rectangle btn7Rec = { posX + offSetY, posY - 100, buttonWidth + 50, buttonHeight };
 
