@@ -428,6 +428,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         }
         case InteractableType::Destructible:
         {
+            auto& li = em.getSingleton<LevelInfo>();
             em.addTag<DestructibleTag>(entity);
             em.addTag<WallTag>(entity);
 
@@ -446,6 +447,11 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 r.offset = interactable["offsetZ"][0].GetDouble();
             }
 
+            if (li.mapID == 1)
+            {
+                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = Effects::PRISONDOOR, .maxParticles = 16, .spawnRate = 0.1f, .lifeTime = 0.3f });
+            }
+
             em.destroyComponent<InteractiveComponent>(entity);
             break;
         }
@@ -459,6 +465,11 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             {
                 em.addTag<SeparateModelTag>(entity);
                 r.position = vec3d::zero();
+                break;
+            }
+            case 1:
+            {
+                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = Effects::PRISONDOOR, .maxParticles = 16, .spawnRate = 0.1f, .lifeTime = 0.3f });
                 break;
             }
             }
@@ -688,7 +699,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
             switch (li.mapID)
             {
             case 1:
-                range = 21.0;
+                range = 30.0;
                 break;
             case 2:
                 range = 7.5;

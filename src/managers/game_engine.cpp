@@ -129,6 +129,9 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // Imagen Mando HUD
     loadAndResizeImage("mando_explicacion", "assets/HUD/botones/Mando_botones.png");
 
+    // Imagen Teclado HUD
+    loadAndResizeImage("teclado_explicacion", "assets/HUD/teclas/teclado_ctrl.png");
+
     // NÚMEROS Y SÍMBOLOS NUMÉRICOS
     //
     loadAndResizeImage("0", "assets/HUD/numeros/0.png");

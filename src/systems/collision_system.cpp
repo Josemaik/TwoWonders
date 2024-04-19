@@ -847,7 +847,7 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                     damage = plfi.currentSpell.damage;
 
                     if (ent1Ptr->hasComponent<ObjectComponent>())
-                        damage = static_cast<int>(damage * 2.0);
+                        damage = static_cast<int>(damage * 1.5);
 
                     if (damage == 0)
                         damage = 2;

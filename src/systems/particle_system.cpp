@@ -15,13 +15,14 @@ void ParticleSystem::update(EntityManager& em)
     { Effects::FIREBALL, { { 2.0f, 0.5f, 2.0f }, { {255, 0, 0, 255}, {130, 129, 129, 255} } } },
     { Effects::OBJECT, { { 1.0f, 0.2f, 1.0f }, {  {255, 215, 0, 255}, { 255, 119, 0, 255 } } } },
     { Effects::WATERSPLASH, { { 2.0f, 0.1f, 2.0f }, { {0, 121, 241, 255}, { 102, 191, 255, 255 } } } },
-    { Effects::FIRESPLASH, { { 2.0f, 0.1f, 2.0f }, { {255, 0, 0, 255}, {156, 50, 52, 255} } } }
+    { Effects::FIRESPLASH, { { 2.0f, 0.1f, 2.0f }, { {255, 0, 0, 255}, {156, 50, 52, 255} } } },
+    { Effects::PRISONDOOR, { { .2f, 0.1f, .2f }, { {255, 0, 0, 255}, {156, 50, 52, 255} } } }
     };
 
     // La parte del motor gráfico será poder colocar puntos de luz desde donde se generen las partículas sjsjsj
 
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, PhysicsComponent& phy, ColliderComponent& col, ParticleMakerComponent& pmc)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col, ParticleMakerComponent& pmc)
     {
         if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
             return;
@@ -57,8 +58,31 @@ void ParticleSystem::update(EntityManager& em)
                     randomFloatX = static_cast<float>(phy.position.x()) - rangeX / 2 + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) / rangeX);
                     randomFloatZ = static_cast<float>(phy.position.z()) - rangeZ / 2 + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) / rangeZ);
 
-                    p.position = { randomFloatX, static_cast<float>(phy.position.y()), randomFloatZ };
-                    p.initialPos = p.position;
+                    if (pmc.effect != Effects::PRISONDOOR)
+                    {
+                        p.position = { randomFloatX, static_cast<float>(phy.position.y()), randomFloatZ };
+                        p.initialPos = p.position;
+
+                    }
+                    else
+                    {
+                        auto offSetY = e.hasTag<DestructibleTag>() ? 5.5f : 4.0f;
+                        float xOffset = 0.0f, zOffset = 0.0f;
+
+                        if (std::abs(std::sin(phy.orientation)) == 1)
+                        {
+                            xOffset = pmc.particles.size() % 2 == 0 ? -4.0f : 4.0f;
+                            zOffset = -2.1f;
+                        }
+                        else
+                        {
+                            xOffset = -2.1f;
+                            zOffset = pmc.particles.size() % 2 == 0 ? -4.0f : 4.0f;
+                        }
+
+                        p.position = { static_cast<float>(phy.position.x()) + xOffset, static_cast<float>(phy.position.y()) + offSetY, static_cast<float>(phy.position.z()) + zOffset };
+                        p.initialPos = p.position;
+                    }
 
                     // Asignamos la velocidad
                     randomFloatX = 0.1f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) / (0.2f - 0.1f));

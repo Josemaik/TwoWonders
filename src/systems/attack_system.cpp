@@ -269,14 +269,16 @@ void AttackSystem::createAttackType(EntityManager& em, Entity& ent, AttackCompon
         // Creamos el hechizo
         auto& e{ em.newEntity() };
         em.addTag<HitPlayerTag>(e);
-        em.addTag<FireBallTag>(e);
 
         BehaviorType type = BehaviorType::ATK_ENEMY;
         if (ent.hasTag<PlayerTag>())
         {
+            em.addTag<FireBallTag>(e);
             setPlayerAtkVel(em, ent, att);
             type = BehaviorType::ATK_PLAYER;
         }
+        else
+            em.addTag<MagmaBallTag>(e);
 
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = BLACK });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
@@ -350,6 +352,9 @@ void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, Atta
 void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack, double const ranged) {
     auto const& phy = em.getComponent<PhysicsComponent>(ent);
 
+    // Crear la entidad ataque
+    auto& e{ em.newEntity() };
+
     // Comprobar el tipo del ataque
     ElementalType tipoElemental;
     if (ent.hasComponent<TypeComponent>())
@@ -362,9 +367,9 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
         auto& plfi = em.getSingleton<PlayerInfo>();
         tipoElemental = plfi.currentSpell == Spells::None ? ElementalType::Neutral : plfi.currentSpell.type;
     }
+    else if (ent.hasTag<SnowmanTag>())
+        em.addTag<SnowBallTag>(e);
 
-    // Crear la entidad ataque
-    auto& e{ em.newEntity() };
     em.addTag<HitPlayerTag>(e);
     auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position + (isRanged ? vec3d{0, 0, 0} : att.vel * scale_to_respawn_attack), .scale = { isRanged ? 1.5 : 6.0, isRanged ? 1.5 : 3.0, isRanged ? 1.5 : 6.0 }, .color = BLACK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = isRanged ? att.vel : vec3d{0, 0, 0}, .scale = r.scale, .gravity = 0, .orientation = phy.orientation });

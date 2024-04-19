@@ -373,7 +373,7 @@ public:
                         };
 
                         // Le damos el hechizo
-                        Spell spell{ "Dash de agua", "Esquivas a la velocidad de la marea", Spells::WaterDash, 20.0, 4 };
+                        Spell spell{ "Dash de agua", "Esquivas a la velocidad de la marea", Spells::WaterDash, 20.0, 1 };
                         plfi.addSpell(spell);
                         plfi.showBook = true;
 

@@ -26,7 +26,8 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     // PAUSE
     if ((ge.isKeyReleased(KEY_ESCAPE) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_MIDDLE_RIGHT)) && li.currentScreen == GameScreen::GAMEPLAY)
     {
-        inpi.pause = !inpi.pause;
+        if (li.currentScreen != GameScreen::CONTROLS)
+            inpi.pause = !inpi.pause;
         inpi.debugAI1 = false;
         inpi.debugAI2 = false;
         inpi.debugPhy = false;
@@ -297,22 +298,22 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     else if (ge.isKeyReleased(in.interact) || ge.isGamepadButtonReleased(0, in.m_interact))
         inpi.interact = false;
 
-    if (ge.isGamepadButtonPressed(0, in.m_right))
+    if (ge.isGamepadButtonPressed(0, in.m_right) || ge.isKeyPressed(KEY_RIGHT))
         inpi.right = true;
     else
         inpi.right = false;
 
-    if (ge.isGamepadButtonPressed(0, in.m_left))
+    if (ge.isGamepadButtonPressed(0, in.m_left) || ge.isKeyPressed(KEY_LEFT))
         inpi.left = true;
     else
         inpi.left = false;
 
-    if (ge.isGamepadButtonPressed(0, in.m_up))
+    if (ge.isGamepadButtonPressed(0, in.m_up) || ge.isKeyPressed(KEY_UP))
         inpi.up = true;
     else
         inpi.up = false;
 
-    if (ge.isGamepadButtonPressed(0, in.m_down))
+    if (ge.isGamepadButtonPressed(0, in.m_down) || ge.isKeyPressed(KEY_DOWN))
         inpi.down = true;
     else
         inpi.down = false;

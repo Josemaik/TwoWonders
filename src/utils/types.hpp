@@ -117,6 +117,8 @@ struct MissionObjTag {};
 struct BoatTag {};
 struct ObstacleTag {};
 struct FireBallTag {};
+struct SnowBallTag {};
+struct MagmaBallTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -197,7 +199,9 @@ using TL = MP::TypeList <
     InvestigatorTag,
     MissionObjTag,
     BoatTag,
-    ObstacleTag
+    ObstacleTag,
+    SnowBallTag,
+    MagmaBallTag
 > ;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem, FrustumInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

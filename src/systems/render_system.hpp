@@ -60,7 +60,7 @@ private:
     void init();
     void beginFrame(GameEngine& engine, EntityManager& em);
     void endFrame(GameEngine& engine, EntityManager& em);
-    void drawHUD(EntityManager& em, GameEngine& engine, bool debugphy);
+    void drawHUD(EntityManager& em, GameEngine& engine);
     void drawEntities(EntityManager& em, GameEngine& engine);
     void drawParticles(EntityManager& em, GameEngine& engine);
     void drawDeath(GameEngine& engine);
@@ -72,6 +72,7 @@ private:
     void drawStaff(GameEngine& engine, EntityManager& em);
     void drawLockInfo(GameEngine& engine, EntityManager& em);
     void drawBoatParts(GameEngine& engine, EntityManager& em);
+    void drawDebugPhysics(GameEngine& engine, EntityManager& em, LevelInfo& li);
     void drawAnimatedTextures(GameEngine& engine);
     void drawSmallButtons(GameEngine& engine, const std::string& name, int posX, int posY, int width, int height);
     void handleAnimatedTexture(const std::string& name, const std::string& textureName, int x, int y, const Texture2D& texture, float scaleFactor);

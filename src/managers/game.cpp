@@ -50,8 +50,8 @@ void Game::createEntities()
     // -125, 4.0, 138.68 - `pos chunck 3
     // 7.0, 22.0, -21.0 - Posición Incial lvl1
     // -68.0, 4.0, -22.0 - Primera rampa lvl1
-    // -6.0, 4.0, 94.0 - Campamento lvl1
     // -126.0, 4.0, 152.0 - Segundo altar lvl1
+    // -6.0, 4.0, 94.0 - Campamento lvl1
     // 34.0, 13.0, 99.0 - Pasillo antes segundo campamento lvl1
     // 30.0, 13.0, 213.0 - Segundo campamento lvl1
     // -26.0, 4.0, 235.0 - NPC lvl1
@@ -217,7 +217,7 @@ void Game::run()
         case GameScreen::CONTROLS:
         {
             input_system.update(em, engine);
-            render_system.drawControls(em, engine);
+            render_system.update(em, engine);
             break;
         }
 

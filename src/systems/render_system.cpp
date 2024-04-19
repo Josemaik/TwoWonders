@@ -167,20 +167,24 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
 
-    if (inpi.interact || engine.isKeyReleased(KEY_ESCAPE))
+    if ((engine.isKeyDown(KEY_E) && inpi.interact) || engine.isKeyDown(KEY_ESCAPE))
     {
         li.currentScreen = li.previousScreen;
         li.previousScreen = li.evenMorePreviousScreen;
         inpi.interact = false;
     }
 
+    auto text = "mando_explicacion";
+    if (li.keyboardControls)
+        text = "teclado_explicacion";
+
     engine.beginDrawing();
-    engine.clearBackground(Color({ 113, 75, 146, 255 }));
-    engine.textures["mando_explicacion"].width = static_cast<int>(engine.getScreenWidth() / 1.3);
-    engine.textures["mando_explicacion"].height = static_cast<int>(engine.getScreenHeight() / 1.6);
-    engine.drawTexture(engine.textures["mando_explicacion"],
-        engine.getScreenWidth() / 2 - engine.textures["mando_explicacion"].width / 2,
-        engine.getScreenHeight() / 2 - engine.textures["mando_explicacion"].height / 2,
+    engine.drawRectangle(0, 0, engine.getScreenWidth(), engine.getScreenHeight(), Fade({ 113, 75, 146, 255 }, 0.5f));
+    engine.textures[text].width = static_cast<int>(engine.getScreenWidth() / 1.3);
+    engine.textures[text].height = static_cast<int>(engine.getScreenHeight() / 1.6);
+    engine.drawTexture(engine.textures[text],
+        engine.getScreenWidth() / 2 - engine.textures[text].width / 2,
+        engine.getScreenHeight() / 2 - engine.textures[text].height / 2,
         WHITE);
     engine.endDrawing();
 }
@@ -224,7 +228,8 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     Rectangle btn3Rec = { posResX + offSetY, posResY, buttonWidth, buttonHeight };
     Rectangle btn4Rec = { posResX - offSetY, posResY + offSetY, buttonWidth, buttonHeight };
     Rectangle btn5Rec = { posResX + offSetY, posResY + offSetY, buttonWidth, buttonHeight };
-    Rectangle btn6Rec = { posX, posY - 100, buttonWidth, buttonHeight };
+    Rectangle btn6Rec = { posX - offSetY - 40, posY - 100, buttonWidth + 50, buttonHeight };
+    Rectangle btn7Rec = { posX + offSetY, posY - 100, buttonWidth + 50, buttonHeight };
 
     // Define the current button selection
     auto& currentButton = inpi.currentButton;
@@ -241,7 +246,8 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
         { btn4Rec, "1920x1080", 3 },
         { btn5Rec, "FULLSCREEN", 4 },
         { volumenSlider, "Volumen", 5 },
-        { btn6Rec, "CONTROLES", 6}
+        { btn6Rec, "CONTROLES MANDO", 6},
+        { btn7Rec, "CONTROLES TECLADO", 7 }
     };
 
     std::string volName = "Volumen";
@@ -277,6 +283,13 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
             case 5: // "Volumen"
                 break;
             case 6: // "CONTROLES"
+                li.keyboardControls = false;
+                li.evenMorePreviousScreen = li.previousScreen;
+                li.currentScreen = GameScreen::CONTROLS;
+                li.previousScreen = GameScreen::OPTIONS;
+                break;
+            case 7: // "CONTROLES"
+                li.keyboardControls = true;
                 li.evenMorePreviousScreen = li.previousScreen;
                 li.currentScreen = GameScreen::CONTROLS;
                 li.previousScreen = GameScreen::OPTIONS;
@@ -287,11 +300,11 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
         }
         if (i == 5 && currentButton == i)
         {
-            if (engine.isGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) {
+            if (engine.isGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT) || engine.isKeyDown(KEY_RIGHT)) {
                 *vol = (*vol < 100) ? *vol + 1 : 100;
                 // ss.sonido_mov();
             }
-            if (engine.isGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT)) {
+            if (engine.isGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT) || engine.isKeyDown(KEY_LEFT)) {
                 *vol = (*vol > 0) ? *vol - 1 : 0;
                 // ss.sonido_mov();
             }
@@ -330,103 +343,106 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
 
 void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em)
 {
-    auto& ss = em.getSingleton<SoundSystem>();
-
-    float windowWidth = 330.0f;
-    float windowHeight = 460.0f;
-    float buttonWidth = 200.0f;
-    float buttonHeight = 50.0f;
-
-    Rectangle windowRect = {
-        static_cast<float>(engine.getScreenWidth()) / 2.0f - windowWidth / 2.0f,
-        static_cast<float>(engine.getScreenHeight()) / 2.0f - windowHeight / 2.0f,
-        windowWidth,
-        windowHeight
-    };
-    engine.drawRectangleLinesEx(windowRect, 2, BLACK);
-    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
-    engine.drawTextEx(engine.getFontDefault(), "PAUSA", vec2d{ windowRect.x + 100, windowRect.y + 40 }, 40, 1, BLACK);
-
-    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2.0f);
-    float posY = static_cast<float>(engine.getScreenHeight() / 2) - (buttonHeight / .5f);
-
     auto& li = em.getSingleton<LevelInfo>();
-    auto& inpi = em.getSingleton<InputInfo>();
+    if (li.currentScreen != GameScreen::CONTROLS)
+    {
+        auto& ss = em.getSingleton<SoundSystem>();
 
-    // Define the current button selection
-    auto& currentButton = inpi.currentButton;
-    bool buttonTouched = false;
+        float windowWidth = 330.0f;
+        float windowHeight = 460.0f;
+        float buttonWidth = 200.0f;
+        float buttonHeight = 50.0f;
 
-    ButtonRect buttons[] = {
-    { { posX, posY, buttonWidth, buttonHeight }, "CONTINUAR", 0 },
-    { { posX, posY + 70, buttonWidth, buttonHeight }, "OPCIONES", 1 },
-    { { posX, posY + 140, buttonWidth, buttonHeight }, "VOLVER AL INICIO", 2 },
-    { { posX, posY + 210, buttonWidth, buttonHeight }, "SALIR", 3 },
-    };
+        Rectangle windowRect = {
+            static_cast<float>(engine.getScreenWidth()) / 2.0f - windowWidth / 2.0f,
+            static_cast<float>(engine.getScreenHeight()) / 2.0f - windowHeight / 2.0f,
+            windowWidth,
+            windowHeight
+        };
+        engine.drawRectangleLinesEx(windowRect, 2, BLACK);
+        engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
+        engine.drawTextEx(engine.getFontDefault(), "PAUSA", vec2d{ windowRect.x + 100, windowRect.y + 40 }, 40, 1, BLACK);
 
-    for (std::size_t i = 0; i < sizeof(buttons) / sizeof(ButtonRect); i++) {
-        ButtonRect& button = buttons[i];
-        bool isCurrent = (currentButton == i);
-        if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
-            (isCurrent && inpi.interact)) {
-            currentButton = i;
-            inpi.mouseClick = true;
-            // Aquí puedes manejar la acción del botón
-            switch (button.action) {
-            case 0: // "CONTINUAR"
-            {
-                inpi.pause = false;
-                ss.seleccion_menu();
-                ss.playAmbient();
-                ss.play_music();
-                break;
-            }
-            case 1: // "OPCIONES"
-            {
-                inpi.currentButton = 0;
-                li.currentScreen = GameScreen::OPTIONS;
-                li.previousScreen = GameScreen::GAMEPLAY;
-                ss.seleccion_menu();
-                break;
-            }
-            case 2: // "VOLVER AL INICIO"
-            {
-                li.currentScreen = GameScreen::TITLE;
-                li.resetGame = true;
-                ss.seleccion_menu();
-                break;
-            }
-            case 3: // "SALIR"
-            {
-                ss.sonido_salir();
-                li.gameShouldEnd = true;
-                return;
-            }
+        float posX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2.0f);
+        float posY = static_cast<float>(engine.getScreenHeight() / 2) - (buttonHeight / .5f);
+
+        auto& inpi = em.getSingleton<InputInfo>();
+
+        // Define the current button selection
+        auto& currentButton = inpi.currentButton;
+        bool buttonTouched = false;
+
+        ButtonRect buttons[] = {
+        { { posX, posY, buttonWidth, buttonHeight }, "CONTINUAR", 0 },
+        { { posX, posY + 70, buttonWidth, buttonHeight }, "OPCIONES", 1 },
+        { { posX, posY + 140, buttonWidth, buttonHeight }, "VOLVER AL INICIO", 2 },
+        { { posX, posY + 210, buttonWidth, buttonHeight }, "SALIR", 3 },
+        };
+
+        for (std::size_t i = 0; i < sizeof(buttons) / sizeof(ButtonRect); i++) {
+            ButtonRect& button = buttons[i];
+            bool isCurrent = (currentButton == i);
+            if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
+                (isCurrent && inpi.interact)) {
+                currentButton = i;
+                inpi.mouseClick = true;
+                // Aquí puedes manejar la acción del botón
+                switch (button.action) {
+                case 0: // "CONTINUAR"
+                {
+                    inpi.pause = false;
+                    ss.seleccion_menu();
+                    ss.playAmbient();
+                    ss.play_music();
+                    break;
+                }
+                case 1: // "OPCIONES"
+                {
+                    inpi.currentButton = 0;
+                    li.currentScreen = GameScreen::OPTIONS;
+                    li.previousScreen = GameScreen::GAMEPLAY;
+                    ss.seleccion_menu();
+                    break;
+                }
+                case 2: // "VOLVER AL INICIO"
+                {
+                    li.currentScreen = GameScreen::TITLE;
+                    li.resetGame = true;
+                    ss.seleccion_menu();
+                    break;
+                }
+                case 3: // "SALIR"
+                {
+                    ss.sonido_salir();
+                    li.gameShouldEnd = true;
+                    return;
+                }
+                }
+
+                inpi.interact = false;
             }
 
-            inpi.interact = false;
+            if (engine.checkCollisionPointRec(GetMousePosition(), button.rect) && !buttonTouched)
+                buttonTouched = true;
         }
 
-        if (engine.checkCollisionPointRec(GetMousePosition(), button.rect) && !buttonTouched)
-            buttonTouched = true;
-    }
+        if (buttonTouched && !ss.pushed)
+        {
+            ss.sonido_mov();
+            ss.pushed = true;
+        }
+        else if (!buttonTouched && ss.pushed)
+            ss.pushed = false;
 
-    if (buttonTouched && !ss.pushed)
-    {
-        ss.sonido_mov();
-        ss.pushed = true;
-    }
-    else if (!buttonTouched && ss.pushed)
-        ss.pushed = false;
-
-    // Control de botones de mando para cambiar el botón seleccionado
-    if (inpi.up || inpi.left) {
-        currentButton = (currentButton > 0) ? currentButton - 1 : sizeof(buttons) / sizeof(ButtonRect) - 1;
-        ss.sonido_mov();
-    }
-    if (inpi.down || inpi.right) {
-        currentButton = (currentButton < sizeof(buttons) / sizeof(ButtonRect) - 1) ? currentButton + 1 : 0;
-        ss.sonido_mov();
+        // Control de botones de mando para cambiar el botón seleccionado
+        if (inpi.up || inpi.left) {
+            currentButton = (currentButton > 0) ? currentButton - 1 : sizeof(buttons) / sizeof(ButtonRect) - 1;
+            ss.sonido_mov();
+        }
+        if (inpi.down || inpi.right) {
+            currentButton = (currentButton < sizeof(buttons) / sizeof(ButtonRect) - 1) ? currentButton + 1 : 0;
+            ss.sonido_mov();
+        }
     }
 }
 
@@ -830,11 +846,18 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     else if (e.hasTag<SnowmanTag>())
     {
-        r.model = engine.loadModel("assets/models/snowman.obj");
+        r.model = engine.loadModel("assets/Personajes/Enemigos/Snowman/Snowman.obj");
+
+        Texture t{};
+        if (li.mapID != 2)
+            t = engine.loadTexture("assets/Personajes/Enemigos/Snowman/Snowman_texture.png");
+        else
+            t = engine.loadTexture("assets/Personajes/Enemigos/Snowman/snowman_fuego_texture.png");
+
         Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/snowman_uv.png");
-        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/snowman_texture.png");
-        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
         r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+
+        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
     }
     else if (e.hasTag<GolemTag>())
     {
@@ -1166,6 +1189,18 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
 
         loadShaders(r.model);
     }
+    else if (e.hasTag<SnowBallTag>())
+    {
+        r.model = engine.loadModel("assets/Personajes/Enemigos/Snowman/Snow_ball.obj");
+
+        loadShaders(r.model);
+    }
+    else if (e.hasTag<MagmaBallTag>())
+    {
+        r.model = engine.loadModel("assets/Personajes/Enemigos/Snowman/Magma_ball.obj");
+
+        loadShaders(r.model);
+    }
     else
     {
         r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
@@ -1253,7 +1288,11 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
     if (li.isCharging())
         return;
 
-    drawHUD(em, engine, inpi.debugPhy);
+    drawHUD(em, engine);
+
+    if (inpi.debugPhy)
+        drawDebugPhysics(engine, em, li);
+
     drawAlerts_IA(em, engine);
 
     if (txti.hasText())
@@ -1787,9 +1826,10 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
     }
 }
 // Se dibuja el HUD
-void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
+void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
 {
     auto& li = em.getSingleton<LevelInfo>();
+    auto& inpi = em.getSingleton<InputInfo>();
     if (li.isDead)
     {
         em.getComponent<RenderComponent>(*em.getEntityByID(li.playerID)).visible = false;
@@ -1797,7 +1837,13 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
         return;
     }
 
-    if (debugphy)
+    if (li.currentScreen == GameScreen::CONTROLS)
+    {
+        drawControls(em, engine);
+        return;
+    }
+
+    if (inpi.debugPhy)
         pointedEntity = std::numeric_limits<std::size_t>::max();
 
     for (auto const& e : em.getEntities())
@@ -1990,171 +2036,6 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                 }
             }
         }
-
-        if (debugphy && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
-        {
-            auto const& r{ em.getComponent<RenderComponent>(e) };
-            auto const& l{ em.getComponent<LifeComponent>(e) };
-
-            engine.drawText(std::to_string(l.life).c_str(),
-                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 8.0),
-                20,
-                BLACK);
-
-            if (e.hasComponent<TypeComponent>())
-            {
-                auto const& t{ em.getComponent<TypeComponent>(e) };
-
-                std::string tipo = "Hielo";
-                Color color = SKYBLUE;
-
-                if (t.type == ElementalType::Neutral)
-                {
-                    tipo = "Neutral";
-                    color = BLACK;
-                }
-                else if (t.type == ElementalType::Water)
-                {
-                    tipo = "Agua";
-                    color = BLUE;
-                }
-                else if (t.type == ElementalType::Fire)
-                {
-                    tipo = "Fuego";
-                    color = RED;
-                }
-
-                engine.drawText(tipo.c_str(),
-                    static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                    static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 70),
-                    20,
-                    color);
-            }
-        }
-
-        if (debugphy && e.hasComponent<ZoneComponent>())
-        {
-            auto& ren{ em.getComponent<RenderComponent>(e) };
-            auto& z{ em.getComponent<ZoneComponent>(e) };
-
-            engine.drawText(std::to_string(z.zone).c_str(),
-                static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 5),
-                20,
-                RED);
-        }
-
-        if (debugphy && e.hasComponent<RampComponent>() && e.hasComponent<PhysicsComponent>())
-        {
-            // Dibujamos el rectángulo de la rampa
-            auto& phy = em.getComponent<PhysicsComponent>(e);
-            auto& rc = em.getComponent<RampComponent>(e);
-            // La rampa solo tiene vec2d mínimos y máximos, vamos a dibujar el rectángulo que los une
-            engine.drawText(std::to_string(rc.offset.y()).c_str(),
-                static_cast<int>(engine.getWorldToScreenX(phy.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 5),
-                20, RED);
-            engine.beginMode3D();
-            engine.drawCubeWires(phy.position, static_cast<float>(phy.scale.x()), static_cast<float>(phy.scale.y()), static_cast<float>(phy.scale.z()), RED);
-            engine.endMode3D();
-        }
-
-        if (debugphy && e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
-        {
-            auto& col{ em.getComponent<ColliderComponent>(e) };
-
-            // Calcular la posición y el tamaño de la bounding box
-            vec3d boxPosition = (col.bbox.min + col.bbox.max) / 2;
-            vec3d boxSize = col.bbox.max - col.bbox.min;
-
-            Color color = BLUE;
-            if (col.behaviorType & BehaviorType::ZONE)
-                color = GREEN;
-
-            // Dibujar la bounding box
-            engine.beginMode3D();
-            engine.drawCubeWires(boxPosition,
-                static_cast<float>(boxSize.x()),
-                static_cast<float>(boxSize.y()),
-                static_cast<float>(boxSize.z()),
-                color);
-            engine.endMode3D();
-
-            auto& phy = em.getComponent<PhysicsComponent>(e);
-
-            RayCast ray = engine.getMouseRay();
-
-            //std::cout << ray.origin << " " << ray.direction << std::endl;
-
-            auto& ren = em.getComponent<RenderComponent>(e);
-            bool notStatic = !(col.behaviorType & BehaviorType::ZONE);
-            // Comprobar si el rayo intersecta con el collider
-
-            if (col.bbox.intersectsRay(ray.origin, ray.direction) && notStatic && pointedEntity != li.playerID)
-            {
-                pointedEntity = e.getID();
-
-                auto& col{ em.getComponent<ColliderComponent>(e) };
-
-                // Calcular la posición y el tamaño de la bounding box
-                vec3d boxPosition = (col.bbox.min + col.bbox.max) / 2;
-                vec3d boxSize = col.bbox.max - col.bbox.min;
-
-                // Dibujar la bounding box
-                engine.beginMode3D();
-                engine.drawCubeWires(boxPosition,
-                    static_cast<float>(boxSize.x()),
-                    static_cast<float>(boxSize.y()),
-                    static_cast<float>(boxSize.z()),
-                    PURPLE);
-                engine.endMode3D();
-
-                engine.beginMode3D();
-                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
-                engine.endMode3D();
-
-                // Dibujar el HUD de debug
-                engine.drawRectangle(0, 65, 150, 360, WHITE);
-                engine.drawText("Posición", 10, 70, 20, BLACK);
-                std::string posX = "X: " + std::to_string(phy.position.x());
-                engine.drawText(posX.c_str(), 10, 95, 20, BLACK);
-                std::string posY = "Y: " + std::to_string(phy.position.y());
-                engine.drawText(posY.c_str(), 10, 120, 20, BLACK);
-                std::string posZ = "Z: " + std::to_string(phy.position.z());
-                engine.drawText(posZ.c_str(), 10, 145, 20, BLACK);
-
-                engine.drawText("Escala", 10, 175, 20, BLACK);
-                std::string sclX = "X: " + std::to_string(phy.scale.x());
-                engine.drawText(sclX.c_str(), 10, 200, 20, BLACK);
-                std::string sclY = "Y: " + std::to_string(phy.scale.y());
-                engine.drawText(sclY.c_str(), 10, 225, 20, BLACK);
-                std::string sclZ = "Z: " + std::to_string(phy.scale.z());
-                engine.drawText(sclZ.c_str(), 10, 250, 20, BLACK);
-
-                engine.drawText("Velocidad", 10, 280, 20, BLACK);
-                std::string velX = "X: " + std::to_string(phy.velocity.x());
-                engine.drawText(velX.c_str(), 10, 305, 20, BLACK);
-                std::string velY = "Y: " + std::to_string(phy.velocity.y());
-                engine.drawText(velY.c_str(), 10, 330, 20, BLACK);
-                std::string velZ = "Z: " + std::to_string(phy.velocity.z());
-                engine.drawText(velZ.c_str(), 10, 355, 20, BLACK);
-
-                std::string id = "ID: " + std::to_string(e.getID());
-                engine.drawText(id.c_str(), 10, 385, 20, BLACK);
-            }
-        }
-
-        // Dibujar el ID de las entidades // DEBUG
-        if (debugphy && e.hasComponent<RenderComponent>())
-        {
-            auto const& r{ em.getComponent<RenderComponent>(e) };
-            engine.drawText(std::to_string(e.getID()).c_str(),
-                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
-                20,
-                BLACK);
-        }
     }
 
     auto& pl = *em.getEntityByID(li.playerID);
@@ -2332,6 +2213,177 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine, bool debugphy)
                     displayGif(engine, gifCopy, *gif, posX, posY);
                 }
             }
+        }
+    }
+}
+
+void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, LevelInfo& li)
+{
+    for (auto const& e : em.getEntities())
+    {
+        if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
+        {
+            auto const& r{ em.getComponent<RenderComponent>(e) };
+            auto const& l{ em.getComponent<LifeComponent>(e) };
+
+            engine.drawText(std::to_string(l.life).c_str(),
+                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 8.0),
+                20,
+                BLACK);
+
+            if (e.hasComponent<TypeComponent>())
+            {
+                auto const& t{ em.getComponent<TypeComponent>(e) };
+
+                std::string tipo = "Hielo";
+                Color color = SKYBLUE;
+
+                if (t.type == ElementalType::Neutral)
+                {
+                    tipo = "Neutral";
+                    color = BLACK;
+                }
+                else if (t.type == ElementalType::Water)
+                {
+                    tipo = "Agua";
+                    color = BLUE;
+                }
+                else if (t.type == ElementalType::Fire)
+                {
+                    tipo = "Fuego";
+                    color = RED;
+                }
+
+                engine.drawText(tipo.c_str(),
+                    static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+                    static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 70),
+                    20,
+                    color);
+            }
+        }
+
+        if (e.hasComponent<ZoneComponent>())
+        {
+            auto& ren{ em.getComponent<RenderComponent>(e) };
+            auto& z{ em.getComponent<ZoneComponent>(e) };
+
+            engine.drawText(std::to_string(z.zone).c_str(),
+                static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
+                static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 5),
+                20,
+                RED);
+        }
+
+        if (e.hasComponent<RampComponent>() && e.hasComponent<PhysicsComponent>())
+        {
+            // Dibujamos el rectángulo de la rampa
+            auto& phy = em.getComponent<PhysicsComponent>(e);
+            auto& rc = em.getComponent<RampComponent>(e);
+            // La rampa solo tiene vec2d mínimos y máximos, vamos a dibujar el rectángulo que los une
+            engine.drawText(std::to_string(rc.offset.y()).c_str(),
+                static_cast<int>(engine.getWorldToScreenX(phy.position) - 5),
+                static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 5),
+                20, RED);
+            engine.beginMode3D();
+            engine.drawCubeWires(phy.position, static_cast<float>(phy.scale.x()), static_cast<float>(phy.scale.y()), static_cast<float>(phy.scale.z()), RED);
+            engine.endMode3D();
+        }
+
+        if (e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
+        {
+            auto& col{ em.getComponent<ColliderComponent>(e) };
+
+            // Calcular la posición y el tamaño de la bounding box
+            vec3d boxPosition = (col.bbox.min + col.bbox.max) / 2;
+            vec3d boxSize = col.bbox.max - col.bbox.min;
+
+            Color color = BLUE;
+            if (col.behaviorType & BehaviorType::ZONE)
+                color = GREEN;
+
+            // Dibujar la bounding box
+            engine.beginMode3D();
+            engine.drawCubeWires(boxPosition,
+                static_cast<float>(boxSize.x()),
+                static_cast<float>(boxSize.y()),
+                static_cast<float>(boxSize.z()),
+                color);
+            engine.endMode3D();
+
+            auto& phy = em.getComponent<PhysicsComponent>(e);
+
+            RayCast ray = engine.getMouseRay();
+
+            //std::cout << ray.origin << " " << ray.direction << std::endl;
+
+            auto& ren = em.getComponent<RenderComponent>(e);
+            bool notStatic = !(col.behaviorType & BehaviorType::ZONE);
+            // Comprobar si el rayo intersecta con el collider
+
+            if (col.bbox.intersectsRay(ray.origin, ray.direction) && notStatic && pointedEntity != li.playerID)
+            {
+                pointedEntity = e.getID();
+
+                auto& col{ em.getComponent<ColliderComponent>(e) };
+
+                // Calcular la posición y el tamaño de la bounding box
+                vec3d boxPosition = (col.bbox.min + col.bbox.max) / 2;
+                vec3d boxSize = col.bbox.max - col.bbox.min;
+
+                // Dibujar la bounding box
+                engine.beginMode3D();
+                engine.drawCubeWires(boxPosition,
+                    static_cast<float>(boxSize.x()),
+                    static_cast<float>(boxSize.y()),
+                    static_cast<float>(boxSize.z()),
+                    PURPLE);
+                engine.endMode3D();
+
+                engine.beginMode3D();
+                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
+                engine.endMode3D();
+
+                // Dibujar el HUD de debug
+                engine.drawRectangle(0, 65, 150, 360, WHITE);
+                engine.drawText("Posición", 10, 70, 20, BLACK);
+                std::string posX = "X: " + std::to_string(phy.position.x());
+                engine.drawText(posX.c_str(), 10, 95, 20, BLACK);
+                std::string posY = "Y: " + std::to_string(phy.position.y());
+                engine.drawText(posY.c_str(), 10, 120, 20, BLACK);
+                std::string posZ = "Z: " + std::to_string(phy.position.z());
+                engine.drawText(posZ.c_str(), 10, 145, 20, BLACK);
+
+                engine.drawText("Escala", 10, 175, 20, BLACK);
+                std::string sclX = "X: " + std::to_string(phy.scale.x());
+                engine.drawText(sclX.c_str(), 10, 200, 20, BLACK);
+                std::string sclY = "Y: " + std::to_string(phy.scale.y());
+                engine.drawText(sclY.c_str(), 10, 225, 20, BLACK);
+                std::string sclZ = "Z: " + std::to_string(phy.scale.z());
+                engine.drawText(sclZ.c_str(), 10, 250, 20, BLACK);
+
+                engine.drawText("Velocidad", 10, 280, 20, BLACK);
+                std::string velX = "X: " + std::to_string(phy.velocity.x());
+                engine.drawText(velX.c_str(), 10, 305, 20, BLACK);
+                std::string velY = "Y: " + std::to_string(phy.velocity.y());
+                engine.drawText(velY.c_str(), 10, 330, 20, BLACK);
+                std::string velZ = "Z: " + std::to_string(phy.velocity.z());
+                engine.drawText(velZ.c_str(), 10, 355, 20, BLACK);
+
+                std::string id = "ID: " + std::to_string(e.getID());
+                engine.drawText(id.c_str(), 10, 385, 20, BLACK);
+            }
+        }
+
+        // Dibujar el ID de las entidades // DEBUG
+        if (e.hasComponent<RenderComponent>())
+        {
+            auto const& r{ em.getComponent<RenderComponent>(e) };
+            engine.drawText(std::to_string(e.getID()).c_str(),
+                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
+                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
+                20,
+                BLACK);
         }
     }
 }
