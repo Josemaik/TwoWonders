@@ -1694,8 +1694,8 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
     em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, PhysicsComponent& phy, ColliderComponent& col, RenderComponent& ren)
     {
         RayCast ray = engine.getMouseRay();
-        //std::cout << "Origen: " << ray.origin.x() << " | " << ray.origin.y() << " | " << ray.origin.z() << "\n";
-        //std::cout << "Direccion: " << ray.direction.x() << " | " << ray.direction.y() << " | " << ray.direction.z() << "\n";
+        std::cout << "Origen: " << ray.origin.x() << " | " << ray.origin.y() << " | " << ray.origin.z() << "\n";
+        std::cout << "Direccion: " << ray.direction.x() << " | " << ray.direction.y() << " | " << ray.direction.z() << "\n";
         // Comprobar si el rayo intersecta con el collider
         if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
             if (engine.dmeg.IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
