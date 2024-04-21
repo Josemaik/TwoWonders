@@ -3,8 +3,10 @@
 #include <glm/glm.hpp>
 
 struct Entity{
-    virtual void draw(glm::mat4) {};
     virtual ~Entity() {};
+    
+    virtual void draw(glm::mat4) {};
+    virtual void unload() {};
 };
 
 //struct Light : Entity{

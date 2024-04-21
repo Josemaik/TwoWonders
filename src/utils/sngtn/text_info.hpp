@@ -2,9 +2,23 @@
 #include <queue>
 #include <string>
 
+enum struct SpeakerType : uint8_t
+{
+    NONE = 0,
+    PLAYER = 1,
+    PLAYER_SAD = 2,
+    PLAYER_DANGER = 3,
+    NOMAD = 4,
+    INVESTIGATOR = 5,
+    CAT = 6
+};
+
 struct TextInfo
 {
-    void addText(const std::string& text)
+
+    using QueueType = std::queue<std::pair<SpeakerType, std::string>>;
+
+    void addText(const std::pair<SpeakerType, std::string>& text)
     {
         textQueue.push(text);
     }
@@ -20,11 +34,12 @@ struct TextInfo
             textQueue.pop();
     }
 
-    const std::queue<std::string>& getTextQueue() const
+    const QueueType& getTextQueue() const
     {
         return textQueue;
     }
+    bool notPass{ false };
 private:
     // Cola para los textos
-    std::queue<std::string> textQueue{};
+    QueueType textQueue{};
 };

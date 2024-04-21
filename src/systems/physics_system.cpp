@@ -1,31 +1,51 @@
 #include "physics_system.hpp"
 #include <math.h>
 
-void PhysicsSystem::update(EntityManager& em, float dt)
+void PhysicsSystem::update(EntityManager& em)
 {
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, PhysicsComponent& phy)
+    auto& frti = em.getSingleton<FrustumInfo>();
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
     {
+        if (!e.hasTags(FrustOut{}) && frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+            return;
+
+        if (phy.notMove)
+        {
+            if (phy.velocity != vec3d::zero() && phy.target != vec3d::zero())
+            {
+                if (phy.position.distance(phy.target) < 8.0)
+                    phy.velocity = vec3d::zero();
+                else
+                {
+                    phy.position += phy.velocity;
+                }
+            }
+            return;
+        }
         // Cuando el jugador se para por un tiempo determinado
-        if (phy.stopped)
+        if (phy.elapsed_afterStop < phy.countdown_afterStop)
+        {
+            phy.plusDeltatime(timeStep30, phy.elapsed_afterStop);
+            if (phy.stopped)
+                phy.stopped = false;
+        }
+        else if (phy.stopped)
         {
             if (phy.elapsed_stopped >= phy.countdown_stopped)
             {
                 phy.elapsed_stopped = 0;
                 phy.stopped = false;
+                phy.gravity = phy.KGravity;
+                phy.elapsed_afterStop = 0.0f;
                 return;
             }
             else
-                phy.plusdeltatime(dt, phy.elapsed_stopped);
+                phy.plusDeltatime(timeStep30, phy.elapsed_stopped);
         }
+
         // Sacamos referencias a la posición y velocidad
         auto& pos = phy.position;
         auto& vel = phy.velocity;
-
-        // Actualizamos el estado anterior
-        phy.previousState.position = pos;
-        phy.previousState.velocity = vel;
-        phy.previousState.scale = phy.scale;
-        phy.previousState.orientation = phy.orientation;
 
         // Aplicar gravedad y hacer Clamp
         vel.setY(vel.y() - phy.gravity);
@@ -41,11 +61,11 @@ void PhysicsSystem::update(EntityManager& em, float dt)
                 phy.elapsed_stunned = 0;
                 phy.dragActivatedTime = false;
             }
-            phy.plusdeltatime(dt, phy.elapsed_stunned);
+            phy.plusDeltatime(timeStep, phy.elapsed_stunned);
         }
 
         //Stunear o Ralentizar al player
-        if (ent.hasTag<PlayerTag>())
+        if (e.hasTag<PlayerTag>())
         {
             if (phy.dragActivated) {
                 phy.dragActivated = false;
@@ -57,8 +77,27 @@ void PhysicsSystem::update(EntityManager& em, float dt)
                 // si el player no esta siendo ralentizado-> no esta siendo capturado por tearaña
                 em.getSingleton<BlackBoard_t>().playerhunted = false;
             }
+
+            // Normalizamos la velocidad del jugador siempre
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            if (!plfi.onLadder)
+                vel.normalize();
+
+            if (plfi.hasBoots && !phy.stopped && !plfi.onLadder)
+            {
+                auto multiplier = 1.4;
+                vel *= {multiplier, 1.0, multiplier};
+            }
         }
 
+        // Si estamos en una rampa queremos ir un poco más lento
+        if (phy.onRamp)
+        {
+            vel.setX(vel.x() / 1.5);
+            vel.setZ(vel.z() / 1.5);
+        }
+
+        // Colocamos la posición
         pos.setX((pos.x() + vel.x()));
         pos.setY((pos.y() + vel.y()));
         pos.setZ((pos.z() + vel.z()));
@@ -68,10 +107,10 @@ void PhysicsSystem::update(EntityManager& em, float dt)
         }
 
         //Orientamos a enemigos hacia el player si están parados
-        if (ent.hasTag<SpiderTag>() || ent.hasTag<SnowmanTag>()) {
-            if (ent.hasComponent<AIComponent>())
+        if (e.hasTag<SpiderTag>() || e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()) {
+            if (e.hasComponent<AIComponent>())
             {
-                auto& ia = em.getComponent<AIComponent>(ent);
+                auto& ia = em.getComponent<AIComponent>(e);
                 if (ia.playerdetected) {
                     auto& bb = em.getSingleton<BlackBoard_t>();
                     vec3d targetpos{ bb.tx,0.0,bb.tz };
@@ -80,10 +119,6 @@ void PhysicsSystem::update(EntityManager& em, float dt)
                 }
             }
         }
-
-        // comprobar si están en el suelo
-        if (phy.alreadyGrounded)
-            phy.alreadyGrounded = false;
 
         // auto& ss = em.getSingleton<SoundSystem>();
         if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
@@ -105,6 +140,6 @@ void PhysicsSystem::update(EntityManager& em, float dt)
             playerWalking = false;
             //ss.SFX_stop();
         }
-
+        // }
     });
 }

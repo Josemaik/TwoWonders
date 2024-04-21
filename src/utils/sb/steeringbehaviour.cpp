@@ -3,11 +3,11 @@
 #include <numbers>
 #include <algorithm>
 
-double calculatePointDistance(vec3d const& target, vec3d const& origin) {
-        auto dx{ target.x() - origin.x() };
-        auto dz{ target.z() - origin.z() };
-        return std::sqrt(dx * dx + dz * dz);
-}
+// double calculatePointDistance(vec3d const& target, vec3d const& origin) {
+//         auto dx{ target.x() - origin.x() };
+//         auto dz{ target.z() - origin.z() };
+//         return std::sqrt(dx * dx + dz * dz);
+// }
 
 // void adjustAnglePiMinusPi(double& angle){
 //       while      ( angle >  K_PI ) angle -= 2*K_PI;
@@ -51,7 +51,8 @@ Steer_t STBH::Arrive(PhysicsComponent const& phy, vec3d const& target, double co
         Steer_t steering;
         //check if i'm on target
         steering.arrived = false;
-        auto tdist{ calculatePointDistance(target, {phy.position.x(),0.0,phy.position.z()}) };
+        auto tdist{ target.calculatePointDistance({phy.position.x(),0.0,phy.position.z()})};
+        //auto tdist{ calculatePointDistance(target, {phy.position.x(),0.0,phy.position.z()}) };
         if (tdist < arrivalRadious)
                 steering.arrived = true;
         // face target
@@ -83,9 +84,11 @@ Steer_t STBH::Seek(PhysicsComponent const& phy, vec3d const& target) {
         // Calculate target linear acceleration based on angular distance
         // auto angular_velocity_size { std::fabs(phy.v_angular) };
         // auto acceleration { phy.kMaxVLin / (1 + angular_velocity_size) };
+        //Calculate linear velocity based on euclidean distance
         steering.v_x = std::clamp((target.x() - phy.position.x()), -phy.max_speed, phy.max_speed);
         steering.v_z = std::clamp((target.z() - phy.position.z()), -phy.max_speed, phy.max_speed);
-
+        // Evade nearest enemies
+        
         // Cambiamos la orientación del objeto para que mire hacia el objetivo
         vec3d dir = target - phy.position;
         steering.orientation = atan2(dir.x(), dir.z());
@@ -105,7 +108,7 @@ Steer_t STBH::Pursue(PhysicsComponent const& phyTarget, PhysicsComponent const& 
         //Calculate distance
         vec3d target{ phyTarget.position.x(), 0.0 ,   phyTarget.position.z() };
         vec3d avoider{ phyPursuer.position.x(), 0.0 ,   phyPursuer.position.z() };
-        auto distance{ calculatePointDistance(target,avoider) };
+        auto distance{ target.calculatePointDistance(avoider) };
         auto minimaltime{ distance / phyPursuer.max_speed };
         vec3d predicted_target{
                 phyTarget.position.x() + phyTarget.velocity.x() * minimaltime,
@@ -118,7 +121,7 @@ Steer_t STBH::Avoid(PhysicsComponent const& phyTarget, PhysicsComponent const& p
         //Calculate distance
         vec3d target{ phyTarget.position.x(), 0.0 ,   phyTarget.position.z() };
         vec3d pursuer{ phyAvoider.position.x(), 0.0 ,   phyAvoider.position.z() };
-        auto distance{ calculatePointDistance(target,pursuer) };
+        auto distance{ target.calculatePointDistance(pursuer) };
         auto minimaltime{ distance / phyAvoider.kMaxVLin };
         vec3d predicted_avoider{
                 phyTarget.position.x() + phyTarget.velocity.x() * minimaltime,
@@ -128,4 +131,35 @@ Steer_t STBH::Avoid(PhysicsComponent const& phyTarget, PhysicsComponent const& p
         // Invert the direction to avoid the predicted avoider position
         vec3d avoidDirection = target - predicted_avoider;
         return Seek(phyTarget, target + avoidDirection);
+}
+Steer_t STBH::Evade(PhysicsComponent const& phyEvader,PhysicsComponent const& phytoevade,double maxSeparationForce){
+        Steer_t steering;
+        //Calculamos vector de la pos a evadir hacia el player
+
+        // Calcula la dirección hacia la que queremos evadirnos
+        vec3d evadeDirection = phytoevade.position - phyEvader.position;
+        // Normaliza la dirección de la evasión
+        // vec3d normalizedEvadeDirection = evadeDirection.normalized();
+        // Calcula el vector director para evadirse (invertido)
+        evadeDirection.normalize();
+
+        vec3d evadeVector = evadeDirection * -1;
+
+        // Asigna la dirección del vector de evasión a la orientación
+        steering.orientation = atan2(evadeVector.x(), evadeVector.z());
+        // Calcula la distancia entre el evasor y el objetivo a evadir
+        double distance = evadeDirection.length();
+
+        // double distance = phyEvader.position.distance(postoevade);
+        // double separationForce = (1.0 / distance) * 15;
+        //double separationForce = 0.5;
+        // Calcula la fuerza de evasión en función de la distancia
+        //double maxSeparationForce = 1.0; // Ajusta este valor según sea necesario
+        double separationForce = std::clamp((maxSeparationForce / distance), 0.0, maxSeparationForce);
+
+        // Asigna la velocidad máxima al vector de evasión
+        steering.v_x = std::clamp(evadeVector.x() * separationForce, -phyEvader.max_speed, phyEvader.max_speed);
+        steering.v_z = std::clamp(evadeVector.z() * separationForce, -phyEvader.max_speed, phyEvader.max_speed);
+
+        return steering;
 }

@@ -1,13 +1,15 @@
 #pragma once
 
 #include <cstdint>
+#include <set>
 #include <unordered_set>
 #include <limits>
 #include "utils/types.hpp"
+#include "utils/pf/Graph.hpp"
 #include "../../systems/sound_system.hpp"
 
 // Enum que representa el estado del juego
-enum struct GameScreen { LOGO, TITLE, STORY, GAMEPLAY, /*DEAD,*/ OPTIONS, ENDING, PAUSE };
+enum struct GameScreen { LOGO, TITLE, STORY, GAMEPLAY, /*DEAD,*/ OPTIONS, ENDING, PAUSE, CONTROLS };
 
 //Memoria global de nivel
 struct LevelInfo
@@ -61,20 +63,26 @@ struct LevelInfo
     notLoadSet dontLoad{};
 
     // Pantalla de carga
-    float loadingLimit{ 3.0f }, loadingTime{ loadingLimit };
+    double loadingLimit{ 3.0 }, loadingTime{ loadingLimit };
     bool loading{ false };
+    bool keyboardControls{ false };
 
     // Variables relacionadas con los eventos
     std::size_t chestToOpen{ max };
     std::size_t doorToOpen{ max };
     std::size_t npcToTalk{ max };
+    std::size_t boatPartFound{ max };
     bool dungeonKeyCreated{ false };
     vec3d enemyToChestPos{};
     bool door_open{ false };
+    std::set<uint16_t> events{};
 
     // Variables de debug
     bool debugIA2{ false };
     bool resetGame{ false };
+
+    //grafo referencia
+    Graph level_graph{};
 
     // Variables de zona y el nivel
     uint16_t num_zone{};
@@ -85,16 +93,21 @@ struct LevelInfo
     bool openChest{ false };
     bool gameShouldEnd{ false };
 
-
     // Tutorial
     std::vector<std::size_t> tutorialEnemies{};
+    std::vector<std::size_t> volcanoLava{};
 
     // Replay de inputs
     bool replay{ false };
 
+    // Misiones
+    bool volcanoMission{ false };
+    //npc huya
+    bool npcflee{ false }, investigatorstartwalk{ false };
     // Estado del juego
-    GameScreen currentScreen = GameScreen::TITLE;
+    GameScreen currentScreen = GameScreen::LOGO;
     GameScreen previousScreen = GameScreen::LOGO;
+    GameScreen evenMorePreviousScreen = GameScreen::LOGO;
 
     bool isCharging()
     {
@@ -150,6 +163,20 @@ struct LevelInfo
         dead_entities.clear();
         debugIA2 = false;
         resetGame = false;
+        chestToOpen = max;
+        doorToOpen = max;
+        npcToTalk = max;
+        boatPartFound = max;
+        dungeonKeyCreated = false;
+        enemyToChestPos = {};
+        door_open = false;
+        events.clear();
+        tutorialEnemies.clear();
+        volcanoLava.clear();
+        replay = false;
+        volcanoMission = false;
+        npcflee = false;
+        investigatorstartwalk = false;
         num_zone = 0;
         mapID = 0;
         chestToOpen = max;

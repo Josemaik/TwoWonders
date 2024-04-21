@@ -16,9 +16,13 @@ struct InputComponent
     int pause{ KEY_ESCAPE };
     int inventory{ KEY_I };
 
+    int spell1{ KEY_J };
+    int spell2{ KEY_K };
+    int spell3{ KEY_L };
+
     // Teclas de mecánicas
     int air_attack{ KEY_T };
-    int lockIn{ KEY_F };
+    int lockIn{ KEY_Q };
     int interact{ KEY_E };
 
     // Teclas de debug
@@ -34,8 +38,12 @@ struct InputComponent
     int m_right{ GAMEPAD_BUTTON_LEFT_FACE_RIGHT };
 
     int m_interact{ GAMEPAD_BUTTON_RIGHT_FACE_DOWN };
-    int m_space{ GAMEPAD_BUTTON_RIGHT_FACE_LEFT };
-    int m_lockIn{ GAMEPAD_BUTTON_RIGHT_FACE_RIGHT };
+    int m_space{ GAMEPAD_AXIS_RIGHT_TRIGGER };
+    int m_lockIn{ GAMEPAD_AXIS_LEFT_TRIGGER };
+
+    int m_spell1{ GAMEPAD_BUTTON_RIGHT_FACE_LEFT };
+    int m_spell2{ GAMEPAD_BUTTON_RIGHT_FACE_RIGHT };
+    int m_spell3{ GAMEPAD_BUTTON_RIGHT_FACE_UP };
 
     // Joysticks
     float m_joystickX{ 0 };

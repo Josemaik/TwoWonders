@@ -11,7 +11,7 @@ struct NPCSystem
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent, NPCComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, float dt);
+    void update(EntityManager& em);
 };
 
 #endif // !NPC_SYSTEM

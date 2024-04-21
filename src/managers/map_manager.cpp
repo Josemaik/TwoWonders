@@ -12,20 +12,25 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
         case 0:
         {
             li.mapID = 0;
-            map = loadMap("assets/levels/maps/lvl_0.kaiwa");
-            em.getSingleton<SoundSystem>().playAmbient();
+            map = loadMap("assets/Niveles/Lvl_0/Lvl_0.kaiwa");
+            em.getSingleton<SoundSystem>().sonido_amb_bosque();
             break;
         }
         case 1:
         {
             li.mapID = 1;
-            map = loadMap("assets/levels/maps/lvl_1.kaiwa");
+            map = loadMap("assets/Niveles/Lvl_1/Lvl_1.kaiwa");
+
             em.getSingleton<SoundSystem>().sonido_mazmorra();
+            em.getSingleton<SoundSystem>().sonido_music_mazmorra();
             break;
         }
         case 2:
             li.mapID = 2;
-            map = loadMap("assets/levels/caves_level.json");
+            map = loadMap("assets/Niveles/Lvl_2/Lvl_2.kaiwa");
+            em.getSingleton<SoundSystem>().sonido_amb_volcan();
+            em.getSingleton<SoundSystem>().sonido_music_volcan();
+
             break;
 
         default:
@@ -51,110 +56,108 @@ mapType MapManager::loadMap(const std::string& mapFile)
 
 void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_man& iam)
 {
-    const valueType& id = map["id"];
-    uint8_t mapID = static_cast<uint8_t>(id.GetUint());
-
-    const valueType& chunks = map["Chunks"];
+    mapSizeType size{};
+    const valueType* chunks = nullptr;
     int j = 0;
+    auto& li = em.getSingleton<LevelInfo>();
 
-    for (mapSizeType i = 0; i < chunks.Size(); i++)
+    if (state == LoadState::LOAD_CHUNKS)
     {
-        std::string chunkName = "Chunk" + std::to_string(i);
-        const valueType& chunk = chunks[i][chunkName.c_str()];
+        chunks = &map["Chunks"];
+        size = chunks->Size();
+        chunksVec.reserve(size);
+    }
+    else
+        size = static_cast<mapSizeType>(chunksVec.size());
 
-        switch (state)
+    for (mapSizeType i = 0; i < size; i++)
+    {
+        if (state == LoadState::LOAD_CHUNKS)
         {
-        case LoadState::LOAD_GROUND:
-        {
-            const valueType& overworld = chunk[0]["overworld"];
-            const valueType& groundArray = overworld["Ground"];
+            std::string chunkName = "Chunk" + std::to_string(i);
+            chunksVec.push_back(&(*chunks)[i][chunkName.c_str()]);
             generateChunkModel(em, i);
-            generateGround(em, groundArray, j);
-            break;
         }
-        case LoadState::LOAD_WALLS:
+        else
         {
-            const valueType& overworld = chunk[0]["overworld"];
-            const valueType& wallArray = overworld["Walls"];
-            generateWalls(em, wallArray);
-            break;
+            const valueType& chunk = *chunksVec[i];
+            switch (state)
+            {
+            case LoadState::LOAD_GROUND:
+            {
+                const valueType& overworld = chunk[0]["overworld"];
+                const valueType& groundArray = overworld["Ground"];
+                generateGround(em, groundArray, j);
+                break;
+            }
+            case LoadState::LOAD_WALLS:
+            {
+                if (li.loadingTime < 0.5f)
+                    return;
+                const valueType& overworld = chunk[0]["overworld"];
+                const valueType& wallArray = overworld["Walls"];
+                generateWalls(em, wallArray);
+                break;
+            }
+            case LoadState::LOAD_RAMPS:
+            {
+                if (li.loadingTime < 1.0f)
+                    return;
+                const valueType& overworld = chunk[0]["overworld"];
+                const valueType& rampArray = overworld["Ramps"];
+                generateRamps(em, rampArray);
+                break;
+            }
+            case LoadState::LOAD_INTERACTABLES:
+            {
+                if (li.loadingTime < 1.5f)
+                    return;
+                const valueType& overworld = chunk[0]["overworld"];
+                const valueType& interactablesArray = overworld["Interactive"];
+                generateInteractables(em, interactablesArray);
+                break;
+            }
+            case LoadState::LOAD_OBJECTS:
+            {
+                if (li.loadingTime < 2.0f)
+                    return;
+                auto& li = em.getSingleton<LevelInfo>();
+                const valueType& underworld = chunk[1]["underworld"];
+                const valueType& objectArray = underworld["Objects"];
+                generateObjects(em, objectArray, li.mapID);
+                break;
+            }
+            case LoadState::LOAD_ENEMIES:
+            {
+                if (li.loadingTime < 2.5f)
+                    return;
+                const valueType& underworld = chunk[1]["underworld"];
+                const valueType& enemyArray = underworld["Enemies"];
+                generateEnemies(em, enemyArray, iam);
+                break;
+            }
+            case LoadState::LOAD_NPCS:
+            {
+                const valueType& underworld = chunk[1]["underworld"];
+                const valueType& NPCsArray = underworld["NPCs"];
+                generateNPCs(em, NPCsArray);
+                break;
+            }
+            case LoadState::LOAD_NAVMESHES:
+            {
+                if (li.mapID != 0 || li.mapID != 1)
+                    generateNavmeshes(em);
+                break;
+            }
+            default:
+                break;
+            }
         }
-        case LoadState::LOAD_RAMPS_INTERACTABLES:
-        {
-            const valueType& overworld = chunk[0]["overworld"];
-            const valueType& rampArray = overworld["Ramps"];
-            const valueType& interactablesArray = overworld["Interactive"];
-            generateRamps(em, rampArray);
-            generateInteractables(em, interactablesArray);
-        }
-        break;
-        case LoadState::LOAD_OBJECTS_ENEMIES:
-        {
-            const valueType& underworld = chunk[1]["underworld"];
-            const valueType& objectArray = underworld["Objects"];
-            const valueType& enemyArray = underworld["Enemies"];
-            const valueType& NPCsArray = underworld["NPCs"];
-            generateObjects(em, objectArray, mapID);
-            generateEnemies(em, enemyArray, iam);
-            generateNPCs(em, NPCsArray);
 
-            break;
-        }
-        case LoadState::LOAD_NAVMESHES:
-        {
-            generateNavmeshes(em);
-            break;
-        }
-        default:
-            break;
-        }
     }
 
     if (!(state == LoadState::LOAD_COMPLETE))
         state = static_cast<LoadState>(static_cast<int>(state) + 1);
-}
-
-void MapManager::generateChunkFromJSON(EntityManager& em, const valueType& chunk, Ia_man& iam, uint8_t mapID, mapSizeType& i, int& j)
-{
-    const valueType& overworld = chunk[0]["overworld"];
-    const valueType& groundArray = overworld["Ground"];
-    const valueType& wallArray = overworld["Walls"];
-    const valueType& rampArray = overworld["Ramps"];
-    const valueType& interactablesArray = overworld["Interactive"];
-    const valueType& underworld = chunk[1]["underworld"];
-    const valueType& objectArray = underworld["Objects"];
-    const valueType& enemyArray = underworld["Enemies"];
-    const valueType& NPCsArray = underworld["NPCs"];
-
-    generateChunkModel(em, i);
-
-    generateGround(em, groundArray, j);
-
-    generateWalls(em, wallArray);
-
-    generateRamps(em, rampArray);
-
-    generateObjects(em, objectArray, mapID);
-
-    generateEnemies(em, enemyArray, iam);
-
-    generateInteractables(em, interactablesArray);
-
-    generateNPCs(em, NPCsArray);
-
-    // pseudo-codigo para scheduling xdddd
-    // for enemy : map[enemies]
-    // {
-
-    //     if(tiempo pasado > x)
-    //     {
-    //         texturas enemigo = map[enemies][slime][texturas][1];
-    //     }
-    //     else
-    //     {
-    //         texturas enemigo = map[enemies][slime][texturas][0];
-    //     }
-    // }
 }
 
 void MapManager::generateChunkModel(EntityManager& em, mapSizeType& i)
@@ -246,8 +249,15 @@ void MapManager::generateGround(EntityManager& em, const valueType& groundArray,
     // Sacamos la posición del centro del chunk
     vec3d center = { (min.x + max.x) / 2, minHeigth, (min.y + max.y) / 2 };
 
+    auto& li = em.getSingleton<LevelInfo>();
+    double zoneHeight = 20.0;
+    if (li.mapID == 1)
+        zoneHeight = 30.0;
+    else if (li.mapID == 2)
+        zoneHeight = 65.0;
+
     // Creamos 4 zonas para el chunk
-    vec3d zoneScale = { (max.x - min.x) / 2, 20, (max.y - min.y) / 2 };
+    vec3d zoneScale = { (max.x - min.x) / 2, zoneHeight, (max.y - min.y) / 2 };
     int k = 0;
     int limit = j + 4;
     for (; j < limit; j++)
@@ -266,7 +276,9 @@ void MapManager::generateGround(EntityManager& em, const valueType& groundArray,
         auto& rz = em.addComponent<RenderComponent>(zoneEntity, RenderComponent{ .position = zonePosition, .scale = zoneScale, .visible = false });
         auto& pz = em.addComponent<PhysicsComponent>(zoneEntity, PhysicsComponent{ .position = rz.position, .velocity = vec3d::zero(), .scale = rz.scale, .gravity = .0 });
         auto& cz = em.addComponent<ColliderComponent>(zoneEntity, ColliderComponent{ pz.position, rz.scale, BehaviorType::ZONE });
-        zoneBounds.insert({ j, cz.boundingBox });
+
+        auto& zchi = em.getSingleton<ZoneCheckInfo>();
+        zchi.zoneBounds.insert({ j, cz.bbox });
         k += 1;
     }
 }
@@ -310,7 +322,7 @@ void MapManager::generateRamps(EntityManager& em, const valueType& rampArray)
         RampType type{ static_cast<RampType>(ramp["type"].GetUint()) };
 
         // Creamos las dimensiones de la rampa y su posición
-        vec3d rmin = { min.x, offset.y() - 20, min.y };
+        vec3d rmin = { min.x, offset.y() - 5, min.y };
         vec3d rmax = { max.x, offset.y() + 20, max.y };
 
         vec3d rampPos = (rmin + rmax) / 2;
@@ -383,7 +395,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         auto& r = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color, .orientation = rot, .rotationVec = rotationVec });
         auto& p = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = r.position, .velocity = vec3d::zero(), .scale = r.scale, .gravity = 0, .orientation = rot, .rotationVec = r.rotationVec });
         auto& c = em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
-        em.addComponent<InteractiveComponent>(entity);
+        auto& ic = em.addComponent<InteractiveComponent>(entity);
 
         switch (type)
         {
@@ -393,27 +405,33 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             em.addTag<WallTag>(entity);
             ObjectType content{ static_cast<ObjectType>(interactable["content"].GetInt()) };
 
-            std::queue<std::string> messages;
-            for (mapSizeType j = 0; j < interactable["message"].Size(); j++)
-            {
-                messages.emplace(interactable["message"][j].GetString());
-            }
+            addMessageCmp(em, entity, interactable);
 
+            ic.range = 7.5;
             em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
-            [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .dropPosition = { vec3d::zero() }, .content = content, .messages = messages });
+            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
+            [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .content = content });
 
             if (interactable.HasMember("offsetZ"))
             {
                 r.offset = interactable["offsetZ"][0].GetDouble();
             }
 
+            if (interactable.HasMember("checkCrushers"))
+            {
+                cc.checkCrushers = true;
+            }
+
             checkDispatcher(em, entity, interactable);
+            addToZone(em, entity, type);
             break;
         }
         case InteractableType::Destructible:
         {
+            auto& li = em.getSingleton<LevelInfo>();
             em.addTag<DestructibleTag>(entity);
             em.addTag<WallTag>(entity);
+
             int life{ interactable["life"].GetInt() };
             em.addComponent<LifeComponent>(entity, LifeComponent{ .life = life });
             auto& d = em.addComponent<DestructibleComponent>(entity);
@@ -427,6 +445,11 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             if (interactable.HasMember("offsetZ"))
             {
                 r.offset = interactable["offsetZ"][0].GetDouble();
+            }
+
+            if (li.mapID == 1)
+            {
+                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = Effects::PRISONDOOR, .maxParticles = 16, .spawnRate = 0.1f, .lifeTime = 0.3f });
             }
 
             em.destroyComponent<InteractiveComponent>(entity);
@@ -444,12 +467,20 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 r.position = vec3d::zero();
                 break;
             }
+            case 1:
+            {
+                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = Effects::PRISONDOOR, .maxParticles = 16, .spawnRate = 0.1f, .lifeTime = 0.3f });
+                break;
+            }
             }
             em.addTag<DoorTag>(entity);
             em.addTag<WallTag>(entity);
+
+            ic.range = 8.5;
             if (interactable.HasMember("noKey"))
                 em.addTag<NoKeyTag>(entity);
 
+            addToZone(em, entity, type);
             break;
         }
         case InteractableType::Level:
@@ -466,20 +497,71 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             em.addTag<LevelChangeTag>(entity);
             c.behaviorType = BehaviorType::ZONE;
 
-            zoneBounds.insert({ zoneBounds.size(), c.boundingBox });
+            auto& zchi = em.getSingleton<ZoneCheckInfo>();
+            zchi.zoneBounds.insert({ zchi.zoneBounds.size(), c.bbox });
 
-            em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = static_cast<uint16_t>(zoneBounds.size() - 1) });
+            em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = static_cast<uint16_t>(zchi.zoneBounds.size() - 1) });
             break;
         }
         case InteractableType::Spawn:
         {
             em.addTag<SpawnTag>(entity);
+
+            auto& spc = em.addComponent<SpawnComponent>(entity);
             c.behaviorType = BehaviorType::SPAWN;
+            ic.range = 12.5;
+
             if (interactable.HasMember("offsetZ"))
             {
                 r.offset = interactable["offsetZ"][0].GetDouble();
             }
 
+            auto& pos = p.position;
+            auto posY = pos.y() - 2.0;
+            auto rotCopy = rot;
+
+            if (rotationVec[1] > 0.0)
+                rotCopy *= -1;
+
+            std::map<std::size_t, std::pair<vec3d, vec3d>> wallPoints = {
+                {0, {rotateAroundPoint(vec3d{pos.x() + 9.5, posY, pos.z() + 14.5}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
+                {1, {rotateAroundPoint(vec3d{pos.x() + 6.0, posY, pos.z() - 10.0}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
+                {2, {rotateAroundPoint(vec3d{pos.x() - 17.5, posY, pos.z() + 15.0}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
+                {3, {rotateAroundPoint(vec3d{pos.x() - 15.5, posY, pos.z() - 11.5}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
+                {4, {rotateAroundPoint(vec3d{pos.x() - 3.5, posY, pos.z() + 14.0}, pos, rotCopy), rotateScale(vec3d{ 14.0, 4.0, 4.0 }, rotCopy)}},
+                {5, {rotateAroundPoint(vec3d{pos.x() - 16.0, posY, pos.z() - 3.0}, pos, rotCopy), rotateScale(vec3d{ 5.0, 4.0, 13.0 }, rotCopy)}},
+                {6, {rotateAroundPoint(vec3d{pos.x() - 3.0, posY - 2.0, pos.z() + 3.5}, pos, rotCopy), rotateScale(vec3d{ 4.5, 2.0, 4.5 }, rotCopy)}},
+                {7, {rotateAroundPoint(vec3d{pos.x() + 7.0, posY, pos.z() + 8.0}, pos, rotCopy), rotateScale(vec3d{ 6.0, 7.0, 6.0 }, rotCopy)}},
+                {8, {rotateAroundPoint(vec3d{pos.x() - 10.5, posY, pos.z() + 8.0}, pos, rotCopy), rotateScale(vec3d{ 1.5, 4.0, 1.5 }, rotCopy)}},
+                {9, {rotateAroundPoint(vec3d{pos.x() + 4.2, posY + 2.0, pos.z() - 6.0}, pos, rotCopy), rotateScale(vec3d{ .5, 2.0, .5 }, rotCopy)}},
+                {10, {rotateAroundPoint(vec3d{pos.x() - 17.5, posY + 2.0, pos.z() - 9.5}, pos, rotCopy), rotateScale(vec3d{ .5, 2.0, .5 }, rotCopy)}}
+            };
+
+            std::map<std::size_t, std::tuple<Effects, uint8_t, float, float>> particleParts = {
+                {6, {Effects::FIRE, 10, 0.1f, 0.3f}},
+                {7, {Effects::SMOKE, 10, 0.1f, 0.3f}},
+                {8, {Effects::PURPLEM, 4, 0.1f, 0.3f}},
+                {9, {Effects::SPARKLES, 3, 0.05f, 0.3f}},
+                {10, {Effects::SPARKLES, 3, 0.05f, 0.3f}},
+            };
+
+            // Creamos 4 paredes para el spawn
+            for (std::size_t j = 0; j < wallPoints.size(); j++)
+            {
+                auto& wall{ em.newEntity() };
+                em.addTag<WallTag>(wall);
+                em.addComponent<RenderComponent>(wall, RenderComponent{ .position = wallPoints[j].first, .scale = wallPoints[j].second, .color = color, .visible = false, .orientation = 0.0, .rotationVec = rotationVec });
+                em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = wallPoints[j].first, .velocity = vec3d::zero(), .scale = wallPoints[j].second, .gravity = 0, .orientation = 0.0, .rotationVec = rotationVec });
+                em.addComponent<ColliderComponent>(wall, ColliderComponent{ position, scale, BehaviorType::STATIC });
+
+                if (j > 5)
+                {
+                    auto& p = em.addComponent<ParticleMakerComponent>(wall, ParticleMakerComponent{ .active = true, .effect = std::get<0>(particleParts[j]), .maxParticles = std::get<1>(particleParts[j]), .spawnRate = std::get<2>(particleParts[j]), .lifeTime = std::get<3>(particleParts[j]) });
+                    spc.parts[static_cast<SpawnComponent::SpawnParts>(j)] = &p;
+                }
+            }
+
+            addToZone(em, entity, type);
             checkDispatcher(em, entity, interactable);
             break;
         }
@@ -488,18 +570,101 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             em.addTag<WallTag>(entity);
             em.addTag<LeverTag>(entity);
             em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
+            addToZone(em, entity, type);
+
+            ic.range = 7.5;
+            break;
+        }
+        case InteractableType::DamageObj:
+        {
+            em.addTag<LavaTag>(entity);
+            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::LAVA, .maxParticles = 20, .spawnRate = 0.1f });
+            c.behaviorType = BehaviorType::LAVA;
+
+            if (interactable.HasMember("offsetZ"))
+            {
+                r.offset = interactable["offsetZ"][0].GetDouble();
+            }
+            break;
+        }
+        case InteractableType::Roca:
+        {
+            //em.addTag<WallTag>(entity);
+            em.addTag<ObstacleTag>(entity);
+            r.visible = false;
+            break;
+        }
+        case InteractableType::Ladder:
+        {
+            em.addTag<LadderTag>(entity);
+            r.visible = false;
+            c.behaviorType = BehaviorType::LADDER;
+            ic.range = 12.0;
+            addToZone(em, entity, type);
+
+            auto yMin = c.bbox.min.y();
+            auto yMax = c.bbox.max.y();
+            auto rot2 = (orientation - 90.0) * DEGTORAD;
+            em.addComponent<LadderComponent>(entity, LadderComponent{ .orientation = rot2, .yMin = yMin, .yMax = yMax });
+            break;
+        }
+        case InteractableType::Sign:
+        {
+            em.addTag<SignTag>(entity);
+
+            ic.range = 12.0;
+            addMessageCmp(em, entity, interactable);
+            addToZone(em, entity, type);
+            if (interactable.HasMember("offsetZ"))
+            {
+                r.offset = interactable["offsetZ"][0].GetDouble();
+            }
+            break;
+        }
+        case InteractableType::Table:
+        {
+            em.addTag<TableTag>(entity);
+            if (interactable.HasMember("offsetZ"))
+            {
+                r.offset = interactable["offsetZ"][0].GetDouble();
+            }
+            break;
+        }
+        case InteractableType::MissionOBJ:
+        {
+            auto& li = em.getSingleton<LevelInfo>();
+            switch (li.mapID)
+            {
+            case 2:
+            {
+                em.addTag<MissionObjTag>(entity);
+                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
+                auto& bc = em.addComponent<BoatComponent>(entity);
+                bc.setPart(boatParts);
+                ic.range = 7.0;
+
+                addToZone(em, entity, type);
+                if (interactable.HasMember("offsetZ"))
+                {
+                    r.offset = interactable["offsetZ"][0].GetDouble();
+                }
+                break;
+            }
+            default:
+                break;
+            }
             break;
         }
         default:
             break;
         }
-        addToZone(em, entity, type);
     }
 }
 
 
 void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
 {
+    auto& li = em.getSingleton<LevelInfo>();
     for (mapSizeType i = 0; i < npcArray.Size(); i++)
     {
         const valueType& npc = npcArray[i];
@@ -515,7 +680,8 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
                        vec3d{npc["path"][1][0].GetDouble(), npc["path"][1][1].GetDouble(), npc["path"][1][2].GetDouble()},
                        vec3d{npc["path"][2][0].GetDouble(), npc["path"][2][1].GetDouble(), npc["path"][2][2].GetDouble()},
                        vec3d{npc["path"][3][0].GetDouble(), npc["path"][3][1].GetDouble(), npc["path"][3][2].GetDouble()} };
-         double arrival_radius = npc["arrival_radius"].GetDouble();
+        double arrival_radius = npc["arrival_radius"].GetDouble();
+        NPCType npcType = static_cast<NPCType>(npc["npc"].GetUint());
 
         vec_t.push_back(std::make_unique<BehaviourTree_t>());
         auto& tree = *vec_t.back();
@@ -525,11 +691,34 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
         auto& entity{ em.newEntity() };
         em.addTag<NPCTag>(entity);
 
+        double range = 0.0;
+        switch (npcType)
+        {
+        case NPCType::NOMAD:
+            em.addTag<NomadTag>(entity);
+            switch (li.mapID)
+            {
+            case 1:
+                range = 30.0;
+                break;
+            case 2:
+                range = 7.5;
+                break;
+            }
+            break;
+        case NPCType::INVESTIGATOR:
+            em.addTag<InvestigatorTag>(entity);
+            range = 21.0;
+            break;
+        default:
+            break;
+        }
+
         auto& wr = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color,.orientation = rot,.rotationVec = rotationVec });
         auto& wp = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.rotationVec = rotationVec, .max_speed = max_speed });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ wp.position, wr.scale, BehaviorType::STATIC });
-        em.addComponent<InteractiveComponent>(entity);
-        em.addComponent<NPCComponent>(entity,NPCComponent{.path = path,.behaviourTree = &tree,.arrival_radius = arrival_radius});
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ wp.position, wp.scale, BehaviorType::STATIC });
+        em.addComponent<InteractiveComponent>(entity, InteractiveComponent{ .range = range });
+        em.addComponent<NPCComponent>(entity, NPCComponent{ .path = path, .type = npcType, .behaviourTree = &tree,.arrival_radius = arrival_radius });
 
         em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
 
@@ -538,49 +727,19 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
         addToZone(em, entity, InteractableType::NPC);
     }
 }
-
-
-void MapManager::destroyMap(EntityManager& em)
-{
-    auto& li = em.getSingleton<LevelInfo>();
-
-    for (auto e : em.getEntities())
-    {
-        if (e.getID() != li.playerID)
-            li.insertDeath(e.getID());
+vec3d getNodeVec3d(uint16_t nodeId, const std::map<uint16_t, vec3d>& nodes) {
+    for (const auto& node : nodes) {
+        if (node.first == nodeId) {
+            return node.second;
+        }
     }
+    // Si no se encuentra el nodo, se devuelve un vec3d con valores predeterminados o se maneja el error de alguna otra manera
+    return { 0.0f, 0.0f, 0.0f };
 }
-
-void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
-{
-    using TAGs = MP::TypeList <EnemyTag>;
-    destroyParts<TAGs>(em);
-
-    const valueType& chunks = map["Chunks"];
-    for (mapSizeType i = 0; i < chunks.Size(); i++)
-    {
-        std::string chunkName = "Chunk" + std::to_string(i);
-        const valueType& chunk = chunks[i][chunkName.c_str()];
-        const valueType& enemyArray = chunk[1]["underworld"]["Enemies"];
-
-        generateEnemies(em, enemyArray, iam);
-    }
-
-    // for (mapSizeType i = 0; i < chunks.Size(); i++)
-    // {
-    //     std::string chunkName = "Chunk" + std::to_string(i);
-    //     const valueType& chunk = chunks[i][chunkName.c_str()];
-    //     const valueType& destructibleArray = chunk[0]["overworld"]["Destroyables"];
-
-    //     generateDestructibles(em, destructibleArray);
-    // }
-}
-
-
 void MapManager::generateNavmeshes(EntityManager& em)
 {
     auto& navs = em.getSingleton<NavmeshInfo>();
-    mapType navmeshkaiwa = loadMap("assets/levels/navmeshtest/lvl_2-nav.kaiwa");
+    mapType navmeshkaiwa = loadMap("assets/Niveles/Lvl_2/Lvl_2-navmeshes.kaiwa");
 
     const valueType& navmeshes = navmeshkaiwa["NavMesh"];
     for (mapSizeType i = 0; i < navmeshes.Size(); i++) {
@@ -596,6 +755,7 @@ void MapManager::generateNavmeshes(EntityManager& em)
         for (mapSizeType j = 0; j < vertices.Size(); j++)
         {
             vecnodes[j + 1] = { vertices[j][1].GetDouble(),  vertices[j][2].GetDouble(),  vertices[j][0].GetDouble() };
+            navs.corners.insert(vecnodes[j + 1]);
             if (j == 0)
             {
                 max = vecnodes[j + 1];
@@ -605,11 +765,17 @@ void MapManager::generateNavmeshes(EntityManager& em)
                 if (max.x() < vecnodes[j + 1].x()) {
                     max.setX(vecnodes[j + 1].x());
                 }
+                if (max.y() < vecnodes[j + 1].y()) {
+                    max.setY(vecnodes[j + 1].y());
+                }
                 if (max.z() < vecnodes[j + 1].z()) {
                     max.setZ(vecnodes[j + 1].z());
                 }
                 if (min.x() > vecnodes[j + 1].x()) {
                     min.setX(vecnodes[j + 1].x());
+                }
+                if (min.y() > vecnodes[j + 1].y()) {
+                    min.setY(vecnodes[j + 1].y());
                 }
                 if (min.z() > vecnodes[j + 1].z()) {
                     min.setZ(vecnodes[j + 1].z());
@@ -621,57 +787,244 @@ void MapManager::generateNavmeshes(EntityManager& em)
         const valueType& midpoints = navmesh["puntos medios"];
         for (mapSizeType k = 0; k < midpoints.Size(); k++)
         {
-            vecnodes[k + 4] = { midpoints[k][1].GetDouble(),  midpoints[k][2].GetDouble(),  midpoints[k][0].GetDouble() };
-            navs.midpoints.insert(vecnodes[k + 4]);
+            vecnodes[k + 5] = { midpoints[k][1].GetDouble(),  midpoints[k][2].GetDouble(),  midpoints[k][0].GetDouble() };
+            navs.midpoints.insert(vecnodes[k + 5]);
         }
 
+        //Creamos NavMesh BBox
+        double scalex{}, scalez{};
+
+        scalex = (max.x() - min.x());
+        scalez = (max.z() - min.z());
+        BBox b(vecnodes[0], vec3d{ scalex, (max.y() - min.y()) + 0.5, scalez });
+        //BBox b{ min,max };
+        navs.boundingnavmesh.push_back(b);
         //Creamos NavMesh
-        BBox b{ min,max };
         Navmesh nav{ .box = b };
+        //Rellenamos los nodos
         for (auto& n : vecnodes) {
             auto pair = std::make_pair(navs.num_nodes, n);
-            navs.nodes.insert(pair);
+
+            //si es el centro, se guarda
+            if (n.x() == vecnodes[0].x() && n.z() == vecnodes[0].z()) {
+                //Se añade al navinfo
+                nav.centerpoint = pair;
+                navs.centers.insert(pair);
+            }
             nav.nodes.insert(pair);
+            navs.nodes.insert(pair);
             navs.num_nodes++;
         }
-
-        // Guardamos info
         navs.NavMeshes.push_back(nav);
-
+        // Conection c6{1, }; auxconex.push_back(c6);
+        // Conection c7{1, }; auxconex.push_back(c7);
+        // Conection c8{1, }; auxconex.push_back(c8);
         //Creamos conexiones de el navmesh
-        for (auto it = nav.nodes.begin(); it != std::prev(nav.nodes.end()); ++it) {
-            auto& currentNode = it->second;
-            auto& nextNode = std::next(it)->second;
+        // for (auto it = nav.nodes.begin(); it != std::prev(nav.nodes.end()); ++it) {
+        //     auto& currentNode = it->second;
+        //     auto& nextNode = std::next(it)->second;
 
-            // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
-            if (navs.insert_ids(it->first, std::next(it)->first) &&
-                navs.checkmidpoints(currentNode, nextNode)) {
-                Conection c{ 1, it->first, std::next(it)->first };
-                navs.conexiones.push_back(c);
+        //     // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
+        //     if (navs.insert_ids(it->first, std::next(it)->first) &&
+        //         navs.checkmidpoints(currentNode, nextNode)) {
+        //         Conection c{ 1, it->first, std::next(it)->first };
+        //         navs.conexiones.push_back(c);
+        //         //debug
+        //         auto pair = std::make_pair(it->second, std::next(it)->second);
+        //         navs.conexpos.insert(pair);
+        //     }
+        // }
+    }
+    // Guardamos info 
+    std::vector<Conection> auxconex;
+    auxconex.push_back(Conection{ 1,27,7 });
+    auxconex.push_back(Conection{ 1,7,26 });
+    auxconex.push_back(Conection{ 1,26,45 });
+    auxconex.push_back(Conection{ 1,45,50 });
+    auxconex.push_back(Conection{ 1,10,26 });
+    auxconex.push_back(Conection{ 1,0,26 });
+    auxconex.push_back(Conection{ 1,44,0 });
+    auxconex.push_back(Conection{ 1,54,50 });
+    auxconex.push_back(Conection{ 1,59,54 });
+    auxconex.push_back(Conection{ 1,98,59 });
+    auxconex.push_back(Conection{ 1,116,98 });
+    auxconex.push_back(Conection{ 1,124,116 });
+    auxconex.push_back(Conection{ 1,123,124 });
+    auxconex.push_back(Conection{ 1,134,123 });
+    auxconex.push_back(Conection{ 1,242,134 });
+    auxconex.push_back(Conection{ 1,468,473 });
+    auxconex.push_back(Conection{ 1,583,572 });
+    auxconex.push_back(Conection{ 1,473,583 });
+    auxconex.push_back(Conection{ 1,637,816 });
+    auxconex.push_back(Conection{ 1,637,639 });
+    auxconex.push_back(Conection{ 1,639,643 });
+    auxconex.push_back(Conection{ 1,643,837 });
+    auxconex.push_back(Conection{ 1,837,846 });
+    auxconex.push_back(Conection{ 1,639,620 });
+    auxconex.push_back(Conection{ 1,620,639 });
+    auxconex.push_back(Conection{ 1,846,895 });
+    auxconex.push_back(Conection{ 1,816,827 });
+    auxconex.push_back(Conection{ 1,822,827 });
+    auxconex.push_back(Conection{ 1,288,297 });
+    auxconex.push_back(Conection{ 1,297,320 });
+    auxconex.push_back(Conection{ 1,320,333 });
+
+    for (auto& c : auxconex) {
+        navs.conexiones.push_back(c);
+        //debug
+        auto pair = std::make_pair(getNodeVec3d(c.fromNode, navs.nodes), getNodeVec3d(c.toNode, navs.nodes));
+        navs.conexpos.insert(pair);
+        //nodes
+        for (auto& [n, vec] : navs.nodes) {
+            // if(n == 583){
+            //     vec = vec3d{vec.x(),vec.y(),vec.z()+10.0};
+            // }
+            if (n == c.toNode) {
+                navs.selectednodes.insert(std::make_pair(n, vec));
+            }
+            if (n == c.fromNode) {
+                navs.selectednodes.insert(std::make_pair(n, vec));
             }
         }
     }
-    //Crear conexiones de navmesh con otros con los que colisiona
-    for (auto it = navs.NavMeshes.begin(); it != std::prev(navs.NavMeshes.end()); ++it) {
-        auto  nextnavmesh = std::next(it);
-        auto& currentbbox = it->box;
-        auto& nextbbox = nextnavmesh->box;
-        //Conexiones con navmeshes colisionables
-        if (currentbbox.intersects(nextbbox)) {
-            //Recorremos nodos del primer navmesh
-            for (auto it2 = it->nodes.begin(); it2 != std::prev(it->nodes.end()); ++it2) {
-                const auto& currentNode = it2;
-                //Recorremos nodos del segundo navmesh
-                for (auto it3 = nextnavmesh->nodes.begin(); it3 != std::prev(nextnavmesh->nodes.end()); ++it3) {
-                    const auto& nextNode = it3;
-                    //Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
-                    if (navs.insert_ids(currentNode->first, nextNode->first)) {
-                        Conection c{ 1, currentNode->first, nextNode->first };
-                        navs.conexiones.push_back(c);
-                    }
-                }
-            }
-        }
+
+    auto& li = em.getSingleton<LevelInfo>();
+    li.level_graph.createGraph(navs.conexiones, navs.selectednodes);
+    // Crear conexiones de navmesh con otros con los que colisiona
+    // for (auto it = navs.NavMeshes.begin(); it != navs.NavMeshes.end(); ++it) {
+    //     for (auto nextnavmesh = std::next(it); nextnavmesh != navs.NavMeshes.end(); ++nextnavmesh) {
+    //         auto& currentbbox = it->box;
+    //         auto& nextbbox = nextnavmesh->box;
+
+    //         // Conexiones con navmeshes colisionables
+    //         if (currentbbox.intersects(nextbbox)) {
+    //             // Obtenemos el centro (primer nodo) del primer navmesh
+    //             const auto& currentNode = it->nodes.begin();
+
+    //             // Obtenemos el centro (primer nodo) del segundo navmesh
+    //             const auto& nextNode = nextnavmesh->nodes.begin();
+
+    //             // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
+    //             if (navs.insert_ids(currentNode->first, nextNode->first)) {
+    //                 Conection c{ 1, currentNode->first, nextNode->first };
+    //                 navs.conexiones.push_back(c);
+    //                 // debug
+    //                 auto pair = std::make_pair(currentNode->second, nextNode->second);
+    //                 navs.conexpos.insert(pair);
+    //             }
+    //         }
+    //     }
+    // }
+
+    // Crear conexiones de navmesh con otros con los que colisiona
+    // for (auto it = navs.NavMeshes.begin(); it != navs.NavMeshes.end(); ++it) {
+    //     for (auto nextnavmesh = std::next(it); nextnavmesh != navs.NavMeshes.end(); ++nextnavmesh) {
+    //         auto& currentbbox = it->box;
+    //         auto& nextbbox = nextnavmesh->box;
+    //         auto& currentnodes = it->nodes;
+    //         auto& currentcenter = it->centerpoint;
+
+    //         // Conexiones con navmeshes colisionables
+    //         if (currentbbox.intersects(nextbbox)) {
+
+    //             // Recorremos nodos del primer navmesh
+    //             for (auto it2 = it->nodes.begin(); it2 != it->nodes.end(); ++it2) {
+    //                 const auto& currentNode = it2;
+
+    //                 // Solo consideramos nodos en el borde de la intersección
+    //                 // if (!nextbbox.intersects(currentNode->second)
+    //                 //     && currentNode != it->nodes.begin()) continue;
+
+    //                 // Recorremos nodos del segundo navmesh
+    //                 for (auto it3 = nextnavmesh->nodes.begin(); it3 != nextnavmesh->nodes.end(); ++it3) {
+    //                     const auto& nextNode = it3;
+
+    //                     //Solo consideramos nodos en el borde de la intersección
+    //                     // if (!currentbbox.intersects(nextNode->second)
+    //                     //     && nextNode != nextnavmesh->nodes.begin()) continue;
+
+    //                     // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
+    //                     //(navs.checkcousinsnodes())
+    //                     //navs.insert_ids(currentNode->first, nextNode->first
+    //                     //navs.checkcousins(nextNode->second.x(),nextNode->second.z(),it->nodes)
+    //                     if (navs.checkcousins(nextNode->second,currentNode->second)) {
+    //                         Conection c{ 1, currentcenter.first, nextNode->first };
+    //                         navs.conexiones.push_back(c);
+    //                         // debug
+    //                         auto pair = std::make_pair(currentcenter.second, nextNode->second);
+    //                         navs.conexpos.insert(pair);
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+
+    //Crear conexiones entre los centros
+    // Crear conexiones entre los centros
+    // for (auto it = navs.centers.begin(); it != navs.centers.end(); ++it) {
+    //     auto currentCenter = it->first;
+    //     auto currentcenterpos = it->second;
+    //     // Recorrer todos los centros nuevamente para encontrar conexiones
+    //     for (auto nextCenter = std::next(it); nextCenter != navs.centers.end(); ++nextCenter) {
+    //         double distance = currentcenterpos.distance(nextCenter->second);
+
+    //         // Establecer la distancia máxima para crear una conexión (ajusta el valor según sea necesario)
+    //         double maxDistance = 60.0; // Por ejemplo, 10 unidades
+
+    //         // Si la distancia entre los centros es menor o igual a la distancia máxima, crear una conexión
+    //         if (distance <= maxDistance) {
+    //             // Crea la conexión si no existe ya
+    //             // if (navs.insert_ids(currentCenter, nextCenter->first)) {
+    //                 Conection c{ 1, currentCenter, nextCenter->first };
+    //                 navs.conexiones.push_back(c);
+    //                 auto pair = std::make_pair(currentcenterpos, nextCenter->second);
+    //                 navs.conexpos.insert(pair);
+    //             // }
+    //        }
+    //     }
+    // }
+}
+
+vec3d MapManager::rotateY(const vec3d& v, double angle) {
+    double cosTheta = cos(angle);
+    double sinTheta = sin(angle);
+    return vec3d{
+        cosTheta * v.x() - sinTheta * v.z(),
+        v.y(),
+        sinTheta * v.x() + cosTheta * v.z()
+    };
+}
+
+vec3d MapManager::rotateAroundPoint(const vec3d& point, const vec3d& pivot, double angle) {
+    // Translate point back to origin
+    vec3d p = point - pivot;
+
+    // Rotate point
+    vec3d rotated = rotateY(p, angle);
+
+    // Translate point back
+    return rotated + pivot;
+}
+
+vec3d MapManager::rotateScale(const vec3d& v, double angle) {
+    double cosTheta = cos(angle);
+    double sinTheta = sin(angle);
+    return vec3d{
+        std::abs(cosTheta * v.x() + sinTheta * v.z()),
+        v.y(),
+        std::abs(-sinTheta * v.x() + cosTheta * v.z())
+    };
+}
+
+void MapManager::destroyMap(EntityManager& em)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+
+    for (auto e : em.getEntities())
+    {
+        if (e.getID() != li.playerID)
+            li.insertDeath(e.getID());
     }
 }
 
@@ -679,17 +1032,54 @@ void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
 {
     auto& zchi = em.getSingleton<ZoneCheckInfo>();
     auto& c = em.getComponent<ColliderComponent>(e);
-    for (auto [num, bbox] : zoneBounds)
-        if (bbox.intersects(c.boundingBox))
+    for (auto [num, bbox] : zchi.zoneBounds)
+        if (bbox.intersects(c.bbox))
         {
             zchi.insertZone(num, type);
 
             if (e.hasComponent<OneUseComponent>())
             {
                 auto& ouc = em.getComponent<OneUseComponent>(e);
-                ouc.zone = num;
+                ouc.zones.insert(num);
             }
         }
+}
+
+void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
+{
+    if (!reSpawn)
+    {
+        using TAGs = MP::TypeList<EnemyTag>;
+        // using TAGs2 = MP::TypeList<NPCTag>;
+        destroyParts<TAGs>(em);
+        // destroyParts<TAGs2>(em);
+        reSpawn = true;
+    }
+    else
+    {
+        const valueType& chunks = map["Chunks"];
+        for (mapSizeType i = 0; i < chunks.Size(); i++)
+        {
+            std::string chunkName = "Chunk" + std::to_string(i);
+            const valueType& chunk = chunks[i][chunkName.c_str()];
+            const valueType& enemyArray = chunk[1]["underworld"]["Enemies"];
+            // const valueType& npcArray = chunk[1]["underworld"]["NPCs"];
+
+            generateEnemies(em, enemyArray, iam);
+            // generateNPCs(em, npcArray);
+        }
+        reSpawn = false;
+    }
+}
+
+void MapManager::addMessageCmp(EntityManager& em, Entity& e, const valueType& value)
+{
+    std::queue<std::string> messages;
+    for (mapSizeType j = 0; j < value["message"].Size(); j++)
+    {
+        messages.emplace(value["message"][j].GetString());
+    }
+    em.addComponent<MessageComponent>(e, MessageComponent{ .messages = messages });
 }
 
 // template<>
@@ -783,9 +1173,13 @@ void MapManager::reset(EntityManager& em, uint8_t mapID, Ia_man& iam)
     li.mapID = mapID;
     li.levelChanged = true;
     li.loading = false;
-    state = LoadState::LOAD_GROUND;
+    li.npcflee = false;
+    li.door_open = false;
+    state = LoadState::LOAD_CHUNKS;
+    boatParts = 0;
     zchi.clearSets();
-    zoneBounds.clear();
+    zchi.zoneBounds.clear();
+    chunksVec.clear();
 }
 
 void MapManager::changeMap(EntityManager& em, uint8_t mapID, Ia_man& iam)

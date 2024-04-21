@@ -1,8 +1,9 @@
 #pragma once
 #include <cstdint>
+#include <set>
 
 struct OneUseComponent
 {
     uint8_t id{};
-    uint16_t zone{};
+    std::set<uint16_t> zones{};
 };

@@ -9,4 +9,5 @@ release
 motor/Motor
 motor/obj
 motor/release
-assets/data
+assets/data/output/*.cereal
+assets/data/input/*.cereal

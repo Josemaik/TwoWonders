@@ -1,5 +1,7 @@
 #pragma once
+#include <map>
 #include <unordered_set>
+#include <unordered_map>
 #include <cstdint>
 #include "../../components/interactive_component.hpp"
 
@@ -7,34 +9,29 @@ struct ZoneCheckInfo
 {
     void insertZone(uint8_t zone, InteractableType type)
     {
-        switch (type)
+        zones[type].insert(zone);
+    }
+
+    void clearSets()
+    {
+        for (auto& pair : zones)
         {
-        case InteractableType::Chest:
-            chestZones.insert(zone);
-            break;
-        case InteractableType::Lever:
-            leverZones.insert(zone);
-            break;
-        case InteractableType::Door:
-            doorZones.insert(zone);
-            break;
-        case InteractableType::NPC:
-            npcZones.insert(zone);
-            break;
-        default:
-            break;
+            pair.second.clear();
         }
     }
-    void clearSets() { chestZones.clear(); leverZones.clear(); doorZones.clear(); npcZones.clear(); }
 
-    const std::unordered_set<uint8_t>& getChestZones() const { return chestZones; }
-    const std::unordered_set<uint8_t>& getLeverZones() const { return leverZones; }
-    const std::unordered_set<uint8_t>& getDoorZones() const { return doorZones; }
-    const std::unordered_set<uint8_t>& getNpcZones() const { return npcZones; }
+    const std::unordered_set<uint8_t>& getZones(InteractableType type) const
+    {
+        // If the type is not found, return 
+        if (zones.find(type) == zones.end())
+        {
+            return emptySet;
+        }
+        return zones.at(type);
+    }
 
+    std::map<uint8_t, BBox> zoneBounds{};
 private:
-    std::unordered_set<uint8_t> chestZones{};
-    std::unordered_set<uint8_t> leverZones{};
-    std::unordered_set<uint8_t> doorZones{};
-    std::unordered_set<uint8_t> npcZones{};
+    std::unordered_map<InteractableType, std::unordered_set<uint8_t>> zones;
+    const std::unordered_set<uint8_t> emptySet;
 };

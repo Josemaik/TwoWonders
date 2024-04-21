@@ -1,6 +1,9 @@
 #pragma once
 #include "resource.hpp"
 #include "resource_texture.hpp"
+#include "resource_material.hpp"
+#include "../utils/color.hpp"
+#include "../managers/render_manager.hpp"
 
 #include <vector>
 #include <memory>
@@ -16,26 +19,21 @@ struct Vertex{
     glm::vec2 textCoords;
 };
 
-// Forwarding
-struct Texture;
-
 struct Mesh : public Resource{
 public:
     // Mesh data
     std::vector<Vertex> vertices;
     std::vector<u_int16_t> indices;
-    std::vector<Texture*> textures;
+    Material* material;
 
-    Mesh(std::size_t, std::vector<Vertex>, std::vector<u_int16_t>, std::vector<Texture*>);
+    Mesh(std::size_t, std::vector<Vertex>, std::vector<u_int16_t>, Material*);
+    ~Mesh(){ unload(); };
 
-    bool load() override;
+    bool load(const char* ) override;
     void unload() override;
-    bool isLoaded() const override;
 
-    void draw();
-
-    GLuint getVAO(){ return m_VAO; };
-    std::size_t getNumIndices() const { return indices.size(); };
+    void draw(glm::mat4 transMatrix, Color color = GRAY);
+    void drawLines(glm::mat4 transMatrix, Color color = BLACK);
 
 private:
     // Render data

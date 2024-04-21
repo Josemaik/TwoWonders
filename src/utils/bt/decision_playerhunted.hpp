@@ -11,12 +11,18 @@ struct BTDecisionPlayerHunted : BTNode_t{
                 ectx.phy.max_speed += 0.2;
             }
             ectx.ai->boofedvelocity = true;
+            ectx.ai->attack_radius = 5.0;
+            ectx.ai->countdown_shoot = 0.05;
+            ectx.ai->countdown_stop = 0.05;
             return BTNodeStatus_t::success;
         }else{
             if(ectx.ai->boofedvelocity){
-                ectx.phy.max_speed -= 0.2;
+                ectx.phy.max_speed = 0.2;
             }
             ectx.ai->boofedvelocity = false;
+            ectx.ai->attack_radius = 20.5;
+            ectx.ai->countdown_shoot = 0.3;
+            ectx.ai->countdown_stop = 0.6;
             return BTNodeStatus_t::fail;
         }
     }

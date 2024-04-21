@@ -1,10 +1,12 @@
 #include "game_engine.hpp"
+#include <chrono>
+
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
 {
     ENGI::GameEngine::initWindow(width_, height_, "Two Wonders");
 
-    ENGI::GameEngine::setUpCamera({ 0.0f, 01.0f, 0.0f });
+    ENGI::GameEngine::setUpCamera({ 0.0f, 1.0f, 0.0f });
     ENGI::GameEngine::setProjectionCamera(CAMERA_ORTHOGRAPHIC);
 
     // Logo Two Wonders
@@ -16,20 +18,35 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // Corazones HUD
     loadAndResizeImage("heart", "assets/HUD/corazon.png");
 
+    // Medio Corazón HUD
+    loadAndResizeImage("half_heart", "assets/HUD/corazon_medio.png");
+
     // Corazones vacíos HUD
     loadAndResizeImage("empty_heart", "assets/HUD/corazon_vacio.png");
 
     // Corazones Hielo HUD
-    loadAndResizeImage("ice_heart", "assets/HUD/corazon_escudo.png");
+    loadAndResizeImage("ice_heart", "assets/HUD/corazon_escudo2.png");
+
+    // Medio Corazón Hielo HUD
+    loadAndResizeImage("half_ice_heart", "assets/HUD/corazon_escudo_medio2.png");
+
+    // Corazones vacíos Hielo HUD
+    loadAndResizeImage("empty_ice_heart", "assets/HUD/corazon_escudo_v2.png");
 
     // Mago Happy HUD
-    loadAndResizeImage("mago_happy", "assets/HUD/mago_happy.png");
+    loadAndResizeImage("mago_happy", "assets/HUD/caras/mago_happy.png");
 
     // Mago Meh HUD
-    loadAndResizeImage("mago_meh", "assets/HUD/mago_meh.png");
+    loadAndResizeImage("mago_meh", "assets/HUD/caras/mago_meh.png");
 
     // Mago SOS HUD
-    loadAndResizeImage("mago_sos", "assets/HUD/mago_sos.png");
+    loadAndResizeImage("mago_sos", "assets/HUD/caras/mago_sos.png");
+
+    // Nómada HUD
+    loadAndResizeImage("nomada", "assets/HUD/caras/calabaza3.png");
+
+    // Investigador HUD
+    loadAndResizeImage("investigador", "assets/HUD/caras/investigador.png");
 
     // Barra de maná HUD
     loadAndResizeImage("mana", "assets/HUD/mana_bar.png");
@@ -50,12 +67,72 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImage("sig", "assets/HUD/dialog_siguiente.png");
 
     // Espacio para hechizos de agua HUD
-    loadAndResizeImage("agua_holder", "assets/HUD/item_agua.png");
+    loadAndResizeImage("placeholder", "assets/HUD/item_agua.png");
+
+    // Icono de palo HUD
+    loadAndResizeImage("palo", "assets/HUD/palo.png");
 
     // Icono para las pompas de agua HUD
     loadAndResizeImage("pompas", "assets/HUD/pompas.png", 1.5, 1.5);
 
-    // NÚMEROS
+    // Icono para el dash de agua HUD
+    loadAndResizeImage("dash", "assets/HUD/dash.png");
+
+    // Icono para la bola de fuego HUD
+    loadAndResizeImage("bola_fuego", "assets/HUD/bolafuego.png");
+
+    // Icono para meteoritos HUD
+    loadAndResizeImage("meteoritos", "assets/HUD/meteoritos.png");
+
+    // Icono para escudo de hielo HUD
+    loadAndResizeImage("escudo_hielo", "assets/HUD/escudo.png");
+
+    // Icono para las estacas de hielo HUD
+    loadAndResizeImage("estacas", "assets/HUD/estacas.png");
+
+    // Libro para enseñar hechizos HUD
+    loadAndResizeImage("libro", "assets/HUD/Libro.png");
+
+    // Icono de detección HUD
+    loadAndResizeImage("detectionicon", "assets/HUD/detectionicon.png");
+
+    // Barco para el nivel del volcán HUD
+    loadAndResizeImage("barco", "assets/HUD/barco_piezas.png");
+
+    // Icono Batalla HUD
+    loadAndResizeImage("batalla", "assets/HUD/batalla.png");
+
+    // Botón círculo HUD 
+    loadAndResizeImage("boton_circulo", "assets/HUD/botones/cont_circulo.png");
+
+    // Botón cuadrado HUD
+    loadAndResizeImage("boton_cuadrado", "assets/HUD/botones/cont_cuadrado.png");
+
+    // Botón triángulo HUD
+    loadAndResizeImage("boton_triangulo", "assets/HUD/botones/cont_triangulo.png");
+
+    // Botón R2 HUD
+    loadAndResizeImage("boton_r2", "assets/HUD/botones/cont_R2.png");
+
+    // Tecla J HUD
+    loadAndResizeImage("tecla_j", "assets/HUD/teclas/cont_J.png");
+
+    // Tecla K HUD
+    loadAndResizeImage("tecla_k", "assets/HUD/teclas/cont_K.png");
+
+    // Tecla L HUD
+    loadAndResizeImage("tecla_l", "assets/HUD/teclas/cont_L.png");
+
+    // Tecla Espacio HUD
+    loadAndResizeImage("tecla_espacio", "assets/HUD/teclas/cont_space.png");
+
+    // Imagen Mando HUD
+    loadAndResizeImage("mando_explicacion", "assets/HUD/botones/Mando_botones.png");
+
+    // Imagen Teclado HUD
+    loadAndResizeImage("teclado_explicacion", "assets/HUD/teclas/teclado_ctrl.png");
+
+    // NÚMEROS Y SÍMBOLOS NUMÉRICOS
     //
     loadAndResizeImage("0", "assets/HUD/numeros/0.png");
     loadAndResizeImage("1", "assets/HUD/numeros/1.png");
@@ -67,38 +144,96 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImage("7", "assets/HUD/numeros/7.png");
     loadAndResizeImage("8", "assets/HUD/numeros/8.png");
     loadAndResizeImage("9", "assets/HUD/numeros/9.png");
+    loadAndResizeImage("+", "assets/HUD/numeros/mas.png");
+    loadAndResizeImage("-", "assets/HUD/numeros/-.png");
+    loadAndResizeImage("barra", "assets/HUD/barra.png");
 
     // GIFS
     //
     // Joystick Izquierdo
-    loadAndResizeImageGif("joystick_izq", "assets/HUD/botones/joystickL.gif", 0, 35);
+    loadAndResizeImageGif("joystick_izq", "assets/HUD/botones/joystickL.gif", 0, 18);
 
     // Fijador de cámara
-    loadAndResizeImageGif("fijado", "assets/HUD/gifs/fijado_trama.gif", 0, 35, 1.2, 1.2);
+    loadAndResizeImageGif("fijado", "assets/HUD/gifs/fijado_trama.gif", 0, 18, 1.2, 1.2);
 
     // Botón X
-    loadAndResizeImageGif("x", "assets/HUD/botones/x.gif", 0, 55);
+    loadAndResizeImageGif("x", "assets/HUD/botones/x.gif", 0, 28);
 
     // Botón Círculo
-    loadAndResizeImageGif("circulo", "assets/HUD/botones/circulo.gif", 0);
+    loadAndResizeImageGif("circulo", "assets/HUD/botones/circulo.gif", 0, 28);
 
     // Botón Triángulo
     loadAndResizeImageGif("triangulo", "assets/HUD/botones/triangulo.gif", 0);
 
     // Botón Cuadrado
-    loadAndResizeImageGif("cuadrado", "assets/HUD/botones/cuadrado.gif", 0, 55);
+    loadAndResizeImageGif("cuadrado", "assets/HUD/botones/cuadrado.gif", 0, 28);
 
     // Botón Menú
     loadAndResizeImageGif("menu", "assets/HUD/botones/menu.gif", 0);
 
     // Tecla E
-    loadAndResizeImageGif("e", "assets/HUD/teclas/e.gif", 0, 55);
+    loadAndResizeImageGif("e", "assets/HUD/teclas/e.gif", 0, 28);
+
+    // Tecla F
+    loadAndResizeImageGif("f", "assets/HUD/teclas/f.gif", 0, 28);
+
+    // Tecla Q
+    loadAndResizeImageGif("q", "assets/HUD/teclas/q.gif", 0, 28);
+
+    // Tecla I
+    loadAndResizeImageGif("i", "assets/HUD/teclas/i.gif", 0, 28);
+
+    // Tecla H
+    loadAndResizeImageGif("h", "assets/HUD/teclas/H.gif", 0, 28);
+
+    // Tecla L
+    loadAndResizeImageGif("l", "assets/HUD/teclas/L.gif", 0, 28);
+
+    // Tecla J
+    loadAndResizeImageGif("j", "assets/HUD/teclas/J.gif", 0, 28);
+
+    // Tecla K
+    loadAndResizeImageGif("k", "assets/HUD/teclas/k.gif", 0, 28);
+
+    // Tecla O
+    loadAndResizeImageGif("o", "assets/HUD/teclas/o.gif", 0, 28);
+
+    // Tecla U
+    loadAndResizeImageGif("u", "assets/HUD/teclas/u.gif", 0, 28);
 
     // Tecla Espacio
-    loadAndResizeImageGif("espacio", "assets/HUD/teclas/espacio.gif", 0, 55);
+    loadAndResizeImageGif("espacio", "assets/HUD/teclas/espacio.gif", 0, 28);
 
     // Pantalla de carga
-    loadAndResizeImageGif("carga", "assets/HUD/gifs/carga_elementos.gif", 0, 55);
+    loadAndResizeImageGif("carga", "assets/HUD/gifs/carga_elementos.gif", 0, 28);
+
+    // Teclas WASD
+    loadAndResizeImageGif("wasd", "assets/HUD/teclas/WASD.gif", 0, 28);
+
+    // Ejemplo pompa
+    loadAndResizeImageGif("exp_pompa", "assets/HUD/gifs/hechizos/exp_pompa.gif", 0, 28);
+
+    // Ejemplo dash de agua
+    loadAndResizeImageGif("exp_dash", "assets/HUD/gifs/hechizos/exp_dash.gif", 0, 28);
+
+    // Ejemplo bola de fuego
+    loadAndResizeImageGif("exp_bola_f", "assets/HUD/gifs/hechizos/exp_bola_f.gif", 0, 28);
+
+    // Botón L2
+    loadAndResizeImageGif("l2", "assets/HUD/botones/L2.gif", 0, 28);
+
+    // Botón R2
+    loadAndResizeImageGif("r2", "assets/HUD/botones/R2.gif", 0, 28);
+
+    // Botón L1
+    loadAndResizeImageGif("l1", "assets/HUD/botones/L1.gif", 0, 28);
+
+    // Botón R1
+    loadAndResizeImageGif("r1", "assets/HUD/botones/R1.gif", 0, 28);
+
+    //Detección por oído
+    loadAndResizeImageGif("Oido_parp1", "assets/HUD/gifs/Oido_parp1.gif", 0, 28);
+    loadAndResizeImageGif("Oido_parp2", "assets/HUD/gifs/Oido_parp2.gif", 0, 28);
 
     SetExitKey(KEY_F8);
 }
@@ -169,6 +304,10 @@ void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color) {
     DrawLine3D(startPos.toRaylib(), endPos.toRaylib(), color);
 }
 
+void ENGI::GameEngine::drawPoint3D(vec3d pos, Color color) {
+    DrawPoint3D(pos.toRaylib(), color);
+}
+
 void ENGI::GameEngine::drawCube(vec3d pos, float width, float height, float lenght, Color color) {
     DrawCube(pos.toRaylib(), width, height, lenght, color);
 }
@@ -199,6 +338,10 @@ void ENGI::GameEngine::drawRectangleRec(Rectangle rec, Color color) {
 
 void ENGI::GameEngine::drawTexture(Texture2D texture, int posX, int posY, Color tint) {
     DrawTexture(texture, posX, posY, tint);
+}
+
+void ENGI::GameEngine::drawTexture(Texture2D texture, int posX, int posY, Color tint, float scale) {
+    DrawTextureEx(texture, { static_cast<float>(posX), static_cast<float>(posY) }, 0.0f, scale, tint);
 }
 
 void ENGI::GameEngine::drawCircle(int posX, int posY, float radius, Color color) {
@@ -322,16 +465,14 @@ float ENGI::GameEngine::getFovyCamera()
 
 bool ENGI::GameEngine::isKeyPressed(int key)
 {
-    if (replayMode)
-        return gameData->isKeyPressed(key);
-    else
+    if (!replayMode)
     {
         if (IsKeyPressed(key))
         {
             switch (key)
             {
             case KEY_E:
-                gameData->addInputEvent(InputEvent::Type::InteractKeyPressed, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::InteractKeyPressed);
                 break;
             default:
                 break;
@@ -340,20 +481,20 @@ bool ENGI::GameEngine::isKeyPressed(int key)
         }
         return false;
     }
+    else
+        return gameData->isKeyPressed(key);
 }
 
 bool ENGI::GameEngine::isKeyDown(int key)
 {
-    if (replayMode)
-        return gameData->isKeyDown(key);
-    else
+    if (!replayMode)
     {
         if (IsKeyDown(key))
         {
             switch (key)
             {
             case KEY_SPACE:
-                gameData->addInputEvent(InputEvent::Type::AttackKeyDown, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::AttackKeyDown);
                 break;
             default:
                 break;
@@ -362,35 +503,35 @@ bool ENGI::GameEngine::isKeyDown(int key)
         }
         return false;
     }
+    else
+        return gameData->isKeyDown(key);
 }
 
 bool ENGI::GameEngine::isKeyReleased(int key)
 {
-    if (replayMode)
-        return gameData->isKeyReleased(key);
-    else
+    if (!replayMode)
     {
         if (IsKeyReleased(key))
         {
             switch (key)
             {
             case KEY_ENTER:
-                gameData->addInputEvent(InputEvent::Type::EnterReleased, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::EnterReleased);
                 break;
             case KEY_ESCAPE:
-                gameData->addInputEvent(InputEvent::Type::EscapeReleased, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::EscapeReleased);
                 break;
             case KEY_I:
-                gameData->addInputEvent(InputEvent::Type::InventoryReleased, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::InventoryReleased);
                 break;
             case KEY_F:
-                gameData->addInputEvent(InputEvent::Type::LockInReleased, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::LockInReleased);
                 break;
             case KEY_Q:
-                gameData->addInputEvent(InputEvent::Type::ChangeSpellReleased, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::ChangeSpellReleased);
                 break;
             case KEY_E:
-                gameData->addInputEvent(InputEvent::Type::InteractKeyReleased, gameData->getTime());
+                gameData->addInputEvent(InputEvent::Type::InteractKeyReleased);
                 break;
             default:
                 break;
@@ -399,6 +540,8 @@ bool ENGI::GameEngine::isKeyReleased(int key)
         }
         return false;
     }
+    else
+        return gameData->isKeyReleased(key);
 }
 
 bool ENGI::GameEngine::isMouseButtonPressed(int button)
@@ -418,7 +561,26 @@ bool ENGI::GameEngine::isGamepadAvailable(int gamepad)
 
 bool ENGI::GameEngine::isGamepadButtonPressed(int gamepad, int button)
 {
-    if (replayMode)
+    if (!replayMode)
+    {
+        if (IsGamepadButtonPressed(gamepad, button))
+        {
+            switch (button)
+            {
+            case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+                gameData->addInputEvent(InputEvent::Type::InteractKeyPressed);
+                break;
+            case GAMEPAD_BUTTON_RIGHT_FACE_LEFT:
+                gameData->addInputEvent(InputEvent::Type::AttackKeyDown);
+                break;
+            default:
+                break;
+            }
+            return true;
+        }
+        return false;
+    }
+    else
     {
         switch (button)
         {
@@ -432,25 +594,6 @@ bool ENGI::GameEngine::isGamepadButtonPressed(int gamepad, int button)
             return false;
         }
     }
-    else
-    {
-        if (IsGamepadButtonPressed(gamepad, button))
-        {
-            switch (button)
-            {
-            case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
-                gameData->addInputEvent(InputEvent::Type::InteractKeyPressed, gameData->getTime());
-                break;
-            case GAMEPAD_BUTTON_RIGHT_FACE_LEFT:
-                gameData->addInputEvent(InputEvent::Type::AttackKeyDown, gameData->getTime());
-                break;
-            default:
-                break;
-            }
-            return true;
-        }
-        return false;
-    }
 }
 
 bool ENGI::GameEngine::isGamepadButtonDown(int gamepad, int button)
@@ -460,7 +603,29 @@ bool ENGI::GameEngine::isGamepadButtonDown(int gamepad, int button)
 
 bool ENGI::GameEngine::isGamepadButtonReleased(int gamepad, int button)
 {
-    if (replayMode)
+    if (!replayMode)
+    {
+        if (IsGamepadButtonReleased(gamepad, button))
+        {
+            switch (button)
+            {
+            case GAMEPAD_BUTTON_MIDDLE_LEFT:
+                gameData->addInputEvent(InputEvent::Type::InventoryReleased);
+                break;
+            case GAMEPAD_BUTTON_RIGHT_FACE_RIGHT:
+                gameData->addInputEvent(InputEvent::Type::LockInReleased);
+                break;
+            case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+                gameData->addInputEvent(InputEvent::Type::InteractKeyReleased);
+                break;
+            default:
+                break;
+            }
+            return true;
+        }
+        return false;
+    }
+    else
     {
         switch (button)
         {
@@ -476,28 +641,6 @@ bool ENGI::GameEngine::isGamepadButtonReleased(int gamepad, int button)
         default:
             return false;
         }
-    }
-    else
-    {
-        if (IsGamepadButtonReleased(gamepad, button))
-        {
-            switch (button)
-            {
-            case GAMEPAD_BUTTON_MIDDLE_LEFT:
-                gameData->addInputEvent(InputEvent::Type::InventoryReleased, gameData->getTime());
-                break;
-            case GAMEPAD_BUTTON_RIGHT_FACE_RIGHT:
-                gameData->addInputEvent(InputEvent::Type::LockInReleased, gameData->getTime());
-                break;
-            case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
-                gameData->addInputEvent(InputEvent::Type::InteractKeyReleased, gameData->getTime());
-                break;
-            default:
-                break;
-            }
-            return true;
-        }
-        return false;
     }
 }
 
@@ -641,4 +784,17 @@ void ENGI::GameEngine::setReplayMode(bool replay, GameData& gd)
 {
     replayMode = replay;
     gameData = &gd;
+}
+
+double ENGI::GameEngine::getTime()
+{
+    auto now = std::chrono::high_resolution_clock::now();
+    auto duration = now.time_since_epoch();
+    auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+    return static_cast<double>(microseconds.count()) / 1e6;
+}
+
+float ENGI::GameEngine::getAspectRat()
+{
+    return static_cast<float>(width_) / static_cast<float>(height_);
 }

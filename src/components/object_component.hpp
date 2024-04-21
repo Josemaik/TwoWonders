@@ -22,7 +22,10 @@ enum struct ObjectType
     Ice_Spell,
     Water_Spell,
     Basic_Staff,
-    CrusherAttack
+    CrusherAttack,
+    GoodBoots,
+    RegularHat,
+    AttackUpgrade
 };
 
 struct ObjectComponent

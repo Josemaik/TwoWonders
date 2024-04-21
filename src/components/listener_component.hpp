@@ -1,18 +1,19 @@
 #pragma once
 #include <cstdint>
+#include <unordered_set>
 
 struct ListenerComponent
 {
     // Función para añadir un código de evento
-    void addCode(uint16_t code) { codeMask |= static_cast<uint16_t>(1u << code); }
+    void addCode(uint16_t code) { codeSet.insert(code); }
 
     // Función para quitar un código de evento
-    void removeCode(uint16_t code) { codeMask &= static_cast<uint16_t>(~(1u << code)); }
+    void removeCode(uint16_t code) { codeSet.erase(code); }
 
     // Función para comprobar si un código de evento está registrado
-    bool hasCode(uint16_t code) const { return codeMask & static_cast<uint16_t>(1u << code); }
+    bool hasCode(uint16_t code) const { return codeSet.find(code) != codeSet.end(); }
 
 private:
-    // Máscara para añadir códigos en binario
-    uint16_t codeMask{};
+    // Set para añadir códigos
+    std::unordered_set<uint16_t> codeSet;
 };

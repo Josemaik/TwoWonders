@@ -9,7 +9,7 @@ struct ObjectSystem
     using SYSCMPs = MP::TypeList<ObjectComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, float deltaTime);
+    void update(EntityManager& em);
     void addObject(ObjectType type, vec3d pos);
 
 private:

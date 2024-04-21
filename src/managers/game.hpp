@@ -20,6 +20,7 @@
 #include "../systems/camera_system.hpp"
 #include "../systems/lock_system.hpp"
 #include "../systems/npc_system.hpp"
+#include "../systems/particle_system.hpp"
 #include "game_engine.hpp"
 #include "ia_manager.hpp"
 #include "map_manager.hpp"
@@ -52,6 +53,7 @@ private:
     Ia_man iam{};
     PhysicsSystem physics_system{};
     RenderSystem render_system{};
+    ParticleSystem particle_system{};
     InputSystem input_system{};
     CollisionSystem collision_system{};
     LifeSystem life_system{};

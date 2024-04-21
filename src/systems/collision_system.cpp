@@ -5,11 +5,15 @@
 void CollisionSystem::update(EntityManager& em)
 {
     auto& li = em.getSingleton<LevelInfo>();
+    auto& frti = em.getSingleton<FrustumInfo>();
 
     // Liberar el octree
     octree.clear();
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
     {
+        if (!e.hasTags(FrustOut{}) && frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+            return;
+
         // Si la entidad está por debajo del suelo, se destruye
         auto& pos = phy.position;
         if (pos.y() < -20.)
@@ -19,18 +23,17 @@ void CollisionSystem::update(EntityManager& em)
         }
 
         // Actualizar bounding box
-        auto& scl = phy.scale;
-        col.updateBox(pos, scl, phy.gravity, phy.orientation, phy.rotationVec);
+        col.updateBox(pos, phy.scale, phy.gravity, phy.orientation, phy.rotationVec);
 
         // Insertar en el Octree
         octree.insert(e, col);
     });
 
     // Vector para saber qué colisiones se han calculado ya
-    checkedPairs.clear();
+    resetCollisionsMatrix();
 
     // Comprobar colisiones
-    checkCollision(em, octree, checkedPairs);
+    checkCollision(em, octree);
 
     // Comprobar colisiones con rampas
     handleRampCollision(em);
@@ -39,7 +42,7 @@ void CollisionSystem::update(EntityManager& em)
 }
 
 // Función recursiva qué revisa las colisiones de las entidades del octree actual con otras entidades
-void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsType& checkedPairs)
+void CollisionSystem::checkCollision(EntityManager& em, Octree& octree)
 {
     // Si el octree está dividido, revisar sus hijos
     if (octree.isDivided())
@@ -48,7 +51,7 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
         {
             // Si el octante tiene entidades o está dividido, revisar sus colisiones
             if (octant.get()->getNumEntities() > 0 || octant.get()->isDivided())
-                checkCollision(em, *octant, checkedPairs);
+                checkCollision(em, *octant);
         }
         return;
     }
@@ -60,10 +63,16 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
             auto [e, c] = *it1;
             auto [nEnt, nCol] = *it2;
 
-            if (checkedPairs.find({ e->getID(), nEnt->getID() }) == checkedPairs.end() && e != nEnt)
+            auto id1 = e->getID();
+            auto id2 = nEnt->getID();
+
+            if (id1 > id2)
+                std::swap(id1, id2);
+
+            if (!checkedPairs[id1][id2] && e != nEnt)
             {
-                BBox& bbox1 = c->boundingBox;
-                BBox& bbox2 = nCol->boundingBox;
+                BBox& bbox1 = c->bbox;
+                BBox& bbox2 = nCol->bbox;
 
                 if (bbox1.intersects(bbox2))
                 {
@@ -74,7 +83,14 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octree, pairsTyp
                     handleCollision(em, *e, *nEnt, minOverlap, c->behaviorType, nCol->behaviorType);
 
                     // Marcamos la colisión entre ambas entidades como comprobada
-                    checkedPairs.insert({ e->getID(), nEnt->getID() });
+                    checkedPairs[id1][id2] = true;
+
+                    auto& phy1 = em.getComponent<PhysicsComponent>(*e);
+                    auto& phy2 = em.getComponent<PhysicsComponent>(*nEnt);
+
+                    // Actualizamos las cajas de las entidades
+                    c->updateBox(phy1.position, phy1.scale, phy1.gravity, phy1.orientation, phy1.rotationVec);
+                    nCol->updateBox(phy2.position, phy2.scale, phy2.gravity, phy2.orientation, phy2.rotationVec);
                 }
             }
         }
@@ -93,8 +109,14 @@ void CollisionSystem::handleRampCollision(EntityManager& em)
 
     for (auto [rID, eID] : checkedPairsRamp)
     {
-        auto& r = *em.getEntityByID(rID);
-        auto& e = *em.getEntityByID(eID);
+        auto* rPtr = em.getEntityByID(rID);
+        auto* ePtr = em.getEntityByID(eID);
+
+        if (ePtr->hasComponent<RampComponent>())
+            std::swap(rPtr, ePtr);
+
+        auto& r = *rPtr;
+        auto& e = *ePtr;
 
         auto& phy = em.getComponent<PhysicsComponent>(e);
         previousEntsOnRamp.push_back(&phy);
@@ -102,7 +124,6 @@ void CollisionSystem::handleRampCollision(EntityManager& em)
 
         auto& ramp = em.getComponent<RampComponent>(r);
         auto& offSet = ramp.offset;
-
 
         phy.onRamp = true;
         // baseheight provisionalmente a 0
@@ -191,19 +212,30 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     }
 
     // Rampas
+    if (behaviorType1 & BehaviorType::RAMP && behaviorType2 & BehaviorType::RAMP)
+        return;
     if (behaviorType1 & BehaviorType::RAMP || behaviorType2 & BehaviorType::RAMP)
     {
         auto* staticEntPtr = &staticEnt;
         auto* otherEntPtr = &otherEnt;
 
-        auto* staticPhyPtr = &em.getComponent<PhysicsComponent>(*staticEntPtr);
-        auto* otherPhyPtr = &em.getComponent<PhysicsComponent>(*otherEntPtr);
+        auto* staticPhyPtr = &staticPhy;
+        auto* otherPhyPtr = &otherPhy;
 
         if (behaviorType2 & BehaviorType::RAMP)
         {
             std::swap(staticEntPtr, otherEntPtr);
             std::swap(staticPhyPtr, otherPhyPtr);
+            std::swap(behaviorType1, behaviorType2);
         }
+
+        // Entidades que no queremos que colisionen con rampas
+        if (otherEntPtr->hasTag<WaterBombTag>() ||
+            otherEntPtr->hasTag<FireBallTag>() ||
+            otherEntPtr->hasTag<HitPlayerTag>() ||
+            behaviorType2 & BehaviorType::AREADAMAGECRUSHER ||
+            behaviorType2 & BehaviorType::AREADAMAGE)
+            return;
 
         auto& offSet = em.getComponent<RampComponent>(*staticEntPtr).offset;
         auto& pos = otherPhyPtr->position;
@@ -223,11 +255,55 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
             }
         }
 
-        checkedPairsRamp.insert({ staticEntPtr->getID(), otherEntPtr->getID() });
+        auto id1 = staticEntPtr->getID();
+        auto id2 = otherEntPtr->getID();
+
+        if (id1 > id2)
+            std::swap(id1, id2);
+
+        checkedPairsRamp.insert({ id1, id2 });
         return;
     }
 
-    //BOMBA DE CURACION
+    // LAVA
+    if (behaviorType1 & BehaviorType::LAVA || behaviorType2 & BehaviorType::LAVA)
+    {
+        auto* staticEntPtr = &staticEnt;
+        auto* otherEntPtr = &otherEnt;
+
+        auto* staticPhyPtr = &staticPhy;
+        auto* otherPhyPtr = &otherPhy;
+
+        if (behaviorType2 & BehaviorType::LAVA)
+        {
+            std::swap(staticEntPtr, otherEntPtr);
+            std::swap(staticPhyPtr, otherPhyPtr);
+        }
+
+        if (otherEntPtr->hasComponent<TypeComponent>())
+        {
+            auto& type = em.getComponent<TypeComponent>(*otherEntPtr);
+
+            if (type.type != ElementalType::Fire && otherEntPtr->hasComponent<LifeComponent>())
+            {
+                auto& life = em.getComponent<LifeComponent>(*otherEntPtr);
+                life.decreaseLife();
+
+                resolvePlayerDirection(*otherPhyPtr, *staticPhyPtr, false);
+            }
+        }
+        else if (otherEntPtr->hasTag<PlayerTag>() && otherEntPtr->hasComponent<LifeComponent>())
+        {
+            auto& life = em.getComponent<LifeComponent>(*otherEntPtr);
+            life.decreaseLife();
+
+            resolvePlayerDirection(*otherPhyPtr, *staticPhyPtr, false);
+        }
+
+        return;
+    }
+
+    // BOMBA DE CURACION
     if (behaviorType2 & BehaviorType::HEAL || behaviorType1 & BehaviorType::HEAL)
     {
         if (staticEnt.hasComponent<LifeComponent>() && staticEnt.hasTag<SlimeTag>()) {
@@ -284,12 +360,17 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         return;
     }
 
-    if (behaviorType2 & BehaviorType::SPIDERWEB || behaviorType1 & BehaviorType::SPIDERWEB)
+    // SPAWN
+    if (behaviorType1 & BehaviorType::SPAWN || behaviorType2 & BehaviorType::SPAWN)
+        return;
+
+    if ((behaviorType2 & BehaviorType::SPIDERWEB || behaviorType1 & BehaviorType::SPIDERWEB) ||
+        (behaviorType2 & BehaviorType::AREADAMAGECRUSHER || behaviorType1 & BehaviorType::AREADAMAGECRUSHER))
     {
-        if (behaviorType2 & BehaviorType::SPIDERWEB)
+        if (behaviorType2 & BehaviorType::SPIDERWEB || behaviorType2 & BehaviorType::AREADAMAGECRUSHER)
             std::swap(behaviorType1, behaviorType2);
 
-        if (behaviorType2 & BehaviorType::ENEMY || behaviorType2 & BehaviorType::SHIELD)
+        if (behaviorType2 & BehaviorType::ENEMY)
             return;
     }
 
@@ -308,7 +389,9 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
     }
 
     if (behaviorType2 & BehaviorType::WARNINGZONE || behaviorType1 & BehaviorType::WARNINGZONE
-        || behaviorType2 & BehaviorType::AREADAMAGECRUSHER || behaviorType1 & BehaviorType::AREADAMAGECRUSHER)
+        || behaviorType2 & BehaviorType::AREADAMAGECRUSHER || behaviorType1 & BehaviorType::AREADAMAGECRUSHER
+        || behaviorType2 & BehaviorType::OBJECT || behaviorType1 & BehaviorType::OBJECT
+        || behaviorType2 & BehaviorType::LADDER || behaviorType1 & BehaviorType::LADDER)
         return;
 
     // Esto ya es cualquier colisión que no sea de player, paredes, zonas o ataques
@@ -354,17 +437,14 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     }
 
     // Nos aseguramos que el suelo siempre esté en staticEntPtr
-    if (otherEntPtr->hasTag<GroundTag>() || otherEntPtr->hasTag<WaterTag>())
+    if (otherEntPtr->hasTag<GroundTag>())
     {
         std::swap(staticPhy, otherPhy);
         std::swap(staticEntPtr, otherEntPtr);
         std::swap(behaviorType1, behaviorType2);
 
-        if (otherEntPtr->hasTag<GroundTag>() || otherEntPtr->hasTag<WaterTag>())
-        {
-            // floorCollision(*staticPhy, *otherPhy, minOverlap);
+        if (otherEntPtr->hasTag<GroundTag>())
             return;
-        }
 
         if (otherEntPtr->hasTag<WallTag>())
             return;
@@ -373,17 +453,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Colisiones con el suelo
     if (staticEntPtr->hasTag<GroundTag>() && !otherEntPtr->hasTag<HitPlayerTag>())
     {
-        if (minOverlap.y() <= 1.0 || otherPhy->onRamp || otherPhy->stopped)
-        {
-            groundCollision(*otherPhy, otherPhy->scale, minOverlap);
-            return;
-        }
-    }
-
-    // Si el objeto estático es un objeto
-    if (otherEntPtr->hasTag<PlayerTag>() && staticEntPtr->hasTag<ObjectTag>())
-    {
-        em.getComponent<ObjectComponent>(*staticEntPtr).effect();
+        groundCollision(*otherPhy, *staticPhy, minOverlap);
         return;
     }
 
@@ -395,8 +465,19 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
             if (otherEntPtr->hasComponent<TypeComponent>())
             {
                 auto& bulletType = em.getComponent<TypeComponent>(*otherEntPtr);
-                if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(bulletType.type))
+                if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(bulletType.type)) {
                     em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
+                    if (staticEntPtr->hasTag<EnemyTag>()) {
+                        if (staticEntPtr->hasComponent<AIComponent>()) {
+                            em.getComponent<AIComponent>(*staticEntPtr).playerdetected = true;
+                        }
+                    }
+                    // if(otherEnt->hasTag<EnemyTag>()){
+                    //     if(otherEnt->hasComponent<AIComponent>()){
+                    //         em.getComponent<AIComponent>(*staticEntPtr).playerdetected = true;
+                    //     }
+                    // }
+                }
             }
         }
 
@@ -409,19 +490,18 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Si impacta enemigo con pared
     if (behaviorType2 & BehaviorType::ENEMY)
     {
-        if (staticEntPtr->hasTag<WaterTag>())
-        {
-            staticCollision(*otherPhy, *staticPhy, minOverlap);
-            return;
-        }
-
         enemiesWallCollision(em, *otherEntPtr, *staticPhy, *otherPhy, minOverlap);
         return;
     }
 
     if (behaviorType2 & BehaviorType::SPIDERWEB ||
         behaviorType2 & BehaviorType::WARNINGZONE ||
-        behaviorType2 & BehaviorType::AREADAMAGECRUSHER)
+        behaviorType2 & BehaviorType::AREADAMAGECRUSHER ||
+        behaviorType2 & BehaviorType::LADDER ||
+        behaviorType2 & BehaviorType::LAVA ||
+        behaviorType2 & BehaviorType::SPAWN ||
+        behaviorType2 & BehaviorType::RAMP ||
+        behaviorType2 & BehaviorType::OBJECT)
         return;
 
     if (behaviorType2 & BehaviorType::METEORITE)
@@ -506,6 +586,13 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         std::swap(behaviorType1, behaviorType2);
     }
 
+    if (behaviorType2 & BehaviorType::OBJECT)
+    {
+        // Colisión con un objeto
+        em.getComponent<ObjectComponent>(*otherEntPtr).effect();
+        return;
+    }
+
     if (behaviorType2 & BehaviorType::ENEMY)
     {
         classicCollision(*staticPhy, *otherPhy, minOverlap);
@@ -514,7 +601,9 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         {
             resolvePlayerDirection(*staticPhy, *otherPhy, true);
             em.getSingleton<SoundSystem>().sonido_rebote();
-            return;
+
+            if (!otherEntPtr->hasTag<AngryBushTag>())
+                return;
         }
         else if (otherEntPtr->hasTag<CrusherTag>() || otherEntPtr->hasTag<DummyTag>())
             return;
@@ -529,16 +618,18 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::SPAWN)
     {
         auto& plfi = em.getSingleton<PlayerInfo>();;
-        if (evm != nullptr && plfi.spawnPoint != otherPhy->position)
-        {
-            evm->scheduleEvent(Event{ EventCodes::SetSpawn });
+        auto& life = em.getComponent<LifeComponent>(*staticEntPtr);
 
-            plfi.spawnPoint = otherPhy->position;
-            auto& life = em.getComponent<LifeComponent>(*staticEntPtr);
+        if (life.life < life.maxLife)
             life.life = life.maxLife;
+
+        if (plfi.mana < plfi.max_mana - 3.0)
             plfi.mana = plfi.max_mana - 3.0;
 
-            em.getSingleton<SoundSystem>().sonido_checkpoint();
+        if (evm != nullptr && plfi.spawnPoint != otherPhy->position)
+        {
+            plfi.spawnPoint = otherPhy->position;
+            evm->scheduleEvent(Event{ EventCodes::SetSpawn });
 
             if (otherEntPtr->hasComponent<DispatcherComponent>())
             {
@@ -551,9 +642,50 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
                 }
             }
         }
-
         return;
     }
+
+    // ESCALERA
+    if (behaviorType2 & BehaviorType::LADDER)
+    {
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        if (plfi.onLadder)
+        {
+            auto& ldc = em.getComponent<LadderComponent>(*otherEntPtr);
+            auto& col = em.getComponent<ColliderComponent>(*staticEntPtr);
+            auto& box = col.bbox;
+
+            if ((col.bbox.min.y() + 1) >= ldc.yMax || (col.bbox.min.y() - 1) <= ldc.yMin)
+            {
+                auto& phy = em.getComponent<PhysicsComponent>(*staticEntPtr);
+                phy.gravity = 1.0;
+                plfi.onLadder = false;
+
+                vec3d newPos = phy.position;
+                auto& ori = phy.orientation;
+
+                // Si el jugador está por encima de la escalera, lo ponemos un poco más adelante de su posición
+                if ((box.min.y() + 1) >= ldc.yMax)
+                {
+                    newPos.setX(newPos.x() + sin(ori) * 2);
+                    newPos.setZ(newPos.z() + cos(ori) * 2);
+                }
+                else
+                {
+                    newPos.setX(newPos.x() - sin(ori) * 2);
+                    newPos.setZ(newPos.z() - cos(ori) * 2);
+                }
+
+                phy.position = newPos;
+            }
+            return;
+
+        }
+
+        staticCollision(*staticPhy, *otherPhy, minOverlap);
+        return;
+    }
+
 
     // Daño en área
     if (behaviorType2 & BehaviorType::AREADAMAGE)
@@ -614,6 +746,7 @@ void CollisionSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, Physic
     auto& otherPos = enemyPhy.position;
     auto& enemyVel = enemyPhy.velocity;
     vec3d dir = { pos.x() - otherPos.x(), 0, pos.z() - otherPos.z() };
+    int multiplier = 7;
 
     dir.normalize();
 
@@ -641,10 +774,13 @@ void CollisionSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, Physic
             vec3d newDir = { dir.x() * cosAngle - dir.z() * sinAngle, 0.0, dir.x() * sinAngle + dir.z() * cosAngle };
 
             dir = newDir;
-            // dir.normalize();
         }
+        multiplier = 7;
     }
-    playerPhy.velocity = dir * 7;
+    else
+        playerPhy.gravity = playerPhy.gravity / 1.5;
+
+    playerPhy.velocity = dir * multiplier;
     playerPhy.stopped = true;
 }
 
@@ -659,9 +795,7 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
 
         // Nos aseguramos que la bala esté en sea la de la entidad 1
         if (atkPl2 || atkEn2)
-        {
             std::swap(ent1Ptr, ent2Ptr);
-        }
 
         // Ahora sabemos seguro que la entidad con la que ha colisionado la bala está en la entidad 2, pero es enemigo o jugador?
         // Lo comprobamos con el tipo de comportamientoto
@@ -705,14 +839,21 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
 
                 if (balaCol.behaviorType & BehaviorType::ATK_PLAYER)
                 {
+                    //Si pegamos a un enemmigo nos detecta directamente
+                    if (ent2Ptr->hasTag<GolemTag>() || ent2Ptr->hasTag<SnowmanTag>())
+                        em.getComponent<AIComponent>(*ent2Ptr).playerdetected = true;
+
                     auto& plfi = em.getSingleton<PlayerInfo>();
                     damage = plfi.currentSpell.damage;
 
                     if (ent1Ptr->hasComponent<ObjectComponent>())
-                        damage = static_cast<int>(damage * 2.0);
+                        damage = static_cast<int>(damage * 1.5);
 
                     if (damage == 0)
                         damage = 2;
+
+                    if (plfi.attackUpgrade)
+                        damage += 1;
                 }
 
                 if (li.invulnerable)
@@ -724,11 +865,18 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                 {
                     li.decreaseLife(static_cast<int>(damage * 1.5));
                 }
-                else if (typeBala == ElementalType::Neutral)
+                else if (typeBala == ElementalType::Neutral) {
                     li.decreaseLife(damage);
+                    // if (balaCol.attackType & AttackType::GollemAttack) {
+                    //     em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
+                    // }
+                }
                 else
                 {
                     li.decreaseLife(damage / 2);
+                    // if(ent2Ptr->hasTag<GolemTag>()){
+                    //     em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
+                    // }
                     if (balaCol.attackType & AttackType::GollemAttack) {
                         em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
                     }
@@ -739,30 +887,24 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
 }
 
 // Si chocamos contra el suelo, solo se desplaza en Y
-void CollisionSystem::groundCollision(PhysicsComponent& playerPhysics, vec3d& playerEsc, vec3d& minOverlap)
+void CollisionSystem::groundCollision(PhysicsComponent& playerPhysics, PhysicsComponent& groundPhy, vec3d& minOverlap)
 {
     auto& pos1 = playerPhysics.position;
+    auto& playerEsc = playerPhysics.scale;
 
-    minOverlap += vec3d{ playerEsc.x() / 2, 0.f, playerEsc.z() / 2 };
-    if (!playerPhysics.alreadyGrounded && minOverlap.y() < minOverlap.x() && minOverlap.y() < minOverlap.z())
+    minOverlap += vec3d{ playerEsc.x() / 3.0, 0.f, playerEsc.z() / 3.0 };
+    if ((minOverlap.y() < minOverlap.x() && minOverlap.y() < minOverlap.z()) || playerPhysics.onRamp)
     {
         pos1.setY(pos1.y() + minOverlap.y());
-        playerPhysics.alreadyGrounded = true;
-
     }
-    // else if (minOverlap.y() > 2.0)
-    // {
-        // minOverlap -= vec3d{ playerEsc.x() / 2, 0.f, playerEsc.z() / 2 };
-    // std::cout << "alooo\n";
-    // else if (minOverlap.x() < minOverlap.z())
-    // {
-    //     pos1.setX(pos1.x() + minOverlap.x());
-    // }
-    // else
-    // {
-    //     pos1.setZ(pos1.z() + minOverlap.z());
-    // }
-    // }
+    else if (minOverlap.x() < minOverlap.z())
+    {
+        resolveCollision<&vec3d::x, &vec3d::setX>(playerPhysics, groundPhy, minOverlap.x());
+    }
+    else
+    {
+        resolveCollision<&vec3d::z, &vec3d::setZ>(playerPhysics, groundPhy, minOverlap.z());
+    }
 }
 
 // Si el suelo choca contra el suelo, solo se desplaza en X o Z (también se usa para paredes con paredes)
@@ -833,54 +975,62 @@ bool CollisionSystem::resolveCollision(PhysicsComponent& phy1, PhysicsComponent&
     }
 }
 
-bool CollisionSystem::checkWallCollision(EntityManager& em, vec3d& pos)
+bool CollisionSystem::checkWallCollision(EntityManager& em, vec3d& pos, vec3d& normalDir)
 {
+    // Queremos saber si hay una pared en la dirección de la normal
+    // Creamos un rayo que salga de la posición en la dirección de la normal
+    RayCast ray{ pos, normalDir };
+
     // Buscamos todas las paredes cercanas a la posición
-    using noCMPs = MP::TypeList<PhysicsComponent, ColliderComponent>;
-    using wallTag = MP::TypeList<WallTag>;
-    bool collision = false;
+    using noCMPs = MP::TypeList<ColliderComponent>;
+    using wallTag = MP::TypeList<>;
+    bool collision{ false };
+    vec3d colPoint{};
 
-    // Creamos una caja de colisión de 1x1x1 centrada en la posición
-    BBox box{ pos, {2, 4, 2} };
-
-    em.forEach<noCMPs, wallTag>([&](Entity&, PhysicsComponent& phy, ColliderComponent& col)
+    auto& frti = em.getSingleton<FrustumInfo>();
+    em.forEach<noCMPs, wallTag>([&](Entity& e, ColliderComponent& col)
     {
-        if (collision)
+        if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
             return;
-
-        auto& bbox = col.boundingBox;
-        if (bbox.intersects(box))
+        if (col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::LAVA)
         {
-            collision = true;
-
-            // Calculamos el mínimo solape entre las dos entidades
-            vec3d minOverlap = BBox::minOverlap(bbox, box);
-
-            // Sacamos cuál sería la posición de la entidad después de la colisión
-            //std::cout << pos << std::endl;
-            auto newPos = pos;
-            //std::cout << newPos << std::endl;
-            if (minOverlap.x() < minOverlap.y() && minOverlap.x() < minOverlap.z())
+            auto& bbox = col.bbox;
+            if (e.hasTag<LavaTag>())
             {
-                if (phy.position.x() < pos.x())
-                    newPos.setX(pos.x() + minOverlap.x());
-                else
-                    newPos.setX(pos.x() - minOverlap.x());
-            }
-            else if (minOverlap.z() < minOverlap.y())
-            {
-                if (phy.position.z() < pos.z())
-                    newPos.setZ(pos.z() + minOverlap.z());
-                else
-                    newPos.setZ(pos.z() - minOverlap.z());
-            }
+                if (bbox.intersectsRay2(ray.origin, ray.direction, colPoint) && colPoint.distance(pos) < 23.0)
+                {
+                    auto& phy = em.getComponent<PhysicsComponent>(e);
 
-            pos = newPos;
+                    // Pillamos el centro de la caja para asegurarnos que no se quede en la lava o atraviese paredes
+                    auto centreDir = (vec3d{ phy.position.x(), pos.y(), phy.position.z() } - pos).normalize();
+                    ray.direction = centreDir;
+
+                    bbox.intersectsRay2(ray.origin, ray.direction, colPoint);
+                    auto newPos = colPoint + centreDir * 2.0;
+
+                    pos = newPos;
+
+                    collision = true;
+                    return;
+                }
+            }
+            else if (bbox.intersectsRay(ray.origin, ray.direction, colPoint) && colPoint.distance(pos) < 10.0)
+            {
+                pos = colPoint - normalDir * 1.5;
+
+                collision = true;
+                return;
+            }
         }
-
     });
 
     return collision;
+}
+
+void CollisionSystem::resetCollisionsMatrix()
+{
+    for (auto& row : checkedPairs)
+        std::fill(row.begin(), row.end(), false);
 }
 
 // Función para que no se salgan de los bordes, no se usa

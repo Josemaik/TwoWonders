@@ -1,9 +1,10 @@
 #include "resource_font.hpp"
 
 bool Font::load(const char* filePath){
-    setupFont(filePath);
+    this->m_filePath = filePath;
+    setupFont(m_filePath);
 
-    isLoaded() ? std::cout << "Load a font (ID: " << id <<") -> " << filePath << std::endl : std::cout << "Error loading a font" << std::endl;
+    isLoaded() ? std::cout << "Load a font (ID: " << m_id <<") -> " << m_filePath << std::endl : std::cout << "Error loading a font" << std::endl;
 
     return isLoaded();
 }
@@ -19,7 +20,7 @@ void Font::unload(){
         FT_Done_FreeType(library);
         library = nullptr;
     }
-    std::cout << "Unload a font (ID: " << id <<")" << std::endl; 
+    std::cout << "Unload a font (ID: " << m_id <<")" << std::endl; 
 }
 
 // PRIVATE
@@ -35,5 +36,5 @@ void Font::setupFont(const char* filePath){
         std::cerr << "Error loading the font" << std::endl;
     }
 
-    isLoad = (library != nullptr) && (face != nullptr);
+    m_isLoad = (library != nullptr) && (face != nullptr);
 }

@@ -1,6 +1,6 @@
 #include "life_system.hpp"
 
-void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
+void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, LifeComponent& lif)
@@ -44,11 +44,19 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
             {
                 em.getSingleton<SoundSystem>().sonido_apisonadora_danyo();
             }
+            else if (ent.hasTag<GolemTag>())
+            {
+                em.getSingleton<SoundSystem>().sonido_golem_danyo();
+            }
+            else if (ent.hasTag<SnowmanTag>())
+            {
+                em.getSingleton<SoundSystem>().sonido_munyeco_danyo();
+            }
 
             lif.lifeLost = 0;
         }
 
-        lif.decreaseCountdown(deltaTime);
+        lif.decreaseCountdown(timeStep);
 
         if (lif.life == 0)
         {
@@ -58,7 +66,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 auto& phy = em.getComponent<PhysicsComponent>(ent);
                 createObject(em, os, phy.position);
                 em.getSingleton<SoundSystem>().sonido_muerte_enemigo();
-              
+
                 if (li.playerDetected)
                     li.enemyToChestPos = phy.position;
             }
@@ -79,12 +87,21 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
             }
             //si es un golem
             if (ent.hasTag<GolemTag>()) {
-                if (!lif.decreaseNextFrame)
+                if (!lif.decreaseNextFrame) {
                     lif.decreaseNextFrame = true;
+                    em.getSingleton<SoundSystem>().sonido_golem_muere();
+                }
                 else
                     lif.decreaseNextFrame = false;
+                //  if (ent.hasComponent<AttackComponent>()) {
+                //     em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
+                //  }
+            }
 
-                //em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
+            //si es un snowman
+            if (ent.hasTag<SnowmanTag>()) {
+                if (!lif.decreaseNextFrame)
+                    em.getSingleton<SoundSystem>().sonido_munyeco_muere();
             }
 
             //Si es una bala
@@ -119,8 +136,8 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 bb.boss_fase++;
             }
 
-            if(ent.hasTag<DestructibleTag>()){
-                if(li.mapID == 1){
+            if (ent.hasTag<DestructibleTag>()) {
+                if (li.mapID == 1) {
                     li.door_open = true;
                 }
             }
@@ -129,6 +146,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os, float deltaTime) {
                 li.lockedEnemy = li.max;
 
             lif.markedForDeletion = true;
+
         }
 
         // Para cuando se recoge una poción de vida
