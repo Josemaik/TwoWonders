@@ -22,7 +22,20 @@ enum EventCodes : uint16_t
     NPCDialog,
     DialogPrisonNomad1,
     DialogPrisonNomad2,
-    DialogFirstSpawn
+    DialogFirstSpawn,
+    ViewPointDoor,
+    BoatPartFound,
+    BoatDialog,
+    DialogNomadVolcano1,
+    DialogNomadVolcano2,
+    DialogCatVolcano1,
+    InitBoatParts,
+    DialogCatVolcano2,
+    DialogCatVolcano3,
+    DialogNomadVolcano3,
+    TPBoat,
+    ViewPointNomadDoor,
+    MAX
 };
 
 struct Event {
@@ -80,10 +93,14 @@ public:
                         ss.sonido_abrir_cofre();
 
                         os.addObject(cc.content, playerPos);
-                        auto& msgs = cc.messages;
+
+                        auto& msc = em.getComponent<MessageComponent>(chest);
+                        auto& msgs = msc.messages;
+
                         while (!msgs.empty())
                         {
-                            txti.addText(msgs.front());
+
+                            txti.addText({ SpeakerType::NONE, msgs.front() });
                             msgs.pop();
                         }
 
@@ -100,7 +117,6 @@ public:
                                 lc.addCode(static_cast<EventCodes>(dc.eventCodes[i]));
                             }
                         }
-
 
                         break;
                     }
@@ -138,75 +154,6 @@ public:
                         li.viewPointSound = true;
                         break;
                     }
-                    case EventCodes::DialogPrisonNomad1:
-                    {
-                        auto& txti = em.getSingleton<TextInfo>();
-
-                        std::array<std::string, 9> msgs =
-                        {
-                            "Nómada: \nSaludos, no esperaba encontrarme a un \naprendiz de mago por aquí.",
-                            "Mago: \nBuenas! Sabes qué son todos estos enemigos?\nNo aparecían en los libros que estudié.",
-                            "Nómada: \nCuanto más se debilita la barrera más enemigos \nentran al mundo, cosa del viejo.",
-                            "Mago: \n¿Qué viejo?",
-                            "Nómada: \nEl pellejo.",
-                            "Mago: \nEspera, ¿¿no será el gran mago??",
-                            "Nómada: \nEse mismo",
-                            "Mago: \nEse es mi maestro! \nMe abandonó y me encomendó que lo encontrara.",
-                            "Nómada: \nSi eres el aprendiz del viejo sabrás utilizar esto."
-                        };
-
-                        // Metemos el texto en el array de texto
-                        for (std::size_t i = 0; i < msgs.size(); i++)
-                            txti.addText(msgs[i]);
-
-                        em.getComponent<ListenerComponent>(e).addCode(EventCodes::DialogPrisonNomad2);
-                        events.push_back(Event{ EventCodes::DialogPrisonNomad2 });
-                        out = true;
-                        break;
-                    }
-                    case EventCodes::DialogPrisonNomad2:
-                    {
-                        auto& li = em.getSingleton<LevelInfo>();
-                        auto& txti = em.getSingleton<TextInfo>();
-                        auto& plfi = em.getSingleton<PlayerInfo>();
-
-                        std::array<std::string, 2> msgs =
-                        {
-                            "¡Haz recibido un pergamino con la formulación \npara crear una pompa de agua!",
-                            "Nómada: \nCon esto podremos salir de aquí por si disparas a esa puerta. \nLos muñecos de por medio te servirán de práctica."
-                        };
-
-                        // Le damos el hechizo
-                        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 4 };
-                        plfi.addSpell(spell);
-
-                        // Metemos el texto en el stack de texto
-                        for (std::size_t i = 0; i < msgs.size(); i++)
-                            txti.addText(msgs[i]);
-
-                        li.viewPoint = { -84.847, 8.0, 234.267 };
-
-                        break;
-                    }
-                    case EventCodes::NPCDialog:
-                    {
-                        auto& li = em.getSingleton<LevelInfo>();
-                        if (li.npcToTalk == li.max)
-                            break;
-
-                        auto& npc = *em.getEntityByID(li.npcToTalk);
-                        auto& dc = em.getComponent<DispatcherComponent>(npc);
-                        auto& lc = em.getComponent<ListenerComponent>(e);
-
-                        for (std::size_t i = 0; i < dc.eventCodes.size(); i++)
-                        {
-                            scheduleEvent(Event{ static_cast<EventCodes>(dc.eventCodes[i]) });
-                            lc.addCode(static_cast<EventCodes>(dc.eventCodes[i]));
-                        }
-
-                        li.npcToTalk = li.max;
-                        break;
-                    }
                     case EventCodes::DialogFirstSpawn:
                     {
                         auto& txti = em.getSingleton<TextInfo>();
@@ -219,9 +166,350 @@ public:
 
                         // Metemos el texto en el stack de texto
                         for (std::size_t i = 0; i < msgs.size(); i++)
-                            txti.addText(msgs[i]);
+                            txti.addText({ SpeakerType::NONE, msgs[i] });
                         break;
                     }
+                    case EventCodes::ViewPointDoor:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        li.viewPoint = { 15.153, 18.593, 85.767 };
+                        li.viewPointSound = true;
+                        break;
+                    }
+                    case EventCodes::ViewPointNomadDoor:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        li.viewPoint = { -15.847, 16.593, 234.267 };
+                        li.viewPointSound = true;
+                        break;
+                    }
+                    case EventCodes::BoatPartFound:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+                        auto& txti = em.getSingleton<TextInfo>();
+
+                        auto& boatPart = *em.getEntityByID(li.boatPartFound);
+                        auto& bc = em.getComponent<BoatComponent>(boatPart);
+
+
+                        plfi.boatParts.push_back(bc.part);
+                        em.getSingleton<SoundSystem>().sonido_recoger_pieza();
+                        std::string part;
+                        switch (bc.part)
+                        {
+                        case BoatParts::Base:
+                        {
+                            part = "el casco";
+                            break;
+                        }
+                        case BoatParts::Motor:
+                        {
+                            part = "el motor";
+                            break;
+                        }
+                        case BoatParts::Propeller:
+                        {
+                            part = "la hélice";
+                            break;
+                        }
+                        case BoatParts::SteeringWheel:
+                        {
+                            part = "el timón";
+                            break;
+                        }
+                        }
+                        std::string msg = "¡Has encontrado " + part + " de la barca!";
+                        txti.addText({ SpeakerType::NONE, msg });
+
+                        li.insertDeath(li.boatPartFound);
+
+                        if (plfi.boatParts.size() == 4)
+                        {
+                            //em.getSingleton<SoundSystem>().sonido_recoger_pieza();
+                            vec3d pos{ -126.872, 7.0, 24.918 };
+                            li.viewPoint = pos;
+                            li.events.insert(EventCodes::BoatDialog);
+
+                            auto& newBoat{ em.newEntity() };
+                            em.addTag<BoatTag>(newBoat);
+                            em.addComponent<RenderComponent>(newBoat, RenderComponent{ .position = pos, .scale = { 1.0, 1.0, 1.0 }, .color = WHITE, .orientation = 0.0, .rotationVec = { 0.0, 1.0, 0.0 } });
+                        }
+
+                        break;
+                    }
+                    case EventCodes::BoatDialog:
+                    {
+                        auto& txti = em.getSingleton<TextInfo>();
+
+                        std::array<std::string, 2> msgs =
+                        {
+                            "¡Has encontrado todas las partes de la barca!",
+                            "¡Ahora podréis salir del volcán!"
+                        };
+
+                        for (const auto& msg : msgs)
+                            txti.addText({ SpeakerType::NONE, msg });
+
+                        auto& li = em.getSingleton<LevelInfo>();
+                        li.investigatorstartwalk = true;
+                        using CMPs = MP::TypeList<PhysicsComponent, NPCComponent>;
+                        using npcTAG = MP::TypeList<NPCTag>;
+
+                        em.forEach<CMPs, npcTAG>([&](Entity&, PhysicsComponent& phy, NPCComponent& npc)
+                        {
+                            if (npc.type == NPCType::INVESTIGATOR)
+                            {
+                                npc.pathIt_inestigador = npc.path_investigador.begin();
+                                phy.position = { 27.2022,14,-104.252 };
+                                npc.tp = true;
+                            }
+                        });
+
+                        break;
+                    }
+                    case EventCodes::NPCDialog:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        if (li.npcToTalk == li.max)
+                            break;
+
+                        auto& npc = *em.getEntityByID(li.npcToTalk);
+                        auto& dc = em.getComponent<DispatcherComponent>(npc);
+
+                        if (dc.eventCodes.size() > 1)
+                        {
+                            auto& lc = em.getComponent<ListenerComponent>(e);
+                            for (std::size_t i = 1; i < dc.eventCodes.size(); i++)
+                            {
+                                scheduleEvent(Event{ static_cast<EventCodes>(dc.eventCodes[i]) });
+                                lc.addCode(static_cast<EventCodes>(dc.eventCodes[i]));
+                            }
+                        }
+
+                        li.npcToTalk = li.max;
+                        break;
+                    }
+                    case EventCodes::DialogPrisonNomad1:
+                    {
+                        auto& txti = em.getSingleton<TextInfo>();
+
+                        std::array<std::pair<SpeakerType, std::string>, 9> msgs =
+                        {
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nSaludos, no esperaba encontrarme a un \naprendiz de mago por aquí."),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \nBuenas! Sabes qué son todos estos enemigos?\nNo aparecían en los libros que estudié."),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nCuanto más se debilita la barrera más enemigos \nentran al mundo, cosa del viejo."),
+                            std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \n¿Qué viejo?"),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nEl pellejo."),
+                            std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \nEspera, ¿¿no será el gran mago??"),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nEse mismo"),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \nEse es mi maestro! \nMe abandonó y me encomendó que lo encontrara."),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nSi eres el aprendiz del viejo sabrás utilizar esto.")
+                        };
+
+                        // Metemos el texto en el array de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        events.push_back(Event{ EventCodes::DialogPrisonNomad2 });
+                        out = true;
+                        break;
+                    }
+                    case EventCodes::DialogPrisonNomad2:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        auto& txti = em.getSingleton<TextInfo>();
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+
+                        std::array<std::pair<SpeakerType, std::string>, 2> msgs =
+                        {
+                            std::make_pair(SpeakerType::NONE, "¡Haz recibido un pergamino con la formulación \npara crear una pompa de agua!"),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nCon esto podremos salir de aquí por si disparas a esa puerta. \nLos muñecos de por medio te servirán de práctica.")
+                        };
+
+                        // Le damos el hechizo
+                        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 3 };
+                        plfi.addSpell(spell);
+                        plfi.showBook = true;
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        li.viewPoint = { -84.847, 8.0, 234.267 };
+
+                        auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+                        playerPhy.notMove = false;
+                        break;
+                    }
+                    case EventCodes::DialogNomadVolcano1:
+                    {
+                        auto& txti = em.getSingleton<TextInfo>();
+                        std::array<std::pair<SpeakerType, std::string>, 3> msgs =
+                        {
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nTú de nuevo, gracias por sacarme de esa mazmorra.\n ¿Ves los charcos de lava de alrededor?"),
+                            std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \nSí, pero no puedo apagarlos con mi agua. \nY tengo que cruzarlos."),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \n¿Qué te enseñó el viejo ese? \n Toma, usa esto te ayudará con la lava.")
+                        };
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        events.push_back(Event{ EventCodes::DialogNomadVolcano2 });
+                        out = true;
+                        break;
+                    }
+                    case EventCodes::DialogNomadVolcano2:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        auto& txti = em.getSingleton<TextInfo>();
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+
+                        std::array<std::pair<SpeakerType, std::string>, 2> msgs =
+                        {
+                            std::make_pair(SpeakerType::NONE, "¡Haz recibido un pergamino con la formulación \npara hacer una esquiva de agua!"),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nCon esto podrás cruzar los charcos de lava. \n¡Buena suerte, yo solo necesito mis buenas patas para cruzar!")
+                        };
+
+                        // Le damos el hechizo
+                        Spell spell{ "Dash de agua", "Esquivas a la velocidad de la marea", Spells::WaterDash, 20.0, 1 };
+                        plfi.addSpell(spell);
+                        plfi.showBook = true;
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+                        playerPhy.notMove = false;
+                        break;
+                    }
+                    case EventCodes::DialogCatVolcano1:
+                    {
+                        auto& txti = em.getSingleton<TextInfo>();
+                        std::array<std::pair<SpeakerType, std::string>, 14> msgs =
+                        {
+                            std::make_pair(SpeakerType::CAT, "Gato: \n¡Miau! ¡Miau! ¡Miau!"),
+                            std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \n¿Qué dices? ¿Qué quieres decirme?"),
+                            std::make_pair(SpeakerType::CAT, "Gato: \n¿Acaso no hablas gatuno? Qué falta de respeto"),
+                            std::make_pair(SpeakerType::PLAYER_DANGER, "Mago: \nLo siento, le pediré a mi maestro que me lo enseñe."),
+                            std::make_pair(SpeakerType::CAT, "Gato: \nNo te preocupes niño, si me estaba quedando contigo. \nSoy un investigador"),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \n¡Ah vale! Oye, ¿sabes cómo salir de aquí? \nTengo que encontrar a mi maestro."),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nNo eres el único que quiere salir de aquí."),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nIgual deberías de preocuparte más por el volcán\n a punto de estallar que de tu maestro."),
+                            std::make_pair(SpeakerType::PLAYER_DANGER, "Mago: \n¿¡Quéeeee!? ¡¿Estallar!? ¡¿Cómo?!"),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nAsí es, pero no te alarmes, porque me vas a ayudar a \nreconstruir mi barca para salir de aquí."),
+                            std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \n¿Una barca?"),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nEfectivamente, los monstruos me desperdigaron \nlas piezas por todo el lugar."),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nAyúdame a recuperarlas\ny saldremos de aquí antes de la explosión."),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \n¡Entiendo, déjalo en mis manos!")
+                        };
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        scheduleEvent(Event{ EventCodes::InitBoatParts });
+                        out = true;
+                        break;
+                    }
+                    case EventCodes::DialogCatVolcano2:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        auto& txti = em.getSingleton<TextInfo>();
+                        std::array<std::pair<SpeakerType, std::string>, 5> msgs =
+                        {
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \n¡Miau! ¡Miau! ¡Miau!"),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \nNo me vuelves a pillar con esa"),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nBuen trabajo, ahora vamos a salir de aquí\n He terminado las reparaciones"),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \n¡Perfecto!"),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nPero antes toma una recompensa por tu trabajo")
+                        };
+
+                        li.npcflee = true;
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        scheduleEvent(Event{ EventCodes::DialogCatVolcano3 });
+                        out = true;
+                        break;
+                    }
+                    case EventCodes::DialogCatVolcano3:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+                        auto& txti = em.getSingleton<TextInfo>();
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+
+                        std::array<std::pair<SpeakerType, std::string>, 2> msgs =
+                        {
+                            std::make_pair(SpeakerType::NONE, "¡Haz recibido un pergamino con la formulación \npara hacer una bola de fuego!"),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nCon esto y un bizcocho, nos largamos de aquí.")
+                        };
+
+                        // Le damos el hechizo
+                        Spell spell{ "Bola de fuego", "Tiras una poderosa bola de destrucción", Spells::FireBall, 20.0, 4 };
+                        plfi.addSpell(spell);
+                        plfi.showBook = true;
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+                        playerPhy.notMove = false;
+                        break;
+                    }
+                    case EventCodes::DialogNomadVolcano3:
+                    {
+                        auto& txti = em.getSingleton<TextInfo>();
+
+                        std::array<std::pair<SpeakerType, std::string>, 6> msgs =
+                        {
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nYa os queríais largar sin mi, ¿eh?\n¿Acaso no os importa mi vida?"),
+                            std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \n¡Lo siento! Iba a buscarte cuando has aparecido."),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nCasi se me queman las semillas \npasando por la lava, a ver \n si tenéis un poco de respeto."),
+                            std::make_pair(SpeakerType::PLAYER_DANGER, "Mago: \nLo siento mucho por tus semillas."),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nBueno venga, vámonos de aquí."),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \n¡Miau! ¡Miau! ¡Miau!")
+                        };
+
+                        // Metemos el texto en el stack de texto
+                        for (std::size_t i = 0; i < msgs.size(); i++)
+                            txti.addText(msgs[i]);
+
+                        scheduleEvent(Event{ EventCodes::TPBoat });
+                        out = true;
+                        break;
+                    }
+                    case EventCodes::InitBoatParts:
+                    {
+                        // Ponemos a true la variable de enseñar número las piezas de barco
+                        auto& li = em.getSingleton<LevelInfo>();
+                        li.volcanoMission = true;
+                        break;
+                    }
+                    case EventCodes::TPBoat:
+                    {
+                        auto& li = em.getSingleton<LevelInfo>();
+
+                        using CMPs = MP::TypeList<PhysicsComponent>;
+                        using npcTAG = MP::TypeList<NPCTag>;
+
+                        em.forEach<CMPs, npcTAG>([&](Entity&, PhysicsComponent& phy)
+                        {
+                            phy.position = { -126.872, 7.0, 24.918 };
+                        });
+
+                        auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+                        playerPhy.position = { -126.872, 7.0, 24.918 };
+
+                        break;
+                    }
+                    default:
+                        break;
                     }
                 }
             });

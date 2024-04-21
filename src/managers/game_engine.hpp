@@ -25,7 +25,7 @@ namespace ENGI {
 
             // Variable para el update del frame
             int frameCounter{ 0 };
-            int frameDelay{ 25 };
+            int frameDelay{ 13 };
         };
 
         using CL = MP::TypeList<PhysicsComponent, RenderComponent>;
@@ -54,6 +54,7 @@ namespace ENGI {
         void beginMode3D();
         void endMode3D();
         void drawLine3D(vec3d startPos, vec3d endPos, Color color);
+        void drawPoint3D(vec3d pos, Color color);
         void drawCube(vec3d pos, float width, float height, float lenght, Color color);
         void drawCubeWires(vec3d pos, float width, float height, float lenght, Color color);
         void drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
@@ -65,6 +66,7 @@ namespace ENGI {
         void drawRectangleLinesEx(Rectangle rec, float lineThick, Color color);
         void drawRectangleRec(Rectangle rec, Color color);
         void drawTexture(Texture2D texture, int posX, int posY, Color tint);
+        void drawTexture(Texture2D texture, int posX, int posY, Color tint, float scale);
         void drawCircle(int posX, int posY, float radius, Color color);
         void drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color);
         void drawTriangle(vec2d v1, vec2d v2, vec2d v3, Color color);
@@ -132,6 +134,8 @@ namespace ENGI {
         void updateGif(Gif& anim);
         void unloadGifsAndTextures();
         void setReplayMode(bool replay, GameData& gd);
+        double getTime();
+        float getAspectRat();
 
         std::map<std::string, Texture2D> textures;
         std::map<std::string, Gif> gifs;

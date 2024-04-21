@@ -17,6 +17,11 @@
 #include "../components/angrybush_component.hpp"
 #include "../components/dispatcher_component.hpp"
 #include "../components/oneuse_component.hpp"
+#include "../components/ladder_component.hpp"
+#include "../components/message_component.hpp"
+#include "../components/boat_component.hpp"
+#include "../components/particle_component.hpp"
+#include "../components/spawn_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
 #include "../components/navmesh_component.hpp"
@@ -38,6 +43,7 @@
 #include "./sngtn/text_info.hpp"
 #include "./sngtn/navmesh_info.hpp"
 #include "./sngtn/zonecheck_info.hpp"
+#include "./sngtn/frustum_info.hpp"
 
 // GameData
 #include "../utils/sngtn/GameData.hpp"
@@ -49,10 +55,15 @@
 
 // Constants
 static constexpr double K_PI = 3.14159265358979323846;
-static constexpr float DEGTORAD = static_cast<float>(K_PI / 180.0);
-static constexpr float timeStep = 1.0f / 30.0f;  // Actualiza el juego 30 veces por segundo
-static constexpr float timeStep60 = 1.0f / 60.0f;  // Actualiza el juego 60 veces por segundo
-
+static constexpr double DEGTORAD = static_cast<double>(K_PI / 180.0);
+static constexpr float timeStep30 = 1.0f / 30.0f;  // Actualiza el juego 30 veces por segundo
+static constexpr float timeStep = 1.0f / 60.0f;  // Actualiza el juego 60 veces por segundo
+static constexpr float timeStep120 = 1.0f / 120.0f;  // Actualiza el juego 120 veces por segundo
+static constexpr float timeStep240 = 1.0f / 240.0f;  // Actualiza el juego 240 veces por segundo
+static constexpr float timeStep360 = 1.0f / 360.0f;  // Actualiza el juego 360 veces por segundo
+static constexpr float timeStep480 = 1.0f / 480.0f;  // Actualiza el juego 480 veces por segundo
+static constexpr double timeStepDouble = 1.0 / 60.0;  // Actualiza el juego 60 veces por segundo
+static constexpr double timeStepDouble240 = 1.0 / 240.0;  // Actualiza el juego 240 veces por segundo
 // Forward Declarations
 namespace ENGI { struct GameEngine; }
 
@@ -61,7 +72,6 @@ struct PlayerTag {};
 struct EnemyTag {};
 struct HitPlayerTag {};
 struct GroundTag {};
-struct WaterTag {};
 struct WallTag {};
 struct ObjectTag {};
 struct ZoneTag {};
@@ -95,6 +105,20 @@ struct LeverTag {};
 struct NoKeyTag {};
 struct NPCTag {};
 struct LevelChangeTag {};
+struct CoinTag {};
+struct WaterBombTag {};
+struct NomadTag {};
+struct LavaTag {};
+struct LadderTag {};
+struct SignTag {};
+struct TableTag {};
+struct InvestigatorTag {};
+struct MissionObjTag {};
+struct BoatTag {};
+struct ObstacleTag {};
+struct FireBallTag {};
+struct SnowBallTag {};
+struct MagmaBallTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -120,14 +144,18 @@ using CL = MP::TypeList <
     DispatcherComponent,
     Navmesh,
     OneUseComponent,
-    NPCComponent
+    NPCComponent,
+    LadderComponent,
+    MessageComponent,
+    BoatComponent,
+    ParticleMakerComponent,
+    SpawnComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,
     EnemyTag,
     HitPlayerTag,
     GroundTag,
-    WaterTag,
     WallTag,
     ObjectTag,
     ZoneTag,
@@ -159,9 +187,23 @@ using TL = MP::TypeList <
     LeverTag,
     NoKeyTag,
     NPCTag,
-    LevelChangeTag
+    LevelChangeTag,
+    CoinTag,
+    WaterBombTag,
+    FireBallTag,
+    NomadTag,
+    LavaTag,
+    LadderTag,
+    SignTag,
+    TableTag,
+    InvestigatorTag,
+    MissionObjTag,
+    BoatTag,
+    ObstacleTag,
+    SnowBallTag,
+    MagmaBallTag
 > ;
-using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem>;
+using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem, FrustumInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;
@@ -169,3 +211,6 @@ using deathSet = std::set<std::size_t, std::greater<std::size_t>>;
 using mapType = rapidjson::Document;
 using valueType = rapidjson::Value;
 using mapSizeType = rapidjson::SizeType;
+using Effects = ParticleMakerComponent::ParticleEffect;
+using FrustPos = FrustumInfo::Position;
+using FrustOut = MP::TypeList<GroundTag, NPCTag>;

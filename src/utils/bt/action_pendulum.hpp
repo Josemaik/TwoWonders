@@ -21,12 +21,12 @@ struct BTAction_Pendulum : BTNode_t {
                     abc.angrySoundOneTime = true;
                 }
                 else {
-                    ectx.ai->plusdeltatime(ectx.deltatime, ectx.ai->elapsed_stop);
+                    ectx.ai->plusDeltatime(ectx.deltaTime, ectx.ai->elapsed_stop);
                     if (abc.angrySound)
                     {
                         auto& li = ectx.em.getSingleton<LevelInfo>();
-                        auto& playerPos = ectx.em.getComponent<PhysicsComponent>(*ectx.em.getEntityByID(li.playerID)).position; 
-                        if( playerPos.distance(ectx.phy.position) < 28.0 )
+                        auto& playerPos = ectx.em.getComponent<PhysicsComponent>(*ectx.em.getEntityByID(li.playerID)).position;
+                        if (playerPos.distance(ectx.phy.position) < 28.0)
                             ectx.em.getSingleton<SoundSystem>().sonido_piedras_golpe();
                         abc.angrySound = false;
                     }
@@ -40,7 +40,9 @@ struct BTAction_Pendulum : BTNode_t {
                 }
 
                 ectx.phy.velocity = { abc.vel.x() * ectx.phy.max_speed, 0.0, abc.vel.z() * ectx.phy.max_speed };
-                ectx.phy.max_speed += 0.1;
+
+                if (ectx.phy.max_speed < 3.0)
+                    ectx.phy.max_speed += 0.1;
                 return BTNodeStatus_t::success;
             }
 

@@ -3,6 +3,8 @@
 #include "resource.hpp"
 
 #include <string>
+#include <cstring>
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -10,20 +12,23 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-enum struct ShaderType { COLOR, TEXTURE, TEXTURE3D };
-
 struct Shader : public Resource {
 public:
-    GLuint id_shader;
-    ShaderType type;
-
-    // reads and build the shader
-    Shader();
-    Shader(std::size_t, const char*, const char*, ShaderType);
+    Shader(std::size_t, const char*, const char*);
+    ~Shader(){ unload(); };
 
     void use();
-
-    bool load() override { return true; };
+    bool load(const char* filePath) override;
     void unload() override;
-    bool isLoaded() const override { return true; };
+
+    // Getters
+
+    GLuint getIDShader(){ return m_idShader; };
+
+private:
+    GLuint m_idShader;
+    const char* m_vertexPath;
+    const char* m_fragmentPath;
+
+    void setup() override;
 };

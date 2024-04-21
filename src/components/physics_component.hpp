@@ -1,14 +1,6 @@
 #pragma once
 #include "utils/vec3D.hpp"
 
-struct PreviousPhysicsState
-{
-    vec3d position{};
-    vec3d velocity{};
-    vec3d scale{};
-    double orientation{ 0.0 };
-};
-
 struct PhysicsComponent
 {
     static constexpr double KGravity{ 1.0 };
@@ -16,18 +8,31 @@ struct PhysicsComponent
     static constexpr double KMaxVy{ 0.5 };
     static constexpr double MAX_SPEED{ 2.0 };
 
+    void lookAt(vec3d& target)
+    {
+        vec3d direction = target - position;
+        orientation = atan2(direction.x(), direction.z());
+    }
+
+    void moveAt(vec3d& targetVec)
+    {
+        // Se moverá en dirección al targetVec y se parará cuando esté a una distancia de 5
+        vec3d direction = targetVec - position;
+        direction.normalize();
+        velocity = direction / 2;
+        target = targetVec;
+    }
+
     vec3d position{};
     vec3d velocity{};
     vec3d scale{};
 
-    PreviousPhysicsState previousState{};
-
     double gravity{ KGravity };
-    bool alreadyGrounded{ false };
     bool onRamp{ false };
 
     // Ángulo del vector con respecto al eje de origen
     double orientation{ 0.0 };
+    double orientationonrespawn{ 0.0 };
     //vector de rotacion
     vec3d rotationVec{ 0.0, 0.1, 0.0 };
 
@@ -40,14 +45,15 @@ struct PhysicsComponent
     bool dragActivated{ false };
     //rozamiento por ataque melee de golem
     bool dragActivatedTime{ false };
-    double countdown_sttuned{ 6.0 }; // seconds
-    double elapsed_stunned{ 1.0 };
+    float countdown_sttuned{ 3.0f }; // seconds
+    float elapsed_stunned{ 0.5f };
 
-    bool stopped{ false };
-    double countdown_stopped{ 0.7 };
-    double elapsed_stopped{ 0.0 };
+    bool stopped{ false }, notMove{ false };
+    float countdown_stopped{ 0.35f }, elapsed_stopped{ 0.0f };
+    float countdown_afterStop{ 0.5f }, elapsed_afterStop{ countdown_afterStop };
+    vec3d target{};
 
-    void plusdeltatime(double deltaTime, double& elapsed) { elapsed += deltaTime; };
+    void plusDeltatime(float deltaTime, float& elapsed) { elapsed += deltaTime; };
 
     static constexpr double kDrag{ 3.0 };
 };

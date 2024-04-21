@@ -1,11 +1,11 @@
 #include "object_system.hpp"
 
-void ObjectSystem::update(EntityManager& em, float deltaTime) {
+void ObjectSystem::update(EntityManager& em) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ObjectComponent& obj)
     {
-        if (obj.decreaseLifeTime(deltaTime) && (!obj.inmortal))
+        if (obj.decreaseLifeTime(timeStep) && (!obj.inmortal))
         {
             if (obj.type == ObjectType::BombExplode || obj.type == ObjectType::Heal_Spell)
                 obj.effect();
@@ -74,7 +74,7 @@ void ObjectSystem::update(EntityManager& em, float deltaTime) {
                     life.increaseMaxLife();
                     life.increaseLife(4);
                     // FIXME: Crashea el juego
-                     em.getSingleton<SoundSystem>().sonido_aum_vida_max();
+                    em.getSingleton<SoundSystem>().sonido_aum_vida_max();
                 }
                 break;
             }
@@ -197,9 +197,12 @@ void ObjectSystem::createObjects(EntityManager& em)
     // Se crean los objetos del vector
     for (auto& [obj, pos] : toCreate)
     {
+        // Se crea el nuevo objeto
+        auto& e{ em.newEntity() };
         Color color{};
         vec3d scl{ 1.5, 1.5, 1.5 };
         bool inmortal = false;
+        bool visible = true;
 
         switch (obj)
         {
@@ -210,6 +213,7 @@ void ObjectSystem::createObjects(EntityManager& em)
         }
         case ObjectType::Coin:
         {
+            em.addTag<CoinTag>(e);
             color = YELLOW;
             break;
         }
@@ -223,18 +227,39 @@ void ObjectSystem::createObjects(EntityManager& em)
             color = SKYBLUE;
             break;
         }
-        case ObjectType::Sword:
+        case ObjectType::Basic_Staff:
         {
             color = GRAY;
-            scl = { 1.5, 0.3, 0.3 };
+            scl = { 10.5, 10.3, 10.3 };
             inmortal = true;
+            visible = false;
+
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            plfi.hasStaff = true;
             break;
         }
         case ObjectType::Key:
         {
             color = GOLD;
-            scl = { 1.5, 0.3, 0.3 };
+            scl = { 10.5, 10.3, 10.3 };
             inmortal = true;
+            visible = false;
+            break;
+        }
+        case ObjectType::ShopItem_ExtraLife:
+        {
+            color = RED;
+            scl = { 10.5, 10.5, 10.5 };
+            inmortal = true;
+            visible = false;
+            break;
+        }
+        case ObjectType::Coin30:
+        {
+            color = RED;
+            scl = { 10.5, 10.5, 10.5 };
+            inmortal = true;
+            visible = false;
             break;
         }
         case ObjectType::Fire_Spell:
@@ -244,18 +269,55 @@ void ObjectSystem::createObjects(EntityManager& em)
             inmortal = true;
             break;
         }
+        case ObjectType::GoodBoots:
+        {
+            color = GREEN;
+            scl = { 10.5, 10.5, 10.5 };
+            inmortal = true;
+            visible = false;
+
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            plfi.hasBoots = true;
+
+            Item boots = { "Botas de la suerte", "Botas que te hacen correr más rápido" };
+            break;
+        }
+        case ObjectType::RegularHat:
+        {
+            color = GREEN;
+            scl = { 10.5, 10.5, 10.5 };
+            inmortal = true;
+            visible = false;
+
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            plfi.hasHat = true;
+
+            Item boots = { "Sombrero de Mago", "Te ayuda a canalizar mejor tu uso de magia" };
+            break;
+        }
+        case ObjectType::AttackUpgrade:
+        {
+            color = RED;
+            scl = { 10.5, 10.5, 10.5 };
+            inmortal = true;
+            visible = false;
+
+            auto& plfi = em.getSingleton<PlayerInfo>();
+            plfi.attackUpgrade = true;
+            break;
+        }
 
         default:
             break;
         }
 
-        // Se crea el nuevo objeto
-        auto& e{ em.newEntity() };
         em.addTag<ObjectTag>(e);
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = scl, .color = color });
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = scl, .color = color, .visible = visible });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale });
-        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::OBJECT });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = obj, .inmortal = inmortal });
+        if (visible)
+            em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::OBJECT, .maxParticles = 6, .spawnRate = 0.1f, .lifeTime = 0.4f });
     }
 
     // Limpiamos el vector

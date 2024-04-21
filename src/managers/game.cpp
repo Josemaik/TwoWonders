@@ -1,6 +1,7 @@
 #include "game.hpp"
+#include <iomanip>
 // #include "../utils/memory_viewer.hpp"
-#include <chrono>
+// #include <chrono>
 
 void Game::createShield(Entity& ent)
 {
@@ -49,35 +50,41 @@ void Game::createEntities()
     // -125, 4.0, 138.68 - `pos chunck 3
     // 7.0, 22.0, -21.0 - Posición Incial lvl1
     // -68.0, 4.0, -22.0 - Primera rampa lvl1
-    // -6.0, 4.0, 94.0 - Campamento lvl1
     // -126.0, 4.0, 152.0 - Segundo altar lvl1
+    // -6.0, 4.0, 94.0 - Campamento lvl1
     // 34.0, 13.0, 99.0 - Pasillo antes segundo campamento lvl1
     // 30.0, 13.0, 213.0 - Segundo campamento lvl1
     // -26.0, 4.0, 235.0 - NPC lvl1
     // -113.0, 13.0, 236.0 - Final lvl1
+    // 46.0, 13.0, 86.9 - pasillo nivel 1
+    // -28.0, 49.0, -30.0 - Posición Incial lvl2
+    // 34.0, 29.0, -60.0 - Segunda rampa lvl2
+    // -7.55, 40.0, 16.0 - Lugar donde muñeco de nieve lvl2
+    // 37.0, 13.0, -104.0 - Desp segunda lava lvl2
+    // -95.0, 22.0, -135.0 - Spawn lvl2
+    // -30.24, 49.0, -26.59 - Spawn crater lvl2
+    // -58.26,31.0,16.54 - spawn ramp muñeco
+    // 40.0, 50.0, -3.0 - Nomada lvl2
 
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 4.0, 2.0 }, .color = WHITE });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 6.0, 2.0 }, .color = WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
+    // p.gravity = 0;
 
-    auto& lis = em.addComponent<ListenerComponent>(e);
     em.addComponent<InputComponent>(e);
-    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 7 });
+    em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e);
+    // em.addComponent<AttackComponent>(e);
+    auto& lis = em.addComponent<ListenerComponent>(e);
 
     // Listeners de eventos para el jugador
-    lis.addCode(EventCodes::SpawnDungeonKey);
-    lis.addCode(EventCodes::OpenChest);
-    lis.addCode(EventCodes::SetSpawn);
-    lis.addCode(EventCodes::OpenDoor);
-    lis.addCode(EventCodes::NPCDialog);
-    lis.addCode(EventCodes::DialogFirstSpawn);
+    for (auto i = 0; i < EventCodes::MAX; i++)
+        lis.addCode(static_cast<EventCodes>(i));
 
     // Código de añadir un hechizo al jugador
-    // Spell spell{ "Fireball", "Shoots a fireball", Spells::WaterBomb, 20.0, 2 };
+    // Spell spell{ "Fireball", "Shoots a fireball", Spells::WaterDash, 20.0, 2 };
     // plfi.addSpell(spell);
 
     // Código de añadir un objeto poción al inventario
@@ -110,14 +117,12 @@ void Game::run()
 
     // Codigo para medir el tiempo de ejecucion
     //
-    // - Descomentar estas líneas y dejarlas ahí
-    //
     // - Colocar antes de donde se quiere medir el tiempo
     // auto t1 = high_resolution_clock::now();
-    //
     // - Colocar despues de donde se quiere medir el tiempo
     // auto t2 = high_resolution_clock::now();
-    // duration<float, std::milli> duration = t2 - t1;
+    // auto duration = duration_cast<milliseconds>(t2 - t1);
+    // std::cout << "Collision System: " << duration.count() << "ms" << std::endl;
 
     // Singletons
     auto& li = em.getSingleton<LevelInfo>();
@@ -133,7 +138,7 @@ void Game::run()
     auto& sound_system = em.getSingleton<SoundSystem>();
 
     // Incializamos FPSs
-    engine.setTargetFPS(120);
+    engine.setTargetFPS(60);
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
@@ -152,33 +157,36 @@ void Game::run()
 
     gami.setRandomSeed(seed);
     engine.setReplayMode(li.replay, gami);
-
-    // Variable tiempo para saber cuánto dura la ejecución del juego
-    auto gameStart = high_resolution_clock::now();
-    gami.setStartTime(gameStart);
+    sound_system.setVolumeMaster(0.3f);
 
     // Inicializa una variable donde tener el tiempo entre frames
-    float currentTime{}, elapsed{};
+    float currentTime{};
+    float elapsed{};
+    bool debugs{ false }, resets{ false };
 
     createSound();
     attack_system.setCollisionSystem(&collision_system);
 
     while (!li.gameShouldEnd)
     {
-        elapsed += engine.getFrameTime();
+        elapsed += timeStep120;
+        gami.updateFrame();
 
         switch (li.currentScreen)
         {
-
             // CODIGO DE LA PANTALLA DE LOGO DE EMPRESA
         case GameScreen::LOGO:
         {
+            if (li.playerID == li.max)
+                createEntities();
             // Contador para que pasen X segundos
-            currentTime += timeStep60;
-            if (currentTime > 4.0f) {
+            currentTime += timeStep;
+            if (currentTime > 4.0 || inpi.interact) {
                 li.currentScreen = GameScreen::TITLE;
                 currentTime = 0;
+                inpi.interact = false;
             }
+            input_system.update(em, engine);
             render_system.drawLogoKaiwa(engine);
             break;
         }
@@ -190,14 +198,27 @@ void Game::run()
                 sound_system.playMusicMenu();
                 sound_system.music_started = true;
             }
+            input_system.update(em, engine);
             render_system.drawLogoGame(engine, em, sound_system);
+            if (li.playerID == li.max)
+                createEntities();
             break;
         }
 
         // CODIGO DE LA PANTALLA DE OPCIONES
         case GameScreen::OPTIONS:
         {
+            input_system.update(em, engine);
             render_system.drawOptions(engine, em, sound_system);
+            break;
+        }
+
+        // CODIGO DE LA PANTALLA DE CONTROLES
+        case GameScreen::CONTROLS:
+        {
+            input_system.update(em, engine);
+            // render_system.update(em, engine);
+            render_system.drawControls(em, engine);
             break;
         }
 
@@ -212,12 +233,16 @@ void Game::run()
         case GameScreen::STORY:
         {
             // Input del enter para empezar la partida
-            if (input_system.pressEnter(engine))
+            if (inpi.interact)
+            {
                 li.currentScreen = GameScreen::GAMEPLAY;
+                inpi.interact = false;
+            }
+            input_system.update(em, engine);
             render_system.drawStory(engine);
 
-            if (li.playerID == li.max)
-                createEntities();
+            if (li.replay)
+                gami.update();
 
             // TODO - Cuando se implemente el sistema de guardado, cargar el nivel en el que se quedó
             if (!map.isComplete())
@@ -236,22 +261,32 @@ void Game::run()
             if (em.getEntities().empty() || li.resetGame)
                 resetGame();
 
-            if (li.resetFromDeath)
-                resetDeath();
-
             if (!map.isComplete())
             {
                 if (!li.isCharging() && li.loading)
+                {
                     li.loadingTime = 0;
+                    if (!li.replay)
+                    {
+                        auto& gami = em.getSingleton<GameData>();
+                        vec3d vel = { 0.0, 0.0, 0.0 };
+                        gami.addMovementEvent(vel);
+                    }
+                }
                 map.createMap(em, li.mapID, iam);
             }
+            else if (map.isRespawning())
+                map.spawnReset(em, iam);
 
             if (li.isCharging())
                 render_system.drawChargeScreen(engine, em);
 
+            if (li.resetFromDeath)
+                resetDeath();
+
             input_system.update(em, engine);
-            bool debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();
-            bool resets = li.resetGame || li.resetFromDeath;
+            debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();
+            resets = li.resetGame || li.resetFromDeath;
 
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
@@ -260,21 +295,22 @@ void Game::run()
                 {
                     elapsed -= timeStep;
 
-                    ai_system.update(em, timeStep);
-                    npc_system.update(em, timeStep);
-                    physics_system.update(em, timeStep);
+                    ai_system.update(em);
+                    npc_system.update(em);
+                    physics_system.update(em);
                     collision_system.update(em);
-                    zone_system.update(em, engine, iam, evm, map, timeStep);
+                    zone_system.update(em, engine, iam, evm, map);
                     lock_system.update(em);
                     shield_system.update(em);
-                    object_system.update(em, timeStep);
-                    projectile_system.update(em, timeStep);
-                    attack_system.update(em, timeStep);
-                    life_system.update(em, object_system, timeStep);
+                    object_system.update(em);
+                    projectile_system.update(em);
+                    attack_system.update(em);
+                    life_system.update(em, object_system);
                     sound_system.update();
                     // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
-                    camera_system.update(em, engine, timeStep);
+                    camera_system.update(em, engine, evm);
                     event_system.update(em, evm, iam, map, object_system, sound_system);
+                    particle_system.update(em);
 
                     if (!li.getDeath().empty())
                     {
@@ -282,10 +318,10 @@ void Game::run()
                         li.clearDeath();
                     }
                 }
-                render_system.update(em, engine, timeStep);
+                render_system.update(em, engine);
             }
             else if (!resets && debugs)
-                render_system.update(em, engine, timeStep);
+                render_system.update(em, engine);
 
             break;
         }
@@ -315,19 +351,19 @@ void Game::run()
             li.gameShouldEnd = true;
     }
 
-    // Pillamos el tiempo de finalización del juego
-    auto finalTime = high_resolution_clock::now();
-
-    // Calculamos el tiempo que ha durado el juego
-    duration<float, std::milli> dur = finalTime - gameStart;
-
-    gami.setFinalTime(dur);
-
     // Creamos un archivo de salida con los datos de la partida
     // Para hacer replay con este archivo hay que colocarlo en la carpeta assets/data/input
     if (!li.replay)
     {
-        std::ofstream os("assets/data/output/data.cereal", std::ios::binary);
+        std::string name = "assets/data/output/data";
+        // le ponemos la fecha y hora al archivo
+        std::time_t t = std::time(nullptr);
+        std::tm tm = *std::localtime(&t);
+        std::stringstream ss;
+        ss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S");
+        name += ss.str();
+        name += ".cereal";
+        std::ofstream os(name, std::ios::binary);
         cereal::BinaryOutputArchive archive(os);
         archive(CEREAL_NVP(gami));
     }
@@ -373,6 +409,7 @@ void Game::resetGame()
     li.reset();
     plfi.reset();
     lock_system.reset();
+    render_system.resetAnimatedTexture();
     map.reset(em, li.mapID, iam);
     createEntities();
 }

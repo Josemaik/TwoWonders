@@ -32,6 +32,7 @@ struct BBox
     constexpr vec3d size() const { return max - min; }
     constexpr vec3d center() const { return (min + max) / 2.0; }
     bool intersects(const BBox& other) const { return !(max < other.min || min > other.max); }
+    bool intersects(const vec3d& point) const { return point >= min && point <= max; }
 
     // Función para comprobar si un rayo intersecta con la caja delimitadora
     bool intersectsRay(vec3d& rayOrigin, vec3d& rayDirection) const {
@@ -46,7 +47,6 @@ struct BBox
 
         return tNear <= tFar && tFar >= 0;
     }
-
 
     // Función para comprobar si un rayo intersecta y además devuelve el punto de intersección
     bool intersectsRay(vec3d& rayOrigin, vec3d& rayDirection, vec3d& intersectionPoint) const {
@@ -65,6 +65,25 @@ struct BBox
         }
         return false;
     }
+
+    // Función para comprobar si el rayo intersecta y además devuelve el punto de intersección más alejado
+    bool intersectsRay2(vec3d& rayOrigin, vec3d& rayDirection, vec3d& intersectionPoint) const {
+        vec3d t1 = (min - rayOrigin) / rayDirection;
+        vec3d t2 = (max - rayOrigin) / rayDirection;
+
+        vec3d tmin = vec3d::min(t1, t2);
+        vec3d tmax = vec3d::max(t1, t2);
+
+        double tNear = tmin.max();
+        double tFar = tmax.min();
+
+        if (tNear <= tFar && tFar >= 0) {
+            intersectionPoint = rayOrigin + rayDirection * tFar;
+            return true;
+        }
+        return false;
+    }
+
     vec3d getPositiveVertex(const vec3d& normal) const {
         vec3d res = min;
         if (normal.x() >= 0) res.setX(max.x());
@@ -79,6 +98,19 @@ struct BBox
         if (normal.y() >= 0) res.setY(min.y());
         if (normal.z() >= 0) res.setZ(min.z());
         return res;
+    }
+
+    const std::array<vec3f, 8> getCorners() const {
+        return {
+            vec3d(min.x(), min.y(), min.z()).to_other<float>(),
+            vec3d(max.x(), min.y(), min.z()).to_other<float>(),
+            vec3d(max.x(), max.y(), min.z()).to_other<float>(),
+            vec3d(min.x(), max.y(), min.z()).to_other<float>(),
+            vec3d(min.x(), min.y(), max.z()).to_other<float>(),
+            vec3d(max.x(), min.y(), max.z()).to_other<float>(),
+            vec3d(max.x(), max.y(), max.z()).to_other<float>(),
+            vec3d(min.x(), max.y(), max.z()).to_other<float>()
+        };
     }
 };
 

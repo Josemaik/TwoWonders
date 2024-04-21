@@ -5,16 +5,19 @@
 #include <map>
 #include "../utils/types.hpp"
 #include "ia_manager.hpp"
-#include "../utils/pf/Graph.hpp"
 #include "../utils/bt/behaviourtree.hpp"
 #include "../utils/bt/action_patrolNPC.hpp"
 
 enum struct LoadState
 {
+    LOAD_CHUNKS,
     LOAD_GROUND,
     LOAD_WALLS,
-    LOAD_RAMPS_INTERACTABLES,
-    LOAD_OBJECTS_ENEMIES,
+    LOAD_RAMPS,
+    LOAD_INTERACTABLES,
+    LOAD_OBJECTS,
+    LOAD_ENEMIES,
+    LOAD_NPCS,
     LOAD_NAVMESHES,
     LOAD_COMPLETE
 };
@@ -25,6 +28,7 @@ struct MapManager
     void reset(EntityManager& em, uint8_t mapID, Ia_man& iam);
     void changeMap(EntityManager& em, uint8_t mapID, Ia_man& iam);
     void spawnReset(EntityManager& em, Ia_man& iam);
+    bool isRespawning() const { return reSpawn; }
     bool isComplete() const { return state == LoadState::LOAD_COMPLETE; }
 
     template <typename... Tags>
@@ -53,12 +57,17 @@ private:
     void generateNavmeshes(EntityManager& em);
     void addToZone(EntityManager& em, Entity& e, InteractableType type);
     void checkDispatcher(EntityManager& em, Entity& e, const valueType& value);
+    void addMessageCmp(EntityManager& em, Entity& e, const valueType& value);
+    vec3d rotateY(const vec3d& v, double angle);
+    vec3d rotateAroundPoint(const vec3d& point, const vec3d& pivot, double angle);
+    vec3d rotateScale(const vec3d& v, double angle);
 
     std::string fileMap{};
-    std::map<uint8_t, BBox> zoneBounds{};
-    LoadState state{ LoadState::LOAD_GROUND };
+    LoadState state{ LoadState::LOAD_CHUNKS };
     mapType map{};
-    uint8_t unique_ids{ 0 };
+    std::vector<const valueType*> chunksVec{};
+    uint8_t unique_ids{ 0 }, boatParts{ 0 };
+    bool reSpawn{ false };
 
     template <typename... Tags>
     void destroyParts(EntityManager& em)

@@ -25,7 +25,7 @@ struct InputEvent
     }
 
     Type type{};
-    std::chrono::duration<double> timeStamp{};
+    unsigned int timeStamp{};
     bool used{ false };
 };
 
@@ -38,25 +38,21 @@ struct MovementEvent
     }
 
     vec3d vel{};
-    std::chrono::duration<double> timeStamp{};
+    unsigned int timeStamp{};
 };
 
 struct GameData
 {
-    void addInputEvent(InputEvent::Type type, std::chrono::duration<double> timestamp)
+    void addInputEvent(InputEvent::Type type)
     {
-        inputEvents.push_back({ type, timestamp });
+        inputEvents.push_back({ type, currentFrame });
     }
 
-    void addMovementEvent(vec3d& vel, std::chrono::duration<double> timeStamp)
+    void addMovementEvent(vec3d& vel)
     {
-        if (movementEvents.empty())
+        if (movementEvents.empty() || lastVel != vel)
         {
-            movementEvents.push_back({ vel, timeStamp });
-        }
-        else if (lastVel != vel)
-        {
-            movementEvents.push_back({ vel, timeStamp });
+            movementEvents.push_back({ vel, currentFrame });
             lastVel = vel;
         }
     }
@@ -66,25 +62,10 @@ struct GameData
         randomSeed = seed;
     }
 
-    void setStartTime(std::chrono::_V2::system_clock::time_point& time)
-    {
-        startTime = time;
-    }
-
-    void setFinalTime(std::chrono::duration<float, std::milli>& time)
-    {
-        finalTime = time;
-    }
-
-    std::chrono::duration<float, std::milli> getTime()
-    {
-        return std::chrono::duration<float, std::milli>(std::chrono::system_clock::now() - startTime);
-    }
-
     template <class Archive>
     void serialize(Archive& archive)
     {
-        archive(randomSeed, inputEvents, movementEvents, finalTime);
+        archive(randomSeed, inputEvents, movementEvents);
     }
 
     unsigned int getRandomSeed() const
@@ -120,8 +101,7 @@ struct GameData
 
     bool isKeyDown(int key)
     {
-        auto time = getTime();
-        if (currentInput.timeStamp < time && time < finalTime && !currentInput.used)
+        if (currentInput.timeStamp <= currentFrame && !currentInput.used)
             switch (currentInput.type)
             {
             case InputEvent::Type::AttackKeyDown:
@@ -142,8 +122,7 @@ struct GameData
 
     bool isKeyPressed(int key)
     {
-        auto time = getTime();
-        if (currentInput.timeStamp < time && time < finalTime && !currentInput.used)
+        if (currentInput.timeStamp <= currentFrame && !currentInput.used)
             switch (currentInput.type)
             {
             case InputEvent::Type::InteractKeyPressed:
@@ -164,8 +143,7 @@ struct GameData
 
     bool isKeyReleased(int key)
     {
-        auto time = getTime();
-        if (currentInput.timeStamp < time && time < finalTime && !currentInput.used)
+        if (currentInput.timeStamp <= currentFrame && !currentInput.used)
             switch (currentInput.type)
             {
             case InputEvent::Type::EnterReleased:
@@ -221,6 +199,21 @@ struct GameData
         return false;
     }
 
+    unsigned int getCurrentFrame() const
+    {
+        return currentFrame;
+    }
+
+    void updateFrame()
+    {
+        currentFrame += 1;
+    }
+
+    void updateFrameDown()
+    {
+        currentFrame -= 1;
+    }
+
     void setVel(vec3d& vel)
     {
         vel = currentMovement.vel;
@@ -229,10 +222,9 @@ struct GameData
 private:
     void updateCurrentInput()
     {
-        auto time = getTime();
-        if (input_it < inputEvents.size() && time < finalTime)
+        if (input_it < inputEvents.size())
         {
-            if (inputEvents[input_it].timeStamp < time)
+            if (currentFrame >= inputEvents[input_it].timeStamp)
             {
                 currentInput = inputEvents[input_it];
                 input_it += 1;
@@ -242,10 +234,9 @@ private:
 
     void updateCurrentMovement()
     {
-        auto time = getTime();
-        if (movement_it < movementEvents.size() && time < finalTime)
+        if (movement_it < movementEvents.size())
         {
-            if (movementEvents[movement_it].timeStamp < time)
+            if (currentFrame >= movementEvents[movement_it].timeStamp)
             {
                 currentMovement = movementEvents[movement_it];
                 movement_it += 1;
@@ -253,11 +244,9 @@ private:
         }
     }
 
-    unsigned int randomSeed{};
+    unsigned int randomSeed{}, currentFrame{ 0 };
     std::vector<InputEvent> inputEvents{};
     std::vector<MovementEvent> movementEvents{};
-    std::chrono::_V2::system_clock::time_point startTime{};
-    std::chrono::duration<float, std::milli> finalTime{};
     InputEvent currentInput{};
     MovementEvent currentMovement{};
     std::size_t input_it{ 0 }, movement_it{ 0 };

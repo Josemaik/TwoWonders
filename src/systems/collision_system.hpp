@@ -1,7 +1,6 @@
 #pragma once
 #ifndef COLLISION_MANAGER
 #define COLLISION_MANAGER
-#include <unordered_set>
 #include "../utils/Octree.hpp"
 #include "../managers/event_manager.hpp"
 
@@ -45,22 +44,24 @@ struct CollisionSystem
     // Se van a buscar las entidad que tengan estos componentes y tags
     using SYSCMPs = MP::TypeList<PhysicsComponent, ColliderComponent>;
     using SYSTAGs = MP::TypeList<>;
+    using matrixType = std::vector<std::vector<bool>>;
     using pairsType = std::unordered_set<std::pair<std::size_t, std::size_t>, pair_hash, pair_equal>;
+    using pairsType2 = std::set<std::pair<std::size_t, std::size_t>>;
     // using octreeMap = std::unordered_map<std::size_t, std::unordered_set<Octree*>>;
 
     CollisionSystem()
-        : octree(0, BBox(vec3d{ 0.0, 0.0, 0.0 }, vec3d{ 600.0, 50.0, 600.0 })) {}
-
+        : octree(0, BBox(vec3d{ 0.0, 0.0, 0.0 }, vec3d{ 600.0, 200.0, 600.0 })),
+        checkedPairs(EntityManager::MAX_ENTITIES, std::vector<bool>(EntityManager::MAX_ENTITIES, false)) {}
     void update(EntityManager& em);
-    bool checkWallCollision(EntityManager& em, vec3d& pos);
+    bool checkWallCollision(EntityManager& em, vec3d& pos, vec3d& normalDir);
     void setEventManager(EventManager& evm) { this->evm = &evm; }
 private:
-    void checkCollision(EntityManager& em, Octree& boxes, pairsType& checkedPairs);
+    void checkCollision(EntityManager& em, Octree& boxes);
     void handleRampCollision(EntityManager& em);
     void enemyCollision(EntityManager& em, Entity& damagedEntity);
     void staticCollision(PhysicsComponent& playerPhysics, PhysicsComponent& staticPhysics, vec3d& minOverlap);
     void nonStaticCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3d& minOverlap);
-    void groundCollision(PhysicsComponent& playerPhysics, vec3d& playerEsc, vec3d& minOverlap);
+    void groundCollision(PhysicsComponent& playerPhysics, PhysicsComponent& groundPhy, vec3d& minOverlap);
     void floorCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3d& minOverlap);
     void handleCollision(EntityManager& em, Entity& entity1, Entity& entity2, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
     void handleStaticCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
@@ -73,10 +74,11 @@ private:
     void resolvePlayerDirection(PhysicsComponent& playerPhysics, PhysicsComponent& enemyPhy, bool isEnemy);
     template <auto getPos, auto setPos>
     bool resolveCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, double overlap);
+    void resetCollisionsMatrix();
 
     Octree octree;
-    pairsType checkedPairs{};
-    pairsType checkedPairsRamp{};
+    matrixType checkedPairs{};
+    pairsType2 checkedPairsRamp{};
     std::vector<PhysicsComponent*> previousEntsOnRamp{};
     EventManager* evm{ nullptr };
     // void checkBorderCollision(EntityManager& em, Octree& boxes);

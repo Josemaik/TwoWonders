@@ -10,20 +10,49 @@ struct PlayerInfo
     static constexpr std::size_t max = std::numeric_limits<std::size_t>::max();
 
     double increaseLife{ 0.0 };
-    uint16_t coins{}, bombs{}, max_bombs{ 8 };
+    uint16_t coins{}, coinsAdded{}, bombs{}, max_bombs{ 8 };
     float elapsed_limit_coins{ 5.0f }, elapsed_coins{ elapsed_limit_coins };
     double max_mana{ 100.0 }, mana{ max_mana };
-    int mana_width{}, armor{};
+    int mana_width{}, max_armor{ 4 }, armor{};
     bool hasKey{ false };
     bool hasStaff{ false };
+    bool hasBoots{ false };
+    bool hasHat{ false };
     bool onSpawn{ false };
+    bool minusCoins{ false };
+    bool onLadder{ false };
+    bool showBook{ false };
+    bool attackUpgrade{ false };
     std::vector<std::unique_ptr<Item>> inventory{};
     std::vector<Spell> spells{};
-    Spell currentSpell{ "None", "No spell", Spells::None, 0.0, 0 };
+    Spell noSpell{ "None", "No spell", Spells::None, 0.0, 0 };
+    Spell currentSpell{ noSpell };
+    std::array<Spell, 3> spellSlots{ noSpell, noSpell, noSpell };
     std::size_t selectedItem{ max };
     vec3d spawnPoint{};
+    std::vector<BoatParts> boatParts{};
 
-    void addSpell(Spell spell) { spells.push_back(spell); currentSpell = spell; }
+    void addSpell(Spell spell)
+    {
+        spells.push_back(spell);
+        inventory.push_back(std::make_unique<Item>(spell));
+        bool noCurrent{ false };
+        for (auto& slot : spellSlots)
+        {
+            if (slot == noSpell)
+            {
+                slot = spell;
+                noCurrent = true;
+            }
+
+            if (noCurrent)
+                break;
+        }
+
+        if (!noCurrent)
+            spellSlots[0] = spell;
+    }
+
     void changeCurrentSpell()
     {
         auto it = std::find(spells.begin(), spells.end(), currentSpell);
@@ -55,8 +84,21 @@ struct PlayerInfo
     void addCoin(uint16_t add)
     {
         coins += add;
+        coinsAdded = add;
         elapsed_coins = 0.0f;
     }
+
+    void coinDeath()
+    {
+        auto prev = coins;
+        coins = 0;
+
+        // Hacemos la división y si tiene resto se lo sumamos
+        uint16_t rest = prev % 2;
+        addCoin((prev / 2) + rest);
+        minusCoins = true;
+    }
+
     void addKey() { hasKey = true; }
     void addBomb() {
         if (bombs < max_bombs)
@@ -105,6 +147,7 @@ struct PlayerInfo
     {
         mana = max_mana;
         armor = 0;
+        coinDeath();
     }
 
     void reset()
@@ -113,6 +156,7 @@ struct PlayerInfo
         selectedItem = max;
         inventory.clear();
         spells.clear();
+        spellSlots = { noSpell, noSpell, noSpell };
         increaseLife = 0.0;
         armor = 0;
         coins = 0;
@@ -120,7 +164,15 @@ struct PlayerInfo
         max_mana = 100.0;
         mana = max_mana;
         mana_width = 0;
+        onLadder = false;
+        hasStaff = false;
+        hasBoots = false;
+        hasHat = false;
         hasKey = false;
+        onSpawn = false;
+        showBook = false;
+        attackUpgrade = false;
+        boatParts.clear();
         spawnPoint = { 33.0, 4.0, -25.9 };
     }
 };

@@ -3,7 +3,7 @@
 #include <random>
 
 // Cada cuanto se percibe al jugador
-void perception(BlackBoard_t& bb, AIComponent& ai, float dt) {
+void AISystem::perception(BlackBoard_t& bb, AIComponent& ai) {
     // Accumulate delta time still perception time
     // ai.accumulated_dt += dt;
     // if (ai.accumulated_dt <= ai.perceptionTime) return;
@@ -24,11 +24,11 @@ void perception(BlackBoard_t& bb, AIComponent& ai, float dt) {
         }
     }
     else {
-        ai.plusdeltatime(dt, ai.elapsed_perception);
+        ai.plusDeltatime(timeStep, ai.elapsed_perception);
     }
 }
 // Actualizar las IA
-void AISystem::update(EntityManager& em, float dt)
+void AISystem::update(EntityManager& em)
 {
     bool isDetected{ false };
     std::vector<vec3d> enemyPositions{};
@@ -36,13 +36,48 @@ void AISystem::update(EntityManager& em, float dt)
     auto& bb = em.getSingleton<BlackBoard_t>();
     bb.idsubditos.clear();
 
-    em.forEach<SYSCMPs, SYSTAGs>([&, dt](Entity& e, PhysicsComponent& phy, RenderComponent& ren, AIComponent& ai, LifeComponent& lc)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren, AIComponent& ai, LifeComponent& lc)
     {
+        //Ptr a ai y lc
         AIComponent* aiptr = &ai;
         LifeComponent* lcptr = &lc;
         //percibir el entorno
-        perception(bb, ai, dt);
-        // Actualizar datos de los slimes y subditos en blackboard
+        if(e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()){
+            perception(bb, ai);
+        }
+
+        //Actualizar posiciones de la IAs o potenciales targets para calcular Flocking
+        // Comprobamos si el elemento debe procesarse
+        // Más alante hacer que se cumpla si esta a una cierta distancia del player
+        if(e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()){
+            //Si el vector esta vacío, el elemento se inserta
+            bool id_found = false;
+            // Iterar sobre el vector positions
+            if(bb.potencial_targets.size() != 0){
+                for(auto it = bb.potencial_targets.begin(); it != bb.potencial_targets.end(); ++it) {
+                    // Si ya existe ele elemento , se comprueba si esta detectando al player
+                    if(it->first == e.getID()) {
+                        // si lo detecta, actualizamos posición y sino, lo borramos del vector
+                        if(ai.playerdetected){
+                            // Actualizar la posición
+                            it->second = phy.position;
+                            // Marcar que se ha encontrado el ID
+                            id_found = true;
+                        }else{
+                            bb.potencial_targets.erase(it);
+                        }
+                        // Salir del bucle
+                        break;
+                    }
+                }
+            }
+            // Si no se ha encontrado el ID en el vector positions, añadir un nuevo par
+            if(!id_found && ai.playerdetected) {
+                bb.potencial_targets.push_back(std::make_pair(e.getID(), phy.position));
+            }
+        }
+
+        // Actualizar datos de los slimes , subditos y boss en blackboard
         if (e.hasTag<SlimeTag>()) {
             bb.updateInfoSlime(e.getID(), phy.position, lc.life);
         }
@@ -53,12 +88,19 @@ void AISystem::update(EntityManager& em, float dt)
         if (e.hasTag<BossFinalTag>()) {
             bb.updateInfoBoss(phy.position);
         }
+
         //visual debug cone
-        if (e.hasTag<SpiderTag>()) {
-            bb.pos_enemy = phy.position;
-            bb.orientation_enemy = phy.orientation;
-            bb.horizontalFOV = 200.0;
-            bb.VerticalFOV = 80.0;
+        if(e.hasTag<SnowmanTag>()){
+            bb.conesnow.first = phy.position;
+            bb.conesnow.second = phy.orientation;
+        }
+        if(e.hasTag<GolemTag>()){
+            bb.conegolem.first = phy.position;
+            bb.conegolem.second = phy.orientation;
+        }
+        if(e.hasTag<SpiderTag>()){
+            bb.conespider.first = phy.position;
+            bb.conespider.second = phy.orientation;
         }
 
         if (!isDetected && ai.playerdetected)
@@ -71,7 +113,7 @@ void AISystem::update(EntityManager& em, float dt)
             enemyPositions.push_back(phy.position);
 
         if (ai.behaviourTree) {
-            ai.behaviourTree->run({ em,e,aiptr,nullptr,phy,ren,lcptr,dt });
+            ai.behaviourTree->run({ em,e,aiptr,nullptr,phy,ren,lcptr, timeStep });
             return;
         }
     });

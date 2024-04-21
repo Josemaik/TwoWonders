@@ -1,6 +1,6 @@
 #include "camera_system.hpp"
 
-void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
+void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
 {
     // Constantes de los distintos estados de la cámara
     static constexpr vec3d cameraPosSum = { -60.f, 66.f, -60.f };
@@ -17,14 +17,14 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
 
     // Velocidad de la transición
     float t = 0.1f;
+    auto& playerEn = *em.getEntityByID(li.playerID);
 
-    if (li.viewPoint == vec3d::zero())
+    if (playerEn.hasTag<PlayerTag>())
     {
-        auto& playerEn = *em.getEntityByID(li.playerID);
-
-        if (playerEn.hasTag<PlayerTag>())
+        auto& phy = em.getComponent<PhysicsComponent>(playerEn);
+        if (li.viewPoint == vec3d::zero())
         {
-            auto& phy = em.getComponent<RenderComponent>(playerEn);
+
             cameraPos = phy.position + cameraPosSum;
             cameraTar = phy.position;
             cameraFovy = cameraFovyNormal;
@@ -33,6 +33,9 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
             {
                 if (!li.enemyPositions.empty())
                 {
+                    auto& player = *em.getEntityByID(li.playerID);
+                    auto& phy = em.getComponent<PhysicsComponent>(player);
+
                     // Calcular la posición media de los enemigos
                     double x{}, y{}, z{};
                     for (auto& e : li.enemyPositions)
@@ -67,33 +70,46 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
                 cameraFovy = cameraFovyLocked;
             }
         }
-    }
-    else
-    {
-        // Asignamos el punto de vista a la cámara para señalar ahí
-        cameraPos = li.viewPoint + cameraPosSum;
-        cameraTar = li.viewPoint;
-        cameraFovy = cameraFovyCinematic;
-
-        if( li.viewPointSound)
+        else
         {
-            em.getSingleton<SoundSystem>().sonido_movimiento_camara();
-            li.viewPointSound = false;
-        }
-        // La cinematica se desactiva cuando pasan 4 segundos
-        viewPointTime += dt;
-        if (viewPointTime >= viewPointLimit)
-        {
-            viewPointTime = 0.f;
-            li.viewPoint = vec3d::zero();
-        }
+            // Asignamos el punto de vista a la cámara para señalar ahí
+            cameraPos = li.viewPoint + cameraPosSum;
+            cameraTar = li.viewPoint;
+            cameraFovy = cameraFovyCinematic;
 
-        t = 0.05f;
+            if (li.viewPointSound)
+            {
+                em.getSingleton<SoundSystem>().sonido_movimiento_camara();
+                li.viewPointSound = false;
+            }
+
+            if (!phy.notMove)
+                phy.notMove = true;
+
+            // La cinematica se desactiva cuando pasan 4 segundos
+            viewPointTime += timeStep;
+            if (viewPointTime >= viewPointLimit)
+            {
+                viewPointTime = 0.f;
+                li.viewPoint = vec3d::zero();
+                phy.notMove = false;
+
+                if (!li.events.empty())
+                {
+                    for (auto& e : li.events)
+                        evm.scheduleEvent(Event{ static_cast<EventCodes>(e) });
+
+                    li.events.clear();
+                }
+            }
+
+            t = 0.05f;
+        }
     }
 
     if (li.transition)
     {
-        transitionTime += dt;
+        transitionTime += timeStep;
         if (transitionTime >= transitionLimit)
         {
             transitionTime = 0.f;
@@ -117,4 +133,28 @@ void CameraSystem::update(EntityManager& em, ENGI::GameEngine& ge, float dt)
     ge.setPositionCamera(newCameraPos);
     ge.setTargetCamera(newCameraTarget);
     ge.setFovyCamera(newCameraFovy);
+
+    updateFrustum(em, ge, newCameraPos, newCameraTarget, newCameraFovy);
+}
+
+void CameraSystem::updateFrustum(EntityManager& em, GameEngine& ge, vec3d& cameraPos, vec3d& cameraTar, float cameraFovy)
+{
+    // Actualizamos el FrustumInfo de la cámara
+    auto& frustum = em.getSingleton<FrustumInfo>();
+    vec3f cameraUp = ge.getUpCamera().to_other<float>();
+    float aspectRatio = ge.getAspectRat();
+
+    float halfHeight = static_cast<float>(std::tan(((cameraFovy) / 2.0f) * DEGTORAD) * cameraPos.distance(cameraTar));
+    float halfWidth = aspectRatio * halfHeight;
+
+    // Calculate the bounds of the orthographic projection
+    float left = -halfWidth;
+    float right = halfWidth;
+    float bottom = -halfHeight;
+    float top = halfHeight;
+
+    float nearPlane = 0.1f;
+    float farPlane = 100.0f;
+
+    frustum.setFrustum(left, right, bottom, top, nearPlane, farPlane, cameraPos.to_other<float>(), cameraTar.to_other<float>(), cameraUp);
 }

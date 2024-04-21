@@ -13,6 +13,10 @@ struct Path_t{
             if ( ++i >= N) i = 0;
             return *this;
         }
+        // iterator &operator--() {
+        //     if( --i < 0) ++i;
+        //     return *this;
+        // }
         bool operator!=(iterator const& oit) {
             return i != oit.i;
         }
