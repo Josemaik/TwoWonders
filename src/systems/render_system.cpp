@@ -1681,12 +1681,13 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
 
     if (debugIA["editorIA"] == nullptr)
     {
-        debugIA["editorIA"] = engine.dmeg.CreateNode("editorIA", engine.node_scene2D);
+        debugIA["editorIA"] = engine.dmeg.CreateNode("Editor IA", engine.node_scene2D);
         engine.dmeg.CreateTextBox({ 0, 150 }, { 390, 550 }, { 255, 255, 255, 128 }, "Editor IA", engine.dmeg.GetDefaultFont(), 20, D_BLACK, DarkMoon::Aligned::TOP, DarkMoon::Aligned::CENTER, "Editor IA", debugIA["editorIA"]);
-        engine.dmeg.CreateText({ 5, 150 }, "PARÁMETROS", engine.dmeg.GetDefaultFont(), 20, D_RED, "text_parametros", debugIA["editorIA"]);
+        engine.dmeg.CreateLine({ 0, 20 }, { 390, 20 }, D_GRAY, "Linea horizontal", debugIA["editorIA"]);
+        engine.dmeg.CreateText({ 5, 150 }, "PARAMETROS", engine.dmeg.GetDefaultFont(), 20, D_RED, "text_parametros", debugIA["editorIA"]);
     }
 
-    debugIA["neditorIA"]->setVisible(true);
+    debugIA["editorIA"]->setVisible(true);
     // auto& debugsglt = em.getSingleton<Debug_t>();
 
     // [TODO] - RAYCAST

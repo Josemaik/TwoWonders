@@ -295,6 +295,11 @@ namespace DarkMoon {
         return m_rootNode.get();
     }
 
+    // Get mouse ray cast
+    Ray DarkMoonEngine::GetMouseRay(){
+        return m_renderManager.m_camera->getMouseRay(GetMouseX(), GetMouseY(), m_windowsManager.getScreenWidth(), m_windowsManager.getScreenHeight());
+    }
+
     // ------------------------ //
     // Window-related functions //
     // ------------------------ //

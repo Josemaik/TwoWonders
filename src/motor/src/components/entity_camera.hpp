@@ -10,6 +10,11 @@ namespace DarkMoon {
     // Camera projection
     enum struct CameraProjection { CAMERA_PERSPECTIVE, CAMERA_ORTHOGRAPHIC };
 
+    struct Ray {
+        glm::vec3 origin;
+        glm::vec3 direction;
+    };
+
     struct Camera : Entity {
     public:
         // CameraProjection
@@ -53,6 +58,34 @@ namespace DarkMoon {
             }
 
             return glm::mat4(1.0f);
+        }
+
+        Ray getMouseRay(int mouseX, int mouseY, int screenWidth, int screenHeight) {
+            // Normalized device coordinates
+            float ndcX = (2.0f * static_cast<float>(mouseX)) / static_cast<float>(screenWidth) - 1.0f;
+            float ndcY = 1.0f - (2.0f * static_cast<float>(mouseY)) / static_cast<float>(screenHeight);
+
+            // Screen space coordinates (considering orthographic projection)
+            float halfScreenWidth = static_cast<float>(screenWidth) / 2.0f;
+            float halfScreenHeight = static_cast<float>(screenHeight) / 2.0f;
+            float screenX = ndcX * halfScreenWidth;
+            float screenY = ndcY * halfScreenHeight;
+
+            // Camera space coordinates
+            float right = halfScreenWidth;
+            float left = -halfScreenWidth;
+            float top = halfScreenHeight;
+            float bottom = -halfScreenHeight;
+            float cameraX = left + (screenX + 1) * (right - left) / 2.0f;
+            float cameraY = bottom + (screenY + 1) * (top - bottom) / 2.0f;
+
+            // World space coordinates (assuming z = -1 for near plane)
+            glm::mat4 inverseView = glm::inverse(getViewMatrix());
+            glm::vec4 rayWorld(cameraX, cameraY, -1.0f, 1.0f);
+            glm::vec4 rayDirection4 = inverseView * rayWorld;
+            glm::vec3 rayDirection = glm::normalize(glm::vec3(rayDirection4));
+
+            return Ray{position, rayDirection};
         }
 
         void updateCameraVectors() {

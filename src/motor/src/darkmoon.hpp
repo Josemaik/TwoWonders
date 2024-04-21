@@ -86,6 +86,8 @@ namespace DarkMoon {
         Node* GetRootNode();
         // Get default font
         Font* GetDefaultFont(){ return m_renderManager.defaultFont; };
+        // Get mouse ray cast
+        Ray GetMouseRay();
 
         // ------------------------ //
         // Window-related functions //

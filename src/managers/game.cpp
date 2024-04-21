@@ -317,8 +317,8 @@ void Game::run()
                         em.destroyEntities(li.getDeath());
                         li.clearDeath();
                     }
+                    render_system.update(em, engine);
                 }
-                render_system.update(em, engine);
             }
             else if (!resets && debugs)
                 render_system.update(em, engine);
