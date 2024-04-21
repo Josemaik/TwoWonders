@@ -1,5 +1,5 @@
 APP		   	:= TwoWonders
-CCFLAGS    	:= -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
+CCFLAGS    	:= -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/ -I/usr/include/freetype2
 
 ifeq ($(OS),Windows_NT)
 	CC 	   		:= g++
@@ -10,7 +10,7 @@ ifeq ($(OS),Windows_NT)
 else
 	CC 		   	:= g++-12
 	CCACHE 	   	:= ccache
-    LIBS 		:= -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so
+    LIBS 		:= -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so -lglfw -lGLEW -lGLU -lGL -lm -lassimp -lfreetype
 	SANITIZE   	:= -fsanitize=address
 	LIBS_COPY  	:= /usr/lib/libraylib.so.420 libs/raygui.so fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13
 endif

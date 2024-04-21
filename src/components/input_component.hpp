@@ -1,35 +1,35 @@
 #pragma once
-#include <raylib.h>
+#include "../motor/src/darkmoon.hpp"
 
 // Sujeto a cambios cuando dejemos de usar Raylib
 struct InputComponent
 {
     // Teclas de movimiento
-    int up{ KEY_W };
-    int down{ KEY_S };
-    int left{ KEY_A };
-    int right{ KEY_D };
+    int up{ D_KEY_W };
+    int down{ D_KEY_S };
+    int left{ D_KEY_A };
+    int right{ D_KEY_D };
 
     // Teclas de acción
-    int space{ KEY_SPACE };
-    int enter{ KEY_ENTER };
-    int pause{ KEY_ESCAPE };
-    int inventory{ KEY_I };
+    int space{ D_KEY_SPACE };
+    int enter{ D_KEY_ENTER };
+    int pause{ D_KEY_ESCAPE };
+    int inventory{ D_KEY_I };
 
     int spell1{ KEY_J };
     int spell2{ KEY_K };
     int spell3{ KEY_L };
 
     // Teclas de mecánicas
-    int air_attack{ KEY_T };
-    int lockIn{ KEY_Q };
-    int interact{ KEY_E };
+    int air_attack{ D_KEY_T };
+    int lockIn{ D_KEY_Q };
+    int interact{ D_KEY_E };
 
     // Teclas de debug
-    int debugPhy{ KEY_F1 };
-    int debugIA1{ KEY_F2 };
-    int debugIA2{ KEY_F3 };
-    int pathfinfing{ KEY_F4 };
+    int debugPhy{ D_KEY_F1 };
+    int debugIA1{ D_KEY_F2 };
+    int debugIA2{ D_KEY_F3 };
+    int pathfinfing{ D_KEY_F4 };
 
     // Botones de Mando
     int m_up{ GAMEPAD_BUTTON_LEFT_FACE_UP };

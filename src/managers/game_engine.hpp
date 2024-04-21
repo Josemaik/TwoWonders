@@ -4,8 +4,9 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
-#include "utils/types.hpp"
-#include "utils/vec3D.hpp"
+#include "../utils/types.hpp"
+#include "../utils/vec3D.hpp"
+#include "../motor/src/darkmoon.hpp"
 
 namespace ENGI {
 
@@ -15,7 +16,7 @@ namespace ENGI {
         {
             std::string name{};
             Image image{};
-            Texture2D texture{};
+            TextureType texture{};
             int currentFrame{};
             int frames{};
             int nextFrameDataOffset{};
@@ -44,11 +45,11 @@ namespace ENGI {
         Image loadImagenAnim(const char* filename, int& frames);
         void imageResize(Image* image, int newWidth, int newHeight);
         void unloadImage(Image image);
-        Texture2D loadTextureFromImage(Image image);
+        TextureType loadTextureFromImage(Image image);
 
         // Drawing
         void beginDrawing();
-        void clearBackground(Color color);
+        void clearBackground(DarkMoon::Color color);
         void drawGrid(int slices, float spacing);
         void endDrawing();
         void beginMode3D();
@@ -57,16 +58,16 @@ namespace ENGI {
         void drawPoint3D(vec3d pos, Color color);
         void drawCube(vec3d pos, float width, float height, float lenght, Color color);
         void drawCubeWires(vec3d pos, float width, float height, float lenght, Color color);
-        void drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
-        void drawModelWires(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
+        // void drawModel(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
+        // void drawModelWires(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
         void drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color);
 
         // Rectangle
         void drawRectangle(int posX, int posY, int width, int height, Color color);
         void drawRectangleLinesEx(Rectangle rec, float lineThick, Color color);
         void drawRectangleRec(Rectangle rec, Color color);
-        void drawTexture(Texture2D texture, int posX, int posY, Color tint);
-        void drawTexture(Texture2D texture, int posX, int posY, Color tint, float scale);
+        void drawTexture(TextureType texture, int posX, int posY, Color tint);
+        void drawTexture(TextureType texture, int posX, int posY, Color tint, float scale);
         void drawCircle(int posX, int posY, float radius, Color color);
         void drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color);
         void drawTriangle(vec2d v1, vec2d v2, vec2d v3, Color color);
@@ -85,13 +86,14 @@ namespace ENGI {
         int getScreenHeight();
         void setWindowSize(int width, int height);
         void setWindowFullScreen();
+        void setExitKey(int key);
 
         // Camera
         void setPositionCamera(vec3d pos);
         void setTargetCamera(vec3d tar);
         void setUpCamera(vec3d up);
         void setFovyCamera(float fovy);
-        void setProjectionCamera(int proj);
+        void setProjectionCamera(DarkMoon::CameraProjection proj);
         vec3d getPositionCamera();
         vec3d getTargetCamera();
         vec3d getUpCamera();
@@ -114,18 +116,19 @@ namespace ENGI {
 
         // Shaders
         Shader loadShader(const char* vsFileName, const char* fsFileName);
-        void unloadShader(Shader s);
+        // void unloadShader(Shader s);
         int getShaderLocation(Shader s, const char* uniformName);
-        void setShaderValue(Shader s, int uniformLoc, const void* value, int uniformType);
+        // void setShaderValue(Shader s, int uniformLoc, const void* value, int uniformType);
 
         // Aux
-        Mesh genMeshCube(float width, float height, float lenght);
-        Model loadModelFromMesh(Mesh m);
-        Model loadModel(const char* filename);
-        Texture2D loadTexture(const char* filename);
-        void updateTexture(Texture2D texture, const void* data);
-        void unloadMesh(Mesh m);
-        void unloadModel(Model m);
+        MeshType genMeshCube(float width, float height, float lenght);
+        Model loadModelFromMesh(MeshType m);
+        DarkMoon::Node* loadModel(const char* filename);
+        // ModelType loadModelRaylib(const char* filename);
+        TextureType loadTexture(const char* filename);
+        void updateTexture(TextureType texture, const void* data);
+        void unloadMesh(MeshType m);
+        // void unloadModel(ModelType m);
         float getWorldToScreenX(vec3d pos);
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();
@@ -137,17 +140,31 @@ namespace ENGI {
         double getTime();
         float getAspectRat();
 
-        std::map<std::string, Texture2D> textures;
+        std::map<std::string, TextureType> textures;
         std::map<std::string, Gif> gifs;
 
+        // DarkMoon Engine //
+
+        DarkMoon::DarkMoonEngine dmeg;
+        DarkMoon::Node* node_scene2D;
+        DarkMoon::Node* node_scene3D;
+        DarkMoon::Node* node_sceneTextures;
+
+        std::map<std::string, DarkMoon::Node*> nodes_scene;
+        std::map<std::string, DarkMoon::Node*> nodes_sceneAnimatedTexture;
+
+        DarkMoon::Node* createNode(const std::string& name, DarkMoon::Node* parentNode);
+        DarkMoon::Node* createAnimatedTexture2D(std::vector<DarkMoon::Texture*> filePaths, DarkMoon::Color color, float frameDuration, int currentFrame, const std::string& name, DarkMoon::Node* parentNode);
+
+        DarkMoon::Texture* loadTexture2D(const char* filePath);
 
     private:
         u16 const width_{}, height_{};
-        Camera3D camera{};
         bool replayMode{ false };
         GameData* gameData{ nullptr };
+
+        DarkMoon::Camera* camera;
     };
 
 #endif // !GAME_ENGINE
-
 }

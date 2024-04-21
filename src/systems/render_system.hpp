@@ -53,7 +53,7 @@ struct RenderSystem
     void drawPauseMenu(GameEngine& engine, EntityManager& em);
     void drawInventory(GameEngine& engine, EntityManager& em);
     void drawItemDescription(GameEngine& engine, EntityManager& em, Item& item);
-    void setShader(Shader& shader) { shaderPtr = &shader; }
+    // void setShader(Shader& shader) { shaderPtr = &shader; }
     void resetAnimatedTexture() { animatedTextures.clear(); }
     // Funciones double dtprivadas para organizar el codigo
 private:
@@ -61,12 +61,11 @@ private:
     void beginFrame(GameEngine& engine, EntityManager& em);
     void endFrame(GameEngine& engine, EntityManager& em);
     void drawHUD(EntityManager& em, GameEngine& engine);
+    void initHUD(EntityManager& em, GameEngine& engine);
     void drawEntities(EntityManager& em, GameEngine& engine);
     void drawParticles(EntityManager& em, GameEngine& engine);
     void drawDeath(GameEngine& engine);
     void drawCoinBar(GameEngine& engine, EntityManager& em);
-    void drawHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
-    void drawManaBar(GameEngine& engine, EntityManager& em);
     void drawSpellSlots(GameEngine& engine, EntityManager& em);
     void drawSpellExp(GameEngine& engine, std::string name);
     void drawStaff(GameEngine& engine, EntityManager& em);
@@ -79,18 +78,26 @@ private:
     void drawAlerts_IA(EntityManager& em, GameEngine& engine);
     void drawFPSCounter(GameEngine& engine);
     void loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r);
-    void loadShaders(Model& model);
+    // void loadShaders(Model& model);
     void drawTextBox(GameEngine& engine, EntityManager& em);
-    void displayGif(GameEngine& engine, Texture2D& copy, GameEngine::Gif& gif, int& posX, int& posY);
+    void displayGif(GameEngine& engine, TextureType& copy, GameEngine::Gif& gif, int& posX, int& posY);
     double shakeDouble(double value);
+
+    void updateHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
+    void updateManaBar(GameEngine& engine, EntityManager& em);
+    void updateAnimatedTextures(GameEngine& engine);
 
     bool isSelected{ false };
     bool isSelectedfordebug{ false }, fullScreen{ false };
     std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
-    std::map<std::string, AnimatedTexture> animatedTextures;
+    std::map<std::string, AnimatedTexture> animatedTextures{};
+    std::map<std::string, DarkMoon::Node*> HUDElements{};
+    std::map<std::string, DarkMoon::Node*> debugIA{};
     // bool chunk0Charged{ false };
     // bool chunk1Charged{ false };
-    Shader* shaderPtr{ nullptr };
+    // ShaderType* shaderPtr{ nullptr };
+
+    void restartScene(GameEngine& engine);
 
     float elapsed{ 0.0f }, elapsed_limit{ 0.4f };
     float elapsed_WASD{ 0.0f }, elapsed_limit_WASD{ 5.0f };

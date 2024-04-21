@@ -18,13 +18,13 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     // Si no hay jugador, no hacemos nada
     if (li.isDead)
     {
-        if (ge.isKeyReleased(KEY_ENTER) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN))
+        if (ge.isKeyReleased(D_KEY_ENTER) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN))
             li.resetFromDeath = true;
         return;
     }
 
     // PAUSE
-    if ((ge.isKeyReleased(KEY_ESCAPE) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_MIDDLE_RIGHT)) && li.currentScreen == GameScreen::GAMEPLAY)
+    if ((ge.isKeyReleased(D_KEY_ESCAPE) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_MIDDLE_RIGHT)) && li.currentScreen == GameScreen::GAMEPLAY)
     {
         if (li.currentScreen != GameScreen::CONTROLS)
             inpi.pause = !inpi.pause;
@@ -36,7 +36,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     }
 
     // INVENTORY
-    if ((ge.isKeyReleased(KEY_I) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_MIDDLE) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_MIDDLE_LEFT)) && li.currentScreen == GameScreen::GAMEPLAY && !inpi.pause)
+    if ((ge.isKeyReleased(D_KEY_I) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_MIDDLE) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_MIDDLE_LEFT)) && li.currentScreen == GameScreen::GAMEPLAY && !inpi.pause)
     {
         inpi.inventory = !inpi.inventory;
         inpi.debugAI1 = false;
@@ -45,48 +45,63 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         return;
     }
 
-    // // DEBUG PHYSICS
-    // if (ge.isKeyReleased(KEY_F1))
-    // {
-    //     inpi.debugPhy = !inpi.debugPhy;
-    //     inpi.debugAI1 = false;
-    //     inpi.debugAI2 = false;
-    //     inpi.pause = false;
-    //     inpi.inventory = false;
-    //     return;
-    // }
+    // DEBUG PHYSICS
+    if (ge.isKeyReleased(D_KEY_F1))
+    {
+        inpi.debugPhy = !inpi.debugPhy;
+        inpi.debugAI1 = false;
+        inpi.debugAI2 = false;
+        inpi.pause = false;
+        inpi.inventory = false;
+        return;
+    }
 
-    // //DEBUG AI - Stop Game
-    // if (ge.isKeyReleased(KEY_F2))
-    // {
-    //     inpi.debugAI1 = !inpi.debugAI1;
-    //     inpi.debugPhy = false;
-    //     inpi.debugAI2 = false;
-    //     inpi.pause = false;
-    //     inpi.inventory = false;
-    //     return;
-    // }
+    //DEBUG AI - Stop Game
+    if (ge.isKeyReleased(D_KEY_F2))
+    {
+        inpi.debugAI1 = !inpi.debugAI1;
+        inpi.debugPhy = false;
+        inpi.debugAI2 = false;
+        inpi.pause = false;
+        inpi.inventory = false;
+        return;
+    }
 
-    // // DEBUG AI - Real Time
-    // if (ge.isKeyReleased(KEY_F3))
-    // {
-    //     inpi.debugAI2 = !inpi.debugAI2;
-    //     inpi.debugPhy = false;
-    //     inpi.debugAI1 = false;
-    //     inpi.pause = false;
-    //     return;
-    // }
+    //DEBUG AI - Real Time
+    if (ge.isKeyReleased(D_KEY_F3))
+    {
+        inpi.debugAI2 = !inpi.debugAI2;
+        inpi.debugPhy = false;
+        inpi.debugAI1 = false;
+        inpi.pause = false;
+        return;
+    }
 
-    // // DEBUG NAVMESH
-    // if (ge.isKeyReleased(KEY_F4))
-    // {
-    //     inpi.pathfind = !inpi.pathfind;
-    //     inpi.debugPhy = false;
-    //     inpi.debugAI1 = false;
-    //     inpi.debugAI2 = false;
-    //     inpi.pause = false;
-    //     return;
-    // }
+    if (ge.isKeyReleased(D_KEY_F4))
+    {
+        inpi.pathfind = !inpi.pathfind;
+        inpi.debugPhy = false;
+        inpi.debugAI1 = false;
+        inpi.debugAI2 = false;
+        inpi.pause = false;
+        return;
+    }
+
+    // Dibujar por consola el arbol de la escena
+    if (ge.isKeyReleased(D_KEY_F7))
+        ge.dmeg.DrawTree();
+
+    if (ge.isKeyReleased(D_KEY_F9)) {
+        auto& life = em.getComponent<LifeComponent>(player);
+        life.decreaseLife();
+    }
+
+    if (ge.isKeyReleased(D_KEY_F10))
+        ge.dmeg.SetWindowSize(800, 600);
+
+    if (ge.isKeyReleased(D_KEY_F11))
+        ge.dmeg.ToggleFullscreen();
+
 
     // Sacamos las físicas y el input del jugador
     auto& phy = em.getComponent<PhysicsComponent>(player);
@@ -323,7 +338,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     //     plfi.changeCurrentSpell();
 
     // Codigo para curarse // DEBUG
-    if (ge.isKeyDown(KEY_Z) && player.hasComponent<LifeComponent>())
+    if (ge.isKeyDown(D_KEY_Z) && player.hasComponent<LifeComponent>())
         em.getComponent<LifeComponent>(player).increaseLife();
 
     if (ge.isKeyReleased(KEY_F12))
@@ -340,5 +355,5 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
 }
 
 bool InputSystem::pressEnter(GameEngine& ge) {
-    return ge.isKeyReleased(KEY_ENTER) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN);
+    return ge.isKeyReleased(D_KEY_ENTER) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN);
 }

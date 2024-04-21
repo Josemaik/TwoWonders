@@ -64,6 +64,7 @@ static constexpr float timeStep360 = 1.0f / 360.0f;  // Actualiza el juego 360 v
 static constexpr float timeStep480 = 1.0f / 480.0f;  // Actualiza el juego 480 veces por segundo
 static constexpr double timeStepDouble = 1.0 / 60.0;  // Actualiza el juego 60 veces por segundo
 static constexpr double timeStepDouble240 = 1.0 / 240.0;  // Actualiza el juego 240 veces por segundo
+
 // Forward Declarations
 namespace ENGI { struct GameEngine; }
 
@@ -211,6 +212,12 @@ using deathSet = std::set<std::size_t, std::greater<std::size_t>>;
 using mapType = rapidjson::Document;
 using valueType = rapidjson::Value;
 using mapSizeType = rapidjson::SizeType;
+using ShaderType = DarkMoon::Shader;
+using TextureType = Texture2D;
+using ModelType = DarkMoon::Model;
+using MaterialType = Material;
+using MeshType = Mesh;
+using CameraType = Camera3D;
 using Effects = ParticleMakerComponent::ParticleEffect;
 using FrustPos = FrustumInfo::Position;
 using FrustOut = MP::TypeList<GroundTag, NPCTag>;

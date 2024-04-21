@@ -1,5 +1,5 @@
 #pragma once
-#include "utils/vec3D.hpp"
+#include "../utils/vec3D.hpp"
 
 struct PhysicsComponent
 {

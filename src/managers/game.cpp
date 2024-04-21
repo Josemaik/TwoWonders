@@ -20,21 +20,21 @@ void Game::createEnding()
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
 }
 
-Shader Game::createShader()
-{
-    Shader shader = engine.loadShader(TextFormat("assets/shaders/lighting.vs", 330),
-        TextFormat("assets/shaders/lighting.fs", 330));
+// ShaderType Game::createShader()
+// {
+//     ShaderType shader = engine.loadShader(TextFormat("assets/shaders/lighting.vs", 330),
+//         TextFormat("assets/shaders/lighting.fs", 330));
 
-    // Get some required shader locations
-    shader.locs[SHADER_LOC_VECTOR_VIEW] = engine.getShaderLocation(shader, "viewPos");
+//     // Get some required shader locations
+//     shader.locs[SHADER_LOC_VECTOR_VIEW] = engine.getShaderLocation(shader, "viewPos");
 
-    // Ambient light level (some basic lighting)
-    int ambientLoc = engine.getShaderLocation(shader, "ambient");
-    float ambientValue[4] = { 3.1f, 3.1f, 3.1f, 20.0f };
-    engine.setShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
+//     // Ambient light level (some basic lighting)
+//     int ambientLoc = engine.getShaderLocation(shader, "ambient");
+//     float ambientValue[4] = { 3.1f, 3.1f, 3.1f, 20.0f };
+//     engine.setShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
 
-    return shader;
-}
+//     return shader;
+// }
 
 void Game::createEntities()
 {
@@ -131,9 +131,9 @@ void Game::run()
     auto& gami = em.getSingleton<GameData>();
 
     // Shader ambiente
-    Shader shader = createShader();
+    // ShaderType shader = createShader();
 
-    render_system.setShader(shader);
+    // render_system.setShader(shader);
     collision_system.setEventManager(evm);
     auto& sound_system = em.getSingleton<SoundSystem>();
 
@@ -169,7 +169,7 @@ void Game::run()
 
     while (!li.gameShouldEnd)
     {
-        elapsed += timeStep120;
+        elapsed += timeStep240;
         gami.updateFrame();
 
         switch (li.currentScreen)
@@ -373,7 +373,7 @@ void Game::run()
     render_system.unloadModels(em, engine);
 
     engine.unloadGifsAndTextures();
-    engine.unloadShader(shader);
+    // engine.unloadShader(shader);
     engine.closeWindow();
 }
 
