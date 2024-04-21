@@ -1669,81 +1669,77 @@ void RenderSystem::drawVisionCone(vec3d pos_enemy, double orientation, double ho
 
 //Editor In-Game
 void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
-    // engine.beginDrawing();
+    // Parametros ventana editor in-game
+    float windowRectX = 0.0f;
+    float windowRectY = 100.0f;
 
-    // Dibujar un rectángulo que simula una ventana
-    // engine.dmeg.CreateRectangle({ 0, 100 }, { 390, 550 }, { 255, 255, 255, 128 }, "EditorIA", engine.node_sceneIA);
-
-    // // Dibujar el texto "debugger IA" en el centro de la ventana
-    // vec2d textSize = engine.measureTextEx(engine.getFontDefault(), "Editor IA", 20, 1);
-    // vec2d textPosition = { windowRect.x + 20,
-    //                          windowRect.y + 10 };
+    float windowRectWidth = 390.0f;
+    float windowRectHeight = 550.0f;
 
     if (debugIA["editorIA"] == nullptr)
     {
         debugIA["editorIA"] = engine.dmeg.CreateNode("Editor IA", engine.node_scene2D);
-        engine.dmeg.CreateTextBox({ 0, 150 }, { 390, 550 }, { 255, 255, 255, 128 }, "Editor IA", engine.dmeg.GetDefaultFont(), 20, D_BLACK, DarkMoon::Aligned::TOP, DarkMoon::Aligned::CENTER, "Editor IA", debugIA["editorIA"]);
-        engine.dmeg.CreateLine({ 0, 20 }, { 390, 20 }, D_GRAY, "Linea horizontal", debugIA["editorIA"]);
-        engine.dmeg.CreateText({ 5, 150 }, "PARAMETROS", engine.dmeg.GetDefaultFont(), 20, D_RED, "text_parametros", debugIA["editorIA"]);
+        engine.dmeg.CreateTextBox({ windowRectX, windowRectY }, { windowRectWidth, windowRectHeight }, { 255, 255, 255, 128 }, "Editor IA", engine.dmeg.GetDefaultFont(), 20, D_BLUE_DARK, DarkMoon::Aligned::TOP, DarkMoon::Aligned::LEFT, "Editor IA", debugIA["editorIA"]);
+        engine.dmeg.CreateLine({ windowRectX, windowRectY + 40 }, { windowRectWidth, windowRectY + 40 }, D_GRAY, "Linea horizontal", debugIA["editorIA"]);
+        engine.dmeg.CreateText({ windowRectX + 20, windowRectY + 50 }, "PARAMETROS", engine.dmeg.GetDefaultFont(), 20, D_RED, "text_parametros", debugIA["editorIA"]);
     }
 
     debugIA["editorIA"]->setVisible(true);
-    // auto& debugsglt = em.getSingleton<Debug_t>();
+    
+    auto& debugsglt = em.getSingleton<Debug_t>();
+    using SYSCMPss = MP::TypeList<AIComponent, PhysicsComponent, ColliderComponent, RenderComponent>;
+    using SYSTAGss = MP::TypeList<EnemyTag>;
 
     // [TODO] - RAYCAST
-    // // Dibujar una línea recta debajo del texto
-    // float lineY = static_cast<float>(textPosition.y + textSize.y + 5);  // Ajusta la posición de la línea según tus necesidades
-    // engine.drawLine(static_cast<int>(windowRect.x), static_cast<int>(lineY), static_cast<int>(windowRect.x) + static_cast<int>(windowRect.width),
-    //     static_cast<int>(lineY), DARKGRAY);
-    // // Dibujar el texto "INFO" debajo de la línea
-
-    // vec2d textPositionParameters = { windowRect.x + 5, 150 };
-
-    // using SYSCMPss = MP::TypeList<AIComponent, PhysicsComponent, ColliderComponent, RenderComponent>;
-    // using SYSTAGss = MP::TypeList<EnemyTag>;
-
-    // em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, PhysicsComponent& phy, ColliderComponent& col, RenderComponent& ren)
-    // {
-    //     RayCast ray = engine.getMouseRay();
-    //     // Comprobar si el rayo intersecta con el collider
-    //     if (col.boundingBox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
-    //         if (engine.isMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-    //             isSelected = !isSelected;
-    //             debugsnglt.IA_id = e.getID();
-    //         }
-    //         //     // si es seleccionada => wires morados
-    //         //     // no es seleccionada => wires rojos
-    //         engine.beginMode3D();
-    //         engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
-    //         engine.endMode3D();
-    //     }
-    //     if (isSelected && e.getID() == debugsnglt.IA_id) {
-    //         engine.beginMode3D();
-    //         engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
-    //         engine.endMode3D();
-    //         // si se seleccionada una entidad se muestra el Editor de parámetros
-    //         if (isSelected) {
-    //             // ID DE LA ENTIDAD SELECCIONADA
-    //             engine.drawText("EID:", 15, 170, 20, BLACK);
-    //             engine.drawText(std::to_string(debugsnglt.IA_id).c_str(), 55, 170, 20, DARKGRAY);
-    //             //Detect Radius
-    //             aic.detect_radius = SelectValue(engine, aic.detect_radius, 145.0, 200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
-    //             // Attack Radius
-    //             aic.attack_radius = SelectValue(engine, aic.attack_radius, 145.0, 240.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
-    //             // Arrival Radius
-    //             aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 145.0, 280.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
-    //             // Max Speed
-    //             phy.max_speed = SelectValue(engine, phy.max_speed, 145.0, 320.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
-    //             //COuntdown Perception
-    //             aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 145.0, 360.0, 120.0, 30.0, "Perception", 0.0, 10.0);
-    //             //Countdown Shoot
-    //             aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 145.0, 400.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
-    //             //Countdown stop
-    //             aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 145.0, 440.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
-    //         }
-    //     }
-    // });
-    // engine.endDrawing();
+    em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, PhysicsComponent& phy, ColliderComponent& col, RenderComponent& ren)
+    {
+        RayCast ray = engine.getMouseRay();
+        //std::cout << "Origen: " << ray.origin.x() << " | " << ray.origin.y() << " | " << ray.origin.z() << "\n";
+        //std::cout << "Direccion: " << ray.direction.x() << " | " << ray.direction.y() << " | " << ray.direction.z() << "\n";
+        // Comprobar si el rayo intersecta con el collider
+        if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
+            if (engine.dmeg.IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                isSelected = !isSelected;
+                debugsglt.IA_id = e.getID();
+            }
+            //     // si es seleccionada => wires morados
+            //     // no es seleccionada => wires rojos
+            /*
+            engine.beginMode3D();
+            engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
+            engine.endMode3D();
+            */
+            //std::cout << "hola\n";
+        }
+        if (isSelected && e.getID() == debugsglt.IA_id) {
+            std::cout << "ID: " << std::to_string(debugsglt.IA_id).c_str() << "\n";
+            /*
+            engine.beginMode3D();
+            engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
+            engine.endMode3D();
+            // si se seleccionada una entidad se muestra el Editor de parámetros
+            if (isSelected) {
+                // ID DE LA ENTIDAD SELECCIONADA
+                engine.drawText("EID:", 15, 170, 20, BLACK);
+                engine.drawText(std::to_string(debugsglt.IA_id).c_str(), 55, 170, 20, DARKGRAY);
+                //Detect Radius
+                aic.detect_radius = SelectValue(engine, aic.detect_radius, 145.0, 200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
+                // Attack Radius
+                aic.attack_radius = SelectValue(engine, aic.attack_radius, 145.0, 240.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
+                // Arrival Radius
+                aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 145.0, 280.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
+                // Max Speed
+                phy.max_speed = SelectValue(engine, phy.max_speed, 145.0, 320.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
+                //COuntdown Perception
+                aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 145.0, 360.0, 120.0, 30.0, "Perception", 0.0, 10.0);
+                //Countdown Shoot
+                aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 145.0, 400.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
+                //Countdown stop
+                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 145.0, 440.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
+            }
+            */
+        }
+    });
 }
 
 //Dibujado alertas de detección de enemigos
@@ -2432,13 +2428,13 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, Level
                 color = GREEN;
 
             // Dibujar la bounding box
-            engine.beginMode3D();
-            engine.drawCubeWires(boxPosition,
-                static_cast<float>(boxSize.x()),
-                static_cast<float>(boxSize.y()),
-                static_cast<float>(boxSize.z()),
-                color);
-            engine.endMode3D();
+            //engine.beginMode3D();
+            //engine.drawCubeWires(boxPosition,
+            //    static_cast<float>(boxSize.x()),
+            //    static_cast<float>(boxSize.y()),
+            //    static_cast<float>(boxSize.z()),
+            //    color);
+            //engine.endMode3D();
 
             auto& phy = em.getComponent<PhysicsComponent>(e);
 

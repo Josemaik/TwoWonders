@@ -612,6 +612,7 @@ namespace DarkMoon {
         Rectangle box;
         Rectangle boxBackground;
         Text text;
+        float padding = 10.0f;
         
         Aligned verAligned;
         Aligned horAligned;
@@ -638,13 +639,13 @@ namespace DarkMoon {
             // Vertical Aligned
             switch (verAligned){
                 case Aligned::TOP:
-                    transMatrix[3][1] = box.position.y;
+                    transMatrix[3][1] = box.position.y + padding;
                     break;
                 case Aligned::CENTER:
                     transMatrix[3][1] = box.position.y + (box.size.y - text.maxHeight) / 2;
                     break;
                 case Aligned::BOTTOM:
-                    transMatrix[3][1] = box.position.y + box.size.y - text.maxHeight;
+                    transMatrix[3][1] = box.position.y + box.size.y - text.maxHeight - padding;
                     break;
                 default:
                     break;
@@ -653,13 +654,13 @@ namespace DarkMoon {
             // Horizontal Aligned
             switch (horAligned){
                 case Aligned::LEFT:
-                    transMatrix[3][0] = box.position.x;
+                    transMatrix[3][0] = box.position.x + padding;
                     break;
                 case Aligned::CENTER:
                     transMatrix[3][0] = box.position.x + (box.size.x / 2 - text.maxWidth / 2);
                     break;
                 case Aligned::RIGHT:
-                    transMatrix[3][0] = box.position.x + box.size.x - text.maxWidth;
+                    transMatrix[3][0] = box.position.x + box.size.x - text.maxWidth - padding;
                     break;
                 default:
                     break;

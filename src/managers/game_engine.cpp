@@ -859,7 +859,8 @@ float ENGI::GameEngine::getWorldToScreenY(vec3d pos)
 
 RayCast ENGI::GameEngine::getMouseRay()
 {
-    return RayCast{};
+    auto ray = dmeg.GetMouseRay();
+    return RayCast{{ray.origin.x, ray.origin.y, ray.origin.z}, {ray.direction.x, ray.direction.y, ray.direction.z}};
     //Ray r = GetMouseRay(GetMousePosition(), camera);
     //return RayCast{ .origin = vec3d(r.position.x, r.position.y, r.position.z), .direction = vec3d(r.direction.x, r.direction.y, r.direction.z) };
 }

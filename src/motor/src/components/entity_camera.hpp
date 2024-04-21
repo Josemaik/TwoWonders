@@ -2,9 +2,9 @@
 
 #include "entity.hpp"
 
+#include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
 
 namespace DarkMoon {
     // Camera projection
@@ -60,32 +60,38 @@ namespace DarkMoon {
             return glm::mat4(1.0f);
         }
 
-        Ray getMouseRay(int mouseX, int mouseY, int screenWidth, int screenHeight) {
+        Ray getMouseRay(int mouseX, int mouseY, int screenWidth, int screenHeight) {            
+            Ray ray = {};
+
             // Normalized device coordinates
-            float ndcX = (2.0f * static_cast<float>(mouseX)) / static_cast<float>(screenWidth) - 1.0f;
-            float ndcY = 1.0f - (2.0f * static_cast<float>(mouseY)) / static_cast<float>(screenHeight);
+            float x = (2.0f * static_cast<float>(mouseX)) / static_cast<float>(screenWidth) - 1.0f;
+            float y = 1.0f - (2.0f * static_cast<float>(mouseY)) / static_cast<float>(screenHeight);
+            float z = 1.0f;
 
-            // Screen space coordinates (considering orthographic projection)
-            float halfScreenWidth = static_cast<float>(screenWidth) / 2.0f;
-            float halfScreenHeight = static_cast<float>(screenHeight) / 2.0f;
-            float screenX = ndcX * halfScreenWidth;
-            float screenY = ndcY * halfScreenHeight;
+            glm::vec3 deviceCoords = { x, y, z };
 
-            // Camera space coordinates
-            float right = halfScreenWidth;
-            float left = -halfScreenWidth;
-            float top = halfScreenHeight;
-            float bottom = -halfScreenHeight;
-            float cameraX = left + (screenX + 1) * (right - left) / 2.0f;
-            float cameraY = bottom + (screenY + 1) * (top - bottom) / 2.0f;
+            // View matrix and projection matrix
+            auto matView = getViewMatrix();
+            auto matProj = getProjectionMatrix(screenWidth, screenHeight);
 
-            // World space coordinates (assuming z = -1 for near plane)
-            glm::mat4 inverseView = glm::inverse(getViewMatrix());
-            glm::vec4 rayWorld(cameraX, cameraY, -1.0f, 1.0f);
-            glm::vec4 rayDirection4 = inverseView * rayWorld;
-            glm::vec3 rayDirection = glm::normalize(glm::vec3(rayDirection4));
+            // Unproject far/near points
+            glm::vec3 nearPoint = glm::unProject(glm::vec3(deviceCoords.x, deviceCoords.y, 0.0f), matView, matProj, glm::vec4(0, 0, screenWidth, screenHeight));
+            glm::vec3 farPoint = glm::unProject(glm::vec3(deviceCoords.x, deviceCoords.y, 1.0f), matView, matProj, glm::vec4(0, 0, screenWidth, screenHeight));
+            
+            // Unproject mouse cursor in the near plane
+            glm::vec3 cameraPlanePointerPos = glm::unProject(glm::vec3(deviceCoords.x, deviceCoords.y, -1.0f), matView, matProj, glm::vec4(0, 0, screenWidth, screenHeight));
 
-            return Ray{position, rayDirection};
+            // Normalize direction vector
+            glm::vec3 direction = glm::normalize(farPoint - nearPoint);
+
+            if(this->cameraProjection == CameraProjection::CAMERA_PERSPECTIVE)
+                ray.origin = this->position;
+            else if(this->cameraProjection == CameraProjection::CAMERA_ORTHOGRAPHIC)
+                ray.origin = cameraPlanePointerPos;
+
+            ray.direction = direction;
+
+            return ray;
         }
 
         void updateCameraVectors() {
