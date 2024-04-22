@@ -158,8 +158,8 @@ int main(){
         std::cout << "└────────────────┘" << std::endl;
 
         createScene3D(engine);
-        auto button = createHUD(engine);
         auto mainCharacter = createMainCharacter(engine);
+        auto button = createHUD(engine);
 
         auto buttonEntity = dynamic_cast<DarkMoon::Button*>(button->getEntity());
 
@@ -184,6 +184,15 @@ int main(){
 
             if(buttonEntity->state == DarkMoon::ButtonState::CLICK)
                 std::cout << "Pulsando el boton\n";
+
+            //if(engine.IsMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
+            //    std::cout << "Mantengo click\n";
+            //if(engine.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
+            //    std::cout << "Hago click\n";
+            //if(engine.IsMouseButtonUp(GLFW_MOUSE_BUTTON_LEFT))
+            //    std::cout << "No hago nada\n";
+            //if(engine.IsMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT))
+            //    std::cout << "Acabo de soltar\n";
 
             // Draw
 

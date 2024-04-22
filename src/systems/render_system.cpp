@@ -55,6 +55,17 @@ void RenderSystem::restartScene(GameEngine& engine)
     engine.node_sceneTextures->clearChildren();
     for (auto& ia : debugIA)
         ia.second->setVisible(false);
+    for (auto& but : buttons)
+        but.second->setVisible(false);
+    for (auto& txt : textElements)
+        if(txt.second)
+            txt.second->setVisible(false);
+}
+
+void RenderSystem::changeScene(GameEngine& engine)
+{
+    engine.node_scene2D->clearChildren();
+    engine.node_scene3D->clearChildren();
 }
 
 void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss) {
@@ -64,6 +75,8 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
 
     engine.beginDrawing();
     engine.clearBackground(D_WHITE);
+
+    restartScene(engine);
 
     // Logo del videojuego
     {
@@ -84,15 +97,75 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
         logoTwoWonders->setTranslation({ posX, posY, 0.0f });
     }
 
-    // Dibujar arbol
-    engine.dmeg.GetRootNode()->traverse(glm::mat4());
-
-
     // Datos de los botones
     float buttonWidth = 200.0f;
     float buttonHeight = 50.0f;
     float posX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2.f);
     float posY = static_cast<float>(engine.getScreenHeight() / 1.30) - (buttonHeight / 2.f);
+
+    // Botones
+    if (buttons["logoGame"] == nullptr){
+        buttons["logoGame"] = engine.dmeg.CreateNode("Pantalla de inicio", engine.node_scene2D);
+    
+        engine.dmeg.CreateButton({}, {buttonWidth, buttonHeight}, "JUGAR",
+                                engine.dmeg.GetDefaultFont(), 15,
+                                D_BLACK,
+                                DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                D_AQUA_DARK, D_AQUA, D_AQUA_LIGHT,
+                                "Boton jugar", buttons["logoGame"]);
+
+        engine.dmeg.CreateButton({}, {buttonWidth, buttonHeight}, "CONFIGURACION",
+                                engine.dmeg.GetDefaultFont(), 15,
+                                D_BLACK,
+                                DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                D_AQUA_DARK, D_AQUA, D_AQUA_LIGHT,
+                                "Boton configuracion", buttons["logoGame"]);
+
+        engine.dmeg.CreateButton({}, {buttonWidth, buttonHeight}, "SALIR",
+                                engine.dmeg.GetDefaultFont(), 15,
+                                D_BLACK,
+                                DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                D_AQUA_DARK, D_AQUA, D_AQUA_LIGHT,
+                                "Boton salir", buttons["logoGame"]);
+    }
+
+    buttons["logoGame"]->setVisible(true);
+
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& inpi = em.getSingleton<InputInfo>();
+
+    for(auto& bt : buttons["logoGame"]->getChildren()){
+        auto but = dynamic_cast<DarkMoon::Button*>(bt->getEntity());
+        // Recolocar botones
+        if (bt->name == "Boton jugar")
+            bt->setTranslation({posX, posY, 0.0f});
+        else if (bt->name == "Boton configuracion")
+            bt->setTranslation({posX, posY + 55, 0.0f});
+        else if (bt->name == "Boton salir")
+            bt->setTranslation({posX, posY + 110, 0.0f});
+        
+        // Comprobar estado del boton
+        if(but->state == DarkMoon::ButtonState::CLICK){
+            if (bt->name == "Boton jugar"){
+                li.currentScreen = GameScreen::STORY;
+                ss.seleccion_menu();
+                ss.music_stop();
+            }
+            else if (bt->name == "Boton configuracion"){
+                li.currentScreen = GameScreen::OPTIONS;
+                li.previousScreen = GameScreen::TITLE;
+                ss.seleccion_menu();
+            }
+            else if (bt->name == "Boton salir"){
+                li.gameShouldEnd = true;
+                ss.sonido_salir();
+            }
+        }
+    }
+
+    // [ TODO ] -> Funcionalidad Mando
+    
+    /*
 
     // Funcionalidad de botones
     Rectangle btn1Rec = { posX, posY, buttonWidth, buttonHeight };
@@ -161,6 +234,10 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
     }
     else if (!buttonTouched && ss.pushed)
         ss.pushed = false;
+    */
+
+    // Dibujar arbol
+    engine.dmeg.GetRootNode()->traverse(glm::mat4());
 
     engine.endDrawing();
 }
@@ -217,18 +294,12 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
 void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSystem& ss) {
     engine.beginDrawing();
     engine.clearBackground(D_WHITE);
-    auto& li = em.getSingleton<LevelInfo>();
-    auto& inpi = em.getSingleton<InputInfo>();
+
+    restartScene(engine);
 
     float buttonWidth = 200.0f;
     float buttonHeight = 50.0f;
     float middleScreen = static_cast<float>(engine.getScreenWidth() / 2);
-
-    // Slider del volumen
-    Rectangle volumenSlider = { middleScreen - buttonWidth, 100, buttonWidth, 20 };
-    auto& sosy = em.getSingleton<SoundSystem>();
-    float volumen = sosy.getVolumeMaster() * 100;
-    float* vol = &volumen;
 
     // Posición del botón de volver
     float posX = middleScreen - (buttonWidth / 2);
@@ -239,22 +310,126 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     float posResY = static_cast<float>(200) - (buttonHeight / 2);
     float offSetY = 150;
 
-    if (fullScreen)
-    {
-        engine.setWindowFullScreen();
-        fullScreen = false;
+    // Botones
+    if (!buttons["opciones"]){
+        buttons["opciones"] = engine.dmeg.CreateNode("Pantalla de opciones", engine.node_scene2D);
+    
+        engine.dmeg.CreateButton({}, {buttonWidth, buttonHeight}, "VOLVER",
+                                 engine.dmeg.GetDefaultFont(), 15, D_BLACK,
+                                 DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                 D_AQUA_DARK, D_AQUA, D_AQUA_LIGHT,
+                                 "Boton volver", buttons["opciones"]);
+
+        engine.dmeg.CreateButton({}, {buttonWidth, buttonHeight}, "800x600",
+                                 engine.dmeg.GetDefaultFont(), 15, D_BLACK,
+                                 DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                 D_AQUA_DARK, D_AQUA, D_AQUA_LIGHT,
+                                 "Boton 800x600", buttons["opciones"]);
+
+        engine.dmeg.CreateButton({}, {buttonWidth, buttonHeight}, "1280x720",
+                                 engine.dmeg.GetDefaultFont(), 15, D_BLACK,
+                                 DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                 D_AQUA_DARK, D_AQUA, D_AQUA_LIGHT,
+                                 "Boton 1280x720", buttons["opciones"]);
+
+        engine.dmeg.CreateButton({}, {buttonWidth, buttonHeight}, "1920x1080",
+                                 engine.dmeg.GetDefaultFont(), 15, D_BLACK,
+                                 DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                 D_AQUA_DARK, D_AQUA, D_AQUA_LIGHT,
+                                 "Boton 1920x1080", buttons["opciones"]);
+
+        engine.dmeg.CreateButton({}, {buttonWidth, buttonHeight}, "FULLSCREEN",
+                                 engine.dmeg.GetDefaultFont(), 15, D_BLACK,
+                                 DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                 D_AQUA_DARK, D_AQUA, D_AQUA_LIGHT,
+                                 "Boton fullscreen", buttons["opciones"]);
+
+        engine.dmeg.CreateButton({}, {buttonWidth + 50, buttonHeight}, "CONTROLES MANDO",
+                                 engine.dmeg.GetDefaultFont(), 15, D_BLACK,
+                                 DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                 D_AQUA_DARK, D_AQUA, D_AQUA_LIGHT,
+                                 "Boton controles mando", buttons["opciones"]);
+
+        engine.dmeg.CreateButton({}, {buttonWidth + 50, buttonHeight}, "CONTROLES TECLADO",
+                                 engine.dmeg.GetDefaultFont(), 15, D_BLACK,
+                                 DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                 D_AQUA_DARK, D_AQUA, D_AQUA_LIGHT,
+                                 "Boton controles teclado", buttons["opciones"]);
+
+        engine.dmeg.CreateSlider({}, {buttonWidth, 20}, D_WHITE, D_AQUA, "Slider volumen", buttons["opciones"]);
+    }
+    buttons["opciones"]->setVisible(true);
+
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& inpi = em.getSingleton<InputInfo>();
+
+    for(auto& bt : buttons["opciones"]->getChildren()){
+        // Recolocar botones
+        if (bt->name == "Boton volver")
+            bt->setTranslation({posX, posY, 0.0f});
+        else if (bt->name == "Boton 800x600")
+            bt->setTranslation({posResX - offSetY, posResY, 0.0f});
+        else if (bt->name == "Boton 1280x720")
+            bt->setTranslation({posResX + offSetY, posResY, 0.0f});
+        else if (bt->name == "Boton 1920x1080")
+            bt->setTranslation({posResX - offSetY, posResY + offSetY / 2.5f, 0.0f});
+        else if (bt->name == "Boton fullscreen")
+            bt->setTranslation({posResX + offSetY, posResY + offSetY / 2.5f, 0.0f});
+        else if (bt->name == "Boton controles mando")
+            bt->setTranslation({posX - offSetY - 40, posY - 100, 0.0f});
+        else if (bt->name == "Boton controles teclado")
+            bt->setTranslation({posX + offSetY, posY - 100, 0.0f});
+        else if (bt->name == "Slider volumen")
+            bt->setTranslation({middleScreen - buttonWidth, 100.0f, 0.0f});
+
+        // Estado de los botones
+        auto but = dynamic_cast<DarkMoon::Button*>(bt->getEntity());
+        auto sli = dynamic_cast<DarkMoon::Slider*>(bt->getEntity());
+
+        if(but != nullptr && but->state == DarkMoon::ButtonState::CLICK){
+            if(bt->name == "Boton volver")
+                li.currentScreen = li.previousScreen;
+            else if(bt->name == "Boton 800x600")
+                engine.setWindowSize(800, 600);
+            else if(bt->name == "Boton 1280x720")
+                engine.setWindowSize(1280, 720);
+            else if(bt->name == "Boton 1920x1080")
+                engine.setWindowSize(1920, 1080);
+            else if(bt->name == "Boton fullscreen"){
+                engine.setWindowFullScreen();
+                fullScreen = !fullScreen;
+            }
+            else if(bt->name == "Boton controles mando"){
+                li.keyboardControls = false;
+                li.evenMorePreviousScreen = li.previousScreen;
+                li.currentScreen = GameScreen::CONTROLS;
+                li.previousScreen = GameScreen::OPTIONS;
+            }
+            else if(bt->name == "Boton controles teclado"){
+                li.keyboardControls = true;
+                li.evenMorePreviousScreen = li.previousScreen;
+                li.currentScreen = GameScreen::CONTROLS;
+                li.previousScreen = GameScreen::OPTIONS;
+            }
+
+            ss.seleccion_menu();
+        }
+        else if(sli != nullptr)
+            if(bt->name == "Slider volumen")
+                ss.setVolumeMaster(sli->valor);
     }
 
-    // Boton de volver al inicio
-    Rectangle btn1Rec = { posX, posY, buttonWidth, buttonHeight };
+    // [ TODO ] -> MANDO
 
-    // Botones de resolución
-    Rectangle btn2Rec = { posResX - offSetY, posResY, buttonWidth, buttonHeight };
-    Rectangle btn3Rec = { posResX + offSetY, posResY, buttonWidth, buttonHeight };
-    Rectangle btn4Rec = { posResX - offSetY, posResY + offSetY / 2.5f, buttonWidth, buttonHeight };
-    Rectangle btn5Rec = { posResX + offSetY, posResY + offSetY / 2.5f, buttonWidth, buttonHeight };
-    Rectangle btn6Rec = { posX - offSetY - 40, posY - 100, buttonWidth + 50, buttonHeight };
-    Rectangle btn7Rec = { posX + offSetY, posY - 100, buttonWidth + 50, buttonHeight };
+    /*
+
+    // Slider del volumen
+    Rectangle volumenSlider = { middleScreen - buttonWidth, 100, buttonWidth, 20 };
+    auto& sosy = em.getSingleton<SoundSystem>();
+    float volumen = sosy.getVolumeMaster() * 100;
+    float* vol = &volumen;
+
+    // { volumenSlider, "Volumen", 5 },
 
     // Define the current button selection
     auto& currentButton = inpi.currentButton;
@@ -284,27 +459,6 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
             currentButton = i;
             // Handle the button action
             switch (button.action) {
-            case 0: // "VOLVER"
-                li.currentScreen = li.previousScreen;
-                ss.seleccion_menu();
-                break;
-            case 1: // "800x600"
-                engine.setWindowSize(800, 600);
-                ss.seleccion_menu();
-                break;
-            case 2: // "1280x720"
-                engine.setWindowSize(1280, 720);
-                ss.seleccion_menu();
-                break;
-            case 3: // "1920x1080"
-                engine.setWindowSize(1920, 1080);
-                ss.seleccion_menu();
-                break;
-            case 4: // "FULLSCREEN"
-                engine.setWindowSize(1920, 1080);
-                fullScreen = true;
-                ss.seleccion_menu();
-                break;
             case 5: // "Volumen"
                 break;
             case 6: // "CONTROLES"
@@ -362,6 +516,10 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     }
     else if (!buttonTouched && ss.pushed)
         ss.pushed = false;
+    
+    */
+
+    engine.dmeg.GetRootNode()->traverse(glm::mat4());
 
     engine.endDrawing();
 }
@@ -607,6 +765,8 @@ void RenderSystem::drawLogoKaiwa(GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground({ 136, 219, 152, 255 });
 
+    restartScene(engine);
+
     // DrawLogoKaiwa
     {
         float aux_width = 11722.0f;
@@ -663,28 +823,52 @@ void RenderSystem::drawEnding(GameEngine& engine) {
 void RenderSystem::drawStory(GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(D_WHITE);
+
+    restartScene(engine);
+
     float boxWidth = 700.f;
     float boxHeight = 400.f;
     float posX = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth / 2);
     float posY = static_cast<float>(engine.getScreenHeight() / 2.5) - (boxHeight / 2);
 
-    Rectangle boxRect = { posX, posY, boxWidth, boxHeight };
+    if(!textElements["historia"]){
+        textElements["historia"] = engine.dmeg.CreateNode("Texto historia", engine.node_scene2D);
 
-    // Tamaño de la fuente
-    GuiSetStyle(DEFAULT, TEXT_SIZE, 40);
+        engine.dmeg.CreateTextBox({posX, posY}, {boxWidth, boxHeight}, D_WHITE,
+                                  "¡Bienvenido a la aventura!", engine.dmeg.GetDefaultFont(), 40,
+                                  D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                  "Texto 1", textElements["historia"]);
+        engine.dmeg.CreateTextBox({posX, posY + 50}, {boxWidth, boxHeight}, D_WHITE,
+                                  "Estas perdido por el bosque y", engine.dmeg.GetDefaultFont(), 40,
+                                  D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                  "Texto 2", textElements["historia"]);
+        engine.dmeg.CreateTextBox({posX, posY + 100}, {boxWidth, boxHeight}, D_WHITE,
+                                  "debes encontrar a tu maestro.", engine.dmeg.GetDefaultFont(), 40,
+                                  D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                  "Texto 3", textElements["historia"]);
+        engine.dmeg.CreateTextBox({posX, posY + 150}, {boxWidth, boxHeight}, D_WHITE,
+                                  "¡Mucha suerte!", engine.dmeg.GetDefaultFont(), 40,
+                                  D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                  "Texto 4", textElements["historia"]);
 
-    // Alineamiento del texto
-    GuiSetStyle(LABEL, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+        engine.dmeg.CreateTextBox({posX, posY + 250}, {boxWidth, boxHeight}, D_WHITE,
+                                  "", engine.dmeg.GetDefaultFont(), 40,
+                                  D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                  "Texto 5", textElements["historia"]);
 
-    GuiLabel(boxRect, "¡Bienvenido a la aventura!");
-    GuiLabel({ posX, posY + 50, boxWidth, boxHeight }, "Estas perdido por el bosque y");
-    GuiLabel({ posX, posY + 100, boxWidth, boxHeight }, "debes encontrar a tu maestro.");
-    GuiLabel({ posX, posY + 150, boxWidth, boxHeight }, "¡Mucha suerte!");
+        for(auto& txtEl : textElements["historia"]->getChildren())
+            dynamic_cast<DarkMoon::TextBox*>(txtEl->getEntity())->drawBox = false;
+    }
 
-    std::string text = "DALE A [E] PARA JUGAR";
+    textElements["historia"]->setVisible(true);
+
+    auto auxText = dynamic_cast<DarkMoon::TextBox*>(textElements["historia"]->getChildren().back()->getEntity());
+
+    auxText->text.text = "DALE A [E] PARA JUGAR";
     if (engine.isGamepadAvailable(0))
-        text = "DALE A [X] PARA JUGAR";
-    GuiLabel({ posX, posY + 250, boxWidth, boxHeight }, text.c_str());
+        auxText->text.text = "DALE A [X] PARA JUGAR";
+
+    engine.dmeg.GetRootNode()->traverse(glm::mat4());
 
     init();
     engine.endDrawing();
@@ -1691,11 +1875,12 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
     using SYSTAGss = MP::TypeList<EnemyTag>;
 
     // [TODO] - RAYCAST
+    RayCast ray = engine.getMouseRay();
+    std::cout << "Origen: " << ray.origin.x() << " | " << ray.origin.y() << " | " << ray.origin.z() << "\n";
+    std::cout << "Direccion: " << ray.direction.x() << " | " << ray.direction.y() << " | " << ray.direction.z() << "\n";
+
     em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, PhysicsComponent& phy, ColliderComponent& col, RenderComponent& ren)
     {
-        RayCast ray = engine.getMouseRay();
-        std::cout << "Origen: " << ray.origin.x() << " | " << ray.origin.y() << " | " << ray.origin.z() << "\n";
-        std::cout << "Direccion: " << ray.direction.x() << " | " << ray.direction.y() << " | " << ray.direction.z() << "\n";
         // Comprobar si el rayo intersecta con el collider
         if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
             if (engine.dmeg.IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {

@@ -516,6 +516,21 @@ namespace DarkMoon {
         Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK)
             : position(pos), text(txt), font(f), fontSize(fS), color(col) {
                 scale = static_cast<float>(fontSize) / 48.0f;
+                if(font && !text.empty()){
+                    std::string::const_iterator c;
+                    float aux_x = position.x;
+                    for(c = text.begin(); c != text.end(); c++){
+                        // Max Height
+                        Character ch = font->characters[*c];
+                        auto chY = static_cast<float>(ch.size.y);
+                        if(maxHeight < chY)
+                            maxHeight = chY;
+                        // Max Width
+                        aux_x += static_cast<float>(ch.advance >> 6) * scale;
+                    }
+                    maxHeight *= scale;
+                    maxWidth = aux_x - position.x;
+                }
             };
 
         void draw(glm::mat4 transMatrix) override {
@@ -613,6 +628,8 @@ namespace DarkMoon {
         Rectangle boxBackground;
         Text text;
         float padding = 10.0f;
+
+        bool drawBox { true };
         
         Aligned verAligned;
         Aligned horAligned;
@@ -629,12 +646,14 @@ namespace DarkMoon {
             box(pos, sz, bCol), boxBackground({pos.x - 1, pos.y - 1}, {sz.x + 2, sz.y + 2}, D_GRAY), text(pos, txt, f, fS, tCol), verAligned(verAl), horAligned(horAl) {};
 
         void draw(glm::mat4 transMatrix) override {
-            // Rectangle background
-            glm::mat4 aux = transMatrix;
-            aux[3][0] -= 1;   aux[3][1] -= 1;
-            boxBackground.draw(aux);
-            // Rectangle
-            box.draw(transMatrix);
+            if(drawBox){
+                // Rectangle background
+                glm::mat4 aux = transMatrix;
+                aux[3][0] -= 1;   aux[3][1] -= 1;
+                boxBackground.draw(aux);
+                // Rectangle
+                box.draw(transMatrix);
+            }
 
             // Vertical Aligned
             switch (verAligned){
@@ -697,8 +716,8 @@ namespace DarkMoon {
 
         void draw(glm::mat4 transMatrix) override {
             // Color
-            WindowsManager wm = WindowsManager::getInstance();
-            InputManager im = InputManager::getInstance();
+            WindowsManager& wm = WindowsManager::getInstance();
+            InputManager& im = InputManager::getInstance();
 
             glm::vec2 mPos = { im.getMouseX(wm.getWindow()), im.getMouseY(wm.getWindow()) };
             glm::vec2 topLeft = textBox.box.position;
@@ -706,7 +725,7 @@ namespace DarkMoon {
 
             if(mPos.x >= topLeft.x && mPos.x <= bottomRight.x &&
                mPos.y >= topLeft.y && mPos.y <= bottomRight.y){
-                if(im.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)){
+                if(im.isMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT)){
                     textBox.box.color = clickColor;
                     state = ButtonState::CLICK;
                 }
@@ -727,6 +746,7 @@ namespace DarkMoon {
 
     struct Slider : Entity {
         Rectangle background;
+        Rectangle boxBackground;
         Rectangle slider;
         float valor = 0.5f; // 0 -> 1
 
@@ -734,18 +754,23 @@ namespace DarkMoon {
                glm::vec2 sz = { 100.0f, 50.0f },
                Color bCol = D_GRAY,
                Color sCol = D_WHITE) :
-               background(pos, sz, bCol), slider({pos.x + 1, pos.y + 1}, {sz.x - 2, sz.y - 2}, sCol) {};
+               background(pos, sz, bCol), boxBackground({pos.x - 1, pos.y - 1}, {sz.x + 2, sz.y + 2}, D_GRAY), slider({pos.x + 1, pos.y + 1}, {sz.x - 2, sz.y - 2}, sCol) {};
 
         void draw(glm::mat4 transMatrix) override {
+            // Rectangle box background
+            glm::mat4 aux = transMatrix;
+            aux[3][0] -= 1;   aux[3][1] -= 1;
+            boxBackground.draw(aux);
+
             // Rectangle background
             background.draw(transMatrix);
 
             // Rectangle slider
-            glm::mat4 aux = transMatrix;
+            aux = transMatrix;
             aux[3][0] += 1;   aux[3][1] += 1;
 
-            WindowsManager wm = WindowsManager::getInstance();
-            InputManager im = InputManager::getInstance();
+            WindowsManager& wm = WindowsManager::getInstance();
+            InputManager& im = InputManager::getInstance();
             
             glm::vec2 mPos = { im.getMouseX(wm.getWindow()), im.getMouseY(wm.getWindow()) };
             glm::vec2 topLeft = slider.position;

@@ -157,6 +157,7 @@ namespace DarkMoon {
                 im->m_mouseButtonReleaseStates[button] = true;
             else
                 im->m_mouseButtonReleaseStates[button] = false;
+
         }
     }
 }

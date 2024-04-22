@@ -93,11 +93,14 @@ private:
     std::map<std::string, AnimatedTexture> animatedTextures{};
     std::map<std::string, DarkMoon::Node*> HUDElements{};
     std::map<std::string, DarkMoon::Node*> debugIA{};
+    std::map<std::string, DarkMoon::Node*> buttons{};
+    std::map<std::string, DarkMoon::Node*> textElements{};
     // bool chunk0Charged{ false };
     // bool chunk1Charged{ false };
     // ShaderType* shaderPtr{ nullptr };
 
     void restartScene(GameEngine& engine);
+    void changeScene(GameEngine& engine);
 
     float elapsed{ 0.0f }, elapsed_limit{ 0.4f };
     float elapsed_WASD{ 0.0f }, elapsed_limit_WASD{ 5.0f };

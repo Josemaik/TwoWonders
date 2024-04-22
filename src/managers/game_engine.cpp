@@ -13,7 +13,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     node_scene3D = dmeg.CreateNode("Scene 3D", dmeg.GetRootNode());
     node_scene2D = dmeg.CreateNode("Scene 2D", dmeg.GetRootNode());
-    node_sceneTextures = dmeg.CreateNode("texturas", node_scene2D);
+    node_sceneTextures = dmeg.CreateNode("Texturas", node_scene2D);
 
     ENGI::GameEngine::setExitKey(D_KEY_F8);
 

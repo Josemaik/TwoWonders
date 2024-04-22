@@ -82,7 +82,7 @@ namespace DarkMoon {
             ray.direction = glm::normalize(farPoint - nearPoint);
 
             // Unproject mouse cursor in the near plane
-            glm::vec3 cameraPlanePointerPos = glm::unProject(glm::vec3(deviceCoords.x, deviceCoords.y, 0.0f), matView, matProj, glm::vec4(0, 0, screenWidth, screenHeight));
+            glm::vec3 cameraPlanePointerPos = glm::unProject(glm::vec3(deviceCoords.x, deviceCoords.y, -1.0f), matView, matProj, glm::vec4(0, 0, screenWidth, screenHeight));
 
             if(this->cameraProjection == CameraProjection::CAMERA_PERSPECTIVE)
                 ray.origin = this->position;
