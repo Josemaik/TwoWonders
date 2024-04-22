@@ -246,7 +246,7 @@ void Game::run()
 
             // TODO - Cuando se implemente el sistema de guardado, cargar el nivel en el que se quedó
             if (!map.isComplete())
-                map.createMap(em, 0, iam);
+                map.createMap(em, 2, iam);
 
             break;
         }
