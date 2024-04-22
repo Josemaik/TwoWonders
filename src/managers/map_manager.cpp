@@ -370,7 +370,7 @@ void MapManager::generateEnemies(EntityManager& em, const valueType& enemyArray,
     for (mapSizeType i = 0; i < enemyArray.Size(); i++)
     {
         const valueType& enemy = enemyArray[i];
-        //iam.createEnemy(em, enemy);
+        iam.createEnemy(em, enemy);
     }
 }
 
@@ -942,16 +942,16 @@ void MapManager::generateNavmeshes(EntityManager& em)
                         const auto& currentNode = it2;
 
                         // Solo consideramos nodos en el borde de la intersección
-                        // if (!nextbbox.intersects(currentNode->second)
-                        //     && currentNode != it->nodes.begin()) continue;
+                        if (!nextbbox.intersects(currentNode->second)
+                            && currentNode != it->nodes.begin()) continue;
 
                         // Recorremos nodos del segundo navmesh
                         for (auto it3 = nextnavmesh->nodes.begin(); it3 != nextnavmesh->nodes.end(); ++it3) {
                             const auto& nextNode = it3;
 
                             //Solo consideramos nodos en el borde de la intersección
-                            // if (!currentbbox.intersects(nextNode->second)
-                            //     && nextNode != nextnavmesh->nodes.begin()) continue;
+                            if (!currentbbox.intersects(nextNode->second)
+                                && nextNode != nextnavmesh->nodes.begin()) continue;
 
                             // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
                             //(navs.checkcousinsnodes())
@@ -970,7 +970,8 @@ void MapManager::generateNavmeshes(EntityManager& em)
             }
         }
     }
-    //Conexiones a mano de las rampas
+    //Conexiones a mano de las rampas del nivel 2
+    //rampa muñeco izquierda
     std::vector<Conection> auxconex;
     auxconex.push_back(Conection{ 1,2,18});
     auxconex.push_back(Conection{ 1,5,18});
@@ -980,6 +981,45 @@ void MapManager::generateNavmeshes(EntityManager& em)
     auxconex.push_back(Conection{ 1,44,0});
     auxconex.push_back(Conection{ 1,14,2});
     auxconex.push_back(Conection{ 1,27,14});
+    auxconex.push_back(Conection{ 1,21,18});
+    // rampa derecha muñeco
+    auxconex.push_back(Conection{ 1,63,59});
+    auxconex.push_back(Conection{ 1,98,63});
+    auxconex.push_back(Conection{ 1,64,63});
+    auxconex.push_back(Conection{ 1,65,63});
+    // rampa mas abajo
+    auxconex.push_back(Conection{ 1,124,116});
+    auxconex.push_back(Conection{ 1,121,116});
+    auxconex.push_back(Conection{ 1,119,116});
+    //
+    auxconex.push_back(Conection{ 1,576,572});
+    auxconex.push_back(Conection{ 1,572,567});
+    auxconex.push_back(Conection{ 1,567,536});
+    auxconex.push_back(Conection{ 1,620,572});
+    auxconex.push_back(Conection{ 1,583,572});
+    auxconex.push_back(Conection{ 1,470,576});
+    auxconex.push_back(Conection{ 1,473,576});
+    auxconex.push_back(Conection{ 1,484,473});
+    //
+    auxconex.push_back(Conection{ 1,333,346});
+    auxconex.push_back(Conection{ 1,303,333});
+    //
+    auxconex.push_back(Conection{ 1,643,843});
+    auxconex.push_back(Conection{ 1,646,843});
+    auxconex.push_back(Conection{ 1,652,843});
+    auxconex.push_back(Conection{ 1,843,837});
+    auxconex.push_back(Conection{ 1,647,648});
+    auxconex.push_back(Conection{ 1,630,639});
+    //
+    auxconex.push_back(Conection{ 1,801,808});
+    auxconex.push_back(Conection{ 1,808,819});
+    auxconex.push_back(Conection{ 1,742,801});
+    auxconex.push_back(Conection{ 1,799,801});
+    auxconex.push_back(Conection{ 1,731,801});
+    auxconex.push_back(Conection{ 1,736,801});
+    auxconex.push_back(Conection{ 1,745,801});
+    auxconex.push_back(Conection{ 1,792,742});
+    auxconex.push_back(Conection{ 1,800,742});
     for (auto& c : auxconex) {
         navs.conexiones.push_back(c);
         //debug
