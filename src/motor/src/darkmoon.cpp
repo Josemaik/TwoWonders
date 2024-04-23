@@ -333,7 +333,7 @@ namespace DarkMoon {
             m_renderManager.shaderText = LoadShader("shaderText", "assets/shaders/text.vs", "assets/shaders/text.fs");
 
             //----- Font -----//
-            m_renderManager.defaultFont = LoadFont("assets/fonts/roboto.ttf");
+            m_renderManager.defaultFont = LoadFont("assets/fonts/Capriola-Regular.ttf");
 
             return true;
         }
