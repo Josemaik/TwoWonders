@@ -31,11 +31,11 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     //     i++;
     // }
     //check if ai have to follow or no patrol
-    bool followpatrol{true};
-    vec3d firstpathpos = {json["path"][0][0].GetDouble(), json["path"][0][1].GetDouble(), json["path"][0][2].GetDouble()};
-    if(firstpathpos.x() == position.x() && firstpathpos.z() == position.z()){
+    bool followpatrol{ true };
+    vec3d firstpathpos = { json["path"][0][0].GetDouble(), json["path"][0][1].GetDouble(), json["path"][0][2].GetDouble() };
+    if (firstpathpos.x() == position.x() && firstpathpos.z() == position.z()) {
         followpatrol = false;
-    }   
+    }
 
 
     double countdown_stop = json["countdown_stop"].GetDouble();
@@ -183,7 +183,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* d_s_1 = &tree.createNode<BTAction_Seek>();
         auto* d_rax = &tree.createNode<BTDecisionReadyforAttack>();
         auto* a_a_6 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee, vec3d{});
-        auto* sequence0 = &tree.createNode<BTNodeSequence_t>(d_p_h, d_s_1,d_rax, a_a_6);
+        auto* sequence0 = &tree.createNode<BTNodeSequence_t>(d_p_h, d_s_1, d_rax, a_a_6);
 
         auto* d_1_7 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* d_ra = &tree.createNode<BTDecisionReadyforAttack>();
@@ -220,7 +220,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* pdc = &tree.createNode<BTDecisionPlayerDetected>();
         auto* rfca = &tree.createNode<BTDecisionReadyforCrusherAttk>();
         auto* ash = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::CrusherAttack, wp.position);
-        tree.createNode<BTNodeSequence_t>(pdc,rfca, ash);
+        tree.createNode<BTNodeSequence_t>(pdc, rfca, ash);
     }
           break;
     default:
@@ -230,7 +230,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
 
     // Creamos el componente IA
     auto& ai = em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = arrival_radius, .detect_radius = detect_radius, .attack_radius = attack_radius, .tx = tx, .tz = tz,.time2arrive = time2arrive, .tactive = tactive, .perceptionTime = static_cast<float>(perceptionTime),
-        .path = path,.followpatrol = followpatrol ,.countdown_stop = countdown_stop, .countdown_shoot = countdown_shoot, .countdown_perception = countdown_perception, .behaviourTree = &tree });
+        .path = path,.followpatrol = followpatrol ,.countdown_stop = countdown_stop, .countdown_shoot = countdown_shoot, .countdown_perception = countdown_perception, .initialPos = position, .behaviourTree = &tree });
 
     em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = static_cast<float>(scale_to_respawn_attack) });
 
