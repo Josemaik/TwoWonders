@@ -182,13 +182,13 @@ int main(){
 
             inputManager(engine, mainCharacter);
 
-            //if(buttonEntity->state == DarkMoon::ButtonState::CLICK)
-            //    std::cout << "Pulsando el boton\n";
+            if(buttonEntity->state == DarkMoon::ButtonState::CLICK)
+                std::cout << "Pulsando el boton\n";
 
             //if(engine.IsMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
             //    std::cout << "Mantengo click\n";
-            if(engine.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
-                std::cout << "Hago click\n";
+            //if(engine.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
+            //    std::cout << "Hago click\n";
             //if(engine.IsMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT))
             //    std::cout << "Acabo de soltar\n";
             //if(engine.IsMouseButtonUp(GLFW_MOUSE_BUTTON_LEFT))

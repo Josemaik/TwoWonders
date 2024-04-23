@@ -3,7 +3,7 @@ CCACHE 	   := ccache
 CC         := g++-12
 CCFLAGS    := -std=c++2b -g -Wall -Wpedantic -Wextra -Wconversion -I/usr/include/freetype2
 
-LIBS 	   := -lglfw -lGLEW -lGLU -lGL -lm -lassimp -lfreetype
+LIBS 	   := -lglfw -lGLEW -lGLU -lGL -lm -lassimp -lfreetype -lgif
 
 SANITIZE   := -fsanitize=address,undefined
 
