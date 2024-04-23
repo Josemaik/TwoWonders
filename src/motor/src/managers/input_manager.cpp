@@ -9,6 +9,7 @@ namespace DarkMoon {
     bool InputManager::isKeyPressedRepeat(int key) { return m_keyStates[key] == GLFW_PRESS; }
     bool InputManager::isKeyDown(int key) { return m_keyStates[key] == GLFW_PRESS; }
     bool InputManager::isKeyUp(int key) { return m_keyStates[key] == GLFW_RELEASE; }
+    
     void InputManager::setExitKey(int key){ m_exitKey = key; }
 
     void InputManager::keyCallback(GLFWwindow* window, int key, int, int action, int) {
