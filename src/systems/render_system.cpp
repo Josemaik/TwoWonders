@@ -655,12 +655,15 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, RenderComponent& r)
     {
-        if (!e.hasTags(FrustOut{}) && r.meshLoaded && e.hasComponent<ColliderComponent>())
+        if ((!e.hasTags(FrustOut{}) && r.meshLoaded && e.hasComponent<ColliderComponent>()))
         {
             auto& col = em.getComponent<ColliderComponent>(e);
             if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
                 return;
         }
+
+        if (e.hasTag<EnemyDeathTag>())
+            return;
 
         if (r.visible) {
             Color colorEntidad = r.color;
@@ -1752,7 +1755,7 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
     for (auto const& e : em.getEntities())
     {
         //Alert state
-        if (e.hasTag<EnemyTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>()) {
+        if (e.hasTag<EnemyTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>() && !e.hasTag<EnemyDeathTag>()) {
             auto& aic = em.getComponent<AIComponent>(e);
             auto& r = em.getComponent<RenderComponent>(e);
 
@@ -1865,7 +1868,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
 
         // Vidas HUD
         if (e.hasTag<EnemyTag>() && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible &&
-            !(e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>()))
+            !(e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>() || e.hasTag<EnemyDeathTag>()))
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
             auto& l{ em.getComponent<LifeComponent>(e) };

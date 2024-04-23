@@ -17,10 +17,8 @@ void LockSystem::update(EntityManager& em)
         {
             if (e.hasTag<EnemyTag>() || e.hasTag<DestructibleTag>())
             {
-                if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
-                    return;
-
-                if (e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>())
+                if (e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>() ||
+                    frti.bboxIn(col.bbox) == FrustPos::OUTSIDE || e.hasTag<EnemyDeathTag>())
                     return;
 
                 auto& pos = phy.position;

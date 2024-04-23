@@ -11,7 +11,7 @@ void CollisionSystem::update(EntityManager& em)
     octree.clear();
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
     {
-        if (!e.hasTags(FrustOut{}) && frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+        if ((!e.hasTags(FrustOut{}) && frti.bboxIn(col.bbox) == FrustPos::OUTSIDE) || e.hasTag<EnemyDeathTag>())
             return;
 
         // Si la entidad está por debajo del suelo, se destruye
@@ -625,23 +625,6 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
 
         if (plfi.mana < plfi.max_mana - 3.0)
             plfi.mana = plfi.max_mana - 3.0;
-
-        if (evm != nullptr && plfi.spawnPoint != otherPhy->position)
-        {
-            plfi.spawnPoint = otherPhy->position;
-            evm->scheduleEvent(Event{ EventCodes::SetSpawn });
-
-            if (otherEntPtr->hasComponent<DispatcherComponent>())
-            {
-                auto& dc = em.getComponent<DispatcherComponent>(*otherEntPtr);
-                auto& lc = em.getComponent<ListenerComponent>(*staticEntPtr);
-                for (std::size_t i = 0; i < dc.eventCodes.size(); i++)
-                {
-                    evm->scheduleEvent(Event{ static_cast<EventCodes>(dc.eventCodes[i]) });
-                    lc.addCode(static_cast<EventCodes>(dc.eventCodes[i]));
-                }
-            }
-        }
         return;
     }
 

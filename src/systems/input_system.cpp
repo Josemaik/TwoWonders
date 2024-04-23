@@ -46,36 +46,36 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     }
 
     // // DEBUG PHYSICS
-    // if (ge.isKeyReleased(KEY_F1))
-    // {
-    //     inpi.debugPhy = !inpi.debugPhy;
-    //     inpi.debugAI1 = false;
-    //     inpi.debugAI2 = false;
-    //     inpi.pause = false;
-    //     inpi.inventory = false;
-    //     return;
-    // }
+    if (ge.isKeyReleased(KEY_F1))
+    {
+        inpi.debugPhy = !inpi.debugPhy;
+        inpi.debugAI1 = false;
+        inpi.debugAI2 = false;
+        inpi.pause = false;
+        inpi.inventory = false;
+        return;
+    }
 
-    // //DEBUG AI - Stop Game
-    // if (ge.isKeyReleased(KEY_F2))
-    // {
-    //     inpi.debugAI1 = !inpi.debugAI1;
-    //     inpi.debugPhy = false;
-    //     inpi.debugAI2 = false;
-    //     inpi.pause = false;
-    //     inpi.inventory = false;
-    //     return;
-    // }
+    //DEBUG AI - Stop Game
+    if (ge.isKeyReleased(KEY_F2))
+    {
+        inpi.debugAI1 = !inpi.debugAI1;
+        inpi.debugPhy = false;
+        inpi.debugAI2 = false;
+        inpi.pause = false;
+        inpi.inventory = false;
+        return;
+    }
 
-    // // DEBUG AI - Real Time
-    // if (ge.isKeyReleased(KEY_F3))
-    // {
-    //     inpi.debugAI2 = !inpi.debugAI2;
-    //     inpi.debugPhy = false;
-    //     inpi.debugAI1 = false;
-    //     inpi.pause = false;
-    //     return;
-    // }
+    // DEBUG AI - Real Time
+    if (ge.isKeyReleased(KEY_F3))
+    {
+        inpi.debugAI2 = !inpi.debugAI2;
+        inpi.debugPhy = false;
+        inpi.debugAI1 = false;
+        inpi.pause = false;
+        return;
+    }
 
     // // DEBUG NAVMESH
     if (ge.isKeyReleased(KEY_F4))
