@@ -35,7 +35,7 @@ struct MapManager
     inline void resetParts(EntityManager& em)
     {
         // Primero, destruye las partes
-        destroyParts<Tags...>(em);
+        resetEnemies<Tags...>(em);
 
         // Luego, resetea cada parte
         (resetTag<Tags>(em), ...);
@@ -61,6 +61,7 @@ private:
     vec3d rotateY(const vec3d& v, double angle);
     vec3d rotateAroundPoint(const vec3d& point, const vec3d& pivot, double angle);
     vec3d rotateScale(const vec3d& v, double angle);
+    void resetEnemies(EntityManager& em);
 
     std::string fileMap{};
     LoadState state{ LoadState::LOAD_CHUNKS };
@@ -68,15 +69,6 @@ private:
     std::vector<const valueType*> chunksVec{};
     uint8_t unique_ids{ 0 }, boatParts{ 0 };
     bool reSpawn{ false };
-
-    template <typename... Tags>
-    void destroyParts(EntityManager& em)
-    {
-        using CMPS = MP::TypeList<>;
-        auto& li = em.getSingleton<LevelInfo>();
-
-        (em.forEachAny<CMPS, Tags>([&](Entity& entity) { li.insertDeath(entity.getID()); }), ...);
-    }
 
     template <typename Tag>
     inline void resetTag(EntityManager&) {}

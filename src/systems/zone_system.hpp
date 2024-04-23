@@ -27,7 +27,7 @@ private:
     void checkMissionObjs(EntityManager& em, EventManager& evm);
     void checkNPCs(EntityManager& em, EventManager& evm);
     void checkDoors(EntityManager& em, EventManager& evm);
-    void checkSpawns(EntityManager& em);
+    void checkSpawns(EntityManager& em, EventManager& evm);
     // void checkDungeonSlimes(EntityManager& em, EventManager& evm);
     void checkTutorialEnemies(EntityManager& em);
     void checkVolcanoLava(EntityManager& em);

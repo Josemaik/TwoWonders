@@ -38,32 +38,35 @@ void AISystem::update(EntityManager& em)
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren, AIComponent& ai, LifeComponent& lc)
     {
+        if (e.hasTag<EnemyDeathTag>())
+            return;
         //Ptr a ai y lc
         AIComponent* aiptr = &ai;
         LifeComponent* lcptr = &lc;
         //percibir el entorno
-        if(e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()){
+        if (e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()) {
             perception(bb, ai);
         }
 
         //Actualizar posiciones de la IAs o potenciales targets para calcular Flocking
         // Comprobamos si el elemento debe procesarse
         // Más alante hacer que se cumpla si esta a una cierta distancia del player
-        if(e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()){
+        if (e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()) {
             //Si el vector esta vacío, el elemento se inserta
             bool id_found = false;
             // Iterar sobre el vector positions
-            if(bb.potencial_targets.size() != 0){
-                for(auto it = bb.potencial_targets.begin(); it != bb.potencial_targets.end(); ++it) {
+            if (bb.potencial_targets.size() != 0) {
+                for (auto it = bb.potencial_targets.begin(); it != bb.potencial_targets.end(); ++it) {
                     // Si ya existe ele elemento , se comprueba si esta detectando al player
-                    if(it->first == e.getID()) {
+                    if (it->first == e.getID()) {
                         // si lo detecta, actualizamos posición y sino, lo borramos del vector
-                        if(ai.playerdetected){
+                        if (ai.playerdetected) {
                             // Actualizar la posición
                             it->second = phy.position;
                             // Marcar que se ha encontrado el ID
                             id_found = true;
-                        }else{
+                        }
+                        else {
                             bb.potencial_targets.erase(it);
                         }
                         // Salir del bucle
@@ -72,7 +75,7 @@ void AISystem::update(EntityManager& em)
                 }
             }
             // Si no se ha encontrado el ID en el vector positions, añadir un nuevo par
-            if(!id_found && ai.playerdetected) {
+            if (!id_found && ai.playerdetected) {
                 bb.potencial_targets.push_back(std::make_pair(e.getID(), phy.position));
             }
         }
@@ -90,15 +93,15 @@ void AISystem::update(EntityManager& em)
         }
 
         //visual debug cone
-        if(e.hasTag<SnowmanTag>()){
+        if (e.hasTag<SnowmanTag>()) {
             bb.conesnow.first = phy.position;
             bb.conesnow.second = phy.orientation;
         }
-        if(e.hasTag<GolemTag>()){
+        if (e.hasTag<GolemTag>()) {
             bb.conegolem.first = phy.position;
             bb.conegolem.second = phy.orientation;
         }
-        if(e.hasTag<SpiderTag>()){
+        if (e.hasTag<SpiderTag>()) {
             bb.conespider.first = phy.position;
             bb.conespider.second = phy.orientation;
         }
