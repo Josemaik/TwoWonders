@@ -66,8 +66,8 @@ namespace DarkMoon {
         int m_keyPressedStates[GLFW_KEY_LAST] = { GLFW_RELEASE };
 
         // Button States
-        GLFWgamepadstate m_gamepadStates[GLFW_JOYSTICK_LAST + 1] = { GLFW_RELEASE };
-        GLFWgamepadstate m_gamepadReleaseStates[GLFW_JOYSTICK_LAST + 1] = { GLFW_RELEASE };
+        GLFWgamepadstate m_gamepadStates[GLFW_JOYSTICK_LAST + 1] = {};
+        GLFWgamepadstate m_gamepadReleaseStates[GLFW_JOYSTICK_LAST + 1] = {};
 
         // Mouse States
         int m_mouseButtonStates[GLFW_MOUSE_BUTTON_LAST] = { GLFW_RELEASE };

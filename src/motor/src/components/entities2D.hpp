@@ -9,53 +9,23 @@
 #include <GL/gl.h>
 #include <glm/glm.hpp>
 
+#include <chrono>
+
 namespace DarkMoon {
     struct Pixel : Entity {
-        Color color;
+    private:
+        glm::vec2 m_position = {}; 
+        GLuint m_VAO = {}, m_VBO = {};
 
-        Pixel(Color c = D_BLACK)
-            : color(c) {};
+        void changePosition(float newPosX, float newPosY);
 
-        void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
+    public:
+        Color color = { D_BLACK };
 
-            // Apply Transformation Matrix
-            auto position = glm::vec2(transMatrix[3][0], transMatrix[3][1]);
+        Pixel(Color c);
+        ~Pixel();
 
-            // Define a single vertex for the pixel
-            float vertex[] = { rm.normalizeX(position.x), rm.normalizeY(position.y) };
-
-            // Create and configure VAO, VBO
-            GLuint VAO, VBO;
-            glGenVertexArrays(1, &VAO);
-            glGenBuffers(1, &VBO);
-
-            glBindVertexArray(VAO);
-
-            glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-            glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
-
-            // Set up vertex attribute pointers
-            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(0);
-
-            glBindVertexArray(0);
-
-            // Set the uniform color in the shader
-            GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
-            glUseProgram(rm.getShader()->getIDShader());
-            glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
-
-            // Draw the pixel
-            glBindVertexArray(VAO);
-            glDrawArrays(GL_POINTS, 0, 1);
-            glBindVertexArray(0);
-
-            // Clean up resources
-            glDeleteVertexArrays(1, &VAO);
-            glDeleteBuffers(1, &VBO);
-        };
+        void draw(glm::mat4 transMatrix) override;
     };
 
     struct Line : Entity {
