@@ -740,7 +740,7 @@ void MapManager::generateNavmeshes(EntityManager& em)
 {
     auto& navs = em.getSingleton<NavmeshInfo>();
     mapType navmeshkaiwa = loadMap("assets/Niveles/Lvl_2/Lvl_2-navmeshes.kaiwa");
-
+    int numr {0};
     const valueType& navmeshes = navmeshkaiwa["NavMesh"];
     for (mapSizeType i = 0; i < navmeshes.Size(); i++) {
         std::array<vec3d, 9> vecnodes{};
@@ -792,7 +792,21 @@ void MapManager::generateNavmeshes(EntityManager& em)
         }
 
         //Rampa?
-        bool hasramp = navmesh["ramp"].GetBool();
+        bool hasramp{false};
+        // const valueType& xd = navmesh["ramp"];
+        // if(xd==NULL){
+        //     hasramp = true;
+        // }
+
+        
+        
+        const rapidjson::Value::ConstMemberIterator& xd = navmesh.FindMember("ramp");
+        if(xd != navmesh.MemberEnd()){
+            if(xd->value.GetBool())
+                hasramp = true;
+                numr++;
+        }
+        // bool hasramp = navmesh["ramp"].GetBool();
 
         //Creamos NavMesh BBox
         double scalex{}, scalez{};
@@ -840,6 +854,7 @@ void MapManager::generateNavmeshes(EntityManager& em)
             }
         }
     }
+    
     ///////////////////////////////////////////////////////////////////////////////////////////////////////7
     // Guardamos info 
     // std::vector<Conection> auxconex;
@@ -1011,15 +1026,18 @@ void MapManager::generateNavmeshes(EntityManager& em)
     auxconex.push_back(Conection{ 1,647,648 });
     auxconex.push_back(Conection{ 1,630,639 });
     //
-    auxconex.push_back(Conection{ 1,801,808 });
-    auxconex.push_back(Conection{ 1,808,819 });
-    auxconex.push_back(Conection{ 1,742,801 });
-    auxconex.push_back(Conection{ 1,799,801 });
-    auxconex.push_back(Conection{ 1,731,801 });
-    auxconex.push_back(Conection{ 1,736,801 });
-    auxconex.push_back(Conection{ 1,745,801 });
-    auxconex.push_back(Conection{ 1,792,742 });
-    auxconex.push_back(Conection{ 1,800,742 });
+    auxconex.push_back(Conection{ 1,801,808});
+    auxconex.push_back(Conection{ 1,808,819});
+    auxconex.push_back(Conection{ 1,742,801});
+    auxconex.push_back(Conection{ 1,799,801});
+    auxconex.push_back(Conection{ 1,731,801});
+    auxconex.push_back(Conection{ 1,736,801});
+    auxconex.push_back(Conection{ 1,745,801});
+    auxconex.push_back(Conection{ 1,792,742});
+    auxconex.push_back(Conection{ 1,800,742});
+    auxconex.push_back(Conection{ 1,644,808});
+    auxconex.push_back(Conection{ 1,632,639});
+
     for (auto& c : auxconex) {
         navs.conexiones.push_back(c);
         //debug
