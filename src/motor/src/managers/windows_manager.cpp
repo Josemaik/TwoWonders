@@ -133,7 +133,7 @@ namespace DarkMoon {
         glLoadIdentity();
         glOrtho(0, m_width, 0, m_height, -1, 1);
 
-        glfwPollEvents();
+        //glfwPollEvents();
 
         //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -148,6 +148,8 @@ namespace DarkMoon {
         glfwSwapBuffers(m_window);
 
         m_lastFrameTime = getTime();
+
+        glfwPollEvents();
     }
 
     // Timing-related functions

@@ -106,7 +106,7 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
     auto camera = engine.GetCamera();
     float velocity = 0.5f;
 
-    if(engine.IsKeyPressed(D_KEY_A)){ // +X -Z
+    if(engine.IsKeyDown(D_KEY_A)){ // +X -Z
         camera->position.x += velocity;
         camera->target.x   += velocity;
 
@@ -116,7 +116,7 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
         nodeCharacter->translate({velocity, 0.0f, -velocity});
         nodeCharacter->setRotation({0.0f, 1.0f, 0.0f}, 135.0f);
     }
-    if(engine.IsKeyPressed(D_KEY_D)){ // -X +Z
+    if(engine.IsKeyDown(D_KEY_D)){ // -X +Z
         camera->position.x -= velocity;
         camera->target.x   -= velocity;
 
@@ -126,7 +126,7 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
         nodeCharacter->translate({-velocity, 0.0f, velocity});
         nodeCharacter->setRotation({0.0f, 1.0f, 0.0f}, 315.0f);
     }
-    if(engine.IsKeyPressed(D_KEY_W)){ // +X +Z
+    if(engine.IsKeyDown(D_KEY_W)){ // +X +Z
         camera->position.x += velocity;
         camera->target.x   += velocity;
 
@@ -136,7 +136,7 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
         nodeCharacter->translate({velocity, 0.0f, velocity});
         nodeCharacter->setRotation({0.0f, 1.0f, 0.0f}, 45.0f);
     }
-    if(engine.IsKeyPressed(D_KEY_S)){ // -X -Z
+    if(engine.IsKeyDown(D_KEY_S)){ // -X -Z
         camera->position.x -= velocity;
         camera->target.x   -= velocity;
 
@@ -185,18 +185,19 @@ int main(){
             if(buttonEntity->state == DarkMoon::ButtonState::CLICK)
                 std::cout << "Pulsando el boton\n";
 
-            //if(engine.IsMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
+            engine.BeginDrawing();
+
+            //if(engine.IsKeyDown(D_KEY_A))
             //    std::cout << "Mantengo click\n";
-            //if(engine.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
+            //if(engine.IsKeyPressed(D_KEY_A))
             //    std::cout << "Hago click\n";
-            //if(engine.IsMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT))
+            //if(engine.IsKeyReleased(D_KEY_A))
             //    std::cout << "Acabo de soltar\n";
-            //if(engine.IsMouseButtonUp(GLFW_MOUSE_BUTTON_LEFT))
+            //if(engine.IsKeyUp(D_KEY_A))
             //    std::cout << "No hago nada\n";
 
             // Draw
 
-            engine.BeginDrawing();
 
             engine.ClearBackground(D_WHITE);
             engine.GetRootNode()->traverse(glm::mat4());

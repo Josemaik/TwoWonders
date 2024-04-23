@@ -1,22 +1,13 @@
 #include "input_manager.hpp"
 
-// Input-related functions: keyboard
 namespace DarkMoon {
-    bool InputManager::isKeyPressed(int key) { return m_keyStates[key]; }
+
+    // Input-related functions: keyboard
+
+    bool InputManager::isKeyPressed(int key) { return m_keyPressedStates[key]; }
+    bool InputManager::isKeyReleased(int key) { return m_keyReleaseStates[key]; }
     bool InputManager::isKeyPressedRepeat(int key) { return m_keyStates[key] == GLFW_PRESS; }
-
-    bool InputManager::isKeyDown(int key) { 
-        return m_keyStates[key] == GLFW_REPEAT || m_keyStates[key] == GLFW_PRESS; 
-    }
-
-    bool InputManager::isKeyReleased(int key) {
-        if (m_keyReleaseStates[key]) {
-            m_keyReleaseStates[key] = false;
-            return true;
-        }
-        return false;
-    }
-
+    bool InputManager::isKeyDown(int key) { return m_keyStates[key] == GLFW_PRESS; }
     bool InputManager::isKeyUp(int key) { return m_keyStates[key] == GLFW_RELEASE; }
     void InputManager::setExitKey(int key){ m_exitKey = key; }
 
@@ -29,8 +20,8 @@ namespace DarkMoon {
 
             if (action == GLFW_RELEASE)
                 im->m_keyReleaseStates[key] = true;
-            else
-                im->m_keyReleaseStates[key] = false;
+            else if (action == GLFW_PRESS)
+                im->m_keyPressedStates[key] = true;
         }
 
         // Mark the GLFW window to be closed
@@ -110,24 +101,17 @@ namespace DarkMoon {
         // Update mouse state
         for(auto& sta : m_mouseButtonReleaseStates) sta = false;
         for(auto& sta : m_mouseButtonPressedStates) sta = false;
+
+        // Update key state
+        for(auto& sta : m_keyReleaseStates) sta = false;
+        for(auto& sta : m_keyPressedStates) sta = false;
     }
 
     // Input-related functions: mouse
-    bool InputManager::isMouseButtonPressed(int button) {
-        return m_mouseButtonPressedStates[button];
-    }
-
-    bool InputManager::isMouseButtonDown(int button) {
-        return m_mouseButtonStates[button] == GLFW_PRESS;
-    }
-
-    bool InputManager::isMouseButtonReleased(int button) {
-        return m_mouseButtonReleaseStates[button];
-    }
-
-    bool InputManager::isMouseButtonUp(int button) {
-        return m_mouseButtonStates[button] == GLFW_RELEASE;
-    }
+    bool InputManager::isMouseButtonPressed(int button) { return m_mouseButtonPressedStates[button]; }
+    bool InputManager::isMouseButtonDown(int button) { return m_mouseButtonStates[button] == GLFW_PRESS; }
+    bool InputManager::isMouseButtonReleased(int button) { return m_mouseButtonReleaseStates[button]; }
+    bool InputManager::isMouseButtonUp(int button) { return m_mouseButtonStates[button] == GLFW_RELEASE; }
 
     int InputManager::getMouseX(GLFWwindow* window) {
         double posX, posY;
@@ -141,9 +125,7 @@ namespace DarkMoon {
         return static_cast<int>(posY);
     }
 
-    void InputManager::setMousePosition(GLFWwindow* window, int x, int y) {
-        glfwSetCursorPos(window, x, y);
-    }
+    void InputManager::setMousePosition(GLFWwindow* window, int x, int y) { glfwSetCursorPos(window, x, y); }
 
     void InputManager::mouseButtonCallback(GLFWwindow* window, int button, int action, int) {
         auto* im = static_cast<InputManager*>(glfwGetWindowUserPointer(window));

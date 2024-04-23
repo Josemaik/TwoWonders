@@ -408,9 +408,9 @@ namespace DarkMoon {
 
     // End canvas drawing and swap buffers
     void DarkMoonEngine::EndDrawing() {
-        m_windowsManager.endDrawing();
-
         m_inputManager.updateEndFrame();
+
+        m_windowsManager.endDrawing();
     }
 
     // ------------------------- //
