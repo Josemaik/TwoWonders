@@ -5,6 +5,8 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, LifeComponent& lif)
     {
+        if (ent.hasTag<EnemyDeathTag>())
+            return;
         if (lif.lifeLost > 0)
         {
             // Si es un subdito y tiene escudo activo, se le resta al escudo
@@ -146,7 +148,6 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 li.lockedEnemy = li.max;
 
             lif.markedForDeletion = true;
-
         }
 
         // Para cuando se recoge una poción de vida
@@ -163,7 +164,12 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
         }
 
         if (lif.markedForDeletion && !lif.decreaseNextFrame)
-            li.insertDeath(ent.getID());
+        {
+            if (!ent.hasTag<EnemyTag>())
+                li.insertDeath(ent.getID());
+            else
+                em.addTag<EnemyDeathTag>(ent);
+        }
     });
 }
 
