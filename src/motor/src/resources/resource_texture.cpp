@@ -18,6 +18,51 @@ namespace DarkMoon {
         return isLoaded();
     }
 
+    bool Texture::loadFrame(GifFileType* gifFile, int frameIndex) {
+        this->m_filePath = "Loaded from GIF frame";
+        setup();
+
+        GifImageDesc* img = &gifFile->SavedImages[frameIndex].ImageDesc;
+        ColorMapObject* colorMap = img->ColorMap ? img->ColorMap : gifFile->SColorMap;
+        GifByteType* raster = gifFile->SavedImages[frameIndex].RasterBits;
+
+        m_width = img->Width;
+        m_height = img->Height;
+        m_nrChannels = 4;
+
+        unsigned char* data = (unsigned char*)stbi__malloc(m_width * m_height * m_nrChannels);
+        memset(data, 0, m_width * m_height * m_nrChannels);
+
+        int transparentColor = -1;
+        if (gifFile->SavedImages[frameIndex].ExtensionBlockCount > 0) {
+            for (int i = 0; i < gifFile->SavedImages[frameIndex].ExtensionBlockCount; i++) {
+                if (gifFile->SavedImages[frameIndex].ExtensionBlocks[i].Function == GRAPHICS_EXT_FUNC_CODE) {
+                    transparentColor = (unsigned char)gifFile->SavedImages[frameIndex].ExtensionBlocks[i].Bytes[3];
+                    break;
+                }
+            }
+        }
+
+        for (int y = 0; y < img->Height; y++) {
+            for (int x = 0; x < img->Width; x++) {
+                GifByteType* p = raster + y * img->Width + x;
+                data[y * m_width * m_nrChannels + x * m_nrChannels + 0] = colorMap->Colors[*p].Red;
+                data[y * m_width * m_nrChannels + x * m_nrChannels + 1] = colorMap->Colors[*p].Green;
+                data[y * m_width * m_nrChannels + x * m_nrChannels + 2] = colorMap->Colors[*p].Blue;
+                data[y * m_width * m_nrChannels + x * m_nrChannels + 3] = (*p == transparentColor) ? 0 : 255;
+            }
+        }
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        stbi_image_free(data);
+
+        m_isLoad = true;
+
+        return isLoaded();
+    }
+
     void Texture::unload() {
         glDeleteTextures(1, &m_idTexture);
         if (isLoaded())

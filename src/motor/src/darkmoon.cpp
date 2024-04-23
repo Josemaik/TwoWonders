@@ -21,7 +21,7 @@ namespace DarkMoon {
     // Node-related functions //
     // ---------------------- //
 
-    void DarkMoonEngine::DrawTree(){
+    void DarkMoonEngine::DrawTree() {
         std::cout << "┌──────┐" << std::endl;
         std::cout << "│ Tree │" << std::endl;
         std::cout << "└──────┘" << std::endl;
@@ -114,7 +114,7 @@ namespace DarkMoon {
     }
 
     // Create animated texture 2D in node
-    Node* DarkMoonEngine::CreateAnimatedTexture2D(glm::vec2 position, std::vector<Texture*> frames, Color color, float frameDuration, int currentFrame, const char* nodeName, Node* parentNode){
+    Node* DarkMoonEngine::CreateAnimatedTexture2D(glm::vec2 position, std::vector<Texture*> frames, Color color, float frameDuration, int currentFrame, const char* nodeName, Node* parentNode) {
         auto p_nodeAnimTex = CreateNode(nodeName, parentNode);
 
         // Create animatedTexture2D
@@ -122,7 +122,7 @@ namespace DarkMoon {
         // Load animated texture
         animTex2D->frames = frames;
 
-        p_nodeAnimTex->translate({ position.x, position.y, 0.0f});
+        p_nodeAnimTex->translate({ position.x, position.y, 0.0f });
         p_nodeAnimTex->setEntity(std::move(animTex2D));
 
         return p_nodeAnimTex;
@@ -131,46 +131,46 @@ namespace DarkMoon {
     // GUI
 
     // Create text in node
-    Node* DarkMoonEngine::CreateText(glm::vec2 position, std::string text, Font* font, int fontSize, Color color, const char* nodeName, Node* parentNode){
+    Node* DarkMoonEngine::CreateText(glm::vec2 position, std::string text, Font* font, int fontSize, Color color, const char* nodeName, Node* parentNode) {
         auto p_nodeText = CreateNode(nodeName, parentNode);
 
         // Create text
         auto textE = std::make_unique<Text>(position, text, font, fontSize, color);
 
-        p_nodeText->translate({ position.x, position.y, 0.0f});
+        p_nodeText->translate({ position.x, position.y, 0.0f });
         p_nodeText->setEntity(std::move(textE));
 
         return p_nodeText;
     }
 
     // Create a text box in node
-    Node* DarkMoonEngine::CreateTextBox(glm::vec2 position, glm::vec2 size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode){
+    Node* DarkMoonEngine::CreateTextBox(glm::vec2 position, glm::vec2 size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode) {
         auto p_nodeTextBox = CreateNode(nodeName, parentNode);
 
         // Create text box
         auto textBoxE = std::make_unique<TextBox>(position, size, boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned);
 
-        p_nodeTextBox->translate({ position.x, position.y, 0.0f});
+        p_nodeTextBox->translate({ position.x, position.y, 0.0f });
         p_nodeTextBox->setEntity(std::move(textBoxE));
 
         return p_nodeTextBox;
     }
 
     // Create a button in node
-    Node* DarkMoonEngine::CreateButton(glm::vec2 position, glm::vec2 size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor, const char* nodeName, Node* parentNode){
+    Node* DarkMoonEngine::CreateButton(glm::vec2 position, glm::vec2 size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor, const char* nodeName, Node* parentNode) {
         auto p_nodeButton = CreateNode(nodeName, parentNode);
 
         // Create button
         auto buttonE = std::make_unique<Button>(position, size, normalColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned, normalColor, hoverColor, clickColor);
 
-        p_nodeButton->translate({ position.x, position.y, 0.0f});
+        p_nodeButton->translate({ position.x, position.y, 0.0f });
         p_nodeButton->setEntity(std::move(buttonE));
 
         return p_nodeButton;
     }
 
     // Create a slider in node
-    Node* DarkMoonEngine::CreateSlider(glm::vec2 position, glm::vec2 size, Color backColor, Color sliderColor, const char* nodeName, Node* parentNode){
+    Node* DarkMoonEngine::CreateSlider(glm::vec2 position, glm::vec2 size, Color backColor, Color sliderColor, const char* nodeName, Node* parentNode) {
         auto p_nodeSlider = CreateNode(nodeName, parentNode);
 
         // Create slider
@@ -296,7 +296,7 @@ namespace DarkMoon {
     }
 
     // Get mouse ray cast
-    Ray DarkMoonEngine::GetMouseRay(){
+    Ray DarkMoonEngine::GetMouseRay() {
         return m_renderManager.m_camera->getMouseRay(GetMouseX(), GetMouseY(), m_windowsManager.getScreenWidth(), m_windowsManager.getScreenHeight());
     }
 
@@ -368,19 +368,19 @@ namespace DarkMoon {
     }
 
     // Check if window is fullscreen
-    bool DarkMoonEngine::IsWindowFullscreen(){
+    bool DarkMoonEngine::IsWindowFullscreen() {
         return m_windowsManager.isWindowFullscreen();
     }
 
     // Toggle Fullscreen
-    void DarkMoonEngine::ToggleFullscreen(){
+    void DarkMoonEngine::ToggleFullscreen() {
         m_windowsManager.toggleFullscreen();
 
         SetWindowSize(GetScreenWidth(), GetScreenHeight());
     }
 
     // Get position from 3D world to 2D world
-    glm::vec2 DarkMoonEngine::GetWorldToScreen(glm::vec3 pos3D){
+    glm::vec2 DarkMoonEngine::GetWorldToScreen(glm::vec3 pos3D) {
         return m_renderManager.getWorldToScreen(pos3D);
     }
 
@@ -421,6 +421,10 @@ namespace DarkMoon {
         //texture->load(filePath);
 
         return texture;
+    }
+
+    std::vector<Texture*> DarkMoonEngine::LoadTexture2DAnim(const char* filePath) {
+        return m_resourceManager.loadGifResources(filePath);
     }
 
     // Unload texture data from CPU and GPU

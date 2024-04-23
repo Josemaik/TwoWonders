@@ -85,7 +85,7 @@ namespace DarkMoon {
         // Get root node
         Node* GetRootNode();
         // Get default font
-        Font* GetDefaultFont(){ return m_renderManager.defaultFont; };
+        Font* GetDefaultFont() { return m_renderManager.defaultFont; };
         // Get mouse ray cast
         Ray GetMouseRay();
 
@@ -112,7 +112,7 @@ namespace DarkMoon {
 
         // Get position from 3D world to 2D world
         glm::vec2 GetWorldToScreen(glm::vec3 pos3D);
-        
+
         // Set exit key
         void SetExitKey(int key);
 
@@ -133,6 +133,8 @@ namespace DarkMoon {
 
         // Load texture from file into GPU memory
         Texture* LoadTexture2D(const char* filePath);
+        // Load textures from file into GPU memory
+        std::vector<Texture*> LoadTexture2DAnim(const char* filePath);
         // Unload texture data from CPU and GPU
         void UnloadTexture(Texture* texture);
 

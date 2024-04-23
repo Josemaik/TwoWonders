@@ -133,7 +133,7 @@ namespace ENGI {
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();
         void loadAndResizeImage(const std::string& name, const std::string& path, double reScaleX = 1.3, double reScaleY = 1.3);
-        void loadAndResizeImageGif(const std::string& name, const std::string& path, int frames, int delay = 15, double reScaleX = 2.0, double reScaleY = 2.0);
+        void loadAndResizeImageGif(const std::string& name, const char* filePath);
         void updateGif(Gif& anim);
         void unloadGifsAndTextures();
         void setReplayMode(bool replay, GameData& gd);
@@ -149,6 +149,7 @@ namespace ENGI {
         DarkMoon::Node* node_scene2D;
         DarkMoon::Node* node_scene3D;
         DarkMoon::Node* node_sceneTextures;
+        DarkMoon::Node* node_animatedTextures;
 
         std::map<std::string, DarkMoon::Node*> nodes_scene;
         std::map<std::string, DarkMoon::Node*> nodes_sceneAnimatedTexture;
@@ -157,6 +158,7 @@ namespace ENGI {
         DarkMoon::Node* createAnimatedTexture2D(std::vector<DarkMoon::Texture*> filePaths, DarkMoon::Color color, float frameDuration, int currentFrame, const std::string& name, DarkMoon::Node* parentNode);
 
         DarkMoon::Texture* loadTexture2D(const char* filePath);
+        std::vector<DarkMoon::Texture*> loadTextures2DAnim(const char* filePath);
 
     private:
         u16 const width_{}, height_{};

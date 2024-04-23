@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <gif_lib.h>
 
 #include <memory>
 #include <unordered_map>
@@ -54,6 +55,45 @@ namespace DarkMoon {
                 nextID--;
                 return nullptr;
             }
+        }
+
+        std::vector<Texture*> loadGifResources(const char* filePath) {
+            std::vector<Texture*> resources;
+
+            // Check if the file is a GIF
+            std::string pathStr(filePath);
+            if (pathStr.substr(pathStr.find_last_of(".") + 1) == "gif") {
+                // Load the GIF and create a texture for each frame
+                int error = 0;
+                GifFileType* gifFile = DGifOpenFileName(filePath, &error);
+                if (gifFile == nullptr) {
+                    return resources;
+                }
+
+                if (DGifSlurp(gifFile) == GIF_ERROR) {
+                    DGifCloseFile(gifFile, &error);
+                    return resources;
+                }
+
+                for (int i = 0; i < gifFile->ImageCount; i++) {
+                    nextID++;
+                    auto resource = std::make_unique<Texture>(nextID);
+                    if (resource->loadFrame(gifFile, i)) {
+                        auto rawPtr = resource.get();
+                        m_resources[nextID] = std::move(resource);
+                        m_fileNames[nextID] = std::string(filePath);
+                        m_fileTypes[nextID] = typeid(Texture).hash_code();
+                        resources.push_back(rawPtr);
+                    }
+                    else {
+                        nextID--;
+                    }
+                }
+
+                DGifCloseFile(gifFile, &error);
+            }
+
+            return resources;
         }
 
         void unloadResource(const std::size_t& id) {

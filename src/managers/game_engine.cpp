@@ -14,6 +14,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     node_scene3D = dmeg.CreateNode("Scene 3D", dmeg.GetRootNode());
     node_scene2D = dmeg.CreateNode("Scene 2D", dmeg.GetRootNode());
     node_sceneTextures = dmeg.CreateNode("Texturas", node_scene2D);
+    node_animatedTextures = createNode("texturas_animadas", node_scene2D);
 
     ENGI::GameEngine::setExitKey(D_KEY_F8);
 
@@ -40,9 +41,6 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // loadAndResizeImage("9", "assets/HUD/numeros/9.png");
 
     // --- GIFS --- //
-    auto node_texturas_animadas = createNode("texturas_animadas", node_scene2D);
-    std::vector<DarkMoon::Texture*> aux_textures;
-
     // [NUEVAS IMAGENES Y TEXTURAS]
     // Medio Corazón HUD
     // loadAndResizeImage("half_heart", "assets/HUD/corazon_medio.png");
@@ -74,36 +72,12 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // // Investigador HUD
     // loadAndResizeImage("investigador", "assets/HUD/caras/investigador.png");
 
-    // Fijador de camara
-    {
-        aux_textures.push_back(loadTexture2D("assets/HUD/gifs/fijado_trama/fijado_trama-0.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/gifs/fijado_trama/fijado_trama-1.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/gifs/fijado_trama/fijado_trama-2.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/gifs/fijado_trama/fijado_trama-3.png"));
-
-        createAnimatedTexture2D(aux_textures, D_WHITE, 1.0f, 0, "fijado", node_texturas_animadas);
-        aux_textures.clear();
-    }
-
     // // Botón Triángulo
     // loadAndResizeImageGif("triangulo", "assets/HUD/botones/triangulo.gif", 0);
 
     // // Botón Menú
     // loadAndResizeImageGif("menu", "assets/HUD/botones/menu.gif", 0);
 
-    // Pantalla de carga
-    {
-        aux_textures.push_back(loadTexture2D("assets/HUD/gifs/carga_elementos/carga_elementos-0.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/gifs/carga_elementos/carga_elementos-1.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/gifs/carga_elementos/carga_elementos-2.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/gifs/carga_elementos/carga_elementos-3.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/gifs/carga_elementos/carga_elementos-4.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/gifs/carga_elementos/carga_elementos-5.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/gifs/carga_elementos/carga_elementos-6.png"));
-
-        createAnimatedTexture2D(aux_textures, D_WHITE, 1.0f, 0, "carga", node_texturas_animadas);
-        aux_textures.clear();
-    }
     // // Candado abierto HUD
     // loadAndResizeImage("candado_abierto", "assets/HUD/candado_abierto.png");
 
@@ -197,160 +171,90 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // GIFS
     //
-    // // Joystick Izquierdo
-    // loadAndResizeImageGif("joystick_izq", "assets/HUD/botones/joystickL.gif", 0, 18);
+    // Joystick Izquierdo
+    loadAndResizeImageGif("joystick_izq", "assets/HUD/botones/joystickL.gif");
 
-    // // Fijador de cámara
-    // loadAndResizeImageGif("fijado", "assets/HUD/gifs/fijado_trama.gif", 0, 18, 1.2, 1.2);
-
-    // // Botón X
-    // loadAndResizeImageGif("x", "assets/HUD/botones/x.gif", 0, 28);
-
-    // // Botón Círculo
-    // loadAndResizeImageGif("circulo", "assets/HUD/botones/circulo.gif", 0, 28);
-
-    // // Botón Triángulo
-    // loadAndResizeImageGif("triangulo", "assets/HUD/botones/triangulo.gif", 0);
-
-    // // Botón Cuadrado
-    // loadAndResizeImageGif("cuadrado", "assets/HUD/botones/cuadrado.gif", 0, 28);
-
-    // // Botón Menú
-    // loadAndResizeImageGif("menu", "assets/HUD/botones/menu.gif", 0);
-
-    // // Tecla E
-    // loadAndResizeImageGif("e", "assets/HUD/teclas/e.gif", 0, 28);
-
-    // // Tecla F
-    // loadAndResizeImageGif("f", "assets/HUD/teclas/f.gif", 0, 28);
-
-    // // Tecla Q
-    // loadAndResizeImageGif("q", "assets/HUD/teclas/q.gif", 0, 28);
-
-    // // Tecla I
-    // loadAndResizeImageGif("i", "assets/HUD/teclas/i.gif", 0, 28);
-
-    // // Tecla H
-    // loadAndResizeImageGif("h", "assets/HUD/teclas/H.gif", 0, 28);
-
-    // // Tecla L
-    // loadAndResizeImageGif("l", "assets/HUD/teclas/L.gif", 0, 28);
-
-    // // Tecla J
-    // loadAndResizeImageGif("j", "assets/HUD/teclas/J.gif", 0, 28);
-
-    // // Tecla K
-    // loadAndResizeImageGif("k", "assets/HUD/teclas/k.gif", 0, 28);
-
-    // // Tecla O
-    // loadAndResizeImageGif("o", "assets/HUD/teclas/o.gif", 0, 28);
-
-    // // Tecla U
-    // loadAndResizeImageGif("u", "assets/HUD/teclas/u.gif", 0, 28);
-
-    // // Tecla Espacio
-    // loadAndResizeImageGif("espacio", "assets/HUD/teclas/espacio.gif", 0, 28);
-
-    // // Pantalla de carga
-    // loadAndResizeImageGif("carga", "assets/HUD/gifs/carga_elementos.gif", 0, 28);
-
-    // // Teclas WASD
-    // loadAndResizeImageGif("wasd", "assets/HUD/teclas/WASD.gif", 0, 28);
-
-    // // Ejemplo pompa
-    // loadAndResizeImageGif("exp_pompa", "assets/HUD/gifs/hechizos/exp_pompa.gif", 0, 28);
-
-    // // Ejemplo dash de agua
-    // loadAndResizeImageGif("exp_dash", "assets/HUD/gifs/hechizos/exp_dash.gif", 0, 28);
-
-    // // Ejemplo bola de fuego
-    // loadAndResizeImageGif("exp_bola_f", "assets/HUD/gifs/hechizos/exp_bola_f.gif", 0, 28);
-
-    // // Botón L2
-    // loadAndResizeImageGif("l2", "assets/HUD/botones/L2.gif", 0, 28);
-
-    // // Botón R2
-    // loadAndResizeImageGif("r2", "assets/HUD/botones/R2.gif", 0, 28);
-
-    // // Botón L1
-    // loadAndResizeImageGif("l1", "assets/HUD/botones/L1.gif", 0, 28);
-
-    // // Botón R1
-    // loadAndResizeImageGif("r1", "assets/HUD/botones/R1.gif", 0, 28);
-
-    // //Detección por oído
-    // loadAndResizeImageGif("Oido_parp1", "assets/HUD/gifs/Oido_parp1.gif", 0, 28);
-    // loadAndResizeImageGif("Oido_parp2", "assets/HUD/gifs/Oido_parp2.gif", 0, 28);
-
-
-// --- MANDO --- //
-
-// Joystick Izquierdo
-    {
-        aux_textures.push_back(loadTexture2D("assets/HUD/botones/joystickL/joystickL-0.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/botones/joystickL/joystickL-1.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/botones/joystickL/joystickL-2.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/botones/joystickL/joystickL-3.png"));
-
-        createAnimatedTexture2D(aux_textures, D_WHITE, 1.0f, 0, "joystickL", node_texturas_animadas);
-        aux_textures.clear();
-    }
+    // Fijador de cámara
+    loadAndResizeImageGif("fijado", "assets/HUD/gifs/fijado_trama.gif");
 
     // Botón X
-    {
-        aux_textures.push_back(loadTexture2D("assets/HUD/botones/x/x-0.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/botones/x/x-1.png"));
-
-        createAnimatedTexture2D(aux_textures, D_WHITE, 1.0f, 0, "x", node_texturas_animadas);
-        aux_textures.clear();
-    }
+    loadAndResizeImageGif("x", "assets/HUD/botones/x.gif");
 
     // Botón Círculo
-    {
-        aux_textures.push_back(loadTexture2D("assets/HUD/botones/circulo/circulo-0.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/botones/circulo/circulo-1.png"));
+    loadAndResizeImageGif("circulo", "assets/HUD/botones/circulo.gif");
 
-        createAnimatedTexture2D(aux_textures, D_WHITE, 1.0f, 0, "circulo", node_texturas_animadas);
-        aux_textures.clear();
-    }
+    // Botón Triángulo
+    loadAndResizeImageGif("triangulo", "assets/HUD/botones/triangulo.gif");
 
     // Botón Cuadrado
-    {
-        aux_textures.push_back(loadTexture2D("assets/HUD/botones/cuadrado/cuadrado-0.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/botones/cuadrado/cuadrado-1.png"));
+    loadAndResizeImageGif("cuadrado", "assets/HUD/botones/cuadrado.gif");
 
-        createAnimatedTexture2D(aux_textures, D_WHITE, 1.0f, 0, "cuadrado", node_texturas_animadas);
-        aux_textures.clear();
-    }
-
-    // --- TECLADO --- //
+    // Botón Menú
+    loadAndResizeImageGif("menu", "assets/HUD/botones/menu.gif");
 
     // Tecla E
-    {
-        aux_textures.push_back(loadTexture2D("assets/HUD/teclas/e/e-0.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/teclas/e/e-1.png"));
-
-        createAnimatedTexture2D(aux_textures, D_WHITE, 1.0f, 0, "e", node_texturas_animadas);
-        aux_textures.clear();
-    }
-
-    // Tecla Espacio
-    {
-        aux_textures.push_back(loadTexture2D("assets/HUD/teclas/espacio/espacio-0.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/teclas/espacio/espacio-1.png"));
-
-        createAnimatedTexture2D(aux_textures, D_WHITE, 1.0f, 0, "espacio", node_texturas_animadas);
-        aux_textures.clear();
-    }
+    loadAndResizeImageGif("e", "assets/HUD/teclas/e.gif");
 
     // Tecla F
-    {
-        aux_textures.push_back(loadTexture2D("assets/HUD/teclas/f/f-0.png"));
-        aux_textures.push_back(loadTexture2D("assets/HUD/teclas/f/f-1.png"));
+    loadAndResizeImageGif("f", "assets/HUD/teclas/f.gif");
 
-        createAnimatedTexture2D(aux_textures, D_WHITE, 1.0f, 0, "f", node_texturas_animadas);
-        aux_textures.clear();
-    }
+    // Tecla Q
+    loadAndResizeImageGif("q", "assets/HUD/teclas/q.gif");
+
+    // Tecla I
+    loadAndResizeImageGif("i", "assets/HUD/teclas/i.gif");
+
+    // Tecla H
+    loadAndResizeImageGif("h", "assets/HUD/teclas/H.gif");
+
+    // Tecla L
+    loadAndResizeImageGif("l", "assets/HUD/teclas/L.gif");
+
+    // Tecla J
+    loadAndResizeImageGif("j", "assets/HUD/teclas/J.gif");
+
+    // Tecla K
+    loadAndResizeImageGif("k", "assets/HUD/teclas/k.gif");
+
+    // Tecla O
+    loadAndResizeImageGif("o", "assets/HUD/teclas/o.gif");
+
+    // Tecla U
+    loadAndResizeImageGif("u", "assets/HUD/teclas/u.gif");
+
+    // Tecla Espacio
+    loadAndResizeImageGif("espacio", "assets/HUD/teclas/espacio.gif");
+
+    // Pantalla de carga
+    loadAndResizeImageGif("carga", "assets/HUD/gifs/carga_elementos.gif");
+
+    // Teclas WASD
+    loadAndResizeImageGif("wasd", "assets/HUD/teclas/WASD.gif");
+
+    // Ejemplo pompa
+    loadAndResizeImageGif("exp_pompa", "assets/HUD/gifs/hechizos/exp_pompa.gif");
+
+    // Ejemplo dash de agua
+    loadAndResizeImageGif("exp_dash", "assets/HUD/gifs/hechizos/exp_dash.gif");
+
+    // Ejemplo bola de fuego
+    loadAndResizeImageGif("exp_bola_f", "assets/HUD/gifs/hechizos/exp_bola_f.gif");
+
+    // Botón L2
+    loadAndResizeImageGif("l2", "assets/HUD/botones/L2.gif");
+
+    // Botón R2
+    loadAndResizeImageGif("r2", "assets/HUD/botones/R2.gif");
+
+    // Botón L1
+    loadAndResizeImageGif("l1", "assets/HUD/botones/L1.gif");
+
+    // Botón R1
+    loadAndResizeImageGif("r1", "assets/HUD/botones/R1.gif");
+
+    //Detección por oído
+    loadAndResizeImageGif("Oido_parp1", "assets/HUD/gifs/Oido_parp1.gif");
+    loadAndResizeImageGif("Oido_parp2", "assets/HUD/gifs/Oido_parp2.gif");
 }
 
 ////// IMAGE AND TEXTURE //////
@@ -832,6 +736,11 @@ DarkMoon::Texture* ENGI::GameEngine::loadTexture2D(const char* filePath)
     return dmeg.LoadTexture2D(filePath);
 }
 
+std::vector<DarkMoon::Texture*> ENGI::GameEngine::loadTextures2DAnim(const char* filePath)
+{
+    return dmeg.LoadTexture2DAnim(filePath);
+}
+
 void ENGI::GameEngine::updateTexture(TextureType texture, const void* data)
 {
     UpdateTexture(texture, data);
@@ -860,7 +769,7 @@ float ENGI::GameEngine::getWorldToScreenY(vec3d pos)
 RayCast ENGI::GameEngine::getMouseRay()
 {
     auto ray = dmeg.GetMouseRay();
-    return RayCast{{ray.origin.x, ray.origin.y, ray.origin.z}, {ray.direction.x, ray.direction.y, ray.direction.z}};
+    return RayCast{ {ray.origin.x, ray.origin.y, ray.origin.z}, {ray.direction.x, ray.direction.y, ray.direction.z} };
     //Ray r = GetMouseRay(GetMousePosition(), camera);
     //return RayCast{ .origin = vec3d(r.position.x, r.position.y, r.position.z), .direction = vec3d(r.direction.x, r.direction.y, r.direction.z) };
 }
@@ -872,18 +781,12 @@ void ENGI::GameEngine::loadAndResizeImage(const std::string&, const std::string&
     //unloadImage(image);
 }
 
-void ENGI::GameEngine::loadAndResizeImageGif(const std::string&, const std::string&, int, int, double, double) {
-    //Gif anim;
-    //anim.name = name;
-    //anim.frames = frames;
-    //anim.frameDelay = delay;
-    //anim.reScaleX = reScaleX;
-    //anim.reScaleY = reScaleY;
-    //anim.image = loadImagenAnim(path.c_str(), anim.frames);
-    //// imageResize(&image, static_cast<int>(image.width / 1.3), static_cast<int>(image.height / 1.3));
-    //anim.texture = loadTextureFromImage(anim.image);
-//
-    //gifs[name] = anim;
+void ENGI::GameEngine::loadAndResizeImageGif(const std::string& name, const char* filePath) {
+
+    auto textures = loadTextures2DAnim(filePath);
+
+    if (!nodes_sceneAnimatedTexture[name.c_str()])
+        nodes_sceneAnimatedTexture[name.c_str()] = dmeg.CreateAnimatedTexture2D({ 0.0f, 0.0f }, textures, D_WHITE, 1.0f, 0, name.c_str(), node_animatedTextures);
 }
 
 void ENGI::GameEngine::updateGif(Gif&) {

@@ -1,6 +1,8 @@
 #pragma once
 #include "resource.hpp"
 
+#include <gif_lib.h>
+#include <vector>
 #include <GL/glew.h>
 
 namespace DarkMoon {
@@ -11,6 +13,7 @@ namespace DarkMoon {
         ~Texture() { unload(); };
 
         bool load(const char* filePath) override;
+        bool loadFrame(GifFileType* gifFile, int frame);
         void unload() override;
 
         // Getters
