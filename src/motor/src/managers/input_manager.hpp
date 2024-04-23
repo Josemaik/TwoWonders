@@ -11,7 +11,8 @@ namespace DarkMoon {
     struct InputManager {
     public:
         // Update
-        void update();
+        void updateBeginFrame();
+        void updateEndFrame();
 
         // ------------------------ //
         // Input Handling Functions //
@@ -70,5 +71,6 @@ namespace DarkMoon {
         // Mouse States
         int m_mouseButtonStates[GLFW_MOUSE_BUTTON_LAST] = { GLFW_RELEASE };
         int m_mouseButtonReleaseStates[GLFW_MOUSE_BUTTON_LAST] = { GLFW_RELEASE };
+        int m_mouseButtonPressedStates[GLFW_MOUSE_BUTTON_LAST] = { GLFW_RELEASE };
     };
 }

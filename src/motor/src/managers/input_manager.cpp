@@ -89,9 +89,9 @@ namespace DarkMoon {
 
     // Update
 
-    void InputManager::update() {
-        int jid = 0;
+    void InputManager::updateBeginFrame() {
         // Update gamepad state
+        int jid = 0;
         GLFWgamepadstate gamepadState;
         if (glfwGetGamepadState(jid, &gamepadState)) {
             m_gamepadStates[jid] = gamepadState;
@@ -106,21 +106,23 @@ namespace DarkMoon {
         }
     }
 
+    void InputManager::updateEndFrame() {
+        // Update mouse state
+        for(auto& sta : m_mouseButtonReleaseStates) sta = false;
+        for(auto& sta : m_mouseButtonPressedStates) sta = false;
+    }
+
     // Input-related functions: mouse
     bool InputManager::isMouseButtonPressed(int button) {
-        return m_mouseButtonStates[button];
+        return m_mouseButtonPressedStates[button];
     }
 
     bool InputManager::isMouseButtonDown(int button) {
-        return m_mouseButtonStates[button];
+        return m_mouseButtonStates[button] == GLFW_PRESS;
     }
 
     bool InputManager::isMouseButtonReleased(int button) {
-        if (m_mouseButtonReleaseStates[button]) {
-            m_mouseButtonReleaseStates[button] = false;
-            return true;
-        }
-        return false;
+        return m_mouseButtonReleaseStates[button];
     }
 
     bool InputManager::isMouseButtonUp(int button) {
@@ -151,9 +153,8 @@ namespace DarkMoon {
 
             if (action == GLFW_RELEASE)
                 im->m_mouseButtonReleaseStates[button] = true;
-            else
-                im->m_mouseButtonReleaseStates[button] = false;
-
+            else if (action == GLFW_PRESS)
+                im->m_mouseButtonPressedStates[button] = true;
         }
     }
 }

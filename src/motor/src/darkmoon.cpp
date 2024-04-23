@@ -403,12 +403,14 @@ namespace DarkMoon {
         m_windowsManager.beginDrawing();
         m_renderManager.useShader(m_renderManager.shaderColor);
 
-        m_inputManager.update();
+        m_inputManager.updateBeginFrame();
     }
 
     // End canvas drawing and swap buffers
     void DarkMoonEngine::EndDrawing() {
         m_windowsManager.endDrawing();
+
+        m_inputManager.updateEndFrame();
     }
 
     // ------------------------- //

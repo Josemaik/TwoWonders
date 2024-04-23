@@ -778,7 +778,7 @@ namespace DarkMoon {
 
             if(mPos.x >= topLeft.x && mPos.x <= bottomRight.x &&
                mPos.y >= topLeft.y && mPos.y <= bottomRight.y)
-                if(im.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
+                if(im.isMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
                     valor = (mPos.x - topLeft.x) / (bottomRight.x - topLeft.x);
     
             aux[0][0] = valor;
