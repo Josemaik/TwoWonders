@@ -108,7 +108,7 @@ namespace DarkMoon {
 
     // Input-related functions: mouse
     bool InputManager::isMouseButtonPressed(int button) {
-        return m_mouseButtonStates[button];
+        return m_mouseButtonPressedStates[button] == GLFW_PRESS;
     }
 
     bool InputManager::isMouseButtonDown(int button) {
@@ -116,11 +116,7 @@ namespace DarkMoon {
     }
 
     bool InputManager::isMouseButtonReleased(int button) {
-        if (m_mouseButtonReleaseStates[button]) {
-            m_mouseButtonReleaseStates[button] = false;
-            return true;
-        }
-        return false;
+        return m_mouseButtonReleaseStates[button];
     }
 
     bool InputManager::isMouseButtonUp(int button) {
@@ -151,13 +147,36 @@ namespace DarkMoon {
         auto* im = static_cast<InputManager*>(glfwGetWindowUserPointer(window));
 
         if (button >= 0) {
-            im->m_mouseButtonStates[button] = action;
+            // PRESS //
 
-            if (action == GLFW_RELEASE)
-                im->m_mouseButtonReleaseStates[button] = true;
+            if (action == GLFW_PRESS){
+                std::cout << "Boton: " << button << " apretado\n";
+                if (im->m_mouseButtonStates[button] == GLFW_PRESS 
+                    && im->m_mouseButtonPressedStates[button] == GLFW_RELEASE)
+                {
+                    std::cout << "Estado anterior del boton - apretado\n";
+                    im->m_mouseButtonPressedStates[button] = GLFW_PRESS;
+                }
+                else{
+                    im->m_mouseButtonPressedStates[button] = GLFW_RELEASE;
+                }
+            }
+
+            /*
+             && im->m_mouseButtonPressedStates[button] == GLFW_RELEASE)
+                im->m_mouseButtonPressedStates[button] = GLFW_PRESS;
             else
-                im->m_mouseButtonReleaseStates[button] = false;
+                im->m_mouseButtonPressedStates[button] = GLFW_RELEASE;
+            */
 
+            // RELEASE //
+
+            //if (action == 0 && im->m_mouseButtonStates[button])
+            //    im->m_mouseButtonReleaseStates[button] = true;
+            //else
+            //    im->m_mouseButtonReleaseStates[button] = false;
+
+            im->m_mouseButtonStates[button] = action;
         }
     }
 }
