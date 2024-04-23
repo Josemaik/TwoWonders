@@ -276,11 +276,45 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
         inpi.interact = false;
     }
 
-    auto text = "mando_explicacion";
+    auto text = "assets/HUD/botones/Mando_botones.png";
     if (li.keyboardControls)
-        text = "teclado_explicacion";
+        text = "assets/HUD/teclas/teclado_ctrl.png";
 
     engine.beginDrawing();
+    engine.clearBackground(D_GRAY);
+
+    restartScene(engine);
+
+    // Controles
+    {
+        auto controles = engine.dmeg.CreateTexture2D({ 0.0f, 0.0f },
+            text,
+            D_WHITE,
+            "logo controles",
+            engine.node_sceneTextures);
+
+        auto cont = dynamic_cast<DarkMoon::Texture2D*>(controles->getEntity());
+
+        float aux_width = cont->texture->getWidth();
+        float aux_height = cont->texture->getHeight();
+
+        float reScaleX = 0.7f / (aux_width / static_cast<float>(engine.getScreenWidth()));
+        float reScaleY = 0.5f / (aux_height / static_cast<float>(engine.getScreenHeight()));
+        controles->setScale({ reScaleX, reScaleY, 0.0f });
+
+        int posX = static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 2 - (aux_width * reScaleX) / 2);
+        int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2 - (aux_height * reScaleY) / 1.5f);
+        controles->setTranslation({ posX, posY, 0.0f });
+
+        auto txtBox = engine.dmeg.CreateTextBox({engine.getScreenWidth() / 2 - 100, engine.getScreenHeight() - 100},
+                                                {200, 50}, D_WHITE, "DALE A [E] PARA SALIR", engine.dmeg.GetDefaultFont(),
+                                                20, D_WHITE, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+                                                "Texto controles", engine.node_sceneTextures);
+
+        auto entTxtBox = dynamic_cast<DarkMoon::TextBox*>(txtBox->getEntity());
+        entTxtBox->drawBox = false;
+    }
+    /*
     engine.drawRectangle(0, 0, engine.getScreenWidth(), engine.getScreenHeight(), Fade({ 113, 75, 146, 255 }, 0.5f));
     engine.textures[text].width = static_cast<int>(engine.getScreenWidth() / 1.3);
     engine.textures[text].height = static_cast<int>(engine.getScreenHeight() / 1.6);
@@ -288,6 +322,9 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
         engine.getScreenWidth() / 2 - engine.textures[text].width / 2,
         engine.getScreenHeight() / 2 - engine.textures[text].height / 2,
         WHITE);
+    */
+    engine.dmeg.GetRootNode()->traverse(glm::mat4());
+
     engine.endDrawing();
 }
 
