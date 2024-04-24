@@ -4,8 +4,22 @@ namespace DarkMoon {
 
     // Input-related functions: keyboard
 
-    bool InputManager::isKeyPressed(int key) { return m_keyPressedStates[key]; }
-    bool InputManager::isKeyReleased(int key) { return m_keyReleaseStates[key]; }
+    bool InputManager::isKeyPressed(int key) { 
+        if(m_keyPressedStates[key]){
+            m_keyPressedStates[key] = false;
+            return true;
+        }
+        return false; 
+    }
+
+    bool InputManager::isKeyReleased(int key) {
+        if(m_keyReleaseStates[key]){
+            m_keyPressedStates[key] = false;
+            return true;
+        }
+        return false;  
+    }
+
     bool InputManager::isKeyPressedRepeat(int key) { return m_keyStates[key] == GLFW_REPEAT; }
     bool InputManager::isKeyDown(int key) { 
         return m_keyStates[key] == GLFW_PRESS || m_keyStates[key] == GLFW_REPEAT; 
