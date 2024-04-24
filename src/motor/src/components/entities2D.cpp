@@ -9,6 +9,9 @@ namespace DarkMoon {
         // Create VAO, VBO
         glGenVertexArrays(1, &m_VAO);
         glGenBuffers(1, &m_VBO);
+
+        auto TM = glm::mat4();
+        changeVAO(TM);
     };
 
     Pixel::~Pixel() {
@@ -64,6 +67,9 @@ namespace DarkMoon {
         // Create VAO, VBO
         glGenVertexArrays(1, &m_VAO);
         glGenBuffers(1, &m_VBO);
+
+        auto TM = glm::mat4();
+        changeVAO(TM);
     };
 
     Line::~Line() {
@@ -132,6 +138,9 @@ namespace DarkMoon {
         glGenVertexArrays(1, &m_VAO);
         glGenBuffers(1, &m_VBO);
         glGenBuffers(1, &m_EBO);
+
+        auto TM = glm::mat4();
+        changeVAO(TM);
     };
 
     Triangle::~Triangle() {
@@ -202,6 +211,9 @@ namespace DarkMoon {
         glGenVertexArrays(1, &m_VAO);
         glGenBuffers(1, &m_VBO);
         glGenBuffers(1, &m_EBO);
+
+        auto TM = glm::mat4();
+        changeVAO(TM);
     };
 
     Rectangle::~Rectangle() {
@@ -272,6 +284,9 @@ namespace DarkMoon {
         // Create VAO and VBO
         glGenVertexArrays(1, &m_VAO);
         glGenBuffers(1, &m_VBO);
+
+        auto TM = glm::mat4();
+        changeVAO(TM);
     };
 
     Circle::~Circle() {
@@ -336,6 +351,9 @@ namespace DarkMoon {
         glGenVertexArrays(1, &m_VAO);
         glGenBuffers(1, &m_VBO);
         glGenBuffers(1, &m_EBO);
+
+        auto TM = glm::mat4();
+        changeVAO(TM);
     };
 
     Texture2D::~Texture2D() {

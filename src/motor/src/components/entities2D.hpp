@@ -91,12 +91,9 @@ namespace DarkMoon {
         void draw(glm::mat4 transMatrix) override;
     };
 
-    struct Texture2D : Entity {
+    struct Texture2D : Entity2D {
     private:
-        GLuint m_VAO = {}, m_VBO = {}, m_EBO = {};
-        glm::mat4 m_transMatrix = {};
-
-        void changeVAO(glm::mat4& transMatrix);
+        void changeVAO(glm::mat4& transMatrix) override;
     public:
         glm::vec2 position = {};
         Texture* texture = { nullptr };
