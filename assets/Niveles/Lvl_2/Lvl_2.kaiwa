@@ -940,9 +940,9 @@
 								[-23.81, 50.0, 10.23],
 								[-23.81,50.0,23.11]
 							],
-							"countdown_stop": 0.6,
-							"countdown_shoot": 0.1,
-							"countdown_perception": 0.2,
+							"countdown_stop": 0.0,
+							"countdown_shoot": 0.0,
+							"countdown_perception": 0.0,
 							"scale_to_respawn_attack": 7.0
 						}
 					],
