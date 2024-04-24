@@ -265,4 +265,164 @@ namespace DarkMoon {
         glBindVertexArray(0);
     }
 
+    // CIRCLE //
+
+    Circle::Circle(glm::vec2 p, float rad, int seg, Color c)
+        : position(p), radius(rad), segments(seg), color(c) {
+        // Create VAO and VBO
+        glGenVertexArrays(1, &m_VAO);
+        glGenBuffers(1, &m_VBO);
+    };
+
+    Circle::~Circle(){
+        // Clean up resources
+        glDeleteVertexArrays(1, &m_VAO);
+        glDeleteBuffers(1, &m_VBO);
+    };
+
+    void Circle::changeVAO(glm::mat4& transMatrix){
+        RenderManager rm = RenderManager::getInstance();
+
+        m_transMatrix = transMatrix;
+
+        // Apply Transformation Matrix
+        position = glm::vec2(transMatrix[3][0], transMatrix[3][1]);
+        auto scale = glm::length(glm::vec2(transMatrix[0][0], transMatrix[1][0]));
+
+        // Calculate vertices for the circle
+        int vertexCount = segments * 2;
+        std::vector<float> vertices(vertexCount);
+
+        for (int i = 0; i < vertexCount; i += 2) {
+            float theta = static_cast<float>((i / 2) * (2.0f * M_PI / segments));
+            vertices[i] = rm.normalizeX(position.x + (radius * scale) * std::cos(theta));
+            vertices[i + 1] = rm.normalizeY(position.y + (radius * scale) * std::sin(theta));
+        }
+
+        glBindVertexArray(m_VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexCount, vertices.data(), GL_STATIC_DRAW);
+
+        // Set up vertex attribute pointers
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        glBindVertexArray(0);
+    };
+
+    void Circle::draw(glm::mat4 transMatrix){
+        RenderManager rm = RenderManager::getInstance();
+
+        // Apply Transformation Matrix
+        if(m_transMatrix != transMatrix)
+            changeVAO(transMatrix);
+
+        // Set the uniform color in the shader
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+        glUseProgram(rm.getShader()->getIDShader());
+        glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
+
+        // Draw the circle
+        glBindVertexArray(m_VAO);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, segments);
+        glBindVertexArray(0);
+    };
+
+    // TEXTURE 2D //
+
+    Texture2D::Texture2D(glm::vec2 pos, Texture* text, Color col)
+        : position(pos), texture(text), color(col) {
+        // Configure VAO, VBO and EBO
+        glGenVertexArrays(1, &m_VAO);
+        glGenBuffers(1, &m_VBO);
+        glGenBuffers(1, &m_EBO);
+    };
+
+    Texture2D::~Texture2D(){
+        // Clean up resources
+        glDeleteVertexArrays(1, &m_VAO);
+        glDeleteBuffers(1, &m_VBO);
+        glDeleteBuffers(1, &m_EBO);
+    };
+
+    void Texture2D::changeVAO(glm::mat4& transMatrix){
+        RenderManager rm = RenderManager::getInstance();
+
+        m_transMatrix = transMatrix;
+
+        // Apply Transformation Matrix
+        position = glm::vec2(m_transMatrix[3][0], m_transMatrix[3][1]);
+
+        // Top-left corner
+        float auxWidth { 0.0f }, auxHeight { 0.0f };
+        if(texture){
+            auxWidth = static_cast<float>(texture->getWidth()) * glm::length(glm::vec2(m_transMatrix[0][0], m_transMatrix[1][0]));
+            auxHeight = static_cast<float>(texture->getHeight()) * glm::length(glm::vec2(m_transMatrix[1][1], m_transMatrix[1][0]));
+        }
+
+        auto nColor = rm.normalizeColor(color);
+
+        // Define vertices and indices
+        float vertices[] = {
+            // positions                                                                         // colors                       // texture coords
+            rm.normalizeX(position.x)           , rm.normalizeY(position.y)            , 0.0f,   nColor.x, nColor.y, nColor.z,   0.0f, 0.0f,
+            rm.normalizeX(position.x + auxWidth), rm.normalizeY(position.y)            , 0.0f,   nColor.x, nColor.y, nColor.z,   1.0f, 0.0f,
+            rm.normalizeX(position.x)           , rm.normalizeY(position.y + auxHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   0.0f, 1.0f,
+            rm.normalizeX(position.x + auxWidth), rm.normalizeY(position.y + auxHeight), 0.0f,   nColor.x, nColor.y, nColor.z,   1.0f, 1.0f
+        };
+
+        GLuint indices[] = { 0, 1, 2, 1, 2, 3 };
+
+        glBindVertexArray(m_VAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+        // position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        // color attribute
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+        // texture coord attribute
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+    };
+
+    void Texture2D::draw(glm::mat4 transMatrix){
+        if(!texture)
+            return;
+
+        RenderManager rm = RenderManager::getInstance();
+
+        if(m_transMatrix != transMatrix)
+            changeVAO(transMatrix);
+
+        rm.useShader(rm.shaderTexture);
+
+        // Colors
+        GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+        glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
+
+        if(texture){
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            
+            // Draw Texture
+            glBindTexture(GL_TEXTURE_2D, texture->getIDTexture());
+            glBindVertexArray(m_VAO);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+            glBindTexture(GL_TEXTURE_2D, 0);
+            glDisable(GL_BLEND);
+        }
+
+        rm.useShader(rm.shaderColor);
+    };
+
 };
