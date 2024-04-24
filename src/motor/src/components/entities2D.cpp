@@ -418,8 +418,8 @@ namespace DarkMoon {
 
         RenderManager rm = RenderManager::getInstance();
 
-        // if(m_transMatrix != transMatrix)
-        changeVAO(transMatrix);
+        //if(m_transMatrix != transMatrix)
+            changeVAO(transMatrix);
 
         rm.useShader(rm.shaderTexture);
 

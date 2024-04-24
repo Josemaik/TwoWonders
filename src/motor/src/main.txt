@@ -38,7 +38,7 @@ DarkMoon::Node* createHUD(DarkMoon::DarkMoonEngine& engine){
     engine.CreateAnimatedTexture2D({10.0f, 100.0f}, texturesGif, D_WHITE, 1.0f, 0, "Textura Joystick Izquierdo", p_nodeHUD);
 
     // Node: TextBox
-    engine.CreateTextBox({660, 20}, {120, 60}, D_AQUA_LIGHT, "Texto", engine.GetDefaultFont(), 24, D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER, "Caja de texto de prueba", p_nodeHUD);
+    auto textBox = engine.CreateTextBox({660, 20}, {120, 60}, D_AQUA_LIGHT, "Texto", engine.GetDefaultFont(), 24, D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER, "Caja de texto de prueba", p_nodeHUD);
 
     // Node: Button
     engine.CreateButton({660, 100}, {120, 60}, "Boton", engine.GetDefaultFont(), 24, D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER, D_ORANGE_DARK, D_ORANGE, D_ORANGE_LIGHT, "Boton de prueba naranja", p_nodeHUD);
@@ -55,7 +55,7 @@ DarkMoon::Node* createHUD(DarkMoon::DarkMoonEngine& engine){
     // // Node: Circulo 
     // engine.CreateCircle({250.0f, 50.0f}, 30.0f, 20, LAVENDER, "Circulo lavanda", p_nodeHUD);
 
-    return p_nodeHUD;
+    return textBox;
 }
 
 DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine){
@@ -170,15 +170,16 @@ int main(){
 
         createScene3D(engine);
         auto mainCharacter = createMainCharacter(engine);
-        auto HUD = createHUD(engine);
-
-        //auto buttonEntity = dynamic_cast<DarkMoon::Button*>(button->getEntity());
+        auto textBox = createHUD(engine);
+        
+        auto textBoxEntity = dynamic_cast<DarkMoon::TextBox*>(textBox->getEntity());
 
         auto camera = engine.GetCamera();
         camera->position = {-60.0f, 60.0f, -60.0f};
         camera->fovy = 60.0f;
 
         engine.SetExitKey(D_KEY_F8);
+        engine.SetTargetFPS(60);
 
         //scene3D->getParent()->removeChild(scene3D);
 
@@ -193,27 +194,11 @@ int main(){
 
             inputManager(engine, mainCharacter);
 
-            //if(buttonEntity->state == DarkMoon::ButtonState::CLICK)
-            //    std::cout << "Pulsado el boton\n";
-
-            engine.BeginDrawing();
-
-            if(engine.IsKeyDown(D_KEY_D))
-                HUD->translate({1.0f, 1.0f, 0.0f});
-            if(engine.IsKeyDown(D_KEY_A))
-                HUD->translate({-1.0f, -1.0f, 0.0f});
-
-            //if(engine.IsKeyDown(D_KEY_A))
-            //    std::cout << "Mantengo click\n";
-            //if(engine.IsKeyPressed(D_KEY_A))
-            //    std::cout << "Hago click\n";
-            //if(engine.IsKeyReleased(D_KEY_A))
-            //    std::cout << "Acabo de soltar\n";
-            //if(engine.IsKeyUp(D_KEY_A))
-            //    std::cout << "No hago nada\n";
+            textBoxEntity->text.text = std::to_string(engine.GetFPS());            
 
             // Draw
-
+            
+            engine.BeginDrawing();
 
             engine.ClearBackground(D_WHITE);
             engine.GetRootNode()->traverse(glm::mat4());

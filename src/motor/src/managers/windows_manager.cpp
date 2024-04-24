@@ -132,67 +132,32 @@ namespace DarkMoon {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(0, m_width, 0, m_height, -1, 1);
-
-        //glfwPollEvents();
-
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // GLenum error = glGetError();
-        // if (error != GL_NO_ERROR) {
-        //     std::cerr << "Error OpenGL: " << gluErrorString(error) << std::endl;
-        // }
     }
 
     void WindowsManager::endDrawing() {
         controlFrameRate();
         glfwSwapBuffers(m_window);
-
-        m_lastFrameTime = getTime();
-
         glfwPollEvents();
     }
 
     // Timing-related functions
-    void WindowsManager::setTargetFPS(int fps) {
-        m_targetFrameTime = 1.0 / static_cast<double>(fps);
+    void WindowsManager::setTargetFPS(int ) {
+ 
     }
 
     float WindowsManager::getFrameTime() {
-        double currentFrameTime = glfwGetTime();
-        m_deltaTime = currentFrameTime - m_lastFrameTime;
-        m_lastFrameTime = currentFrameTime;
-
-        return static_cast<float>(m_deltaTime);
+        return 0.0f;
     }
 
     double WindowsManager::getTime() {
-        return glfwGetTime();
+        return 0;
     }
 
     int WindowsManager::getFPS() {
-        double currentTime = glfwGetTime();
-        ++m_frameCount;
-
-        if (currentTime - m_lastFPSTime >= 1.0) {
-            m_fps = m_frameCount;
-            m_frameCount = 0;
-            m_lastFPSTime += 1.0;
-        }
-
-        return m_fps;
+        return 0;
     }
 
     void WindowsManager::controlFrameRate() {
-        if (m_targetFrameTime > 0.0) {
-            double currentTime = glfwGetTime();
-            double elapsedTime = currentTime - m_lastFrameTime;
 
-            if (elapsedTime < m_targetFrameTime) {
-                double sleepTime = m_targetFrameTime - elapsedTime;
-                int milliseconds = static_cast<int>(sleepTime * 1000);
-                if (milliseconds > 0)
-                    std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
-            }
-        }
     }
 }

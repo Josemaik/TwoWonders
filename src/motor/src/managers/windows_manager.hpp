@@ -20,14 +20,6 @@ namespace DarkMoon {
         int m_width, m_height;
         int m_oldWidth, m_oldHeight;
 
-        double m_lastFrameTime = 0.0;
-        double m_deltaTime = 0.0;
-        double m_targetFrameTime = 0.0;
-
-        int m_frameCount = 0;
-        double m_lastFPSTime = 0.0;
-        int m_fps = 0;
-
         void controlFrameRate();
         void framebuffer_size_callback();
 
