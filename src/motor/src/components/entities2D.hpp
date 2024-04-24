@@ -103,12 +103,6 @@ namespace DarkMoon {
         Color color = { D_WHITE };
 
         Texture2D(glm::vec2 pos, Texture* text, Color col);
-        // Constructor copia
-        Texture2D(const Texture2D& other) {
-            position = other.position;
-            texture = other.texture;
-            color = other.color;
-        }
         ~Texture2D();
 
         void draw(glm::mat4 transMatrix) override;

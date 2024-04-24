@@ -2841,9 +2841,7 @@ void RenderSystem::updateHealthBar(GameEngine& engine, EntityManager& em, const 
     // Node: Puntos de vida //
     // -------------------- //
 
-    auto* hearts = getNode(engine, "Hearts");
-    auto* heartsCopyNode = getNode(engine, "HeartsCopy");
-    hearts->setVisibleOne(true);
+    auto* heartsCopyNode = getNode(engine, "textCopy");
     heartsCopyNode->clearChildren();
 
     int i{};
@@ -3020,8 +3018,8 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
     int posX = coinBarX;
     int posY = engine.getScreenHeight() - 130;
 
-    auto* numsCopy = getNode(engine, "NumsCopy");
-    numsCopy->clearChildren();
+    auto* numsCopy = getNode(engine, "textCopy");
+    // numsCopy->clearChildren();
     auto* destellos = engine.createNode(getNode(engine, "destellos"), numsCopy);
 
     destellos->setTranslation({ posX, posY, 0.0f });

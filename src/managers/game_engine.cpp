@@ -22,8 +22,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["Faces"] = dmeg.CreateNode("Faces", nodes["HUD"]);
     nodes["Hearts"] = dmeg.CreateNode("Hearts", nodes["HUD"]);
     nodes["ManaBar"] = dmeg.CreateNode("Mana", nodes["HUD"]);
-    nodes["HeartsCopy"] = dmeg.CreateNode("HeartsCopy", nodes["Hearts"]);
-    nodes["NumsCopy"] = dmeg.CreateNode("NumsCopy", nodes["Nums"]);
+    nodes["textCopy"] = dmeg.CreateNode("textCopy", nodes["HUD"]);
 
     ENGI::GameEngine::setExitKey(D_KEY_F8);
 

@@ -4,20 +4,20 @@ namespace DarkMoon {
 
     // PIXEL //
 
-    Pixel::Pixel(Color c) 
-        : color(c){
+    Pixel::Pixel(Color c)
+        : color(c) {
         // Create VAO, VBO
         glGenVertexArrays(1, &m_VAO);
         glGenBuffers(1, &m_VBO);
     };
 
-    Pixel::~Pixel(){
+    Pixel::~Pixel() {
         // Clean up resources
         glDeleteVertexArrays(1, &m_VAO);
         glDeleteBuffers(1, &m_VBO);
     };
 
-    void Pixel::changeVAO(glm::mat4& transMatrix){
+    void Pixel::changeVAO(glm::mat4& transMatrix) {
         RenderManager rm = RenderManager::getInstance();
 
         m_transMatrix = transMatrix;
@@ -33,11 +33,11 @@ namespace DarkMoon {
         glBindVertexArray(0);
     };
 
-    void Pixel::draw(glm::mat4 transMatrix){
+    void Pixel::draw(glm::mat4 transMatrix) {
         RenderManager rm = RenderManager::getInstance();
 
         // Apply Transformation Matrix
-        if(m_transMatrix != transMatrix)
+        if (m_transMatrix != transMatrix)
             changeVAO(transMatrix);
 
         // Set the uniform color in the shader
@@ -59,20 +59,20 @@ namespace DarkMoon {
 
     // LINE //
 
-    Line::Line(glm::vec2 sP, glm::vec2 eP, Color c) 
+    Line::Line(glm::vec2 sP, glm::vec2 eP, Color c)
         : startPos(sP), endPos(eP), color(c) {
         // Create VAO, VBO
         glGenVertexArrays(1, &m_VAO);
         glGenBuffers(1, &m_VBO);
     };
 
-    Line::~Line(){
+    Line::~Line() {
         // Clean up resources
         glDeleteVertexArrays(1, &m_VAO);
         glDeleteBuffers(1, &m_VBO);
     };
 
-    void Line::changeVAO(glm::mat4& transMatrix){
+    void Line::changeVAO(glm::mat4& transMatrix) {
         RenderManager rm = RenderManager::getInstance();
 
         m_transMatrix = transMatrix;
@@ -100,11 +100,11 @@ namespace DarkMoon {
         glBindVertexArray(0);
     };
 
-    void Line::draw(glm::mat4 transMatrix){
+    void Line::draw(glm::mat4 transMatrix) {
         RenderManager rm = RenderManager::getInstance();
 
         // Apply Transformation Matrix
-        if(m_transMatrix != transMatrix)
+        if (m_transMatrix != transMatrix)
             changeVAO(transMatrix);
 
         // Set the uniform color in the shader
@@ -134,17 +134,17 @@ namespace DarkMoon {
         glGenBuffers(1, &m_EBO);
     };
 
-    Triangle::~Triangle(){
+    Triangle::~Triangle() {
         // Clean up resources
         glDeleteVertexArrays(1, &m_VAO);
         glDeleteBuffers(1, &m_VBO);
         glDeleteBuffers(1, &m_EBO);
     }
 
-    void Triangle::changeVAO(glm::mat4& transMatrix){
+    void Triangle::changeVAO(glm::mat4& transMatrix) {
         RenderManager rm = RenderManager::getInstance();
 
-        m_transMatrix =  transMatrix;
+        m_transMatrix = transMatrix;
 
         // Apply Transformation Matrix
         auto pos = glm::vec2(transMatrix[3][0], transMatrix[3][1]);
@@ -176,11 +176,11 @@ namespace DarkMoon {
         glBindVertexArray(0);
     }
 
-    void Triangle::draw(glm::mat4 transMatrix){
+    void Triangle::draw(glm::mat4 transMatrix) {
         RenderManager rm = RenderManager::getInstance();
 
         // Apply Transformation Matrix
-        if(m_transMatrix != transMatrix)
+        if (m_transMatrix != transMatrix)
             changeVAO(transMatrix);
 
         // Set the uniform color in the shader
@@ -204,14 +204,14 @@ namespace DarkMoon {
         glGenBuffers(1, &m_EBO);
     };
 
-    Rectangle::~Rectangle(){
+    Rectangle::~Rectangle() {
         // Clean up resources
         glDeleteVertexArrays(1, &m_VAO);
         glDeleteBuffers(1, &m_VBO);
         glDeleteBuffers(1, &m_EBO);
     };
 
-    void Rectangle::changeVAO(glm::mat4& transMatrix){
+    void Rectangle::changeVAO(glm::mat4& transMatrix) {
         RenderManager rm = RenderManager::getInstance();
 
         m_transMatrix = transMatrix;
@@ -247,11 +247,11 @@ namespace DarkMoon {
         glBindVertexArray(0);
     };
 
-    void Rectangle::draw(glm::mat4 transMatrix){
+    void Rectangle::draw(glm::mat4 transMatrix) {
         RenderManager rm = RenderManager::getInstance();
 
         // Apply Transformation Matrix
-        if(m_transMatrix != transMatrix)
+        if (m_transMatrix != transMatrix)
             changeVAO(transMatrix);
 
         // Set the uniform color in the shader
@@ -274,13 +274,13 @@ namespace DarkMoon {
         glGenBuffers(1, &m_VBO);
     };
 
-    Circle::~Circle(){
+    Circle::~Circle() {
         // Clean up resources
         glDeleteVertexArrays(1, &m_VAO);
         glDeleteBuffers(1, &m_VBO);
     };
 
-    void Circle::changeVAO(glm::mat4& transMatrix){
+    void Circle::changeVAO(glm::mat4& transMatrix) {
         RenderManager rm = RenderManager::getInstance();
 
         m_transMatrix = transMatrix;
@@ -310,11 +310,11 @@ namespace DarkMoon {
         glBindVertexArray(0);
     };
 
-    void Circle::draw(glm::mat4 transMatrix){
+    void Circle::draw(glm::mat4 transMatrix) {
         RenderManager rm = RenderManager::getInstance();
 
         // Apply Transformation Matrix
-        if(m_transMatrix != transMatrix)
+        if (m_transMatrix != transMatrix)
             changeVAO(transMatrix);
 
         // Set the uniform color in the shader
@@ -338,14 +338,14 @@ namespace DarkMoon {
         glGenBuffers(1, &m_EBO);
     };
 
-    Texture2D::~Texture2D(){
+    Texture2D::~Texture2D() {
         // Clean up resources
         glDeleteVertexArrays(1, &m_VAO);
         glDeleteBuffers(1, &m_VBO);
         glDeleteBuffers(1, &m_EBO);
     };
 
-    void Texture2D::changeVAO(glm::mat4& transMatrix){
+    void Texture2D::changeVAO(glm::mat4& transMatrix) {
         RenderManager rm = RenderManager::getInstance();
 
         m_transMatrix = transMatrix;
@@ -354,8 +354,8 @@ namespace DarkMoon {
         position = glm::vec2(m_transMatrix[3][0], m_transMatrix[3][1]);
 
         // Top-left corner
-        float auxWidth { 0.0f }, auxHeight { 0.0f };
-        if(texture){
+        float auxWidth{ 0.0f }, auxHeight{ 0.0f };
+        if (texture) {
             auxWidth = static_cast<float>(texture->getWidth()) * glm::length(glm::vec2(m_transMatrix[0][0], m_transMatrix[1][0]));
             auxHeight = static_cast<float>(texture->getHeight()) * glm::length(glm::vec2(m_transMatrix[1][1], m_transMatrix[1][0]));
         }
@@ -394,14 +394,14 @@ namespace DarkMoon {
         glEnableVertexAttribArray(2);
     };
 
-    void Texture2D::draw(glm::mat4 transMatrix){
-        if(!texture)
+    void Texture2D::draw(glm::mat4 transMatrix) {
+        if (!texture)
             return;
 
         RenderManager rm = RenderManager::getInstance();
 
-        if(m_transMatrix != transMatrix)
-            changeVAO(transMatrix);
+        // if(m_transMatrix != transMatrix)
+        changeVAO(transMatrix);
 
         rm.useShader(rm.shaderTexture);
 
@@ -409,10 +409,10 @@ namespace DarkMoon {
         GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
         glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
-        if(texture){
+        if (texture) {
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            
+
             // Draw Texture
             glBindTexture(GL_TEXTURE_2D, texture->getIDTexture());
             glBindVertexArray(m_VAO);
