@@ -17,6 +17,14 @@ struct BTActionShoot : BTNode_t {
         auto const distance = plphy.position - ectx.phy.position;
         return  distance;
     }
+    PhysicsComponent& getplayerphy(EntityContext_t& ectx) {
+        auto& li = ectx.em.getSingleton<LevelInfo>();
+        auto* playerEn = ectx.em.getEntityByID(li.playerID);
+        //if (not playerEn) return vec3d{}; // No hay player
+        // Si hay player
+        auto& plphy = ectx.em.getComponent<PhysicsComponent>(*playerEn);
+        return plphy;
+    };
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         auto& att = ectx.em.getComponent<AttackComponent>(ectx.ent);
         ectx.ai->bh = "shooting";
@@ -44,7 +52,17 @@ struct BTActionShoot : BTNode_t {
 
                 if (ectx.ent.hasTag<SnowmanTag>() && li.mapID == 2) {
                     att.attack(AttackType::FireBallShot);
+                    //auto& plphy = getplayerphy(ectx);
+                    // if(plphy.velocity.x() == 0.0 && plphy.velocity.z() == 0.0)
+                    //auto distance = ectx.phy.position.distance(plphy.position);
+                    //segun la distancia poner un altura u otra
+                    //pursue en un futuro, arreglar que sea mas preciso
+                    // else{
+                    //     Steer_t steering = STBH::Pursue(plphy,ectx.phy,0.5);
+                    //     att.vel = vec3d{ steering.v_x/2.0,att.vel.y() + 0.5, steering.v_z/2.0};
                     att.vel = { att.vel.x() * 1.2, att.vel.y() + 0.7, att.vel.z() * 1.2 };
+                    //     //att.vel = vec3d(std::sin(steering.orientation), 0.0, std::cos(steering.orientation));
+                    // }
                 }
                 else
                     att.attack(AttackType::Ranged);

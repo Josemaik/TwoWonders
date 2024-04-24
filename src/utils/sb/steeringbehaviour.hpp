@@ -13,7 +13,7 @@ namespace STBH {
     Steer_t Arrive(PhysicsComponent const& phy, vec3d const& target, double const arrivalRadious);
     Steer_t Seek(PhysicsComponent const& phy, vec3d const& target);
     Steer_t Flee(PhysicsComponent const& phy, vec3d const& enemy);
-    Steer_t Pursue(PhysicsComponent const& phyTarget, PhysicsComponent const& phyPursuer);
+    Steer_t Pursue(PhysicsComponent const& phyTarget, PhysicsComponent const& phyPursuer,double maxspeed);
     Steer_t Avoid(PhysicsComponent const& phyTarget, PhysicsComponent const& phyPursuer);
     Steer_t Evade(PhysicsComponent const& phyEvader,PhysicsComponent const& phytoevade,double maxSeparationForce);
 } //STBH
