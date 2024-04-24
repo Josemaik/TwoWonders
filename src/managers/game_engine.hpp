@@ -64,6 +64,7 @@ namespace ENGI {
 
         // Rectangle
         void drawRectangle(int posX, int posY, int width, int height, Color color);
+        DarkMoon::Node* createRectangle(vec2d& pos, vec2d& size, DarkMoon::Color color, const char* name, DarkMoon::Node* parentNode);
         void drawRectangleLinesEx(Rectangle rec, float lineThick, Color color);
         void drawRectangleRec(Rectangle rec, Color color);
         void drawTexture(TextureType texture, int posX, int posY, Color tint);
@@ -132,13 +133,16 @@ namespace ENGI {
         float getWorldToScreenX(vec3d pos);
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();
-        void loadAndResizeImage(const std::string& name, const std::string& path, double reScaleX = 1.3, double reScaleY = 1.3);
-        void loadAndResizeImageGif(const std::string& name, const char* filePath);
+        void loadAndResizeImage(const char* name, const char* path, DarkMoon::Node* parentNode);
+        void loadAndResizeImageGif(const char* name, const char* filePath);
         void updateGif(Gif& anim);
         void unloadGifsAndTextures();
         void setReplayMode(bool replay, GameData& gd);
         double getTime();
         float getAspectRat();
+        DarkMoon::Node* get2D();
+        DarkMoon::Node* get3D();
+        DarkMoon::Node* createTextBox(glm::vec2 position, glm::vec2 size, DarkMoon::Color boxColor, std::string text, DarkMoon::Font* font, int fontSize, DarkMoon::Color textColor, DarkMoon::Aligned verticalAligned, DarkMoon::Aligned horizontalAligned, const char* nodeName, DarkMoon::Node* parentNode);
 
         std::map<std::string, TextureType> textures;
         std::map<std::string, Gif> gifs;
@@ -146,16 +150,18 @@ namespace ENGI {
         // DarkMoon Engine //
 
         DarkMoon::DarkMoonEngine dmeg;
-        DarkMoon::Node* node_scene2D;
-        DarkMoon::Node* node_scene3D;
-        DarkMoon::Node* node_sceneTextures;
-        DarkMoon::Node* node_animatedTextures;
 
-        std::map<std::string, DarkMoon::Node*> nodes_scene;
-        std::map<std::string, DarkMoon::Node*> nodes_sceneAnimatedTexture;
+        struct cmp_str
+        {
+            bool operator()(char const* a, char const* b) const
+            {
+                return std::strcmp(a, b) < 0;
+            }
+        };
+        std::map<const char*, DarkMoon::Node*, cmp_str> nodes;
 
-        DarkMoon::Node* createNode(const std::string& name, DarkMoon::Node* parentNode);
-        DarkMoon::Node* createAnimatedTexture2D(std::vector<DarkMoon::Texture*> filePaths, DarkMoon::Color color, float frameDuration, int currentFrame, const std::string& name, DarkMoon::Node* parentNode);
+        DarkMoon::Node* createNode(const char* name, DarkMoon::Node* parentNode);
+        DarkMoon::Node* createNode(DarkMoon::Node* copyNode, DarkMoon::Node* parentNode);
 
         DarkMoon::Texture* loadTexture2D(const char* filePath);
         std::vector<DarkMoon::Texture*> loadTextures2DAnim(const char* filePath);

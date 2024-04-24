@@ -11,163 +11,173 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     ENGI::GameEngine::setUpCamera({ 0.0f, 1.0f, 0.0f });
     ENGI::GameEngine::setProjectionCamera(DarkMoon::CameraProjection::CAMERA_ORTHOGRAPHIC);
 
-    node_scene3D = dmeg.CreateNode("Scene 3D", dmeg.GetRootNode());
-    node_scene2D = dmeg.CreateNode("Scene 2D", dmeg.GetRootNode());
-    node_sceneTextures = dmeg.CreateNode("Texturas", node_scene2D);
-    node_animatedTextures = createNode("texturas_animadas", node_scene2D);
+    nodes["3D"] = dmeg.CreateNode("Scene 3D", dmeg.GetRootNode());
+    nodes["2D"] = dmeg.CreateNode("Scene 2D", dmeg.GetRootNode());
+    nodes["Gifs"] = dmeg.CreateNode("Gifs", nodes["2D"]);
+    nodes["HUD"] = dmeg.CreateNode("HUD", nodes["2D"]);
+    nodes["Menu"] = dmeg.CreateNode("Menu", nodes["2D"]);
+    nodes["AnimTextures"] = dmeg.CreateNode("AnimTextures", nodes["HUD"]);
+    nodes["Dialog"] = dmeg.CreateNode("Dialog", nodes["HUD"]);
+    nodes["Nums"] = dmeg.CreateNode("Nums", nodes["HUD"]);
+    nodes["Faces"] = dmeg.CreateNode("Faces", nodes["HUD"]);
+    nodes["Hearts"] = dmeg.CreateNode("Hearts", nodes["HUD"]);
+    nodes["ManaBar"] = dmeg.CreateNode("Mana", nodes["HUD"]);
+    nodes["HeartsCopy"] = dmeg.CreateNode("HeartsCopy", nodes["Hearts"]);
+    nodes["NumsCopy"] = dmeg.CreateNode("NumsCopy", nodes["Nums"]);
 
     ENGI::GameEngine::setExitKey(D_KEY_F8);
 
-    // // Diálogo Siguiente HUD
-    // loadAndResizeImage("sig", "assets/HUD/dialog_siguiente.png");
+    // Logo TwoWonders
+    loadAndResizeImage("logo_twowonders", "assets/logo_two_wonders.png", nodes["2D"]);
 
-    // // Espacio para hechizos de agua HUD
-    // loadAndResizeImage("agua_holder", "assets/HUD/item_agua.png");
+    // Logo Kaiwa
+    loadAndResizeImage("logo_kaiwa", "assets/logo_kaiwa_games.png", nodes["2D"]);
 
-    // // Icono para las pompas de agua HUD
-    // loadAndResizeImage("pompas", "assets/HUD/pompas.png", 1.5, 1.5);
+    // Corazón HUD
+    loadAndResizeImage("heart", "assets/HUD/corazon.png", nodes["Hearts"]);
 
-    // // NÚMEROS
-    // //
-    // loadAndResizeImage("0", "assets/HUD/numeros/0.png");
-    // loadAndResizeImage("1", "assets/HUD/numeros/1.png");
-    // loadAndResizeImage("2", "assets/HUD/numeros/2.png");
-    // loadAndResizeImage("3", "assets/HUD/numeros/3.png");
-    // loadAndResizeImage("4", "assets/HUD/numeros/4.png");
-    // loadAndResizeImage("5", "assets/HUD/numeros/5.png");
-    // loadAndResizeImage("6", "assets/HUD/numeros/6.png");
-    // loadAndResizeImage("7", "assets/HUD/numeros/7.png");
-    // loadAndResizeImage("8", "assets/HUD/numeros/8.png");
-    // loadAndResizeImage("9", "assets/HUD/numeros/9.png");
-
-    // --- GIFS --- //
-    // [NUEVAS IMAGENES Y TEXTURAS]
     // Medio Corazón HUD
-    // loadAndResizeImage("half_heart", "assets/HUD/corazon_medio.png");
+    loadAndResizeImage("half_heart", "assets/HUD/corazon_medio.png", nodes["Hearts"]);
 
-    // // Corazones vacíos HUD
-    // loadAndResizeImage("empty_heart", "assets/HUD/corazon_vacio.png");
+    // Corazones vacíos HUD
+    loadAndResizeImage("empty_heart", "assets/HUD/corazon_vacio.png", nodes["Hearts"]);;
 
-    // // Corazones Hielo HUD
-    // loadAndResizeImage("ice_heart", "assets/HUD/corazon_escudo2.png");
+    // Corazones Hielo HUD
+    loadAndResizeImage("ice_heart", "assets/HUD/corazon_escudo2.png", nodes["Hearts"]);;
 
-    // // Medio Corazón Hielo HUD
-    // loadAndResizeImage("half_ice_heart", "assets/HUD/corazon_escudo_medio2.png");
+    // Medio Corazón Hielo HUD
+    loadAndResizeImage("half_ice_heart", "assets/HUD/corazon_escudo_medio2.png", nodes["Hearts"]);
 
-    // // Corazones vacíos Hielo HUD
-    // loadAndResizeImage("empty_ice_heart", "assets/HUD/corazon_escudo_v2.png");
+    // Corazones vacíos Hielo HUD
+    loadAndResizeImage("empty_ice_heart", "assets/HUD/corazon_escudo_v2.png", nodes["Hearts"]);
 
-    // // Mago Happy HUD
-    // loadAndResizeImage("mago_happy", "assets/HUD/caras/mago_happy.png");
+    // Mago Happy HUD
+    loadAndResizeImage("mago_happy1", "assets/HUD/caras/mago_happy.png", nodes["Faces"]);
+    loadAndResizeImage("mago_happy2", "assets/HUD/caras/mago_happy.png", nodes["Faces"]);
 
-    // // Mago Meh HUD
-    // loadAndResizeImage("mago_meh", "assets/HUD/caras/mago_meh.png");
+    // Mago Meh HUD
+    loadAndResizeImage("mago_meh1", "assets/HUD/caras/mago_meh.png", nodes["Faces"]);
+    loadAndResizeImage("mago_meh2", "assets/HUD/caras/mago_meh.png", nodes["Faces"]);
 
-    // // Mago SOS HUD
-    // loadAndResizeImage("mago_sos", "assets/HUD/caras/mago_sos.png");
+    // Mago SOS HUD
+    loadAndResizeImage("mago_sos1", "assets/HUD/caras/mago_sos.png", nodes["Faces"]);
+    loadAndResizeImage("mago_sos2", "assets/HUD/caras/mago_sos.png", nodes["Faces"]);
 
-    // // Nómada HUD
-    // loadAndResizeImage("nomada", "assets/HUD/caras/calabaza3.png");
+    // Nómada HUD
+    loadAndResizeImage("nomada", "assets/HUD/caras/calabaza3.png", nodes["Faces"]);
 
-    // // Investigador HUD
-    // loadAndResizeImage("investigador", "assets/HUD/caras/investigador.png");
+    // Investigador HUD
+    loadAndResizeImage("investigador", "assets/HUD/caras/investigador.png", nodes["Faces"]);
 
-    // // Botón Triángulo
-    // loadAndResizeImageGif("triangulo", "assets/HUD/botones/triangulo.gif", 0);
+    // Candado abierto HUD
+    loadAndResizeImage("candado_abierto", "assets/HUD/candado_abierto.png", nodes["HUD"]);
 
-    // // Botón Menú
-    // loadAndResizeImageGif("menu", "assets/HUD/botones/menu.gif", 0);
+    // Candado cerrado HUD
+    loadAndResizeImage("candado_cerrado", "assets/HUD/candado_cerrado.png", nodes["HUD"]);
 
-    // // Candado abierto HUD
-    // loadAndResizeImage("candado_abierto", "assets/HUD/candado_abierto.png");
+    // Diálogo Siguiente HUD
+    loadAndResizeImage("sig", "assets/HUD/dialog_siguiente.png", nodes["Dialog"]);
 
-    // // Candado cerrado HUD
-    // loadAndResizeImage("candado_cerrado", "assets/HUD/candado_cerrado.png");
+    // Fijado Destello HUD
+    loadAndResizeImage("destellin", "assets/HUD/fijado_destellin.png", nodes["HUD"]);
 
-    // // Diálogo Siguiente HUD
-    // loadAndResizeImage("sig", "assets/HUD/dialog_siguiente.png");
+    // Barra de destellos HUD
+    loadAndResizeImage("destellos", "assets/HUD/destellos.png", nodes["HUD"]);
 
-    // // Espacio para hechizos de agua HUD
-    // loadAndResizeImage("placeholder", "assets/HUD/item_agua.png");
+    // Borde Barra Maná
+    loadAndResizeImage("borde_mana", "assets/HUD/mana_bar.png", nodes["ManaBar"]);
 
-    // // Icono de palo HUD
-    // loadAndResizeImage("palo", "assets/HUD/palo.png");
+    // Rectángulo de la barra de maná
+    dmeg.CreateRectangle({ 0.0f, 0.0f }, { 1.0f, 35 }, { 154, 222, 235, 255 }, "mana_rect", nodes["ManaBar"]);
 
-    // // Icono para las pompas de agua HUD
-    // loadAndResizeImage("pompas", "assets/HUD/pompas.png", 1.5, 1.5);
+    // Cuadro de diálogo
+    createTextBox({ 0, 0 }, { 600, 120 }, D_WHITE, "", dmeg.GetDefaultFont(),
+        20, D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER, "cuadroDialogo", nodes["Dialog"]);
 
-    // // Icono para el dash de agua HUD
-    // loadAndResizeImage("dash", "assets/HUD/dash.png");
+    // Espacio para hechizos de agua HUD
+    loadAndResizeImage("placeholder1", "assets/HUD/item_agua.png", nodes["AnimTextures"]);
+    loadAndResizeImage("placeholder2", "assets/HUD/item_agua.png", nodes["AnimTextures"]);
+    loadAndResizeImage("placeholder3", "assets/HUD/item_agua.png", nodes["AnimTextures"]);
+    loadAndResizeImage("placeholder4", "assets/HUD/item_agua.png", nodes["AnimTextures"]);
 
-    // // Icono para la bola de fuego HUD
-    // loadAndResizeImage("bola_fuego", "assets/HUD/bolafuego.png");
+    // Icono de palo HUD
+    loadAndResizeImage("palo", "assets/HUD/palo.png", nodes["AnimTextures"]);
 
-    // // Icono para meteoritos HUD
-    // loadAndResizeImage("meteoritos", "assets/HUD/meteoritos.png");
+    // Icono para las pompas de agua HUD
+    loadAndResizeImage("pompas", "assets/HUD/pompas.png", nodes["AnimTextures"]);
 
-    // // Icono para escudo de hielo HUD
-    // loadAndResizeImage("escudo_hielo", "assets/HUD/escudo.png");
+    // Icono para el dash de agua HUD
+    loadAndResizeImage("dash", "assets/HUD/dash.png", nodes["AnimTextures"]);
 
-    // // Icono para las estacas de hielo HUD
-    // loadAndResizeImage("estacas", "assets/HUD/estacas.png");
+    // Icono para la bola de fuego HUD
+    loadAndResizeImage("bola_fuego", "assets/HUD/bolafuego.png", nodes["AnimTextures"]);
 
-    // // Libro para enseñar hechizos HUD
-    // loadAndResizeImage("libro", "assets/HUD/Libro.png");
+    // Icono para meteoritos HUD
+    loadAndResizeImage("meteoritos", "assets/HUD/meteoritos.png", nodes["AnimTextures"]);
 
-    // // Icono de detección HUD
-    // loadAndResizeImage("detectionicon", "assets/HUD/detectionicon.png");
+    // Icono para escudo de hielo HUD
+    loadAndResizeImage("escudo_hielo", "assets/HUD/escudo.png", nodes["AnimTextures"]);
 
-    // // Barco para el nivel del volcán HUD
-    // loadAndResizeImage("barco", "assets/HUD/barco_piezas.png");
+    // Icono para las estacas de hielo HUD
+    loadAndResizeImage("estacas", "assets/HUD/estacas.png", nodes["AnimTextures"]);
 
-    // // Icono Batalla HUD
-    // loadAndResizeImage("batalla", "assets/HUD/batalla.png");
+    // Libro para enseñar hechizos HUD
+    loadAndResizeImage("libro", "assets/HUD/Libro.png", nodes["AnimTextures"]);
 
-    // // Botón círculo HUD 
-    // loadAndResizeImage("boton_circulo", "assets/HUD/botones/cont_circulo.png");
+    // Icono de detección HUD
+    loadAndResizeImage("detectionicon", "assets/HUD/detectionicon.png", nodes["HUD"]);
 
-    // // Botón cuadrado HUD
-    // loadAndResizeImage("boton_cuadrado", "assets/HUD/botones/cont_cuadrado.png");
+    // Barco para el nivel del volcán HUD
+    loadAndResizeImage("barco", "assets/HUD/barco_piezas.png", nodes["HUD"]);
 
-    // // Botón triángulo HUD
-    // loadAndResizeImage("boton_triangulo", "assets/HUD/botones/cont_triangulo.png");
+    // Icono Batalla HUD
+    loadAndResizeImage("batalla", "assets/HUD/batalla.png", nodes["HUD"]);
 
-    // // Botón R2 HUD
-    // loadAndResizeImage("boton_r2", "assets/HUD/botones/cont_R2.png");
+    // Botón círculo HUD 
+    loadAndResizeImage("boton_circulo", "assets/HUD/botones/cont_circulo.png", nodes["AnimTextures"]);
 
-    // // Tecla J HUD
-    // loadAndResizeImage("tecla_j", "assets/HUD/teclas/cont_J.png");
+    // Botón cuadrado HUD
+    loadAndResizeImage("boton_cuadrado", "assets/HUD/botones/cont_cuadrado.png", nodes["AnimTextures"]);
 
-    // // Tecla K HUD
-    // loadAndResizeImage("tecla_k", "assets/HUD/teclas/cont_K.png");
+    // Botón triángulo HUD
+    loadAndResizeImage("boton_triangulo", "assets/HUD/botones/cont_triangulo.png", nodes["AnimTextures"]);
 
-    // // Tecla L HUD
-    // loadAndResizeImage("tecla_l", "assets/HUD/teclas/cont_L.png");
+    // Botón R2 HUD
+    loadAndResizeImage("boton_r2", "assets/HUD/botones/cont_R2.png", nodes["AnimTextures"]);
 
-    // // Tecla Espacio HUD
-    // loadAndResizeImage("tecla_espacio", "assets/HUD/teclas/cont_space.png");
+    // Tecla J HUD
+    loadAndResizeImage("tecla_j", "assets/HUD/teclas/cont_J.png", nodes["AnimTextures"]);
 
-    // // Imagen Mando HUD
-    // loadAndResizeImage("mando_explicacion", "assets/HUD/botones/Mando_botones.png");
+    // Tecla K HUD
+    loadAndResizeImage("tecla_k", "assets/HUD/teclas/cont_K.png", nodes["AnimTextures"]);
 
-    // // Imagen Teclado HUD
-    // loadAndResizeImage("teclado_explicacion", "assets/HUD/teclas/teclado_ctrl.png");
+    // Tecla L HUD
+    loadAndResizeImage("tecla_l", "assets/HUD/teclas/cont_L.png", nodes["AnimTextures"]);
+
+    // Tecla Espacio HUD
+    loadAndResizeImage("tecla_espacio", "assets/HUD/teclas/cont_space.png", nodes["AnimTextures"]);
+
+    // Imagen Mando HUD
+    loadAndResizeImage("mando_explicacion", "assets/HUD/botones/Mando_botones.png", nodes["2D"]);
+
+    // Imagen Teclado HUD
+    loadAndResizeImage("teclado_explicacion", "assets/HUD/teclas/teclado_ctrl.png", nodes["2D"]);
 
     // NÚMEROS Y SÍMBOLOS NUMÉRICOS
     //
-    // loadAndResizeImage("0", "assets/HUD/numeros/0.png");
-    // loadAndResizeImage("1", "assets/HUD/numeros/1.png");
-    // loadAndResizeImage("2", "assets/HUD/numeros/2.png");
-    // loadAndResizeImage("3", "assets/HUD/numeros/3.png");
-    // loadAndResizeImage("4", "assets/HUD/numeros/4.png");
-    // loadAndResizeImage("5", "assets/HUD/numeros/5.png");
-    // loadAndResizeImage("6", "assets/HUD/numeros/6.png");
-    // loadAndResizeImage("7", "assets/HUD/numeros/7.png");
-    // loadAndResizeImage("8", "assets/HUD/numeros/8.png");
-    // loadAndResizeImage("9", "assets/HUD/numeros/9.png");
-    // loadAndResizeImage("+", "assets/HUD/numeros/mas.png");
-    // loadAndResizeImage("-", "assets/HUD/numeros/-.png");
-    // loadAndResizeImage("barra", "assets/HUD/barra.png");
+    loadAndResizeImage("0", "assets/HUD/numeros/0.png", nodes["Nums"]);
+    loadAndResizeImage("1", "assets/HUD/numeros/1.png", nodes["Nums"]);
+    loadAndResizeImage("2", "assets/HUD/numeros/2.png", nodes["Nums"]);
+    loadAndResizeImage("3", "assets/HUD/numeros/3.png", nodes["Nums"]);
+    loadAndResizeImage("4", "assets/HUD/numeros/4.png", nodes["Nums"]);
+    loadAndResizeImage("5", "assets/HUD/numeros/5.png", nodes["Nums"]);
+    loadAndResizeImage("6", "assets/HUD/numeros/6.png", nodes["Nums"]);
+    loadAndResizeImage("7", "assets/HUD/numeros/7.png", nodes["Nums"]);
+    loadAndResizeImage("8", "assets/HUD/numeros/8.png", nodes["Nums"]);
+    loadAndResizeImage("9", "assets/HUD/numeros/9.png", nodes["Nums"]);
+    loadAndResizeImage("+", "assets/HUD/numeros/mas.png", nodes["Nums"]);
+    loadAndResizeImage("-", "assets/HUD/numeros/-.png", nodes["Nums"]);
+    loadAndResizeImage("barra", "assets/HUD/barra.png", nodes["Nums"]);
 
     // GIFS
     //
@@ -718,7 +728,7 @@ Model ENGI::GameEngine::loadModelFromMesh(MeshType m)
 
 DarkMoon::Node* ENGI::GameEngine::loadModel(const char* filename)
 {
-    return dmeg.CreateModel(filename, D_WHITE, filename, node_scene3D);
+    return dmeg.CreateModel(filename, D_WHITE, filename, nodes["3D"]);
 }
 
 // ModelType ENGI::GameEngine::loadModelRaylib(const char* filename)
@@ -774,19 +784,17 @@ RayCast ENGI::GameEngine::getMouseRay()
     //return RayCast{ .origin = vec3d(r.position.x, r.position.y, r.position.z), .direction = vec3d(r.direction.x, r.direction.y, r.direction.z) };
 }
 
-void ENGI::GameEngine::loadAndResizeImage(const std::string&, const std::string&, double, double) {
-    //Image image = loadImage(path.c_str());
-    //imageResize(&image, static_cast<int>(image.width / reScaleX), static_cast<int>(image.height / reScaleY));
-    //textures[name] = loadTextureFromImage(image);
-    //unloadImage(image);
+void ENGI::GameEngine::loadAndResizeImage(const char* name, const char* path, DarkMoon::Node* parentNode) {
+    if (!nodes[name])
+        nodes[name] = dmeg.CreateTexture2D({ 0, 0 }, path, D_WHITE, name, parentNode);
 }
 
-void ENGI::GameEngine::loadAndResizeImageGif(const std::string& name, const char* filePath) {
+void ENGI::GameEngine::loadAndResizeImageGif(const char* name, const char* filePath) {
 
     auto textures = loadTextures2DAnim(filePath);
 
-    if (!nodes_sceneAnimatedTexture[name.c_str()])
-        nodes_sceneAnimatedTexture[name.c_str()] = dmeg.CreateAnimatedTexture2D({ 0.0f, 0.0f }, textures, D_WHITE, 1.0f, 0, name.c_str(), node_animatedTextures);
+    if (!nodes[name])
+        nodes[name] = dmeg.CreateAnimatedTexture2D({ 0.0f, 0.0f }, textures, D_WHITE, 0.5f, 0, name, nodes["Gifs"]);
 }
 
 void ENGI::GameEngine::updateGif(Gif&) {
@@ -831,23 +839,46 @@ double ENGI::GameEngine::getTime()
     return static_cast<double>(microseconds.count()) / 1e6;
 }
 
-DarkMoon::Node* ENGI::GameEngine::createNode(const std::string& name, DarkMoon::Node* parentNode)
+DarkMoon::Node* ENGI::GameEngine::createNode(const char* name, DarkMoon::Node* parentNode)
 {
-    if (!nodes_scene[name.c_str()])
-        nodes_scene[name.c_str()] = dmeg.CreateNode(name.c_str(), parentNode);
+    if (!nodes[name])
+        nodes[name] = dmeg.CreateNode(name, parentNode);
 
-    return nodes_scene[name.c_str()];
+    return nodes[name];
 }
 
-DarkMoon::Node* ENGI::GameEngine::createAnimatedTexture2D(std::vector<DarkMoon::Texture*> filePaths, DarkMoon::Color color, float frameDuration, int currentFrame, const std::string& name, DarkMoon::Node* parentNode)
+DarkMoon::Node* ENGI::GameEngine::createNode(DarkMoon::Node* copyNode, DarkMoon::Node* parentNode)
 {
-    if (!nodes_sceneAnimatedTexture[name.c_str()])
-        nodes_sceneAnimatedTexture[name.c_str()] = dmeg.CreateAnimatedTexture2D({ 0.0f, 0.0f }, filePaths, color, frameDuration, currentFrame, name.c_str(), parentNode);
+    return dmeg.CreateNodeCopy(copyNode, parentNode);
+}
 
-    return nodes_sceneAnimatedTexture[name.c_str()];
+DarkMoon::Node* ENGI::GameEngine::createRectangle(vec2d& pos, vec2d& size, DarkMoon::Color color, const char* name, DarkMoon::Node* parentNode)
+{
+    if (!nodes[name])
+        nodes[name] = dmeg.CreateRectangle({ pos.x, pos.y }, { size.x, size.y }, color, name, parentNode);
+
+    return nodes[name];
+}
+
+DarkMoon::Node* ENGI::GameEngine::createTextBox(glm::vec2 position, glm::vec2 size, DarkMoon::Color boxColor, std::string text, DarkMoon::Font* font, int fontSize, DarkMoon::Color textColor, DarkMoon::Aligned verticalAligned, DarkMoon::Aligned horizontalAligned, const char* nodeName, DarkMoon::Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateTextBox(position, size, boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned, nodeName, parentNode);
+
+    return nodes[nodeName];
 }
 
 float ENGI::GameEngine::getAspectRat()
 {
     return static_cast<float>(width_) / static_cast<float>(height_);
+}
+
+DarkMoon::Node* ENGI::GameEngine::get2D()
+{
+    return nodes["2D"];
+}
+
+DarkMoon::Node* ENGI::GameEngine::get3D()
+{
+    return nodes["3D"];
 }

@@ -73,6 +73,7 @@ private:
     void drawBoatParts(GameEngine& engine, EntityManager& em);
     void drawDebugPhysics(GameEngine& engine, EntityManager& em, LevelInfo& li);
     void drawAnimatedTextures(GameEngine& engine);
+    void drawCheatMenu(GameEngine& engine, EntityManager& em);
     void drawSmallButtons(GameEngine& engine, const std::string& name, int posX, int posY, int width, int height);
     void handleAnimatedTexture(const std::string& name, const std::string& textureName, int x, int y, const Texture2D& texture, float scaleFactor);
     void drawAlerts_IA(EntityManager& em, GameEngine& engine);
@@ -86,15 +87,13 @@ private:
     void updateHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
     void updateManaBar(GameEngine& engine, EntityManager& em);
     void updateAnimatedTextures(GameEngine& engine);
+    DarkMoon::Node* getNode(GameEngine& engine, const char* name);
+    bool nodeExists(GameEngine& engine, const char* name);
 
     bool isSelected{ false };
     bool isSelectedfordebug{ false }, fullScreen{ false };
     std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
     std::map<std::string, AnimatedTexture> animatedTextures{};
-    std::map<std::string, DarkMoon::Node*> HUDElements{};
-    std::map<std::string, DarkMoon::Node*> debugIA{};
-    std::map<std::string, DarkMoon::Node*> buttons{};
-    std::map<std::string, DarkMoon::Node*> textElements{};
     // bool chunk0Charged{ false };
     // bool chunk1Charged{ false };
     // ShaderType* shaderPtr{ nullptr };

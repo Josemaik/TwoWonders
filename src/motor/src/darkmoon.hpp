@@ -30,6 +30,7 @@ namespace DarkMoon {
 
         // Create node in parentNode
         Node* CreateNode(const char* nodeName, Node* parentNode);
+        Node* CreateNodeCopy(Node* copyNode, Node* parentNode);
 
         // 2D
 

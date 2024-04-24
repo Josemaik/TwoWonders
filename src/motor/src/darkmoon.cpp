@@ -38,6 +38,25 @@ namespace DarkMoon {
         return p_node;
     }
 
+    // Create a copy of a Texture2D node
+    Node* DarkMoonEngine::CreateNodeCopy(Node* node, Node* parentNode)
+    {
+        Node* p_node = nullptr;
+        DarkMoon::Texture2D* texture2D = dynamic_cast<DarkMoon::Texture2D*>(node->getEntity());
+        if (texture2D)
+        {
+            auto nodeCopy = std::make_unique<Node>();
+            nodeCopy->name = node->name;
+
+            std::unique_ptr<Texture2D> unique = std::make_unique<Texture2D>(*texture2D);
+
+            nodeCopy->setEntity(std::move(unique));
+            p_node = nodeCopy.get();
+            parentNode->addChild(std::move(nodeCopy));
+        }
+
+        return p_node;
+    }
     // 2D
 
     // Create pixel in node

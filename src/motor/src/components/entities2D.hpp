@@ -18,7 +18,7 @@ namespace DarkMoon {
         GLuint m_VAO = {}, m_VBO = {}, m_EBO = {};
         glm::mat4 m_transMatrix = {};
 
-        virtual void changeVAO(glm::mat4&) {};  
+        virtual void changeVAO(glm::mat4&) {};
     };
 
     struct Pixel : Entity2D {
@@ -100,6 +100,12 @@ namespace DarkMoon {
         Color color = { D_WHITE };
 
         Texture2D(glm::vec2 pos, Texture* text, Color col);
+        // Constructor copia
+        Texture2D(const Texture2D& other) {
+            position = other.position;
+            texture = other.texture;
+            color = other.color;
+        }
         ~Texture2D();
 
         void draw(glm::mat4 transMatrix) override;
@@ -110,7 +116,7 @@ namespace DarkMoon {
         std::vector<Texture*> frames;
         Color color;
         float frameDuration;
-        float elapsedTime { 0.0f };
+        float elapsedTime{ 0.0f };
         int currentFrame;
 
         AnimatedTexture2D(glm::vec2 pos = { 0.0f, 0.0f }, Color col = D_WHITE, float framD = 1.0f, int currF = 0)
@@ -121,8 +127,8 @@ namespace DarkMoon {
             WindowsManager wm = WindowsManager::getInstance();
 
             elapsedTime += wm.getFrameTime();
-            if(elapsedTime > frameDuration){
-                if(currentFrame + 1 > static_cast<int>(frames.size() - 1))
+            if (elapsedTime > frameDuration) {
+                if (currentFrame + 1 > static_cast<int>(frames.size() - 1))
                     currentFrame = 0;
                 else
                     currentFrame += 1;
@@ -142,8 +148,8 @@ namespace DarkMoon {
             position = glm::vec2(transMatrix[3][0], transMatrix[3][1]);
 
             // Top-left corner
-            float auxWidth { 0.0f }, auxHeight { 0.0f };
-            if(texture){
+            float auxWidth{ 0.0f }, auxHeight{ 0.0f };
+            if (texture) {
                 auxWidth = static_cast<float>(texture->getWidth()) * glm::length(glm::vec2(transMatrix[0][0], transMatrix[1][0]));
                 auxHeight = static_cast<float>(texture->getHeight()) * glm::length(glm::vec2(transMatrix[1][1], transMatrix[1][0]));
             }
@@ -193,10 +199,10 @@ namespace DarkMoon {
             //GLuint transformLoc = glGetUniformLocation(rm.getShader()->getIDShader(), "transform");
             //glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transMatrix));
 
-            if(texture){
+            if (texture) {
                 glEnable(GL_BLEND);
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                
+
                 // Draw Texture
                 glBindTexture(GL_TEXTURE_2D, texture->getIDTexture());
                 glBindVertexArray(VAO);
@@ -230,23 +236,23 @@ namespace DarkMoon {
 
         Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK)
             : position(pos), text(txt), font(f), fontSize(fS), color(col) {
-                scale = static_cast<float>(fontSize) / 48.0f;
-                if(font && !text.empty()){
-                    std::string::const_iterator c;
-                    float aux_x = position.x;
-                    for(c = text.begin(); c != text.end(); c++){
-                        // Max Height
-                        Character ch = font->characters[*c];
-                        auto chY = static_cast<float>(ch.size.y);
-                        if(maxHeight < chY)
-                            maxHeight = chY;
-                        // Max Width
-                        aux_x += static_cast<float>(ch.advance >> 6) * scale;
-                    }
-                    maxHeight *= scale;
-                    maxWidth = aux_x - position.x;
+            scale = static_cast<float>(fontSize) / 48.0f;
+            if (font && !text.empty()) {
+                std::string::const_iterator c;
+                float aux_x = position.x;
+                for (c = text.begin(); c != text.end(); c++) {
+                    // Max Height
+                    Character ch = font->characters[*c];
+                    auto chY = static_cast<float>(ch.size.y);
+                    if (maxHeight < chY)
+                        maxHeight = chY;
+                    // Max Width
+                    aux_x += static_cast<float>(ch.advance >> 6) * scale;
                 }
-            };
+                maxHeight *= scale;
+                maxWidth = aux_x - position.x;
+            }
+        };
 
         void draw(glm::mat4 transMatrix) override {
             RenderManager rm = RenderManager::getInstance();
@@ -255,9 +261,9 @@ namespace DarkMoon {
 
             position = glm::vec2(transMatrix[3][0], transMatrix[3][1]);
 
-            if(!font)
+            if (!font)
                 font = rm.defaultFont;
-            if(text.empty())
+            if (text.empty())
                 return;
 
             auto normColor = rm.normalizeColor(color);
@@ -274,16 +280,16 @@ namespace DarkMoon {
 
             //std::cout << "-----------------------------\n";
             std::string::const_iterator c;
-            for(c = text.begin(); c != text.end(); c++){
+            for (c = text.begin(); c != text.end(); c++) {
                 Character ch = font->characters[*c];
                 auto chY = static_cast<float>(ch.size.y);
-                if(maxHeight < chY)
+                if (maxHeight < chY)
                     maxHeight = chY;
             }
             maxHeight *= scale;
 
             // Iterate through all characters
-            for(c = text.begin(); c != text.end(); c++){
+            for (c = text.begin(); c != text.end(); c++) {
                 Character ch = font->characters[*c];
 
                 float posX = aux_x + static_cast<float>(ch.bearing.x) * scale;
@@ -331,7 +337,7 @@ namespace DarkMoon {
             // Clean up resources
             glDeleteBuffers(1, &VBO);
             glDeleteVertexArrays(1, &VAO);
-            
+
             rm.useShader(rm.shaderColor);
         };
     };
@@ -344,24 +350,24 @@ namespace DarkMoon {
         Text text;
         float padding = 10.0f;
 
-        bool drawBox { true };
-        
+        bool drawBox{ true };
+
         Aligned verAligned;
         Aligned horAligned;
 
-        TextBox(glm::vec2 pos = { 0.0f, 0.0f }, 
-                glm::vec2 sz = { 100.0f, 50.0f }, 
-                Color bCol = D_WHITE, 
-                std::string txt = "", 
-                Font* f = nullptr, 
-                int fS = 10, 
-                Color tCol = D_BLACK, 
-                Aligned verAl = Aligned::CENTER, 
-                Aligned horAl = Aligned::CENTER) :
-            box(pos, sz, bCol), boxBackground({pos.x - 1, pos.y - 1}, {sz.x + 2, sz.y + 2}, D_GRAY), text(pos, txt, f, fS, tCol), verAligned(verAl), horAligned(horAl) {};
+        TextBox(glm::vec2 pos = { 0.0f, 0.0f },
+            glm::vec2 sz = { 100.0f, 50.0f },
+            Color bCol = D_WHITE,
+            std::string txt = "",
+            Font* f = nullptr,
+            int fS = 10,
+            Color tCol = D_BLACK,
+            Aligned verAl = Aligned::CENTER,
+            Aligned horAl = Aligned::CENTER) :
+            box(pos, sz, bCol), boxBackground({ pos.x - 1, pos.y - 1 }, { sz.x + 2, sz.y + 2 }, D_GRAY), text(pos, txt, f, fS, tCol), verAligned(verAl), horAligned(horAl) {};
 
         void draw(glm::mat4 transMatrix) override {
-            if(drawBox){
+            if (drawBox) {
                 // Rectangle background
                 glm::mat4 aux = transMatrix;
                 aux[3][0] -= 1;   aux[3][1] -= 1;
@@ -371,33 +377,33 @@ namespace DarkMoon {
             }
 
             // Vertical Aligned
-            switch (verAligned){
-                case Aligned::TOP:
-                    transMatrix[3][1] = box.position.y + padding;
-                    break;
-                case Aligned::CENTER:
-                    transMatrix[3][1] = box.position.y + (box.size.y - text.maxHeight) / 2;
-                    break;
-                case Aligned::BOTTOM:
-                    transMatrix[3][1] = box.position.y + box.size.y - text.maxHeight - padding;
-                    break;
-                default:
-                    break;
+            switch (verAligned) {
+            case Aligned::TOP:
+                transMatrix[3][1] = box.position.y + padding;
+                break;
+            case Aligned::CENTER:
+                transMatrix[3][1] = box.position.y + (box.size.y - text.maxHeight) / 2;
+                break;
+            case Aligned::BOTTOM:
+                transMatrix[3][1] = box.position.y + box.size.y - text.maxHeight - padding;
+                break;
+            default:
+                break;
             }
 
             // Horizontal Aligned
-            switch (horAligned){
-                case Aligned::LEFT:
-                    transMatrix[3][0] = box.position.x + padding;
-                    break;
-                case Aligned::CENTER:
-                    transMatrix[3][0] = box.position.x + (box.size.x / 2 - text.maxWidth / 2);
-                    break;
-                case Aligned::RIGHT:
-                    transMatrix[3][0] = box.position.x + box.size.x - text.maxWidth - padding;
-                    break;
-                default:
-                    break;
+            switch (horAligned) {
+            case Aligned::LEFT:
+                transMatrix[3][0] = box.position.x + padding;
+                break;
+            case Aligned::CENTER:
+                transMatrix[3][0] = box.position.x + (box.size.x / 2 - text.maxWidth / 2);
+                break;
+            case Aligned::RIGHT:
+                transMatrix[3][0] = box.position.x + box.size.x - text.maxWidth - padding;
+                break;
+            default:
+                break;
             }
 
             // Text
@@ -413,21 +419,21 @@ namespace DarkMoon {
         Color normalColor;
         Color hoverColor;
         Color clickColor;
-        ButtonState state { ButtonState::NORMAL };
+        ButtonState state{ ButtonState::NORMAL };
 
-        Button(glm::vec2 pos = { 0.0f, 0.0f }, 
-               glm::vec2 sz = { 100.0f, 50.0f }, 
-               Color bCol = D_WHITE, 
-               std::string txt = "", 
-               Font* f = nullptr, 
-               int fS = 10, 
-               Color tCol = D_BLACK, 
-               Aligned verAl = Aligned::CENTER, 
-               Aligned horAl = Aligned::CENTER,
-               Color nColor = D_WHITE,
-               Color hColor = D_GRAY,
-               Color cColor = D_BLACK) :
-        textBox(pos, sz, bCol, txt, f, fS, tCol, verAl, horAl), normalColor(nColor), hoverColor(hColor), clickColor(cColor) {};
+        Button(glm::vec2 pos = { 0.0f, 0.0f },
+            glm::vec2 sz = { 100.0f, 50.0f },
+            Color bCol = D_WHITE,
+            std::string txt = "",
+            Font* f = nullptr,
+            int fS = 10,
+            Color tCol = D_BLACK,
+            Aligned verAl = Aligned::CENTER,
+            Aligned horAl = Aligned::CENTER,
+            Color nColor = D_WHITE,
+            Color hColor = D_GRAY,
+            Color cColor = D_BLACK) :
+            textBox(pos, sz, bCol, txt, f, fS, tCol, verAl, horAl), normalColor(nColor), hoverColor(hColor), clickColor(cColor) {};
 
         void draw(glm::mat4 transMatrix) override {
             // Color
@@ -438,18 +444,18 @@ namespace DarkMoon {
             glm::vec2 topLeft = textBox.box.position;
             glm::vec2 bottomRight = { topLeft.x + textBox.box.size.x, topLeft.y + textBox.box.size.y };
 
-            if(mPos.x >= topLeft.x && mPos.x <= bottomRight.x &&
-               mPos.y >= topLeft.y && mPos.y <= bottomRight.y){
-                if(im.isMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT)){
+            if (mPos.x >= topLeft.x && mPos.x <= bottomRight.x &&
+                mPos.y >= topLeft.y && mPos.y <= bottomRight.y) {
+                if (im.isMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT)) {
                     textBox.box.color = clickColor;
                     state = ButtonState::CLICK;
                 }
-                else{
+                else {
                     textBox.box.color = hoverColor;
                     state = ButtonState::HOVER;
                 }
             }
-            else{
+            else {
                 textBox.box.color = normalColor;
                 state = ButtonState::NORMAL;
             }
@@ -465,11 +471,11 @@ namespace DarkMoon {
         Rectangle slider;
         float valor = 0.5f; // 0 -> 1
 
-        Slider(glm::vec2 pos = { 0.0f, 0.0f }, 
-               glm::vec2 sz = { 100.0f, 50.0f },
-               Color bCol = D_GRAY,
-               Color sCol = D_WHITE) :
-               background(pos, sz, bCol), boxBackground({pos.x - 1, pos.y - 1}, {sz.x + 2, sz.y + 2}, D_GRAY), slider({pos.x + 1, pos.y + 1}, {sz.x - 2, sz.y - 2}, sCol) {};
+        Slider(glm::vec2 pos = { 0.0f, 0.0f },
+            glm::vec2 sz = { 100.0f, 50.0f },
+            Color bCol = D_GRAY,
+            Color sCol = D_WHITE) :
+            background(pos, sz, bCol), boxBackground({ pos.x - 1, pos.y - 1 }, { sz.x + 2, sz.y + 2 }, D_GRAY), slider({ pos.x + 1, pos.y + 1 }, { sz.x - 2, sz.y - 2 }, sCol) {};
 
         void draw(glm::mat4 transMatrix) override {
             // Rectangle box background
@@ -486,16 +492,16 @@ namespace DarkMoon {
 
             WindowsManager& wm = WindowsManager::getInstance();
             InputManager& im = InputManager::getInstance();
-            
+
             glm::vec2 mPos = { im.getMouseX(wm.getWindow()), im.getMouseY(wm.getWindow()) };
             glm::vec2 topLeft = slider.position;
             glm::vec2 bottomRight = { topLeft.x + slider.size.x, topLeft.y + slider.size.y };
 
-            if(mPos.x >= topLeft.x && mPos.x <= bottomRight.x &&
-               mPos.y >= topLeft.y && mPos.y <= bottomRight.y)
-                if(im.isMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
+            if (mPos.x >= topLeft.x && mPos.x <= bottomRight.x &&
+                mPos.y >= topLeft.y && mPos.y <= bottomRight.y)
+                if (im.isMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
                     valor = (mPos.x - topLeft.x) / (bottomRight.x - topLeft.x);
-    
+
             aux[0][0] = valor;
             slider.draw(aux);
         };
