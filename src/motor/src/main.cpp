@@ -4,8 +4,12 @@ DarkMoon::Node* createHUD(DarkMoon::DarkMoonEngine& engine){
     // Node HUD
     auto p_nodeHUD = engine.CreateNode("HUD", engine.GetRootNode());
 
+    // PRUEBAS RENDIMIENTO //
+
     // Node: Pixel prueba
-    engine.CreatePixel({ 5, 5 }, D_BLACK, "Pixel prueba", p_nodeHUD);
+    //engine.CreatePixel({ 5, 5 }, D_BLACK, "Pixel prueba", p_nodeHUD);
+    // Node: Linea prueba
+    engine.CreateLine({ 0, 0 }, { 100, 100 }, D_RED, "Linea prueba", p_nodeHUD);
     
     // Node: Rectangulo rosa Oscuro
     engine.CreateRectangle({12.0f, 12.0f}, {375.0f, 40.0f}, D_PINK_DARK, "Rectangulo rosa oscuro", p_nodeHUD);
@@ -191,7 +195,7 @@ int main(){
             engine.BeginDrawing();
 
             if(engine.IsKeyDown(D_KEY_D))
-                HUD->translate({1.0f, 0.0f, 0.0f});
+                HUD->scale({1.1f, 1.0f, 0.0f});
 
             //if(engine.IsKeyDown(D_KEY_A))
             //    std::cout << "Mantengo click\n";
