@@ -7,14 +7,17 @@ DarkMoon::Node* createHUD(DarkMoon::DarkMoonEngine& engine){
     // PRUEBAS RENDIMIENTO //
 
     // Node: Pixel prueba
-    //engine.CreatePixel({ 5, 5 }, D_BLACK, "Pixel prueba", p_nodeHUD);
+    engine.CreatePixel({ 5, 5 }, D_BLACK, "Pixel prueba", p_nodeHUD);
     // Node: Linea prueba
     engine.CreateLine({ 0, 0 }, { 100, 100 }, D_RED, "Linea prueba", p_nodeHUD);
+    // Node: Triangulo prueba
+    engine.CreateTriangle({ 0, 0 }, {100, 100}, {0, 100}, D_YELLOW_DARK, "Triangulo prueba", p_nodeHUD);
     
+
     // Node: Rectangulo rosa Oscuro
     engine.CreateRectangle({12.0f, 12.0f}, {375.0f, 40.0f}, D_PINK_DARK, "Rectangulo rosa oscuro", p_nodeHUD);
     // Node: Rectangulo rosa
-    engine.CreateRectangle({10.0f, 10.0f}, {375.0f, 40.0f}, D_PINK, "Rectangulo rosa", p_nodeHUD);
+    //engine.CreateRectangle({10.0f, 10.0f}, {375.0f, 40.0f}, D_PINK, "Rectangulo rosa", p_nodeHUD);
 
     // Node: Texto
     engine.CreateText({10.0f, 10.0f}, "Ya era hora pato", engine.GetDefaultFont(), 24, D_GRAY, "Texto ya era hora", p_nodeHUD);
