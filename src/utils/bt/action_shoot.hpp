@@ -52,15 +52,30 @@ struct BTActionShoot : BTNode_t {
 
                 if (ectx.ent.hasTag<SnowmanTag>() && li.mapID == 2) {
                     att.attack(AttackType::FireBallShot);
-                    //auto& plphy = getplayerphy(ectx);
-                    // if(plphy.velocity.x() == 0.0 && plphy.velocity.z() == 0.0)
-                    //auto distance = ectx.phy.position.distance(plphy.position);
-                    //segun la distancia poner un altura u otra
+                    //Se ajuste la velocidad y altura del atque segun a que distancia se encuentre
+                    auto& plphy = getplayerphy(ectx);
+                    auto distance = ectx.phy.position.distance(plphy.position);
+
+                    if(plphy.velocity.x() != 0.0 && plphy.velocity.z() != 0.0){
+                        Steer_t steering = STBH::Pursue(plphy,ectx.phy,50.0);
+                        if(distance >= 11.0 && distance <= 14.1){
+                            att.vel = vec3d{ steering.v_x,att.vel.y()+0.2, steering.v_z};
+                        }else{
+                            att.vel = vec3d{ steering.v_x,att.vel.y()+0.3, steering.v_z};
+                        }
+                    }else{
+                        if(distance >= 11.0 && distance <= 14.1){
+                            att.vel = { att.vel.x() * 1.0, att.vel.y() + 0.6, att.vel.z() * 1.0 };
+                        }else{
+                            att.vel = { att.vel.x() * 1.4, att.vel.y() + 0.7, att.vel.z() * 1.4 };
+                        }
+                    }
+
+                    
                     //pursue en un futuro, arreglar que sea mas preciso
                     // else{
                     //     Steer_t steering = STBH::Pursue(plphy,ectx.phy,0.5);
                     //     att.vel = vec3d{ steering.v_x/2.0,att.vel.y() + 0.5, steering.v_z/2.0};
-                    att.vel = { att.vel.x() * 1.2, att.vel.y() + 0.7, att.vel.z() * 1.2 };
                     //     //att.vel = vec3d(std::sin(steering.orientation), 0.0, std::cos(steering.orientation));
                     // }
                 }
