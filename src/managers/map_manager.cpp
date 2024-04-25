@@ -740,7 +740,6 @@ void MapManager::generateNavmeshes(EntityManager& em)
 {
     auto& navs = em.getSingleton<NavmeshInfo>();
     mapType navmeshkaiwa = loadMap("assets/Niveles/Lvl_2/Lvl_2-navmeshes.kaiwa");
-    int numr {0};
     const valueType& navmeshes = navmeshkaiwa["NavMesh"];
     for (mapSizeType i = 0; i < navmeshes.Size(); i++) {
         std::array<vec3d, 9> vecnodes{};
@@ -804,7 +803,6 @@ void MapManager::generateNavmeshes(EntityManager& em)
         if(xd != navmesh.MemberEnd()){
             if(xd->value.GetBool())
                 hasramp = true;
-                numr++;
         }
         // bool hasramp = navmesh["ramp"].GetBool();
 
@@ -946,7 +944,7 @@ void MapManager::generateNavmeshes(EntityManager& em)
             if (!it->ramp && !nextnavmesh->ramp) {
                 auto& currentbbox = it->box;
                 auto& nextbbox = nextnavmesh->box;
-                auto& currentnodes = it->nodes;
+                //auto& currentnodes = it->nodes;
                 auto& currentcenter = it->centerpoint;
 
                 // Conexiones con navmeshes colisionables
@@ -1145,7 +1143,7 @@ void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
 {
     using CMPS = MP::TypeList<PhysicsComponent, LifeComponent, AIComponent>;
     using TAGS = MP::TypeList<EnemyTag>;
-    auto& li = em.getSingleton<LevelInfo>();
+    //auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<CMPS, TAGS>([&](Entity& e, PhysicsComponent& phy, LifeComponent& lic, AIComponent& aic)
     {

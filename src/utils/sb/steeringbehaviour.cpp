@@ -104,12 +104,12 @@ Steer_t STBH::Flee(PhysicsComponent const& phy, vec3d const& enemy) {
         return Seek(phy, target);
 }
 
-Steer_t STBH::Pursue(PhysicsComponent const& phyTarget, PhysicsComponent const& phyPursuer) {
+Steer_t STBH::Pursue(PhysicsComponent const& phyTarget, PhysicsComponent const& phyPursuer,double maxspeed) {
         //Calculate distance
         vec3d target{ phyTarget.position.x(), 0.0 ,   phyTarget.position.z() };
         vec3d avoider{ phyPursuer.position.x(), 0.0 ,   phyPursuer.position.z() };
         auto distance{ target.calculatePointDistance(avoider) };
-        auto minimaltime{ distance / phyPursuer.max_speed };
+        auto minimaltime{ distance / maxspeed };
         vec3d predicted_target{
                 phyTarget.position.x() + phyTarget.velocity.x() * minimaltime,
                 0.0                                                          ,

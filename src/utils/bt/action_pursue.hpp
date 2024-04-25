@@ -13,7 +13,7 @@ struct BTAction_Pursue : BTNode_t {
         auto const& e_opt{ ectx.em.getEntityByID(ectx.ai->teid) };
         if (!e_opt) { ectx.ai->tactive = false; return BTNodeStatus_t::running; };
         auto const& phyTarget = ectx.em.getComponent<PhysicsComponent>(*e_opt);
-        Steer_t steering = STBH::Pursue(phyTarget, ectx.phy);
+        Steer_t steering = STBH::Pursue(phyTarget, ectx.phy,ectx.phy.max_speed);
         // ectx.phy.a_linear = steering.linear;
         // ectx.phy.v_angular = steering.angular;
 

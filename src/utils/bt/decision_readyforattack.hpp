@@ -6,7 +6,14 @@
 struct BTDecisionReadyforAttack : BTNode_t {
 
     BTDecisionReadyforAttack() {}
-
+    PhysicsComponent& getplayerphy(EntityContext_t& ectx) {
+        auto& li = ectx.em.getSingleton<LevelInfo>();
+        auto* playerEn = ectx.em.getEntityByID(li.playerID);
+        //if (not playerEn) return vec3d{}; // No hay player
+        // Si hay player
+        auto& plphy = ectx.em.getComponent<PhysicsComponent>(*playerEn);
+        return plphy;
+    };
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         ectx.ai->bh = "check ready attack";
         auto& li = ectx.em.getSingleton<LevelInfo>();
@@ -20,7 +27,17 @@ struct BTDecisionReadyforAttack : BTNode_t {
         //Compruebo si esta dentro del radio de ataque y se acabo el culldown
         //ectx.phy.orientated_before = false;
         if (ectx.ai->playerdetected) {
-            if (distance < (ectx.ai->attack_radius * ectx.ai->attack_radius)){
+            if (distance < (ectx.ai->attack_radius * ectx.ai->attack_radius)){     
+                //Si es muñeco de nieve y te acercas a atacarle a melee, huye
+                if(ectx.ent.hasTag<SnowmanTag>()){
+                    // auto distancetoplayer = (ectx.phy.position - vec3d{ectx.ai->tx,0.0,ectx.ai->tz}).lengthSQ();
+                    if(distance < (ectx.ai->attack_radius * ectx.ai->attack_radius) / 3.0){
+                        Steer_t steering = STBH::Evade(ectx.phy, getplayerphy(ectx),1.0);
+                        //Steer_t steering = STBH::Flee(ectx.phy, { ectx.ai->tx,0.0,ectx.ai->tz });
+                        ectx.phy.velocity = vec3d{ steering.v_x, 0.0, steering.v_z };
+                        return BTNodeStatus_t::running;
+                    }
+                }
                 ectx.ai->on_attack_radius = true;
 
                 //Oriento hacia el jugador
