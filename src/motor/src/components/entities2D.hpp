@@ -6,10 +6,13 @@
 #include "../managers/input_manager.hpp"
 #include "../resources/resource_texture.hpp"   
 
+
 #include <GL/gl.h>
 #include <glm/glm.hpp>
 
 #include <chrono>
+
+static constexpr double K_PI2 = 3.14159265358979323846;
 
 namespace DarkMoon {
 

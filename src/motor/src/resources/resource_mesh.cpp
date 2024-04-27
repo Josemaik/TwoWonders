@@ -1,7 +1,7 @@
 #include "resource_mesh.hpp"
 
 namespace DarkMoon {
-    Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<u_int16_t> indices, Material* material) {
+    Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<uint16_t> indices, Material* material) {
         this->m_id = id;
         this->vertices = vertices;
         this->indices = indices;
@@ -41,7 +41,7 @@ namespace DarkMoon {
 
         // Bind buffer and fill with index data
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(u_int16_t), &indices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint16_t), &indices[0], GL_STATIC_DRAW);
 
         // Enable and specify vertex positions
         glEnableVertexAttribArray(0);
