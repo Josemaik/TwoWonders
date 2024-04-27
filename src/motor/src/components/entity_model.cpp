@@ -29,8 +29,10 @@ namespace DarkMoon {
 
         // Draw meshes
         if (drawModel)
-            for (const auto& mesh : m_meshes)
+            for (const auto& mesh : m_meshes){
+                //std::cout << mesh->getID() << "\n";
                 mesh->draw(transMatrix, color);
+            }
 
         // Draw wires
         if (drawWires)
@@ -104,6 +106,9 @@ namespace DarkMoon {
             }
         }
 
+        //std::cout << aiMaterial->GetName().C_Str() << "\n";
+        //std::cout << mesh->mName.C_Str() << "\n";
+
         // Process material
         auto material = processMaterial(aiMaterial, rm);
         processTextures(aiMaterial, material, rm);
@@ -126,12 +131,12 @@ namespace DarkMoon {
         aiGetMaterialFloat(aiMaterial, AI_MATKEY_SHININESS, &shininess);
 
         // Create and return Material object
-        auto material = rm.loadResource<Material>(aiMaterial->GetName().C_Str());
-        //auto material = rm.loadResource<Material>(aiMaterial->GetName(),
-        //                                          glm::vec3(ambient.r, ambient.g, ambient.b),
-        //                                          glm::vec3(diffuse.r, diffuse.g, diffuse.b),
-        //                                          glm::vec3(specular.r, specular.g, specular.b),
-        //                                          shininess);
+        //auto material = rm.loadResource<Material>(aiMaterial->GetName().C_Str());
+        auto material = rm.loadResource<Material>(aiMaterial->GetName().C_Str(),
+                                                  glm::vec3(ambient.r, ambient.g, ambient.b),
+                                                  glm::vec3(diffuse.r, diffuse.g, diffuse.b),
+                                                  glm::vec3(specular.r, specular.g, specular.b),
+                                                  shininess);
 
         return material;
     }
@@ -141,6 +146,7 @@ namespace DarkMoon {
         aiReturn texFound = aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aiTexturePath);
         if (texFound == AI_SUCCESS) {
             std::string texturePath = aiTexturePath.C_Str();
+            std::replace(texturePath.begin(), texturePath.end(), '\\', '/');
             std::string modelDirectory = m_name;
             size_t lastSlashIndex = modelDirectory.find_last_of('/');
             if (lastSlashIndex != std::string::npos) {

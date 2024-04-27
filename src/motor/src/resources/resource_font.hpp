@@ -29,6 +29,6 @@ namespace DarkMoon {
         void unload() override;
 
     private:
-        void setupFont(const char* filePath);
+        void setupFont(std::string filePath);
     };
 }

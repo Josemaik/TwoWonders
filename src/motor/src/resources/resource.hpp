@@ -5,7 +5,7 @@ namespace DarkMoon {
     struct Resource {
     protected:
         std::size_t m_id;        // ID of ResourceManager
-        const char* m_filePath;  // FilePath of Resource
+        std::string m_filePath;  // FilePath of Resource
         bool m_isLoad{ false };
 
         virtual void setup() {};
@@ -19,6 +19,6 @@ namespace DarkMoon {
 
         bool isLoaded() { return m_isLoad; };
         std::size_t getID() { return m_id; };
-        const char* getFilePath() { return m_filePath; };
+        std::string getFilePath() { return m_filePath; };
     };
 }

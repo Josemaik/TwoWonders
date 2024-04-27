@@ -85,7 +85,7 @@ namespace DarkMoon {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         // Load image, create texture and generate mipmaps
-        unsigned char* data = stbi_load(m_filePath, &m_width, &m_height, &m_nrChannels, STBI_rgb_alpha);
+        unsigned char* data = stbi_load(m_filePath.c_str(), &m_width, &m_height, &m_nrChannels, STBI_rgb_alpha);
         if (data) {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);

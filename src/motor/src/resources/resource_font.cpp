@@ -17,7 +17,7 @@ namespace DarkMoon {
 
     // PRIVATE
 
-    void Font::setupFont(const char* filePath) {
+    void Font::setupFont(std::string filePath) {
 
         // Initialize FreeType
         FT_Library library;
@@ -26,7 +26,7 @@ namespace DarkMoon {
 
         // Load the font
         FT_Face face;
-        if (FT_New_Face(library, filePath, 0, &face)) {
+        if (FT_New_Face(library, filePath.c_str(), 0, &face)) {
             std::cerr << "Error loading the font" << std::endl;
         }
         else{
