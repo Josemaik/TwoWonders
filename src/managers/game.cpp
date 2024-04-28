@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 32.0, 4.0, 130.0 };
+        plfi.spawnPoint = { 32.0, 4.0, 43.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -169,7 +169,7 @@ void Game::run()
 
     while (!li.gameShouldEnd)
     {
-        elapsed += 0.0000006;
+        elapsed += 0.0000007f;
         gami.updateFrame();
 
         switch (li.currentScreen)

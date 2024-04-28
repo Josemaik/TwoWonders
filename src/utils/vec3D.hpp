@@ -327,6 +327,11 @@ struct vec2D
         return Vector2{ static_cast<float>(x),  static_cast<float>(y) };
     }
 
+    constexpr bool operator==(vec2D const& rhs) const
+    {
+        return x == rhs.x && y == rhs.y;
+    }
+
     DataT x{}, y{};
 };
 

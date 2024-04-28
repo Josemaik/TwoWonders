@@ -64,11 +64,12 @@ namespace ENGI {
 
         // Rectangle
         void drawRectangle(int posX, int posY, int width, int height, Color color);
-        DarkMoon::Node* createRectangle(vec2d& pos, vec2d& size, DarkMoon::Color color, const char* name, DarkMoon::Node* parentNode);
+        DarkMoon::Node* createRectangle(vec2d pos, vec2d size, DarkMoon::Color color, const char* name, DarkMoon::Node* parentNode);
         void drawRectangleLinesEx(Rectangle rec, float lineThick, Color color);
         void drawRectangleRec(Rectangle rec, Color color);
         void drawTexture(TextureType texture, int posX, int posY, Color tint);
         void drawTexture(TextureType texture, int posX, int posY, Color tint, float scale);
+        void drawNode(DarkMoon::Node* node, vec2d pos, vec2f scale = { 0.76f, 0.76f });
         void drawCircle(int posX, int posY, float radius, Color color);
         void drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color);
         void drawTriangle(vec2d v1, vec2d v2, vec2d v3, Color color);

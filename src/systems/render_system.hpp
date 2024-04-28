@@ -11,16 +11,14 @@ struct RenderSystem
 {
     struct AnimatedTexture
     {
-        std::string textureName;
-        int targetPosX;
-        int targetPosY;
-        int width;
-        int height;
-        float scaleChange;
+        std::string textureName{};
+        int targetPosX{};
+        int targetPosY{};
+        float scaleChange{};
         float scaleFactor{};
-        float lerpFactor{ 0.0f };
+        float lerpFactor{};
         float lerpSpeed{ 0.02f };
-        float elapsed{ 0.0f };
+        float elapsed{};
     };
 
     struct ButtonRect
@@ -33,8 +31,6 @@ struct RenderSystem
     // Se van a buscar las entidad que tengan estos componentes y tags
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
-
-    RenderSystem() { init(); };
 
     void update(EntityManager& em, GameEngine& engine);
     void drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss);
@@ -75,7 +71,7 @@ private:
     void drawAnimatedTextures(GameEngine& engine);
     void drawCheatMenu(GameEngine& engine, EntityManager& em);
     void drawSmallButtons(GameEngine& engine, const std::string& name, int posX, int posY, int width, int height);
-    void handleAnimatedTexture(const std::string& name, const std::string& textureName, int x, int y, const Texture2D& texture, float scaleFactor);
+    void handleAnimatedTexture(const std::string& name, const std::string& textureName, int x, int y, float scaleFactor);
     void drawAlerts_IA(EntityManager& em, GameEngine& engine);
     void drawFPSCounter(GameEngine& engine);
     void loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r);

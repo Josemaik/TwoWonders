@@ -11,7 +11,7 @@ else
 	CC 		   	:= g++-12
 	CCACHE 	   	:= ccache
     LIBS 		:= -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so -lglfw -lGLEW -lGLU -lGL -lm -lassimp -lfreetype -lgif
-	SANITIZE   	:= -fsanitize=address
+	SANITIZE   	:= -fsanitize=address,undefined
 	LIBS_COPY  	:= /usr/lib/libraylib.so.420 libs/raygui.so fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13
 endif
 

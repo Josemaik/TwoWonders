@@ -121,9 +121,9 @@ namespace DarkMoon {
 
         void draw(glm::mat4 transMatrix) override {
             // Check actual texture
-            WindowsManager wm = WindowsManager::getInstance();
+            // WindowsManager wm = WindowsManager::getInstance();
 
-            elapsedTime += wm.getFrameTime();
+            elapsedTime += 1 / 60.0f;
             if (elapsedTime > frameDuration) {
                 if (currentFrame + 1 > static_cast<int>(frames.size() - 1))
                     currentFrame = 0;
