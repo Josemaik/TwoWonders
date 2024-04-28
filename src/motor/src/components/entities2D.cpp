@@ -21,7 +21,7 @@ namespace DarkMoon {
     };
 
     void Pixel::changeVAO(glm::mat4& transMatrix) {
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         m_transMatrix = transMatrix;
         float vertex[] = { rm.normalizeX(m_transMatrix[3][0]), rm.normalizeY(m_transMatrix[3][1]) };
@@ -37,7 +37,7 @@ namespace DarkMoon {
     };
 
     void Pixel::draw(glm::mat4 transMatrix) {
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         // Apply Transformation Matrix
         if (m_transMatrix != transMatrix)
@@ -79,7 +79,7 @@ namespace DarkMoon {
     };
 
     void Line::changeVAO(glm::mat4& transMatrix) {
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         m_transMatrix = transMatrix;
 
@@ -107,7 +107,7 @@ namespace DarkMoon {
     };
 
     void Line::draw(glm::mat4 transMatrix) {
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         // Apply Transformation Matrix
         if (m_transMatrix != transMatrix)
@@ -151,7 +151,7 @@ namespace DarkMoon {
     }
 
     void Triangle::changeVAO(glm::mat4& transMatrix) {
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         m_transMatrix = transMatrix;
 
@@ -186,7 +186,7 @@ namespace DarkMoon {
     }
 
     void Triangle::draw(glm::mat4 transMatrix) {
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         // Apply Transformation Matrix
         if (m_transMatrix != transMatrix)
@@ -224,7 +224,7 @@ namespace DarkMoon {
     };
 
     void Rectangle::changeVAO(glm::mat4& transMatrix) {
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         m_transMatrix = transMatrix;
 
@@ -260,7 +260,7 @@ namespace DarkMoon {
     };
 
     void Rectangle::draw(glm::mat4 transMatrix) {
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         // Apply Transformation Matrix
         if (m_transMatrix != transMatrix)
@@ -296,7 +296,7 @@ namespace DarkMoon {
     };
 
     void Circle::changeVAO(glm::mat4& transMatrix) {
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         m_transMatrix = transMatrix;
 
@@ -326,7 +326,7 @@ namespace DarkMoon {
     };
 
     void Circle::draw(glm::mat4 transMatrix) {
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         // Apply Transformation Matrix
         if (m_transMatrix != transMatrix)
@@ -364,7 +364,7 @@ namespace DarkMoon {
     };
 
     void Texture2D::changeVAO(glm::mat4& transMatrix) {
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         m_transMatrix = transMatrix;
 
@@ -416,7 +416,7 @@ namespace DarkMoon {
         if (!texture)
             return;
 
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         //if(m_transMatrix != transMatrix)
             changeVAO(transMatrix);

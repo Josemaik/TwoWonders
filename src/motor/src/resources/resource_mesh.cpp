@@ -61,7 +61,7 @@ namespace DarkMoon {
     }
 
     void Mesh::draw(glm::mat4 transMatrix, Color color) {
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         rm.beginMode3D();
 
@@ -104,7 +104,7 @@ namespace DarkMoon {
 
     void Mesh::drawLines(glm::mat4 transMatrix, Color color) {
 
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         rm.beginMode3D();
 

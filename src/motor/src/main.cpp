@@ -208,17 +208,43 @@ int main(){
 
             inputManager(engine, mainCharacter);
 
-            if(engine.IsKeyPressed(D_KEY_I))
-                lightEntity->color = D_MAGENTA;
-            else if(engine.IsKeyPressed(D_KEY_K))
-                lightEntity->color = D_YELLOW;
-            else if(engine.IsKeyPressed(D_KEY_L))
-                lightEntity->color = D_KAIWA;
-            else if(engine.IsKeyPressed(D_KEY_J))
-                lightEntity->color = D_PINK;
+            {
+                // Color lights
+                if(engine.IsKeyPressed(D_KEY_I))
+                    lightEntity->color = D_MAGENTA;
+                else if(engine.IsKeyPressed(D_KEY_K))
+                    lightEntity->color = D_YELLOW;
+                else if(engine.IsKeyPressed(D_KEY_L))
+                    lightEntity->color = D_KAIWA;
+                else if(engine.IsKeyPressed(D_KEY_J))
+                    lightEntity->color = D_PINK;
 
-            if(engine.IsKeyPressed(D_KEY_SPACE))
-                engine.ToggleLights();
+                // Toggle lights
+                if(engine.IsKeyPressed(D_KEY_SPACE))
+                    engine.ToggleLights();
+
+                // On/Off light
+                if(engine.IsKeyPressed(D_KEY_H))
+                    lightEntity->enabled = !lightEntity->enabled;
+
+                // Movement light
+                if(engine.IsKeyDown(D_KEY_LEFT)){
+                    lightEntity->position.x += 0.5f;
+                    lightEntity->position.z -= 0.5f;
+                }
+                if(engine.IsKeyDown(D_KEY_RIGHT)){
+                    lightEntity->position.x -= 0.5f;
+                    lightEntity->position.z += 0.5f;
+                }
+                if(engine.IsKeyDown(D_KEY_UP)){
+                    lightEntity->position.x += 0.5f;
+                    lightEntity->position.z += 0.5f;
+                }
+                if(engine.IsKeyDown(D_KEY_DOWN)){
+                    lightEntity->position.x -= 0.5f;
+                    lightEntity->position.z -= 0.5f;
+                }
+            }
 
             textBoxEntity->text.text = std::to_string(engine.GetFPS());            
 

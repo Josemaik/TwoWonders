@@ -8,6 +8,7 @@
 namespace DarkMoon {
     struct Light : Entity {
         Color color = D_WHITE;
+        bool enabled = { true };
 
         Light(Color c)
             : color(c) {};

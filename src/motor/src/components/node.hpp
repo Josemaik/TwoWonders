@@ -67,6 +67,7 @@ namespace DarkMoon {
         glm::vec3 getScale();
         glm::mat4 getTransformationMatrix();
         std::vector<Node*> getChildren();
+        bool getVisible(){ return m_visible; };
 
         // Auxiliaries
         void printTransformationMatrix();

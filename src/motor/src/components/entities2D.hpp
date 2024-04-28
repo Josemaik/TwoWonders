@@ -132,7 +132,7 @@ namespace DarkMoon {
             auto texture = frames[currentFrame];
 
             // Draw texture
-            RenderManager rm = RenderManager::getInstance();
+            RenderManager& rm = RenderManager::getInstance();
 
             rm.useShader(rm.shaders["texture"]);
 
@@ -249,7 +249,7 @@ namespace DarkMoon {
         };
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
+            RenderManager& rm = RenderManager::getInstance();
 
             rm.useShader(rm.shaders["text"]);
 

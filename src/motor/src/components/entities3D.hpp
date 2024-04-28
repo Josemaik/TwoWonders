@@ -15,7 +15,7 @@ namespace DarkMoon {
             : position(pos), pointSize(pSize), color(c) {};
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
+            RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
 
@@ -91,7 +91,7 @@ namespace DarkMoon {
             : startPos(sP), endPos(eP), lineSize(lSize), color(c) {};
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
+            RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
 
@@ -169,7 +169,7 @@ namespace DarkMoon {
             : slices(sli), spacing(spac), color(c) {};
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
+            RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
 
@@ -257,7 +257,7 @@ namespace DarkMoon {
             : centerPos(cP), size(s), color(c) {};
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
+            RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
 
@@ -345,7 +345,7 @@ namespace DarkMoon {
             : position(pos), size(s), color(c) {};
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
+            RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
 
@@ -448,7 +448,7 @@ namespace DarkMoon {
             : position(pos), size(s), color(c) {};
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
+            RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
 

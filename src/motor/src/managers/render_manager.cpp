@@ -28,9 +28,12 @@ namespace DarkMoon {
         if(activeLights){
             std::vector<PointLight> pointLightsData;
 
-            for(Light* light : lights)
-                if(auto pointLight = dynamic_cast<PointLight*>(light))
-                    pointLightsData.push_back(*pointLight);  
+            for(Light* light : lights){
+                if(light->enabled){
+                    if(auto pointLight = dynamic_cast<PointLight*>(light))
+                        pointLightsData.push_back(*pointLight);  
+                }
+            }
 
             for(int i=0; i<static_cast<int>(pointLightsData.size()); i++){
                 std::string positionUniformName  = "pointsLights[" + std::to_string(i) + "].position";
@@ -47,27 +50,6 @@ namespace DarkMoon {
             }
 
             glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "NumPointLights"), static_cast<int>(pointLightsData.size()));
-
-            /*
-            std::vector<PointLight> pointLightsData;
-
-                    pointLightsData.push_back(*pointLight);    
-                
-            if(!pointLightsData.empty()){
-                GLuint pointLightsBuffer;
-                size_t bufferSize = sizeof(PointLight) * pointLightsData.size();
-                glGenBuffers(1, &pointLightsBuffer);
-                glBindBuffer(GL_UNIFORM_BUFFER, pointLightsBuffer);
-                glBufferData(GL_UNIFORM_BUFFER, bufferSize, pointLightsData.data(), GL_STATIC_DRAW);
-
-                GLuint blockIndex = glGetUniformBlockIndex(shaders["lights"]->getIDShader(), "PointLights");
-
-                glBindBufferBase(GL_UNIFORM_BUFFER, 0, pointLightsBuffer);
-                glUniformBlockBinding(shaders["lights"]->getIDShader(), blockIndex, 0);
-
-                glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "NumPointLights"), pointLightsData.size());
-            }
-            */
         }
     }
 
@@ -85,5 +67,4 @@ namespace DarkMoon {
         glClearColor(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
-
 }

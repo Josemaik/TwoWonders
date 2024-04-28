@@ -96,6 +96,8 @@ namespace DarkMoon {
         Node* CreateDirectionalLight(glm::vec3 direction, Color color, const char* nodeName, Node* parentNode);
         // Active lights
         void ToggleLights(){ m_renderManager.activeLights = !m_renderManager.activeLights; };
+        // Update lights
+        void UpdateLights(Node* parentNode);
 
         // ------------------------ //
         // Window-related functions //

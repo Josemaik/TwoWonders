@@ -22,9 +22,9 @@ namespace DarkMoon {
     // ---------------------- //
 
     void DarkMoonEngine::DrawTree() {
-        std::cout << "┌──────┐" << std::endl;
-        std::cout << "│ Tree │" << std::endl;
-        std::cout << "└──────┘" << std::endl;
+        std::cout << "┌──────┐\n";
+        std::cout << "│ Tree │\n";
+        std::cout << "└──────┘\n";
         GetRootNode()->drawTree();
     }
 
@@ -57,6 +57,7 @@ namespace DarkMoon {
 
         return p_node;
     }
+
     // 2D
 
     // Create pixel in node
@@ -317,7 +318,7 @@ namespace DarkMoon {
         auto light = std::make_unique<PointLight>(position, color);
         p_nodeLight->setEntity(std::move(light));
 
-        m_renderManager.lights.push_back(dynamic_cast<Light*>(p_nodeLight->getEntity()));
+        // m_renderManager.lights.push_back(dynamic_cast<Light*>(p_nodeLight->getEntity()));
 
         return p_nodeLight;
     }
@@ -328,12 +329,19 @@ namespace DarkMoon {
         auto light = std::make_unique<DirectionalLight>(direction, color);
         p_nodeLight->setEntity(std::move(light));
 
-        m_renderManager.lights.push_back(dynamic_cast<Light*>(p_nodeLight->getEntity()));
+        // m_renderManager.lights.push_back(dynamic_cast<Light*>(p_nodeLight->getEntity()));
 
         return p_nodeLight;
     }
 
-
+    // Update lights
+    void DarkMoonEngine::UpdateLights(Node* parentNode){
+        for(auto& child : parentNode->getChildren()){
+            if(auto light = dynamic_cast<Light*>(child->getEntity()))
+                if(child->getVisible())
+                    m_renderManager.lights.push_back(light);
+        }
+    }
 
     // ------------------------ //
     // Window-related functions //
@@ -439,8 +447,14 @@ namespace DarkMoon {
         m_windowsManager.beginDrawing();
         m_renderManager.useShader(m_renderManager.shaders["color"]);
 
+        // Lights
+        m_renderManager.lights.clear();
+        UpdateLights(GetRootNode());
+
         m_inputManager.updateBeginFrame();
     }
+
+
 
     // End canvas drawing and swap buffers
     void DarkMoonEngine::EndDrawing() {
