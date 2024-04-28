@@ -134,7 +134,7 @@ namespace DarkMoon {
             // Draw texture
             RenderManager rm = RenderManager::getInstance();
 
-            rm.useShader(rm.shaderTexture);
+            rm.useShader(rm.shaders["texture"]);
 
             auto nColor = rm.normalizeColor(color);
 
@@ -211,7 +211,7 @@ namespace DarkMoon {
             glDeleteBuffers(1, &VBO);
             glDeleteBuffers(1, &EBO);
 
-            rm.useShader(rm.shaderColor);
+            rm.useShader(rm.shaders["color"]);
         };
     };
 
@@ -251,7 +251,7 @@ namespace DarkMoon {
         void draw(glm::mat4 transMatrix) override {
             RenderManager rm = RenderManager::getInstance();
 
-            rm.useShader(rm.shaderText);
+            rm.useShader(rm.shaders["text"]);
 
             position = glm::vec2(transMatrix[3][0], transMatrix[3][1]);
 
@@ -332,7 +332,7 @@ namespace DarkMoon {
             glDeleteBuffers(1, &VBO);
             glDeleteVertexArrays(1, &VAO);
 
-            rm.useShader(rm.shaderColor);
+            rm.useShader(rm.shaders["color"]);
         };
     };
 

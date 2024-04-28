@@ -421,7 +421,7 @@ namespace DarkMoon {
         //if(m_transMatrix != transMatrix)
             changeVAO(transMatrix);
 
-        rm.useShader(rm.shaderTexture);
+        rm.useShader(rm.shaders["texture"]);
 
         // Colors
         GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
@@ -440,7 +440,6 @@ namespace DarkMoon {
             glDisable(GL_BLEND);
         }
 
-        rm.useShader(rm.shaderColor);
+        rm.useShader(rm.shaders["color"]);
     };
-
 };

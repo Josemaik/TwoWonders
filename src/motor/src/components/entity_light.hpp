@@ -1,19 +1,32 @@
 #pragma once
 #include "entity.hpp"
+#include "../utils/color.hpp"
 
 #include <vector>
 #include <glm/glm.hpp>
 
 namespace DarkMoon {
     struct Light : Entity {
-    private:
-        glm::vec3 m_position;
+        Color color = D_WHITE;
 
-        glm::vec3 m_ambient;
-        glm::vec3 m_diffuse;
-        glm::vec3 m_specular;
+        Light(Color c)
+            : color(c) {};
+    };
 
-    public:
-        Light() : m_position(0.0f, 0.0f, 0.0f) {};
+    struct PointLight : Light {
+        glm::vec3 position{};
+        float constant{ 1.0f };      // 1.0   // 0.9
+        float linear{ 0.09f };       // 0.09  // 0.007
+        float quadratic{ 0.032f };   // 0.032 // 0.00008
+
+        PointLight(glm::vec3 pos, Color c)
+            : Light(c), position(pos) {};
+    };
+
+    struct DirectionalLight : Light {
+        glm::vec3 direction{};
+
+        DirectionalLight(glm::vec3 dir, Color c)
+            : Light(c), direction(dir) {};
     };
 }

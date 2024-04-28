@@ -33,6 +33,11 @@ namespace DarkMoon {
             std::cout << "Unload a material (ID:" << m_id << ")" << std::endl;
         };
 
+        glm::vec3 getAmbientColor(){ return m_ambientColor; };
+        glm::vec3 getDiffuseColor(){ return m_diffuseColor; };
+        glm::vec3 getSpecularColor(){ return m_specularColor; };
+        float getShininess(){ return m_shininess; };
+
     private:
         glm::vec3 m_ambientColor;
         glm::vec3 m_diffuseColor;

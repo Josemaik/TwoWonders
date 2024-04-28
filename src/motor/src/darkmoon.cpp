@@ -8,7 +8,7 @@ namespace DarkMoon {
         m_rootNode->name = "Scene";
 
         // Create Default Light
-        CreateLight({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, "Default Light", GetRootNode());
+        //Creat({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, "Default Light", GetRootNode());
 
         // Create Default Camera
         auto eCamera = CreateCamera("Default Camera", GetRootNode());
@@ -299,16 +299,6 @@ namespace DarkMoon {
         return p_eCamera;
     }
 
-    // Create light in node
-    Node* DarkMoonEngine::CreateLight(glm::vec3, glm::vec3, glm::vec3, glm::vec3, const char* nodeName, Node* parentNode) {
-        auto p_nodeLight = CreateNode(nodeName, parentNode);
-
-        // Create light
-        auto light = std::make_unique<Light>();
-
-        return p_nodeLight;
-    }
-
     // Get root node
     Node* DarkMoonEngine::GetRootNode() {
         return m_rootNode.get();
@@ -318,6 +308,32 @@ namespace DarkMoon {
     Ray DarkMoonEngine::GetMouseRay() {
         return m_renderManager.m_camera->getMouseRay(GetMouseX(), GetMouseY(), m_windowsManager.getScreenWidth(), m_windowsManager.getScreenHeight());
     }
+
+    // LIGHTS
+
+    // Create point light in node
+    Node* DarkMoonEngine::CreatePointLight(glm::vec3 position, Color color, const char* nodeName, Node* parentNode){
+        auto p_nodeLight = CreateNode(nodeName, parentNode);
+        auto light = std::make_unique<PointLight>(position, color);
+        p_nodeLight->setEntity(std::move(light));
+
+        m_renderManager.lights.push_back(dynamic_cast<Light*>(p_nodeLight->getEntity()));
+
+        return p_nodeLight;
+    }
+
+    // Create directional light in node
+    Node* DarkMoonEngine::CreateDirectionalLight(glm::vec3 direction, Color color, const char* nodeName, Node* parentNode){
+        auto p_nodeLight = CreateNode(nodeName, parentNode);
+        auto light = std::make_unique<DirectionalLight>(direction, color);
+        p_nodeLight->setEntity(std::move(light));
+
+        m_renderManager.lights.push_back(dynamic_cast<Light*>(p_nodeLight->getEntity()));
+
+        return p_nodeLight;
+    }
+
+
 
     // ------------------------ //
     // Window-related functions //
@@ -342,14 +358,15 @@ namespace DarkMoon {
                 glm::vec3(0.2f, 0.2f, 0.2f),
                 glm::vec3(0.8f, 0.8f, 0.8f),
                 glm::vec3(0.0f, 0.0f, 0.0f),
-                0.0f);
+                1.0f);
             m_renderManager.defaultMaterial->texture = LoadTexture2D("assets/defaultTexture.png");
 
             //----- Shaders -----// (std::string(vsFilePath) + " - " + std::string(fsFilePath)).c_str()
-            m_renderManager.shaderColor = LoadShader("shaderColor", "assets/shaders/color.vs", "assets/shaders/color.fs");
-            m_renderManager.shaderTexture = LoadShader("shaderTexture", "assets/shaders/texture.vs", "assets/shaders/texture.fs");
-            m_renderManager.shader3D = LoadShader("shader3D", "assets/shaders/3D.vs", "assets/shaders/3D.fs");
-            m_renderManager.shaderText = LoadShader("shaderText", "assets/shaders/text.vs", "assets/shaders/text.fs");
+            m_renderManager.shaders["color"] = LoadShader("shaderColor", "assets/shaders/color.vs", "assets/shaders/color.fs");
+            m_renderManager.shaders["texture"] = LoadShader("shaderTexture", "assets/shaders/texture.vs", "assets/shaders/texture.fs");
+            m_renderManager.shaders["3D"] = LoadShader("shader3D", "assets/shaders/3D.vs", "assets/shaders/3D.fs");
+            m_renderManager.shaders["text"] = LoadShader("shaderText", "assets/shaders/text.vs", "assets/shaders/text.fs");
+            m_renderManager.shaders["lights"] = LoadShader("shaderLights", "assets/shaders/lights.vs", "assets/shaders/lights.fs");
 
             //----- Font -----//
             m_renderManager.defaultFont = LoadFont("assets/fonts/Capriola-Regular.ttf");
@@ -420,7 +437,7 @@ namespace DarkMoon {
     // Setup canvas to start drawing
     void DarkMoonEngine::BeginDrawing() {
         m_windowsManager.beginDrawing();
-        m_renderManager.useShader(m_renderManager.shaderColor);
+        m_renderManager.useShader(m_renderManager.shaders["color"]);
 
         m_inputManager.updateBeginFrame();
     }

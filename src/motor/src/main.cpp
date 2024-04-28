@@ -71,7 +71,9 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine){
     //engine.CreatePoint3D({1.0f, 1.0f, -1.0f}, 5.0f, D_BLACK, "Punto fin linea", p_node3D);
 
     // Node: Plano
-    engine.CreatePlane({0.0f, 0.0f, 0.0f}, {10.0f, 10.0f}, D_PINK, "Plano rosita", p_node3D);
+    //engine.CreatePlane({0.0f, 0.0f, 0.0f}, {10.0f, 10.0f}, D_PINK, "Plano rosita", p_node3D);
+
+    engine.CreateCube({0.0f, -1.0f, 0.0f}, {100.0f, 1.0f, 100.0f}, D_WHITE, "Suelo negro", p_node3D);
 
     // Node: Cubo
     engine.CreateCube({-30.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 10.0f}, D_AQUA_DARK, "Cubo azulito", p_node3D);
@@ -82,28 +84,38 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine){
     // Node: Modelo Dummy 1
     auto modelDummy = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 1", p_node3D);
     //modelDummy->scale({0.2f, 0.2f, 0.2f});
-    modelDummy->translate({0.0f, 0.0f, -30.0f});
+    modelDummy->translate({0.0f, -2.5f, -30.0f});
 
     // Node: Modelo Dummy 2
     auto modelDummy2 = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 2", p_node3D);
     //modelDummy2->scale({0.2f, 0.2f, 0.2f});
-    modelDummy2->translate({0.0f, 0.0f, 30.0f});
+    modelDummy2->translate({0.0f, -2.5f, 30.0f});
     modelDummy2->rotate({0.0f, 1.0f, 0.0f}, 180.0f);
 
     // Node: Modelo Dummy 3
     auto modelDummy3 = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 3", p_node3D);
     //modelDummy3->scale({0.2f, 0.2f, 0.2f});
-    modelDummy3->translate({30.0f, 0.0f, 0.0f});
+    modelDummy3->translate({30.0f, -2.5f, 0.0f});
     modelDummy3->rotate({0.0f, 1.0f, 0.0f}, 270.0f);
 
     return p_node3D;
 }
 
+DarkMoon::Node* createLights(DarkMoon::DarkMoonEngine& engine){
+    auto light = engine.CreatePointLight({0.0f, 5.0f, 0.0f}, D_YELLOW, "Luz prueba", engine.GetRootNode());
+
+    engine.CreatePointLight({0.0f, 5.0f, 30.0f}, D_BLUE, "Luz azul prueba", engine.GetRootNode());
+    engine.CreatePointLight({0.0f, 5.0f, -30.0f}, D_WHITE, "Luz blanca prueba", engine.GetRootNode());
+    engine.CreatePointLight({30.0f, 5.0f, 0.0f}, D_RED, "Luz roja prueba", engine.GetRootNode());
+
+    return light;
+}
+
 DarkMoon::Node* createMainCharacter(DarkMoon::DarkMoonEngine& engine){
     // Node: Modelo
-    auto model = engine.CreateModel("assets/Cofre/Cofre.fbx", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
+    auto model = engine.CreateModel("assets/Cofre/Cofre.obj", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
     //model->scale({0.02f, 0.02f, 0.02f});
-    //model->translate({0.0f, 0.0f, 0.0f});
+    model->translate({0.0f, 1.0f, 0.0f});
     model->rotate({0.0f, 1.0f, 0.0f}, 135.0f);
 
     auto eModel = dynamic_cast<DarkMoon::Model*>(model->getEntity());
@@ -169,10 +181,12 @@ int main(){
         std::cout << "└────────────────┘" << std::endl;
 
         createScene3D(engine);
+        auto light = createLights(engine);
         auto mainCharacter = createMainCharacter(engine);
         auto textBox = createHUD(engine);
         
         auto textBoxEntity = dynamic_cast<DarkMoon::TextBox*>(textBox->getEntity());
+        auto lightEntity = dynamic_cast<DarkMoon::PointLight*>(light->getEntity());
 
         auto camera = engine.GetCamera();
         camera->position = {-60.0f, 60.0f, -60.0f};
@@ -193,6 +207,18 @@ int main(){
             // Logic
 
             inputManager(engine, mainCharacter);
+
+            if(engine.IsKeyPressed(D_KEY_I))
+                lightEntity->color = D_MAGENTA;
+            else if(engine.IsKeyPressed(D_KEY_K))
+                lightEntity->color = D_YELLOW;
+            else if(engine.IsKeyPressed(D_KEY_L))
+                lightEntity->color = D_KAIWA;
+            else if(engine.IsKeyPressed(D_KEY_J))
+                lightEntity->color = D_PINK;
+
+            if(engine.IsKeyPressed(D_KEY_SPACE))
+                engine.ToggleLights();
 
             textBoxEntity->text.text = std::to_string(engine.GetFPS());            
 

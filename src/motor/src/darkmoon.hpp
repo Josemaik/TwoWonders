@@ -81,14 +81,21 @@ namespace DarkMoon {
 
         // Create camera
         Camera* CreateCamera(const char* nodeName, Node* parentNode);
-        // Create light in node
-        Node* CreateLight(glm::vec3 position, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, const char* nodeName, Node* parentNode);
         // Get root node
         Node* GetRootNode();
         // Get default font
         Font* GetDefaultFont() { return m_renderManager.defaultFont; };
         // Get mouse ray cast
         Ray GetMouseRay();
+
+        // LIGHTS
+
+        // Create point light in node
+        Node* CreatePointLight(glm::vec3 position, Color color, const char* nodeName, Node* parentNode);
+        // Create directional light in node
+        Node* CreateDirectionalLight(glm::vec3 direction, Color color, const char* nodeName, Node* parentNode);
+        // Active lights
+        void ToggleLights(){ m_renderManager.activeLights = !m_renderManager.activeLights; };
 
         // ------------------------ //
         // Window-related functions //

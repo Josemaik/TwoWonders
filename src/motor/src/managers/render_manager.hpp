@@ -5,11 +5,13 @@
 #include "../resources/resource_font.hpp"
 #include "../resources/resource_mesh.hpp"
 #include "../components/entity_camera.hpp"
+#include "../components/entity_light.hpp"
 
 #include "resource_manager.hpp"
 
 #include "../utils/color.hpp"
 
+#include <map>
 #include <memory>
 
 #include <GL/glew.h>
@@ -24,19 +26,19 @@
 namespace DarkMoon {
     struct RenderManager {
     private:
-        Shader* m_shaderProgram;
-        int m_width, m_height;
+        Shader* m_shaderProgram {};
+        int m_width {}, m_height {};
 
     public:
-        Camera* m_camera;
-        Material* defaultMaterial;
-        Font* defaultFont;
+        Camera* m_camera {};
+        Material* defaultMaterial {};
+        Font* defaultFont {};
+        std::vector<Light*> lights {};
 
         // Shaders
-        Shader* shaderColor;
-        Shader* shaderTexture;
-        Shader* shader3D;
-        Shader* shaderText;
+        std::map<std::string, Shader*> shaders;
+
+        bool activeLights { false };
 
         // Screen width and height
         void setWindowSize(int width, int height) { m_width = width; m_height = height; };
