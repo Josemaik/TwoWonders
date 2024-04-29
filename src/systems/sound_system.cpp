@@ -18,6 +18,8 @@ SoundSystem::SoundSystem() {
     ERRCHECK(FMOD_System_SetOutput(coreSystem, FMOD_OUTPUTTYPE_AUTODETECT));
     ERRCHECK(FMOD_Studio_System_Initialize(soundSystem, 512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0));
 
+    
+
 }
 
 void SoundSystem::initBanks(const char* master_bank_location, const char* master_string_location, const char* ui_bank_location, const char* ambient_bank_location, const char* music_bank_location, const char* SFX_bank_location)
@@ -29,6 +31,12 @@ void SoundSystem::initBanks(const char* master_bank_location, const char* master
     ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, ambient_bank_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &ambient_bank));
     ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, SFX_bank_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &SFX_bank));
     ERRCHECK(FMOD_Studio_Bank_GetLoadingState(ui_bank, &loadingState));
+
+    initBuses();
+
+    initChannels();
+
+    
 }
 
 void SoundSystem::createEventInstance() {
@@ -37,6 +45,39 @@ void SoundSystem::createEventInstance() {
     FMOD_Studio_EventInstance_Start(eventInstance);
 }
 
+void SoundSystem::initBuses(){
+    ERRCHECK(FMOD_Studio_System_GetBus(soundSystem, "bus:/SFX", &sfxBus));
+    ERRCHECK(FMOD_Studio_System_GetBus(soundSystem, "bus:/Ambience", &AmbientBus));
+    ERRCHECK(FMOD_Studio_System_GetBus(soundSystem, "bus:/Music", &MusicBus));
+
+   // ERRCHECK(FMOD_System_GetMasterChannelGroup(coreSystem, &masterGroup));
+   //ERRCHECK(FMOD_Studio_Bus_GetChannelGroup(AmbientBus, &ambientGroup));
+    //ERRCHECK(FMOD_Studio_Bus_GetChannelGroup(MusicBus, &musicGroup));
+    //ERRCHECK(FMOD_Studio_Bus_GetChannelGroup(sfxBus, &sfxGroup));
+    
+}
+
+void SoundSystem::initChannels(){
+
+      ERRCHECK(FMOD_System_GetMasterChannelGroup(coreSystem, &masterGroup));
+      /*const char* name = "Ambience";
+
+      ERRCHECK( FMOD_System_CreateChannelGroup( coreSystem, name, &ambientGroup));
+
+     FMOD_RESULT result = FMOD_Studio_Bus_GetChannelGroup(sfxBus, &ambientGroup);
+      if (!ambientGroup) {
+        printf("Error: El grupo de canales del bus de ambiente es NULL.\n");
+        if(sfxBus==NULL){
+            printf("NULL");
+        }
+        // Realizar manejo de error adicional si es necesario
+    }
+    ERRCHECK(result);*/
+    
+   //ERRCHECK(FMOD_Studio_Bus_GetChannelGroup(AmbientBus, &ambientGroup));
+    //ERRCHECK(FMOD_Studio_Bus_GetChannelGroup(MusicBus, &musicGroup));
+    //ERRCHECK(FMOD_Studio_Bus_GetChannelGroup(sfxBus, &sfxGroup));
+}
 
 void SoundSystem::play_music() {
     FMOD_Studio_EventInstance_Start(eventInstance_Musica);
@@ -632,35 +673,67 @@ void SoundSystem::SFX_stop() {
 }
 
 float SoundSystem::getVolumeMaster() {
-
-    FMOD_RESULT result;
-
-    result = FMOD_System_GetMasterChannelGroup(coreSystem, &masterGroup);
-
-    if (result != FMOD_OK) {
-        fprintf(stderr, "%s\n", FMOD_ErrorString(result));
-        exit(-1);
-    }
-
     float currentVolume;
-    result = FMOD_ChannelGroup_GetVolume(masterGroup, &currentVolume);
-    if (result != FMOD_OK) {
-        fprintf(stderr, "%s\n", FMOD_ErrorString(result));
-        exit(-1);
-    }
+    ERRCHECK(FMOD_ChannelGroup_GetVolume(masterGroup, &currentVolume));
+
     return currentVolume;
 }
-void SoundSystem::setVolumeMaster(float volumen) {
-    FMOD_System_GetMasterChannelGroup(coreSystem, &masterGroup);
 
-    [[maybe_unused]] FMOD_RESULT result;
 
-    result = FMOD_ChannelGroup_SetVolume(masterGroup, volumen);
-
-    if (result != FMOD_OK) {
-        fprintf(stderr, "%s\n", FMOD_ErrorString(result));
-        exit(-1);
-    }
-
+float SoundSystem::getVolumeSFX() {
+    float currentVolume, finalvolume;
+    ERRCHECK(FMOD_Studio_Bus_GetVolume(sfxBus, &currentVolume, &finalvolume));
+    return currentVolume;
 }
 
+float SoundSystem::getVolumeMusic(){
+    float currentVolume, finalvolume;
+    ERRCHECK(FMOD_Studio_Bus_GetVolume(MusicBus, &currentVolume, &finalvolume));
+    return currentVolume;
+}
+float SoundSystem::getVolumeAmbient(){
+    float currentVolume, finalvolume;
+    ERRCHECK(FMOD_Studio_Bus_GetVolume(AmbientBus, &currentVolume, &finalvolume));
+    return currentVolume;
+}
+
+void SoundSystem::setVolumeMaster(float volumen) {
+    //REVISAR, ESTO SE DECLARA CREAR EL SYSTEM
+    FMOD_System_GetMasterChannelGroup(coreSystem, &masterGroup);
+
+
+    ERRCHECK(FMOD_ChannelGroup_SetVolume(masterGroup, volumen));
+}
+
+void SoundSystem::setVolumeSFX(float volumen){
+    ERRCHECK( FMOD_Studio_Bus_SetVolume(sfxBus,volumen ));
+}
+
+void SoundSystem::setVolumeMusic(float volumen){
+    ERRCHECK( FMOD_Studio_Bus_SetVolume(MusicBus,volumen ));
+}
+
+void SoundSystem::setVolumeAmbient(float volumen){
+    ERRCHECK( FMOD_Studio_Bus_SetVolume(AmbientBus,volumen ));
+}
+
+void SoundSystem::muteMaster(){
+    generalVolume = getVolumeMaster();
+    setVolumeMaster(0);
+}
+
+void SoundSystem::muteAmbient(){
+    ambientVolume = getVolumeAmbient();
+    setVolumeAmbient(0);
+
+}
+void SoundSystem::muteMusic(){
+    musicVolume = getVolumeMusic();
+    setVolumeMusic(0);
+
+}
+void SoundSystem::muteSFX(){
+    sfxVolume = getVolumeSFX();
+    setVolumeSFX(0);
+
+}
