@@ -108,6 +108,8 @@ DarkMoon::Node* createLights(DarkMoon::DarkMoonEngine& engine){
     engine.CreatePointLight({0.0f, 5.0f, -30.0f}, D_WHITE, "Luz blanca prueba", engine.GetRootNode());
     engine.CreatePointLight({30.0f, 5.0f, 0.0f}, D_RED, "Luz roja prueba", engine.GetRootNode());
 
+    engine.CreateDirectionalLight({0.0f, -1.0f, 0.0f}, D_WHITE, "Luz direccional", engine.GetRootNode());
+
     return light;
 }
 

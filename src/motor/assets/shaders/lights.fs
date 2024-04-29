@@ -5,18 +5,28 @@ in vec3 FragPos;
 in vec3 Normal;
 in vec2 TextCoord;
 
+// --------------- //
+// --- Texture --- //
+// --------------- //
+
 uniform sampler2D texture0;
 uniform vec4 customColor;
 
-// Material properties
+// ---------------- //
+// --- Material --- //
+// ---------------- //
+
 uniform vec3 Kd;
 uniform vec3 Ka;
 uniform vec3 Ks;
 uniform float Shininess;
 
+// -------------- //
+// --- Lights --- //
+// -------------- //
+
 #define MAX_POINT_LIGHTS 10
 
-// Light
 struct PointLight {
     vec4 position;
     vec4 color;
@@ -28,10 +38,28 @@ struct PointLight {
 uniform PointLight pointsLights[MAX_POINT_LIGHTS];
 uniform int NumPointLights;
 
+#define MAX_DIRECTIONAL_LIGHTS 10
+
+struct DirectionalLight {
+    vec3 direction;
+    vec4 color;
+};
+
+uniform DirectionalLight directionalLights[MAX_DIRECTIONAL_LIGHTS];
+uniform int NumDirectionalLights;
+
+// ------------- //
+// --- Phong --- //
+// ------------- //
+
 vec3 Phong(){
+
+    vec3 totalLight = vec3(0.0);
+
+    // pointsLights
+
     vec3 n = normalize(Normal);
     vec3 v = normalize(vec3(-FragPos));
-    vec3 totalLight = vec3(0.0);
 
     for(int i = 0; i < NumPointLights; i++){
         vec3 l = normalize(vec3(pointsLights[i].position) - FragPos);
@@ -47,8 +75,29 @@ vec3 Phong(){
         totalLight += attenuation * (ambientTerm + diffuseTerm + specularTerm);
     }
 
+    // directionalLights
+
+    for(int i = 0; i < NumDirectionalLights; i++){
+        vec3 lightDir = normalize(-directionalLights[i].direction);
+
+        float diff = max(dot(n, lightDir), 0.0);
+
+        vec3 reflectDir = reflect(-lightDir, n);
+        float spec = pow(max(dot(v, reflectDir), 0.0), Shininess);
+
+        vec3 ambientTerm = Ka * directionalLights[i].color.rgb;
+        vec3 diffuseTerm = Kd * diff * directionalLights[i].color.rgb;
+        vec3 specularTerm = Ks * spec * directionalLights[i].color.rgb;
+
+        totalLight += (ambientTerm + diffuseTerm + specularTerm);
+    }
+
     return totalLight;
 }
+
+// ------------ //
+// --- Main --- //
+// ------------ //
 
 void main(){
    FragColor = texture(texture0, TextCoord) * customColor * vec4(Phong(), 1.0);

@@ -29,6 +29,9 @@ namespace DarkMoon {
         Shader* m_shaderProgram {};
         int m_width {}, m_height {};
 
+        void checkLights();
+        void checkLights2();
+
     public:
         Camera* m_camera {};
         Material* defaultMaterial {};
