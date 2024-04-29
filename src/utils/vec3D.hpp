@@ -332,8 +332,21 @@ struct vec2D
         return x == rhs.x && y == rhs.y;
     }
 
+    constexpr vec2D operator*(vec2D const& rhs) const
+    {
+        return { x * rhs.x, y * rhs.y };
+    }
+
+    constexpr vec2D operator*=(vec2D const& rhs)
+    {
+        x *= rhs.x;
+        y *= rhs.y;
+        return *this;
+    }
+
     DataT x{}, y{};
 };
 
 using vec2f = vec2D<float>;
 using vec2d = vec2D<double>;
+using vec2i = vec2D<int>;

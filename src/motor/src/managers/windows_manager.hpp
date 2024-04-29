@@ -34,6 +34,9 @@ namespace DarkMoon {
         void setWindowSize(int width, int height);
         bool isWindowFullscreen();
         void toggleFullscreen();
+        float getWidthRatio();
+        float getHeightRatio();
+        glm::vec2 getMonitorSize();
 
         // Drawing-related functions
         void beginDrawing();

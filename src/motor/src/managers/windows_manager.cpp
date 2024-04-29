@@ -88,13 +88,13 @@ namespace DarkMoon {
         }
     }
 
-    bool WindowsManager::isWindowFullscreen(){
-        int monitorCount;
+    bool WindowsManager::isWindowFullscreen() {
+        int monitorCount{};
         // Check if the window is in fullscreen mode
         GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
-        for(int i=0; i<monitorCount; i++){
+        for (int i = 0; i < monitorCount; i++) {
             GLFWmonitor* monitor = monitors[i];
-            if(glfwGetWindowMonitor(m_window) == monitor)
+            if (glfwGetWindowMonitor(m_window) == monitor)
                 return true;
         }
 
@@ -102,20 +102,20 @@ namespace DarkMoon {
     }
 
     void WindowsManager::toggleFullscreen() {
-        if(m_window){
+        if (m_window) {
             GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 
             // Fullscreen mode -> Windowed mode
-            if(isWindowFullscreen()){
+            if (isWindowFullscreen()) {
                 glfwSetWindowMonitor(m_window, nullptr, 100, 100, m_oldWidth, m_oldHeight, GLFW_DONT_CARE);
 
                 m_width = m_oldWidth;
                 m_height = m_oldHeight;
             }
             // Windowed mode -> Fullscreen mode
-            else{
+            else {
                 const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-                glfwSetWindowMonitor(m_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+                glfwSetWindowMonitor(m_window, monitor, 01, 01, mode->width, mode->height, mode->refreshRate);
 
                 m_oldWidth = m_width;
                 m_oldHeight = m_height;
@@ -124,6 +124,23 @@ namespace DarkMoon {
                 m_height = mode->height;
             }
         }
+    }
+
+    float WindowsManager::getWidthRatio() {
+        return (float)m_width / (float)1920;
+    }
+
+    float WindowsManager::getHeightRatio() {
+        return (float)m_height / (float)1080;
+    }
+
+    glm::vec2 WindowsManager::getMonitorSize() {
+        int monitorCount;
+        GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
+        GLFWmonitor* monitor = monitors[0];
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+        return glm::vec2(mode->width, mode->height);
     }
 
     // Drawing-related functions
@@ -141,8 +158,8 @@ namespace DarkMoon {
     }
 
     // Timing-related functions
-    void WindowsManager::setTargetFPS(int ) {
- 
+    void WindowsManager::setTargetFPS(int) {
+
     }
 
     float WindowsManager::getFrameTime() {

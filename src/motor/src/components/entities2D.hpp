@@ -103,6 +103,7 @@ namespace DarkMoon {
         Color color = { D_WHITE };
 
         Texture2D(glm::vec2 pos, Texture* text, Color col);
+        Texture2D(const Texture2D& other);
         ~Texture2D();
 
         void draw(glm::mat4 transMatrix) override;
@@ -373,16 +374,20 @@ namespace DarkMoon {
                 box.draw(transMatrix);
             }
 
+            WindowsManager& wm = WindowsManager::getInstance();
+            auto wRat = wm.getWidthRatio();
+            auto hRat = wm.getHeightRatio();
+
             // Vertical Aligned
             switch (verAligned) {
             case Aligned::TOP:
                 transMatrix[3][1] = box.position.y + padding;
                 break;
             case Aligned::CENTER:
-                transMatrix[3][1] = box.position.y + (box.size.y - text.maxHeight) / 2;
+                transMatrix[3][1] = box.position.y + (box.size.y - text.maxHeight) * hRat / 2;
                 break;
             case Aligned::BOTTOM:
-                transMatrix[3][1] = box.position.y + box.size.y - text.maxHeight - padding;
+                transMatrix[3][1] = box.position.y + box.size.y * hRat - text.maxHeight - padding;
                 break;
             default:
                 break;
@@ -394,10 +399,10 @@ namespace DarkMoon {
                 transMatrix[3][0] = box.position.x + padding;
                 break;
             case Aligned::CENTER:
-                transMatrix[3][0] = box.position.x + (box.size.x / 2 - text.maxWidth / 2);
+                transMatrix[3][0] = box.position.x + (box.size.x * wRat / 2 - text.maxWidth / 2);
                 break;
             case Aligned::RIGHT:
-                transMatrix[3][0] = box.position.x + box.size.x - text.maxWidth - padding;
+                transMatrix[3][0] = box.position.x + box.size.x * wRat - text.maxWidth - padding;
                 break;
             default:
                 break;
@@ -439,7 +444,7 @@ namespace DarkMoon {
 
             glm::vec2 mPos = { im.getMouseX(wm.getWindow()), im.getMouseY(wm.getWindow()) };
             glm::vec2 topLeft = textBox.box.position;
-            glm::vec2 bottomRight = { topLeft.x + textBox.box.size.x, topLeft.y + textBox.box.size.y };
+            glm::vec2 bottomRight = { topLeft.x + textBox.box.size.x * wm.getWidthRatio(), topLeft.y + textBox.box.size.y * wm.getHeightRatio() };
 
             if (mPos.x >= topLeft.x && mPos.x <= bottomRight.x &&
                 mPos.y >= topLeft.y && mPos.y <= bottomRight.y) {

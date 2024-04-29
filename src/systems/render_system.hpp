@@ -15,7 +15,8 @@ struct RenderSystem
         int targetPosX{};
         int targetPosY{};
         float scaleChange{};
-        float scaleFactor{};
+        float scaleFactorX{};
+        float scaleFactorY{};
         float lerpFactor{};
         float lerpSpeed{ 0.02f };
         float elapsed{};
@@ -87,7 +88,7 @@ private:
     bool nodeExists(GameEngine& engine, const char* name);
 
     bool isSelected{ false };
-    bool isSelectedfordebug{ false }, fullScreen{ false };
+    bool isSelectedfordebug{ false };
     std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
     std::map<std::string, AnimatedTexture> animatedTextures{};
     // bool chunk0Charged{ false };

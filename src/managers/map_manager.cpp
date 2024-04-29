@@ -145,7 +145,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             }
             case LoadState::LOAD_NAVMESHES:
             {
-                if (li.mapID != 0 || li.mapID != 1)
+                if (li.mapID == 2)
                     generateNavmeshes(em);
                 break;
             }

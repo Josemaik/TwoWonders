@@ -69,7 +69,7 @@ namespace ENGI {
         void drawRectangleRec(Rectangle rec, Color color);
         void drawTexture(TextureType texture, int posX, int posY, Color tint);
         void drawTexture(TextureType texture, int posX, int posY, Color tint, float scale);
-        void drawNode(DarkMoon::Node* node, vec2d pos, vec2f scale = { 0.76f, 0.76f });
+        void drawNode(DarkMoon::Node* node, vec2i pos, vec2f scale = { 1.0f, 1.0f });
         void drawCircle(int posX, int posY, float radius, Color color);
         void drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color);
         void drawTriangle(vec2d v1, vec2d v2, vec2d v3, Color color);
@@ -140,10 +140,14 @@ namespace ENGI {
         void unloadGifsAndTextures();
         void setReplayMode(bool replay, GameData& gd);
         double getTime();
+        float getWidthRate();
+        float getHeightRate();
         float getAspectRat();
         DarkMoon::Node* get2D();
         DarkMoon::Node* get3D();
         DarkMoon::Node* createTextBox(glm::vec2 position, glm::vec2 size, DarkMoon::Color boxColor, std::string text, DarkMoon::Font* font, int fontSize, DarkMoon::Color textColor, DarkMoon::Aligned verticalAligned, DarkMoon::Aligned horizontalAligned, const char* nodeName, DarkMoon::Node* parentNode);
+        DarkMoon::Node* createText(glm::vec2 position, std::string text, DarkMoon::Font* font, int fontSize, DarkMoon::Color textColor, const char* nodeName, DarkMoon::Node* parentNode);
+        DarkMoon::Font* getDefaultFont();
 
         std::map<std::string, TextureType> textures;
         std::map<std::string, Gif> gifs;
@@ -169,6 +173,7 @@ namespace ENGI {
 
     private:
         u16 const width_{}, height_{};
+        static float widthRate, heightRate;
         bool replayMode{ false };
         GameData* gameData{ nullptr };
 

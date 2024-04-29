@@ -100,8 +100,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         ge.dmeg.SetWindowSize(800, 600);
 
     if (ge.isKeyReleased(D_KEY_F11))
-        ge.dmeg.ToggleFullscreen();
-
+        ge.setWindowFullScreen();
 
     // Sacamos las físicas y el input del jugador
     auto& phy = em.getComponent<PhysicsComponent>(player);

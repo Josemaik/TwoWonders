@@ -11,10 +11,13 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     ENGI::GameEngine::setUpCamera({ 0.0f, 1.0f, 0.0f });
     ENGI::GameEngine::setProjectionCamera(DarkMoon::CameraProjection::CAMERA_ORTHOGRAPHIC);
 
+    widthRate = static_cast<float>(width) / 1920.0f;
+    heightRate = static_cast<float>(height) / 1080.0f;
+
     nodes["3D"] = dmeg.CreateNode("Scene 3D", dmeg.GetRootNode());
     nodes["2D"] = dmeg.CreateNode("Scene 2D", dmeg.GetRootNode());
+    nodes["Menu"] = dmeg.CreateNode("Menu", dmeg.GetRootNode());
     nodes["HUD"] = dmeg.CreateNode("HUD", nodes["2D"]);
-    nodes["Menu"] = dmeg.CreateNode("Menu", nodes["2D"]);
     nodes["Dialog"] = dmeg.CreateNode("Dialog", nodes["HUD"]);
     nodes["Gifs"] = dmeg.CreateNode("Gifs", nodes["2D"]);
     nodes["Nums"] = dmeg.CreateNode("Nums", nodes["HUD"]);
@@ -26,6 +29,9 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["AnimTextures"] = dmeg.CreateNode("AnimTextures", nodes["HUD"]);
 
     ENGI::GameEngine::setExitKey(D_KEY_F8);
+
+    // Fondo Inicio
+    loadAndResizeImage("fondo_inicio", "assets/Inicio_fondo.png", nodes["2D"]);
 
     // Logo TwoWonders
     loadAndResizeImage("logo_twowonders", "assets/logo_two_wonders.png", nodes["2D"]);
@@ -81,11 +87,17 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // Rectángulo de la barra de maná
     createRectangle({ 0.0f, 0.0f }, { 1.0f, 35 }, { 154, 222, 235, 255 }, "mana_rect", nodes["ManaBar"]);
 
+    // Rectángulo fondo de la vida de los enemigos
+    createRectangle({ 0.0f, 0.0f }, { 40.0f, 4.0f }, { D_GRAY }, "borde_vida", nodes["HUD"]);
+
+    // Rectángulo de la barra de vida
+    createRectangle({ 0.0f, 0.0f }, { 1.0f, 4.0f }, { D_RED }, "vida_rect", nodes["HUD"]);
+
     // Borde Barra Maná
     loadAndResizeImage("borde_mana", "assets/HUD/mana_bar.png", nodes["ManaBar"]);
 
     // Cuadro de diálogo
-    createTextBox({ 0, 0 }, { 600, 120 }, D_WHITE, "", dmeg.GetDefaultFont(),
+    createTextBox({ 0, 0 }, { 900, 180 }, D_WHITE, "", dmeg.GetDefaultFont(),
         20, D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER, "cuadroDialogo", nodes["Dialog"]);
 
     // Diálogo Siguiente HUD
@@ -368,10 +380,10 @@ void ENGI::GameEngine::drawTexture(TextureType, int, int, Color, float) {
     //DrawTextureEx(texture, { static_cast<float>(posX), static_cast<float>(posY) }, 0.0f, scale, tint);
 }
 
-void ENGI::GameEngine::drawNode(DarkMoon::Node* node, vec2d pos, vec2f scale) {
-    if (pos != vec2d(0, 0))
-        node->setTranslation({ pos.x, pos.y, 0.0f });
+void ENGI::GameEngine::drawNode(DarkMoon::Node* node, vec2i pos, vec2f scale) {
+    scale *= { widthRate, heightRate };
 
+    node->setTranslation({ pos.x, pos.y, 0.0f });
     node->setScale({ scale.x, scale.y, 1.0f });
     node->setVisibleOne(true);
 }
@@ -440,11 +452,23 @@ void ENGI::GameEngine::setWindowSize(int width, int height)
         dmeg.ToggleFullscreen();
 
     dmeg.SetWindowSize(width, height);
+    widthRate = static_cast<float>(width) / 1920.0f;
+    heightRate = static_cast<float>(height) / 1080.0f;
 }
 
 void ENGI::GameEngine::setWindowFullScreen()
 {
     dmeg.ToggleFullscreen();
+    if (dmeg.IsWindowFullscreen())
+    {
+        auto size = dmeg.GetMonitorSize();
+        widthRate = static_cast<float>(size.x) / 1920.0f;
+        heightRate = static_cast<float>(size.y) / 1080.0f;
+    }
+    else {
+        widthRate = static_cast<float>(dmeg.GetScreenWidth()) / 1920.0f;
+        heightRate = static_cast<float>(dmeg.GetScreenHeight()) / 1080.0f;
+    }
 }
 
 void ENGI::GameEngine::setExitKey(int key)
@@ -868,6 +892,29 @@ DarkMoon::Node* ENGI::GameEngine::createTextBox(glm::vec2 position, glm::vec2 si
         nodes[nodeName] = dmeg.CreateTextBox(position, size, boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned, nodeName, parentNode);
 
     return nodes[nodeName];
+}
+
+DarkMoon::Node* ENGI::GameEngine::createText(glm::vec2 position, std::string text, DarkMoon::Font* font, int fontSize, DarkMoon::Color color, const char* nodeName, DarkMoon::Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateText(position, text, font, fontSize, color, nodeName, parentNode);
+
+    return nodes[nodeName];
+}
+
+DarkMoon::Font* ENGI::GameEngine::getDefaultFont()
+{
+    return dmeg.GetDefaultFont();
+}
+
+float ENGI::GameEngine::getWidthRate()
+{
+    return widthRate;
+}
+
+float ENGI::GameEngine::getHeightRate()
+{
+    return heightRate;
 }
 
 float ENGI::GameEngine::getAspectRat()

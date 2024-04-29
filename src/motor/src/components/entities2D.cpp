@@ -356,6 +356,19 @@ namespace DarkMoon {
         changeVAO(TM);
     };
 
+    Texture2D::Texture2D(const Texture2D& other) {
+        position = other.position;
+        texture = other.texture;
+        color = other.color;
+
+        glGenVertexArrays(1, &m_VAO);
+        glGenBuffers(1, &m_VBO);
+        glGenBuffers(1, &m_EBO);
+
+        auto TM = glm::mat4();
+        changeVAO(TM);
+    };
+
     Texture2D::~Texture2D() {
         // Clean up resources
         glDeleteVertexArrays(1, &m_VAO);
@@ -419,7 +432,7 @@ namespace DarkMoon {
         RenderManager rm = RenderManager::getInstance();
 
         //if(m_transMatrix != transMatrix)
-            changeVAO(transMatrix);
+        changeVAO(transMatrix);
 
         rm.useShader(rm.shaderTexture);
 
