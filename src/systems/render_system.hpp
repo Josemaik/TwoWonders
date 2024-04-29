@@ -18,7 +18,7 @@ struct RenderSystem
         float scaleFactorX{};
         float scaleFactorY{};
         float lerpFactor{};
-        float lerpSpeed{ 0.02f };
+        float lerpSpeed{ 0.01f };
         float elapsed{};
     };
 
@@ -64,7 +64,7 @@ private:
     void drawDeath(GameEngine& engine);
     void drawCoinBar(GameEngine& engine, EntityManager& em);
     void drawSpellSlots(GameEngine& engine, EntityManager& em);
-    void drawSpellExp(GameEngine& engine, std::string name);
+    void drawSpellExplanation(GameEngine& engine, std::string name);
     void drawStaff(GameEngine& engine, EntityManager& em);
     void drawLockInfo(GameEngine& engine, EntityManager& em);
     void drawBoatParts(GameEngine& engine, EntityManager& em);

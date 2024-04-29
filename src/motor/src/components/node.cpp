@@ -47,6 +47,7 @@ namespace DarkMoon {
             m_parent->setVisibleOne(visible);
     }
 
+    bool Node::isVisible() { return m_visible; }
 
     void Node::traverse(glm::mat4 parentMatrix) {
 

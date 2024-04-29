@@ -18,6 +18,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["2D"] = dmeg.CreateNode("Scene 2D", dmeg.GetRootNode());
     nodes["Menu"] = dmeg.CreateNode("Menu", dmeg.GetRootNode());
     nodes["HUD"] = dmeg.CreateNode("HUD", nodes["2D"]);
+    nodes["Book"] = dmeg.CreateNode("Book", nodes["HUD"]);
     nodes["Dialog"] = dmeg.CreateNode("Dialog", nodes["HUD"]);
     nodes["Gifs"] = dmeg.CreateNode("Gifs", nodes["2D"]);
     nodes["Nums"] = dmeg.CreateNode("Nums", nodes["HUD"]);
@@ -26,6 +27,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["ManaBar"] = dmeg.CreateNode("Mana", nodes["HUD"]);
     nodes["CoinBar"] = dmeg.CreateNode("Coins", nodes["HUD"]);
     nodes["Copy"] = dmeg.CreateNode("Copy", nodes["HUD"]);
+    nodes["Boat"] = dmeg.CreateNode("Boat", nodes["HUD"]);
     nodes["AnimTextures"] = dmeg.CreateNode("AnimTextures", nodes["HUD"]);
 
     ENGI::GameEngine::setExitKey(D_KEY_F8);
@@ -61,10 +63,10 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImage("mago_happy", "assets/HUD/caras/mago_happy.png", nodes["Faces"]);
 
     // Mago Meh HUD
-    loadAndResizeImage("mago_meh1", "assets/HUD/caras/mago_meh.png", nodes["Faces"]);
+    loadAndResizeImage("mago_meh", "assets/HUD/caras/mago_meh.png", nodes["Faces"]);
 
     // Mago SOS HUD
-    loadAndResizeImage("mago_sos1", "assets/HUD/caras/mago_sos.png", nodes["Faces"]);
+    loadAndResizeImage("mago_sos", "assets/HUD/caras/mago_sos.png", nodes["Faces"]);
 
     // Nómada HUD
     loadAndResizeImage("nomada", "assets/HUD/caras/calabaza3.png", nodes["Faces"]);
@@ -128,13 +130,14 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImage("estacas", "assets/HUD/estacas.png", nodes["AnimTextures"]);
 
     // Libro para enseñar hechizos HUD
-    loadAndResizeImage("libro", "assets/HUD/Libro.png", nodes["AnimTextures"]);
+    loadAndResizeImage("libro", "assets/HUD/Libro.png", nodes["Book"]);
 
     // Icono de detección HUD
     loadAndResizeImage("detectionIcon", "assets/HUD/detectionicon.png", nodes["HUD"]);
 
     // Barco para el nivel del volcán HUD
-    loadAndResizeImage("barco", "assets/HUD/barco_piezas.png", nodes["HUD"]);
+    loadAndResizeImage("barco", "assets/HUD/barco_piezas.png", nodes["Boat"]);
+    nodes["BoatCopy"] = dmeg.CreateNode("BoatCopy", nodes["Boat"]);
 
     // Icono Batalla HUD
     loadAndResizeImage("batalla", "assets/HUD/batalla.png", nodes["HUD"]);
