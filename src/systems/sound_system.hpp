@@ -12,6 +12,8 @@ struct SoundSystem {
     SoundSystem();
 
     void initBanks(const char* master_bank_location, const char* master_string_location, const char* ui_bank_location,const char* ambient_bank_location,  const char* music_bank_location, const char* SFX_bank_location);
+    void initBuses();
+    void initChannels();
     void createEventInstance();
     void playMusicMenu();
     void playAmbient();
@@ -117,7 +119,17 @@ struct SoundSystem {
     void update();
     void clear();
     float getVolumeMaster();
+    float getVolumeSFX();
+    float getVolumeMusic();
+    float getVolumeAmbient();
     void setVolumeMaster(float volumen);
+    void setVolumeSFX(float volumen);
+    void setVolumeMusic(float volumen);
+    void setVolumeAmbient(float volumen);
+    void muteMaster();
+    void muteAmbient();
+    void muteSFX();
+    void muteMusic();
     bool pushed{ false };
     bool music_started{ false };
     bool ambient_started{ false};
@@ -141,11 +153,27 @@ private:
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_SFX;
     FMOD_STUDIO_BUS* bus;
-    FMOD_CHANNELGROUP *masterGroup;
+    FMOD_STUDIO_BUS* sfxBus;
+    FMOD_STUDIO_BUS* AmbientBus;
+    FMOD_STUDIO_BUS* MusicBus;
+    
+    FMOD_CHANNELGROUP *masterGroup {};
+    FMOD_CHANNELGROUP *ambientGroup {};
+    FMOD_CHANNELGROUP *musicGroup {};
+    FMOD_CHANNELGROUP *sfxGroup {};
     
     
-     
-    FMOD_RESULT res;
-    float* volume;
-    float* finalvolume;
+    
+    
+    //Variables para guardar el volumen, en caso de querer mutear el juego
+    float musicVolume;
+    float sfxVolume;
+    float ambientVolume;
+    float generalVolume;
+
+    //FMOD_RESULT res;
+    //float* volume;
+    //float* finalvolume;
+
+
 };
