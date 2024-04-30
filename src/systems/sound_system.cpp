@@ -36,6 +36,9 @@ void SoundSystem::initBanks(const char* master_bank_location, const char* master
 
     initChannels();
 
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_volcan", &eventDescription_Musica));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica_volcan));
+
     
 }
 
@@ -92,10 +95,13 @@ void SoundSystem::playMusicMenu() {
 
 
 void SoundSystem::sonido_music_volcan() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_volcan", &eventDescription_Musica));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica));
+    //ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_volcan", &eventDescription_Musica));
+    //ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica_volcan));
 
-    play_music();
+    //play_music();
+    FMOD_Studio_EventInstance_Start(eventInstance_Musica_volcan);
+    update();
+
 }
 
 void SoundSystem::sonido_music_mazmorra() {

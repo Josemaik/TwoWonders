@@ -152,6 +152,8 @@ private:
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_SFX;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_volcan;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_mazmorra;
     FMOD_STUDIO_BUS* bus;
     FMOD_STUDIO_BUS* sfxBus;
     FMOD_STUDIO_BUS* AmbientBus;
