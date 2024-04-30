@@ -42,7 +42,7 @@ void ObjectSystem::update(EntityManager& em) {
 
             case ObjectType::Mana_Potion:
                 plfi.mana += 40;
-                em.getSingleton<SoundSystem>().sonido_config();
+                em.getSingleton<SoundSystem>().recoger_mana();
                 break;
 
             case ObjectType::Bomb:

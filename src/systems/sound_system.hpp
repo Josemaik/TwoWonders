@@ -20,7 +20,7 @@ struct SoundSystem {
     void sonido_amb_bosque();
     void sonido_mazmorra();
     void seleccion_menu();
-    void sonido_config();
+    void recoger_mana();
     void sonido_mov();
     void sonido_salir();
    

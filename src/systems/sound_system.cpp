@@ -186,8 +186,8 @@ void SoundSystem::sonido_amb_pradera() {
 
 
 
-void SoundSystem::sonido_config() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Menus/sound_config", &eventDescription));
+void SoundSystem::recoger_mana() {
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Interaccion/Recoger_mana", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
     FMOD_Studio_EventInstance_Start(eventInstance);
 }
