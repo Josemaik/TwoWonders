@@ -1138,7 +1138,7 @@ void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
         }
 }
 
-void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
+void MapManager::spawnReset(EntityManager& em, Ia_man&)
 {
     using CMPS = MP::TypeList<PhysicsComponent, LifeComponent, AIComponent>;
     using TAGS = MP::TypeList<EnemyTag>;

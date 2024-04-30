@@ -3,6 +3,7 @@
 #include <cmath>
 #include <optional>
 #include <raylib.h>
+#include <glm/glm.hpp>
 #include <array>
 // Si queremos que la serialización sea en json, descomentar las siguientes líneas
 // #define CEREAL_RAPIDJSON_NAMESPACE cereal_rapidjson
@@ -235,6 +236,11 @@ struct vec3D
     constexpr Vector3 toRaylib() const noexcept
     {
         return Vector3{ static_cast<float>(x_),  static_cast<float>(y_),  static_cast<float>(z_) };
+    }
+
+    constexpr glm::vec3 toGlm() const noexcept
+    {
+        return glm::vec3{ x_, y_, z_ };
     }
 
     friend std::ostream& operator<<(std::ostream& os, vec3D const& v)

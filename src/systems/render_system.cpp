@@ -32,9 +32,11 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine)
 void RenderSystem::restartScene(GameEngine& engine)
 {
     updateAnimatedTextures(engine);
+    auto* particles = getNode(engine, "Particles");
     auto* dosde = getNode(engine, "2D");
     auto* menu = getNode(engine, "Menu");
     auto* copyNode = getNode(engine, "Copy");
+    particles->clearChildren();
     copyNode->clearChildren();
     dosde->setVisible(false);
     menu->setVisible(false);
@@ -1393,33 +1395,36 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
 }
 
 
-void RenderSystem::drawParticles(EntityManager&, GameEngine&)
+void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
 {
-    //     using partCMPs = MP::TypeList<ColliderComponent, ParticleMakerComponent>;
-    //     using noTAGs = MP::TypeList<>;
+    using partCMPs = MP::TypeList<ColliderComponent, ParticleMakerComponent>;
+    using noTAGs = MP::TypeList<>;
 
-    //     auto& frti = em.getSingleton<FrustumInfo>();
-    //     em.forEach<partCMPs, noTAGs>([&](Entity&, ColliderComponent& col, ParticleMakerComponent& pmc)
-    //     {
-    //         if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
-    //             return;
+    auto& frti = em.getSingleton<FrustumInfo>();
+    em.forEach<partCMPs, noTAGs>([&](Entity&, ColliderComponent& col, ParticleMakerComponent& pmc)
+    {
+        if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+            return;
 
-    //         if (pmc.active)
-    //         {
-    //             for (auto& p : pmc.particles)
-    //             {
-    //                 if (p.type == Particle::ParticleType::Pixel)
-    //                 {
-    //                     // Dibujamos 4 partćulas arriba, abajo, izquierda y derecha de la posición
-    //                     engine.drawPoint3D(p.position.to_other<double>(), { p.r, p.g, p.b, p.a });
-    //                     engine.drawPoint3D((p.position + vec3f{ 0.0f, 0.1f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
-    //                     engine.drawPoint3D((p.position + vec3f{ 0.1f, 0.0f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
-    //                     engine.drawPoint3D((p.position + vec3f{ 0.0f, -0.1f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
-    //                     engine.drawPoint3D((p.position + vec3f{ -0.1f, 0.0f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
-    //                 }
-    //             }
-    //         }
-    //     });
+        if (pmc.active)
+        {
+            for (auto& p : pmc.particles)
+            {
+                if (p.type == Particle::ParticleType::Pixel)
+                {
+                    // Dibujamos 4 partćulas arriba, abajo, izquierda y derecha de la posición
+                    // engine.dmeg.CreatePoint3D(p.position.toGlm(), 3.f, { p.r, p.g, p.b, p.a }, "particula", getNode(engine, "Particles"));
+                    engine.dmeg.CreateLine3D(p.position.toGlm(), (p.position + vec3f{ 0.0f, .4f, 0.0f }).toGlm(), 1.5f, { p.r, p.g, p.b, p.a }, "particula", getNode(engine, "Particles"));
+                    // engine.drawPoint3D(p.position.to_other<double>(), { p.r, p.g, p.b, p.a });
+                    // engine.drawPoint3D((p.position + vec3f{ 0.0f, 0.1f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
+                    // engine.drawPoint3D((p.position + vec3f{ 0.1f, 0.0f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
+                    // engine.drawPoint3D((p.position + vec3f{ 0.0f, -0.1f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
+                    // engine.drawPoint3D((p.position + vec3f{ -0.1f, 0.0f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
+                }
+            }
+        }
+    });
+
 }
 
 // Empieza el dibujado y se limpia la pantalla

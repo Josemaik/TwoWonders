@@ -17,6 +17,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["3D"] = dmeg.CreateNode("Scene 3D", dmeg.GetRootNode());
     nodes["2D"] = dmeg.CreateNode("Scene 2D", dmeg.GetRootNode());
     nodes["Menu"] = dmeg.CreateNode("Menu", dmeg.GetRootNode());
+    nodes["Particles"] = dmeg.CreateNode("Particles", nodes["3D"]);
     nodes["HUD"] = dmeg.CreateNode("HUD", nodes["2D"]);
     nodes["Book"] = dmeg.CreateNode("Book", nodes["HUD"]);
     nodes["Dialog"] = dmeg.CreateNode("Dialog", nodes["HUD"]);
