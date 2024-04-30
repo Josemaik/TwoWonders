@@ -222,101 +222,161 @@ namespace DarkMoon {
     // GUI
 
     struct Text : Entity {
-        glm::vec2 position;
-        std::string text;
-        Font* font;
-        int fontSize;
-        Color color;
+        glm::vec2 position{};
+        Font* font{};
+        int fontSize{};
+        Color color{};
 
-        float scale;
-        float maxWidth;
-        float maxHeight;
+        float scale{};
+        float maxWidth{};
+        float maxHeight{};
+        std::vector<float> widths{};
+
+        GLuint VAO{}, VBO{};
+        GLint textColorLocation{};
+        RenderManager* rm{ nullptr };
 
         Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK)
-            : position(pos), text(txt), font(f), fontSize(fS), color(col) {
+            : position(pos), font(f), fontSize(fS), color(col) {
             scale = static_cast<float>(fontSize) / 48.0f;
-            if (font && !text.empty()) {
-                std::string::const_iterator c;
-                float aux_x = position.x;
-                for (c = text.begin(); c != text.end(); c++) {
+            setText(txt);
+
+            // Buffers
+            setupBuffers();
+
+            // Get uniform location
+            rm = &RenderManager::getInstance();
+            rm->useShader(rm->shaderText);
+            textColorLocation = glGetUniformLocation(rm->getShader()->getIDShader(), "textColor");
+        };
+
+        void setText(std::string text)
+        {
+            if (font && !text.empty() && this->text != text) {
+                // Reset values
+                widths.clear();
+                float lineWidth = position.x;
+                for (char& c : text) {
+                    if (c == '\n') {
+                        widths.push_back(lineWidth - position.x);
+                        lineWidth = position.x;
+                        if (maxWidth < lineWidth)
+                            maxWidth = lineWidth;
+
+                        continue;
+                    }
+
                     // Max Height
-                    Character ch = font->characters[*c];
+                    Character ch = font->characters[c];
                     auto chY = static_cast<float>(ch.size.y);
                     if (maxHeight < chY)
                         maxHeight = chY;
-                    // Max Width
-                    aux_x += static_cast<float>(ch.advance >> 6) * scale;
+                    lineWidth += static_cast<float>(ch.advance >> 6) * scale;
                 }
                 maxHeight *= scale;
-                maxWidth = aux_x - position.x;
+                widths.push_back(lineWidth - position.x);
+                if (maxWidth < lineWidth)
+                    maxWidth = lineWidth;
+
+                this->text = text;
             }
+        }
+
+        void setupBuffers() {
+            // Enable blending
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+            // Generate VAO and VBO
+            glGenVertexArrays(1, &VAO);
+            glGenBuffers(1, &VBO);
+
+            // Configure VAO/VBO for texture quads
+            glBindVertexArray(VAO);
+            glBindBuffer(GL_ARRAY_BUFFER, VBO);
+            glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+            glEnableVertexAttribArray(0);
+        }
+
+        ~Text() {
+            // Delete VAO and VBO
+            glDeleteBuffers(1, &VBO);
+            glDeleteVertexArrays(1, &VAO);
         };
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
-
-            rm.useShader(rm.shaderText);
+            rm->useShader(rm->shaderText);
 
             position = glm::vec2(transMatrix[3][0], transMatrix[3][1]);
 
             if (!font)
-                font = rm.defaultFont;
+                font = rm->defaultFont;
             if (text.empty())
                 return;
 
-            auto normColor = rm.normalizeColor(color);
-            glUniform3f(glGetUniformLocation(rm.getShader()->getIDShader(), "textColor"), normColor.r, normColor.g, normColor.b);
-
-            GLuint VAO, VBO;
+            auto normColor = rm->normalizeColor(color);
+            glUniform3f(textColorLocation, normColor.r, normColor.g, normColor.b);
 
             // Blend
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
             scale = static_cast<float>(fontSize) / 48.0f;
-            float aux_x = position.x;
+            float aux_x = position.x - widths[0] / 2;
+            int numLines = 1;
 
-            //std::cout << "-----------------------------\n";
-            std::string::const_iterator c;
-            for (c = text.begin(); c != text.end(); c++) {
-                Character ch = font->characters[*c];
+            for (char& c : text) {
+                Character ch = font->characters[c];
                 auto chY = static_cast<float>(ch.size.y);
                 if (maxHeight < chY)
                     maxHeight = chY;
+
+                if (c == '\n')
+                    numLines++;
             }
             maxHeight *= scale;
 
             // Iterate through all characters
-            for (c = text.begin(); c != text.end(); c++) {
-                Character ch = font->characters[*c];
+
+            if (numLines != 1)
+                position.y -= maxHeight * static_cast<float>(numLines) * 0.6f;
+
+            int i{ 1 };
+            for (char& c : text) {
+                if (c == '\n') {
+                    // Reset the x position to the start of the line
+                    aux_x = position.x - widths[i] / 2;
+                    i += 1;
+                    position.y += maxHeight * 1.2f;
+                    // Skip the rest of the loop
+                    continue;
+                }
+
+                Character ch = font->characters[c];
+
 
                 float posX = aux_x + static_cast<float>(ch.bearing.x) * scale;
-                float posY = position.y - static_cast<float>(ch.bearing.y) * scale + maxHeight;
+                float posY = position.y - static_cast<float>(ch.bearing.y) * scale + maxHeight / 2;
 
                 float w = static_cast<float>(ch.size.x) * scale;
                 float h = static_cast<float>(ch.size.y) * scale;
 
                 // Update VBO for each character
                 float vertices[6][4] = {
-                    { rm.normalizeX(posX)    , rm.normalizeY(posY + h), 0.0f, 1.0f },
-                    { rm.normalizeX(posX)    , rm.normalizeY(posY)    , 0.0f, 0.0f },
-                    { rm.normalizeX(posX + w), rm.normalizeY(posY)    , 1.0f, 0.0f },
+                    { rm->normalizeX(posX)    , rm->normalizeY(posY + h), 0.0f, 1.0f },
+                    { rm->normalizeX(posX)    , rm->normalizeY(posY)    , 0.0f, 0.0f },
+                    { rm->normalizeX(posX + w), rm->normalizeY(posY)    , 1.0f, 0.0f },
 
-                    { rm.normalizeX(posX)    , rm.normalizeY(posY + h), 0.0f, 1.0f },
-                    { rm.normalizeX(posX + w), rm.normalizeY(posY)    , 1.0f, 0.0f },
-                    { rm.normalizeX(posX + w), rm.normalizeY(posY + h), 1.0f, 1.0f }
+                    { rm->normalizeX(posX)    , rm->normalizeY(posY + h), 0.0f, 1.0f },
+                    { rm->normalizeX(posX + w), rm->normalizeY(posY)    , 1.0f, 0.0f },
+                    { rm->normalizeX(posX + w), rm->normalizeY(posY + h), 1.0f, 1.0f }
                 };
 
                 // Configure VAO/VBO for texture quads
-                glGenVertexArrays(1, &VAO);
                 glBindVertexArray(VAO);
-
-                glGenBuffers(1, &VBO);
                 glBindBuffer(GL_ARRAY_BUFFER, VBO);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-                glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-                glEnableVertexAttribArray(0);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
                 glBindTexture(GL_TEXTURE_2D, ch.textureID);
                 glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -324,20 +384,17 @@ namespace DarkMoon {
                 // Advance cursors for next glyph
                 aux_x += static_cast<float>(ch.advance >> 6) * scale;
             }
-            maxWidth = aux_x - position.x;
 
-            glDisable(GL_BLEND);
-
+            // Clean up resources
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
             glBindTexture(GL_TEXTURE_2D, 0);
 
-            // Clean up resources
-            glDeleteBuffers(1, &VBO);
-            glDeleteVertexArrays(1, &VAO);
-
-            rm.useShader(rm.shaderColor);
+            rm->useShader(rm->shaderColor);
         };
+
+    private:
+        std::string text{};
     };
 
     enum struct Aligned { LEFT, CENTER, RIGHT, TOP, BOTTOM };
@@ -399,7 +456,7 @@ namespace DarkMoon {
                 transMatrix[3][0] = box.position.x + padding;
                 break;
             case Aligned::CENTER:
-                transMatrix[3][0] = box.position.x + (box.size.x * wRat / 2 - text.maxWidth / 2);
+                transMatrix[3][0] = box.position.x + box.size.x * wRat / 2;
                 break;
             case Aligned::RIGHT:
                 transMatrix[3][0] = box.position.x + box.size.x * wRat - text.maxWidth - padding;

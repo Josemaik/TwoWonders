@@ -875,11 +875,12 @@ void RenderSystem::drawStory(GameEngine& engine) {
     hist->setVisible(true);
 
     auto auxText = dynamic_cast<DarkMoon::TextBox*>(hist->getChildren().back()->getEntity());
+    std::string textGame = "DALE A [E] PARA JUGAR";
 
-    auxText->text.text = "DALE A [E] PARA JUGAR";
     if (engine.isGamepadAvailable(0))
-        auxText->text.text = "DALE A [X] PARA JUGAR";
+        textGame = "DALE A [X] PARA JUGAR";
 
+    auxText->text.setText(textGame);
     engine.dmeg.GetRootNode()->traverse(glm::mat4());
 
     engine.endDrawing();
@@ -3304,7 +3305,7 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     int posX = engine.getScreenWidth() / 2 - static_cast<int>(boxWidth * wRate / 2);
     int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.25f) - static_cast<int>(boxHeight * hRate / 2);
 
-    boxInfo.text.text = text;
+    boxInfo.text.setText(text);
     engine.drawNode(box, { posX, posY });
 
     int offSetX = 40;
@@ -3403,7 +3404,7 @@ void RenderSystem::drawFPSCounter(GameEngine& engine)
     else
     {
         auto* fpsNode = getNode(engine, "fpstext");
-        dynamic_cast<DarkMoon::Text*>(fpsNode->getEntity())->text = fpsStr;
+        dynamic_cast<DarkMoon::Text*>(fpsNode->getEntity())->setText(fpsStr);
         fpsNode->setVisibleOne(true);
     }
 }
