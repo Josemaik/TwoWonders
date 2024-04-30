@@ -136,6 +136,8 @@ namespace DarkMoon {
         void BeginDrawing();
         // End canvas drawing and swap buffers
         void EndDrawing();
+        // Draw the scene
+        void Draw(Color clearColor);
 
         // ------------------------ //
         // Texture Loading unctions //

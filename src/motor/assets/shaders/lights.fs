@@ -83,7 +83,7 @@ vec3 Phong(){
         float diff = max(dot(n, lightDir), 0.0);
 
         vec3 reflectDir = reflect(-lightDir, n);
-        float spec = pow(max(dot(v, reflectDir), 0.0), Shininess);
+        float spec = pow(max(dot(reflectDir, v), 0.0), Shininess);
 
         vec3 ambientTerm = Ka * directionalLights[i].color.rgb;
         vec3 diffuseTerm = Kd * diff * directionalLights[i].color.rgb;
@@ -93,7 +93,7 @@ vec3 Phong(){
     }
 
     return totalLight;
-}
+}   
 
 // ------------ //
 // --- Main --- //

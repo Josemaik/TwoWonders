@@ -73,7 +73,7 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine){
     // Node: Plano
     //engine.CreatePlane({0.0f, 0.0f, 0.0f}, {10.0f, 10.0f}, D_PINK, "Plano rosita", p_node3D);
 
-    engine.CreateCube({0.0f, -1.0f, 0.0f}, {100.0f, 1.0f, 100.0f}, D_WHITE, "Suelo negro", p_node3D);
+    engine.CreateCube({0.0f, -1.0f, 0.0f}, {100.0f, 1.0f, 100.0f}, D_WHITE, "Suelo blanco", p_node3D);
 
     // Node: Cubo
     engine.CreateCube({-30.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 10.0f}, D_AQUA_DARK, "Cubo azulito", p_node3D);
@@ -108,7 +108,7 @@ DarkMoon::Node* createLights(DarkMoon::DarkMoonEngine& engine){
     engine.CreatePointLight({0.0f, 5.0f, -30.0f}, D_WHITE, "Luz blanca prueba", engine.GetRootNode());
     engine.CreatePointLight({30.0f, 5.0f, 0.0f}, D_RED, "Luz roja prueba", engine.GetRootNode());
 
-    engine.CreateDirectionalLight({0.0f, -1.0f, 0.0f}, D_WHITE, "Luz direccional", engine.GetRootNode());
+    //engine.CreateDirectionalLight({0.0f, -1.0f, 0.0f}, D_MAGENTA, "Luz direccional", engine.GetRootNode());
 
     return light;
 }
@@ -252,12 +252,7 @@ int main(){
 
             // Draw
             
-            engine.BeginDrawing();
-
-            engine.ClearBackground(D_WHITE);
-            engine.GetRootNode()->traverse(glm::mat4());
-
-            engine.EndDrawing();
+            engine.Draw(D_WHITE);
         }
 
         engine.CloseWindow();

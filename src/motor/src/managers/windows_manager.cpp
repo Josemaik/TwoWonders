@@ -146,7 +146,7 @@ namespace DarkMoon {
     }
 
     float WindowsManager::getFrameTime() {
-        return 0.0f;
+        return 0.016f;
     }
 
     double WindowsManager::getTime() {

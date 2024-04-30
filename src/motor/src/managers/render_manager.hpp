@@ -29,9 +29,6 @@ namespace DarkMoon {
         Shader* m_shaderProgram {};
         int m_width {}, m_height {};
 
-        void checkLights();
-        void checkLights2();
-
     public:
         Camera* m_camera {};
         Material* defaultMaterial {};
@@ -42,6 +39,7 @@ namespace DarkMoon {
         std::map<std::string, Shader*> shaders;
 
         bool activeLights { false };
+        void checkLights();
 
         // Screen width and height
         void setWindowSize(int width, int height) { m_width = width; m_height = height; };

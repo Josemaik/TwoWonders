@@ -8,7 +8,7 @@ namespace DarkMoon {
         m_rootNode->name = "Scene";
 
         // Create Default Light
-        //Creat({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, "Default Light", GetRootNode());
+        CreateDirectionalLight({0.0f, tan(-45.0f), -1.0f}, D_WHITE, "Default directional light", GetRootNode());
 
         // Create Default Camera
         auto eCamera = CreateCamera("Default Camera", GetRootNode());
@@ -363,9 +363,9 @@ namespace DarkMoon {
 
             //----- Default Material -----//
             m_renderManager.defaultMaterial = m_resourceManager.loadResource<Material>("defaultMaterial",
-                glm::vec3(0.2f, 0.2f, 0.2f),
-                glm::vec3(0.8f, 0.8f, 0.8f),
-                glm::vec3(0.0f, 0.0f, 0.0f),
+                glm::vec3(1.0f, 1.0f, 1.0f),
+                glm::vec3(1.0f, 1.0f, 1.0f),
+                glm::vec3(1.0f, 1.0f, 1.0f),
                 1.0f);
             m_renderManager.defaultMaterial->texture = LoadTexture2D("assets/defaultTexture.png");
 
@@ -454,13 +454,19 @@ namespace DarkMoon {
         m_inputManager.updateBeginFrame();
     }
 
-
-
     // End canvas drawing and swap buffers
     void DarkMoonEngine::EndDrawing() {
         m_inputManager.updateEndFrame();
 
         m_windowsManager.endDrawing();
+    }
+
+    // Draw the scene
+    void DarkMoonEngine::Draw(Color clearColor){
+        BeginDrawing();
+        ClearBackground(clearColor);
+        GetRootNode()->traverse(glm::mat4());
+        EndDrawing();
     }
 
     // ------------------------- //
