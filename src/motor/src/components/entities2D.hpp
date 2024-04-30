@@ -252,11 +252,14 @@ namespace DarkMoon {
 
         void setText(std::string text)
         {
-            if (font && !text.empty() && this->text != text) {
+            std::wstring textW{};
+            textW.resize(text.size());
+            std::mbstowcs(&textW[0], text.c_str(), text.size());
+            if (font && !text.empty() && this->text != textW) {
                 // Reset values
                 widths.clear();
                 float lineWidth = position.x;
-                for (char& c : text) {
+                for (wchar_t& c : textW) {
                     if (c == '\n') {
                         widths.push_back(lineWidth - position.x);
                         lineWidth = position.x;
@@ -278,7 +281,7 @@ namespace DarkMoon {
                 if (maxWidth < lineWidth)
                     maxWidth = lineWidth;
 
-                this->text = text;
+                this->text = textW;
             }
         }
 
@@ -325,7 +328,7 @@ namespace DarkMoon {
             float aux_x = position.x - widths[0] / 2;
             int numLines = 1;
 
-            for (char& c : text) {
+            for (wchar_t& c : text) {
                 Character ch = font->characters[c];
                 auto chY = static_cast<float>(ch.size.y);
                 if (maxHeight < chY)
@@ -342,7 +345,7 @@ namespace DarkMoon {
                 position.y -= maxHeight * static_cast<float>(numLines) * 0.6f;
 
             int i{ 1 };
-            for (char& c : text) {
+            for (wchar_t& c : text) {
                 if (c == '\n') {
                     // Reset the x position to the start of the line
                     aux_x = position.x - widths[i] / 2;
@@ -394,7 +397,7 @@ namespace DarkMoon {
         };
 
     private:
-        std::string text{};
+        std::wstring text{};
     };
 
     enum struct Aligned { LEFT, CENTER, RIGHT, TOP, BOTTOM };

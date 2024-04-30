@@ -21,7 +21,7 @@ namespace DarkMoon {
 
     struct Font : public Resource {
     public:
-        std::map<GLchar, Character> characters;
+        std::map<wchar_t, Character> characters;
 
         Font(std::size_t id) { this->m_id = id; };
         ~Font() { unload(); };
