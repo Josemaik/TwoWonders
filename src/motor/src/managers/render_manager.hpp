@@ -35,10 +35,14 @@ namespace DarkMoon {
         Font* defaultFont {};
         std::vector<Light*> lights {};
 
+        std::vector<PointLight*> pointLights {};
+        std::vector<DirectionalLight*> directionalLights {};
+
         // Shaders
         std::map<std::string, Shader*> shaders;
 
         bool activeLights { false };
+        void updateLights();
         void checkLights();
 
         // Screen width and height
@@ -56,10 +60,6 @@ namespace DarkMoon {
 
         // Basic drawing functions
         void clearBackground(Color color);
-
-        // Mesh generation functions
-        // TODO
-        // Mesh* genMeshCube();
 
         // ChangeShader
         void useShader(Shader* shader) {

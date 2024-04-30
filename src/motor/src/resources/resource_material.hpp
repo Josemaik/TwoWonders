@@ -39,9 +39,9 @@ namespace DarkMoon {
         float getShininess(){ return m_shininess; };
 
     private:
-        glm::vec3 m_ambientColor;
-        glm::vec3 m_diffuseColor;
-        glm::vec3 m_specularColor;
-        float m_shininess;
+        glm::vec3 m_ambientColor {};
+        glm::vec3 m_diffuseColor {};
+        glm::vec3 m_specularColor {};
+        float m_shininess {};
     };
 }

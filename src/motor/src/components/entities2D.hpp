@@ -503,10 +503,6 @@ namespace DarkMoon {
 
     // TODO
 
-    struct ButtonTexture : Entity {
-
-    };
-
     struct CheckBox : Entity {
 
     };

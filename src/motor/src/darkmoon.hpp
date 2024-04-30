@@ -137,7 +137,7 @@ namespace DarkMoon {
         // End canvas drawing and swap buffers
         void EndDrawing();
         // Draw the scene
-        void Draw(Color clearColor);
+        void Draw(Color clearColor = D_WHITE);
 
         // ------------------------ //
         // Texture Loading unctions //
@@ -156,24 +156,11 @@ namespace DarkMoon {
 
         // Load model from file into GPU memory
         std::unique_ptr<Model> LoadModel(const char* filePath);
-        // Load model from generated mesh ? TODO
 
         // Unload model data from CPU and GPU
         void UnloadModel(Model* model);
-
-        // ---------------------------------------- //
-        // Mesh management and generation functions //
-        // ---------------------------------------- //
-
-        // TODO
-        // Generate cuboid mesh
-        Mesh* GenerateMeshCube(float width, float height, float length);
         // Unload mesh data from CPU and GPU
         void UnloadMesh(Mesh* mesh);
-        // Draw mesh ?
-
-
-        // MATERIAL
 
         // --------------------------------- //
         // Input-related functions: keyboard //

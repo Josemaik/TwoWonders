@@ -8,6 +8,7 @@ LIBS 	   := -lglfw -lGLEW -lGLU -lGL -lm -lassimp -lfreetype -lgif
 SANITIZE   := -fsanitize=address,undefined
 
 # agregar g++ | clang++
+# -pg
 
 MKDIR      := mkdir -p
 SRC  	   := src

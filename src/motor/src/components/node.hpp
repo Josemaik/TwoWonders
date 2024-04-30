@@ -60,7 +60,8 @@ namespace DarkMoon {
         void scale(glm::vec3 newScale);
 
         // Getters
-        Entity* getEntity(); // TODO
+        Entity* getEntity();
+        template<typename T> T* getEntity(){ return dynamic_cast<T*>(m_entity.get()); }
         Node* getParent();
         glm::vec3 getTranslation();
         glm::quat getRotation();

@@ -25,7 +25,7 @@ uniform float Shininess;
 // --- Lights --- //
 // -------------- //
 
-#define MAX_POINT_LIGHTS 10
+const int MAX_POINT_LIGHTS = 10;
 
 struct PointLight {
     vec4 position;
@@ -38,7 +38,7 @@ struct PointLight {
 uniform PointLight pointsLights[MAX_POINT_LIGHTS];
 uniform int NumPointLights;
 
-#define MAX_DIRECTIONAL_LIGHTS 10
+const int MAX_DIRECTIONAL_LIGHTS = 2;
 
 struct DirectionalLight {
     vec3 direction;
@@ -61,7 +61,8 @@ vec3 Phong(){
     vec3 n = normalize(Normal);
     vec3 v = normalize(vec3(-FragPos));
 
-    for(int i = 0; i < NumPointLights; i++){
+    int pLightCount = min(NumPointLights, MAX_POINT_LIGHTS);
+    for(int i = 0; i < pLightCount; i++){
         vec3 l = normalize(vec3(pointsLights[i].position) - FragPos);
         vec3 r = reflect(-l, n);
 
@@ -77,7 +78,8 @@ vec3 Phong(){
 
     // directionalLights
 
-    for(int i = 0; i < NumDirectionalLights; i++){
+    int dLightCount = min(NumDirectionalLights, MAX_DIRECTIONAL_LIGHTS);
+    for(int i = 0; i < dLightCount; i++){
         vec3 lightDir = normalize(-directionalLights[i].direction);
 
         float diff = max(dot(n, lightDir), 0.0);

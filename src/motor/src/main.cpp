@@ -115,7 +115,7 @@ DarkMoon::Node* createLights(DarkMoon::DarkMoonEngine& engine){
 
 DarkMoon::Node* createMainCharacter(DarkMoon::DarkMoonEngine& engine){
     // Node: Modelo
-    auto model = engine.CreateModel("assets/Cofre/Cofre.obj", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
+    auto model = engine.CreateModel("assets/lvl_0-cnk_0.obj", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
     //model->scale({0.02f, 0.02f, 0.02f});
     model->translate({0.0f, 1.0f, 0.0f});
     model->rotate({0.0f, 1.0f, 0.0f}, 135.0f);
@@ -252,7 +252,7 @@ int main(){
 
             // Draw
             
-            engine.Draw(D_WHITE);
+            engine.Draw();
         }
 
         engine.CloseWindow();

@@ -336,11 +336,18 @@ namespace DarkMoon {
 
     // Update lights
     void DarkMoonEngine::UpdateLights(Node* parentNode){
+        m_renderManager.updateLights();
+
         for(auto& child : parentNode->getChildren()){
-            if(auto light = dynamic_cast<Light*>(child->getEntity()))
-                if(child->getVisible())
-                    m_renderManager.lights.push_back(light);
+            if(child->getVisible()){
+                if(auto pLight = child->getEntity<PointLight>())
+                    m_renderManager.pointLights.push_back(pLight);
+                else if(auto dLight = child->getEntity<DirectionalLight>())
+                    m_renderManager.directionalLights.push_back(dLight);
+            }
         }
+        
+        m_renderManager.checkLights();
     }
 
     // ------------------------ //
@@ -445,10 +452,8 @@ namespace DarkMoon {
     // Setup canvas to start drawing
     void DarkMoonEngine::BeginDrawing() {
         m_windowsManager.beginDrawing();
-        m_renderManager.useShader(m_renderManager.shaders["color"]);
 
         // Lights
-        m_renderManager.lights.clear();
         UpdateLights(GetRootNode());
 
         m_inputManager.updateBeginFrame();
