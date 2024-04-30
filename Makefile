@@ -6,7 +6,7 @@ ifeq ($(OS),Windows_NT)
 	CCACHE 	   	:=
     LIBS 	   	:= -L./ libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll -lwinmm -lgdi32 -lglfw3 -lopengl32 -lglew32 -lglu32 -lm -lassimp -lfreetype -lgif
 	SANITIZE   	:=
-	LIBS_COPY  	:= libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll libs/libstdc++-6.dll libs/libgcc_s_seh-1.dll libs/libwinpthread-1.dll
+	LIBS_COPY  	:= libs/*.dll
 else
 	CC 		   	:= g++-12
 	CCACHE 	   	:= ccache
