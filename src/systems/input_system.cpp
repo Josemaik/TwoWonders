@@ -18,13 +18,12 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     // Si no hay jugador, no hacemos nada
     if (li.isDead)
     {
-        if (ge.isKeyReleased(D_KEY_ENTER) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN))
+        if (ge.isKeyReleased(D_KEY_ENTER) || ge.isGamepadButtonReleased(0, GLFW_GAMEPAD_BUTTON_A))
             li.resetFromDeath = true;
         return;
     }
-
     // PAUSE
-    if ((ge.isKeyReleased(D_KEY_ESCAPE) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_MIDDLE_RIGHT)) && li.currentScreen == GameScreen::GAMEPLAY)
+    if ((ge.isKeyReleased(D_KEY_ESCAPE) || ge.isGamepadButtonReleased(0, GLFW_GAMEPAD_BUTTON_START)) && li.currentScreen == GameScreen::GAMEPLAY)
     {
         if (li.currentScreen != GameScreen::CONTROLS)
             inpi.pause = !inpi.pause;
@@ -36,7 +35,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     }
 
     // INVENTORY
-    if ((ge.isKeyReleased(D_KEY_I) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_MIDDLE) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_MIDDLE_LEFT)) && li.currentScreen == GameScreen::GAMEPLAY && !inpi.pause)
+    if ((ge.isKeyReleased(D_KEY_I) /* || ge.isGamepadButtonReleased(0, GLFW_GAMEPAD_BUTTON_BACK)*/) && li.currentScreen == GameScreen::GAMEPLAY && !inpi.pause)
     {
         // inpi.inventory = !inpi.inventory;
         inpi.debugAI1 = false;
@@ -166,8 +165,8 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
                     auto& joystick_x = in.m_joystickX;
                     auto& joystick_y = in.m_joystickY;
 
-                    joystick_x = ge.getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * -1;
-                    joystick_y = ge.getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
+                    joystick_x = ge.getGamepadAxisMovement(0, D_GAMEPAD_AXIS_LEFT_X) * -1;
+                    joystick_y = ge.getGamepadAxisMovement(0, D_GAMEPAD_AXIS_LEFT_Y);
 
                     float deadzone = 0.3f;
                     float slowzone = 0.8f;
@@ -205,8 +204,8 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
                     auto& joystick_x = in.m_joystickX;
                     auto& joystick_y = in.m_joystickY;
 
-                    joystick_x = ge.getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * -1;
-                    joystick_y = ge.getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
+                    joystick_x = ge.getGamepadAxisMovement(0, D_GAMEPAD_AXIS_LEFT_X) * -1;
+                    joystick_y = ge.getGamepadAxisMovement(0, D_GAMEPAD_AXIS_LEFT_Y);
 
                     float deadzone = 0.3f;
                     float slowzone = 0.8f;
@@ -232,25 +231,25 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             gami.setVel(vel);
     }
 
-    if (ge.isKeyReleased(KEY_Z))
+    if (ge.isKeyReleased(D_KEY_Z))
     {
         Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 4 };
         plfi.addSpell(spell);
     }
 
-    if (ge.isKeyReleased(KEY_X))
+    if (ge.isKeyReleased(D_KEY_X))
     {
         Spell spell{ "Pompa de fuego", "Disparas una potente concentración de fuego que explota al impacto", Spells::WaterDash, 20.0, 4 };
         plfi.addSpell(spell);
     }
 
-    if (ge.isKeyReleased(KEY_C))
+    if (ge.isKeyReleased(D_KEY_C))
     {
         Spell spell{ "Pompa de aire", "Disparas una potente concentración de aire que explota al impacto", Spells::FireBall, 20.0, 4 };
         plfi.addSpell(spell);
     }
 
-    if (ge.isKeyReleased(KEY_V))
+    if (ge.isKeyReleased(D_KEY_V))
     {
         plfi.hasStaff = true;
     }
@@ -312,22 +311,22 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     else if (ge.isKeyReleased(in.interact) || ge.isGamepadButtonReleased(0, in.m_interact))
         inpi.interact = false;
 
-    if (ge.isGamepadButtonPressed(0, in.m_right) || ge.isKeyPressed(KEY_RIGHT))
+    if (ge.isGamepadButtonPressed(0, in.m_right) || ge.isKeyPressed(D_KEY_RIGHT))
         inpi.right = true;
     else
         inpi.right = false;
 
-    if (ge.isGamepadButtonPressed(0, in.m_left) || ge.isKeyPressed(KEY_LEFT))
+    if (ge.isGamepadButtonPressed(0, in.m_left) || ge.isKeyPressed(D_KEY_LEFT))
         inpi.left = true;
     else
         inpi.left = false;
 
-    if (ge.isGamepadButtonPressed(0, in.m_up) || ge.isKeyPressed(KEY_UP))
+    if (ge.isGamepadButtonPressed(0, in.m_up) || ge.isKeyPressed(D_KEY_UP))
         inpi.up = true;
     else
         inpi.up = false;
 
-    if (ge.isGamepadButtonPressed(0, in.m_down) || ge.isKeyPressed(KEY_DOWN))
+    if (ge.isGamepadButtonPressed(0, in.m_down) || ge.isKeyPressed(D_KEY_DOWN))
         inpi.down = true;
     else
         inpi.down = false;
@@ -340,19 +339,19 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     if (ge.isKeyDown(D_KEY_Z) && player.hasComponent<LifeComponent>())
         em.getComponent<LifeComponent>(player).increaseLife();
 
-    if (ge.isKeyReleased(KEY_F12))
+    if (ge.isKeyReleased(D_KEY_F12))
     {
         if (phy.gravity == 0)
             phy.gravity = 1.0;
         else
             phy.gravity = 0;
     }
-    if (ge.isKeyDown(KEY_M)) {
+    if (ge.isKeyDown(D_KEY_M)) {
         li.npcflee = true;
     }
 
 }
 
 bool InputSystem::pressEnter(GameEngine& ge) {
-    return ge.isKeyReleased(D_KEY_ENTER) || ge.isGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN);
+    return ge.isKeyReleased(D_KEY_ENTER) || ge.isGamepadButtonReleased(0, GLFW_GAMEPAD_BUTTON_A);
 }

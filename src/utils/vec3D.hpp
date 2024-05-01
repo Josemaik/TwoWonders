@@ -2,7 +2,6 @@
 #include <iostream>
 #include <cmath>
 #include <optional>
-#include <raylib.h>
 #include <glm/glm.hpp>
 #include <array>
 // Si queremos que la serialización sea en json, descomentar las siguientes líneas
@@ -233,11 +232,6 @@ struct vec3D
             return 0;
     }
 
-    constexpr Vector3 toRaylib() const noexcept
-    {
-        return Vector3{ static_cast<float>(x_),  static_cast<float>(y_),  static_cast<float>(z_) };
-    }
-
     constexpr glm::vec3 toGlm() const noexcept
     {
         return glm::vec3{ x_, y_, z_ };
@@ -328,10 +322,6 @@ struct vec2D
 {
     constexpr vec2D() = default;
     constexpr vec2D(DataT x, DataT y) : x{ x }, y{ y } {}
-    constexpr Vector2 toRaylib() const noexcept
-    {
-        return Vector2{ static_cast<float>(x),  static_cast<float>(y) };
-    }
 
     constexpr bool operator==(vec2D const& rhs) const
     {

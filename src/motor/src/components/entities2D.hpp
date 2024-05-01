@@ -254,7 +254,9 @@ namespace DarkMoon {
             std::wstring textW{};
             textW.resize(text.size());
             std::mbstowcs(&textW[0], text.c_str(), text.size());
+#ifdef _WIN32
             bool checkSpecial = false;
+#endif
             if (font && !text.empty() && this->text != textW) {
                 // Reset values
                 widths.clear();
@@ -268,16 +270,18 @@ namespace DarkMoon {
 
                         continue;
                     }
-                    else if(checkSpecial)
+#ifdef _WIN32
+                    else if (checkSpecial)
                     {
                         c += 64;
                         checkSpecial = false;
                     }
-                    else if(c == 195)
+                    else if (c == 195)
                     {
                         checkSpecial = true;
                         continue;
                     }
+#endif
 
                     // Max Height
                     Character ch = font->characters[c];
@@ -357,7 +361,9 @@ namespace DarkMoon {
                 position.y -= maxHeight * static_cast<float>(numLines) * 0.6f;
 
             int i{ 1 };
+#ifdef _WIN32
             bool checkSpecial = false;
+#endif
             for (wchar_t& c : text) {
                 if (c == '\n') {
                     // Reset the x position to the start of the line
@@ -367,16 +373,18 @@ namespace DarkMoon {
                     // Skip the rest of the loop
                     continue;
                 }
-                else if(checkSpecial)
+#ifdef _WIN32
+                else if (checkSpecial)
                 {
                     c += 64;
                     checkSpecial = false;
                 }
-                else if(c == 195)
+                else if (c == 195)
                 {
                     checkSpecial = true;
                     continue;
                 }
+#endif
 
                 Character ch = font->characters[c];
 

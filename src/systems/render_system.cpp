@@ -31,13 +31,16 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine)
 
 void RenderSystem::restartScene(GameEngine& engine)
 {
-    updateAnimatedTextures(engine);
+    auto* tresde = getNode(engine, "3D");
     auto* particles = getNode(engine, "Particles");
     auto* dosde = getNode(engine, "2D");
     auto* menu = getNode(engine, "Menu");
     auto* copyNode = getNode(engine, "Copy");
+
     particles->clearChildren();
     copyNode->clearChildren();
+
+    tresde->setVisible(false);
     dosde->setVisible(false);
     menu->setVisible(false);
     dosde->setVisibleOne(true);
@@ -230,25 +233,27 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
 
 void RenderSystem::drawChargeScreen(GameEngine& engine, EntityManager& em)
 {
-    engine.beginDrawing();
     engine.clearBackground({ 171, 159, 197, 255 });
     auto* chargeGif = getNode(engine, "carga");
 
     // Redimensionamos
-    auto& textEntity = *dynamic_cast<DarkMoon::AnimatedTexture2D*>(chargeGif->getEntity());
-    auto& frames = textEntity.frames;
-    auto& currentFrame = textEntity.currentFrame;
+    auto& gifInfo = *chargeGif->getEntity<DarkMoon::AnimatedTexture2D>();
+    auto& frames = gifInfo.frames;
+    auto& currentFrame = gifInfo.currentFrame;
 
-    int posX = static_cast<int>(engine.getScreenWidth() / 2 - frames[currentFrame]->getWidth() / 2);
-    int posY = static_cast<int>(engine.getScreenHeight() / 2 - frames[currentFrame]->getHeight() / 2);
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+
+    float width = static_cast<float>(frames[currentFrame]->getWidth());
+    float height = static_cast<float>(frames[currentFrame]->getHeight());
+
+    int posX = static_cast<int>(engine.getScreenWidth() / 2 - static_cast<int>(width * wRate / 2));
+    int posY = static_cast<int>(engine.getScreenHeight() / 2 - static_cast<int>(height * hRate / 2));
 
     engine.drawNode(chargeGif, { posX, posY });
 
     auto& li = em.getSingleton<LevelInfo>();
     li.loadingTime += timeStep;
-
-    updateAnimatedTextures(engine);
-    engine.endDrawing();
 }
 
 void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
@@ -256,7 +261,7 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
 
-    if ((engine.isKeyDown(KEY_E) && inpi.interact) || engine.isKeyDown(KEY_ESCAPE))
+    if ((engine.isKeyDown(D_KEY_E) && inpi.interact) || engine.isKeyDown(D_KEY_ESCAPE))
     {
         li.currentScreen = li.previousScreen;
         li.previousScreen = li.evenMorePreviousScreen;
@@ -301,7 +306,7 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
     engine.drawTexture(engine.textures[text],
         engine.getScreenWidth() / 2 - engine.textures[text].width / 2,
         engine.getScreenHeight() / 2 - engine.textures[text].height / 2,
-        WHITE);
+        D_WHITE);
     */
     engine.dmeg.GetRootNode()->traverse(glm::mat4());
 
@@ -645,40 +650,40 @@ void RenderSystem::drawPauseMenu(GameEngine&, EntityManager&)
     // }
 }
 
-void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
+void RenderSystem::drawInventory(GameEngine&, EntityManager&)
 {
-    float windowWidth = 450.0f;
-    float windowHeight = 450.0f;
-    float buttonWidth = 200.0f;
-    float buttonHeight = 50.0f;
-    float posButtonX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2);
-    float posButtonY = static_cast<float>(engine.getScreenHeight() / 3) - (buttonHeight / 2);
-    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (windowWidth / 2);
-    float posY = static_cast<float>(engine.getScreenHeight() / 2) - (windowHeight / 2);
+    // float windowWidth = 450.0f;
+    // float windowHeight = 450.0f;
+    // float buttonWidth = 200.0f;
+    // float buttonHeight = 50.0f;
+    // float posButtonX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2);
+    // float posButtonY = static_cast<float>(engine.getScreenHeight() / 3) - (buttonHeight / 2);
+    // float posX = static_cast<float>(engine.getScreenWidth() / 2) - (windowWidth / 2);
+    // float posY = static_cast<float>(engine.getScreenHeight() / 2) - (windowHeight / 2);
     // float augment = 55.f;
 
-    Rectangle windowRect = {
-        posX,
-        posY,
-        windowWidth,
-        windowHeight
-    };
-    engine.drawRectangleLinesEx(windowRect, 2, BLACK);
-    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
-    engine.drawTextEx(engine.getFontDefault(), "INVENTARIO", vec2d{ windowRect.x + 110, windowRect.y + 20 }, 40, 1, BLACK);
+    // Rectangle windowRect = {
+    //     posX,
+    //     posY,
+    //     windowWidth,
+    //     windowHeight
+    // };
+    // engine.drawRectangleLinesEx(windowRect, 2, BLACK);
+    // engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
+    // engine.drawTextEx(engine.getFontDefault(), "INVENTARIO", vec2d{ windowRect.x + 110, windowRect.y + 20 }, 40, 1, BLACK);
 
-    auto& plfi = em.getSingleton<PlayerInfo>();
-    // auto& inpi = em.getSingleton<InputInfo>();
+    // auto& plfi = em.getSingleton<PlayerInfo>();
+    // // auto& inpi = em.getSingleton<InputInfo>();
 
-    // auto& currentButton = inpi.currentButton;
+    // // auto& currentButton = inpi.currentButton;
 
-    // Definimos los botones
-    auto size = plfi.inventory.size() + 1;
-    std::vector<ButtonRect> buttons(size);
-    for (std::size_t i = 0; i < plfi.inventory.size(); i++) {
-        buttons[i] = { { posButtonX, posButtonY + 55 * static_cast<float>(i), buttonWidth, buttonHeight }, plfi.inventory[i]->name.c_str(), static_cast<int>(i) };
-    }
-    buttons[plfi.inventory.size()] = { { posButtonX, posButtonY + 55 * static_cast<float>(plfi.inventory.size()), buttonWidth, buttonHeight }, "VOLVER", static_cast<int>(plfi.inventory.size()) };
+    // // Definimos los botones
+    // auto size = plfi.inventory.size() + 1;
+    // std::vector<ButtonRect> buttons(size);
+    // for (std::size_t i = 0; i < plfi.inventory.size(); i++) {
+    //     buttons[i] = { { posButtonX, posButtonY + 55 * static_cast<float>(i), buttonWidth, buttonHeight }, plfi.inventory[i]->name.c_str(), static_cast<int>(i) };
+    // }
+    // buttons[plfi.inventory.size()] = { { posButtonX, posButtonY + 55 * static_cast<float>(plfi.inventory.size()), buttonWidth, buttonHeight }, "VOLVER", static_cast<int>(plfi.inventory.size()) };
 
     // if (plfi.selectedItem == plfi.max)
     // {
@@ -848,24 +853,24 @@ void RenderSystem::drawStory(GameEngine& engine) {
         auto* hist = engine.createNode("historia", getNode(engine, "Dialog"));
 
         engine.dmeg.CreateTextBox({ posX, posY }, { boxWidth, boxHeight }, D_WHITE,
-            "¡Bienvenido a la aventura!", engine.dmeg.GetDefaultFont(), 40,
+            "¡Bienvenido a la aventura!", engine.getDefaultFont(), 40,
             D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
             "Texto 1", hist);
         engine.dmeg.CreateTextBox({ posX, posY + 50 }, { boxWidth, boxHeight }, D_WHITE,
-            "Estas perdido por el bosque y", engine.dmeg.GetDefaultFont(), 40,
+            "Estas perdido por el bosque y", engine.getDefaultFont(), 40,
             D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
             "Texto 2", hist);
         engine.dmeg.CreateTextBox({ posX, posY + 100 }, { boxWidth, boxHeight }, D_WHITE,
-            "debes encontrar a tu maestro.", engine.dmeg.GetDefaultFont(), 40,
+            "debes encontrar a tu maestro.", engine.getDefaultFont(), 40,
             D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
             "Texto 3", hist);
         engine.dmeg.CreateTextBox({ posX, posY + 150 }, { boxWidth, boxHeight }, D_WHITE,
-            "¡Mucha suerte!", engine.dmeg.GetDefaultFont(), 40,
+            "¡Mucha suerte!", engine.getDefaultFont(), 40,
             D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
             "Texto 4", hist);
 
         engine.dmeg.CreateTextBox({ posX, posY + 250 }, { boxWidth, boxHeight }, D_WHITE,
-            "", engine.dmeg.GetDefaultFont(), 40,
+            "", engine.getDefaultFont(), 40,
             D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
             "Texto 5", hist);
 
@@ -915,19 +920,19 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 switch (t.type)
                 {
                 case ElementalType::Neutral:
-                    colorEntidad = GRAY;
+                    colorEntidad = D_GRAY;
                     break;
 
                 case ElementalType::Water:
-                    colorEntidad = BLUE;
+                    colorEntidad = D_BLUE;
                     break;
 
                 case ElementalType::Fire:
-                    colorEntidad = RED;
+                    colorEntidad = D_RED;
                     break;
 
                 case ElementalType::Ice:
-                    colorEntidad = SKYBLUE;
+                    colorEntidad = D_BLUE_LIGHT;
                     break;
 
                 default:
@@ -936,13 +941,13 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
             }
 
             if (e.hasTag<SubjectTag>() && e.hasComponent<SubjectComponent>() && em.getComponent<SubjectComponent>(e).activeShield)
-                colorEntidad = GREEN;
+                colorEntidad = D_GREEN;
 
             if (e.hasComponent<LifeComponent>()) {
                 auto& l{ em.getComponent<LifeComponent>(e) };
                 if (l.elapsed < l.countdown)
                 {
-                    colorEntidad = MAROON;
+                    colorEntidad = D_CORAL_PINK;
 
                     if (e.hasTag<DestructibleTag>())
                         r.position.setZ(shakeDouble(r.position.z()));
@@ -1040,9 +1045,8 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 if (r.node) {
                     r.node->setTranslation({ pos.x(), pos.y(), pos.z() });
                     r.node->setScale({ scl.x(), scl.y(), scl.z() });
-
                     r.node->setRotation({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees);
-
+                    r.node->setVisibleOne(true);
                     /*
                     if (!in)
                     {
@@ -1413,8 +1417,8 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
                 if (p.type == Particle::ParticleType::Pixel)
                 {
                     // Dibujamos 4 partćulas arriba, abajo, izquierda y derecha de la posición
-                    // engine.dmeg.CreatePoint3D(p.position.toGlm(), 3.f, { p.r, p.g, p.b, p.a }, "particula", getNode(engine, "Particles"));
-                    engine.dmeg.CreateLine3D(p.position.toGlm(), (p.position + vec3f{ 0.0f, .4f, 0.0f }).toGlm(), 1.5f, { p.r, p.g, p.b, p.a }, "particula", getNode(engine, "Particles"));
+                    engine.drawPoint3D(p.position.toGlm(), 3.f, { p.r, p.g, p.b, p.a }, "particula", getNode(engine, "Particles"));
+                    // engine.dmeg.CreateLine3D(p.position.toGlm(), (p.position + vec3f{ 0.0f, .3f, 0.0f }).toGlm(), 1.5f, { p.r, p.g, p.b, p.a }, "particula", getNode(engine, "Particles"));
                     // engine.drawPoint3D(p.position.to_other<double>(), { p.r, p.g, p.b, p.a });
                     // engine.drawPoint3D((p.position + vec3f{ 0.0f, 0.1f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
                     // engine.drawPoint3D((p.position + vec3f{ 0.1f, 0.0f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
@@ -1466,9 +1470,12 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
     auto& txti = em.getSingleton<TextInfo>();
 
     if (li.isCharging())
-        return;
-
-    drawHUD(em, engine);
+    {
+        restartScene(engine);
+        drawChargeScreen(engine, em);
+    }
+    else
+        drawHUD(em, engine);
 
     if (inpi.debugPhy)
         drawDebugPhysics(engine, em, li);
@@ -1751,107 +1758,107 @@ uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::ma
 // }
 
 //Debugger visual in-game
-void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
+void RenderSystem::drawDebuggerInGameIA(GameEngine&, EntityManager&)
 {
-    // engine.beginDrawing();
-    float posX = static_cast<float>(engine.getScreenWidth() - 330);
-    int posText = static_cast<int>(posX + 10);
-    Rectangle windowRect = { posX, 80, 330, 230 };
-    engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
-    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
-    vec2d textPositionInfo = { static_cast<double>(posText), 90 };
-    engine.drawTextEx(engine.getFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
-    auto& debugsnglt = em.getSingleton<Debug_t>();
+    // // engine.beginDrawing();
+    // float posX = static_cast<float>(engine.getScreenWidth() - 330);
+    // int posText = static_cast<int>(posX + 10);
+    // Rectangle windowRect = { posX, 80, 330, 230 };
+    // engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
+    // engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
+    // vec2d textPositionInfo = { static_cast<double>(posText), 90 };
+    // engine.drawTextEx(engine.getFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
+    // auto& debugsnglt = em.getSingleton<Debug_t>();
 
-    using SYSCMPss = MP::TypeList<AIComponent, ColliderComponent, RenderComponent>;
-    using SYSTAGss = MP::TypeList<EnemyTag>;
+    // using SYSCMPss = MP::TypeList<AIComponent, ColliderComponent, RenderComponent>;
+    // using SYSTAGss = MP::TypeList<EnemyTag>;
 
-    // AQUI PONDRIA
-    em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, ColliderComponent& col, RenderComponent& ren)
-    {
-        RayCast ray = engine.getMouseRay();
-        if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
-            if (engine.isMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                isSelectedfordebug = !isSelectedfordebug;
-                debugsnglt.IA_id_debug = e.getID();
-            }
-        }
-        if (isSelectedfordebug && e.getID() == debugsnglt.IA_id_debug) {
-            auto& bb = em.getSingleton<BlackBoard_t>();
-            engine.beginMode3D();
-            engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
-            engine.endMode3D();
-            engine.drawText("ID:", posText, 110, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(e.getID()).c_str(), vec2d{ static_cast<double>(posText) + 90.0,110 }, 20, 1, DARKGRAY);
-            engine.drawText("Node active:", posText, 130, 20, BLACK);
-            // std::cout << debugsnglt.elapsed << "\n";
-             // std::cout << debugsnglt.countdown << "\n";
-            if (debugsnglt.elapsed >= debugsnglt.countdown) {
-                debugsnglt.elapsed = 0;
-                debugsnglt.text = aic.bh;
-            }
-            else {
-                debugsnglt.plusDeltatime(timeStep, debugsnglt.elapsed);
-            }
-            engine.drawTextEx(engine.getFontDefault(), debugsnglt.text, vec2d{ static_cast<double>(posText) + 130.0,130 }, 20, 1, DARKGRAY);
-            engine.drawText("TEID:", posText, 150, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.teid).c_str(), vec2d{ static_cast<double>(posText) + 90.0,150 }, 20, 1, DARKGRAY);
-            engine.drawText("TX:", posText, 170, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tx).c_str(), vec2d{ static_cast<double>(posText) + 80.0,170 }, 20, 1, DARKGRAY);
-            engine.drawText("TZ:", posText, 190, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tz).c_str(), vec2d{ static_cast<double>(posText) + 80.0,190 }, 20, 1, DARKGRAY);
-            engine.drawText("Culldown:", posText, 210, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), vec2d{ static_cast<double>(posText) + 90.0,210 }, 20, 1, DARKGRAY);
-            engine.drawText("Player Detected?:", posText, 230, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,230 }, 20, 1, RED);
-            engine.drawText("Player hunted?:", posText, 250, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), (bb.playerhunted == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,250 }, 20, 1, RED);
-            engine.drawText("Subditos alive:", posText, 270, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.subditosData.size()).c_str(), vec2d{ static_cast<double>(posText) + 180.0,270 }, 20, 1, RED);
-            engine.drawText("Subditos id alive:", posText, 290, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), vec2d{ static_cast<double>(posText) + 180.0,290 }, 20, 1, RED);
-            engine.drawText("Alert state:", posText, 310, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), (aic.alert_state == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,310 }, 20, 1, RED);
+    // // AQUI PONDRIA
+    // em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, ColliderComponent& col, RenderComponent& ren)
+    // {
+    //     RayCast ray = engine.getMouseRay();
+    //     if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
+    //         if (engine.isMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    //             isSelectedfordebug = !isSelectedfordebug;
+    //             debugsnglt.IA_id_debug = e.getID();
+    //         }
+    //     }
+    //     if (isSelectedfordebug && e.getID() == debugsnglt.IA_id_debug) {
+    //         auto& bb = em.getSingleton<BlackBoard_t>();
+    //         engine.beginMode3D();
+    //         engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
+    //         engine.endMode3D();
+    //         engine.drawText("ID:", posText, 110, 20, BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(e.getID()).c_str(), vec2d{ static_cast<double>(posText) + 90.0,110 }, 20, 1, DARKGRAY);
+    //         engine.drawText("Node active:", posText, 130, 20, BLACK);
+    //         // std::cout << debugsnglt.elapsed << "\n";
+    //          // std::cout << debugsnglt.countdown << "\n";
+    //         if (debugsnglt.elapsed >= debugsnglt.countdown) {
+    //             debugsnglt.elapsed = 0;
+    //             debugsnglt.text = aic.bh;
+    //         }
+    //         else {
+    //             debugsnglt.plusDeltatime(timeStep, debugsnglt.elapsed);
+    //         }
+    //         engine.drawTextEx(engine.getFontDefault(), debugsnglt.text, vec2d{ static_cast<double>(posText) + 130.0,130 }, 20, 1, DARKGRAY);
+    //         engine.drawText("TEID:", posText, 150, 20, BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.teid).c_str(), vec2d{ static_cast<double>(posText) + 90.0,150 }, 20, 1, DARKGRAY);
+    //         engine.drawText("TX:", posText, 170, 20, BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tx).c_str(), vec2d{ static_cast<double>(posText) + 80.0,170 }, 20, 1, DARKGRAY);
+    //         engine.drawText("TZ:", posText, 190, 20, BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tz).c_str(), vec2d{ static_cast<double>(posText) + 80.0,190 }, 20, 1, DARKGRAY);
+    //         engine.drawText("Culldown:", posText, 210, 20, BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), vec2d{ static_cast<double>(posText) + 90.0,210 }, 20, 1, DARKGRAY);
+    //         engine.drawText("Player Detected?:", posText, 230, 20, BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,230 }, 20, 1, RED);
+    //         engine.drawText("Player hunted?:", posText, 250, 20, BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), (bb.playerhunted == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,250 }, 20, 1, RED);
+    //         engine.drawText("Subditos alive:", posText, 270, 20, BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.subditosData.size()).c_str(), vec2d{ static_cast<double>(posText) + 180.0,270 }, 20, 1, RED);
+    //         engine.drawText("Subditos id alive:", posText, 290, 20, BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), vec2d{ static_cast<double>(posText) + 180.0,290 }, 20, 1, RED);
+    //         engine.drawText("Alert state:", posText, 310, 20, BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), (aic.alert_state == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,310 }, 20, 1, RED);
 
-            engine.beginMode3D();
-            //raycast
-            if (bb.launched) {
-                // engine.beginMode3D();
+    //         engine.beginMode3D();
+    //         //raycast
+    //         if (bb.launched) {
+    //             // engine.beginMode3D();
 
-                auto dir = bb.direction * 100;
-                DrawLine3D(bb.position_origin.toRaylib(), dir.toRaylib(), BLUE);
-                // engine.endMode3D();
-                bb.launched = false;
-            }
-            //Cone
-            //if(e.hasTag<SnowmanTag>())
-            auto& phy = em.getComponent<PhysicsComponent>(e);
-            drawVisionCone(phy.position, phy.orientation, bb.horizontalFOV);
-            // if(e.hasTag<GolemTag>())
-            //     drawVisionCone(bb.conegolem.first, bb.conegolem.second, bb.horizontalFOV);
-            engine.endMode3D();
-        }
-    });
+    //             auto dir = bb.direction * 100;
+    //             DrawLine3D(bb.position_origin.toRaylib(), dir.toRaylib(), BLUE);
+    //             // engine.endMode3D();
+    //             bb.launched = false;
+    //         }
+    //         //Cone
+    //         //if(e.hasTag<SnowmanTag>())
+    //         auto& phy = em.getComponent<PhysicsComponent>(e);
+    //         drawVisionCone(phy.position, phy.orientation, bb.horizontalFOV);
+    //         // if(e.hasTag<GolemTag>())
+    //         //     drawVisionCone(bb.conegolem.first, bb.conegolem.second, bb.horizontalFOV);
+    //         engine.endMode3D();
+    //     }
+    // });
     //  engine.endDrawing();
 }
 
 // Dentro de tu clase BTDecisionPlayerDetected, podrías tener un método para dibujar el cono de visión
-void RenderSystem::drawVisionCone(vec3d pos_enemy, double orientation, double horizontalFOV) {
-    // Calcula las direcciones de las líneas del cono
-    Vector3 direction1 = { static_cast<float>(std::sin(orientation - horizontalFOV / 2.0)), 0.0f, static_cast<float>(std::cos(orientation - horizontalFOV / 2.0)) };
-    Vector3 direction2 = { static_cast<float>(std::sin(orientation + horizontalFOV / 2.0)), 0.0f, static_cast<float>(std::cos(orientation + horizontalFOV / 2.0)) };
+void RenderSystem::drawVisionCone(vec3d, double, double) {
+    // // Calcula las direcciones de las líneas del cono
+    // Vector3 direction1 = { static_cast<float>(std::sin(orientation - horizontalFOV / 2.0)), 0.0f, static_cast<float>(std::cos(orientation - horizontalFOV / 2.0)) };
+    // Vector3 direction2 = { static_cast<float>(std::sin(orientation + horizontalFOV / 2.0)), 0.0f, static_cast<float>(std::cos(orientation + horizontalFOV / 2.0)) };
 
-    // Calcula los puntos de inicio de las líneas
-    Vector3 start1 = pos_enemy.toRaylib();
-    Vector3 start2 = pos_enemy.toRaylib();
+    // // Calcula los puntos de inicio de las líneas
+    // Vector3 start1 = pos_enemy.toRaylib();
+    // Vector3 start2 = pos_enemy.toRaylib();
 
-    // Calcula los puntos finales de las líneas (multiplica por una distancia adecuada para hacerlas visibles)
-    Vector3 end1 = { start1.x + direction1.x * 10.0f, start1.y + direction1.y * 10.0f, start1.z + direction1.z * 10.0f };
-    Vector3 end2 = { start2.x + direction2.x * 10.0f, start2.y + direction2.y * 10.0f, start2.z + direction2.z * 10.0f };
+    // // Calcula los puntos finales de las líneas (multiplica por una distancia adecuada para hacerlas visibles)
+    // Vector3 end1 = { start1.x + direction1.x * 10.0f, start1.y + direction1.y * 10.0f, start1.z + direction1.z * 10.0f };
+    // Vector3 end2 = { start2.x + direction2.x * 10.0f, start2.y + direction2.y * 10.0f, start2.z + direction2.z * 10.0f };
 
-    // Dibuja las líneas
-    DrawLine3D(start1, end1, PURPLE);
-    DrawLine3D(start2, end2, PURPLE);
+    // // Dibuja las líneas
+    // DrawLine3D(start1, end1, PURPLE);
+    // DrawLine3D(start2, end2, PURPLE);
 }
 
 //Editor In-Game
@@ -1886,7 +1893,7 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
     {
         // Comprobar si el rayo intersecta con el collider
         if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
-            if (engine.dmeg.IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            if (engine.dmeg.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
                 isSelected = !isSelected;
                 debugsglt.IA_id = e.getID();
             }
@@ -2039,7 +2046,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
         if (e.hasTag<PlayerTag>())
             continue;
 
-        if (e.hasTag<CrusherTag>()) {
+        if (e.hasTag<CrusherTag>() && !e.hasTag<EnemyDeathTag>()) {
             auto& phy = em.getComponent<PhysicsComponent>(e);
             auto& ai = em.getComponent<AIComponent>(e);
 
@@ -2355,7 +2362,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
         //             static_cast<int>(engine.getWorldToScreenX(phy.position) - 120),
         //             static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 25),
         //             20,
-        //             WHITE);
+        //             D_WHITE);
         //     }
 
         //     elapsed_WASD += 1.0f / 60.0f;
@@ -2518,29 +2525,29 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, Level
                 static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
                 static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 8.0),
                 20,
-                BLACK);
+                D_BLACK);
 
             if (e.hasComponent<TypeComponent>())
             {
                 auto const& t{ em.getComponent<TypeComponent>(e) };
 
                 std::string tipo = "Hielo";
-                Color color = SKYBLUE;
+                Color color = D_BLUE_LIGHT;
 
                 if (t.type == ElementalType::Neutral)
                 {
                     tipo = "Neutral";
-                    color = BLACK;
+                    color = D_BLACK;
                 }
                 else if (t.type == ElementalType::Water)
                 {
                     tipo = "Agua";
-                    color = BLUE;
+                    color = D_BLUE;
                 }
                 else if (t.type == ElementalType::Fire)
                 {
                     tipo = "Fuego";
-                    color = RED;
+                    color = D_RED;
                 }
 
                 engine.drawText(tipo.c_str(),
@@ -2560,7 +2567,7 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, Level
                 static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
                 static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 5),
                 20,
-                RED);
+                D_RED);
         }
 
         if (e.hasComponent<RampComponent>() && e.hasComponent<PhysicsComponent>())
@@ -2572,10 +2579,10 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, Level
             engine.drawText(std::to_string(rc.offset.y()).c_str(),
                 static_cast<int>(engine.getWorldToScreenX(phy.position) - 5),
                 static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 5),
-                20, RED);
-            engine.beginMode3D();
-            engine.drawCubeWires(phy.position, static_cast<float>(phy.scale.x()), static_cast<float>(phy.scale.y()), static_cast<float>(phy.scale.z()), RED);
-            engine.endMode3D();
+                20, D_RED);
+            // engine.beginMode3D();
+            // engine.drawCubeWires(phy.position, static_cast<float>(phy.scale.x()), static_cast<float>(phy.scale.y()), static_cast<float>(phy.scale.z()), D_RED);
+            // engine.endMode3D();
         }
 
         if (e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
@@ -2586,9 +2593,9 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, Level
             // vec3d boxPosition = (col.bbox.min + col.bbox.max) / 2;
             // vec3d boxSize = col.bbox.max - col.bbox.min;
 
-            Color color = BLUE;
+            Color color = D_BLUE;
             if (col.behaviorType & BehaviorType::ZONE)
-                color = GREEN;
+                color = D_GREEN;
 
             // Dibujar la bounding box
             //engine.beginMode3D();
@@ -2605,7 +2612,7 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, Level
 
             //std::cout << ray.origin << " " << ray.direction << std::endl;
 
-            auto& ren = em.getComponent<RenderComponent>(e);
+            // auto& ren = em.getComponent<RenderComponent>(e);
             bool notStatic = !(col.behaviorType & BehaviorType::ZONE);
             // Comprobar si el rayo intersecta con el collider
 
@@ -2613,53 +2620,53 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, Level
             {
                 pointedEntity = e.getID();
 
-                auto& col{ em.getComponent<ColliderComponent>(e) };
+                // auto& col{ em.getComponent<ColliderComponent>(e) };
 
                 // Calcular la posición y el tamaño de la bounding box
-                vec3d boxPosition = (col.bbox.min + col.bbox.max) / 2;
-                vec3d boxSize = col.bbox.max - col.bbox.min;
+                // vec3d boxPosition = (col.bbox.min + col.bbox.max) / 2;
+                // vec3d boxSize = col.bbox.max - col.bbox.min;
 
                 // Dibujar la bounding box
-                engine.beginMode3D();
-                engine.drawCubeWires(boxPosition,
-                    static_cast<float>(boxSize.x()),
-                    static_cast<float>(boxSize.y()),
-                    static_cast<float>(boxSize.z()),
-                    PURPLE);
-                engine.endMode3D();
+                // engine.beginMode3D();
+                // engine.drawCubeWires(boxPosition,
+                //     static_cast<float>(boxSize.x()),
+                //     static_cast<float>(boxSize.y()),
+                //     static_cast<float>(boxSize.z()),
+                //     D_VIOLET);
+                // engine.endMode3D();
 
-                engine.beginMode3D();
-                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
-                engine.endMode3D();
+                // engine.beginMode3D();
+                // engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), D_RED);
+                // engine.endMode3D();
 
                 // Dibujar el HUD de debug
-                engine.drawRectangle(0, 65, 150, 360, WHITE);
-                engine.drawText("Posición", 10, 70, 20, BLACK);
+                engine.drawRectangle(0, 65, 150, 360, D_WHITE);
+                engine.drawText("Posición", 10, 70, 20, D_BLACK);
                 std::string posX = "X: " + std::to_string(phy.position.x());
-                engine.drawText(posX.c_str(), 10, 95, 20, BLACK);
+                engine.drawText(posX.c_str(), 10, 95, 20, D_BLACK);
                 std::string posY = "Y: " + std::to_string(phy.position.y());
-                engine.drawText(posY.c_str(), 10, 120, 20, BLACK);
+                engine.drawText(posY.c_str(), 10, 120, 20, D_BLACK);
                 std::string posZ = "Z: " + std::to_string(phy.position.z());
-                engine.drawText(posZ.c_str(), 10, 145, 20, BLACK);
+                engine.drawText(posZ.c_str(), 10, 145, 20, D_BLACK);
 
-                engine.drawText("Escala", 10, 175, 20, BLACK);
+                engine.drawText("Escala", 10, 175, 20, D_BLACK);
                 std::string sclX = "X: " + std::to_string(phy.scale.x());
-                engine.drawText(sclX.c_str(), 10, 200, 20, BLACK);
+                engine.drawText(sclX.c_str(), 10, 200, 20, D_BLACK);
                 std::string sclY = "Y: " + std::to_string(phy.scale.y());
-                engine.drawText(sclY.c_str(), 10, 225, 20, BLACK);
+                engine.drawText(sclY.c_str(), 10, 225, 20, D_BLACK);
                 std::string sclZ = "Z: " + std::to_string(phy.scale.z());
-                engine.drawText(sclZ.c_str(), 10, 250, 20, BLACK);
+                engine.drawText(sclZ.c_str(), 10, 250, 20, D_BLACK);
 
-                engine.drawText("Velocidad", 10, 280, 20, BLACK);
+                engine.drawText("Velocidad", 10, 280, 20, D_BLACK);
                 std::string velX = "X: " + std::to_string(phy.velocity.x());
-                engine.drawText(velX.c_str(), 10, 305, 20, BLACK);
+                engine.drawText(velX.c_str(), 10, 305, 20, D_BLACK);
                 std::string velY = "Y: " + std::to_string(phy.velocity.y());
-                engine.drawText(velY.c_str(), 10, 330, 20, BLACK);
+                engine.drawText(velY.c_str(), 10, 330, 20, D_BLACK);
                 std::string velZ = "Z: " + std::to_string(phy.velocity.z());
-                engine.drawText(velZ.c_str(), 10, 355, 20, BLACK);
+                engine.drawText(velZ.c_str(), 10, 355, 20, D_BLACK);
 
                 std::string id = "ID: " + std::to_string(e.getID());
-                engine.drawText(id.c_str(), 10, 385, 20, BLACK);
+                engine.drawText(id.c_str(), 10, 385, 20, D_BLACK);
             }
         }
 
@@ -2671,7 +2678,7 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, Level
                 static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
                 static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
                 20,
-                BLACK);
+                D_BLACK);
         }
     }
 }
@@ -2687,7 +2694,7 @@ void RenderSystem::drawLockInfo(GameEngine& ge, EntityManager& em)
     if (li.lockedEnemy != li.max)
     {
         enemyID = li.lockedEnemy;
-        color = WHITE;
+        color = D_WHITE;
     }
     else if (li.closestEnemy != li.max)
     {
@@ -2911,17 +2918,6 @@ void RenderSystem::updateManaBar(GameEngine& engine, EntityManager& em)
     engine.drawNode(border, { barX, barY });
 
     plfi.mana_width = manaWidth;
-}
-
-void RenderSystem::updateAnimatedTextures(GameEngine& engine)
-{
-    // ----------------------- //
-    // Node: Gifs              //
-    // ----------------------- //
-
-    auto* gifs = getNode(engine, "Gifs");
-    for (DarkMoon::Node* child : gifs->getChildren())
-        child->setVisible(false);
 }
 
 // -------- //
@@ -3373,12 +3369,6 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     }
 
     engine.drawNode(gif, { posButtonX, posButtonY }, { 0.4f, 0.4f });
-}
-
-void RenderSystem::displayGif(GameEngine& engine, TextureType& copy, GameEngine::Gif& gif, int& posX, int& posY)
-{
-    engine.drawTexture(copy, posX, posY, WHITE);
-    engine.updateGif(gif);
 }
 
 double RenderSystem::shakeDouble(double value)

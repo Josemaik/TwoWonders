@@ -210,7 +210,7 @@ void MapManager::generateGround(EntityManager& em, const valueType& groundArray,
         vec3d rotationVec{ ground["rotVector"][1].GetDouble(), ground["rotVector"][2].GetDouble(), ground["rotVector"][0].GetDouble() };
         double orientation{ ground["rotation"].GetDouble() };
         double rot = orientation * DEGTORAD;
-        Color color{ WHITE };
+        Color color{ D_WHITE };
 
         // Sacamos los máximos y los mínimos
         if (i == 0)
@@ -295,7 +295,7 @@ void MapManager::generateWalls(EntityManager& em, const valueType& wallArray)
         vec3d scale{ wall["scale"][1].GetDouble(), wall["scale"][2].GetDouble(), wall["scale"][0].GetDouble() };
         vec3d rotationVec{ wall["rotVector"][1].GetDouble(), wall["rotVector"][2].GetDouble(), wall["rotVector"][0].GetDouble() };
         double orientation{ wall["rotation"].GetDouble() };
-        Color color{ LIME };
+        Color color{ D_GREEN_LIGHT };
 
         double rot = orientation * DEGTORAD;
 
@@ -351,7 +351,7 @@ void MapManager::generateObjects(EntityManager& em, const valueType& objectArray
         // Extraemos los datos del json
         vec3d position{ obj["position"][0].GetDouble(), obj["position"][2].GetDouble(), obj["position"][1].GetDouble() };
         vec3d scale{ obj["scale"][0].GetDouble(), obj["scale"][2].GetDouble(), obj["scale"][1].GetDouble() };
-        Color color{ RED };
+        Color color{ D_RED };
         ObjectType type{ static_cast<ObjectType>(obj["type"].GetDouble()) };
 
         auto& entity = em.newEntity();
@@ -385,7 +385,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         vec3d scale{ interactable["scale"][1].GetDouble(), interactable["scale"][2].GetDouble(), interactable["scale"][0].GetDouble() };
         vec3d rotationVec{ interactable["rotVector"][1].GetDouble(), interactable["rotVector"][2].GetDouble(), interactable["rotVector"][0].GetDouble() };
         double orientation{ interactable["rotation"].GetDouble() };
-        Color color{ LIGHTGRAY };
+        Color color{ D_GRAY };
         InteractableType type{ static_cast<InteractableType>(interactable["type"].GetInt()) };
 
         double rot = orientation * DEGTORAD;
@@ -1140,15 +1140,17 @@ void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
 
 void MapManager::spawnReset(EntityManager& em, Ia_man&)
 {
-    using CMPS = MP::TypeList<PhysicsComponent, LifeComponent, AIComponent>;
+    using CMPS = MP::TypeList<RenderComponent, PhysicsComponent, LifeComponent, AIComponent>;
     using TAGS = MP::TypeList<EnemyTag>;
     //auto& li = em.getSingleton<LevelInfo>();
 
-    em.forEach<CMPS, TAGS>([&](Entity& e, PhysicsComponent& phy, LifeComponent& lic, AIComponent& aic)
+    em.forEach<CMPS, TAGS>([&](Entity& e, RenderComponent& ren, PhysicsComponent& phy, LifeComponent& lic, AIComponent& aic)
     {
         if (e.hasTag<EnemyDeathTag>())
             em.destroyTag<EnemyDeathTag>(e);
 
+        if (ren.node)
+            ren.node->setVisible(true);
         lic.life = lic.maxLife;
         lic.markedForDeletion = false;
         phy.position = aic.initialPos;

@@ -12,23 +12,6 @@ namespace ENGI {
 
     struct GameEngine
     {
-        struct Gif
-        {
-            std::string name{};
-            Image image{};
-            TextureType texture{};
-            int currentFrame{};
-            int frames{};
-            int nextFrameDataOffset{};
-
-            double reScaleX{ 2.0 };
-            double reScaleY{ 2.0 };
-
-            // Variable para el update del frame
-            int frameCounter{ 0 };
-            int frameDelay{ 13 };
-        };
-
         using CL = MP::TypeList<PhysicsComponent, RenderComponent>;
         using TL = MP::TypeList<>;
 
@@ -40,13 +23,6 @@ namespace ENGI {
         void setTargetFPS(int fps);
         float getFrameTime();
 
-        // Image and Texture
-        Image loadImage(const char* filename);
-        Image loadImagenAnim(const char* filename, int& frames);
-        void imageResize(Image* image, int newWidth, int newHeight);
-        void unloadImage(Image image);
-        TextureType loadTextureFromImage(Image image);
-
         // Drawing
         void beginDrawing();
         void clearBackground(DarkMoon::Color color);
@@ -55,7 +31,7 @@ namespace ENGI {
         void beginMode3D();
         void endMode3D();
         void drawLine3D(vec3d startPos, vec3d endPos, Color color);
-        void drawPoint3D(vec3d pos, Color color);
+        void drawPoint3D(glm::vec3 position, float pointSize, DarkMoon::Color color, const char* nodeName, DarkMoon::Node* parentNode);
         void drawCube(vec3d pos, float width, float height, float lenght, Color color);
         void drawCubeWires(vec3d pos, float width, float height, float lenght, Color color);
         // void drawModel(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
@@ -65,10 +41,6 @@ namespace ENGI {
         // Rectangle
         void drawRectangle(int posX, int posY, int width, int height, Color color);
         DarkMoon::Node* createRectangle(vec2d pos, vec2d size, DarkMoon::Color color, const char* name, DarkMoon::Node* parentNode);
-        void drawRectangleLinesEx(Rectangle rec, float lineThick, Color color);
-        void drawRectangleRec(Rectangle rec, Color color);
-        void drawTexture(TextureType texture, int posX, int posY, Color tint);
-        void drawTexture(TextureType texture, int posX, int posY, Color tint, float scale);
         void drawNode(DarkMoon::Node* node, vec2i pos, vec2f scale = { 1.0f, 1.0f });
         void drawCircle(int posX, int posY, float radius, Color color);
         void drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color);
@@ -76,9 +48,7 @@ namespace ENGI {
 
         // Text
         void drawText(const char* text, int posX, int posY, int fontSize, Color color);
-        void drawTextEx(Font font, const char* text, vec2d position, float fontSize, float spacing, Color tint);
-        vec2d measureTextEx(Font font, const char* text, float fontSize, float spacing);
-        Font getFontDefault();
+        Font* getFontDefault();
 
         // Window
         void initWindow(int width, int height, const char* title);
@@ -113,30 +83,12 @@ namespace ENGI {
         bool isGamepadButtonReleased(int gamepad, int button);
         float getGamepadAxisMovement(int gamepad, int axis);
 
-        // Mouse collision
-        bool checkCollisionPointRec(Vector2 point, Rectangle rec);
-
-        // Shaders
-        Shader loadShader(const char* vsFileName, const char* fsFileName);
-        // void unloadShader(Shader s);
-        int getShaderLocation(Shader s, const char* uniformName);
-        // void setShaderValue(Shader s, int uniformLoc, const void* value, int uniformType);
-
-        // Aux
-        MeshType genMeshCube(float width, float height, float lenght);
-        Model loadModelFromMesh(MeshType m);
         DarkMoon::Node* loadModel(const char* filename);
-        // ModelType loadModelRaylib(const char* filename);
-        TextureType loadTexture(const char* filename);
-        void updateTexture(TextureType texture, const void* data);
-        void unloadMesh(MeshType m);
-        // void unloadModel(ModelType m);
         float getWorldToScreenX(vec3d pos);
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();
         void loadAndResizeImage(const char* name, const char* path, DarkMoon::Node* parentNode);
         void loadAndResizeImageGif(const char* name, const char* filePath);
-        void updateGif(Gif& anim);
         void unloadGifsAndTextures();
         void setReplayMode(bool replay, GameData& gd);
         double getTime();
@@ -148,9 +100,6 @@ namespace ENGI {
         DarkMoon::Node* createTextBox(glm::vec2 position, glm::vec2 size, DarkMoon::Color boxColor, std::string text, DarkMoon::Font* font, int fontSize, DarkMoon::Color textColor, DarkMoon::Aligned verticalAligned, DarkMoon::Aligned horizontalAligned, const char* nodeName, DarkMoon::Node* parentNode);
         DarkMoon::Node* createText(glm::vec2 position, std::string text, DarkMoon::Font* font, int fontSize, DarkMoon::Color textColor, const char* nodeName, DarkMoon::Node* parentNode);
         DarkMoon::Font* getDefaultFont();
-
-        std::map<std::string, TextureType> textures;
-        std::map<std::string, Gif> gifs;
 
         // DarkMoon Engine //
 

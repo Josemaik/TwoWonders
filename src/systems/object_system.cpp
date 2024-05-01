@@ -164,13 +164,13 @@ bool ObjectSystem::buyExtraLife(EntityManager& em, Entity* ent) {
 }
 
 void ObjectSystem::explodeBombHeal(EntityManager& em, Entity& ent) {
-    createExplodeBomb(em, ent, BehaviorType::HEAL, GREEN);
-    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY, GREEN);
+    createExplodeBomb(em, ent, BehaviorType::HEAL, D_GREEN);
+    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY, D_GREEN);
 }
 
 void ObjectSystem::explodeBomb(EntityManager& em, Entity& ent) {
-    createExplodeBomb(em, ent, BehaviorType::ATK_PLAYER, BLACK);
-    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY, BLACK);
+    createExplodeBomb(em, ent, BehaviorType::ATK_PLAYER, D_BLACK);
+    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY, D_BLACK);
 }
 
 void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type, Color color) {
@@ -208,28 +208,28 @@ void ObjectSystem::createObjects(EntityManager& em)
         {
         case ObjectType::Life:
         {
-            color = RED;
+            color = D_RED;
             break;
         }
         case ObjectType::Coin:
         {
             em.addTag<CoinTag>(e);
-            color = YELLOW;
+            color = D_YELLOW;
             break;
         }
         case ObjectType::Bomb:
         {
-            color = GRAY;
+            color = D_GRAY;
             break;
         }
         case ObjectType::Mana_Potion:
         {
-            color = SKYBLUE;
+            color = D_BLUE_LIGHT;
             break;
         }
         case ObjectType::Basic_Staff:
         {
-            color = GRAY;
+            color = D_GRAY;
             scl = { 10.5, 10.3, 10.3 };
             inmortal = true;
             visible = false;
@@ -240,7 +240,7 @@ void ObjectSystem::createObjects(EntityManager& em)
         }
         case ObjectType::Key:
         {
-            color = GOLD;
+            color = D_YELLOW_LIGHT;
             scl = { 10.5, 10.3, 10.3 };
             inmortal = true;
             visible = false;
@@ -248,7 +248,7 @@ void ObjectSystem::createObjects(EntityManager& em)
         }
         case ObjectType::ShopItem_ExtraLife:
         {
-            color = RED;
+            color = D_RED;
             scl = { 10.5, 10.5, 10.5 };
             inmortal = true;
             visible = false;
@@ -256,7 +256,7 @@ void ObjectSystem::createObjects(EntityManager& em)
         }
         case ObjectType::Coin30:
         {
-            color = RED;
+            color = D_RED;
             scl = { 10.5, 10.5, 10.5 };
             inmortal = true;
             visible = false;
@@ -264,14 +264,14 @@ void ObjectSystem::createObjects(EntityManager& em)
         }
         case ObjectType::Fire_Spell:
         {
-            color = RED;
+            color = D_RED;
             scl = { 1.5, 0.3, 0.3 };
             inmortal = true;
             break;
         }
         case ObjectType::GoodBoots:
         {
-            color = GREEN;
+            color = D_GREEN;
             scl = { 10.5, 10.5, 10.5 };
             inmortal = true;
             visible = false;
@@ -284,7 +284,7 @@ void ObjectSystem::createObjects(EntityManager& em)
         }
         case ObjectType::RegularHat:
         {
-            color = GREEN;
+            color = D_GREEN;
             scl = { 10.5, 10.5, 10.5 };
             inmortal = true;
             visible = false;
@@ -297,7 +297,7 @@ void ObjectSystem::createObjects(EntityManager& em)
         }
         case ObjectType::AttackUpgrade:
         {
-            color = RED;
+            color = D_RED;
             scl = { 10.5, 10.5, 10.5 };
             inmortal = true;
             visible = false;

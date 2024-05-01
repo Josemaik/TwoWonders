@@ -6,7 +6,7 @@
 void Game::createShield(Entity& ent)
 {
     auto& e{ em.newEntity() };
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = DARKBROWN });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = D_ORANGE_DARK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
     em.addComponent<ShieldComponent>(e, ShieldComponent{ .createdby = EntitieswithShield::Player });
@@ -15,7 +15,7 @@ void Game::createShield(Entity& ent)
 void Game::createEnding()
 {
     auto& e{ em.newEntity() };
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = {83.0f, 1.0f, -87.0f}, .scale = {1.0f, 1.0f, 1.0f}, .color = WHITE });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = {83.0f, 1.0f, -87.0f}, .scale = {1.0f, 1.0f, 1.0f}, .color = D_WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
 }
@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 33.0, 4.0, -25.9  };
+        plfi.spawnPoint = { -116.0, 4.0, 111.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -69,7 +69,7 @@ void Game::createEntities()
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 6.0, 2.0 }, .color = WHITE });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 6.0, 2.0 }, .color = D_WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
     // p.gravity = 0;
 
@@ -278,9 +278,6 @@ void Game::run()
             else if (map.isRespawning())
                 map.spawnReset(em, iam);
 
-            if (li.isCharging())
-                render_system.drawChargeScreen(engine, em);
-
             if (li.resetFromDeath)
                 resetDeath();
 
@@ -372,7 +369,6 @@ void Game::run()
     sound_system.clear();
     render_system.unloadModels(em, engine);
 
-    engine.unloadGifsAndTextures();
     // engine.unloadShader(shader);
     engine.closeWindow();
 }

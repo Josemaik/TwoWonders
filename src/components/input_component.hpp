@@ -16,9 +16,9 @@ struct InputComponent
     int pause{ D_KEY_ESCAPE };
     int inventory{ D_KEY_I };
 
-    int spell1{ KEY_J };
-    int spell2{ KEY_K };
-    int spell3{ KEY_L };
+    int spell1{ D_KEY_J };
+    int spell2{ D_KEY_K };
+    int spell3{ D_KEY_L };
 
     // Teclas de mecánicas
     int air_attack{ D_KEY_T };
@@ -32,18 +32,18 @@ struct InputComponent
     int pathfinfing{ D_KEY_F4 };
 
     // Botones de Mando
-    int m_up{ GAMEPAD_BUTTON_LEFT_FACE_UP };
-    int m_down{ GAMEPAD_BUTTON_LEFT_FACE_DOWN };
-    int m_left{ GAMEPAD_BUTTON_LEFT_FACE_LEFT };
-    int m_right{ GAMEPAD_BUTTON_LEFT_FACE_RIGHT };
+    int m_up{ GLFW_GAMEPAD_BUTTON_DPAD_UP };
+    int m_down{ GLFW_GAMEPAD_BUTTON_DPAD_DOWN };
+    int m_left{ GLFW_GAMEPAD_BUTTON_DPAD_LEFT };
+    int m_right{ GLFW_GAMEPAD_BUTTON_DPAD_RIGHT };
 
-    int m_interact{ GAMEPAD_BUTTON_RIGHT_FACE_DOWN };
-    int m_space{ GAMEPAD_AXIS_RIGHT_TRIGGER };
-    int m_lockIn{ GAMEPAD_AXIS_LEFT_TRIGGER };
+    int m_interact{ GLFW_GAMEPAD_BUTTON_A };
+    int m_space{ D_GAMEPAD_AXIS_RIGHT_TRIGGER };
+    int m_lockIn{ D_GAMEPAD_AXIS_LEFT_TRIGGER };
 
-    int m_spell1{ GAMEPAD_BUTTON_RIGHT_FACE_LEFT };
-    int m_spell2{ GAMEPAD_BUTTON_RIGHT_FACE_RIGHT };
-    int m_spell3{ GAMEPAD_BUTTON_RIGHT_FACE_UP };
+    int m_spell1{ GLFW_GAMEPAD_BUTTON_X };
+    int m_spell2{ GLFW_GAMEPAD_BUTTON_B };
+    int m_spell3{ GLFW_GAMEPAD_BUTTON_Y };
 
     // Joysticks
     float m_joystickX{ 0 };

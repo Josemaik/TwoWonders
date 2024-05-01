@@ -277,36 +277,14 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImageGif("Oido_parp2", "assets/HUD/gifs/Oido_parp2.gif");
 }
 
-////// IMAGE AND TEXTURE //////
-
-Image ENGI::GameEngine::loadImage(const char* filename) {
-    return LoadImage(filename);
-}
-
-Image ENGI::GameEngine::loadImagenAnim(const char* filename, int& frames) {
-    return LoadImageAnim(filename, &frames);
-}
-
-void ENGI::GameEngine::imageResize(Image* image, int newWidth, int newHeight) {
-    ImageResize(image, newWidth, newHeight);
-}
-
-void ENGI::GameEngine::unloadImage(Image image) {
-    UnloadImage(image);
-}
-
-TextureType ENGI::GameEngine::loadTextureFromImage(Image image) {
-    return LoadTextureFromImage(image);
-}
-
 ////// TIMIING RELATED FUNCTIONS //////
 
 void ENGI::GameEngine::setTargetFPS(int fps) {
-    SetTargetFPS(fps);
+    dmeg.SetTargetFPS(fps);
 }
 
 float ENGI::GameEngine::getFrameTime() {
-    return GetFrameTime();
+    return dmeg.GetFrameTime();
 }
 
 ////// DRAWING //////
@@ -317,10 +295,6 @@ void ENGI::GameEngine::beginDrawing() {
 
 void ENGI::GameEngine::clearBackground(DarkMoon::Color color) {
     dmeg.ClearBackground(color);
-}
-
-void ENGI::GameEngine::drawGrid(int slices, float spacing) {
-    DrawGrid(slices, spacing);
 }
 
 void ENGI::GameEngine::endDrawing() {
@@ -336,24 +310,12 @@ void ENGI::GameEngine::endMode3D() {
     // EndMode3D();
 }
 
-void ENGI::GameEngine::drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color) {
-    DrawLine(startPosX, startPosY, endPosX, endPosY, color);
-}
+// void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color) {
+//     DrawLine3D(startPos.toRaylib(), endPos.toRaylib(), color);
+// }
 
-void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color) {
-    DrawLine3D(startPos.toRaylib(), endPos.toRaylib(), color);
-}
-
-void ENGI::GameEngine::drawPoint3D(vec3d pos, Color color) {
-    DrawPoint3D(pos.toRaylib(), color);
-}
-
-void ENGI::GameEngine::drawCube(vec3d pos, float width, float height, float lenght, Color color) {
-    DrawCube(pos.toRaylib(), width, height, lenght, color);
-}
-
-void ENGI::GameEngine::drawCubeWires(vec3d pos, float width, float height, float lenght, Color color) {
-    DrawCubeWires(pos.toRaylib(), width, height, lenght, color);
+void ENGI::GameEngine::drawPoint3D(glm::vec3 position, float pointSize, DarkMoon::Color color, const char* nodeName, DarkMoon::Node* parentNode) {
+    dmeg.CreatePoint3D(position, pointSize, color, nodeName, parentNode);
 }
 
 // void ENGI::GameEngine::drawModel(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint) {
@@ -366,22 +328,6 @@ void ENGI::GameEngine::drawCubeWires(vec3d pos, float width, float height, float
 
 void ENGI::GameEngine::drawRectangle(int, int, int, int, Color) {
     // dmeg.drawRectangle(posX, posY, width, height, color);
-}
-
-void ENGI::GameEngine::drawRectangleLinesEx(Rectangle, float, Color) {
-    // DrawRectangleLinesEx(rec, lineThick, color);
-}
-
-void ENGI::GameEngine::drawRectangleRec(Rectangle, Color) {
-    // DrawRectangleRec(rec, color);
-}
-
-void ENGI::GameEngine::drawTexture(TextureType, int, int, Color) {
-    //DrawTexture(texture, posX, posY, tint);
-}
-
-void ENGI::GameEngine::drawTexture(TextureType, int, int, Color, float) {
-    //DrawTextureEx(texture, { static_cast<float>(posX), static_cast<float>(posY) }, 0.0f, scale, tint);
 }
 
 void ENGI::GameEngine::drawNode(DarkMoon::Node* node, vec2i pos, vec2f scale) {
@@ -410,17 +356,8 @@ void ENGI::GameEngine::drawText(const char*, int, int, int, Color) {
     //DrawText(text, posX, posY, fontSize, color);
 }
 
-void ENGI::GameEngine::drawTextEx(Font, const char*, vec2d, float, float, Color) {
-    //DrawTextEx(font, text, position.toRaylib(), fontSize, spacing, tint);
-}
-
-vec2d ENGI::GameEngine::measureTextEx(Font font, const char* text, float fontSize, float spacing) {
-    Vector2 v = MeasureTextEx(font, text, fontSize, spacing);
-    return vec2d(v.x, v.y);
-}
-
-Font ENGI::GameEngine::getFontDefault() {
-    return GetFontDefault();
+Font* ENGI::GameEngine::getFontDefault() {
+    return dmeg.GetDefaultFont();
 }
 
 ////// WINDOW //////
@@ -631,35 +568,36 @@ bool ENGI::GameEngine::isGamepadButtonPressed(int gamepad, int button)
     {
         if (dmeg.IsGamepadButtonPressed(gamepad, button))
         {
-            switch (button)
-            {
-            case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
-                gameData->addInputEvent(InputEvent::Type::InteractKeyPressed);
-                break;
-            case GAMEPAD_BUTTON_RIGHT_FACE_LEFT:
-                gameData->addInputEvent(InputEvent::Type::AttackKeyDown);
-                break;
-            default:
-                break;
-            }
+            // switch (button)
+            // {
+            // case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+            //     gameData->addInputEvent(InputEvent::Type::InteractKeyPressed);
+            //     break;
+            // case GAMEPAD_BUTTON_RIGHT_FACE_LEFT:
+            //     gameData->addInputEvent(InputEvent::Type::AttackKeyDown);
+            //     break;
+            // default:
+            //     break;
+            // }
             return true;
         }
         return false;
     }
-    else
-    {
-        switch (button)
-        {
-        case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
-            return gameData->isKeyPressed(D_KEY_E);
-            break;
-        case GAMEPAD_BUTTON_RIGHT_FACE_LEFT:
-            return gameData->isKeyDown(D_KEY_SPACE);
-            break;
-        default:
-            return false;
-        }
-    }
+    // else
+    // {
+    //     switch (button)
+    //     {
+    //     case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+    //         return gameData->isKeyPressed(D_KEY_E);
+    //         break;
+    //     case GAMEPAD_BUTTON_RIGHT_FACE_LEFT:
+    //         return gameData->isKeyDown(D_KEY_SPACE);
+    //         break;
+    //     default:
+    //         return false;
+    //     }
+    // }
+    return false;
 }
 
 bool ENGI::GameEngine::isGamepadButtonDown(int gamepad, int button)
@@ -673,87 +611,47 @@ bool ENGI::GameEngine::isGamepadButtonReleased(int gamepad, int button)
     {
         if (dmeg.IsGamepadButtonReleased(gamepad, button))
         {
-            switch (button)
-            {
-            case GAMEPAD_BUTTON_MIDDLE_LEFT:
-                gameData->addInputEvent(InputEvent::Type::InventoryReleased);
-                break;
-            case GAMEPAD_BUTTON_RIGHT_FACE_RIGHT:
-                gameData->addInputEvent(InputEvent::Type::LockInReleased);
-                break;
-            case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
-                gameData->addInputEvent(InputEvent::Type::InteractKeyReleased);
-                break;
-            default:
-                break;
-            }
+            // switch (button)
+            // {
+            // case GAMEPAD_BUTTON_MIDDLE_LEFT:
+            //     gameData->addInputEvent(InputEvent::Type::InventoryReleased);
+            //     break;
+            // case GAMEPAD_BUTTON_RIGHT_FACE_RIGHT:
+            //     gameData->addInputEvent(InputEvent::Type::LockInReleased);
+            //     break;
+            // case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+            //     gameData->addInputEvent(InputEvent::Type::InteractKeyReleased);
+            //     break;
+            // default:
+            //     break;
+            // }
             return true;
         }
         return false;
     }
-    else
-    {
-        switch (button)
-        {
-        case GAMEPAD_BUTTON_MIDDLE_LEFT:
-            return gameData->isKeyReleased(D_KEY_I);
-            break;
-        case GAMEPAD_BUTTON_RIGHT_FACE_RIGHT:
-            return gameData->isKeyReleased(D_KEY_F);
-            break;
-        case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
-            return gameData->isKeyReleased(D_KEY_E);
-            break;
-        default:
-            return false;
-        }
-    }
+    // else
+    // {
+    //     switch (button)
+    //     {
+    //     case GAMEPAD_BUTTON_MIDDLE_LEFT:
+    //         return gameData->isKeyReleased(D_KEY_I);
+    //         break;
+    //     case GAMEPAD_BUTTON_RIGHT_FACE_RIGHT:
+    //         return gameData->isKeyReleased(D_KEY_F);
+    //         break;
+    //     case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+    //         return gameData->isKeyReleased(D_KEY_E);
+    //         break;
+    //     default:
+    //         return false;
+    //     }
+    // }
+    return false;
 }
 
 float ENGI::GameEngine::getGamepadAxisMovement(int gamepad, int axis)
 {
     return dmeg.GetGamepadAxisMovement(gamepad, axis);
-}
-
-////// MOUSE COLLISION //////
-
-bool ENGI::GameEngine::checkCollisionPointRec(Vector2 point, Rectangle rec)
-{
-    return CheckCollisionPointRec(point, rec);
-}
-
-////// SHADERS //////
-
-// ShaderType ENGI::GameEngine::loadShader(const char* vsFileName, const char* fsFileName)
-// {
-//     return *dmeg.LoadShader("holiiiiii :3", vsFileName, fsFileName);
-// }
-
-// void ENGI::GameEngine::unloadShader(ShaderType s)
-// {
-//     UnloadShader(s);
-// }
-
-// int ENGI::GameEngine::getShaderLocation(ShaderType s, const char* uniformName)
-// {
-//     return GetShaderLocation(s, uniformName);
-// }
-
-// void ENGI::GameEngine::setShaderValue(ShaderType s, int uniformLoc, const void* value, int uniformType)
-// {
-//     SetShaderValue(s, uniformLoc, value, uniformType);
-// }
-
-////// AUX //////
-
-MeshType ENGI::GameEngine::genMeshCube(float width, float height, float lenght)
-{
-    return GenMeshCube(width, height, lenght);
-}
-
-Model ENGI::GameEngine::loadModelFromMesh(MeshType m)
-{
-    return LoadModelFromMesh(m);
 }
 
 DarkMoon::Node* ENGI::GameEngine::loadModel(const char* filename)
@@ -766,11 +664,6 @@ DarkMoon::Node* ENGI::GameEngine::loadModel(const char* filename)
 //     return LoadModel(filename);
 // }
 
-TextureType ENGI::GameEngine::loadTexture(const char* filename)
-{
-    return LoadTexture(filename);
-}
-
 DarkMoon::Texture* ENGI::GameEngine::loadTexture2D(const char* filePath)
 {
     return dmeg.LoadTexture2D(filePath);
@@ -779,16 +672,6 @@ DarkMoon::Texture* ENGI::GameEngine::loadTexture2D(const char* filePath)
 std::vector<DarkMoon::Texture*> ENGI::GameEngine::loadTextures2DAnim(const char* filePath)
 {
     return dmeg.LoadTexture2DAnim(filePath);
-}
-
-void ENGI::GameEngine::updateTexture(TextureType texture, const void* data)
-{
-    UpdateTexture(texture, data);
-}
-
-void ENGI::GameEngine::unloadMesh(MeshType m)
-{
-    UnloadMesh(m);
 }
 
 // void ENGI::GameEngine::unloadModel(ModelType m)
@@ -825,34 +708,6 @@ void ENGI::GameEngine::loadAndResizeImageGif(const char* name, const char* fileP
 
     if (!nodes[name])
         nodes[name] = dmeg.CreateAnimatedTexture2D({ 0.0f, 0.0f }, textures, D_WHITE, 0.5f, 0, name, nodes["Gifs"]);
-}
-
-void ENGI::GameEngine::updateGif(Gif&) {
-    //anim.frameCounter += 1;
-    //if (anim.frameCounter >= anim.frameDelay)
-    //{
-    //    anim.frameCounter = 0;
-    //    anim.currentFrame++;
-//
-    //    if (anim.currentFrame >= anim.frames) anim.currentFrame = 0;
-//
-    //    anim.nextFrameDataOffset = anim.image.width * anim.image.height * 4 * anim.currentFrame;
-//
-    //    updateTexture(anim.texture, static_cast<char*>(anim.image.data) + anim.nextFrameDataOffset);
-    //}
-}
-
-void ENGI::GameEngine::unloadGifsAndTextures() {
-    //for (auto& gif : gifs)
-    //{
-    //    UnloadTexture(gif.second.texture);
-    //    UnloadImage(gif.second.image);
-    //}
-//
-    //for (auto& texture : textures)
-    //{
-    //    UnloadTexture(texture.second);
-    //}
 }
 
 void ENGI::GameEngine::setReplayMode(bool replay, GameData& gd)

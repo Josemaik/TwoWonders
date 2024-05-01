@@ -22,13 +22,6 @@ struct RenderSystem
         float elapsed{};
     };
 
-    struct ButtonRect
-    {
-        Rectangle rect{};
-        const char* text{};
-        int action{};
-    };
-
     // Se van a buscar las entidad que tengan estos componentes y tags
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
@@ -78,12 +71,10 @@ private:
     void loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r);
     // void loadShaders(Model& model);
     void drawTextBox(GameEngine& engine, EntityManager& em);
-    void displayGif(GameEngine& engine, TextureType& copy, GameEngine::Gif& gif, int& posX, int& posY);
     double shakeDouble(double value);
 
     void updateHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
     void updateManaBar(GameEngine& engine, EntityManager& em);
-    void updateAnimatedTextures(GameEngine& engine);
     DarkMoon::Node* getNode(GameEngine& engine, const char* name);
     bool nodeExists(GameEngine& engine, const char* name);
 

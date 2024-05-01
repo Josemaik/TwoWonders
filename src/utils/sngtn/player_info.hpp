@@ -14,7 +14,7 @@ struct PlayerInfo
     float elapsed_limit_coins{ 5.0f }, elapsed_coins{ elapsed_limit_coins }, mana_width{};
     double max_mana{ 100.0 }, mana{ max_mana };
     int max_armor{ 4 }, armor{};
-    bool hasKey{ false };
+    bool hasKey{ true };
     bool hasStaff{ false };
     bool hasBoots{ false };
     bool hasHat{ false };
