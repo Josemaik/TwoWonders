@@ -61,7 +61,7 @@ namespace DarkMoon {
     }
 
     void Mesh::draw(glm::mat4 transMatrix, Color color) {
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         rm.beginMode3D();
 
@@ -80,13 +80,15 @@ namespace DarkMoon {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Texture
-        if (material->texture)
-            glBindTexture(GL_TEXTURE_2D, material->texture->getIDTexture());
-        else // Bind default texture
-            glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
-
-        // Material - TODO
-        // Lights - TODO
+        if (!material->texture)
+            material->texture = rm.defaultMaterial->texture;
+        glBindTexture(GL_TEXTURE_2D, material->texture->getIDTexture());
+        
+        // Material
+        glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Kd"), 1, glm::value_ptr(material->getDiffuseColor()));
+        glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ka"), 1, glm::value_ptr(material->getAmbientColor()));
+        glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ks"), 1, glm::value_ptr(material->getSpecularColor()));
+        glUniform1f(glGetUniformLocation(rm.getShader()->getIDShader(), "Shininess"), material->getShininess());
 
         // Draw the triangle of mesh
         glBindVertexArray(m_VAO);
@@ -102,7 +104,7 @@ namespace DarkMoon {
 
     void Mesh::drawLines(glm::mat4 transMatrix, Color color) {
 
-        RenderManager rm = RenderManager::getInstance();
+        RenderManager& rm = RenderManager::getInstance();
 
         rm.beginMode3D();
 

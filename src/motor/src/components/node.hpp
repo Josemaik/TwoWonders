@@ -62,12 +62,14 @@ namespace DarkMoon {
 
         // Getters
         Entity* getEntity();
+        template<typename T> T* getEntity(){ return dynamic_cast<T*>(m_entity.get()); }
         Node* getParent();
         glm::vec3 getTranslation();
         glm::quat getRotation();
         glm::vec3 getScale();
         glm::mat4 getTransformationMatrix();
         std::vector<Node*> getChildren();
+        bool getVisible(){ return m_visible; };
 
         // Auxiliaries
         void printTransformationMatrix();
