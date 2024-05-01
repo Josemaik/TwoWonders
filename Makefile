@@ -1,17 +1,17 @@
 APP		   	:= TwoWonders
-CCFLAGS    	:= -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/ -I/usr/include/freetype2
+CCFLAGS    	:= -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/ -I/usr/include/freetype2 -I/mingw64/include/freetype2
 
 ifeq ($(OS),Windows_NT)
 	CC 	   		:= g++
 	CCACHE 	   	:=
-    LIBS 	   	:= -L./ libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll -lwinmm -lgdi32
+    LIBS 	   	:= -L./ libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll -lwinmm -lgdi32 -lglfw3 -lopengl32 -lglew32 -lglu32 -lm -lassimp -lfreetype -lgif
 	SANITIZE   	:=
-	LIBS_COPY  	:= libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll libs/libstdc++-6.dll libs/libgcc_s_seh-1.dll libs/libwinpthread-1.dll
+	LIBS_COPY  	:= libs/*.dll
 else
 	CC 		   	:= g++-12
 	CCACHE 	   	:= ccache
     LIBS 		:= -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so -lglfw -lGLEW -lGLU -lGL -lm -lassimp -lfreetype -lgif
-	SANITIZE   	:= -fsanitize=address
+	SANITIZE   	:= -fsanitize=address,undefined
 	LIBS_COPY  	:= /usr/lib/libraylib.so.420 libs/raygui.so fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13
 endif
 

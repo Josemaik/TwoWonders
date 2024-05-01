@@ -158,7 +158,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     checkZones(em, evm, zchi.getZones(InteractableType::Ladder), [&](EntityManager& em, EventManager&) { checkLadders(em); });
     checkZones(em, evm, zchi.getZones(InteractableType::Sign), [&](EntityManager& em, EventManager&) { checkSigns(em); });
     checkZones(em, evm, zchi.getZones(InteractableType::MissionOBJ), [&](EntityManager& em, EventManager& evm) { checkMissionObjs(em, evm); });
-    checkZones(em, evm, zchi.getZones(InteractableType::Spawn), [&](EntityManager& em, EventManager&) { checkSpawns(em); });
+    checkZones(em, evm, zchi.getZones(InteractableType::Spawn), [&](EntityManager& em, EventManager& evm) { checkSpawns(em, evm); });
 }
 
 void ZoneSystem::checkZones(EntityManager& em, EventManager& evm, checkType zones, checkFuncType checkFunction)
@@ -200,7 +200,7 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
             ch.closeEnemies = 0;
             em.forEach<crusherCMP, crusherTag>([&](Entity& e, PhysicsComponent& phyC)
             {
-                if (e.hasTag<AngryBushTag>() || e.hasTag<DummyTag>() || e.hasTag<AngryBushTag2>())
+                if (e.hasTag<AngryBushTag>() || e.hasTag<DummyTag>() || e.hasTag<AngryBushTag2>() || e.hasTag<EnemyDeathTag>())
                     return;
                 if (phy.position.distance(phyC.position) < 50.0 &&
                     std::abs(phy.position.y() - phyC.position.y()) < 4.0)
@@ -363,6 +363,9 @@ void ZoneSystem::checkTutorialEnemies(EntityManager& em)
 
     em.forEachAny<noCMP, enemyTag>([&](Entity& e)
     {
+        if (e.hasTag<EnemyDeathTag>())
+            return;
+
         auto& phy = em.getComponent<PhysicsComponent>(e);
         double distance = playerPos.distance(phy.position);
 
@@ -549,7 +552,7 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager&)
     });
 }
 
-void ZoneSystem::checkSpawns(EntityManager& em)
+void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto& playerEnt = *em.getEntityByID(li.playerID);
@@ -574,7 +577,7 @@ void ZoneSystem::checkSpawns(EntityManager& em)
                 part->multiply = true;
             }
             sc.active = true;
-            em.getSingleton<SoundSystem>().sonido_checkpoint();
+            ic.showButton = true;
         }
         else if (distance > ic.range && sc.active)
         {
@@ -583,27 +586,29 @@ void ZoneSystem::checkSpawns(EntityManager& em)
                 part->multiply = false;
             }
             sc.active = false;
+            ic.showButton = false;
+            return;
+        }
+
+        auto& inpi = em.getSingleton<InputInfo>();
+        auto& plfi = em.getSingleton<PlayerInfo>();
+
+        if (sc.active && inpi.interact)
+        {
+            plfi.spawnPoint = phy.position;
+            evm.scheduleEvent(Event{ EventCodes::SetSpawn });
+            em.getSingleton<SoundSystem>().sonido_checkpoint();
+
+            // if (e.hasComponent<DispatcherComponent>())
+            // {
+            //     auto& dc = em.getComponent<DispatcherComponent>(e);
+            //     for (std::size_t i = 0; i < dc.eventCodes.size(); i++)
+            //     {
+            // evm.scheduleEvent(Event{ static_cast<EventCodes>(11) });
+            evm.scheduleEvent(Event{ EventCodes::DialogFirstSpawn });
+            //     }
+            // }
+            inpi.interact = false;
         }
     });
 }
-
-// void ZoneSystem::checkDungeonSlimes(EntityManager& em, EventManager& evm)
-// {
-//     auto& li = em.getSingleton<LevelInfo>();
-
-//     if (!li.dungeonKeyCreated)
-//     {
-//         using noCMPs = MP::TypeList<>;
-//         using enemyTag = MP::TypeList<EnemyTag>;
-//         bool slimesDead{ true };
-
-//         em.forEach<noCMPs, enemyTag>([&](Entity& ent)
-//         {
-//             if (slimesDead && ent.hasTag<SlimeTag>())
-//                 slimesDead = false;
-//         });
-
-//         if (slimesDead)
-//             evm.scheduleEvent(Event{ EventCodes::SpawnDungeonKey });
-//     }
-// }

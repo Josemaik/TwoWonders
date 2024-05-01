@@ -7,12 +7,12 @@ namespace DarkMoon {
     bool InputManager::isKeyPressed(int key) { return m_keyPressedStates[key]; }
     bool InputManager::isKeyReleased(int key) { return m_keyReleaseStates[key]; }
     bool InputManager::isKeyPressedRepeat(int key) { return m_keyStates[key] == GLFW_REPEAT; }
-    bool InputManager::isKeyDown(int key) { 
-        return m_keyStates[key] == GLFW_PRESS || m_keyStates[key] == GLFW_REPEAT; 
+    bool InputManager::isKeyDown(int key) {
+        return m_keyStates[key] == GLFW_PRESS || m_keyStates[key] == GLFW_REPEAT;
     }
     bool InputManager::isKeyUp(int key) { return m_keyStates[key] == GLFW_RELEASE; }
-    
-    void InputManager::setExitKey(int key){ m_exitKey = key; }
+
+    void InputManager::setExitKey(int key) { m_exitKey = key; }
 
     void InputManager::keyCallback(GLFWwindow* window, int key, int, int action, int) {
         auto* im = static_cast<InputManager*>(glfwGetWindowUserPointer(window));
@@ -44,30 +44,30 @@ namespace DarkMoon {
     }
 
     bool InputManager::isGamepadButtonPressed(int gamepad, int button) {
-        if(gamepad < 0 || gamepad >= GLFW_JOYSTICK_LAST || button < 0 || button >= GLFW_GAMEPAD_BUTTON_LAST)
+        if (gamepad < 0 || gamepad >= GLFW_JOYSTICK_LAST || button < 0 || button >= GLFW_GAMEPAD_BUTTON_LAST)
             return false;
 
         return m_gamepadStates[gamepad].buttons[button] == GLFW_PRESS;
     }
 
     bool InputManager::isGamepadButtonDown(int gamepad, int button) {
-        if(gamepad < 0 || gamepad >= GLFW_JOYSTICK_LAST || button < 0 || button >= GLFW_GAMEPAD_BUTTON_LAST)
+        if (gamepad < 0 || gamepad >= GLFW_JOYSTICK_LAST || button < 0 || button >= GLFW_GAMEPAD_BUTTON_LAST)
             return false;
 
         return m_gamepadStates[gamepad].buttons[button] == GLFW_PRESS;
     }
 
     bool InputManager::isGamepadButtonReleased(int gamepad, int button) {
-        if(gamepad < 0 || gamepad >= GLFW_JOYSTICK_LAST || button < 0 || button >= GLFW_GAMEPAD_BUTTON_LAST)
+        if (gamepad < 0 || gamepad >= GLFW_JOYSTICK_LAST || button < 0 || button >= GLFW_GAMEPAD_BUTTON_LAST)
             return false;
-        
+
         return m_gamepadReleaseStates[gamepad].buttons[button] == GLFW_PRESS;
     }
 
     bool InputManager::isGamepadButtonUp(int gamepad, int button) {
-        if(gamepad < 0 || gamepad >= GLFW_JOYSTICK_LAST || button < 0 || button >= GLFW_GAMEPAD_BUTTON_LAST)
+        if (gamepad < 0 || gamepad >= GLFW_JOYSTICK_LAST || button < 0 || button >= GLFW_GAMEPAD_BUTTON_LAST)
             return false;
-        
+
         return m_gamepadStates[gamepad].buttons[button] == GLFW_RELEASE;
     }
 
@@ -102,12 +102,12 @@ namespace DarkMoon {
 
     void InputManager::updateEndFrame() {
         // Update mouse state
-        for(auto& sta : m_mouseButtonReleaseStates) sta = false;
-        for(auto& sta : m_mouseButtonPressedStates) sta = false;
+        for (auto& sta : m_mouseButtonReleaseStates) sta = false;
+        for (auto& sta : m_mouseButtonPressedStates) sta = false;
 
         // Update key state
-        for(auto& sta : m_keyReleaseStates) sta = false;
-        for(auto& sta : m_keyPressedStates) sta = false;
+        for (auto& sta : m_keyReleaseStates) sta = false;
+        for (auto& sta : m_keyPressedStates) sta = false;
     }
 
     // Input-related functions: mouse

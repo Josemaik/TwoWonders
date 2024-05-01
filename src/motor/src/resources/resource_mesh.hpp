@@ -24,10 +24,10 @@ namespace DarkMoon {
     public:
         // Mesh data
         std::vector<Vertex> vertices;
-        std::vector<u_int16_t> indices;
+        std::vector<uint16_t> indices;
         Material* material;
 
-        Mesh(std::size_t, std::vector<Vertex>, std::vector<u_int16_t>, Material*);
+        Mesh(std::size_t, std::vector<Vertex>, std::vector<uint16_t>, Material*);
         ~Mesh() { unload(); };
 
         bool load(const char*) override;

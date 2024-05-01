@@ -11,9 +11,9 @@ struct PlayerInfo
 
     double increaseLife{ 0.0 };
     uint16_t coins{}, coinsAdded{}, bombs{}, max_bombs{ 8 };
-    float elapsed_limit_coins{ 5.0f }, elapsed_coins{ elapsed_limit_coins };
+    float elapsed_limit_coins{ 5.0f }, elapsed_coins{ elapsed_limit_coins }, mana_width{};
     double max_mana{ 100.0 }, mana{ max_mana };
-    int mana_width{}, max_armor{ 4 }, armor{};
+    int max_armor{ 4 }, armor{};
     bool hasKey{ false };
     bool hasStaff{ false };
     bool hasBoots{ false };
@@ -168,7 +168,7 @@ struct PlayerInfo
         hasStaff = false;
         hasBoots = false;
         hasHat = false;
-        hasKey = false;
+        hasKey = true;
         onSpawn = false;
         showBook = false;
         attackUpgrade = false;

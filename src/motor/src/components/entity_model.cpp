@@ -97,7 +97,7 @@ namespace DarkMoon {
         }
 
         // Process the indices
-        std::vector<u_int16_t> indices;
+        std::vector<uint16_t> indices;
 
         for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
             aiFace face = mesh->mFaces[i];

@@ -40,6 +40,14 @@ namespace DarkMoon {
             child->setVisible(visible);
     }
 
+    void Node::setVisibleOne(bool visible) {
+        this->m_visible = visible;
+
+        if (m_parent)
+            m_parent->setVisibleOne(visible);
+    }
+
+    bool Node::isVisible() { return m_visible; }
 
     void Node::traverse(glm::mat4 parentMatrix) {
 
@@ -52,7 +60,7 @@ namespace DarkMoon {
         }
 
         // Draw Entity
-        if (m_entity && m_visible)
+        if (m_entity && m_visible && m_parent->m_visible)
             m_entity->draw(m_transformationMatrix);
 
         for (auto& child : m_children) {

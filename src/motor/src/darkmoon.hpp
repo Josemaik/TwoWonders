@@ -115,6 +115,8 @@ namespace DarkMoon {
         int GetScreenWidth();
         // Get current screen height
         int GetScreenHeight();
+        // Get Monitor size
+        glm::vec2 GetMonitorSize();
         // Check if window is fullscreen
         bool IsWindowFullscreen();
         // Toggle Fullscreen

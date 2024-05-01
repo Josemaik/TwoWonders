@@ -49,21 +49,21 @@ struct AIComponent
     double slimex{}, slimez{};
     std::size_t slimetarget{};
     //flocking
-    bool ispushed{false};
+    bool ispushed{ false };
     //dejar de ver
-    bool seeking{false};
+    bool seeking{ false };
     //area
     bool attackbeforedie{ false };
     //PATH
     Path_t<4> path{ };
     Path_t<4>::iterator pathIt{ };
     bool path_initialized{ false };
-    bool followpatrol{true};
+    bool followpatrol{ true };
     //pathfinding
-    bool pathfind_active{false},check_distance{false};
+    bool pathfind_active{ false }, check_distance{ false };
     std::vector<vec3d> found_path{};
-    vec3d *it_path{nullptr};
-    
+    vec3d* it_path{ nullptr };
+
     // SB behaviour {SB::Arrive};
     double txp{}, tzp{};
     bool target_obtained{ false };
@@ -78,6 +78,8 @@ struct AIComponent
     double elapsed_change_position{ 1.0 }, elapsed_stop{ 1.0 }, elapsed_change_dir{ 1.0 }, elapsed_shoot{ 0.0 },
         elapsed_fleeing{ 1.0 }, elapsed_perception{ 1.0 }, elapsed_spawning{ 1.0 }, elapsed_heal{ 1.0 }, elapsed_shield{ 1.0 },
         elapsed_air_attack{ 1.0 }, elapsed_show_icon{ 1.0 };
+
+    vec3d initialPos{};
 
     void plusDeltatime(float deltaTime, double& elapsed) { elapsed += deltaTime; };
     // Behaviour trees

@@ -39,7 +39,8 @@ namespace DarkMoon {
         }
 
         void setVisible(bool visible);
-        void setVisibleOne(bool visible) { m_visible = visible; }
+        void setVisibleOne(bool visible);
+        bool isVisible();
         void clearChildren() { m_children.clear(); };
         void destroy() {
             /* TODO

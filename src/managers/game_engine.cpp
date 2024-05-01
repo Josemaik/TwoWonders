@@ -11,20 +11,30 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     ENGI::GameEngine::setUpCamera({ 0.0f, 1.0f, 0.0f });
     ENGI::GameEngine::setProjectionCamera(DarkMoon::CameraProjection::CAMERA_ORTHOGRAPHIC);
 
+    widthRate = static_cast<float>(width) / 1920.0f;
+    heightRate = static_cast<float>(height) / 1080.0f;
+
     nodes["3D"] = dmeg.CreateNode("Scene 3D", dmeg.GetRootNode());
     nodes["2D"] = dmeg.CreateNode("Scene 2D", dmeg.GetRootNode());
-    nodes["Gifs"] = dmeg.CreateNode("Gifs", nodes["2D"]);
+    nodes["Menu"] = dmeg.CreateNode("Menu", dmeg.GetRootNode());
+    nodes["Particles"] = dmeg.CreateNode("Particles", nodes["3D"]);
     nodes["HUD"] = dmeg.CreateNode("HUD", nodes["2D"]);
-    nodes["Menu"] = dmeg.CreateNode("Menu", nodes["2D"]);
-    nodes["AnimTextures"] = dmeg.CreateNode("AnimTextures", nodes["HUD"]);
+    nodes["Book"] = dmeg.CreateNode("Book", nodes["HUD"]);
     nodes["Dialog"] = dmeg.CreateNode("Dialog", nodes["HUD"]);
+    nodes["Gifs"] = dmeg.CreateNode("Gifs", nodes["2D"]);
     nodes["Nums"] = dmeg.CreateNode("Nums", nodes["HUD"]);
     nodes["Faces"] = dmeg.CreateNode("Faces", nodes["HUD"]);
     nodes["Hearts"] = dmeg.CreateNode("Hearts", nodes["HUD"]);
     nodes["ManaBar"] = dmeg.CreateNode("Mana", nodes["HUD"]);
-    nodes["textCopy"] = dmeg.CreateNode("textCopy", nodes["HUD"]);
+    nodes["CoinBar"] = dmeg.CreateNode("Coins", nodes["HUD"]);
+    nodes["Copy"] = dmeg.CreateNode("Copy", nodes["HUD"]);
+    nodes["Boat"] = dmeg.CreateNode("Boat", nodes["HUD"]);
+    nodes["AnimTextures"] = dmeg.CreateNode("AnimTextures", nodes["HUD"]);
 
     ENGI::GameEngine::setExitKey(D_KEY_F8);
+
+    // Fondo Inicio
+    loadAndResizeImage("fondo_inicio", "assets/Inicio_fondo.png", nodes["2D"]);
 
     // Logo TwoWonders
     loadAndResizeImage("logo_twowonders", "assets/logo_two_wonders.png", nodes["2D"]);
@@ -51,16 +61,13 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImage("empty_ice_heart", "assets/HUD/corazon_escudo_v2.png", nodes["Hearts"]);
 
     // Mago Happy HUD
-    loadAndResizeImage("mago_happy1", "assets/HUD/caras/mago_happy.png", nodes["Faces"]);
-    loadAndResizeImage("mago_happy2", "assets/HUD/caras/mago_happy.png", nodes["Faces"]);
+    loadAndResizeImage("mago_happy", "assets/HUD/caras/mago_happy.png", nodes["Faces"]);
 
     // Mago Meh HUD
-    loadAndResizeImage("mago_meh1", "assets/HUD/caras/mago_meh.png", nodes["Faces"]);
-    loadAndResizeImage("mago_meh2", "assets/HUD/caras/mago_meh.png", nodes["Faces"]);
+    loadAndResizeImage("mago_meh", "assets/HUD/caras/mago_meh.png", nodes["Faces"]);
 
     // Mago SOS HUD
-    loadAndResizeImage("mago_sos1", "assets/HUD/caras/mago_sos.png", nodes["Faces"]);
-    loadAndResizeImage("mago_sos2", "assets/HUD/caras/mago_sos.png", nodes["Faces"]);
+    loadAndResizeImage("mago_sos", "assets/HUD/caras/mago_sos.png", nodes["Faces"]);
 
     // Nómada HUD
     loadAndResizeImage("nomada", "assets/HUD/caras/calabaza3.png", nodes["Faces"]);
@@ -74,30 +81,33 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // Candado cerrado HUD
     loadAndResizeImage("candado_cerrado", "assets/HUD/candado_cerrado.png", nodes["HUD"]);
 
-    // Diálogo Siguiente HUD
-    loadAndResizeImage("sig", "assets/HUD/dialog_siguiente.png", nodes["Dialog"]);
-
     // Fijado Destello HUD
     loadAndResizeImage("destellin", "assets/HUD/fijado_destellin.png", nodes["HUD"]);
 
     // Barra de destellos HUD
-    loadAndResizeImage("destellos", "assets/HUD/destellos.png", nodes["HUD"]);
+    loadAndResizeImage("destellos", "assets/HUD/destellos.png", nodes["CoinBar"]);
+
+    // Rectángulo de la barra de maná
+    createRectangle({ 0.0f, 0.0f }, { 1.0f, 35 }, { 154, 222, 235, 255 }, "mana_rect", nodes["ManaBar"]);
+
+    // Rectángulo fondo de la vida de los enemigos
+    createRectangle({ 0.0f, 0.0f }, { 40.0f, 4.0f }, { D_GRAY }, "borde_vida", nodes["HUD"]);
+
+    // Rectángulo de la barra de vida
+    createRectangle({ 0.0f, 0.0f }, { 1.0f, 4.0f }, { D_RED }, "vida_rect", nodes["HUD"]);
 
     // Borde Barra Maná
     loadAndResizeImage("borde_mana", "assets/HUD/mana_bar.png", nodes["ManaBar"]);
 
-    // Rectángulo de la barra de maná
-    dmeg.CreateRectangle({ 0.0f, 0.0f }, { 1.0f, 35 }, { 154, 222, 235, 255 }, "mana_rect", nodes["ManaBar"]);
-
     // Cuadro de diálogo
-    createTextBox({ 0, 0 }, { 600, 120 }, D_WHITE, "", dmeg.GetDefaultFont(),
+    createTextBox({ 0, 0 }, { 900, 180 }, D_WHITE, "", dmeg.GetDefaultFont(),
         20, D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER, "cuadroDialogo", nodes["Dialog"]);
 
+    // Diálogo Siguiente HUD
+    loadAndResizeImage("sig", "assets/HUD/dialog_siguiente.png", nodes["Dialog"]);
+
     // Espacio para hechizos de agua HUD
-    loadAndResizeImage("placeholder1", "assets/HUD/item_agua.png", nodes["AnimTextures"]);
-    loadAndResizeImage("placeholder2", "assets/HUD/item_agua.png", nodes["AnimTextures"]);
-    loadAndResizeImage("placeholder3", "assets/HUD/item_agua.png", nodes["AnimTextures"]);
-    loadAndResizeImage("placeholder4", "assets/HUD/item_agua.png", nodes["AnimTextures"]);
+    loadAndResizeImage("placeholder", "assets/HUD/item_agua.png", nodes["AnimTextures"]);
 
     // Icono de palo HUD
     loadAndResizeImage("palo", "assets/HUD/palo.png", nodes["AnimTextures"]);
@@ -121,13 +131,14 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImage("estacas", "assets/HUD/estacas.png", nodes["AnimTextures"]);
 
     // Libro para enseñar hechizos HUD
-    loadAndResizeImage("libro", "assets/HUD/Libro.png", nodes["AnimTextures"]);
+    loadAndResizeImage("libro", "assets/HUD/Libro.png", nodes["Book"]);
 
     // Icono de detección HUD
-    loadAndResizeImage("detectionicon", "assets/HUD/detectionicon.png", nodes["HUD"]);
+    loadAndResizeImage("detectionIcon", "assets/HUD/detectionicon.png", nodes["HUD"]);
 
     // Barco para el nivel del volcán HUD
-    loadAndResizeImage("barco", "assets/HUD/barco_piezas.png", nodes["HUD"]);
+    loadAndResizeImage("barco", "assets/HUD/barco_piezas.png", nodes["Boat"]);
+    nodes["BoatCopy"] = dmeg.CreateNode("BoatCopy", nodes["Boat"]);
 
     // Icono Batalla HUD
     loadAndResizeImage("batalla", "assets/HUD/batalla.png", nodes["HUD"]);
@@ -373,6 +384,14 @@ void ENGI::GameEngine::drawTexture(TextureType, int, int, Color, float) {
     //DrawTextureEx(texture, { static_cast<float>(posX), static_cast<float>(posY) }, 0.0f, scale, tint);
 }
 
+void ENGI::GameEngine::drawNode(DarkMoon::Node* node, vec2i pos, vec2f scale) {
+    scale *= { widthRate, heightRate };
+
+    node->setTranslation({ pos.x, pos.y, 0.0f });
+    node->setScale({ scale.x, scale.y, 1.0f });
+    node->setVisibleOne(true);
+}
+
 void ENGI::GameEngine::drawCircle(int, int, float, Color) {
     //DrawCircle(posX, posY, radius, color);
 }
@@ -437,11 +456,23 @@ void ENGI::GameEngine::setWindowSize(int width, int height)
         dmeg.ToggleFullscreen();
 
     dmeg.SetWindowSize(width, height);
+    widthRate = static_cast<float>(width) / 1920.0f;
+    heightRate = static_cast<float>(height) / 1080.0f;
 }
 
 void ENGI::GameEngine::setWindowFullScreen()
 {
     dmeg.ToggleFullscreen();
+    if (dmeg.IsWindowFullscreen())
+    {
+        auto size = dmeg.GetMonitorSize();
+        widthRate = static_cast<float>(size.x) / 1920.0f;
+        heightRate = static_cast<float>(size.y) / 1080.0f;
+    }
+    else {
+        widthRate = static_cast<float>(dmeg.GetScreenWidth()) / 1920.0f;
+        heightRate = static_cast<float>(dmeg.GetScreenHeight()) / 1080.0f;
+    }
 }
 
 void ENGI::GameEngine::setExitKey(int key)
@@ -851,7 +882,7 @@ DarkMoon::Node* ENGI::GameEngine::createNode(DarkMoon::Node* copyNode, DarkMoon:
     return dmeg.CreateNodeCopy(copyNode, parentNode);
 }
 
-DarkMoon::Node* ENGI::GameEngine::createRectangle(vec2d& pos, vec2d& size, DarkMoon::Color color, const char* name, DarkMoon::Node* parentNode)
+DarkMoon::Node* ENGI::GameEngine::createRectangle(vec2d pos, vec2d size, DarkMoon::Color color, const char* name, DarkMoon::Node* parentNode)
 {
     if (!nodes[name])
         nodes[name] = dmeg.CreateRectangle({ pos.x, pos.y }, { size.x, size.y }, color, name, parentNode);
@@ -865,6 +896,29 @@ DarkMoon::Node* ENGI::GameEngine::createTextBox(glm::vec2 position, glm::vec2 si
         nodes[nodeName] = dmeg.CreateTextBox(position, size, boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned, nodeName, parentNode);
 
     return nodes[nodeName];
+}
+
+DarkMoon::Node* ENGI::GameEngine::createText(glm::vec2 position, std::string text, DarkMoon::Font* font, int fontSize, DarkMoon::Color color, const char* nodeName, DarkMoon::Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateText(position, text, font, fontSize, color, nodeName, parentNode);
+
+    return nodes[nodeName];
+}
+
+DarkMoon::Font* ENGI::GameEngine::getDefaultFont()
+{
+    return dmeg.GetDefaultFont();
+}
+
+float ENGI::GameEngine::getWidthRate()
+{
+    return widthRate;
+}
+
+float ENGI::GameEngine::getHeightRate()
+{
+    return heightRate;
 }
 
 float ENGI::GameEngine::getAspectRat()

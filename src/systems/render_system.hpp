@@ -11,16 +11,15 @@ struct RenderSystem
 {
     struct AnimatedTexture
     {
-        std::string textureName;
-        int targetPosX;
-        int targetPosY;
-        int width;
-        int height;
-        float scaleChange;
-        float scaleFactor{};
-        float lerpFactor{ 0.0f };
-        float lerpSpeed{ 0.02f };
-        float elapsed{ 0.0f };
+        std::string textureName{};
+        int targetPosX{};
+        int targetPosY{};
+        float scaleChange{};
+        float scaleFactorX{};
+        float scaleFactorY{};
+        float lerpFactor{};
+        float lerpSpeed{ 0.01f };
+        float elapsed{};
     };
 
     struct ButtonRect
@@ -33,8 +32,6 @@ struct RenderSystem
     // Se van a buscar las entidad que tengan estos componentes y tags
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
-
-    RenderSystem() { init(); };
 
     void update(EntityManager& em, GameEngine& engine);
     void drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss);
@@ -67,7 +64,7 @@ private:
     void drawDeath(GameEngine& engine);
     void drawCoinBar(GameEngine& engine, EntityManager& em);
     void drawSpellSlots(GameEngine& engine, EntityManager& em);
-    void drawSpellExp(GameEngine& engine, std::string name);
+    void drawSpellExplanation(GameEngine& engine, std::string name);
     void drawStaff(GameEngine& engine, EntityManager& em);
     void drawLockInfo(GameEngine& engine, EntityManager& em);
     void drawBoatParts(GameEngine& engine, EntityManager& em);
@@ -75,7 +72,7 @@ private:
     void drawAnimatedTextures(GameEngine& engine);
     void drawCheatMenu(GameEngine& engine, EntityManager& em);
     void drawSmallButtons(GameEngine& engine, const std::string& name, int posX, int posY, int width, int height);
-    void handleAnimatedTexture(const std::string& name, const std::string& textureName, int x, int y, const Texture2D& texture, float scaleFactor);
+    void handleAnimatedTexture(const std::string& name, const std::string& textureName, int x, int y, float scaleFactor);
     void drawAlerts_IA(EntityManager& em, GameEngine& engine);
     void drawFPSCounter(GameEngine& engine);
     void loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r);
@@ -91,7 +88,7 @@ private:
     bool nodeExists(GameEngine& engine, const char* name);
 
     bool isSelected{ false };
-    bool isSelectedfordebug{ false }, fullScreen{ false };
+    bool isSelectedfordebug{ false };
     std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
     std::map<std::string, AnimatedTexture> animatedTextures{};
     // bool chunk0Charged{ false };

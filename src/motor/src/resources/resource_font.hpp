@@ -4,6 +4,7 @@
 #include FT_FREETYPE_H
 
 #include <map>
+#include <GL/glew.h>
 #include <GL/gl.h>
 #include <glm/glm.hpp>
 
@@ -20,7 +21,7 @@ namespace DarkMoon {
 
     struct Font : public Resource {
     public:
-        std::map<GLchar, Character> characters;
+        std::map<wchar_t, Character> characters;
 
         Font(std::size_t id) { this->m_id = id; };
         ~Font() { unload(); };

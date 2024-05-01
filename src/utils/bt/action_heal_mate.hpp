@@ -14,7 +14,7 @@ struct BTAction_HealMate : BTNode_t{
         ectx.ai->bh = "Healing mate";
         if(ectx.ent.hasTag<SlimeTag>()){
             auto const& phyTarget = ectx.em.getComponent<PhysicsComponent>(*ectx.em.getEntityByID(ectx.ai->slimetarget));
-            Steer_t steering = STBH::Pursue(phyTarget ,ectx.phy);
+            Steer_t steering = STBH::Pursue(phyTarget ,ectx.phy,ectx.phy.max_speed);
             double tdist = calculatedistance(phyTarget.position,ectx.phy.position);
             if(tdist < ectx.ai->arrival_radius){
                 //Nos matamos

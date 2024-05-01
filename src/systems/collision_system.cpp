@@ -11,7 +11,7 @@ void CollisionSystem::update(EntityManager& em)
     octree.clear();
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
     {
-        if (!e.hasTags(FrustOut{}) && frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+        if ((!e.hasTags(FrustOut{}) && frti.bboxIn(col.bbox) == FrustPos::OUTSIDE) || e.hasTag<EnemyDeathTag>())
             return;
 
         // Si la entidad está por debajo del suelo, se destruye
@@ -468,15 +468,11 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
                 if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(bulletType.type)) {
                     em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
                     if (staticEntPtr->hasTag<EnemyTag>()) {
+                        //Detectar al player si  te impacta una bala
                         if (staticEntPtr->hasComponent<AIComponent>()) {
                             em.getComponent<AIComponent>(*staticEntPtr).playerdetected = true;
                         }
                     }
-                    // if(otherEnt->hasTag<EnemyTag>()){
-                    //     if(otherEnt->hasComponent<AIComponent>()){
-                    //         em.getComponent<AIComponent>(*staticEntPtr).playerdetected = true;
-                    //     }
-                    // }
                 }
             }
         }
@@ -625,23 +621,6 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
 
         if (plfi.mana < plfi.max_mana - 3.0)
             plfi.mana = plfi.max_mana - 3.0;
-
-        if (evm != nullptr && plfi.spawnPoint != otherPhy->position)
-        {
-            plfi.spawnPoint = otherPhy->position;
-            evm->scheduleEvent(Event{ EventCodes::SetSpawn });
-
-            if (otherEntPtr->hasComponent<DispatcherComponent>())
-            {
-                auto& dc = em.getComponent<DispatcherComponent>(*otherEntPtr);
-                auto& lc = em.getComponent<ListenerComponent>(*staticEntPtr);
-                for (std::size_t i = 0; i < dc.eventCodes.size(); i++)
-                {
-                    evm->scheduleEvent(Event{ static_cast<EventCodes>(dc.eventCodes[i]) });
-                    lc.addCode(static_cast<EventCodes>(dc.eventCodes[i]));
-                }
-            }
-        }
         return;
     }
 
@@ -840,8 +819,19 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                 if (balaCol.behaviorType & BehaviorType::ATK_PLAYER)
                 {
                     //Si pegamos a un enemmigo nos detecta directamente
-                    if (ent2Ptr->hasTag<GolemTag>() || ent2Ptr->hasTag<SnowmanTag>())
+                    if (ent2Ptr->hasTag<GolemTag>()){
                         em.getComponent<AIComponent>(*ent2Ptr).playerdetected = true;
+                        // //empujar hacia atras si le impacta una bala
+                        if(ent2Ptr->hasComponent<PhysicsComponent>() && (ent2Ptr->hasTag<SnowmanTag>()
+                        || ent2Ptr->hasTag<GolemTag>())){
+                            auto& li = em.getSingleton<LevelInfo>();
+                            auto& enpos = em.getComponent<PhysicsComponent>(*ent2Ptr).position;
+                            auto& plphy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+                            vec3d plorientation = vec3d(std::sin(plphy.orientation), 0.0, std::cos(plphy.orientation));
+                            enpos.setX(enpos.x() + plorientation.x() * 4.0);
+                            enpos.setZ(enpos.z() + plorientation.z() * 4.0);
+                        }
+                    }
 
                     auto& plfi = em.getSingleton<PlayerInfo>();
                     damage = plfi.currentSpell.damage;

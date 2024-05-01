@@ -45,10 +45,12 @@ struct BTAction_Patrol : BTNode_t {
                     ectx.ai->found_path = li.level_graph.PathFindAStar(debug, 
                     startnode,endnode);
                     //creamos iterador que apunte a la primera posición
-                    ectx.ai->it_path = &ectx.ai->found_path[0];
-                    ectx.ai->check_distance = true;
-                    ectx.ai->pathfind_active = true;
-                    ectx.ai->seeking = false;
+                    if(ectx.ai->found_path.size() != 0){
+                        ectx.ai->it_path = &ectx.ai->found_path[0];
+                        ectx.ai->check_distance = true;
+                        ectx.ai->pathfind_active = true;
+                        ectx.ai->seeking = false;
+                    }
                 }else{
                     ectx.ai->pathfind_active = false;
                     ectx.ai->seeking = true;

@@ -3,6 +3,7 @@
 #include <cmath>
 #include <optional>
 #include <raylib.h>
+#include <glm/glm.hpp>
 #include <array>
 // Si queremos que la serialización sea en json, descomentar las siguientes líneas
 // #define CEREAL_RAPIDJSON_NAMESPACE cereal_rapidjson
@@ -237,6 +238,11 @@ struct vec3D
         return Vector3{ static_cast<float>(x_),  static_cast<float>(y_),  static_cast<float>(z_) };
     }
 
+    constexpr glm::vec3 toGlm() const noexcept
+    {
+        return glm::vec3{ x_, y_, z_ };
+    }
+
     friend std::ostream& operator<<(std::ostream& os, vec3D const& v)
     {
         os << '(' << v.x_ << ", " << v.y_ << ", " << v.z_ << ')';
@@ -327,8 +333,26 @@ struct vec2D
         return Vector2{ static_cast<float>(x),  static_cast<float>(y) };
     }
 
+    constexpr bool operator==(vec2D const& rhs) const
+    {
+        return x == rhs.x && y == rhs.y;
+    }
+
+    constexpr vec2D operator*(vec2D const& rhs) const
+    {
+        return { x * rhs.x, y * rhs.y };
+    }
+
+    constexpr vec2D operator*=(vec2D const& rhs)
+    {
+        x *= rhs.x;
+        y *= rhs.y;
+        return *this;
+    }
+
     DataT x{}, y{};
 };
 
 using vec2f = vec2D<float>;
 using vec2d = vec2D<double>;
+using vec2i = vec2D<int>;

@@ -48,7 +48,8 @@ namespace DarkMoon {
             auto nodeCopy = std::make_unique<Node>();
             nodeCopy->name = node->name;
 
-            std::unique_ptr<Texture2D> unique = std::make_unique<Texture2D>(*texture2D);
+            Texture2D newText = Texture2D(*texture2D);
+            std::unique_ptr<Texture2D> unique = std::make_unique<Texture2D>(newText);
 
             nodeCopy->setEntity(std::move(unique));
             p_node = nodeCopy.get();
@@ -416,6 +417,11 @@ namespace DarkMoon {
     // Get current screen height
     int DarkMoonEngine::GetScreenHeight() {
         return m_windowsManager.getScreenHeight();
+    }
+
+    // Get Monitor Size
+    glm::vec2 DarkMoonEngine::GetMonitorSize() {
+        return m_windowsManager.getMonitorSize();
     }
 
     // Check if window is fullscreen

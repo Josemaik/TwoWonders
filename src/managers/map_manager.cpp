@@ -145,7 +145,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             }
             case LoadState::LOAD_NAVMESHES:
             {
-                if (li.mapID != 0 || li.mapID != 1)
+                if (li.mapID == 2)
                     generateNavmeshes(em);
                 break;
             }
@@ -740,7 +740,6 @@ void MapManager::generateNavmeshes(EntityManager& em)
 {
     auto& navs = em.getSingleton<NavmeshInfo>();
     mapType navmeshkaiwa = loadMap("assets/Niveles/Lvl_2/Lvl_2-navmeshes.kaiwa");
-
     const valueType& navmeshes = navmeshkaiwa["NavMesh"];
     for (mapSizeType i = 0; i < navmeshes.Size(); i++) {
         std::array<vec3d, 9> vecnodes{};
@@ -791,16 +790,32 @@ void MapManager::generateNavmeshes(EntityManager& em)
             navs.midpoints.insert(vecnodes[k + 5]);
         }
 
+        //Rampa?
+        bool hasramp{ false };
+        // const valueType& xd = navmesh["ramp"];
+        // if(xd==NULL){
+        //     hasramp = true;
+        // }
+
+
+
+        const rapidjson::Value::ConstMemberIterator& xd = navmesh.FindMember("ramp");
+        if (xd != navmesh.MemberEnd()) {
+            if (xd->value.GetBool())
+                hasramp = true;
+        }
+        // bool hasramp = navmesh["ramp"].GetBool();
+
         //Creamos NavMesh BBox
         double scalex{}, scalez{};
 
         scalex = (max.x() - min.x());
         scalez = (max.z() - min.z());
-        BBox b(vecnodes[0], vec3d{ scalex, (max.y() - min.y()) + 0.5, scalez });
+        BBox b(vecnodes[0], vec3d{ scalex, (max.y() - min.y()) + 0.7, scalez });
         //BBox b{ min,max };
         navs.boundingnavmesh.push_back(b);
         //Creamos NavMesh
-        Navmesh nav{ .box = b };
+        Navmesh nav{ .box = b,.ramp = hasramp };
         //Rellenamos los nodos
         for (auto& n : vecnodes) {
             auto pair = std::make_pair(navs.num_nodes, n);
@@ -820,146 +835,224 @@ void MapManager::generateNavmeshes(EntityManager& em)
         // Conection c7{1, }; auxconex.push_back(c7);
         // Conection c8{1, }; auxconex.push_back(c8);
         //Creamos conexiones de el navmesh
-        // for (auto it = nav.nodes.begin(); it != std::prev(nav.nodes.end()); ++it) {
-        //     auto& currentNode = it->second;
-        //     auto& nextNode = std::next(it)->second;
+        if (nav.ramp == false) {
+            for (auto it = nav.nodes.begin(); it != std::prev(nav.nodes.end()); ++it) {
+                auto& currentNode = it->second;
+                auto& nextNode = std::next(it)->second;
 
-        //     // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
-        //     if (navs.insert_ids(it->first, std::next(it)->first) &&
-        //         navs.checkmidpoints(currentNode, nextNode)) {
-        //         Conection c{ 1, it->first, std::next(it)->first };
-        //         navs.conexiones.push_back(c);
-        //         //debug
-        //         auto pair = std::make_pair(it->second, std::next(it)->second);
-        //         navs.conexpos.insert(pair);
-        //     }
-        // }
-    }
-    // Guardamos info 
-    std::vector<Conection> auxconex;
-    auxconex.push_back(Conection{ 1,27,7 });
-    auxconex.push_back(Conection{ 1,7,26 });
-    auxconex.push_back(Conection{ 1,26,45 });
-    auxconex.push_back(Conection{ 1,45,50 });
-    auxconex.push_back(Conection{ 1,10,26 });
-    auxconex.push_back(Conection{ 1,0,26 });
-    auxconex.push_back(Conection{ 1,44,0 });
-    auxconex.push_back(Conection{ 1,54,50 });
-    auxconex.push_back(Conection{ 1,59,54 });
-    auxconex.push_back(Conection{ 1,98,59 });
-    auxconex.push_back(Conection{ 1,116,98 });
-    auxconex.push_back(Conection{ 1,124,116 });
-    auxconex.push_back(Conection{ 1,123,124 });
-    auxconex.push_back(Conection{ 1,134,123 });
-    auxconex.push_back(Conection{ 1,242,134 });
-    auxconex.push_back(Conection{ 1,468,473 });
-    auxconex.push_back(Conection{ 1,583,572 });
-    auxconex.push_back(Conection{ 1,473,583 });
-    auxconex.push_back(Conection{ 1,637,816 });
-    auxconex.push_back(Conection{ 1,637,639 });
-    auxconex.push_back(Conection{ 1,639,643 });
-    auxconex.push_back(Conection{ 1,643,837 });
-    auxconex.push_back(Conection{ 1,837,846 });
-    auxconex.push_back(Conection{ 1,639,620 });
-    auxconex.push_back(Conection{ 1,620,639 });
-    auxconex.push_back(Conection{ 1,846,895 });
-    auxconex.push_back(Conection{ 1,816,827 });
-    auxconex.push_back(Conection{ 1,822,827 });
-    auxconex.push_back(Conection{ 1,288,297 });
-    auxconex.push_back(Conection{ 1,297,320 });
-    auxconex.push_back(Conection{ 1,320,333 });
-
-    for (auto& c : auxconex) {
-        navs.conexiones.push_back(c);
-        //debug
-        auto pair = std::make_pair(getNodeVec3d(c.fromNode, navs.nodes), getNodeVec3d(c.toNode, navs.nodes));
-        navs.conexpos.insert(pair);
-        //nodes
-        for (auto& [n, vec] : navs.nodes) {
-            // if(n == 583){
-            //     vec = vec3d{vec.x(),vec.y(),vec.z()+10.0};
-            // }
-            if (n == c.toNode) {
-                navs.selectednodes.insert(std::make_pair(n, vec));
-            }
-            if (n == c.fromNode) {
-                navs.selectednodes.insert(std::make_pair(n, vec));
+                // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
+                if (navs.insert_ids(it->first, std::next(it)->first) &&
+                    navs.checkmidpoints(currentNode, nextNode)) {
+                    Conection c{ 1, it->first, std::next(it)->first };
+                    navs.conexiones.push_back(c);
+                    //debug
+                    auto pair = std::make_pair(it->second, std::next(it)->second);
+                    navs.conexpos.insert(pair);
+                }
             }
         }
     }
 
-    auto& li = em.getSingleton<LevelInfo>();
-    li.level_graph.createGraph(navs.conexiones, navs.selectednodes);
-    // Crear conexiones de navmesh con otros con los que colisiona
-    // for (auto it = navs.NavMeshes.begin(); it != navs.NavMeshes.end(); ++it) {
-    //     for (auto nextnavmesh = std::next(it); nextnavmesh != navs.NavMeshes.end(); ++nextnavmesh) {
-    //         auto& currentbbox = it->box;
-    //         auto& nextbbox = nextnavmesh->box;
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////7
+    // Guardamos info 
+    // std::vector<Conection> auxconex;
+    // auxconex.push_back(Conection{ 1,27,7 });
+    // auxconex.push_back(Conection{ 1,7,26 });
+    // auxconex.push_back(Conection{ 1,26,45 });
+    // auxconex.push_back(Conection{ 1,45,50 });
+    // auxconex.push_back(Conection{ 1,10,26 });
+    // auxconex.push_back(Conection{ 1,0,26 });
+    // auxconex.push_back(Conection{ 1,44,0 });
+    // auxconex.push_back(Conection{ 1,54,50 });
+    // auxconex.push_back(Conection{ 1,59,54 });
+    // auxconex.push_back(Conection{ 1,98,59 });
+    // auxconex.push_back(Conection{ 1,116,98 });
+    // auxconex.push_back(Conection{ 1,124,116 });
+    // auxconex.push_back(Conection{ 1,123,124 });
+    // auxconex.push_back(Conection{ 1,134,123 });
+    // auxconex.push_back(Conection{ 1,242,134 });
+    // auxconex.push_back(Conection{ 1,468,473 });
+    // auxconex.push_back(Conection{ 1,583,572 });
+    // auxconex.push_back(Conection{ 1,473,583 });
+    // auxconex.push_back(Conection{ 1,637,816 });
+    // auxconex.push_back(Conection{ 1,637,639 });
+    // auxconex.push_back(Conection{ 1,639,643 });
+    // auxconex.push_back(Conection{ 1,643,837 });
+    // auxconex.push_back(Conection{ 1,837,846 });
+    // auxconex.push_back(Conection{ 1,639,620 });
+    // auxconex.push_back(Conection{ 1,620,639 });
+    // auxconex.push_back(Conection{ 1,846,895 });
+    // auxconex.push_back(Conection{ 1,816,827 });
+    // auxconex.push_back(Conection{ 1,822,827 });
+    // auxconex.push_back(Conection{ 1,288,297 });
+    // auxconex.push_back(Conection{ 1,297,320 });
+    // auxconex.push_back(Conection{ 1,320,333 });
 
-    //         // Conexiones con navmeshes colisionables
-    //         if (currentbbox.intersects(nextbbox)) {
-    //             // Obtenemos el centro (primer nodo) del primer navmesh
-    //             const auto& currentNode = it->nodes.begin();
-
-    //             // Obtenemos el centro (primer nodo) del segundo navmesh
-    //             const auto& nextNode = nextnavmesh->nodes.begin();
-
-    //             // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
-    //             if (navs.insert_ids(currentNode->first, nextNode->first)) {
-    //                 Conection c{ 1, currentNode->first, nextNode->first };
-    //                 navs.conexiones.push_back(c);
-    //                 // debug
-    //                 auto pair = std::make_pair(currentNode->second, nextNode->second);
-    //                 navs.conexpos.insert(pair);
-    //             }
+    // for (auto& c : auxconex) {
+    //     navs.conexiones.push_back(c);
+    //     //debug
+    //     auto pair = std::make_pair(getNodeVec3d(c.fromNode, navs.nodes), getNodeVec3d(c.toNode, navs.nodes));
+    //     navs.conexpos.insert(pair);
+    //     //nodes
+    //     for (auto& [n, vec] : navs.nodes) {
+    //         // if(n == 583){
+    //         //     vec = vec3d{vec.x(),vec.y(),vec.z()+10.0};
+    //         // }
+    //         if (n == c.toNode) {
+    //             navs.selectednodes.insert(std::make_pair(n, vec));
+    //         }
+    //         if (n == c.fromNode) {
+    //             navs.selectednodes.insert(std::make_pair(n, vec));
     //         }
     //     }
     // }
 
+    // auto& li = em.getSingleton<LevelInfo>();
+    // li.level_graph.createGraph(navs.conexiones, navs.selectednodes);
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7
     // Crear conexiones de navmesh con otros con los que colisiona
     // for (auto it = navs.NavMeshes.begin(); it != navs.NavMeshes.end(); ++it) {
     //     for (auto nextnavmesh = std::next(it); nextnavmesh != navs.NavMeshes.end(); ++nextnavmesh) {
-    //         auto& currentbbox = it->box;
-    //         auto& nextbbox = nextnavmesh->box;
-    //         auto& currentnodes = it->nodes;
-    //         auto& currentcenter = it->centerpoint;
+    //         if(!it->ramp && !nextnavmesh->ramp){
+    //             auto& currentbbox = it->box;
+    //             auto& nextbbox = nextnavmesh->box;
 
-    //         // Conexiones con navmeshes colisionables
-    //         if (currentbbox.intersects(nextbbox)) {
+    //             // Conexiones con navmeshes colisionables
+    //             if (currentbbox.intersects(nextbbox)) {
+    //                 // Obtenemos el centro (primer nodo) del primer navmesh
+    //                 const auto& currentNode = it->nodes.begin();
 
-    //             // Recorremos nodos del primer navmesh
-    //             for (auto it2 = it->nodes.begin(); it2 != it->nodes.end(); ++it2) {
-    //                 const auto& currentNode = it2;
+    //                 // Obtenemos el centro (primer nodo) del segundo navmesh
+    //                 const auto& nextNode = nextnavmesh->nodes.begin();
 
-    //                 // Solo consideramos nodos en el borde de la intersección
-    //                 // if (!nextbbox.intersects(currentNode->second)
-    //                 //     && currentNode != it->nodes.begin()) continue;
-
-    //                 // Recorremos nodos del segundo navmesh
-    //                 for (auto it3 = nextnavmesh->nodes.begin(); it3 != nextnavmesh->nodes.end(); ++it3) {
-    //                     const auto& nextNode = it3;
-
-    //                     //Solo consideramos nodos en el borde de la intersección
-    //                     // if (!currentbbox.intersects(nextNode->second)
-    //                     //     && nextNode != nextnavmesh->nodes.begin()) continue;
-
-    //                     // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
-    //                     //(navs.checkcousinsnodes())
-    //                     //navs.insert_ids(currentNode->first, nextNode->first
-    //                     //navs.checkcousins(nextNode->second.x(),nextNode->second.z(),it->nodes)
-    //                     if (navs.checkcousins(nextNode->second,currentNode->second)) {
-    //                         Conection c{ 1, currentcenter.first, nextNode->first };
-    //                         navs.conexiones.push_back(c);
-    //                         // debug
-    //                         auto pair = std::make_pair(currentcenter.second, nextNode->second);
-    //                         navs.conexpos.insert(pair);
-    //                     }
+    //                 // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
+    //                 if (navs.insert_ids(currentNode->first, nextNode->first)) {
+    //                     Conection c{ 1, currentNode->first, nextNode->first };
+    //                     navs.conexiones.push_back(c);
+    //                     // debug
+    //                     auto pair = std::make_pair(currentNode->second, nextNode->second);
+    //                     navs.conexpos.insert(pair);
     //                 }
     //             }
     //         }
     //     }
     // }
 
+    //Crear conexiones de navmesh con otros con los que colisiona
+    for (auto it = navs.NavMeshes.begin(); it != navs.NavMeshes.end(); ++it) {
+        for (auto nextnavmesh = std::next(it); nextnavmesh != navs.NavMeshes.end(); ++nextnavmesh) {
+            if (!it->ramp && !nextnavmesh->ramp) {
+                auto& currentbbox = it->box;
+                auto& nextbbox = nextnavmesh->box;
+                //auto& currentnodes = it->nodes;
+                auto& currentcenter = it->centerpoint;
+
+                // Conexiones con navmeshes colisionables
+                if (currentbbox.intersects(nextbbox)) {
+
+                    // Recorremos nodos del primer navmesh
+                    for (auto it2 = it->nodes.begin(); it2 != it->nodes.end(); ++it2) {
+                        const auto& currentNode = it2;
+
+                        // Solo consideramos nodos en el borde de la intersección
+                        if (!nextbbox.intersects(currentNode->second)
+                            && currentNode != it->nodes.begin()) continue;
+
+                        // Recorremos nodos del segundo navmesh
+                        for (auto it3 = nextnavmesh->nodes.begin(); it3 != nextnavmesh->nodes.end(); ++it3) {
+                            const auto& nextNode = it3;
+
+                            //Solo consideramos nodos en el borde de la intersección
+                            if (!currentbbox.intersects(nextNode->second)
+                                && nextNode != nextnavmesh->nodes.begin()) continue;
+
+                            // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
+                            //(navs.checkcousinsnodes())
+                            //navs.insert_ids(currentNode->first, nextNode->first
+                            //navs.checkcousins(nextNode->second.x(),nextNode->second.z(),it->nodes)
+                            if (navs.insert_ids(currentNode->first, nextNode->first)) {
+                                Conection c{ 1, currentcenter.first, nextNode->first };
+                                navs.conexiones.push_back(c);
+                                // debug
+                                auto pair = std::make_pair(currentcenter.second, nextNode->second);
+                                navs.conexpos.insert(pair);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    //Conexiones a mano de las rampas del nivel 2
+    //rampa muñeco izquierda
+    std::vector<Conection> auxconex;
+    auxconex.push_back(Conection{ 1,2,18 });
+    auxconex.push_back(Conection{ 1,5,18 });
+    auxconex.push_back(Conection{ 1,26,18 });
+    auxconex.push_back(Conection{ 1,18,53 });
+    auxconex.push_back(Conection{ 1,53,50 });
+    auxconex.push_back(Conection{ 1,44,0 });
+    auxconex.push_back(Conection{ 1,14,2 });
+    auxconex.push_back(Conection{ 1,27,14 });
+    auxconex.push_back(Conection{ 1,21,18 });
+    // rampa derecha muñeco
+    auxconex.push_back(Conection{ 1,63,59 });
+    auxconex.push_back(Conection{ 1,98,63 });
+    auxconex.push_back(Conection{ 1,64,63 });
+    auxconex.push_back(Conection{ 1,65,63 });
+    // rampa mas abajo
+    auxconex.push_back(Conection{ 1,124,116 });
+    auxconex.push_back(Conection{ 1,121,116 });
+    auxconex.push_back(Conection{ 1,119,116 });
+    //
+    auxconex.push_back(Conection{ 1,576,572 });
+    auxconex.push_back(Conection{ 1,572,567 });
+    auxconex.push_back(Conection{ 1,567,536 });
+    auxconex.push_back(Conection{ 1,620,572 });
+    auxconex.push_back(Conection{ 1,583,572 });
+    auxconex.push_back(Conection{ 1,470,576 });
+    auxconex.push_back(Conection{ 1,473,576 });
+    auxconex.push_back(Conection{ 1,484,473 });
+    //
+    auxconex.push_back(Conection{ 1,333,346 });
+    auxconex.push_back(Conection{ 1,303,333 });
+    //
+    auxconex.push_back(Conection{ 1,643,843 });
+    auxconex.push_back(Conection{ 1,646,843 });
+    auxconex.push_back(Conection{ 1,652,843 });
+    auxconex.push_back(Conection{ 1,843,837 });
+    auxconex.push_back(Conection{ 1,647,648 });
+    auxconex.push_back(Conection{ 1,630,639 });
+    //
+    auxconex.push_back(Conection{ 1,801,808 });
+    auxconex.push_back(Conection{ 1,808,819 });
+    auxconex.push_back(Conection{ 1,742,801 });
+    auxconex.push_back(Conection{ 1,799,801 });
+    auxconex.push_back(Conection{ 1,731,801 });
+    auxconex.push_back(Conection{ 1,736,801 });
+    auxconex.push_back(Conection{ 1,745,801 });
+    auxconex.push_back(Conection{ 1,792,742 });
+    auxconex.push_back(Conection{ 1,800,742 });
+    auxconex.push_back(Conection{ 1,644,808 });
+    auxconex.push_back(Conection{ 1,632,639 });
+    for (auto& c : auxconex) {
+        navs.conexiones.push_back(c);
+        //debug
+        auto pair = std::make_pair(getNodeVec3d(c.fromNode, navs.nodes), getNodeVec3d(c.toNode, navs.nodes));
+        navs.conexpos.insert(pair);
+        //nodes
+        // for (auto& [n, vec] : navs.nodes) {
+        //     // if(n == 583){
+        //     //     vec = vec3d{vec.x(),vec.y(),vec.z()+10.0};
+        //     // }
+        //     if (n == c.toNode) {
+        //         navs.selectednodes.insert(std::make_pair(n, vec));
+        //     }
+        //     if (n == c.fromNode) {
+        //         navs.selectednodes.insert(std::make_pair(n, vec));
+        //     }
+        // }
+    }
     //Crear conexiones entre los centros
     // Crear conexiones entre los centros
     // for (auto it = navs.centers.begin(); it != navs.centers.end(); ++it) {
@@ -1045,31 +1138,21 @@ void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
         }
 }
 
-void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
+void MapManager::spawnReset(EntityManager& em, Ia_man&)
 {
-    if (!reSpawn)
-    {
-        using TAGs = MP::TypeList<EnemyTag>;
-        // using TAGs2 = MP::TypeList<NPCTag>;
-        destroyParts<TAGs>(em);
-        // destroyParts<TAGs2>(em);
-        reSpawn = true;
-    }
-    else
-    {
-        const valueType& chunks = map["Chunks"];
-        for (mapSizeType i = 0; i < chunks.Size(); i++)
-        {
-            std::string chunkName = "Chunk" + std::to_string(i);
-            const valueType& chunk = chunks[i][chunkName.c_str()];
-            const valueType& enemyArray = chunk[1]["underworld"]["Enemies"];
-            // const valueType& npcArray = chunk[1]["underworld"]["NPCs"];
+    using CMPS = MP::TypeList<PhysicsComponent, LifeComponent, AIComponent>;
+    using TAGS = MP::TypeList<EnemyTag>;
+    //auto& li = em.getSingleton<LevelInfo>();
 
-            generateEnemies(em, enemyArray, iam);
-            // generateNPCs(em, npcArray);
-        }
-        reSpawn = false;
-    }
+    em.forEach<CMPS, TAGS>([&](Entity& e, PhysicsComponent& phy, LifeComponent& lic, AIComponent& aic)
+    {
+        if (e.hasTag<EnemyDeathTag>())
+            em.destroyTag<EnemyDeathTag>(e);
+
+        lic.life = lic.maxLife;
+        lic.markedForDeletion = false;
+        phy.position = aic.initialPos;
+    });
 }
 
 void MapManager::addMessageCmp(EntityManager& em, Entity& e, const valueType& value)

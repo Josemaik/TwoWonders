@@ -100,8 +100,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         ge.dmeg.SetWindowSize(800, 600);
 
     if (ge.isKeyReleased(D_KEY_F11))
-        ge.dmeg.ToggleFullscreen();
-
+        ge.setWindowFullScreen();
 
     // Sacamos las físicas y el input del jugador
     auto& phy = em.getComponent<PhysicsComponent>(player);
@@ -233,28 +232,28 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             gami.setVel(vel);
     }
 
-    // if (ge.isKeyReleased(KEY_Z))
-    // {
-    //     Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 4 };
-    //     plfi.addSpell(spell);
-    // }
+    if (ge.isKeyReleased(KEY_Z))
+    {
+        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 4 };
+        plfi.addSpell(spell);
+    }
 
-    // if (ge.isKeyReleased(KEY_X))
-    // {
-    //     Spell spell{ "Pompa de fuego", "Disparas una potente concentración de fuego que explota al impacto", Spells::WaterDash, 20.0, 4 };
-    //     plfi.addSpell(spell);
-    // }
+    if (ge.isKeyReleased(KEY_X))
+    {
+        Spell spell{ "Pompa de fuego", "Disparas una potente concentración de fuego que explota al impacto", Spells::WaterDash, 20.0, 4 };
+        plfi.addSpell(spell);
+    }
 
-    // if (ge.isKeyReleased(KEY_C))
-    // {
-    //     Spell spell{ "Pompa de aire", "Disparas una potente concentración de aire que explota al impacto", Spells::FireBall, 20.0, 4 };
-    //     plfi.addSpell(spell);
-    // }
+    if (ge.isKeyReleased(KEY_C))
+    {
+        Spell spell{ "Pompa de aire", "Disparas una potente concentración de aire que explota al impacto", Spells::FireBall, 20.0, 4 };
+        plfi.addSpell(spell);
+    }
 
-    // if (ge.isKeyReleased(KEY_V))
-    // {
-    //     plfi.hasStaff = true;
-    // }
+    if (ge.isKeyReleased(KEY_V))
+    {
+        plfi.hasStaff = true;
+    }
 
     // Código para el lock-in
     if ((ge.isKeyReleased(in.lockIn) || ge.getGamepadAxisMovement(0, in.m_lockIn) > 0.5) && elapsedLockIn >= elapsedLockInLimit)
