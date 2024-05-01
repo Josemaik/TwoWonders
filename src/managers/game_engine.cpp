@@ -284,7 +284,7 @@ void ENGI::GameEngine::setTargetFPS(int fps) {
 }
 
 float ENGI::GameEngine::getFrameTime() {
-    return dmeg.GetFrameTime();
+    return static_cast<float>(dmeg.GetFrameTime());
 }
 
 ////// DRAWING //////
