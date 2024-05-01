@@ -6,7 +6,6 @@
 #include "../managers/input_manager.hpp"
 #include "../resources/resource_texture.hpp"   
 
-
 #include <GL/gl.h>
 #include <glm/glm.hpp>
 
@@ -255,17 +254,28 @@ namespace DarkMoon {
             std::wstring textW{};
             textW.resize(text.size());
             std::mbstowcs(&textW[0], text.c_str(), text.size());
+            bool checkSpecial = false;
             if (font && !text.empty() && this->text != textW) {
                 // Reset values
                 widths.clear();
                 float lineWidth = position.x;
-                for (wchar_t& c : textW) {
+                for (wchar_t c : textW) {
                     if (c == '\n') {
                         widths.push_back(lineWidth - position.x);
                         lineWidth = position.x;
                         if (maxWidth < lineWidth)
                             maxWidth = lineWidth;
 
+                        continue;
+                    }
+                    else if(checkSpecial)
+                    {
+                        c += 64;
+                        checkSpecial = false;
+                    }
+                    else if(c == 195)
+                    {
+                        checkSpecial = true;
                         continue;
                     }
 
@@ -345,6 +355,7 @@ namespace DarkMoon {
                 position.y -= maxHeight * static_cast<float>(numLines) * 0.6f;
 
             int i{ 1 };
+            bool checkSpecial = false;
             for (wchar_t& c : text) {
                 if (c == '\n') {
                     // Reset the x position to the start of the line
@@ -354,9 +365,18 @@ namespace DarkMoon {
                     // Skip the rest of the loop
                     continue;
                 }
+                else if(checkSpecial)
+                {
+                    c += 64;
+                    checkSpecial = false;
+                }
+                else if(c == 195)
+                {
+                    checkSpecial = true;
+                    continue;
+                }
 
                 Character ch = font->characters[c];
-
 
                 float posX = aux_x + static_cast<float>(ch.bearing.x) * scale;
                 float posY = position.y - static_cast<float>(ch.bearing.y) * scale + maxHeight / 2;

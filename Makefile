@@ -3,7 +3,7 @@ CCFLAGS    	:= -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/ -I/usr/in
 
 ifeq ($(OS),Windows_NT)
 	CC 	   		:= g++
-	CCACHE 	   	:=
+	CCACHE 	   	:= ccache
     LIBS 	   	:= -L./ libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll -lwinmm -lgdi32 -lglfw3 -lopengl32 -lglew32 -lglu32 -lm -lassimp -lfreetype -lgif
 	SANITIZE   	:=
 	LIBS_COPY  	:= libs/*.dll
@@ -44,6 +44,9 @@ endif
 # Regla principal (enlazado de los .o)
 $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
 	$(CCACHE) $(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE) -Wl,-rpath=libs -Wl,-rpath,./fmodlibs
+ifeq ($(OS),Windows_NT)
+	mv $(APP) ./libs/
+endif
 
 # Regla que compila los .cpp
 %.o : %.cpp
@@ -52,12 +55,13 @@ $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
 # Regla que crea una release
 $(RELEASE) : $(APP) $(ASSETS)
 	$(MKDIR) $(RELEASE)
-	cp $(APP) $(RELEASE)/
 	cp -r $(ASSETS) $(RELEASE)/
 ifeq ($(OS),Windows_NT)
 	cp $(LIBS_COPY) $(RELEASE)/
+	mv $(LIBS_DIR)/$(APP) $(RELEASE)/
 else
 	$(MKDIR) $(RELEASE)/$(LIBS_DIR)
+	cp $(APP) $(RELEASE)/
 	cp $(LIBS_COPY) $(RELEASE)/$(LIBS_DIR)
 endif
 	zip -r $(ZIP_NAME) $(RELEASE)/
@@ -75,7 +79,11 @@ $(ASSETS):
 .PHONY : dir clean game
 
 game: $(APP)
+ifeq ($(OS),Windows_NT)
+	./libs/$(APP)
+else
 	./$(APP)
+endif
 
 dir:
 	$(info $(ASSETS))
