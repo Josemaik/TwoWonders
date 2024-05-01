@@ -30,6 +30,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["Copy"] = dmeg.CreateNode("Copy", nodes["HUD"]);
     nodes["Boat"] = dmeg.CreateNode("Boat", nodes["HUD"]);
     nodes["AnimTextures"] = dmeg.CreateNode("AnimTextures", nodes["HUD"]);
+    nodes["Debug"] = dmeg.CreateNode("Debug", nodes["HUD"]);
 
     ENGI::GameEngine::setExitKey(D_KEY_F8);
 
@@ -95,6 +96,9 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Rectángulo de la barra de vida
     createRectangle({ 0.0f, 0.0f }, { 1.0f, 4.0f }, { D_RED }, "vida_rect", nodes["HUD"]);
+
+    // Rectángulo blanco debug físicas
+    createRectangle({ 0, 55 }, { 225, 520 }, D_WHITE, "debugRectPhy", nodes["Debug"]);
 
     // Borde Barra Maná
     loadAndResizeImage("borde_mana", "assets/HUD/mana_bar.png", nodes["ManaBar"]);
@@ -275,6 +279,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     //Detección por oído
     loadAndResizeImageGif("Oido_parp1", "assets/HUD/gifs/Oido_parp1.gif");
     loadAndResizeImageGif("Oido_parp2", "assets/HUD/gifs/Oido_parp2.gif");
+    nodes["TextCopy"] = dmeg.CreateNode("TextCopy", nodes["HUD"]);
 }
 
 ////// TIMIING RELATED FUNCTIONS //////
@@ -293,7 +298,7 @@ void ENGI::GameEngine::beginDrawing() {
     dmeg.BeginDrawing();
 }
 
-void ENGI::GameEngine::clearBackground(DarkMoon::Color color) {
+void ENGI::GameEngine::clearBackground(Color color) {
     dmeg.ClearBackground(color);
 }
 
@@ -310,12 +315,16 @@ void ENGI::GameEngine::endMode3D() {
     // EndMode3D();
 }
 
-// void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color) {
-//     DrawLine3D(startPos.toRaylib(), endPos.toRaylib(), color);
-// }
+void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color) {
+    dmeg.CreateLine3D(startPos.toGlm(), endPos.toGlm(), 20.0f, color, "line", nodes["Copy"]);
+}
 
-void ENGI::GameEngine::drawPoint3D(glm::vec3 position, float pointSize, DarkMoon::Color color, const char* nodeName, DarkMoon::Node* parentNode) {
-    dmeg.CreatePoint3D(position, pointSize, color, nodeName, parentNode);
+void ENGI::GameEngine::drawPoint3D(vec3d position, float pointSize, Color color) {
+    dmeg.CreatePoint3D(position.toGlm(), pointSize, color, "point", nodes["Particles"]);
+}
+
+void ENGI::GameEngine::drawCubeWires(vec3d position, vec3d size, Color color) {
+    dmeg.CreateCubeWires(position.toGlm(), size.toGlm(), color, "wires", nodes["Copy"]);
 }
 
 // void ENGI::GameEngine::drawModel(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint) {
@@ -332,6 +341,9 @@ void ENGI::GameEngine::drawRectangle(int, int, int, int, Color) {
 
 void ENGI::GameEngine::drawNode(DarkMoon::Node* node, vec2i pos, vec2f scale) {
     scale *= { widthRate, heightRate };
+
+    if (pos == vec2i(-1, -1))
+        pos = { static_cast<int>(node->getTranslation().x), static_cast<int>(node->getTranslation().y) };
 
     node->setTranslation({ pos.x, pos.y, 0.0f });
     node->setScale({ scale.x, scale.y, 1.0f });
@@ -352,8 +364,8 @@ void ENGI::GameEngine::drawTriangle(vec2d, vec2d, vec2d, Color) {
 
 ////// TEXT //////
 
-void ENGI::GameEngine::drawText(const char*, int, int, int, Color) {
-    //DrawText(text, posX, posY, fontSize, color);
+void ENGI::GameEngine::drawText(const char* text, int x, int y, int fontSize, Color c, DarkMoon::Aligned align) {
+    dmeg.CreateText({ x, y }, text, getDefaultFont(), fontSize, c, align, "text", nodes["TextCopy"]);
 }
 
 Font* ENGI::GameEngine::getFontDefault() {
@@ -737,7 +749,7 @@ DarkMoon::Node* ENGI::GameEngine::createNode(DarkMoon::Node* copyNode, DarkMoon:
     return dmeg.CreateNodeCopy(copyNode, parentNode);
 }
 
-DarkMoon::Node* ENGI::GameEngine::createRectangle(vec2d pos, vec2d size, DarkMoon::Color color, const char* name, DarkMoon::Node* parentNode)
+DarkMoon::Node* ENGI::GameEngine::createRectangle(vec2d pos, vec2d size, Color color, const char* name, DarkMoon::Node* parentNode)
 {
     if (!nodes[name])
         nodes[name] = dmeg.CreateRectangle({ pos.x, pos.y }, { size.x, size.y }, color, name, parentNode);
@@ -745,7 +757,7 @@ DarkMoon::Node* ENGI::GameEngine::createRectangle(vec2d pos, vec2d size, DarkMoo
     return nodes[name];
 }
 
-DarkMoon::Node* ENGI::GameEngine::createTextBox(glm::vec2 position, glm::vec2 size, DarkMoon::Color boxColor, std::string text, DarkMoon::Font* font, int fontSize, DarkMoon::Color textColor, DarkMoon::Aligned verticalAligned, DarkMoon::Aligned horizontalAligned, const char* nodeName, DarkMoon::Node* parentNode)
+DarkMoon::Node* ENGI::GameEngine::createTextBox(glm::vec2 position, glm::vec2 size, Color boxColor, std::string text, DarkMoon::Font* font, int fontSize, Color textColor, DarkMoon::Aligned verticalAligned, DarkMoon::Aligned horizontalAligned, const char* nodeName, DarkMoon::Node* parentNode)
 {
     if (!nodes[nodeName])
         nodes[nodeName] = dmeg.CreateTextBox(position, size, boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned, nodeName, parentNode);
@@ -753,10 +765,10 @@ DarkMoon::Node* ENGI::GameEngine::createTextBox(glm::vec2 position, glm::vec2 si
     return nodes[nodeName];
 }
 
-DarkMoon::Node* ENGI::GameEngine::createText(glm::vec2 position, std::string text, DarkMoon::Font* font, int fontSize, DarkMoon::Color color, const char* nodeName, DarkMoon::Node* parentNode)
+DarkMoon::Node* ENGI::GameEngine::createText(glm::vec2 position, std::string text, DarkMoon::Font* font, int fontSize, Color color, const char* nodeName, DarkMoon::Node* parentNode, Align align)
 {
     if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreateText(position, text, font, fontSize, color, nodeName, parentNode);
+        nodes[nodeName] = dmeg.CreateText(position, text, font, fontSize, color, align, nodeName, parentNode);
 
     return nodes[nodeName];
 }

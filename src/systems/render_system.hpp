@@ -61,7 +61,7 @@ private:
     void drawStaff(GameEngine& engine, EntityManager& em);
     void drawLockInfo(GameEngine& engine, EntityManager& em);
     void drawBoatParts(GameEngine& engine, EntityManager& em);
-    void drawDebugPhysics(GameEngine& engine, EntityManager& em, LevelInfo& li);
+    void drawDebugPhysics(GameEngine& engine, EntityManager& em);
     void drawAnimatedTextures(GameEngine& engine);
     void drawCheatMenu(GameEngine& engine, EntityManager& em);
     void drawSmallButtons(GameEngine& engine, const std::string& name, int posX, int posY, int width, int height);
@@ -81,6 +81,7 @@ private:
     bool isSelected{ false };
     bool isSelectedfordebug{ false };
     std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
+    double pointedDistance{ std::numeric_limits<double>::max() };
     std::map<std::string, AnimatedTexture> animatedTextures{};
     // bool chunk0Charged{ false };
     // bool chunk1Charged{ false };

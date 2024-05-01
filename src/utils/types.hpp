@@ -221,3 +221,4 @@ using FrustPos = FrustumInfo::Position;
 using FrustOut = MP::TypeList<GroundTag, NPCTag>;
 using Color = DarkMoon::Color;
 using Font = DarkMoon::Font;
+using Align = DarkMoon::Aligned;

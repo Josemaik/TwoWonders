@@ -8,7 +8,7 @@ namespace DarkMoon {
         m_rootNode->name = "Scene";
 
         // Create Default Light
-        CreateDirectionalLight({0.0f, tan(-45.0f), -1.0f}, D_WHITE, "Default directional light", GetRootNode());
+        CreateDirectionalLight({ 0.0f, tan(-45.0f), -1.0f }, D_WHITE, "Default directional light", GetRootNode());
 
         // Create Default Camera
         auto eCamera = CreateCamera("Default Camera", GetRootNode());
@@ -152,11 +152,11 @@ namespace DarkMoon {
     // GUI
 
     // Create text in node
-    Node* DarkMoonEngine::CreateText(glm::vec2 position, std::string text, Font* font, int fontSize, Color color, const char* nodeName, Node* parentNode) {
+    Node* DarkMoonEngine::CreateText(glm::vec2 position, std::string text, Font* font, int fontSize, Color color, Aligned align, const char* nodeName, Node* parentNode) {
         auto p_nodeText = CreateNode(nodeName, parentNode);
 
         // Create text
-        auto textE = std::make_unique<Text>(position, text, font, fontSize, color);
+        auto textE = std::make_unique<Text>(position, text, font, fontSize, color, align);
 
         p_nodeText->translate({ position.x, position.y, 0.0f });
         p_nodeText->setEntity(std::move(textE));
@@ -314,7 +314,7 @@ namespace DarkMoon {
     // LIGHTS
 
     // Create point light in node
-    Node* DarkMoonEngine::CreatePointLight(glm::vec3 position, Color color, const char* nodeName, Node* parentNode){
+    Node* DarkMoonEngine::CreatePointLight(glm::vec3 position, Color color, const char* nodeName, Node* parentNode) {
         auto p_nodeLight = CreateNode(nodeName, parentNode);
         auto light = std::make_unique<PointLight>(position, color);
         p_nodeLight->setEntity(std::move(light));
@@ -326,7 +326,7 @@ namespace DarkMoon {
     }
 
     // Create directional light in node
-    Node* DarkMoonEngine::CreateDirectionalLight(glm::vec3 direction, Color color, const char* nodeName, Node* parentNode){
+    Node* DarkMoonEngine::CreateDirectionalLight(glm::vec3 direction, Color color, const char* nodeName, Node* parentNode) {
         auto p_nodeLight = CreateNode(nodeName, parentNode);
         auto light = std::make_unique<DirectionalLight>(direction, color);
         p_nodeLight->setEntity(std::move(light));
@@ -337,18 +337,18 @@ namespace DarkMoon {
     }
 
     // Update lights
-    void DarkMoonEngine::UpdateLights(Node* parentNode){
+    void DarkMoonEngine::UpdateLights(Node* parentNode) {
         m_renderManager.updateLights();
 
-        for(auto& child : parentNode->getChildren()){
-            if(child->getVisible()){
-                if(auto pLight = child->getEntity<PointLight>())
+        for (auto& child : parentNode->getChildren()) {
+            if (child->getVisible()) {
+                if (auto pLight = child->getEntity<PointLight>())
                     m_renderManager.pointLights.push_back(pLight);
-                else if(auto dLight = child->getEntity<DirectionalLight>())
+                else if (auto dLight = child->getEntity<DirectionalLight>())
                     m_renderManager.directionalLights.push_back(dLight);
             }
         }
-        
+
         m_renderManager.checkLights();
     }
 
@@ -474,7 +474,7 @@ namespace DarkMoon {
     }
 
     // Draw the scene
-    void DarkMoonEngine::Draw(Color clearColor){
+    void DarkMoonEngine::Draw(Color clearColor) {
         BeginDrawing();
         ClearBackground(clearColor);
         GetRootNode()->traverse(glm::mat4());

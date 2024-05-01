@@ -36,9 +36,11 @@ void RenderSystem::restartScene(GameEngine& engine)
     auto* dosde = getNode(engine, "2D");
     auto* menu = getNode(engine, "Menu");
     auto* copyNode = getNode(engine, "Copy");
+    auto* textCopy = getNode(engine, "TextCopy");
 
     particles->clearChildren();
     copyNode->clearChildren();
+    textCopy->clearChildren();
 
     tresde->setVisible(false);
     dosde->setVisible(false);
@@ -97,21 +99,21 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
         engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "JUGAR",
             engine.dmeg.GetDefaultFont(), 15,
             D_BLACK,
-            DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            Align::CENTER, Align::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton jugar", init);
 
         engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "CONFIGURACION",
             engine.dmeg.GetDefaultFont(), 15,
             D_BLACK,
-            DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            Align::CENTER, Align::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton configuracion", init);
 
         engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "SALIR",
             engine.dmeg.GetDefaultFont(), 15,
             D_BLACK,
-            DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            Align::CENTER, Align::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton salir", init);
     }
@@ -294,7 +296,7 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
 
     auto txtBox = engine.dmeg.CreateTextBox({ engine.getScreenWidth() / 2 - 100, engine.getScreenHeight() - 100 },
         { 200, 50 }, D_WHITE, "DALE A [E] PARA SALIR", engine.dmeg.GetDefaultFont(),
-        20, D_WHITE, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+        20, D_WHITE, Align::CENTER, Align::CENTER,
         "Texto controles", getNode(engine, "Menu"));
 
     auto entTxtBox = dynamic_cast<DarkMoon::TextBox*>(txtBox->getEntity());
@@ -338,43 +340,43 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
 
         engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "VOLVER",
             engine.dmeg.GetDefaultFont(), 15, D_BLACK,
-            DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            Align::CENTER, Align::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton volver", options);
 
         engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "800x600",
             engine.dmeg.GetDefaultFont(), 15, D_BLACK,
-            DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            Align::CENTER, Align::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton 800x600", options);
 
         engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "1280x720",
             engine.dmeg.GetDefaultFont(), 15, D_BLACK,
-            DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            Align::CENTER, Align::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton 1280x720", options);
 
         engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "1920x1080",
             engine.dmeg.GetDefaultFont(), 15, D_BLACK,
-            DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            Align::CENTER, Align::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton 1920x1080", options);
 
         engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "FULLSCREEN",
             engine.dmeg.GetDefaultFont(), 15, D_BLACK,
-            DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            Align::CENTER, Align::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton fullscreen", options);
 
         engine.dmeg.CreateButton({}, { buttonWidth + 50, buttonHeight }, "CONTROLES MANDO",
             engine.dmeg.GetDefaultFont(), 15, D_BLACK,
-            DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            Align::CENTER, Align::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton controles mando", options);
 
         engine.dmeg.CreateButton({}, { buttonWidth + 50, buttonHeight }, "CONTROLES TECLADO",
             engine.dmeg.GetDefaultFont(), 15, D_BLACK,
-            DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            Align::CENTER, Align::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton controles teclado", options);
 
@@ -563,9 +565,9 @@ void RenderSystem::drawPauseMenu(GameEngine&, EntityManager&)
     //         windowWidth,
     //         windowHeight
     //     };
-    //     engine.drawRectangleLinesEx(windowRect, 2, BLACK);
+    //     engine.drawRectangleLinesEx(windowRect, 2, D_BLACK);
     //     engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
-    //     engine.drawTextEx(engine.getFontDefault(), "PAUSA", vec2d{ windowRect.x + 100, windowRect.y + 40 }, 40, 1, BLACK);
+    //     engine.drawTextEx(engine.getFontDefault(), "PAUSA", vec2d{ windowRect.x + 100, windowRect.y + 40 }, 40, 1, D_BLACK);
 
     //     float posX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2.0f);
     //     float posY = static_cast<float>(engine.getScreenHeight() / 2) - (buttonHeight / .5f);
@@ -668,9 +670,9 @@ void RenderSystem::drawInventory(GameEngine&, EntityManager&)
     //     windowWidth,
     //     windowHeight
     // };
-    // engine.drawRectangleLinesEx(windowRect, 2, BLACK);
+    // engine.drawRectangleLinesEx(windowRect, 2, D_BLACK);
     // engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
-    // engine.drawTextEx(engine.getFontDefault(), "INVENTARIO", vec2d{ windowRect.x + 110, windowRect.y + 20 }, 40, 1, BLACK);
+    // engine.drawTextEx(engine.getFontDefault(), "INVENTARIO", vec2d{ windowRect.x + 110, windowRect.y + 20 }, 40, 1, D_BLACK);
 
     // auto& plfi = em.getSingleton<PlayerInfo>();
     // // auto& inpi = em.getSingleton<InputInfo>();
@@ -854,24 +856,24 @@ void RenderSystem::drawStory(GameEngine& engine) {
 
         engine.dmeg.CreateTextBox({ posX, posY }, { boxWidth, boxHeight }, D_WHITE,
             "¡Bienvenido a la aventura!", engine.getDefaultFont(), 40,
-            D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            D_BLACK, Align::CENTER, Align::CENTER,
             "Texto 1", hist);
         engine.dmeg.CreateTextBox({ posX, posY + 50 }, { boxWidth, boxHeight }, D_WHITE,
             "Estas perdido por el bosque y", engine.getDefaultFont(), 40,
-            D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            D_BLACK, Align::CENTER, Align::CENTER,
             "Texto 2", hist);
         engine.dmeg.CreateTextBox({ posX, posY + 100 }, { boxWidth, boxHeight }, D_WHITE,
             "debes encontrar a tu maestro.", engine.getDefaultFont(), 40,
-            D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            D_BLACK, Align::CENTER, Align::CENTER,
             "Texto 3", hist);
         engine.dmeg.CreateTextBox({ posX, posY + 150 }, { boxWidth, boxHeight }, D_WHITE,
             "¡Mucha suerte!", engine.getDefaultFont(), 40,
-            D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            D_BLACK, Align::CENTER, Align::CENTER,
             "Texto 4", hist);
 
         engine.dmeg.CreateTextBox({ posX, posY + 250 }, { boxWidth, boxHeight }, D_WHITE,
             "", engine.getDefaultFont(), 40,
-            D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER,
+            D_BLACK, Align::CENTER, Align::CENTER,
             "Texto 5", hist);
 
         for (auto& txtEl : hist->getChildren())
@@ -1053,12 +1055,12 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                         int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
                         if (orientationInDegreesInt % 90 == 0 && std::abs(orientationInDegreesInt) != 270 && std::abs(orientationInDegreesInt) != 90)
                         {
-                            // engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
+                            // engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), D_BLACK);
                             //std::cout << "Dibujando cubo\n";
                         }
                         else
                         {
-                            // engine.drawModelWires(r.model, pos, r.rotationVec, orientationInDegrees, scl, BLACK);
+                            // engine.drawModelWires(r.model, pos, r.rotationVec, orientationInDegrees, scl, D_BLACK);
                             //auto eModel = dynamic_cast<ModelType*>(r.node->getEntity());
                             //eModel->drawModel = true;
                             //eModel->drawWires = true;
@@ -1417,7 +1419,7 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
                 if (p.type == Particle::ParticleType::Pixel)
                 {
                     // Dibujamos 4 partćulas arriba, abajo, izquierda y derecha de la posición
-                    engine.drawPoint3D(p.position.toGlm(), 3.f, { p.r, p.g, p.b, p.a }, "particula", getNode(engine, "Particles"));
+                    engine.drawPoint3D(p.position.to_other<double>(), 3.f, { p.r, p.g, p.b, p.a });
                     // engine.dmeg.CreateLine3D(p.position.toGlm(), (p.position + vec3f{ 0.0f, .3f, 0.0f }).toGlm(), 1.5f, { p.r, p.g, p.b, p.a }, "particula", getNode(engine, "Particles"));
                     // engine.drawPoint3D(p.position.to_other<double>(), { p.r, p.g, p.b, p.a });
                     // engine.drawPoint3D((p.position + vec3f{ 0.0f, 0.1f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
@@ -1478,7 +1480,7 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
         drawHUD(em, engine);
 
     if (inpi.debugPhy)
-        drawDebugPhysics(engine, em, li);
+        drawDebugPhysics(engine, em);
 
     drawAlerts_IA(em, engine);
 
@@ -1544,7 +1546,7 @@ uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::ma
 //     auto& li = em.getSingleton<LevelInfo>();
 //     //Dibujado de titulo y ventana
 //     Rectangle windowRect = { static_cast<float>(engine.getScreenWidth() - 400), 300, 330, 430 };
-//     engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
+//     engine.drawRectangleLinesEx(windowRect, 2, D_GRAY);
 //     engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
 //     vec2d textPositionInfo = { static_cast<float>(engine.getScreenWidth() - 370), 320 };
 //     engine.drawTextEx(GetFontDefault(), "PATHFINDING", textPositionInfo, 20, 1, RED);
@@ -1764,7 +1766,7 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine&, EntityManager&)
     // float posX = static_cast<float>(engine.getScreenWidth() - 330);
     // int posText = static_cast<int>(posX + 10);
     // Rectangle windowRect = { posX, 80, 330, 230 };
-    // engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
+    // engine.drawRectangleLinesEx(windowRect, 2, D_GRAY);
     // engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
     // vec2d textPositionInfo = { static_cast<double>(posText), 90 };
     // engine.drawTextEx(engine.getFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
@@ -1788,9 +1790,9 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine&, EntityManager&)
     //         engine.beginMode3D();
     //         engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
     //         engine.endMode3D();
-    //         engine.drawText("ID:", posText, 110, 20, BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(e.getID()).c_str(), vec2d{ static_cast<double>(posText) + 90.0,110 }, 20, 1, DARKGRAY);
-    //         engine.drawText("Node active:", posText, 130, 20, BLACK);
+    //         engine.drawText("ID:", posText, 110, 20, D_BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(e.getID()).c_str(), vec2d{ static_cast<double>(posText) + 90.0,110 }, 20, 1, D_GRAY);
+    //         engine.drawText("Node active:", posText, 130, 20, D_BLACK);
     //         // std::cout << debugsnglt.elapsed << "\n";
     //          // std::cout << debugsnglt.countdown << "\n";
     //         if (debugsnglt.elapsed >= debugsnglt.countdown) {
@@ -1800,24 +1802,24 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine&, EntityManager&)
     //         else {
     //             debugsnglt.plusDeltatime(timeStep, debugsnglt.elapsed);
     //         }
-    //         engine.drawTextEx(engine.getFontDefault(), debugsnglt.text, vec2d{ static_cast<double>(posText) + 130.0,130 }, 20, 1, DARKGRAY);
-    //         engine.drawText("TEID:", posText, 150, 20, BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.teid).c_str(), vec2d{ static_cast<double>(posText) + 90.0,150 }, 20, 1, DARKGRAY);
-    //         engine.drawText("TX:", posText, 170, 20, BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tx).c_str(), vec2d{ static_cast<double>(posText) + 80.0,170 }, 20, 1, DARKGRAY);
-    //         engine.drawText("TZ:", posText, 190, 20, BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tz).c_str(), vec2d{ static_cast<double>(posText) + 80.0,190 }, 20, 1, DARKGRAY);
-    //         engine.drawText("Culldown:", posText, 210, 20, BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), vec2d{ static_cast<double>(posText) + 90.0,210 }, 20, 1, DARKGRAY);
-    //         engine.drawText("Player Detected?:", posText, 230, 20, BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), debugsnglt.text, vec2d{ static_cast<double>(posText) + 130.0,130 }, 20, 1, D_GRAY);
+    //         engine.drawText("TEID:", posText, 150, 20, D_BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.teid).c_str(), vec2d{ static_cast<double>(posText) + 90.0,150 }, 20, 1, D_GRAY);
+    //         engine.drawText("TX:", posText, 170, 20, D_BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tx).c_str(), vec2d{ static_cast<double>(posText) + 80.0,170 }, 20, 1, D_GRAY);
+    //         engine.drawText("TZ:", posText, 190, 20, D_BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tz).c_str(), vec2d{ static_cast<double>(posText) + 80.0,190 }, 20, 1, D_GRAY);
+    //         engine.drawText("Culldown:", posText, 210, 20, D_BLACK);
+    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), vec2d{ static_cast<double>(posText) + 90.0,210 }, 20, 1, D_GRAY);
+    //         engine.drawText("Player Detected?:", posText, 230, 20, D_BLACK);
     //         engine.drawTextEx(engine.getFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,230 }, 20, 1, RED);
-    //         engine.drawText("Player hunted?:", posText, 250, 20, BLACK);
+    //         engine.drawText("Player hunted?:", posText, 250, 20, D_BLACK);
     //         engine.drawTextEx(engine.getFontDefault(), (bb.playerhunted == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,250 }, 20, 1, RED);
-    //         engine.drawText("Subditos alive:", posText, 270, 20, BLACK);
+    //         engine.drawText("Subditos alive:", posText, 270, 20, D_BLACK);
     //         engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.subditosData.size()).c_str(), vec2d{ static_cast<double>(posText) + 180.0,270 }, 20, 1, RED);
-    //         engine.drawText("Subditos id alive:", posText, 290, 20, BLACK);
+    //         engine.drawText("Subditos id alive:", posText, 290, 20, D_BLACK);
     //         engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), vec2d{ static_cast<double>(posText) + 180.0,290 }, 20, 1, RED);
-    //         engine.drawText("Alert state:", posText, 310, 20, BLACK);
+    //         engine.drawText("Alert state:", posText, 310, 20, D_BLACK);
     //         engine.drawTextEx(engine.getFontDefault(), (aic.alert_state == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,310 }, 20, 1, RED);
 
     //         engine.beginMode3D();
@@ -1872,10 +1874,9 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
 
     if (!nodeExists(engine, "editorIA"))
     {
-        auto* editAI = engine.createNode("Editor IA", getNode(engine, "Menu"));
-        engine.dmeg.CreateTextBox({ windowRectX, windowRectY }, { windowRectWidth, windowRectHeight }, { 255, 255, 255, 128 }, "Editor IA", engine.dmeg.GetDefaultFont(), 20, D_BLUE_DARK, DarkMoon::Aligned::TOP, DarkMoon::Aligned::LEFT, "Editor IA", editAI);
-        engine.dmeg.CreateLine({ windowRectX, windowRectY + 40 }, { windowRectWidth, windowRectY + 40 }, D_GRAY, "Linea horizontal", editAI);
-        engine.dmeg.CreateText({ windowRectX + 20, windowRectY + 50 }, "PARAMETROS", engine.dmeg.GetDefaultFont(), 20, D_RED, "text_parametros", editAI);
+        auto* editAI = engine.createNode("Editor IA", getNode(engine, "Debug"));
+        engine.createTextBox({ windowRectX, windowRectY }, { windowRectWidth, windowRectHeight }, { 255, 255, 255, 128 }, "Editor IA", engine.dmeg.GetDefaultFont(), 20, D_BLUE_DARK, Align::TOP, Align::LEFT, "Editor IA", editAI);
+        engine.createText({ windowRectX + 20, windowRectY + 50 }, "PARAMETROS", engine.dmeg.GetDefaultFont(), 20, D_RED, "text_parametros", editAI);
     }
 
     getNode(engine, "editorIA")->setVisible(true);
@@ -1889,7 +1890,7 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
     std::cout << "Origen: " << ray.origin.x() << " | " << ray.origin.y() << " | " << ray.origin.z() << "\n";
     std::cout << "Direccion: " << ray.direction.x() << " | " << ray.direction.y() << " | " << ray.direction.z() << "\n";
 
-    em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent&, PhysicsComponent&, ColliderComponent& col, RenderComponent&)
+    em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, PhysicsComponent& phy, ColliderComponent& col, RenderComponent& ren)
     {
         // Comprobar si el rayo intersecta con el collider
         if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
@@ -1897,42 +1898,37 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
                 isSelected = !isSelected;
                 debugsglt.IA_id = e.getID();
             }
-            //     // si es seleccionada => wires morados
-            //     // no es seleccionada => wires rojos
-            /*
-            engine.beginMode3D();
-            engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
-            engine.endMode3D();
-            */
+            // si es seleccionada => wires morados
+            // no es seleccionada => wires rojos
+
+            engine.drawCubeWires(ren.position, { ren.scale.x(), ren.scale.y(), ren.scale.z() }, D_RED);
+
             //std::cout << "hola\n";
         }
         if (isSelected && e.getID() == debugsglt.IA_id) {
-            std::cout << "ID: " << std::to_string(debugsglt.IA_id).c_str() << "\n";
-            /*
-            engine.beginMode3D();
-            engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
+
+            engine.drawCubeWires(ren.position, { ren.scale.x(), ren.scale.y(), ren.scale.z() }, D_VIOLET_DARK);
             engine.endMode3D();
             // si se seleccionada una entidad se muestra el Editor de parámetros
             if (isSelected) {
                 // ID DE LA ENTIDAD SELECCIONADA
-                engine.drawText("EID:", 15, 170, 20, BLACK);
-                engine.drawText(std::to_string(debugsglt.IA_id).c_str(), 55, 170, 20, DARKGRAY);
-                //Detect Radius
-                aic.detect_radius = SelectValue(engine, aic.detect_radius, 145.0, 200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
-                // Attack Radius
-                aic.attack_radius = SelectValue(engine, aic.attack_radius, 145.0, 240.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
-                // Arrival Radius
-                aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 145.0, 280.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
-                // Max Speed
-                phy.max_speed = SelectValue(engine, phy.max_speed, 145.0, 320.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
-                //COuntdown Perception
-                aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 145.0, 360.0, 120.0, 30.0, "Perception", 0.0, 10.0);
-                //Countdown Shoot
-                aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 145.0, 400.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
-                //Countdown stop
-                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 145.0, 440.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
+                // engine.drawText("EID:", 15, 170, 20, D_BLACK);
+                // engine.drawText(std::to_string(debugsglt.IA_id).c_str(), 55, 170, 20, D_GRAY);
+                // //Detect Radius
+                // aic.detect_radius = SelectValue(engine, aic.detect_radius, 145.0, 200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
+                // // Attack Radius
+                // aic.attack_radius = SelectValue(engine, aic.attack_radius, 145.0, 240.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
+                // // Arrival Radius
+                // aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 145.0, 280.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
+                // // Max Speed
+                // phy.max_speed = SelectValue(engine, phy.max_speed, 145.0, 320.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
+                // //COuntdown Perception
+                // aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 145.0, 360.0, 120.0, 30.0, "Perception", 0.0, 10.0);
+                // //Countdown Shoot
+                // aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 145.0, 400.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
+                // //Countdown stop
+                // aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 145.0, 440.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
             }
-            */
         }
     });
 }
@@ -1961,7 +1957,7 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
                 // vec2d point3 = { barX + 30.0f, barY - 50.0f };
                 // //dibujar icono alerta
                 // // Dibuja el triángulo
-                // engine.drawTriangle(point1, point2, point3, BLACK);
+                // engine.drawTriangle(point1, point2, point3, D_BLACK);
                 // // Dibuja el signo de exclamación dentro del triángulo
                 // engine.drawText("!", static_cast<int>(barX - 2), static_cast<int>(barY - 100), 50, YELLOW);
                 auto* icon = engine.createNode(getNode(engine, "detectionIcon"), getNode(engine, "Copy"));
@@ -2105,7 +2101,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
             //     // Dibujamos una barra de vida para el escudo si es que tiene uno activo
             //     if (sub.activeShield)
             //     {
-            //         engine.drawRectangle(barX, barY - 10, barWidth, barHeight, DARKGRAY);
+            //         engine.drawRectangle(barX, barY - 10, barWidth, barHeight, D_GRAY);
             //         float normalizedShieldLife = (static_cast<float>(sub.shieldLife) / static_cast<float>(sub.maxShieldLife));
 
             //         // Calcula la anchura de la barra de vida
@@ -2281,93 +2277,6 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
         if (li.mapID == 2 && li.volcanoMission)
             drawBoatParts(engine, em);
 
-        // if ((li.mapID == 0 || li.mapID == 1) && e.hasComponent<AttackComponent>())
-        // {
-        //     if (!li.tutorialEnemies.empty())
-        //     {
-        //         for (auto& enemy : li.tutorialEnemies)
-        //         {
-        //             auto& ene = *em.getEntityByID(enemy);
-        //             if (ene.hasComponent<RenderComponent>())
-        //             {
-        //                 auto& ren{ em.getComponent<RenderComponent>(ene) };
-        //                 auto& phy{ em.getComponent<PhysicsComponent>(ene) };
-        //                 if (ren.visible && (ene.hasTag<DummyTag>() || ene.hasTag<DestructibleTag>()))
-        //                 {
-        //                     int aux_width = 134;
-        //                     double multiplier = 55.0;
-
-        //                     DarkMoon::Node* animText;
-
-        //                     if (li.lockedEnemy == li.max)
-        //                     {
-        //                         if (engine.isGamepadAvailable(0))
-        //                             animText = engine.nodes_sceneAnimatedTexture["circulo"];
-        //                         else {
-        //                             animText = engine.nodes_sceneAnimatedTexture["f"];
-        //                             aux_width = 102;
-        //                         }
-        //                     }
-        //                     else
-        //                     {
-        //                         if (engine.isGamepadAvailable(0))
-        //                             animText = engine.nodes_sceneAnimatedTexture["cuadrado"];
-        //                         else {
-        //                             animText = engine.nodes_sceneAnimatedTexture["espacio"];
-        //                             aux_width = 292;
-        //                         }
-        //                     }
-
-        //                     if (ene.hasTag<DestructibleTag>())
-        //                         multiplier = 8.0;
-        //                     else if (li.mapID == 1)
-        //                         multiplier = 25.0;
-
-        //                     aux_width = aux_width / 2;
-
-        //                     int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - aux_width / 2;
-        //                     int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * multiplier);
-
-        //                     animText->setTranslation({ posX, posY, 0.0f });
-        //                     animText->setScale({ 0.5f, 0.5f, 1.0f });
-
-        //                     animText->setVisible(true);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
-        // if (li.num_zone == 1 && elapsed_WASD < elapsed_limit_WASD)
-        // {
-        //     auto& phy{ em.getComponent<PhysicsComponent>(e) };
-
-        //     // Mostramos gif de joystick para moverse o texto WASD
-        //     if (engine.isGamepadAvailable(0))
-        //     {
-        //         auto joystickL = engine.nodes_sceneAnimatedTexture["joystickL"];
-        //         int posX = static_cast<int>(engine.getWorldToScreenX(phy.position) - 40);
-        //         int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 37);
-
-        //         joystickL->setTranslation({ posX, posY, 0.0f });
-        //         joystickL->setScale({ 0.5f, 0.5f, 0.5f });
-
-        //         joystickL->setVisible(true);
-        //     }
-        //     else
-        //     {
-        //         std::string text = "WASD para moverse";
-
-        //         engine.drawText(text.c_str(),
-        //             static_cast<int>(engine.getWorldToScreenX(phy.position) - 120),
-        //             static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 25),
-        //             20,
-        //             D_WHITE);
-        //     }
-
-        //     elapsed_WASD += 1.0f / 60.0f;
-        // }
-
         if ((li.mapID == 0 || li.mapID == 1) && pl.hasComponent<AttackComponent>() && !li.tutorialEnemies.empty())
         {
 
@@ -2512,8 +2421,13 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
     }
 }
 
-void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, LevelInfo& li)
+void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em)
 {
+    RayCast ray = engine.getMouseRay();
+    pointedEntity = std::numeric_limits<std::size_t>::max();
+    pointedDistance = std::numeric_limits<double>::max();
+    vec3d auxPointed{};
+    int k = 0;
     for (auto const& e : em.getEntities())
     {
         if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
@@ -2521,11 +2435,12 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, Level
             auto const& r{ em.getComponent<RenderComponent>(e) };
             auto const& l{ em.getComponent<LifeComponent>(e) };
 
+            auto point = r.position.y() + r.scale.y() / 2 + 50;
             engine.drawText(std::to_string(l.life).c_str(),
-                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 8.0),
+                static_cast<int>(engine.getWorldToScreenX(r.position)),
+                static_cast<int>(engine.getWorldToScreenY(r.position) - point),
                 20,
-                D_BLACK);
+                D_BLACK, Align::CENTER);
 
             if (e.hasComponent<TypeComponent>())
             {
@@ -2550,9 +2465,10 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, Level
                     color = D_RED;
                 }
 
+                auto point = r.position.y() + r.scale.y() / 2 - 40;
                 engine.drawText(tipo.c_str(),
                     static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                    static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 70),
+                    static_cast<int>(engine.getWorldToScreenY(r.position) - point),
                     20,
                     color);
             }
@@ -2572,7 +2488,7 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, Level
 
         if (e.hasComponent<RampComponent>() && e.hasComponent<PhysicsComponent>())
         {
-            // Dibujamos el rectángulo de la rampa
+            // // Dibujamos el rectángulo de la rampa
             auto& phy = em.getComponent<PhysicsComponent>(e);
             auto& rc = em.getComponent<RampComponent>(e);
             // La rampa solo tiene vec2d mínimos y máximos, vamos a dibujar el rectángulo que los une
@@ -2580,106 +2496,92 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, Level
                 static_cast<int>(engine.getWorldToScreenX(phy.position) - 5),
                 static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 5),
                 20, D_RED);
-            // engine.beginMode3D();
-            // engine.drawCubeWires(phy.position, static_cast<float>(phy.scale.x()), static_cast<float>(phy.scale.y()), static_cast<float>(phy.scale.z()), D_RED);
-            // engine.endMode3D();
+            engine.drawCubeWires(phy.position, { phy.scale.x(), phy.scale.y(), phy.scale.z() }, D_RED);
         }
 
         if (e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
         {
+            auto& phy{ em.getComponent<PhysicsComponent>(e) };
             auto& col{ em.getComponent<ColliderComponent>(e) };
 
-            // Calcular la posición y el tamaño de la bounding box
-            // vec3d boxPosition = (col.bbox.min + col.bbox.max) / 2;
-            // vec3d boxSize = col.bbox.max - col.bbox.min;
+            // // Calcular la posición y el tamaño de la bounding box
+            vec3d boxPosition = (col.bbox.min + col.bbox.max) / 2;
+            vec3d boxSize = col.bbox.max - col.bbox.min;
 
             Color color = D_BLUE;
             if (col.behaviorType & BehaviorType::ZONE)
                 color = D_GREEN;
 
-            // Dibujar la bounding box
-            //engine.beginMode3D();
-            //engine.drawCubeWires(boxPosition,
-            //    static_cast<float>(boxSize.x()),
-            //    static_cast<float>(boxSize.y()),
-            //    static_cast<float>(boxSize.z()),
-            //    color);
-            //engine.endMode3D();
-
-            auto& phy = em.getComponent<PhysicsComponent>(e);
-
-            RayCast ray = engine.getMouseRay();
-
-            //std::cout << ray.origin << " " << ray.direction << std::endl;
-
-            // auto& ren = em.getComponent<RenderComponent>(e);
             bool notStatic = !(col.behaviorType & BehaviorType::ZONE);
+
             // Comprobar si el rayo intersecta con el collider
-
-            if (col.bbox.intersectsRay(ray.origin, ray.direction) && notStatic && pointedEntity != li.playerID)
+            if (col.bbox.intersectsRay(ray.origin, ray.direction, auxPointed) && notStatic)
             {
-                pointedEntity = e.getID();
-
-                // auto& col{ em.getComponent<ColliderComponent>(e) };
-
-                // Calcular la posición y el tamaño de la bounding box
-                // vec3d boxPosition = (col.bbox.min + col.bbox.max) / 2;
-                // vec3d boxSize = col.bbox.max - col.bbox.min;
-
-                // Dibujar la bounding box
-                // engine.beginMode3D();
-                // engine.drawCubeWires(boxPosition,
-                //     static_cast<float>(boxSize.x()),
-                //     static_cast<float>(boxSize.y()),
-                //     static_cast<float>(boxSize.z()),
-                //     D_VIOLET);
-                // engine.endMode3D();
-
-                // engine.beginMode3D();
-                // engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), D_RED);
-                // engine.endMode3D();
-
-                // Dibujar el HUD de debug
-                engine.drawRectangle(0, 65, 150, 360, D_WHITE);
-                engine.drawText("Posición", 10, 70, 20, D_BLACK);
-                std::string posX = "X: " + std::to_string(phy.position.x());
-                engine.drawText(posX.c_str(), 10, 95, 20, D_BLACK);
-                std::string posY = "Y: " + std::to_string(phy.position.y());
-                engine.drawText(posY.c_str(), 10, 120, 20, D_BLACK);
-                std::string posZ = "Z: " + std::to_string(phy.position.z());
-                engine.drawText(posZ.c_str(), 10, 145, 20, D_BLACK);
-
-                engine.drawText("Escala", 10, 175, 20, D_BLACK);
-                std::string sclX = "X: " + std::to_string(phy.scale.x());
-                engine.drawText(sclX.c_str(), 10, 200, 20, D_BLACK);
-                std::string sclY = "Y: " + std::to_string(phy.scale.y());
-                engine.drawText(sclY.c_str(), 10, 225, 20, D_BLACK);
-                std::string sclZ = "Z: " + std::to_string(phy.scale.z());
-                engine.drawText(sclZ.c_str(), 10, 250, 20, D_BLACK);
-
-                engine.drawText("Velocidad", 10, 280, 20, D_BLACK);
-                std::string velX = "X: " + std::to_string(phy.velocity.x());
-                engine.drawText(velX.c_str(), 10, 305, 20, D_BLACK);
-                std::string velY = "Y: " + std::to_string(phy.velocity.y());
-                engine.drawText(velY.c_str(), 10, 330, 20, D_BLACK);
-                std::string velZ = "Z: " + std::to_string(phy.velocity.z());
-                engine.drawText(velZ.c_str(), 10, 355, 20, D_BLACK);
-
-                std::string id = "ID: " + std::to_string(e.getID());
-                engine.drawText(id.c_str(), 10, 385, 20, D_BLACK);
+                auto dist = auxPointed.distance(ray.origin);
+                if (pointedDistance > dist)
+                {
+                    pointedEntity = e.getID();
+                    pointedDistance = dist;
+                }
             }
-        }
 
-        // Dibujar el ID de las entidades // DEBUG
-        if (e.hasComponent<RenderComponent>())
-        {
-            auto const& r{ em.getComponent<RenderComponent>(e) };
-            engine.drawText(std::to_string(e.getID()).c_str(),
-                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
-                20,
-                D_BLACK);
+            if (e.getID() != pointedEntity)
+                engine.drawCubeWires(boxPosition,
+                    { static_cast<float>(boxSize.x()),
+                    static_cast<float>(boxSize.y()),
+                    static_cast<float>(boxSize.z()), },
+                    color);
+
+            // Dibujar el ID de las entidades // DEBUG
+            // if (e.hasComponent<RenderComponent>())
+            // {
+            //     auto const& r{ em.getComponent<RenderComponent>(e) };
+            //     auto point = r.position.y() + r.scale.y() / 2;
+            //     engine.drawText(std::to_string(e.getID()).c_str(),
+            //         static_cast<int>(engine.getWorldToScreenX(r.position)),
+            //         static_cast<int>(engine.getWorldToScreenY(r.position) - point - 30),
+            //         20,
+            //         c);
+            // }
         }
+    }
+
+    if (pointedEntity != std::numeric_limits<std::size_t>::max())
+    {
+        auto& e = *em.getEntityByID(pointedEntity);
+        auto& phy = em.getComponent<PhysicsComponent>(e);
+        engine.drawCubeWires(phy.position, { phy.scale.x(), phy.scale.y(), phy.scale.z() }, D_RED);
+
+        // Dibujar el HUD de debug
+        auto posTextX = 15;
+        engine.drawNode(getNode(engine, "debugRectPhy"));
+        engine.drawText("Posición", posTextX, 70, 20, D_BLACK);
+        std::string posX = "X: " + std::to_string(phy.position.x());
+        engine.drawText(posX.c_str(), posTextX, 95, 20, D_BLACK);
+        std::string posY = "Y: " + std::to_string(phy.position.y());
+        engine.drawText(posY.c_str(), posTextX, 120, 20, D_BLACK);
+        std::string posZ = "Z: " + std::to_string(phy.position.z());
+        engine.drawText(posZ.c_str(), posTextX, 145, 20, D_BLACK);
+
+        engine.drawText("Escala", posTextX, 175, 20, D_BLACK);
+        std::string sclX = "X: " + std::to_string(phy.scale.x());
+        engine.drawText(sclX.c_str(), posTextX, 200, 20, D_BLACK);
+        std::string sclY = "Y: " + std::to_string(phy.scale.y());
+        engine.drawText(sclY.c_str(), posTextX, 225, 20, D_BLACK);
+        std::string sclZ = "Z: " + std::to_string(phy.scale.z());
+        engine.drawText(sclZ.c_str(), posTextX, 250, 20, D_BLACK);
+
+        engine.drawText("Velocidad", posTextX, 280, 20, D_BLACK);
+        std::string velX = "X: " + std::to_string(phy.velocity.x());
+        engine.drawText(velX.c_str(), posTextX, 305, 20, D_BLACK);
+        std::string velY = "Y: " + std::to_string(phy.velocity.y());
+        engine.drawText(velY.c_str(), posTextX, 330, 20, D_BLACK);
+        std::string velZ = "Z: " + std::to_string(phy.velocity.z());
+        engine.drawText(velZ.c_str(), posTextX, 355, 20, D_BLACK);
+
+        std::string id = "ID: " + std::to_string(e.getID());
+        engine.drawText(id.c_str(), posTextX, 385, 20, D_BLACK);
+        getNode(engine, "TextCopy")->setVisibleOne(true);
     }
 }
 

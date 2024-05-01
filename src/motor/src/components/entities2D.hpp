@@ -219,6 +219,7 @@ namespace DarkMoon {
     };
 
     // GUI
+    enum struct Aligned { LEFT, CENTER, RIGHT, TOP, BOTTOM };
 
     struct Text : Entity {
         glm::vec2 position{};
@@ -230,14 +231,21 @@ namespace DarkMoon {
         float maxWidth{};
         float maxHeight{};
         std::vector<float> widths{};
+        Aligned alignment{};
 
         GLuint VAO{}, VBO{};
         GLint textColorLocation{};
         RenderManager* rm{ nullptr };
+        WindowsManager* wm{ nullptr };
+        float ratio{};
 
-        Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK)
-            : position(pos), font(f), fontSize(fS), color(col) {
-            scale = static_cast<float>(fontSize) / 48.0f;
+        Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK, Aligned al = Aligned::LEFT)
+            : position(pos), font(f), fontSize(fS), color(col), alignment(al)
+        {
+            // Get ratio
+            wm = &WindowsManager::getInstance();
+            ratio = wm->getHeightRatio();
+
             setText(txt);
 
             // Buffers
@@ -261,6 +269,10 @@ namespace DarkMoon {
                 // Reset values
                 widths.clear();
                 float lineWidth = position.x;
+
+                // Seteamos la escala con el ratio
+                scale = static_cast<float>(fontSize) / 34.0f * ratio;
+
                 for (wchar_t c : textW) {
                     if (c == '\n') {
                         widths.push_back(lineWidth - position.x);
@@ -324,6 +336,14 @@ namespace DarkMoon {
         void draw(glm::mat4 transMatrix) override {
             RenderManager& rm = RenderManager::getInstance();
 
+            if (ratio != wm->getHeightRatio())
+            {
+                auto lastRatio = ratio;
+                ratio = wm->getHeightRatio();
+                for (auto& w : widths)
+                    w *= ratio / lastRatio;
+            }
+
             rm.useShader(rm.shaders["text"]);
 
             position = glm::vec2(transMatrix[3][0], transMatrix[3][1]);
@@ -340,8 +360,14 @@ namespace DarkMoon {
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-            scale = static_cast<float>(fontSize) / 48.0f;
-            float aux_x = position.x - widths[0] / 2;
+            // Assign the position
+            float aux_x = position.x;
+
+            if (alignment == Aligned::CENTER)
+                aux_x -= widths[0] / 2;
+            else if (alignment == Aligned::RIGHT)
+                aux_x -= -widths[0];
+
             int numLines = 1;
 
             for (wchar_t& c : text) {
@@ -367,7 +393,13 @@ namespace DarkMoon {
             for (wchar_t& c : text) {
                 if (c == '\n') {
                     // Reset the x position to the start of the line
-                    aux_x = position.x - widths[i] / 2;
+                    aux_x = position.x;
+
+                    if (alignment == Aligned::CENTER)
+                        aux_x -= widths[i] / 2;
+                    else
+                        aux_x -= widths[i];
+
                     i += 1;
                     position.y += maxHeight * 1.2f;
                     // Skip the rest of the loop
@@ -430,8 +462,6 @@ namespace DarkMoon {
         std::wstring text{};
     };
 
-    enum struct Aligned { LEFT, CENTER, RIGHT, TOP, BOTTOM };
-
     struct TextBox : Entity {
         Rectangle box;
         Rectangle boxBackground;
@@ -452,7 +482,7 @@ namespace DarkMoon {
             Color tCol = D_BLACK,
             Aligned verAl = Aligned::CENTER,
             Aligned horAl = Aligned::CENTER) :
-            box(pos, sz, bCol), boxBackground({ pos.x - 1, pos.y - 1 }, { sz.x + 2, sz.y + 2 }, D_GRAY), text(pos, txt, f, fS, tCol), verAligned(verAl), horAligned(horAl) {};
+            box(pos, sz, bCol), boxBackground({ pos.x - 1, pos.y - 1 }, { sz.x + 2, sz.y + 2 }, D_GRAY), text(pos, txt, f, fS, tCol, horAl), verAligned(verAl), horAligned(horAl) {};
 
         void draw(glm::mat4 transMatrix) override {
             if (drawBox) {

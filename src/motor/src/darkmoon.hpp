@@ -52,7 +52,7 @@ namespace DarkMoon {
         // GUI
 
         // Create text in node
-        Node* CreateText(glm::vec2 position, std::string text, Font* font, int fontSize, Color color, const char* nodeName, Node* parentNode);
+        Node* CreateText(glm::vec2 position, std::string text, Font* font, int fontSize, Color color, Aligned align, const char* nodeName, Node* parentNode);
         // Create a text box in node
         Node* CreateTextBox(glm::vec2 position, glm::vec2 size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode);
         // Create a button in node
@@ -95,7 +95,7 @@ namespace DarkMoon {
         // Create directional light in node
         Node* CreateDirectionalLight(glm::vec3 direction, Color color, const char* nodeName, Node* parentNode);
         // Active lights
-        void ToggleLights(){ m_renderManager.activeLights = !m_renderManager.activeLights; };
+        void ToggleLights() { m_renderManager.activeLights = !m_renderManager.activeLights; };
         // Update lights
         void UpdateLights(Node* parentNode);
 

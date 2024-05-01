@@ -29,6 +29,8 @@ namespace DarkMoon {
 
         glm::vec3 front{ 0.0f, 0.0f, -1.0f };
         glm::vec3 right;
+        glm::vec2 mousePos{ 0.0f, 0.0f };
+        Ray rayFromMouse{};
         float fovy{ 60.0f };
 
         Camera() {
@@ -44,9 +46,9 @@ namespace DarkMoon {
         glm::mat4 getProjectionMatrix(int screenWidth, int screenHeight) const {
             // Camera Perspective
             if (cameraProjection == CameraProjection::CAMERA_PERSPECTIVE) {
-                return glm::perspective(glm::radians(fovy), 
-                                        static_cast<float>(screenWidth) / static_cast<float>(screenHeight), 
-                                        0.1f, 100.0f);
+                return glm::perspective(glm::radians(fovy),
+                    static_cast<float>(screenWidth) / static_cast<float>(screenHeight),
+                    0.1f, 100.0f);
             }
             // Camera Orthographic
             else if (cameraProjection == CameraProjection::CAMERA_ORTHOGRAPHIC) {
@@ -60,36 +62,57 @@ namespace DarkMoon {
             return glm::mat4(1.0f);
         }
 
-        Ray getMouseRay(int mouseX, int mouseY, int screenWidth, int screenHeight) {            
-            Ray ray = {};
-
-            // Normalized device coordinates
+        Ray getMouseRay(int mouseX, int mouseY, int screenWidth, int screenHeight) {
+            if (mousePos != glm::vec2(mouseX, mouseY)) {
+                mousePos = glm::vec2(mouseX, mouseY);
+            }
+            else
+                return rayFromMouse;
             float x = (2.0f * static_cast<float>(mouseX)) / static_cast<float>(screenWidth) - 1.0f;
             float y = 1.0f - (2.0f * static_cast<float>(mouseY)) / static_cast<float>(screenHeight);
             float z = 1.0f;
 
-            glm::vec3 deviceCoords = { x, y, z };
+            glm::vec3 deviceCords(x, y, z);
+            float aspect = static_cast<float>(screenWidth) / static_cast<float>(screenHeight);
+            float top = fovy / 2.0f;
+            float right = top * aspect;
 
-            // View matrix and projection matrix
-            auto matView = getViewMatrix();
-            auto matProj = getProjectionMatrix(screenWidth, screenHeight);
+            auto matPro = glm::ortho(-right, right, -top, top, 0.01f, 1000.0f);
 
-            // Unproject far/near points
-            glm::vec3 nearPoint = glm::unProject(glm::vec3(deviceCoords.x, deviceCoords.y, 0.0f), matView, matProj, glm::vec4(0, 0, screenWidth, screenHeight));
-            glm::vec3 farPoint = glm::unProject(glm::vec3(deviceCoords.x, deviceCoords.y, 1.0f), matView, matProj, glm::vec4(0, 0, screenWidth, screenHeight));
-            
-            // Normalize direction vector
-            ray.direction = glm::normalize(farPoint - nearPoint);
+            glm::vec3 nearPoint = unproject(glm::vec3(deviceCords.x, deviceCords.y, 0.0f), matPro, getViewMatrix());
+            glm::vec3 farPoint = unproject(glm::vec3(deviceCords.x, deviceCords.y, 1.0f), matPro, getViewMatrix());
+            glm::vec3 cameraPlanePointerPos = unproject(glm::vec3(deviceCords.x, deviceCords.y, -1.0f), matPro, getViewMatrix());
 
-            // Unproject mouse cursor in the near plane
-            glm::vec3 cameraPlanePointerPos = glm::unProject(glm::vec3(deviceCoords.x, deviceCoords.y, -1.0f), matView, matProj, glm::vec4(0, 0, screenWidth, screenHeight));
+            glm::vec3 rayWorld = glm::normalize(farPoint - nearPoint);
 
-            if(this->cameraProjection == CameraProjection::CAMERA_PERSPECTIVE)
-                ray.origin = this->position;
-            else if(this->cameraProjection == CameraProjection::CAMERA_ORTHOGRAPHIC)
-                ray.origin = cameraPlanePointerPos;
+            rayFromMouse.origin = cameraPlanePointerPos;
+            rayFromMouse.direction = rayWorld;
 
-            return ray;
+            return rayFromMouse;
+        }
+
+        glm::vec3 unproject(glm::vec3 source, glm::mat4 projection, glm::mat4 view)
+        {
+            glm::vec3 result = glm::vec3(0.0f);
+
+            // Calculate unprojected matrix (multiply view matrix by projection matrix) and invert it
+            glm::mat4 matViewProj = projection * view;
+
+            // Calculate inverted matrix
+            glm::mat4 matViewProjInv = glm::inverse(matViewProj);
+
+            // Create vec4 from source point
+            glm::vec4 vec = glm::vec4(source, 1.0f);
+
+            // Multiply vec point by unprojected matrix
+            glm::vec4 transformed = matViewProjInv * vec;
+
+            // Normalized world points in vectors
+            result.x = transformed.x / transformed.w;
+            result.y = transformed.y / transformed.w;
+            result.z = transformed.z / transformed.w;
+
+            return result;
         }
 
         void updateCameraVectors() {

@@ -10,7 +10,7 @@ ifeq ($(OS),Windows_NT)
 else
 	CC 		   	:= g++-12
 	CCACHE 	   	:= ccache
-    LIBS 		:= -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so -lglfw -lGLEW -lGLU -lGL -lm -lassimp -lfreetype -lgif
+    LIBS 		:= -L./fmodlibs -lfmod -lfmodstudio -lglfw -lGLEW -lGLU -lGL -lm -lassimp -lfreetype -lgif
 	SANITIZE   	:= -fsanitize=address,undefined
 	LIBS_COPY  	:= fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13
 endif

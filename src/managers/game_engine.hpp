@@ -25,29 +25,29 @@ namespace ENGI {
 
         // Drawing
         void beginDrawing();
-        void clearBackground(DarkMoon::Color color);
+        void clearBackground(Color color);
         void drawGrid(int slices, float spacing);
         void endDrawing();
         void beginMode3D();
         void endMode3D();
         void drawLine3D(vec3d startPos, vec3d endPos, Color color);
-        void drawPoint3D(glm::vec3 position, float pointSize, DarkMoon::Color color, const char* nodeName, DarkMoon::Node* parentNode);
+        void drawPoint3D(vec3d position, float pointSize, Color color);
         void drawCube(vec3d pos, float width, float height, float lenght, Color color);
-        void drawCubeWires(vec3d pos, float width, float height, float lenght, Color color);
+        void drawCubeWires(vec3d position, vec3d size, Color color);
         // void drawModel(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
         // void drawModelWires(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
         void drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color);
 
         // Rectangle
         void drawRectangle(int posX, int posY, int width, int height, Color color);
-        DarkMoon::Node* createRectangle(vec2d pos, vec2d size, DarkMoon::Color color, const char* name, DarkMoon::Node* parentNode);
-        void drawNode(DarkMoon::Node* node, vec2i pos, vec2f scale = { 1.0f, 1.0f });
+        DarkMoon::Node* createRectangle(vec2d pos, vec2d size, Color color, const char* name, DarkMoon::Node* parentNode);
+        void drawNode(DarkMoon::Node* node, vec2i pos = { -1, -1 }, vec2f scale = { 1.0f, 1.0f });
         void drawCircle(int posX, int posY, float radius, Color color);
         void drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color);
         void drawTriangle(vec2d v1, vec2d v2, vec2d v3, Color color);
 
         // Text
-        void drawText(const char* text, int posX, int posY, int fontSize, Color color);
+        void drawText(const char* text, int posX, int posY, int fontSize, Color color, Align aligned = Align::LEFT);
         Font* getFontDefault();
 
         // Window
@@ -97,8 +97,8 @@ namespace ENGI {
         float getAspectRat();
         DarkMoon::Node* get2D();
         DarkMoon::Node* get3D();
-        DarkMoon::Node* createTextBox(glm::vec2 position, glm::vec2 size, DarkMoon::Color boxColor, std::string text, DarkMoon::Font* font, int fontSize, DarkMoon::Color textColor, DarkMoon::Aligned verticalAligned, DarkMoon::Aligned horizontalAligned, const char* nodeName, DarkMoon::Node* parentNode);
-        DarkMoon::Node* createText(glm::vec2 position, std::string text, DarkMoon::Font* font, int fontSize, DarkMoon::Color textColor, const char* nodeName, DarkMoon::Node* parentNode);
+        DarkMoon::Node* createTextBox(glm::vec2 position, glm::vec2 size, Color boxColor, std::string text, DarkMoon::Font* font, int fontSize, Color textColor, Align verticalAligned, Align horizontalAligned, const char* nodeName, DarkMoon::Node* parentNode);
+        DarkMoon::Node* createText(glm::vec2 position, std::string text, DarkMoon::Font* font, int fontSize, Color textColor, const char* nodeName, DarkMoon::Node* parentNode, Align align = Align::LEFT);
         DarkMoon::Font* getDefaultFont();
 
         // DarkMoon Engine //
