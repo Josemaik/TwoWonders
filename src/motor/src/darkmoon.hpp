@@ -81,14 +81,23 @@ namespace DarkMoon {
 
         // Create camera
         Camera* CreateCamera(const char* nodeName, Node* parentNode);
-        // Create light in node
-        Node* CreateLight(glm::vec3 position, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, const char* nodeName, Node* parentNode);
         // Get root node
         Node* GetRootNode();
         // Get default font
         Font* GetDefaultFont() { return m_renderManager.defaultFont; };
         // Get mouse ray cast
         Ray GetMouseRay();
+
+        // LIGHTS
+
+        // Create point light in node
+        Node* CreatePointLight(glm::vec3 position, Color color, const char* nodeName, Node* parentNode);
+        // Create directional light in node
+        Node* CreateDirectionalLight(glm::vec3 direction, Color color, const char* nodeName, Node* parentNode);
+        // Active lights
+        void ToggleLights(){ m_renderManager.activeLights = !m_renderManager.activeLights; };
+        // Update lights
+        void UpdateLights(Node* parentNode);
 
         // ------------------------ //
         // Window-related functions //
@@ -129,6 +138,8 @@ namespace DarkMoon {
         void BeginDrawing();
         // End canvas drawing and swap buffers
         void EndDrawing();
+        // Draw the scene
+        void Draw(Color clearColor = D_WHITE);
 
         // ------------------------ //
         // Texture Loading unctions //
@@ -147,24 +158,11 @@ namespace DarkMoon {
 
         // Load model from file into GPU memory
         std::unique_ptr<Model> LoadModel(const char* filePath);
-        // Load model from generated mesh ? TODO
 
         // Unload model data from CPU and GPU
         void UnloadModel(Model* model);
-
-        // ---------------------------------------- //
-        // Mesh management and generation functions //
-        // ---------------------------------------- //
-
-        // TODO
-        // Generate cuboid mesh
-        Mesh* GenerateMeshCube(float width, float height, float length);
         // Unload mesh data from CPU and GPU
         void UnloadMesh(Mesh* mesh);
-        // Draw mesh ?
-
-
-        // MATERIAL
 
         // --------------------------------- //
         // Input-related functions: keyboard //

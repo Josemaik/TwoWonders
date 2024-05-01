@@ -15,7 +15,7 @@ namespace DarkMoon {
             : position(pos), pointSize(pSize), color(c) {};
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
+            RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
 
@@ -58,6 +58,12 @@ namespace DarkMoon {
 
             // Bind default texture
             glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
+            
+            // Material
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Kd"), 1, glm::value_ptr(rm.defaultMaterial->getDiffuseColor()));
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ka"), 1, glm::value_ptr(rm.defaultMaterial->getAmbientColor()));
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ks"), 1, glm::value_ptr(rm.defaultMaterial->getSpecularColor()));
+            glUniform1f(glGetUniformLocation(rm.getShader()->getIDShader(), "Shininess"), rm.defaultMaterial->getShininess());
 
             // Draw the point
             glPointSize(pointSize);
@@ -85,7 +91,7 @@ namespace DarkMoon {
             : startPos(sP), endPos(eP), lineSize(lSize), color(c) {};
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
+            RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
 
@@ -130,6 +136,12 @@ namespace DarkMoon {
 
             // Bind default texture
             glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
+            
+            // Material
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Kd"), 1, glm::value_ptr(rm.defaultMaterial->getDiffuseColor()));
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ka"), 1, glm::value_ptr(rm.defaultMaterial->getAmbientColor()));
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ks"), 1, glm::value_ptr(rm.defaultMaterial->getSpecularColor()));
+            glUniform1f(glGetUniformLocation(rm.getShader()->getIDShader(), "Shininess"), rm.defaultMaterial->getShininess());
 
             // Draw the line
             glLineWidth(lineSize);
@@ -157,7 +169,7 @@ namespace DarkMoon {
             : slices(sli), spacing(spac), color(c) {};
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
+            RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
 
@@ -214,6 +226,12 @@ namespace DarkMoon {
 
             // Bind default texture
             glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
+            
+            // Material
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Kd"), 1, glm::value_ptr(rm.defaultMaterial->getDiffuseColor()));
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ka"), 1, glm::value_ptr(rm.defaultMaterial->getAmbientColor()));
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ks"), 1, glm::value_ptr(rm.defaultMaterial->getSpecularColor()));
+            glUniform1f(glGetUniformLocation(rm.getShader()->getIDShader(), "Shininess"), rm.defaultMaterial->getShininess());
 
             // Draw the grid
             glBindVertexArray(VAO);
@@ -239,7 +257,7 @@ namespace DarkMoon {
             : centerPos(cP), size(s), color(c) {};
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
+            RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
 
@@ -295,6 +313,12 @@ namespace DarkMoon {
 
             // Bind default texture
             glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
+            
+            // Material
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Kd"), 1, glm::value_ptr(rm.defaultMaterial->getDiffuseColor()));
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ka"), 1, glm::value_ptr(rm.defaultMaterial->getAmbientColor()));
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ks"), 1, glm::value_ptr(rm.defaultMaterial->getSpecularColor()));
+            glUniform1f(glGetUniformLocation(rm.getShader()->getIDShader(), "Shininess"), rm.defaultMaterial->getShininess());
 
             // Draw the plane
             glBindVertexArray(VAO);
@@ -321,7 +345,7 @@ namespace DarkMoon {
             : position(pos), size(s), color(c) {};
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
+            RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
 
@@ -391,6 +415,12 @@ namespace DarkMoon {
 
             // Bind default texture
             glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
+            
+            // Material
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Kd"), 1, glm::value_ptr(rm.defaultMaterial->getDiffuseColor()));
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ka"), 1, glm::value_ptr(rm.defaultMaterial->getAmbientColor()));
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ks"), 1, glm::value_ptr(rm.defaultMaterial->getSpecularColor()));
+            glUniform1f(glGetUniformLocation(rm.getShader()->getIDShader(), "Shininess"), rm.defaultMaterial->getShininess());
 
             // Draw cube
             glBindVertexArray(VAO);
@@ -418,7 +448,7 @@ namespace DarkMoon {
             : position(pos), size(s), color(c) {};
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager rm = RenderManager::getInstance();
+            RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
 
@@ -488,6 +518,12 @@ namespace DarkMoon {
 
             // Bind default texture
             glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
+            
+            // Material
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Kd"), 1, glm::value_ptr(rm.defaultMaterial->getDiffuseColor()));
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ka"), 1, glm::value_ptr(rm.defaultMaterial->getAmbientColor()));
+            glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ks"), 1, glm::value_ptr(rm.defaultMaterial->getSpecularColor()));
+            glUniform1f(glGetUniformLocation(rm.getShader()->getIDShader(), "Shininess"), rm.defaultMaterial->getShininess());
 
             // Draw the wireframe cube
             glBindVertexArray(VAO);
