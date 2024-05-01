@@ -573,7 +573,70 @@ void SoundSystem::sonido_equipar_lanza() {
 }
 
 
+//EVENTOS BIBLIOTECA
+    void SoundSystem::sonido_aranya_ataque(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Aranya/Aranya_ataque", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+    }           
+    void SoundSystem::sonido_aranya_danyo(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Aranya/Aranya_danyo", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
 
+    }         
+    void SoundSystem::sonido_aranya_mov(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Aranya/Aranya_mov", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }           
+    void SoundSystem::sonido_aranya_muere(){
+ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Aranya/Aranya_muere", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+    }         
+    void SoundSystem::sonido_aranya_telaranya(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Aranya/Aranya_telaranya", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }     
+    void SoundSystem::sonido_music_boss_final(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_boss_final", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }     
+    void SoundSystem::sonido_escaleras_biblio(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Escalera_biblioteca", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }     
+    void SoundSystem::sonido_h_meteorito(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Ataques/H_meteorito", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }
+    void SoundSystem::sonido_pasos_madera(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_biblioteca", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }               
+
+    
 
 //DIALOGOS
 void SoundSystem::sonido_DPlayer() {
@@ -632,6 +695,12 @@ void SoundSystem::sonido_DGuerrera() {
     update();
 }
 
+void SoundSystem::sonido_DMaestro() {
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Dialogos/Maestro", &eventDescription));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+    play();
+    update();
+}
 
 
 

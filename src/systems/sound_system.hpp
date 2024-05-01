@@ -39,7 +39,7 @@ struct SoundSystem {
     void sonido_piedras_golpe();
     void sonido_rebote();             
     void sonido_destello();
-    void sonido_recoger_vida();         //a futuro
+    void sonido_recoger_vida();        
 
     void sonido_llave();                
     void sonido_h_pompa();              
@@ -50,7 +50,7 @@ struct SoundSystem {
 
 
     //SONIDOS PENDIENTES
-    void sonido_music_mazmorra();   //por integrar
+    void sonido_music_mazmorra();   //por realizar mejora
     //dialogos
     void sonido_DInvestigador();    //por integrar
     void sonido_DPlayer();          //por integrar
@@ -60,13 +60,14 @@ struct SoundSystem {
     void sonido_DSacerdotisa();     //por integrar
     void sonido_DEspiritu();        //por integrar
     void sonido_DGuerrera();        //por integrar    
+    void sonido_DMaestro();         //por integrar
 
    //sonidos de zona volcan
 
-    void sonido_music_volcan();     //falla
+    void sonido_music_volcan();     //por realizar mejora
     void sonido_h_dash();                  
     void sonido_h_bola_fuego();     
-    void sonido_amb_volcan();       //por integrar
+    void sonido_amb_volcan();       //por realizar el cambio de parámetros
     void sonido_pasos_volcan();     //por integrar
     void sonido_golem_mov();        //por integrar
     void sonido_golem_ataque();     
@@ -107,6 +108,35 @@ struct SoundSystem {
    void sonido_crear_pociones();        //por integrar    
    void sonido_campamento_derrotado1(); //por integrar          
    void sonido_equipar_lanza();         //por integrar    
+
+
+   //sonidos de zona biblioteca
+
+    void sonido_aranya_ataque();        //por integrar
+    void sonido_aranya_danyo();         //por integrar
+    void sonido_aranya_mov();           //por integrar
+    void sonido_aranya_muere();         //por integrar
+    void sonido_aranya_telaranya();     //por integrar
+    void sonido_music_boss_final();     //por integrar
+    void sonido_escaleras_biblio();     //por integrar
+    void sonido_h_meteorito();          //por integrar
+    void sonido_pasos_madera();         //por integrar
+    
+    void sonido_amb_biblioteca1();      //por disenyar
+    void sonido_amb_biblioteca2();      //por disenyar
+    void sonido_boss_mov();             //por disenyar
+    void sonido_subdito_mov();          //por disenyar  
+    void sonido_boss_resucitar();       //por disenyar
+    void sonido_boss_escudo();          //por disenyar
+    void sonido_boss_danyo();           //por disenyar
+    void sonido_subdito_muere();        //por disenyar
+    void sonido_boss_muere();           //por disenyar
+    void sonido_inicio_batalla();       //por disenyar
+    void sonido_cambio_fase();          //por disenyar
+
+    void sonido_win();
+
+
    
 
     void play();
