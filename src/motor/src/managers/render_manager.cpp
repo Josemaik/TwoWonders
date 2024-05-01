@@ -25,6 +25,7 @@ namespace DarkMoon {
     void RenderManager::beginMode3D() {
         useShader(activeLights ? shaders["lights"] : shaders["3D"]);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
     }
 
     void RenderManager::endMode3D() {
@@ -32,6 +33,7 @@ namespace DarkMoon {
         //glPopAttrib();
 
         glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
         useShader(shaders["color"]);
     }
 
