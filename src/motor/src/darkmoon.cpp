@@ -676,7 +676,7 @@ namespace DarkMoon {
     }
 
     // Get time in seconds for last frame drawn
-    float DarkMoonEngine::GetFrameTime() {
+    double DarkMoonEngine::GetFrameTime() {
         return m_windowsManager.getFrameTime();
     }
 

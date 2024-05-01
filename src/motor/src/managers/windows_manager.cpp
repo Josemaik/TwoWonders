@@ -19,7 +19,7 @@ namespace DarkMoon {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         // Deactivate V-Sync
-        // glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_FALSE);
+        //glfwSwapInterval(0);
 
         // Enable V-Sync
         // glfwSwapInterval(1);
@@ -60,6 +60,9 @@ namespace DarkMoon {
 
         glViewport(0, 0, m_width, m_height);
         //std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
+
+        setTargetFPS(60);
+        m_lastFrameTime = getTime();
 
         return true;
     }
@@ -152,29 +155,47 @@ namespace DarkMoon {
     }
 
     void WindowsManager::endDrawing() {
-        controlFrameRate();
         glfwSwapBuffers(m_window);
+        controlFrameRate();
         glfwPollEvents();
     }
 
     // Timing-related functions
-    void WindowsManager::setTargetFPS(int) {
-
+    void WindowsManager::setTargetFPS(int targetFPS) {
+        m_targetFrameTime = 1.0 / targetFPS;
     }
 
-    float WindowsManager::getFrameTime() {
-        return 0.016f;
+    double WindowsManager::getFrameTime() {
+        return m_deltaTime;
     }
 
     double WindowsManager::getTime() {
-        return 0;
+        return glfwGetTime();
     }
 
     int WindowsManager::getFPS() {
-        return 0;
+        return m_FPS;
     }
 
     void WindowsManager::controlFrameRate() {
+        double currentFrameTime = glfwGetTime();
+        m_deltaTime =  currentFrameTime - m_lastFrameTime;
+        m_lastFrameTime = currentFrameTime;
 
+        double sleepTime = m_targetFrameTime - m_deltaTime;
+        if (sleepTime > 0.0) {
+            std::chrono::milliseconds sleepDuration(static_cast<long long>(sleepTime * 1000));
+            std::this_thread::sleep_for(sleepDuration);
+            currentFrameTime = glfwGetTime();
+            m_deltaTime = currentFrameTime - m_lastFrameTime;
+            m_lastFrameTime = currentFrameTime;
+        }
+
+        m_frames++;
+        if (currentFrameTime - m_lastFPSTime >= 1.0) {
+            m_FPS = m_frames;
+            m_frames = 0;
+            m_lastFPSTime += 1.0;
+        }
     }
 }

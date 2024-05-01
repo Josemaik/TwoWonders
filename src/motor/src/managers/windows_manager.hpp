@@ -16,9 +16,18 @@
 namespace DarkMoon {
     struct WindowsManager {
     private:
-        GLFWwindow* m_window;
-        int m_width, m_height;
-        int m_oldWidth, m_oldHeight;
+        GLFWwindow* m_window {};
+        int m_width {};
+        int m_height {};
+        int m_oldWidth {};
+        int m_oldHeight {};
+
+        int m_FPS {};
+        int m_frames {};
+        double m_lastFrameTime {};
+        double m_targetFrameTime {};
+        double m_lastFPSTime {};
+        double m_deltaTime {};
 
         void controlFrameRate();
         void framebuffer_size_callback();
@@ -43,8 +52,8 @@ namespace DarkMoon {
         void endDrawing();
 
         // Timing-related functions
-        void setTargetFPS(int fps); // TODO
-        float getFrameTime();
+        void setTargetFPS(int fps);
+        double getFrameTime();
         double getTime();
         int getFPS();
 
