@@ -58,7 +58,7 @@ namespace DarkMoon {
         // Create a button in node
         Node* CreateButton(glm::vec2 position, glm::vec2 size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor, const char* nodeName, Node* parentNode);
         // Create a slider in node
-        Node* CreateSlider(glm::vec2 position, glm::vec2 size, Color backColor, Color sliderColor, const char* nodeName, Node* parentNode);
+        Node* CreateSlider(glm::vec2 position, glm::vec2 size, float value, Color backColor, Color sliderColor, const char* nodeName, Node* parentNode);
 
         // 3D
 

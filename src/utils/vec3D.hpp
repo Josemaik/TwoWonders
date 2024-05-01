@@ -323,6 +323,11 @@ struct vec2D
     constexpr vec2D() = default;
     constexpr vec2D(DataT x, DataT y) : x{ x }, y{ y } {}
 
+    constexpr glm::vec2 toGlm() const noexcept
+    {
+        return glm::vec2{ x, y };
+    }
+
     constexpr bool operator==(vec2D const& rhs) const
     {
         return x == rhs.x && y == rhs.y;

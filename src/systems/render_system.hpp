@@ -75,8 +75,10 @@ private:
 
     void updateHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
     void updateManaBar(GameEngine& engine, EntityManager& em);
-    DarkMoon::Node* getNode(GameEngine& engine, const char* name);
+    Node* getNode(GameEngine& engine, const char* name);
     bool nodeExists(GameEngine& engine, const char* name);
+    double SelectValue(GameEngine& engine, double value, int posx, int posy, int height, int width);
+    uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::map<uint16_t, vec3d>& nodes);
 
     bool isSelected{ false };
     bool isSelectedfordebug{ false };

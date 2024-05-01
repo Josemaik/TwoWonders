@@ -62,8 +62,8 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
     auto* fondoTwoWonders = getNode(engine, "fondo_inicio");
     auto* logoTwoWonders = getNode(engine, "logo_twowonders");
 
-    auto* fondoText = dynamic_cast<DarkMoon::Texture2D*>(fondoTwoWonders->getEntity())->texture;
-    auto* logoText = dynamic_cast<DarkMoon::Texture2D*>(logoTwoWonders->getEntity())->texture;
+    auto* fondoText = dynamic_cast<Texture2D*>(fondoTwoWonders->getEntity())->texture;
+    auto* logoText = dynamic_cast<Texture2D*>(logoTwoWonders->getEntity())->texture;
 
     auto fondoWidth = fondoText->getWidth();
     auto fondoHeight = fondoText->getHeight();
@@ -86,34 +86,34 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
     engine.drawNode(logoTwoWonders, { posX, posY });
 
     // Datos de los botones
-    float buttonWidth = 303.03f;
-    float buttonHeight = 75.75f;
+    int buttonWidth = 303;
+    int buttonHeight = 75;
 
-    posX = engine.getScreenWidth() / 2 - static_cast<int>(buttonWidth * wRate / 2.f);
-    posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.3f) - static_cast<int>(buttonHeight * hRate / 2.f);
+    posX = engine.getScreenWidth() / 2 - static_cast<int>(static_cast<float>(buttonWidth) * wRate / 2.f);
+    posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.3f) - static_cast<int>(static_cast<float>(buttonHeight) * hRate / 2.f);
 
     // Botones
     if (!nodeExists(engine, "initScreen")) {
         auto* init = engine.createNode("initScreen", getNode(engine, "Menu"));
 
-        engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "JUGAR",
-            engine.dmeg.GetDefaultFont(), 15,
+        engine.createButton({}, { buttonWidth, buttonHeight }, "JUGAR",
+            engine.getFontDefault(), 15,
             D_BLACK,
-            Align::CENTER, Align::CENTER,
+            Aligned::CENTER, Aligned::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton jugar", init);
 
-        engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "CONFIGURACION",
-            engine.dmeg.GetDefaultFont(), 15,
+        engine.createButton({}, { buttonWidth, buttonHeight }, "CONFIGURACION",
+            engine.getFontDefault(), 15,
             D_BLACK,
-            Align::CENTER, Align::CENTER,
+            Aligned::CENTER, Aligned::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton configuracion", init);
 
-        engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "SALIR",
-            engine.dmeg.GetDefaultFont(), 15,
+        engine.createButton({}, { buttonWidth, buttonHeight }, "SALIR",
+            engine.getFontDefault(), 15,
             D_BLACK,
-            Align::CENTER, Align::CENTER,
+            Aligned::CENTER, Aligned::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton salir", init);
     }
@@ -126,7 +126,7 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
     int downRate = static_cast<int>(83.33f * hRate);
 
     for (auto& bt : init->getChildren()) {
-        auto but = dynamic_cast<DarkMoon::Button*>(bt->getEntity());
+        auto but = dynamic_cast<Button*>(bt->getEntity());
         // Recolocar botones
         if (bt->name == "Boton jugar")
             engine.drawNode(bt, { posX, posY });
@@ -136,7 +136,7 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
             engine.drawNode(bt, { posX, posY + 2 * downRate });
 
         // Comprobar estado del boton
-        if (but->state == DarkMoon::ButtonState::CLICK) {
+        if (but->state == ButtonState::CLICK) {
             if (bt->name == "Boton jugar") {
                 li.currentScreen = GameScreen::STORY;
                 ss.seleccion_menu();
@@ -228,8 +228,7 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
     */
 
     // Dibujar arbol
-    engine.dmeg.GetRootNode()->traverse(glm::mat4());
-
+    engine.traverseRoot();
     engine.endDrawing();
 }
 
@@ -239,7 +238,7 @@ void RenderSystem::drawChargeScreen(GameEngine& engine, EntityManager& em)
     auto* chargeGif = getNode(engine, "carga");
 
     // Redimensionamos
-    auto& gifInfo = *chargeGif->getEntity<DarkMoon::AnimatedTexture2D>();
+    auto& gifInfo = *chargeGif->getEntity<Gif>();
     auto& frames = gifInfo.frames;
     auto& currentFrame = gifInfo.currentFrame;
 
@@ -281,7 +280,7 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
 
     // Controles
     auto controles = getNode(engine, text);
-    auto cont = dynamic_cast<DarkMoon::Texture2D*>(controles->getEntity());
+    auto cont = dynamic_cast<Texture2D*>(controles->getEntity());
 
     int aux_width = cont->texture->getWidth();
     int aux_height = cont->texture->getHeight();
@@ -294,24 +293,15 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
 
     engine.drawNode(controles, { posX, posY }, { reScaleX, reScaleY });
 
-    auto txtBox = engine.dmeg.CreateTextBox({ engine.getScreenWidth() / 2 - 100, engine.getScreenHeight() - 100 },
-        { 200, 50 }, D_WHITE, "DALE A [E] PARA SALIR", engine.dmeg.GetDefaultFont(),
-        20, D_WHITE, Align::CENTER, Align::CENTER,
+    auto txtBox = engine.createTextBox({ engine.getScreenWidth() / 2 - 100, engine.getScreenHeight() - 100 },
+        { 200, 50 }, D_WHITE, "DALE A [E] PARA SALIR", engine.getFontDefault(),
+        20, D_WHITE, Aligned::CENTER, Aligned::CENTER,
         "Texto controles", getNode(engine, "Menu"));
 
-    auto entTxtBox = dynamic_cast<DarkMoon::TextBox*>(txtBox->getEntity());
+    auto entTxtBox = dynamic_cast<TextBox*>(txtBox->getEntity());
     entTxtBox->drawBox = false;
-    /*
-    engine.drawRectangle(0, 0, engine.getScreenWidth(), engine.getScreenHeight(), Fade({ 113, 75, 146, 255 }, 0.5f));
-    engine.textures[text].width = static_cast<int>(engine.getScreenWidth() / 1.3);
-    engine.textures[text].height = static_cast<int>(engine.getScreenHeight() / 1.6);
-    engine.drawTexture(engine.textures[text],
-        engine.getScreenWidth() / 2 - engine.textures[text].width / 2,
-        engine.getScreenHeight() / 2 - engine.textures[text].height / 2,
-        D_WHITE);
-    */
-    engine.dmeg.GetRootNode()->traverse(glm::mat4());
 
+    engine.traverseRoot();
     engine.endDrawing();
 }
 
@@ -321,66 +311,66 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
 
     restartScene(engine);
 
-    float buttonWidth = 200.0f;
-    float buttonHeight = 50.0f;
-    float middleScreen = static_cast<float>(engine.getScreenWidth() / 2);
+    int buttonWidth = 200;
+    int buttonHeight = 50;
+    int middleScreen = engine.getScreenWidth() / 2;
 
     // Posición del botón de volver
-    float posX = middleScreen - (buttonWidth / 2);
-    float posY = static_cast<float>(engine.getScreenHeight() / 1.1) - (buttonHeight / .5f);
+    int posX = middleScreen - (buttonWidth / 2);
+    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.1f - (static_cast<float>(buttonHeight) / .5f));
 
     // Botones de resolución
-    float posResX = static_cast<float>(middleScreen) - (buttonWidth / 2);
-    float posResY = static_cast<float>(200) - (buttonHeight / 2);
-    float offSetY = 150;
+    int posResX = middleScreen - (buttonWidth / 2);
+    int posResY = 200 - (buttonHeight / 2);
+    int offSetY = 150;
 
     // Botones
     if (!nodeExists(engine, "opciones")) {
         auto* options = engine.createNode("opciones", getNode(engine, "Menu"));
 
-        engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "VOLVER",
-            engine.dmeg.GetDefaultFont(), 15, D_BLACK,
-            Align::CENTER, Align::CENTER,
+        engine.createButton({}, { buttonWidth, buttonHeight }, "VOLVER",
+            engine.getFontDefault(), 15, D_BLACK,
+            Aligned::CENTER, Aligned::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton volver", options);
 
-        engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "800x600",
-            engine.dmeg.GetDefaultFont(), 15, D_BLACK,
-            Align::CENTER, Align::CENTER,
+        engine.createButton({}, { buttonWidth, buttonHeight }, "800x600",
+            engine.getFontDefault(), 15, D_BLACK,
+            Aligned::CENTER, Aligned::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton 800x600", options);
 
-        engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "1280x720",
-            engine.dmeg.GetDefaultFont(), 15, D_BLACK,
-            Align::CENTER, Align::CENTER,
+        engine.createButton({}, { buttonWidth, buttonHeight }, "1280x720",
+            engine.getFontDefault(), 15, D_BLACK,
+            Aligned::CENTER, Aligned::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton 1280x720", options);
 
-        engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "1920x1080",
-            engine.dmeg.GetDefaultFont(), 15, D_BLACK,
-            Align::CENTER, Align::CENTER,
+        engine.createButton({}, { buttonWidth, buttonHeight }, "1920x1080",
+            engine.getFontDefault(), 15, D_BLACK,
+            Aligned::CENTER, Aligned::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton 1920x1080", options);
 
-        engine.dmeg.CreateButton({}, { buttonWidth, buttonHeight }, "FULLSCREEN",
-            engine.dmeg.GetDefaultFont(), 15, D_BLACK,
-            Align::CENTER, Align::CENTER,
+        engine.createButton({}, { buttonWidth, buttonHeight }, "FULLSCREEN",
+            engine.getFontDefault(), 15, D_BLACK,
+            Aligned::CENTER, Aligned::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton fullscreen", options);
 
-        engine.dmeg.CreateButton({}, { buttonWidth + 50, buttonHeight }, "CONTROLES MANDO",
-            engine.dmeg.GetDefaultFont(), 15, D_BLACK,
-            Align::CENTER, Align::CENTER,
+        engine.createButton({}, { buttonWidth + 50, buttonHeight }, "CONTROLES MANDO",
+            engine.getFontDefault(), 15, D_BLACK,
+            Aligned::CENTER, Aligned::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton controles mando", options);
 
-        engine.dmeg.CreateButton({}, { buttonWidth + 50, buttonHeight }, "CONTROLES TECLADO",
-            engine.dmeg.GetDefaultFont(), 15, D_BLACK,
-            Align::CENTER, Align::CENTER,
+        engine.createButton({}, { buttonWidth + 50, buttonHeight }, "CONTROLES TECLADO",
+            engine.getFontDefault(), 15, D_BLACK,
+            Aligned::CENTER, Aligned::CENTER,
             { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
             "Boton controles teclado", options);
 
-        engine.dmeg.CreateSlider({}, { buttonWidth, 20 }, D_WHITE, D_AQUA, "Slider volumen", options);
+        engine.createSlider({}, { buttonWidth, 20 }, 0.5f, D_WHITE, D_AQUA, "Slider volumen", options);
     }
     getNode(engine, "opciones")->setVisible(true);
 
@@ -396,9 +386,9 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
         else if (bt->name == "Boton 1280x720")
             bt->setTranslation({ posResX + offSetY, posResY, 0.0f });
         else if (bt->name == "Boton 1920x1080")
-            bt->setTranslation({ posResX - offSetY, posResY + offSetY / 2.5f, 0.0f });
+            bt->setTranslation({ posResX - offSetY, posResY + static_cast<int>(static_cast<float>(offSetY) / 2.5f), 0.0f });
         else if (bt->name == "Boton fullscreen")
-            bt->setTranslation({ posResX + offSetY, posResY + offSetY / 2.5f, 0.0f });
+            bt->setTranslation({ posResX + offSetY, posResY + static_cast<int>(static_cast<float>(offSetY) / 2.5f), 0.0f });
         else if (bt->name == "Boton controles mando")
             bt->setTranslation({ posX - offSetY - 40, posY - 100, 0.0f });
         else if (bt->name == "Boton controles teclado")
@@ -407,10 +397,10 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
             bt->setTranslation({ middleScreen - buttonWidth, 100.0f, 0.0f });
 
         // Estado de los botones
-        auto but = dynamic_cast<DarkMoon::Button*>(bt->getEntity());
-        auto sli = dynamic_cast<DarkMoon::Slider*>(bt->getEntity());
+        auto but = dynamic_cast<Button*>(bt->getEntity());
+        auto sli = dynamic_cast<Slider*>(bt->getEntity());
 
-        if (but != nullptr && but->state == DarkMoon::ButtonState::CLICK) {
+        if (but != nullptr && but->state == ButtonState::CLICK) {
             if (bt->name == "Boton volver")
                 li.currentScreen = li.previousScreen;
             else if (bt->name == "Boton 800x600")
@@ -542,7 +532,7 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
 
     */
 
-    engine.dmeg.GetRootNode()->traverse(glm::mat4());
+    engine.traverseRoot();
 
     engine.endDrawing();
 }
@@ -792,7 +782,7 @@ void RenderSystem::drawLogoKaiwa(GameEngine& engine) {
 
     // DrawLogoKaiwa
     auto* logoKaiwa = getNode(engine, "logo_kaiwa");
-    auto* logoText = dynamic_cast<DarkMoon::Texture2D*>(logoKaiwa->getEntity())->texture;
+    auto* logoText = dynamic_cast<Texture2D*>(logoKaiwa->getEntity())->texture;
 
     auto width = logoText->getWidth();
     auto height = logoText->getHeight();
@@ -806,7 +796,7 @@ void RenderSystem::drawLogoKaiwa(GameEngine& engine) {
     engine.drawNode(logoKaiwa, { posX, posY }, { wRate, hRate });
 
     // Dibujar arbol
-    engine.dmeg.GetRootNode()->traverse(glm::mat4());
+    engine.traverseRoot();
 
     engine.endDrawing();
 }
@@ -846,51 +836,51 @@ void RenderSystem::drawStory(GameEngine& engine) {
 
     restartScene(engine);
 
-    float boxWidth = 700.f;
-    float boxHeight = 400.f;
-    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth / 2);
-    float posY = static_cast<float>(engine.getScreenHeight() / 2.5) - (boxHeight / 2);
+    int boxWidth = 700;
+    int boxHeight = 400;
+    int posX = static_cast<int>(engine.getScreenWidth() / 2 - (boxWidth / 2));
+    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2.5f - static_cast<float>(boxHeight / 2));
 
     if (!nodeExists(engine, "historia")) {
         auto* hist = engine.createNode("historia", getNode(engine, "Dialog"));
 
-        engine.dmeg.CreateTextBox({ posX, posY }, { boxWidth, boxHeight }, D_WHITE,
+        engine.createTextBox({ posX, posY }, { boxWidth, boxHeight }, D_WHITE,
             "¡Bienvenido a la aventura!", engine.getDefaultFont(), 40,
-            D_BLACK, Align::CENTER, Align::CENTER,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
             "Texto 1", hist);
-        engine.dmeg.CreateTextBox({ posX, posY + 50 }, { boxWidth, boxHeight }, D_WHITE,
+        engine.createTextBox({ posX, posY + 50 }, { boxWidth, boxHeight }, D_WHITE,
             "Estas perdido por el bosque y", engine.getDefaultFont(), 40,
-            D_BLACK, Align::CENTER, Align::CENTER,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
             "Texto 2", hist);
-        engine.dmeg.CreateTextBox({ posX, posY + 100 }, { boxWidth, boxHeight }, D_WHITE,
+        engine.createTextBox({ posX, posY + 100 }, { boxWidth, boxHeight }, D_WHITE,
             "debes encontrar a tu maestro.", engine.getDefaultFont(), 40,
-            D_BLACK, Align::CENTER, Align::CENTER,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
             "Texto 3", hist);
-        engine.dmeg.CreateTextBox({ posX, posY + 150 }, { boxWidth, boxHeight }, D_WHITE,
+        engine.createTextBox({ posX, posY + 150 }, { boxWidth, boxHeight }, D_WHITE,
             "¡Mucha suerte!", engine.getDefaultFont(), 40,
-            D_BLACK, Align::CENTER, Align::CENTER,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
             "Texto 4", hist);
 
-        engine.dmeg.CreateTextBox({ posX, posY + 250 }, { boxWidth, boxHeight }, D_WHITE,
+        engine.createTextBox({ posX, posY + 250 }, { boxWidth, boxHeight }, D_WHITE,
             "", engine.getDefaultFont(), 40,
-            D_BLACK, Align::CENTER, Align::CENTER,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
             "Texto 5", hist);
 
         for (auto& txtEl : hist->getChildren())
-            dynamic_cast<DarkMoon::TextBox*>(txtEl->getEntity())->drawBox = false;
+            dynamic_cast<TextBox*>(txtEl->getEntity())->drawBox = false;
     }
 
     auto* hist = getNode(engine, "historia");
     hist->setVisible(true);
 
-    auto auxText = dynamic_cast<DarkMoon::TextBox*>(hist->getChildren().back()->getEntity());
+    auto auxText = dynamic_cast<TextBox*>(hist->getChildren().back()->getEntity());
     std::string textGame = "DALE A [E] PARA JUGAR";
 
     if (engine.isGamepadAvailable(0))
         textGame = "DALE A [X] PARA JUGAR";
 
     auxText->text.setText(textGame);
-    engine.dmeg.GetRootNode()->traverse(glm::mat4());
+    engine.traverseRoot();
 
     engine.endDrawing();
 }
@@ -1393,7 +1383,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     else
     {
-        r.node = engine.dmeg.CreateCube({ 0.0f, 0.0f, 0.0f },
+        r.node = engine.createCube({ 0.0f, 0.0f, 0.0f },
             { static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()) },
             D_GRAY, "cubo 3D", getNode(engine, "3D"));
     }
@@ -1420,7 +1410,7 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
                 {
                     // Dibujamos 4 partćulas arriba, abajo, izquierda y derecha de la posición
                     engine.drawPoint3D(p.position.to_other<double>(), 3.f, { p.r, p.g, p.b, p.a });
-                    // engine.dmeg.CreateLine3D(p.position.toGlm(), (p.position + vec3f{ 0.0f, .3f, 0.0f }).toGlm(), 1.5f, { p.r, p.g, p.b, p.a }, "particula", getNode(engine, "Particles"));
+                    // engine.createLine3D(p.position.toGlm(), (p.position + vec3f{ 0.0f, .3f, 0.0f }).toGlm(), 1.5f, { p.r, p.g, p.b, p.a }, "particula", getNode(engine, "Particles"));
                     // engine.drawPoint3D(p.position.to_other<double>(), { p.r, p.g, p.b, p.a });
                     // engine.drawPoint3D((p.position + vec3f{ 0.0f, 0.1f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
                     // engine.drawPoint3D((p.position + vec3f{ 0.1f, 0.0f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
@@ -1441,7 +1431,7 @@ void RenderSystem::beginFrame(GameEngine& engine, EntityManager& em)
 
     auto& li = em.getSingleton<LevelInfo>();
 
-    DarkMoon::Color bgColor = D_WHITE;
+    Color bgColor = D_WHITE;
     switch (li.mapID)
     {
     case 0:
@@ -1506,22 +1496,12 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
     // else if (inpi.pathfind)
     //     drawTestPathfindinf(engine, em);
 
-    // engine.dmeg.DrawTree();
-    engine.dmeg.GetRootNode()->traverse(glm::mat4());
+    getNode(engine, "TextCopy")->setVisibleOne(true);
+
+    // engine.drawTree();
+    engine.traverseRoot();
     engine.endDrawing();
 }
-
-// //Dibuja Slider en función de los parámetros
-// double SelectValue(GameEngine& engine, double value, float posx, float posy, float height, float width, const char* text, float min_value, float max_value) {
-//     // pasamos a float el valor
-//     float floatvalue = static_cast<float>(value);
-//     // dibujamos el slider para modificar su valor
-//     int new_detect_radius = GuiSliderBar(Rectangle(posx, posy, height, width), text, NULL, &floatvalue, min_value, max_value);
-//     new_detect_radius = new_detect_radius + 1;
-//     engine.drawText(std::to_string(floatvalue).c_str(), 300, static_cast<int>(posy + 5.0f), 20, BLUE);
-//     // seteamos el nuevo valor
-//     return static_cast<double>(floatvalue);
-// }
 
 uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::map<uint16_t, vec3d>& nodes) {
     uint16_t nearestNodeId = 0; // Suponemos que el primer nodo es el más cercano inicialmente
@@ -1564,14 +1544,14 @@ uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::ma
 //     // posX = 600.0f; // Reseteamos la posición X
 //     // posY = 355.0f; // Posición Y para el slider de startnode
 //     // int startnodenew = GuiSliderBar(Rectangle(posX, posY, buttonWidth, buttonHeight), startNodeText, NULL, &debug.startnode, startMinValue, startMaxValue);
-//     // engine.drawText(std::to_string(static_cast<int>(debug.startnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY), 20, BLUE);
+//     // engine.drawText(std::to_string(static_cast<int>(debug.startnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY), 20, D_BLUE);
 //     // startnodenew += 1;
 //     // // Slider para goalnode
 //     // float goalMinValue = 1.0f;
 //     // float goalMaxValue = 100.0f;
 //     // const char* goalNodeText = "Goal Node";
 //     // int goalnodenew = GuiSliderBar(Rectangle(posX, posY + 40, buttonWidth, buttonHeight), goalNodeText, NULL, &debug.goalnode, goalMinValue, goalMaxValue);
-//     // engine.drawText(std::to_string(static_cast<int>(debug.goalnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY + 40), 20, BLUE);
+//     // engine.drawText(std::to_string(static_cast<int>(debug.goalnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY + 40), 20, D_BLUE);
 //     // goalnodenew += 1;
 
 //     Rectangle btn1Rec = { posX - 10, posY + 80, buttonWidth, buttonHeight };
@@ -1722,7 +1702,7 @@ uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::ma
 //     }
 //     if (debug.seecenters) {
 //         for (auto it = navs.centers.begin(); it != std::prev(navs.centers.end()); ++it) {
-//             engine.drawCube(it->second, 2, 2, 2, BLUE);
+//             engine.drawCube(it->second, 2, 2, 2, D_BLUE);
 //         }
 //     }
 //     if (debug.seemidpoint) {
@@ -1828,7 +1808,7 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine&, EntityManager&)
     //             // engine.beginMode3D();
 
     //             auto dir = bb.direction * 100;
-    //             DrawLine3D(bb.position_origin.toRaylib(), dir.toRaylib(), BLUE);
+    //             DrawLine3D(bb.position_origin.toRaylib(), dir.toRaylib(), D_BLUE);
     //             // engine.endMode3D();
     //             bb.launched = false;
     //         }
@@ -1863,20 +1843,51 @@ void RenderSystem::drawVisionCone(vec3d, double, double) {
     // DrawLine3D(start2, end2, PURPLE);
 }
 
+//Dibuja Slider en función de los parámetros
+double RenderSystem::SelectValue(GameEngine& engine, double value, int posx, int posy, int height, int width) {
+    // pasamos a float el valor
+    float floatValue = static_cast<float>(value) / 100.f;
+    // dibujamos el slider para modificar su valor
+    auto* slider = engine.drawSlider({ posx, posy }, { height, width }, floatValue, D_VIOLET, D_BLUE_LIGHT);
+    auto& sliderInfo = *slider->getEntity<Slider>();
+
+    floatValue = sliderInfo.valor * 100.f;
+    engine.drawText(std::to_string(floatValue).c_str(), 300, posy + 5, 20, D_BLUE);
+    // seteamos el nuevo valor
+    return static_cast<double>(floatValue);
+}
+
+uint16_t RenderSystem::findNearestNode(EntityManager& em, const vec3d& position, const std::map<uint16_t, vec3d>& nodes) {
+    uint16_t nearestNodeId = 0; // Suponemos que el primer nodo es el más cercano inicialmente
+    double minDistance = std::numeric_limits<double>::max(); // Inicializamos la distancia mínima con un valor muy grande
+    vec3d nearestpos{};
+    for (const auto& node : nodes) {
+        double dist = position.distance(node.second); // Calculamos la distancia entre la posición y el nodo actual
+        if (dist < minDistance) { // Si encontramos un nodo más cercano
+            minDistance = dist;
+            nearestNodeId = node.first;
+            nearestpos = node.second;
+        }
+    }
+    auto& debug = em.getSingleton<Debug_t>();
+    debug.nodes.push_back(nearestpos);
+    return nearestNodeId;
+}
+
 //Editor In-Game
 void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
     // Parametros ventana editor in-game
-    float windowRectX = 0.0f;
-    float windowRectY = 100.0f;
+    int windowRectX = 0;
+    int windowRectY = 100;
 
-    float windowRectWidth = 390.0f;
-    float windowRectHeight = 550.0f;
+    int windowRectWidth = 390;
+    int windowRectHeight = 550;
 
     if (!nodeExists(engine, "editorIA"))
     {
-        auto* editAI = engine.createNode("Editor IA", getNode(engine, "Debug"));
-        engine.createTextBox({ windowRectX, windowRectY }, { windowRectWidth, windowRectHeight }, { 255, 255, 255, 128 }, "Editor IA", engine.dmeg.GetDefaultFont(), 20, D_BLUE_DARK, Align::TOP, Align::LEFT, "Editor IA", editAI);
-        engine.createText({ windowRectX + 20, windowRectY + 50 }, "PARAMETROS", engine.dmeg.GetDefaultFont(), 20, D_RED, "text_parametros", editAI);
+        auto* editAI = engine.createNode("editorIA", getNode(engine, "Debug"));
+        engine.createTextBox({ windowRectX, windowRectY }, { windowRectWidth, windowRectHeight }, { 255, 255, 255, 128 }, "Editor IA", engine.getFontDefault(), 20, D_BLUE_DARK, Aligned::TOP, Aligned::LEFT, "Editor IA", editAI);
+        engine.createText({ windowRectX + 20, windowRectY + 50 }, "PARAMETROS", engine.getFontDefault(), 20, D_RED, "text_parametros", editAI);
     }
 
     getNode(engine, "editorIA")->setVisible(true);
@@ -1885,16 +1896,12 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
     using SYSCMPss = MP::TypeList<AIComponent, PhysicsComponent, ColliderComponent, RenderComponent>;
     using SYSTAGss = MP::TypeList<EnemyTag>;
 
-    // [TODO] - RAYCAST
     RayCast ray = engine.getMouseRay();
-    std::cout << "Origen: " << ray.origin.x() << " | " << ray.origin.y() << " | " << ray.origin.z() << "\n";
-    std::cout << "Direccion: " << ray.direction.x() << " | " << ray.direction.y() << " | " << ray.direction.z() << "\n";
-
     em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, PhysicsComponent& phy, ColliderComponent& col, RenderComponent& ren)
     {
         // Comprobar si el rayo intersecta con el collider
         if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
-            if (engine.dmeg.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+            if (engine.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
                 isSelected = !isSelected;
                 debugsglt.IA_id = e.getID();
             }
@@ -1902,32 +1909,30 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
             // no es seleccionada => wires rojos
 
             engine.drawCubeWires(ren.position, { ren.scale.x(), ren.scale.y(), ren.scale.z() }, D_RED);
-
-            //std::cout << "hola\n";
         }
+
         if (isSelected && e.getID() == debugsglt.IA_id) {
 
             engine.drawCubeWires(ren.position, { ren.scale.x(), ren.scale.y(), ren.scale.z() }, D_VIOLET_DARK);
-            engine.endMode3D();
             // si se seleccionada una entidad se muestra el Editor de parámetros
             if (isSelected) {
                 // ID DE LA ENTIDAD SELECCIONADA
-                // engine.drawText("EID:", 15, 170, 20, D_BLACK);
-                // engine.drawText(std::to_string(debugsglt.IA_id).c_str(), 55, 170, 20, D_GRAY);
-                // //Detect Radius
-                // aic.detect_radius = SelectValue(engine, aic.detect_radius, 145.0, 200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
-                // // Attack Radius
-                // aic.attack_radius = SelectValue(engine, aic.attack_radius, 145.0, 240.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
-                // // Arrival Radius
-                // aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 145.0, 280.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
-                // // Max Speed
-                // phy.max_speed = SelectValue(engine, phy.max_speed, 145.0, 320.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
-                // //COuntdown Perception
-                // aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 145.0, 360.0, 120.0, 30.0, "Perception", 0.0, 10.0);
-                // //Countdown Shoot
-                // aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 145.0, 400.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
-                // //Countdown stop
-                // aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 145.0, 440.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
+                engine.drawText("EID:", 15, 170, 20, D_BLACK);
+                engine.drawText(std::to_string(debugsglt.IA_id).c_str(), 55, 170, 20, D_GRAY);
+                //Detect Radius
+                aic.detect_radius = SelectValue(engine, aic.detect_radius, 145.0, 200.0, 120.0, 30.0);
+                // Attack Radius
+                aic.attack_radius = SelectValue(engine, aic.attack_radius, 145.0, 240.0, 120.0, 30.0);
+                // Arrival Radius
+                aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 145.0, 280.0, 120.0, 30.0);
+                // Max Speed
+                phy.max_speed = SelectValue(engine, phy.max_speed, 145.0, 320.0, 120.0, 30.0);
+                //COuntdown Perception
+                aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 145.0, 360.0, 120.0, 30.0);
+                //Countdown Shoot
+                aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 145.0, 400.0, 120.0, 30.0);
+                //Countdown stop
+                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 145.0, 440.0, 120.0, 30.0);
             }
         }
     });
@@ -2000,7 +2005,7 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
                 }
 
                 auto* gif = getNode(engine, icon);
-                auto& gifInfo = *dynamic_cast<DarkMoon::AnimatedTexture2D*>(gif->getEntity());
+                auto& gifInfo = *dynamic_cast<Gif*>(gif->getEntity());
                 auto& frames = gifInfo.frames;
                 auto& currentFrame = frames[gifInfo.currentFrame];
 
@@ -2052,12 +2057,10 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
             int posx = static_cast<int>(engine.getWorldToScreenX(phy.position) + 45.f * wRate);
             int posz = static_cast<int>(engine.getWorldToScreenY(phy.position) - 105.f * hRate);
 
-            auto* rec1 = engine.dmeg.CreateRectangle({ posx, posz }, { 10, 100 }, D_BLACK, "barra_crusher", getNode(engine, "Copy"));
-            rec1->setVisibleOne(true);
+            engine.drawRectangle({ posx, posz }, { 10, 100 }, D_BLACK);
 
             int barHeight = static_cast<int>((ai.elapsed_shoot / ai.countdown_shoot) * 100);
-            auto* rec2 = engine.dmeg.CreateRectangle({ posx, posz }, { 10, barHeight }, D_BLUE_LIGHT, "barra_crusher2", getNode(engine, "Copy"));
-            rec2->setVisibleOne(true);
+            engine.drawRectangle({ posx, posz }, { 10, barHeight }, D_BLUE_LIGHT);
         }
 
         // Vidas HUD
@@ -2075,7 +2078,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
             int barY = static_cast<int>(engine.getWorldToScreenY(r.position)) - static_cast<int>(r.scale.y() * 10);
 
             auto* copy = getNode(engine, "Copy");
-            auto* bar = engine.dmeg.CreateRectangle({ 0.0f, 0.0f }, { barWidth, barHeight }, { D_GRAY }, "borde_vida", copy);
+            auto* bar = engine.createRectangle({ 0, 0 }, { barWidth, barHeight }, { D_GRAY }, "borde_vida", copy);
             engine.drawNode(bar, { barX, barY });
 
             // Normaliza la vida actual del personaje
@@ -2088,7 +2091,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                 lifeWidth = l.life_width + (static_cast<float>(lifeWidth) - static_cast<float>(l.life_width)) * 0.25f;
 
             // Dibujamos la barra de vida
-            auto* lifeBar = engine.dmeg.CreateRectangle({ 0.0f, 0.0f }, { 1.0f, 4.0f }, { D_RED }, "vida_rect", copy);
+            auto* lifeBar = engine.createRectangle({ 0, 0 }, { 1, 4 }, { D_RED }, "vida_rect", copy);
             engine.drawNode(lifeBar, { barX, barY }, { lifeWidth, 1.0f });
 
             l.life_width = lifeWidth;
@@ -2150,7 +2153,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                 }
 
                 auto* gif = getNode(engine, text.c_str());
-                auto* gifInfo = dynamic_cast<DarkMoon::AnimatedTexture2D*>(gif->getEntity());
+                auto* gifInfo = dynamic_cast<Gif*>(gif->getEntity());
                 auto& frames = gifInfo->frames;
                 auto width = frames[gifInfo->currentFrame]->getWidth();
 
@@ -2168,7 +2171,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                 if (e.hasTag<DoorTag>())
                 {
                     auto* lock = getNode(engine, "candado_abierto");
-                    auto& lockText = *dynamic_cast<DarkMoon::Texture2D*>(lock->getEntity());
+                    auto& lockText = *dynamic_cast<Texture2D*>(lock->getEntity());
                     posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(lockText.texture->getWidth() / 2));
                     posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13);
                     engine.drawNode(lock, { posX, posY });
@@ -2177,7 +2180,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
             else if (inter.showLock)
             {
                 auto* lock = getNode(engine, "candado_cerrado");
-                auto& lockText = *dynamic_cast<DarkMoon::Texture2D*>(lock->getEntity());
+                auto& lockText = *dynamic_cast<Texture2D*>(lock->getEntity());
                 int posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(lockText.texture->getWidth() / 2));
                 int posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13);
                 engine.drawNode(lock, { posX, posY });
@@ -2185,7 +2188,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                 if (e.hasTag<ChestTag>())
                 {
                     auto* sword = getNode(engine, "batalla");
-                    auto& swordText = *dynamic_cast<DarkMoon::Texture2D*>(sword->getEntity());
+                    auto& swordText = *dynamic_cast<Texture2D*>(sword->getEntity());
                     posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(swordText.texture->getWidth() / 2));
                     posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9.5);
                     engine.drawNode(sword, { posX, posY }, { 0.5f, 0.5f });
@@ -2199,8 +2202,8 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                         auto* textureMax = engine.createNode(getNode(engine, std::to_string(ch.maxEnemies).c_str()), copyNode);
                         auto* textureBar = engine.createNode(getNode(engine, "barra"), copyNode);
 
-                        auto* numText = dynamic_cast<DarkMoon::Texture2D*>(textureNum->getEntity())->texture;
-                        auto* barText = dynamic_cast<DarkMoon::Texture2D*>(textureBar->getEntity())->texture;
+                        auto* numText = dynamic_cast<Texture2D*>(textureNum->getEntity())->texture;
+                        auto* barText = dynamic_cast<Texture2D*>(textureBar->getEntity())->texture;
 
                         auto posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(numText->getWidth() / 2) - 100);
                         auto posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 12);
@@ -2229,7 +2232,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                         if (elapsed_Lock < elapsed_limit_Lock)
                         {
                             auto* lock = getNode(engine, "candado_abierto");
-                            auto& lockText = *dynamic_cast<DarkMoon::Texture2D*>(lock->getEntity());
+                            auto& lockText = *dynamic_cast<Texture2D*>(lock->getEntity());
                             int posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(lockText.texture->getWidth() / 2));
                             int posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9);
                             engine.drawNode(lock, { posX, posY });
@@ -2332,7 +2335,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                         else if (li.mapID == 1)
                             multiplier = 25.0;
 
-                        auto& textEntity = *dynamic_cast<DarkMoon::AnimatedTexture2D*>(gif->getEntity());
+                        auto& textEntity = *dynamic_cast<Gif*>(gif->getEntity());
                         auto& frames = textEntity.frames;
                         auto& currentFrame = textEntity.currentFrame;
                         auto wRate = engine.getWidthRate() * 0.75f;
@@ -2405,7 +2408,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
 
                     // Pillamos el nodo del gif
                     auto* gif = getNode(engine, gifName.c_str());
-                    auto& gifInfo = *dynamic_cast<DarkMoon::AnimatedTexture2D*>(gif->getEntity());
+                    auto& gifInfo = *dynamic_cast<Gif*>(gif->getEntity());
                     auto& frames = gifInfo.frames;
                     auto& currentFrame = frames[gifInfo.currentFrame];
                     auto wRate = engine.getWidthRate() * 0.75f;
@@ -2427,7 +2430,6 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em)
     pointedEntity = std::numeric_limits<std::size_t>::max();
     pointedDistance = std::numeric_limits<double>::max();
     vec3d auxPointed{};
-    int k = 0;
     for (auto const& e : em.getEntities())
     {
         if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
@@ -2440,7 +2442,7 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em)
                 static_cast<int>(engine.getWorldToScreenX(r.position)),
                 static_cast<int>(engine.getWorldToScreenY(r.position) - point),
                 20,
-                D_BLACK, Align::CENTER);
+                D_BLACK, Aligned::CENTER);
 
             if (e.hasComponent<TypeComponent>())
             {
@@ -2501,7 +2503,6 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em)
 
         if (e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
         {
-            auto& phy{ em.getComponent<PhysicsComponent>(e) };
             auto& col{ em.getComponent<ColliderComponent>(e) };
 
             // // Calcular la posición y el tamaño de la bounding box
@@ -2581,7 +2582,6 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em)
 
         std::string id = "ID: " + std::to_string(e.getID());
         engine.drawText(id.c_str(), posTextX, 385, 20, D_BLACK);
-        getNode(engine, "TextCopy")->setVisibleOne(true);
     }
 }
 
@@ -2615,7 +2615,7 @@ void RenderSystem::drawLockInfo(GameEngine& ge, EntityManager& em)
             if (color.a == 100)
             {
                 auto* destellin = getNode(ge, "destellin");
-                auto* destellinText = dynamic_cast<DarkMoon::Texture2D*>(destellin->getEntity())->texture;
+                auto* destellinText = dynamic_cast<Texture2D*>(destellin->getEntity())->texture;
 
 
                 int posX = static_cast<int>(ge.getWorldToScreenX(r.position) - static_cast<float>(destellinText->getWidth()) * wRate / 2);
@@ -2626,7 +2626,7 @@ void RenderSystem::drawLockInfo(GameEngine& ge, EntityManager& em)
             else
             {
                 auto* fijado = getNode(ge, "fijado");
-                auto* fijadoInfo = dynamic_cast<DarkMoon::AnimatedTexture2D*>(fijado->getEntity());
+                auto* fijadoInfo = dynamic_cast<Gif*>(fijado->getEntity());
                 auto& frames = fijadoInfo->frames;
                 auto& current = frames[fijadoInfo->currentFrame];
                 int posX = static_cast<int>(ge.getWorldToScreenX(r.position) - static_cast<float>(current->getWidth()) * wRate * 1.1f / 2);
@@ -3020,7 +3020,7 @@ void RenderSystem::drawSpellExplanation(GameEngine& engine, std::string name)
     auto wRate = engine.getWidthRate();
     auto hRate = engine.getHeightRate();
     auto* libro = getNode(engine, "libro");
-    auto* libroText = dynamic_cast<DarkMoon::Texture2D*>(libro->getEntity())->texture;
+    auto* libroText = dynamic_cast<Texture2D*>(libro->getEntity())->texture;
     // Calculamos la posición inicial fuera de la pantalla
     int initialPosY = -libroText->getHeight();
     int posX = engine.getScreenWidth() / 2 - static_cast<int>(static_cast<float>(libroText->getWidth()) * wRate / 2);
@@ -3036,7 +3036,7 @@ void RenderSystem::drawSpellExplanation(GameEngine& engine, std::string name)
 
     // Dibujamos el gif de la explicación por encima
     auto* gif = getNode(engine, name.c_str());
-    auto* gifInfo = dynamic_cast<DarkMoon::AnimatedTexture2D*>(gif->getEntity());
+    auto* gifInfo = dynamic_cast<Gif*>(gif->getEntity());
     auto& gifFrames = gifInfo->frames;
     auto& gifCurrent = gifFrames[gifInfo->currentFrame];
 
@@ -3089,14 +3089,14 @@ void RenderSystem::drawAnimatedTextures(GameEngine& engine)
         // Calculamos los factores de escala
         textureInfo.scaleFactorX = 3.5f - textureInfo.scaleChange * textureInfo.lerpFactor;
         textureInfo.scaleFactorY = 3.5f - textureInfo.scaleChange * textureInfo.lerpFactor;
-        DarkMoon::Node* texture = nullptr;
+        Node* texture = nullptr;
         if (textureInfo.textureName == "placeholder")
             texture = engine.createNode(getNode(engine, textureInfo.textureName.c_str()), getNode(engine, "Copy"));
         else
             texture = getNode(engine, textureInfo.textureName.c_str());
 
         // Información de la textura
-        auto* textureData = dynamic_cast<DarkMoon::Texture2D*>(texture->getEntity());
+        auto* textureData = dynamic_cast<Texture2D*>(texture->getEntity());
         float width = static_cast<float>(textureData->texture->getWidth()) * wRate;
         float height = static_cast<float>(textureData->texture->getHeight()) * hRate;
 
@@ -3199,7 +3199,7 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     };
 
     auto* box = getNode(engine, "cuadroDialogo");
-    auto& boxInfo = *dynamic_cast<DarkMoon::TextBox*>(box->getEntity());
+    auto& boxInfo = *dynamic_cast<TextBox*>(box->getEntity());
     auto& boxRect = boxInfo.box.size;
     auto& boxWidth = boxRect.x;
     auto& boxHeight = boxRect.y;
@@ -3242,7 +3242,7 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     {
         isLast = false;
         auto* arrowNode = getNode(engine, "sig");
-        auto& flecha = *dynamic_cast<DarkMoon::Texture2D*>(arrowNode->getEntity())->texture;
+        auto& flecha = *dynamic_cast<Texture2D*>(arrowNode->getEntity())->texture;
 
         posButtonX -= static_cast<int>(static_cast<float>(flecha.getWidth()) * wRate * 0.5f);
         posButtonY -= static_cast<int>(static_cast<float>(flecha.getHeight()) * 1.2f * hRate * 0.5f);
@@ -3259,7 +3259,7 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     }
 
     auto* gif = getNode(engine, textGif.c_str());
-    auto& textEntity = *dynamic_cast<DarkMoon::AnimatedTexture2D*>(gif->getEntity());
+    auto& textEntity = *dynamic_cast<Gif*>(gif->getEntity());
     auto& frames = textEntity.frames;
     posButtonX -= static_cast<int>(static_cast<float>(frames[textEntity.currentFrame]->getWidth()) * wRate * 0.4f);
     if (!isLast)
@@ -3304,7 +3304,7 @@ void RenderSystem::drawFPSCounter(GameEngine& engine)
     else
     {
         auto* fpsNode = getNode(engine, "fpstext");
-        dynamic_cast<DarkMoon::Text*>(fpsNode->getEntity())->setText(fpsStr);
+        dynamic_cast<Text*>(fpsNode->getEntity())->setText(fpsStr);
         fpsNode->setVisibleOne(true);
     }
 }
@@ -3323,7 +3323,7 @@ void RenderSystem::drawBoatParts(GameEngine& ge, EntityManager& em)
 
     // Dibujamos la textura de la barra que sale desde la derecha
     auto* barca = getNode(ge, "barco");
-    auto* barcaText = dynamic_cast<DarkMoon::Texture2D*>(barca->getEntity())->texture;
+    auto* barcaText = dynamic_cast<Texture2D*>(barca->getEntity())->texture;
 
     // Calculamos la posición inicial y final de la barra
     int initialPosX = 0 - barcaText->getWidth();
@@ -3343,8 +3343,8 @@ void RenderSystem::drawBoatParts(GameEngine& ge, EntityManager& em)
     auto* texture4 = ge.createNode(getNode(ge, "4"), copyNode);
     auto* textureBar = ge.createNode(getNode(ge, "barra"), copyNode);
 
-    auto* numText = dynamic_cast<DarkMoon::Texture2D*>(textureNum->getEntity())->texture;
-    auto* barText = dynamic_cast<DarkMoon::Texture2D*>(textureBar->getEntity())->texture;
+    auto* numText = dynamic_cast<Texture2D*>(textureNum->getEntity())->texture;
+    auto* barText = dynamic_cast<Texture2D*>(textureBar->getEntity())->texture;
     int offSetX1 = static_cast<int>(157.5f * wRate);
     int offSetX2 = offSetX1 - static_cast<int>(19.5f * wRate);
     int offSetX3 = offSetX1 - static_cast<int>(15.f * wRate);
@@ -3363,7 +3363,7 @@ void RenderSystem::drawBoatParts(GameEngine& ge, EntityManager& em)
     ge.drawNode(texture4, { posX + offSetX3 + textWidth / 2 + barWidth / 2, posY + offSetY2 });
 }
 
-DarkMoon::Node* RenderSystem::getNode(GameEngine& engine, const char* name)
+Node* RenderSystem::getNode(GameEngine& engine, const char* name)
 {
     return engine.nodes.at(name);
 }

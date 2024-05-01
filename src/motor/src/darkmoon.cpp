@@ -42,7 +42,7 @@ namespace DarkMoon {
     Node* DarkMoonEngine::CreateNodeCopy(Node* node, Node* parentNode)
     {
         Node* p_node = nullptr;
-        DarkMoon::Texture2D* texture2D = dynamic_cast<DarkMoon::Texture2D*>(node->getEntity());
+        Texture2D* texture2D = dynamic_cast<Texture2D*>(node->getEntity());
         if (texture2D)
         {
             auto nodeCopy = std::make_unique<Node>();
@@ -191,11 +191,11 @@ namespace DarkMoon {
     }
 
     // Create a slider in node
-    Node* DarkMoonEngine::CreateSlider(glm::vec2 position, glm::vec2 size, Color backColor, Color sliderColor, const char* nodeName, Node* parentNode) {
+    Node* DarkMoonEngine::CreateSlider(glm::vec2 position, glm::vec2 size, float value, Color backColor, Color sliderColor, const char* nodeName, Node* parentNode) {
         auto p_nodeSlider = CreateNode(nodeName, parentNode);
 
         // Create slider
-        auto sliderE = std::make_unique<Slider>(position, size, backColor, sliderColor);
+        auto sliderE = std::make_unique<Slider>(position, size, value, backColor, sliderColor);
 
         p_nodeSlider->translate({ position.x, position.y, 0.0f });
         p_nodeSlider->setEntity(std::move(sliderE));

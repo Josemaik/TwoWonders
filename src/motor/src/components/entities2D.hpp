@@ -542,6 +542,8 @@ namespace DarkMoon {
         Color hoverColor;
         Color clickColor;
         ButtonState state{ ButtonState::NORMAL };
+        WindowsManager& wm = WindowsManager::getInstance();
+        InputManager& im = InputManager::getInstance();
 
         Button(glm::vec2 pos = { 0.0f, 0.0f },
             glm::vec2 sz = { 100.0f, 50.0f },
@@ -555,13 +557,21 @@ namespace DarkMoon {
             Color nColor = D_WHITE,
             Color hColor = D_GRAY,
             Color cColor = D_BLACK) :
-            textBox(pos, sz, bCol, txt, f, fS, tCol, verAl, horAl), normalColor(nColor), hoverColor(hColor), clickColor(cColor) {};
+            textBox(pos, sz, bCol, txt, f, fS, tCol, verAl, horAl), normalColor(nColor), hoverColor(hColor), clickColor(cColor)
+        {
+            textBox.box.position = pos;
+            checkMouse();
+        };
 
         void draw(glm::mat4 transMatrix) override {
             // Color
-            WindowsManager& wm = WindowsManager::getInstance();
-            InputManager& im = InputManager::getInstance();
+            checkMouse();
+            // Text box
+            textBox.draw(transMatrix);
+        };
 
+        void checkMouse()
+        {
             glm::vec2 mPos = { im.getMouseX(wm.getWindow()), im.getMouseY(wm.getWindow()) };
             glm::vec2 topLeft = textBox.box.position;
             glm::vec2 bottomRight = { topLeft.x + textBox.box.size.x * wm.getWidthRatio(), topLeft.y + textBox.box.size.y * wm.getHeightRatio() };
@@ -581,23 +591,27 @@ namespace DarkMoon {
                 textBox.box.color = normalColor;
                 state = ButtonState::NORMAL;
             }
-
-            // Text box
-            textBox.draw(transMatrix);
-        };
+        }
     };
 
     struct Slider : Entity {
         Rectangle background;
         Rectangle boxBackground;
         Rectangle slider;
-        float valor = 0.5f; // 0 -> 1
+        WindowsManager& wm = WindowsManager::getInstance();
+        InputManager& im = InputManager::getInstance();
+        float valor{}; // 0 -> 1
 
         Slider(glm::vec2 pos = { 0.0f, 0.0f },
             glm::vec2 sz = { 100.0f, 50.0f },
+            float value = 0.5f,
             Color bCol = D_GRAY,
             Color sCol = D_WHITE) :
-            background(pos, sz, bCol), boxBackground({ pos.x - 1, pos.y - 1 }, { sz.x + 2, sz.y + 2 }, D_GRAY), slider({ pos.x + 1, pos.y + 1 }, { sz.x - 2, sz.y - 2 }, sCol) {};
+            background(pos, sz, bCol), boxBackground({ pos.x - 1, pos.y - 1 }, { sz.x + 2, sz.y + 2 }, D_GRAY), slider({ pos.x + 1, pos.y + 1 }, { sz.x - 2, sz.y - 2 }, sCol), valor{ value }
+        {
+            slider.position = { pos.x + 1, pos.y + 1 };
+            checkMouse();
+        };
 
         void draw(glm::mat4 transMatrix) override {
             // Rectangle box background
@@ -612,9 +626,14 @@ namespace DarkMoon {
             aux = transMatrix;
             aux[3][0] += 1;   aux[3][1] += 1;
 
-            WindowsManager& wm = WindowsManager::getInstance();
-            InputManager& im = InputManager::getInstance();
+            checkMouse();
 
+            aux[0][0] = valor;
+            slider.draw(aux);
+        };
+
+        void checkMouse()
+        {
             glm::vec2 mPos = { im.getMouseX(wm.getWindow()), im.getMouseY(wm.getWindow()) };
             glm::vec2 topLeft = slider.position;
             glm::vec2 bottomRight = { topLeft.x + slider.size.x, topLeft.y + slider.size.y };
@@ -623,10 +642,7 @@ namespace DarkMoon {
                 mPos.y >= topLeft.y && mPos.y <= bottomRight.y)
                 if (im.isMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
                     valor = (mPos.x - topLeft.x) / (bottomRight.x - topLeft.x);
-
-            aux[0][0] = valor;
-            slider.draw(aux);
-        };
+        }
     };
 
     // TODO

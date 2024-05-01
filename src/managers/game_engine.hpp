@@ -30,25 +30,46 @@ namespace ENGI {
         void endDrawing();
         void beginMode3D();
         void endMode3D();
-        void drawLine3D(vec3d startPos, vec3d endPos, Color color);
-        void drawPoint3D(vec3d position, float pointSize, Color color);
         void drawCube(vec3d pos, float width, float height, float lenght, Color color);
         void drawCubeWires(vec3d position, vec3d size, Color color);
         // void drawModel(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
         // void drawModelWires(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
         void drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color);
 
-        // Rectangle
-        void drawRectangle(int posX, int posY, int width, int height, Color color);
-        DarkMoon::Node* createRectangle(vec2d pos, vec2d size, Color color, const char* name, DarkMoon::Node* parentNode);
-        void drawNode(DarkMoon::Node* node, vec2i pos = { -1, -1 }, vec2f scale = { 1.0f, 1.0f });
+        void drawNode(Node* node, vec2i pos = { -1, -1 }, vec2f scale = { 1.0f, 1.0f });
         void drawCircle(int posX, int posY, float radius, Color color);
         void drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color);
         void drawTriangle(vec2d v1, vec2d v2, vec2d v3, Color color);
 
+        // Rectangle
+        Node* drawRectangle(vec2i pos, vec2i size, Color color);
+        Node* createRectangle(vec2i pos, vec2i size, Color color, const char* name, Node* parentNode);
+
+        // Slider
+        Node* drawSlider(vec2i position, vec2i size, float value, Color backColor, Color sliderColor);
+        Node* createSlider(vec2i position, vec2i size, float value, Color backColor, Color sliderColor, const char* nodeName, Node* parentNode);
+
+        // Button
+        Node* drawButton(vec2i position, vec2i size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor);
+        Node* createButton(vec2i position, vec2i size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor, const char* nodeName, Node* parentNode);
+
+        // Cube
+        Node* drawCube(vec3d position, vec3d size, DarkMoon::Color color);
+        Node* createCube(vec3d position, vec3d size, DarkMoon::Color color, const char* nodeName, Node* parentNode);
+
         // Text
-        void drawText(const char* text, int posX, int posY, int fontSize, Color color, Align aligned = Align::LEFT);
+        Node* drawText(const char* text, int posX, int posY, int fontSize, Color color, Aligned aligned = Aligned::LEFT);
+        Node* createText(vec2i position, std::string text, Font* font, int fontSize, Color textColor, const char* nodeName, Node* parentNode, Aligned align = Aligned::LEFT);
+        Node* createTextBox(vec2i position, vec2i size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode);
         Font* getFontDefault();
+
+        // Line 3D
+        Node* drawLine3D(vec3d startPos, vec3d endPos, Color color);
+        Node* createLine3D(vec3d startPos, vec3d endPos, Color color, const char* nodeName, Node* parentNode);
+
+        // Point 3D
+        Node* drawPoint3D(vec3d position, float pointSize, Color color);
+        Node* createPoint3D(vec3d position, float pointSize, Color color, const char* nodeName, Node* parentNode);
 
         // Window
         void initWindow(int width, int height, const char* title);
@@ -65,7 +86,7 @@ namespace ENGI {
         void setTargetCamera(vec3d tar);
         void setUpCamera(vec3d up);
         void setFovyCamera(float fovy);
-        void setProjectionCamera(DarkMoon::CameraProjection proj);
+        void setProjectionCamera(CameraProjection proj);
         vec3d getPositionCamera();
         vec3d getTargetCamera();
         vec3d getUpCamera();
@@ -83,11 +104,11 @@ namespace ENGI {
         bool isGamepadButtonReleased(int gamepad, int button);
         float getGamepadAxisMovement(int gamepad, int axis);
 
-        DarkMoon::Node* loadModel(const char* filename);
+        Node* loadModel(const char* filename);
         float getWorldToScreenX(vec3d pos);
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();
-        void loadAndResizeImage(const char* name, const char* path, DarkMoon::Node* parentNode);
+        void loadAndResizeImage(const char* name, const char* path, Node* parentNode);
         void loadAndResizeImageGif(const char* name, const char* filePath);
         void unloadGifsAndTextures();
         void setReplayMode(bool replay, GameData& gd);
@@ -95,15 +116,14 @@ namespace ENGI {
         float getWidthRate();
         float getHeightRate();
         float getAspectRat();
-        DarkMoon::Node* get2D();
-        DarkMoon::Node* get3D();
-        DarkMoon::Node* createTextBox(glm::vec2 position, glm::vec2 size, Color boxColor, std::string text, DarkMoon::Font* font, int fontSize, Color textColor, Align verticalAligned, Align horizontalAligned, const char* nodeName, DarkMoon::Node* parentNode);
-        DarkMoon::Node* createText(glm::vec2 position, std::string text, DarkMoon::Font* font, int fontSize, Color textColor, const char* nodeName, DarkMoon::Node* parentNode, Align align = Align::LEFT);
-        DarkMoon::Font* getDefaultFont();
+        Node* get2D();
+        Node* get3D();
+        Font* getDefaultFont();
+        void traverseRoot();
 
         // DarkMoon Engine //
 
-        DarkMoon::DarkMoonEngine dmeg;
+        DarkMoonEngine dmeg;
 
         struct cmp_str
         {
@@ -112,13 +132,13 @@ namespace ENGI {
                 return std::strcmp(a, b) < 0;
             }
         };
-        std::map<const char*, DarkMoon::Node*, cmp_str> nodes;
+        std::map<const char*, Node*, cmp_str> nodes;
 
-        DarkMoon::Node* createNode(const char* name, DarkMoon::Node* parentNode);
-        DarkMoon::Node* createNode(DarkMoon::Node* copyNode, DarkMoon::Node* parentNode);
+        Node* createNode(const char* name, Node* parentNode);
+        Node* createNode(Node* copyNode, Node* parentNode);
 
-        DarkMoon::Texture* loadTexture2D(const char* filePath);
-        std::vector<DarkMoon::Texture*> loadTextures2DAnim(const char* filePath);
+        Texture* loadTexture2D(const char* filePath);
+        std::vector<Texture*> loadTextures2DAnim(const char* filePath);
 
     private:
         u16 const width_{}, height_{};
@@ -126,7 +146,7 @@ namespace ENGI {
         bool replayMode{ false };
         GameData* gameData{ nullptr };
 
-        DarkMoon::Camera* camera;
+        Camera* camera;
     };
 
 #endif // !GAME_ENGINE

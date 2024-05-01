@@ -138,7 +138,7 @@ void Game::run()
     auto& sound_system = em.getSingleton<SoundSystem>();
 
     // Incializamos FPSs
-    // engine.setTargetFPS(60);
+    engine.setTargetFPS(60);
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
@@ -169,7 +169,7 @@ void Game::run()
 
     while (!li.gameShouldEnd)
     {
-        elapsed += timeStep240;
+        elapsed += engine.getFrameTime();
         gami.updateFrame();
 
         switch (li.currentScreen)
@@ -180,7 +180,7 @@ void Game::run()
             if (li.playerID == li.max)
                 createEntities();
             // Contador para que pasen X segundos
-            currentTime += timeStep;
+            currentTime += timeStep45;
             if (currentTime > 4.0 || inpi.interact) {
                 li.currentScreen = GameScreen::TITLE;
                 currentTime = 0;
@@ -288,9 +288,9 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
             {
-                if (elapsed >= timeStep)
+                if (elapsed >= timeStep45)
                 {
-                    elapsed -= timeStep;
+                    elapsed -= timeStep45;
 
                     ai_system.update(em);
                     npc_system.update(em);
@@ -304,7 +304,7 @@ void Game::run()
                     attack_system.update(em);
                     life_system.update(em, object_system);
                     sound_system.update();
-                    // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
+                    // if (elapsed < timeStep45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     camera_system.update(em, engine, evm);
                     event_system.update(em, evm, iam, map, object_system, sound_system);
                     particle_system.update(em);
@@ -341,7 +341,7 @@ void Game::run()
         default:
             break;
         }
-        if (elapsed >= timeStep)
+        if (elapsed >= timeStep45)
             elapsed = 0; // Para que no se acumule el tiempo
 
         if (engine.windowShouldClose())
