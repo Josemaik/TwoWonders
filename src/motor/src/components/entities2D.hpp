@@ -246,7 +246,7 @@ namespace DarkMoon {
 
             // Get uniform location
             rm = &RenderManager::getInstance();
-            rm->useShader(rm->shaderText);
+            rm->useShader(rm->shaders["text"]);
             textColorLocation = glGetUniformLocation(rm->getShader()->getIDShader(), "textColor");
         };
 
@@ -315,11 +315,11 @@ namespace DarkMoon {
             position = glm::vec2(transMatrix[3][0], transMatrix[3][1]);
 
             if (!font)
-                font = rm->defaultFont;
+                font = rm.defaultFont;
             if (text.empty())
                 return;
 
-            auto normColor = rm->normalizeColor(color);
+            auto normColor = rm.normalizeColor(color);
             glUniform3f(textColorLocation, normColor.r, normColor.g, normColor.b);
 
             // Blend
@@ -368,13 +368,13 @@ namespace DarkMoon {
 
                 // Update VBO for each character
                 float vertices[6][4] = {
-                    { rm->normalizeX(posX)    , rm->normalizeY(posY + h), 0.0f, 1.0f },
-                    { rm->normalizeX(posX)    , rm->normalizeY(posY)    , 0.0f, 0.0f },
-                    { rm->normalizeX(posX + w), rm->normalizeY(posY)    , 1.0f, 0.0f },
+                    { rm.normalizeX(posX)    , rm.normalizeY(posY + h), 0.0f, 1.0f },
+                    { rm.normalizeX(posX)    , rm.normalizeY(posY)    , 0.0f, 0.0f },
+                    { rm.normalizeX(posX + w), rm.normalizeY(posY)    , 1.0f, 0.0f },
 
-                    { rm->normalizeX(posX)    , rm->normalizeY(posY + h), 0.0f, 1.0f },
-                    { rm->normalizeX(posX + w), rm->normalizeY(posY)    , 1.0f, 0.0f },
-                    { rm->normalizeX(posX + w), rm->normalizeY(posY + h), 1.0f, 1.0f }
+                    { rm.normalizeX(posX)    , rm.normalizeY(posY + h), 0.0f, 1.0f },
+                    { rm.normalizeX(posX + w), rm.normalizeY(posY)    , 1.0f, 0.0f },
+                    { rm.normalizeX(posX + w), rm.normalizeY(posY + h), 1.0f, 1.0f }
                 };
 
                 // Configure VAO/VBO for texture quads
