@@ -33,6 +33,7 @@ namespace DarkMoon {
         Node();
         int addChild(std::unique_ptr<Node> child);
         int removeChild(Node* child);
+
         template<typename T> bool setEntity(std::unique_ptr<T> newEntity) {
             m_entity = std::move(newEntity);
             return true;
@@ -40,15 +41,9 @@ namespace DarkMoon {
 
         void setVisible(bool visible);
         void setVisibleOne(bool visible);
-        bool isVisible();
+        bool isVisible() { return m_visible; };
         void clearChildren() { m_children.clear(); };
-        void destroy() {
-            /* TODO
-            if(m_parent) m_parent->removeChild(this);
-            for(auto& child : m_children)
-                child->destroy();
-            */
-        };
+        void destroy();
 
         // Transform
         void traverse(glm::mat4 parentMatrix);

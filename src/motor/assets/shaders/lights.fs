@@ -21,6 +21,8 @@ uniform vec3 Ka;
 uniform vec3 Ks;
 uniform float Shininess;
 
+const float MIN_SHININESS = 0.1;
+
 // -------------- //
 // --- Lights --- //
 // -------------- //
@@ -61,6 +63,8 @@ vec3 Phong(){
     vec3 n = normalize(Normal);
     vec3 v = normalize(vec3(-FragPos));
 
+    float ShininessAux = max(Shininess, MIN_SHININESS);
+
     int pLightCount = min(NumPointLights, MAX_POINT_LIGHTS);
     for(int i = 0; i < pLightCount; i++){
         vec3 l = normalize(vec3(pointsLights[i].position) - FragPos);
@@ -71,7 +75,7 @@ vec3 Phong(){
 
         vec3 ambientTerm = Ka * pointsLights[i].color.rgb;
         vec3 diffuseTerm = Kd * max(dot(l,n), 0.0) * pointsLights[i].color.rgb;
-        vec3 specularTerm = Ks * pow(max(dot(r,v), 0.0), Shininess) * pointsLights[i].color.rgb;
+        vec3 specularTerm = Ks * pow(max(dot(r,v), 0.0), ShininessAux) * pointsLights[i].color.rgb;
 
         totalLight += attenuation * (ambientTerm + diffuseTerm + specularTerm);
     }
@@ -85,7 +89,7 @@ vec3 Phong(){
         float diff = max(dot(n, lightDir), 0.0);
 
         vec3 reflectDir = reflect(-lightDir, n);
-        float spec = pow(max(dot(reflectDir, v), 0.0), Shininess);
+        float spec = pow(max(dot(reflectDir, v), 0.0), ShininessAux);
 
         vec3 ambientTerm = Ka * directionalLights[i].color.rgb;
         vec3 diffuseTerm = Kd * diff * directionalLights[i].color.rgb;

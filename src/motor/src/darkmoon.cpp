@@ -318,6 +318,7 @@ namespace DarkMoon {
         auto p_nodeLight = CreateNode(nodeName, parentNode);
         auto light = std::make_unique<PointLight>(position, color);
         p_nodeLight->setEntity(std::move(light));
+        p_nodeLight->translate({ position.x, position.y, position.z });
 
         // m_renderManager.lights.push_back(dynamic_cast<Light*>(p_nodeLight->getEntity()));
 
