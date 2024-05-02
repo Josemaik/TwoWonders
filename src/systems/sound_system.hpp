@@ -14,6 +14,7 @@ struct SoundSystem {
     void initBanks(const char* master_bank_location, const char* master_string_location, const char* ui_bank_location,const char* ambient_bank_location,  const char* music_bank_location, const char* SFX_bank_location);
     void initBuses();
     void initChannels();
+    void initEvents();
     void createEventInstance();
     void playMusicMenu();
     void playAmbient();
@@ -144,7 +145,7 @@ struct SoundSystem {
     void play_music();
     void music_stop();
     void ambient_stop();
-    void SFX_stop();
+    void SFX_pasos_stop();
 
     void update();
     void clear();
@@ -177,17 +178,21 @@ private:
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription;
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Ambiente;
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica;
-    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_SFX;  
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_pasos;  
     FMOD_STUDIO_EVENTINSTANCE* eventInstance;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica;
-    FMOD_STUDIO_EVENTINSTANCE* eventInstance_SFX;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_SFX_pasos;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_volcan;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_mazmorra;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_pradera;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_monte;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_boss_final;
     FMOD_STUDIO_BUS* bus;
     FMOD_STUDIO_BUS* sfxBus;
     FMOD_STUDIO_BUS* AmbientBus;
     FMOD_STUDIO_BUS* MusicBus;
+
     
     FMOD_CHANNELGROUP *masterGroup {};
     FMOD_CHANNELGROUP *ambientGroup {};

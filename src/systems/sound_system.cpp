@@ -18,8 +18,7 @@ SoundSystem::SoundSystem() {
     ERRCHECK(FMOD_System_SetOutput(coreSystem, FMOD_OUTPUTTYPE_AUTODETECT));
     ERRCHECK(FMOD_Studio_System_Initialize(soundSystem, 512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0));
 
-    
-
+  
 }
 
 void SoundSystem::initBanks(const char* master_bank_location, const char* master_string_location, const char* ui_bank_location, const char* ambient_bank_location, const char* music_bank_location, const char* SFX_bank_location)
@@ -36,8 +35,9 @@ void SoundSystem::initBanks(const char* master_bank_location, const char* master
 
     initChannels();
 
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_volcan", &eventDescription_Musica));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica_volcan));
+    initEvents();
+
+ 
 
     
 }
@@ -52,12 +52,7 @@ void SoundSystem::initBuses(){
     ERRCHECK(FMOD_Studio_System_GetBus(soundSystem, "bus:/SFX", &sfxBus));
     ERRCHECK(FMOD_Studio_System_GetBus(soundSystem, "bus:/Ambience", &AmbientBus));
     ERRCHECK(FMOD_Studio_System_GetBus(soundSystem, "bus:/Music", &MusicBus));
-
-   // ERRCHECK(FMOD_System_GetMasterChannelGroup(coreSystem, &masterGroup));
-   //ERRCHECK(FMOD_Studio_Bus_GetChannelGroup(AmbientBus, &ambientGroup));
-    //ERRCHECK(FMOD_Studio_Bus_GetChannelGroup(MusicBus, &musicGroup));
-    //ERRCHECK(FMOD_Studio_Bus_GetChannelGroup(sfxBus, &sfxGroup));
-    
+  
 }
 
 void SoundSystem::initChannels(){
@@ -81,11 +76,29 @@ void SoundSystem::initChannels(){
     //ERRCHECK(FMOD_Studio_Bus_GetChannelGroup(MusicBus, &musicGroup));
     //ERRCHECK(FMOD_Studio_Bus_GetChannelGroup(sfxBus, &sfxGroup));
 }
+void SoundSystem::initEvents(){
 
-void SoundSystem::play_music() {
-    FMOD_Studio_EventInstance_Start(eventInstance_Musica);
-    update();
+    //MUSICA DE LOS DIFERENTES NIVELES
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_volcan", &eventDescription_Musica));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica_volcan));
+
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/Mazmorra/music_mazmorra", &eventDescription_Musica));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica_mazmorra));
+
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_pradera", &eventDescription_Musica));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica_pradera));
+
+
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_monte", &eventDescription_Musica));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica_monte));
+
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_boss_final", &eventDescription));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica_boss_final));
+
+
 }
+
+
 
 void SoundSystem::playMusicMenu() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/Menu/menu_music", &eventDescription_Musica));
@@ -95,36 +108,32 @@ void SoundSystem::playMusicMenu() {
 
 
 void SoundSystem::sonido_music_volcan() {
-    //ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_volcan", &eventDescription_Musica));
-    //ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica_volcan));
-
-    //play_music();
     FMOD_Studio_EventInstance_Start(eventInstance_Musica_volcan);
     update();
 
 }
 
 void SoundSystem::sonido_music_mazmorra() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/Mazmorra/music_mazmorra", &eventDescription_Musica));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica));
-    play_music();
+    FMOD_Studio_EventInstance_Start(eventInstance_Musica_mazmorra);
+    update();
+
 
 }
 void SoundSystem::sonido_music_monte() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_monte", &eventDescription_Musica));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_Musica));
-
-    play_music();
-}
-
-void SoundSystem::sonido_music_pradera() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_pradera", &eventDescription_Musica));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_Musica));
-
-    play_music();
+    FMOD_Studio_EventInstance_Start(eventInstance_Musica_monte);
     update();
 }
 
+void SoundSystem::sonido_music_pradera() {
+    FMOD_Studio_EventInstance_Start(eventInstance_Musica_pradera);
+    update();
+}
+
+void SoundSystem::sonido_music_boss_final(){
+    FMOD_Studio_EventInstance_Start(eventInstance_Musica_boss_final);
+    update();
+
+}  
 
 
 void SoundSystem::seleccion_menu() {
@@ -273,18 +282,8 @@ void SoundSystem::sonido_muerte_enemigo() {
     play();
     update();
 }
-void SoundSystem::sonido_pasos_pradera() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_pradera", &eventDescription));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_SFX));
-    play_pasos();
-    update();
-}
-void SoundSystem::sonido_pasos_prision() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_prision", &eventDescription));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
-    play();
-    update();
-}
+
+
 void SoundSystem::sonido_piedras_golpe() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Piedras_golpe", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
@@ -370,12 +369,7 @@ void SoundSystem::sonido_h_bola_fuego() {
 
 
 
-void SoundSystem::sonido_pasos_volcan() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_volcan", &eventDescription));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
-    play();
-    update();
-}
+
 
 
 void SoundSystem::sonido_golem_mov() {
@@ -461,12 +455,7 @@ void SoundSystem::sonido_equipar_gorro() {
     update();
 }
 
-void SoundSystem::sonido_pasos_nieve() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_monte", &eventDescription));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
-    play();
-    update();
-}
+
 
 void SoundSystem::sonido_h_estacas() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Ataques/H_estacas", &eventDescription));
@@ -607,13 +596,7 @@ ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Arany
         update();
 
     }     
-    void SoundSystem::sonido_music_boss_final(){
-        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_boss_final", &eventDescription));
-        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
-        play();
-        update();
-
-    }     
+   
     void SoundSystem::sonido_escaleras_biblio(){
         ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Escalera_biblioteca", &eventDescription));
         ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
@@ -628,14 +611,35 @@ ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Arany
         update();
 
     }
-    void SoundSystem::sonido_pasos_madera(){
-        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_biblioteca", &eventDescription));
-        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
-        play();
-        update();
 
+
+    //PASOS
+
+    void SoundSystem::sonido_pasos_pradera() {
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_pradera", &eventDescription_pasos));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance_SFX_pasos));
+     }
+
+    void SoundSystem::sonido_pasos_prision() {
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_prision", &eventDescription_pasos));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance));
+    }
+
+    void SoundSystem::sonido_pasos_volcan() {
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_volcan", &eventDescription_pasos));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance));
+    }
+    void SoundSystem::sonido_pasos_nieve() {
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_monte", &eventDescription_pasos));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance));
+    }
+
+    void SoundSystem::sonido_pasos_madera(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_biblioteca", &eventDescription_pasos));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance));
     }               
 
+    
     
 
 //DIALOGOS
@@ -709,44 +713,46 @@ void SoundSystem::sonido_DMaestro() {
 
 
 
+//ACCIONAR O PARAR EVENTOS
 
-
+    //accionar eventos SFX
 void SoundSystem::play() {
     FMOD_Studio_EventInstance_Start(eventInstance);
 }
 
+    //accionar evento de pasos
 void SoundSystem::play_pasos() {
-    FMOD_Studio_EventInstance_Start(eventInstance_SFX);
-
+    FMOD_Studio_EventInstance_Start(eventInstance_SFX_pasos);
+    update();
+}
+    //accionar musica menu
+void SoundSystem::play_music() {
+    FMOD_Studio_EventInstance_Start(eventInstance_Musica);
+    update();
 }
 
-void SoundSystem::update() {
-    ERRCHECK(FMOD_Studio_System_Update(soundSystem));
-}
 
-void SoundSystem::clear() {
-    FMOD_Studio_Bank_Unload(master_bank);
-    FMOD_Studio_Bank_Unload(strings_bank);
-    FMOD_Studio_Bank_Unload(ui_bank);
-    FMOD_Studio_Bank_Unload(music_bank);
-    FMOD_Studio_Bank_Unload(ambient_bank);
-    FMOD_Studio_Bank_Unload(SFX_bank);
-    FMOD_Studio_System_UnloadAll(soundSystem);
-}
-
+    //parar musica menu
 void SoundSystem::music_stop() {
     FMOD_Studio_EventInstance_Stop(eventInstance_Musica, FMOD_STUDIO_STOP_ALLOWFADEOUT);
 }
+
+    //parar ambiente
 void SoundSystem::ambient_stop() {
     FMOD_Studio_EventInstance_Stop(eventInstance_Ambiente, FMOD_STUDIO_STOP_ALLOWFADEOUT);
     // update();
 }
 
-void SoundSystem::SFX_stop() {
-    FMOD_Studio_EventInstance_Stop(eventInstance_SFX, FMOD_STUDIO_STOP_ALLOWFADEOUT);
+    //parar pasos
+void SoundSystem::SFX_pasos_stop() {
+    FMOD_Studio_EventInstance_Stop(eventInstance_SFX_pasos, FMOD_STUDIO_STOP_ALLOWFADEOUT);
     update();
 }
 
+
+
+
+//CONFIGURACION DE VOLUMENES
 float SoundSystem::getVolumeMaster() {
     float currentVolume;
     ERRCHECK(FMOD_ChannelGroup_GetVolume(masterGroup, &currentVolume));
@@ -811,4 +817,20 @@ void SoundSystem::muteSFX(){
     sfxVolume = getVolumeSFX();
     setVolumeSFX(0);
 
+}
+
+
+//UPDATE Y DESCARGA DE BANCOS
+void SoundSystem::update() {
+    ERRCHECK(FMOD_Studio_System_Update(soundSystem));
+}
+
+void SoundSystem::clear() {
+    FMOD_Studio_Bank_Unload(master_bank);
+    FMOD_Studio_Bank_Unload(strings_bank);
+    FMOD_Studio_Bank_Unload(ui_bank);
+    FMOD_Studio_Bank_Unload(music_bank);
+    FMOD_Studio_Bank_Unload(ambient_bank);
+    FMOD_Studio_Bank_Unload(SFX_bank);
+    FMOD_Studio_System_UnloadAll(soundSystem);
 }
