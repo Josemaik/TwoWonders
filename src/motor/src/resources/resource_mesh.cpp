@@ -31,6 +31,7 @@ namespace DarkMoon {
         glGenVertexArrays(1, &m_VAO);
         glGenBuffers(1, &m_VBO);
         glGenBuffers(1, &m_EBO);
+        //glGenBuffers(1, &m_BAO);
 
         // Bind vertex array
         glBindVertexArray(m_VAO);
@@ -43,6 +44,10 @@ namespace DarkMoon {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint16_t), &indices[0], GL_STATIC_DRAW);
 
+        //Bind buffer and fill with nones data
+        // glBindBuffer(GL_ARRAY_BUFFER,m_BAO);
+        // glBufferData(GL_ARRAY_BUFFER,sizeof(num_bones[0]) * num_bones.size(), &num_bones[0], GL_STATIC_DRAW);
+
         // Enable and specify vertex positions
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
@@ -52,7 +57,12 @@ namespace DarkMoon {
         // Enable and specify vertex coords
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, textCoords));
-
+        // Enable and specify bones
+        // glEnableVertexAttribArray(BONE_ID_LOCATION);
+        // glVertexAttribPointer(BONE_ID_LOCATION,MAX_NUM_BONES_PER_VERTEX,GL_INT,sizeof(VertexBoneData),(void*)offsetof(Vertex,num_bones));
+        // glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
+        // glVertexAttribPointer(BONE_WEIGHT_LOCATION,MAX_NUM_BONES_PER_VERTEX,GL_FLOAT,GL_FALSE,sizeof(VertexBoneData),(void*)offsetof(Vertex,num_bones));
+        
         // Unbind vertex array
         glBindVertexArray(0);
 

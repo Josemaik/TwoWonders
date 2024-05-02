@@ -4,7 +4,7 @@ namespace DarkMoon {
     void Model::load(const char* filePath, ResourceManager& rm) {
         // Read file
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs);
+        const aiScene* scene = importer.ReadFile(filePath,aiProcess_Triangulate | aiProcess_FlipUVs);
         if (!scene || !scene->mRootNode) {
             std::cerr << "[ERROR ASSIMP] : " << importer.GetErrorString() << std::endl;
             return;
@@ -50,8 +50,10 @@ namespace DarkMoon {
         if (std::string::npos != last_slash_idx)
             directory = directory.substr(0, last_slash_idx);
 
+        mesh_base_vertex.resize(scene->mNumMeshes);
         // Process all the node's meshes
         for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
+            //auto name = scene->mMeshes[0]->mName;
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
             aiMaterial* aiMaterial = scene->mMaterials[mesh->mMaterialIndex];
             //std::cout << "Material: " << aiMaterial->GetName().C_Str() << std::endl;
@@ -67,6 +69,8 @@ namespace DarkMoon {
     void Model::processMesh(aiMesh* mesh, aiMaterial* aiMaterial, const aiScene*, ResourceManager& rm) {
         // Process the vertices
         std::vector<Vertex> vertices(mesh->mNumVertices);
+
+        m_Bones.resize(mesh->mNumVertices);
 
         for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
             Vertex vertex;
@@ -104,6 +108,13 @@ namespace DarkMoon {
             for (unsigned int j = 0; j < face.mNumIndices; ++j) {
                 indices.push_back(static_cast<unsigned short>(face.mIndices[j]));
             }
+        }
+
+        //Process bones
+        if(mesh->HasBones()){
+            for(unsigned int i = 0;i < mesh->mNumBones;++i){
+                processBone(i,mesh->mBones[i]);
+            }        
         }
 
         //std::cout << aiMaterial->GetName().C_Str() << "\n";
@@ -161,5 +172,30 @@ namespace DarkMoon {
         }
         else
             material->texture = nullptr;
+    }
+    int Model::getBoneID(const aiBone* pBone){
+        int bone_id = 0;
+        std::string bone_name{pBone->mName.C_Str()};
+        if(m_BoneNameToIndexMap.find(bone_name) == m_BoneNameToIndexMap.end()){
+            bone_id = static_cast<int>(m_BoneNameToIndexMap.size());
+            m_BoneNameToIndexMap[bone_name] = bone_id;
+        }else{
+            bone_id = m_BoneNameToIndexMap[bone_name];
+        }
+        return bone_id;
+    }
+    void Model::processBone(int mesh_index, const aiBone* pbone){
+        //vertices affected by this bone
+        std::cout << "nvertices affected by bone " << pbone->mNumWeights << "\n";
+        int bone_id = getBoneID(pbone);
+        for(uint i = 0; i < pbone->mNumWeights ;i++){
+            const aiVertexWeight& vw = pbone->mWeights [i];
+            uint global_vertex_id = mesh_base_vertex[mesh_index] + vw.mVertexId;
+            //std::cout << "global_vertex_id " << global_vertex_id << " ";
+            assert(global_vertex_id < m_Bones.size());
+            std::cout << i << " vertex id " << vw.mVertexId << " weight " << vw.mWeight << "\n";
+            m_Bones[global_vertex_id].AddBoneata(bone_id,vw.mWeight);
+        }
+        std::cout << "\n";
     }
 }
