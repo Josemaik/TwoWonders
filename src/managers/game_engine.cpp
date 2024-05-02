@@ -31,6 +31,11 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["Boat"] = dmeg.CreateNode("Boat", nodes["HUD"]);
     nodes["AnimTextures"] = dmeg.CreateNode("AnimTextures", nodes["HUD"]);
     nodes["Debug"] = dmeg.CreateNode("Debug", nodes["HUD"]);
+    nodes["DebugPhy"] = dmeg.CreateNode("DebugPhy", nodes["Debug"]);
+    nodes["DebugAI1"] = dmeg.CreateNode("DebugAI1", nodes["Debug"]);
+    nodes["DebugAI2"] = dmeg.CreateNode("DebugAI2", nodes["Debug"]);
+    nodes["DebugAI3"] = dmeg.CreateNode("DebugAI3", nodes["Debug"]);
+    nodes["DebugAI4"] = dmeg.CreateNode("DebugAI4", nodes["Debug"]);
 
     ENGI::GameEngine::setExitKey(D_KEY_F8);
 
@@ -98,7 +103,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     createRectangle({ 0, 0 }, { 1, 4 }, { D_RED }, "vida_rect", nodes["HUD"]);
 
     // Rectángulo blanco debug físicas
-    createRectangle({ 0, 55 }, { 225, 520 }, D_WHITE, "debugRectPhy", nodes["Debug"]);
+    createRectangle({ 0, 55 }, { 225, 520 }, D_WHITE, "debugRectPhy", nodes["DebugPhy"]);
 
     // Borde Barra Maná
     loadAndResizeImage("borde_mana", "assets/HUD/mana_bar.png", nodes["ManaBar"]);
@@ -348,16 +353,6 @@ void ENGI::GameEngine::drawCircleSector(vec2d, float, float, float, int, Color) 
 
 void ENGI::GameEngine::drawTriangle(vec2d, vec2d, vec2d, Color) {
     //DrawTriangle(v1.toRaylib(), v2.toRaylib(), v3.toRaylib(), color);
-}
-
-////// TEXT //////
-
-Node* ENGI::GameEngine::drawText(const char* text, int x, int y, int fontSize, Color c, Aligned align) {
-    return dmeg.CreateText({ x, y }, text, getDefaultFont(), fontSize, c, align, "text", nodes["TextCopy"]);
-}
-
-Font* ENGI::GameEngine::getFontDefault() {
-    return dmeg.GetDefaultFont();
 }
 
 ////// WINDOW //////
@@ -742,16 +737,16 @@ Node* ENGI::GameEngine::createNode(Node* copyNode, Node* parentNode)
 Node* ENGI::GameEngine::createRectangle(vec2i pos, vec2i size, Color color, const char* name, Node* parentNode)
 {
     if (!nodes[name])
-        nodes[name] = dmeg.CreateRectangle({ pos.x, pos.y }, { size.x, size.y }, color, name, parentNode);
+        nodes[name] = dmeg.CreateRectangle({ pos.x, pos.y }, size.toGlm(), color, name, parentNode);
+    else
+        nodesToDraw[nodes[name]] = { vec2i(pos.x, pos.y), size.to_other<float>() };
 
     return nodes[name];
 }
 
-
-
 Node* ENGI::GameEngine::drawRectangle(vec2i pos, vec2i size, Color color)
 {
-    return dmeg.CreateRectangle({ pos.x, pos.y }, { size.x, size.y }, color, "rectangle", nodes["Copy"]);
+    return dmeg.CreateRectangle({ pos.x, pos.y }, size.toGlm(), color, "rectangle", nodes["Copy"]);
 }
 
 ///// TextBox /////
@@ -760,6 +755,11 @@ Node* ENGI::GameEngine::createTextBox(vec2i position, vec2i size, Color boxColor
 {
     if (!nodes[nodeName])
         nodes[nodeName] = dmeg.CreateTextBox(position.toGlm(), size.toGlm(), boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), size.to_other<float>() };
+        nodes[nodeName]->getEntity<TextBox>()->text.setText(text);
+    }
 
     return nodes[nodeName];
 }
@@ -770,9 +770,36 @@ Node* ENGI::GameEngine::createText(vec2i position, std::string text, Font* font,
 {
     if (!nodes[nodeName])
         nodes[nodeName] = dmeg.CreateText(position.toGlm(), text, font, fontSize, color, align, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {1.f, 1.f} };
+        nodes[nodeName]->getEntity<Text>()->setText(text);
+    }
 
     return nodes[nodeName];
 }
+
+Node* ENGI::GameEngine::createText(vec2i position, std::string text, Color c, const char* nodeName, Node* parentNode, int fontSize)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateText(position.toGlm(), text, getDefaultFont(), fontSize, c, Aligned::LEFT, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {1.f, 1.f} };
+        nodes[nodeName]->getEntity<Text>()->setText(text);
+    }
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::drawText(const char* text, int x, int y, int fontSize, Color c, Aligned align) {
+    return dmeg.CreateText({ x, y }, text, getDefaultFont(), fontSize, c, align, "text", nodes["TextCopy"]);
+}
+
+Font* ENGI::GameEngine::getFontDefault() {
+    return dmeg.GetDefaultFont();
+}
+
 
 ///// Slider /////
 
@@ -780,6 +807,8 @@ Node* ENGI::GameEngine::createSlider(vec2i position, vec2i size, float value, Co
 {
     if (!nodes[nodeName])
         nodes[nodeName] = dmeg.CreateSlider(position.toGlm(), size.toGlm(), value, backColor, sliderColor, nodeName, parentNode);
+    else
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), size.to_other<float>() };
 
     return nodes[nodeName];
 }
@@ -795,6 +824,24 @@ Node* ENGI::GameEngine::createButton(vec2i position, vec2i size, std::string tex
 {
     if (!nodes[nodeName])
         nodes[nodeName] = dmeg.CreateButton(position.toGlm(), size.toGlm(), text, font, fontSize, textColor, verticalAligned, horizontalAligned, normalColor, hoverColor, clickColor, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), size.to_other<float>() };
+        nodes[nodeName]->getEntity<Button>()->textBox.text.setText(text);
+    }
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::createButton(vec2i position, vec2i size, std::string text, const char* nodeName, Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateButton(position.toGlm(), size.toGlm(), text, dmeg.GetDefaultFont(), 20, D_WHITE, Aligned::CENTER, Aligned::CENTER, D_MINT_LIGHT, D_MINT, D_MINT_DARK, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), size.to_other<float>() };
+        nodes[nodeName]->getEntity<Button>()->textBox.text.setText(text);
+    }
 
     return nodes[nodeName];
 }
@@ -810,6 +857,8 @@ Node* ENGI::GameEngine::createCube(vec3d position, vec3d size, DarkMoon::Color c
 {
     if (!nodes[nodeName])
         nodes[nodeName] = dmeg.CreateCube(position.toGlm(), size.toGlm(), color, nodeName, parentNode);
+    else
+        nodes[nodeName]->setVisibleOne(true);
 
     return nodes[nodeName];
 }
@@ -825,6 +874,8 @@ Node* ENGI::GameEngine::createLine3D(vec3d startPos, vec3d endPos, Color color, 
 {
     if (!nodes[nodeName])
         nodes[nodeName] = dmeg.CreateLine3D(startPos.toGlm(), endPos.toGlm(), 20.0f, color, nodeName, parentNode);
+    else
+        nodes[nodeName]->setVisibleOne(true);
 
     return nodes[nodeName];
 }
@@ -840,6 +891,8 @@ Node* ENGI::GameEngine::createPoint3D(vec3d position, float pointSize, Color col
 {
     if (!nodes[nodeName])
         nodes[nodeName] = dmeg.CreatePoint3D(position.toGlm(), pointSize, color, nodeName, parentNode);
+    else
+        nodes[nodeName]->setVisibleOne(true);
 
     return nodes[nodeName];
 }
@@ -881,5 +934,10 @@ Node* ENGI::GameEngine::get3D()
 
 void ENGI::GameEngine::traverseRoot()
 {
+    for (auto& [node, pair] : nodesToDraw)
+        drawNode(node, pair.first);
+
     dmeg.GetRootNode()->traverse(glm::mat4());
+
+    nodesToDraw.clear();
 }

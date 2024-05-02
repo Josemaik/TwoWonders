@@ -340,6 +340,7 @@ namespace DarkMoon {
             {
                 auto lastRatio = ratio;
                 ratio = wm->getHeightRatio();
+                scale = static_cast<float>(fontSize) / 34.0f * ratio;
                 for (auto& w : widths)
                     w *= ratio / lastRatio;
             }
@@ -382,9 +383,12 @@ namespace DarkMoon {
             maxHeight *= scale;
 
             // Iterate through all characters
-
+            auto offSetY = maxHeight * 0.8f;
             if (numLines != 1)
+            {
+                offSetY = maxHeight / 2;
                 position.y -= maxHeight * static_cast<float>(numLines) * 0.6f;
+            }
 
             int i{ 1 };
 #ifdef _WIN32
@@ -421,7 +425,7 @@ namespace DarkMoon {
                 Character ch = font->characters[c];
 
                 float posX = aux_x + static_cast<float>(ch.bearing.x) * scale;
-                float posY = position.y - static_cast<float>(ch.bearing.y) * scale + maxHeight / 2;
+                float posY = position.y - static_cast<float>(ch.bearing.y) * scale + offSetY;
 
                 float w = static_cast<float>(ch.size.x) * scale;
                 float h = static_cast<float>(ch.size.y) * scale;
@@ -457,6 +461,10 @@ namespace DarkMoon {
 
             rm.useShader(rm.shaders["color"]);
         };
+
+        std::wstring getText() {
+            return text;
+        }
 
     private:
         std::wstring text{};

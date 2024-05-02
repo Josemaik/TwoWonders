@@ -75,6 +75,7 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
 
     auto wRate = engine.getWidthRate();
     auto hRate = engine.getHeightRate();
+    int downRate = static_cast<int>(83.33f * hRate);
 
     int posBackX = static_cast<int>(static_cast<float>(middleX) - static_cast<float>(fondoWidth) * wRate / 2);
     int posBackY = static_cast<int>(static_cast<float>(middleY) - static_cast<float>(fondoHeight) * hRate / 2);
@@ -93,47 +94,38 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
     posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.3f) - static_cast<int>(static_cast<float>(buttonHeight) * hRate / 2.f);
 
     // Botones
-    if (!nodeExists(engine, "initScreen")) {
-        auto* init = engine.createNode("initScreen", getNode(engine, "Menu"));
+    std::vector<Node*> buttons;
+    auto* init = engine.createNode("initScreen", getNode(engine, "Menu"));
 
-        engine.createButton({}, { buttonWidth, buttonHeight }, "JUGAR",
-            engine.getFontDefault(), 15,
-            D_BLACK,
-            Aligned::CENTER, Aligned::CENTER,
-            { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
-            "Boton jugar", init);
+    buttons.push_back(engine.createButton({ posX, posY }, { buttonWidth, buttonHeight }, "JUGAR",
+        engine.getFontDefault(), 15,
+        D_BLACK,
+        Aligned::CENTER, Aligned::CENTER,
+        { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
+        "Boton jugar", init));
 
-        engine.createButton({}, { buttonWidth, buttonHeight }, "CONFIGURACION",
-            engine.getFontDefault(), 15,
-            D_BLACK,
-            Aligned::CENTER, Aligned::CENTER,
-            { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
-            "Boton configuracion", init);
+    buttons.push_back(engine.createButton({ posX, posY + downRate }, { buttonWidth, buttonHeight }, "CONFIGURACION",
+        engine.getFontDefault(), 15,
+        D_BLACK,
+        Aligned::CENTER, Aligned::CENTER,
+        { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
+        "Boton configuracion", init));
 
-        engine.createButton({}, { buttonWidth, buttonHeight }, "SALIR",
-            engine.getFontDefault(), 15,
-            D_BLACK,
-            Aligned::CENTER, Aligned::CENTER,
-            { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
-            "Boton salir", init);
-    }
+    buttons.push_back(engine.createButton({ posX, posY + 2 * downRate }, { buttonWidth, buttonHeight }, "SALIR",
+        engine.getFontDefault(), 15,
+        D_BLACK,
+        Aligned::CENTER, Aligned::CENTER,
+        { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
+        "Boton salir", init));
 
-    auto* init = getNode(engine, "initScreen");
+    for (auto& bt : buttons)
+        engine.drawNode(bt);
 
     auto& li = em.getSingleton<LevelInfo>();
     // auto& inpi = em.getSingleton<InputInfo>();
 
-    int downRate = static_cast<int>(83.33f * hRate);
-
     for (auto& bt : init->getChildren()) {
         auto but = dynamic_cast<Button*>(bt->getEntity());
-        // Recolocar botones
-        if (bt->name == "Boton jugar")
-            engine.drawNode(bt, { posX, posY });
-        else if (bt->name == "Boton configuracion")
-            engine.drawNode(bt, { posX, posY + downRate });
-        else if (bt->name == "Boton salir")
-            engine.drawNode(bt, { posX, posY + 2 * downRate });
 
         // Comprobar estado del boton
         if (but->state == ButtonState::CLICK) {
@@ -289,17 +281,14 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
     float reScaleY = engine.getHeightRate();
 
     int posX = static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 2 - (static_cast<float>(aux_width) * reScaleX) / 2);
-    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2 - (static_cast<float>(aux_height) * reScaleY) / 1.5f);
+    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2 - (static_cast<float>(aux_height) * reScaleY) / 2);
 
-    engine.drawNode(controles, { posX, posY }, { reScaleX, reScaleY });
-
-    auto txtBox = engine.createTextBox({ engine.getScreenWidth() / 2 - 100, engine.getScreenHeight() - 100 },
-        { 200, 50 }, D_WHITE, "DALE A [E] PARA SALIR", engine.getFontDefault(),
-        20, D_WHITE, Aligned::CENTER, Aligned::CENTER,
+    auto* txtBox = engine.createText({ engine.getScreenWidth() / 2 - 100, engine.getScreenHeight() - 50 },
+        "DALE A [E] PARA SALIR", engine.getDefaultFont(), 20, D_WHITE,
         "Texto controles", getNode(engine, "Menu"));
 
-    auto entTxtBox = dynamic_cast<TextBox*>(txtBox->getEntity());
-    entTxtBox->drawBox = false;
+    engine.drawNode(controles, { posX, posY });
+    engine.drawNode(txtBox);
 
     engine.traverseRoot();
     engine.endDrawing();
@@ -1493,8 +1482,8 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
     else if (inpi.debugAI2)
         drawDebuggerInGameIA(engine, em);
 
-    // else if (inpi.pathfind)
-    //     drawTestPathfindinf(engine, em);
+    else if (inpi.pathfind)
+        drawTestPathfindinf(engine, em);
 
     getNode(engine, "TextCopy")->setVisibleOne(true);
 
@@ -1503,325 +1492,309 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
     engine.endDrawing();
 }
 
-uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::map<uint16_t, vec3d>& nodes) {
-    uint16_t nearestNodeId = 0; // Suponemos que el primer nodo es el más cercano inicialmente
-    double minDistance = std::numeric_limits<double>::max(); // Inicializamos la distancia mínima con un valor muy grande
-    vec3d nearestpos{};
-    for (const auto& node : nodes) {
-        double dist = position.distance(node.second); // Calculamos la distancia entre la posición y el nodo actual
-        if (dist < minDistance) { // Si encontramos un nodo más cercano
-            minDistance = dist;
-            nearestNodeId = node.first;
-            nearestpos = node.second;
+// Interfaz para probar el pathfinding
+void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
+    auto& debug = em.getSingleton<Debug_t>();
+    auto& navs = em.getSingleton<NavmeshInfo>();
+    auto& li = em.getSingleton<LevelInfo>();
+    //Dibujado de titulo y ventana
+    auto* debugNode = getNode(engine, "DebugAI4");
+    engine.createRectangle({ engine.getScreenWidth() - 400, 300 }, { 495, 645 }, { 255, 255, 255, 128 }, "pathfinding", debugNode);
+    engine.createText({ engine.getScreenWidth() - 370, 320 }, "PATHFINDING", D_RED, "pathfinding_title", debugNode);
+
+    // Datos de los botones
+    int buttonWidth = 225;
+    int buttonHeight = 45;
+    int posX = engine.getScreenWidth() - 370;
+    int posY = 350;
+
+    // Slider para startnode
+    // float startMinValue = 1.0f;
+    // float startMaxValue = 100.0f;
+    // const char* startNodeText = "Start Node";
+    // posX = 600.0f; // Reseteamos la posición X
+    // posY = 355.0f; // Posición Y para el slider de startnode
+    // int startnodenew = GuiSliderBar(Rectangle(posX, posY, buttonWidth, buttonHeight), startNodeText, NULL, &debug.startnode, startMinValue, startMaxValue);
+    // engine.drawText(std::to_string(static_cast<int>(debug.startnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY), 20, D_BLUE);
+    // startnodenew += 1;
+    // // Slider para goalnode
+    // float goalMinValue = 1.0f;
+    // float goalMaxValue = 100.0f;
+    // const char* goalNodeText = "Goal Node";
+    // int goalnodenew = GuiSliderBar(Rectangle(posX, posY + 40, buttonWidth, buttonHeight), goalNodeText, NULL, &debug.goalnode, goalMinValue, goalMaxValue);
+    // engine.drawText(std::to_string(static_cast<int>(debug.goalnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY + 40), 20, D_BLUE);
+    // goalnodenew += 1;
+
+    auto& butt1 = *engine.createButton({ posX - 10, posY + 80 }, { buttonWidth, buttonHeight }, "CALCULATE", "pathfinding_butt1", debugNode)->getEntity<Button>();
+    auto& butt2 = *engine.createButton({ posX + 140, posY + 80 }, { buttonWidth, buttonHeight }, "CLEAR", "pathfinding_butt2", debugNode)->getEntity<Button>();
+    auto& butt3 = *engine.createButton({ posX + 140, posY }, { buttonWidth, buttonHeight }, "CORNERS", "pathfinding_butt3", debugNode)->getEntity<Button>();
+    auto& butt4 = *engine.createButton({ posX - 10, posY }, { buttonWidth, buttonHeight }, "CENTERS", "pathfinding_butt4", debugNode)->getEntity<Button>();
+    auto& butt5 = *engine.createButton({ posX + 140, posY + 40 }, { buttonWidth, buttonHeight }, "MIDPOINTS", "pathfinding_butt5", debugNode)->getEntity<Button>();
+    auto& butt6 = *engine.createButton({ posX - 10, posY + 40 }, { buttonWidth, buttonHeight }, "CONEXIONES", "pathfinding_butt6", debugNode)->getEntity<Button>();
+
+    // Botón
+    if (butt1.state == ButtonState::CLICK) {
+        //std::size_t idcenter{};
+                // if(em.getEntityByID(li.playerID)->hasComponent<ColliderComponent>()){
+                //     auto& playerbbox = em.getComponent<ColliderComponent>(*em.getEntityByID(li.playerID)).boundingBox;
+                //     for (auto& navmesh : navs.NavMeshes){
+                //         //auto center = it->centerpoint.second;
+                //         auto& currentbbox = navmesh.box;
+                //         if(currentbbox.intersects(playerbbox)){
+                //             vec3d center = {navmesh.centerpoint.second.x(),navmesh.centerpoint.second.y(),navmesh.centerpoint.second.z()};
+                //             idcenter = navmesh.centerpoint.first;
+                //             break;
+                //             // DrawCube(Vector3{static_cast<float>(center.x()),
+                //             // static_cast<float>(center.y()),
+                //             // static_cast<float>(center.z())},500,500,500,RED);
+                //         }
+                //     }
+                // }
+                //Recorre navs.nodes //    std::set<std::pair<uint16_t, vec3d>> nodes;
+                // recorrelos y devuelve
+                // Función para encontrar el nodo más cercano a una posición dada
+        vec3d posplayer = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
+        uint16_t startnode = findNearestNode(em, posplayer, navs.nodes);
+        // uint16_t targetnode = findNearestNode(em, vec3d{ -12.33, 40.0, 22.41 }, navs.nodes);
+        std::cout << startnode << "\n";
+        //Creamos Grafo
+        Graph graph{};
+        graph.createGraph(navs.conexiones, navs.nodes);
+        std::vector<vec3d> path = graph.PathFindAStar(debug, startnode, 819);
+
+        std::size_t lengthpath = path.size();
+        std::cout << lengthpath;
+        //calcular camnino desde el centro hasta un punto
+
+    //     std::vector<vec3d> nodes;
+    //     nodes.push_back({ -106.9, 4.0, 116.0 });
+    //     nodes.push_back({ -119.0, 4.0, 114.0 });
+    //     nodes.push_back({ -131.0, 4.0, 105.1 });
+    //     nodes.push_back({ -105.0, 4.0, 97.3 });
+    //     nodes.push_back({ -118.0, 4.0, 92.0 });
+    //     nodes.push_back({ -132.0, 4.0, 87.0 });
+    //     nodes.push_back({ -117.0, 4.0, 78.0 });
+    //     nodes.push_back({ -127.4, 4.0, 69.6 });
+    //     //Creamos puntos y conexiones
+    //     std::vector<Conection> conexiones;
+    //     Conection cone12(1, 1, 2);
+    //     conexiones.push_back(cone12);
+    //     Conection cone14(1, 1, 4);
+    //     conexiones.push_back(cone14);
+    //     Conection cone15(1, 1, 5);
+    //     conexiones.push_back(cone15);
+    //     Conection cone25(1, 2, 5);
+    //     conexiones.push_back(cone25);
+    //     Conection cone23(1, 2, 3);
+    //     conexiones.push_back(cone23);
+    //     Conection cone36(1, 3, 6);
+    //     conexiones.push_back(cone36);
+    //     Conection cone45(1, 4, 5);
+    //     conexiones.push_back(cone45);
+    //     Conection cone56(1, 5, 6);
+    //     conexiones.push_back(cone56);
+    //     Conection cone57(1, 5, 7);
+    //     conexiones.push_back(cone57);
+    //     Conection cone58(1, 5, 8);
+    //     conexiones.push_back(cone58);
+    //     Conection cone68(1, 6, 8);
+    //     conexiones.push_back(cone68);
+    //     Conection cone78(1, 7, 8);
+    //     conexiones.push_back(cone78);
+    //     Lammamos a creargrafo
+    //     Creamos el grafo
+    //     Graph graph{};
+    //     graph.createGraph(navs.conexiones, navs.nodes);
+    //     graph.createGraph(conexiones,nodes);
+    //     Calcular pathfinding
+    //     std::cout << static_cast<uint16_t>(debug.startnode) << static_cast<uint16_t>(debug.goalnode) << "\n";
+    //     std::vector<vec3d> path = graph.PathFindAStar(static_cast<uint16_t>(debug.startnode), static_cast<uint16_t>(debug.goalnode));
+        if (path.size() == 0) {
+            std::cout << "CAGUEEEEEEEE \n";
+        }
+        else {
+            //     // Copiar el path devuelto por PathFindAStar() a debug.path
+            debug.path.resize(path.size());
+            //     //Rellenamos
+            std::copy(path.begin(), path.end(), debug.path.begin());
+            //     Mostrar el camino copiado
+                //    std::cout << "Camino en debug.path:" << std::endl;
+            // for (const auto& node : debug.path) {
+            //     std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
+            //     debug.nodes.push_back(node);
+            // }
+        }
+        //    debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
+        //    std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
+    }
+    if (butt2.state == ButtonState::CLICK) {
+        debug.path.clear();
+        debug.nodes.clear();
+        debug.closedlist.clear();
+    }
+    if (butt3.state == ButtonState::CLICK) {
+        debug.seecorners = !debug.seecorners;
+    }
+    if (butt4.state == ButtonState::CLICK) {
+        debug.seecenters = !debug.seecenters;
+    }
+    if (butt5.state == ButtonState::CLICK) {
+        debug.seemidpoint = !debug.seemidpoint;
+    }
+    if (butt6.state == ButtonState::CLICK) {
+        debug.seeconex = !debug.seeconex;
+    }
+    //resultado
+    engine.createText({ posX, 480 }, "PATH RESULT", D_RED, "path_result", debugNode);
+
+    //Dibujar path
+    int posyt = 510;
+    for (auto pos : debug.path) {
+        std::string text = std::to_string(pos.x()) + " " + std::to_string(pos.y()) + " " + std::to_string(pos.z());
+        engine.createText({ posX, posyt }, text, D_RED, "path_numbers", debugNode);
+        posyt += 20;
+    }
+
+    //DIbujar nodos de la lista cerrada y nodos del path resultado
+    for (auto& closenode : debug.closedlist) {
+        engine.drawCube(closenode, { 2, 2, 2 }, D_YELLOW);
+    }
+    for (auto& node : debug.nodes) {
+        engine.drawCube(node, { 2, 2, 2 }, D_GREEN);
+    }
+
+    // for (auto& node : navs.nodes) {
+    //     engine.drawCube(node.second, 2, 2, 2, RED);
+    // }
+//Dibujar corners
+    if (debug.seecorners) {
+        for (auto& node : navs.corners) {
+            engine.drawCube(node, { 2, 2, 2 }, D_RED);
         }
     }
-    auto& debug = em.getSingleton<Debug_t>();
-    debug.nodes.push_back(nearestpos);
-    return nearestNodeId;
+    if (debug.seecenters) {
+        for (auto it = navs.centers.begin(); it != std::prev(navs.centers.end()); ++it) {
+            engine.drawCube(it->second, { 2, 2, 2 }, D_BLUE);
+        }
+    }
+    if (debug.seemidpoint) {
+        for (auto& node : navs.midpoints) {
+            engine.drawCube(node, { 2, 2, 2 }, D_VIOLET);
+        }
+    }
+    if (debug.seeconex) {
+        for (auto& conex : navs.conexpos) {
+            engine.drawLine3D(conex.first, conex.second, D_GREEN);
+        }
+        for (auto& bbox : navs.boundingnavmesh) {
+            auto boxSize = bbox.max - bbox.min;
+            vec3d boxPosition = (bbox.min + bbox.max) / 2;
+            //boxPosition.setY(boxPosition.y + 20.0);
+            engine.drawCubeWires(boxPosition,
+                { static_cast<float>(boxSize.x()),
+                static_cast<float>(boxSize.y()),
+                static_cast<float>(boxSize.z()), },
+                D_VIOLET);
+        }
+    }
+
+    for (auto& node : debug.nodes) {
+        std::string text = std::to_string(node.x()) + " " + std::to_string(node.y()) + " " + std::to_string(node.z());
+        int posx = static_cast<int>(engine.getWorldToScreenX(node));
+        int posy = static_cast<int>(engine.getWorldToScreenY(node));
+        engine.createText({ posx, posy }, text, D_RED, "path_numbers2", debugNode, 15);
+    }
+
+    // debugNode->setTranslation({ engine.getScreenWidth() / 2, 0.0f, 0.0f });
+    // engine.drawNode(debugNode);
 }
-//Interfaz para probar el pathfinding
-// void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
-//     auto& debug = em.getSingleton<Debug_t>();
-//     auto& navs = em.getSingleton<NavmeshInfo>();
-//     auto& li = em.getSingleton<LevelInfo>();
-//     //Dibujado de titulo y ventana
-//     Rectangle windowRect = { static_cast<float>(engine.getScreenWidth() - 400), 300, 330, 430 };
-//     engine.drawRectangleLinesEx(windowRect, 2, D_GRAY);
-//     engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
-//     vec2d textPositionInfo = { static_cast<float>(engine.getScreenWidth() - 370), 320 };
-//     engine.drawTextEx(GetFontDefault(), "PATHFINDING", textPositionInfo, 20, 1, RED);
-
-//     // Datos de los botones
-//     float buttonWidth = 150.0f;
-//     float buttonHeight = 30.0f;
-//     float posX = static_cast<float>(engine.getScreenWidth() - 370);
-//     float posY = 350.0f;
-
-//     // Slider para startnode
-//     // float startMinValue = 1.0f;
-//     // float startMaxValue = 100.0f;
-//     // const char* startNodeText = "Start Node";
-//     // posX = 600.0f; // Reseteamos la posición X
-//     // posY = 355.0f; // Posición Y para el slider de startnode
-//     // int startnodenew = GuiSliderBar(Rectangle(posX, posY, buttonWidth, buttonHeight), startNodeText, NULL, &debug.startnode, startMinValue, startMaxValue);
-//     // engine.drawText(std::to_string(static_cast<int>(debug.startnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY), 20, D_BLUE);
-//     // startnodenew += 1;
-//     // // Slider para goalnode
-//     // float goalMinValue = 1.0f;
-//     // float goalMaxValue = 100.0f;
-//     // const char* goalNodeText = "Goal Node";
-//     // int goalnodenew = GuiSliderBar(Rectangle(posX, posY + 40, buttonWidth, buttonHeight), goalNodeText, NULL, &debug.goalnode, goalMinValue, goalMaxValue);
-//     // engine.drawText(std::to_string(static_cast<int>(debug.goalnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY + 40), 20, D_BLUE);
-//     // goalnodenew += 1;
-
-//     Rectangle btn1Rec = { posX - 10, posY + 80, buttonWidth, buttonHeight };
-//     Rectangle btn2Rec = { posX + 140, posY + 80, buttonWidth, buttonHeight };
-//     Rectangle btn3Rec = { posX + 140, posY  , buttonWidth, buttonHeight };
-//     Rectangle btn4Rec = { posX - 10, posY  , buttonWidth, buttonHeight };
-//     Rectangle btn5Rec = { posX + 140, posY + 40, buttonWidth, buttonHeight };
-//     Rectangle btn6Rec = { posX - 10, posY + 40, buttonWidth, buttonHeight };
-//     // Botón
-//     if (GuiButton(btn1Rec, "CALCULATE")) {
-//         //std::size_t idcenter{};
-//         // if(em.getEntityByID(li.playerID)->hasComponent<ColliderComponent>()){
-//         //     auto& playerbbox = em.getComponent<ColliderComponent>(*em.getEntityByID(li.playerID)).boundingBox;
-//         //     for (auto& navmesh : navs.NavMeshes){
-//         //         //auto center = it->centerpoint.second;
-//         //         auto& currentbbox = navmesh.box;
-//         //         if(currentbbox.intersects(playerbbox)){
-//         //             vec3d center = {navmesh.centerpoint.second.x(),navmesh.centerpoint.second.y(),navmesh.centerpoint.second.z()};
-//         //             idcenter = navmesh.centerpoint.first;
-//         //             break;
-//         //             // DrawCube(Vector3{static_cast<float>(center.x()),
-//         //             // static_cast<float>(center.y()),
-//         //             // static_cast<float>(center.z())},500,500,500,RED);
-//         //         }
-//         //     }
-//         // }
-//         //Recorre navs.nodes //    std::set<std::pair<uint16_t, vec3d>> nodes;
-//         // recorrelos y devuelve
-//         // Función para encontrar el nodo más cercano a una posición dada
-//         vec3d posplayer = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
-//         uint16_t startnode = findNearestNode(em, posplayer, navs.nodes);
-//         uint16_t targetnode = findNearestNode(em, vec3d{ -12.33, 40.0, 22.41 }, navs.nodes);
-//         std::cout << startnode << "\n";
-//         //Creamos Grafo
-//         Graph graph{};
-//         graph.createGraph(navs.conexiones, navs.nodes);
-//         std::vector<vec3d> path = graph.PathFindAStar(debug, startnode, targetnode);
-
-//         std::size_t lengthpath = path.size();
-//         std::cout << lengthpath;
-//         //calcular camnino desde el centro hasta un punto
-
-//     //     std::vector<vec3d> nodes;
-//     //     nodes.push_back({ -106.9, 4.0, 116.0 });
-//     //     nodes.push_back({ -119.0, 4.0, 114.0 });
-//     //     nodes.push_back({ -131.0, 4.0, 105.1 });
-//     //     nodes.push_back({ -105.0, 4.0, 97.3 });
-//     //     nodes.push_back({ -118.0, 4.0, 92.0 });
-//     //     nodes.push_back({ -132.0, 4.0, 87.0 });
-//     //     nodes.push_back({ -117.0, 4.0, 78.0 });
-//     //     nodes.push_back({ -127.4, 4.0, 69.6 });
-//     //     //Creamos puntos y conexiones
-//     //     std::vector<Conection> conexiones;
-//     //     Conection cone12(1, 1, 2);
-//     //     conexiones.push_back(cone12);
-//     //     Conection cone14(1, 1, 4);
-//     //     conexiones.push_back(cone14);
-//     //     Conection cone15(1, 1, 5);
-//     //     conexiones.push_back(cone15);
-//     //     Conection cone25(1, 2, 5);
-//     //     conexiones.push_back(cone25);
-//     //     Conection cone23(1, 2, 3);
-//     //     conexiones.push_back(cone23);
-//     //     Conection cone36(1, 3, 6);
-//     //     conexiones.push_back(cone36);
-//     //     Conection cone45(1, 4, 5);
-//     //     conexiones.push_back(cone45);
-//     //     Conection cone56(1, 5, 6);
-//     //     conexiones.push_back(cone56);
-//     //     Conection cone57(1, 5, 7);
-//     //     conexiones.push_back(cone57);
-//     //     Conection cone58(1, 5, 8);
-//     //     conexiones.push_back(cone58);
-//     //     Conection cone68(1, 6, 8);
-//     //     conexiones.push_back(cone68);
-//     //     Conection cone78(1, 7, 8);
-//     //     conexiones.push_back(cone78);
-//     //     Lammamos a creargrafo
-//     //     Creamos el grafo
-//     //     Graph graph{};
-//     //     graph.createGraph(navs.conexiones, navs.nodes);
-//     //     graph.createGraph(conexiones,nodes);
-//     //     Calcular pathfinding
-//     //     std::cout << static_cast<uint16_t>(debug.startnode) << static_cast<uint16_t>(debug.goalnode) << "\n";
-//     //     std::vector<vec3d> path = graph.PathFindAStar(static_cast<uint16_t>(debug.startnode), static_cast<uint16_t>(debug.goalnode));
-//         if (path.size() == 0) {
-//             std::cout << "CAGUEEEEEEEE \n";
-//         }
-//         else {
-//             //     // Copiar el path devuelto por PathFindAStar() a debug.path
-//             debug.path.resize(path.size());
-//             //     //Rellenamos
-//             std::copy(path.begin(), path.end(), debug.path.begin());
-//             //     Mostrar el camino copiado
-//                 //    std::cout << "Camino en debug.path:" << std::endl;
-//             // for (const auto& node : debug.path) {
-//             //     std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
-//             //     debug.nodes.push_back(node);
-//             // }
-//         }
-//         //    debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
-//         //    std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
-//     }
-//     if (GuiButton(btn2Rec, "CLEAR")) {
-//         debug.path.clear();
-//         debug.nodes.clear();
-//         debug.closedlist.clear();
-//     }
-//     if (GuiButton(btn3Rec, "CORNERS")) {
-//         debug.seecorners = !debug.seecorners;
-//     }
-//     if (GuiButton(btn4Rec, "CENTERS")) {
-//         debug.seecenters = !debug.seecenters;
-//     }
-//     if (GuiButton(btn5Rec, "MIDPOINTS")) {
-//         debug.seemidpoint = !debug.seemidpoint;
-//     }
-//     if (GuiButton(btn6Rec, "CONEXIONES")) {
-//         debug.seeconex = !debug.seeconex;
-//     }
-//     //resultado
-//     vec2d textPositionInfo2 = { static_cast<double>(engine.getScreenWidth() - 370), 480 };
-//     engine.drawTextEx(GetFontDefault(), "PATH RESULT", textPositionInfo2, 20, 1, RED);
-//     //Dibujar path
-//     float posyt = 510.0f;
-//     for (auto pos : debug.path) {
-//         std::string text = std::to_string(pos.x()) + " " + std::to_string(pos.y()) + " " + std::to_string(pos.z());
-//         engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{ static_cast<double>(engine.getScreenWidth() - 370),posyt }, 20, 1, RED);
-//         posyt += 20.0f;
-//     }
-//     engine.beginMode3D();
-//     //DIbujar nodos de la lista cerrada y nodos del path resultado
-//     for (auto& closenode : debug.closedlist) {
-//         engine.drawCube(closenode, 2, 2, 2, YELLOW);
-//     }
-//     for (auto& node : debug.nodes) {
-//         engine.drawCube(node, 2, 2, 2, GREEN);
-//     }
-
-//     // for (auto& node : navs.nodes) {
-//     //     engine.drawCube(node.second, 2, 2, 2, RED);
-//     // }
-// //Dibujar corners
-//     if (debug.seecorners) {
-//         for (auto& node : navs.corners) {
-//             engine.drawCube(node, 2, 2, 2, RED);
-//         }
-//     }
-//     if (debug.seecenters) {
-//         for (auto it = navs.centers.begin(); it != std::prev(navs.centers.end()); ++it) {
-//             engine.drawCube(it->second, 2, 2, 2, D_BLUE);
-//         }
-//     }
-//     if (debug.seemidpoint) {
-//         for (auto& node : navs.midpoints) {
-//             engine.drawCube(node, 2, 2, 2, PURPLE);
-//         }
-//     }
-//     if (debug.seeconex) {
-//         for (auto& conex : navs.conexpos) {
-//             engine.drawLine3D(conex.first, conex.second, GREEN);
-//         }
-//         for (auto& bbox : navs.boundingnavmesh) {
-//             auto boxSize = bbox.max - bbox.min;
-//             vec3d boxPosition = (bbox.min + bbox.max) / 2;
-//             //boxPosition.setY(boxPosition.y + 20.0);
-//             engine.drawCubeWires(boxPosition,
-//                 static_cast<float>(boxSize.x()),
-//                 static_cast<float>(boxSize.y()),
-//                 static_cast<float>(boxSize.z()),
-//                 PURPLE);
-//         }
-//     }
-
-//     engine.endMode3D();
-//     engine.beginDrawing();
-//     for (auto& node : debug.nodes) {
-//         std::string text = std::to_string(node.x()) + " " + std::to_string(node.y()) + " " + std::to_string(node.z());
-//         float posx = engine.getWorldToScreenX(node);
-//         float posy = engine.getWorldToScreenY(node);
-//         engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{ static_cast<double>(posx),static_cast<double>(posy) }, 15, 1, RED);
-//     }
-
-//     //engine.endDrawing();
-
-// }
 
 //Debugger visual in-game
-void RenderSystem::drawDebuggerInGameIA(GameEngine&, EntityManager&)
+void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
 {
-    // // engine.beginDrawing();
-    // float posX = static_cast<float>(engine.getScreenWidth() - 330);
-    // int posText = static_cast<int>(posX + 10);
-    // Rectangle windowRect = { posX, 80, 330, 230 };
-    // engine.drawRectangleLinesEx(windowRect, 2, D_GRAY);
-    // engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
-    // vec2d textPositionInfo = { static_cast<double>(posText), 90 };
-    // engine.drawTextEx(engine.getFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
-    // auto& debugsnglt = em.getSingleton<Debug_t>();
+    auto& debugsnglt = em.getSingleton<Debug_t>();
 
-    // using SYSCMPss = MP::TypeList<AIComponent, ColliderComponent, RenderComponent>;
-    // using SYSTAGss = MP::TypeList<EnemyTag>;
+    int posX = engine.getScreenWidth() - 330;
+    int posText = static_cast<int>(posX + 10);
 
-    // // AQUI PONDRIA
-    // em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, ColliderComponent& col, RenderComponent& ren)
-    // {
-    //     RayCast ray = engine.getMouseRay();
-    //     if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
-    //         if (engine.isMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-    //             isSelectedfordebug = !isSelectedfordebug;
-    //             debugsnglt.IA_id_debug = e.getID();
-    //         }
-    //     }
-    //     if (isSelectedfordebug && e.getID() == debugsnglt.IA_id_debug) {
-    //         auto& bb = em.getSingleton<BlackBoard_t>();
-    //         engine.beginMode3D();
-    //         engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
-    //         engine.endMode3D();
-    //         engine.drawText("ID:", posText, 110, 20, D_BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(e.getID()).c_str(), vec2d{ static_cast<double>(posText) + 90.0,110 }, 20, 1, D_GRAY);
-    //         engine.drawText("Node active:", posText, 130, 20, D_BLACK);
-    //         // std::cout << debugsnglt.elapsed << "\n";
-    //          // std::cout << debugsnglt.countdown << "\n";
-    //         if (debugsnglt.elapsed >= debugsnglt.countdown) {
-    //             debugsnglt.elapsed = 0;
-    //             debugsnglt.text = aic.bh;
-    //         }
-    //         else {
-    //             debugsnglt.plusDeltatime(timeStep, debugsnglt.elapsed);
-    //         }
-    //         engine.drawTextEx(engine.getFontDefault(), debugsnglt.text, vec2d{ static_cast<double>(posText) + 130.0,130 }, 20, 1, D_GRAY);
-    //         engine.drawText("TEID:", posText, 150, 20, D_BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.teid).c_str(), vec2d{ static_cast<double>(posText) + 90.0,150 }, 20, 1, D_GRAY);
-    //         engine.drawText("TX:", posText, 170, 20, D_BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tx).c_str(), vec2d{ static_cast<double>(posText) + 80.0,170 }, 20, 1, D_GRAY);
-    //         engine.drawText("TZ:", posText, 190, 20, D_BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tz).c_str(), vec2d{ static_cast<double>(posText) + 80.0,190 }, 20, 1, D_GRAY);
-    //         engine.drawText("Culldown:", posText, 210, 20, D_BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), vec2d{ static_cast<double>(posText) + 90.0,210 }, 20, 1, D_GRAY);
-    //         engine.drawText("Player Detected?:", posText, 230, 20, D_BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,230 }, 20, 1, RED);
-    //         engine.drawText("Player hunted?:", posText, 250, 20, D_BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), (bb.playerhunted == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,250 }, 20, 1, RED);
-    //         engine.drawText("Subditos alive:", posText, 270, 20, D_BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.subditosData.size()).c_str(), vec2d{ static_cast<double>(posText) + 180.0,270 }, 20, 1, RED);
-    //         engine.drawText("Subditos id alive:", posText, 290, 20, D_BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), vec2d{ static_cast<double>(posText) + 180.0,290 }, 20, 1, RED);
-    //         engine.drawText("Alert state:", posText, 310, 20, D_BLACK);
-    //         engine.drawTextEx(engine.getFontDefault(), (aic.alert_state == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,310 }, 20, 1, RED);
+    auto* debugNode = getNode(engine, "DebugAI2");
+    engine.createRectangle({ posX, 80 }, { 330, 230 }, { 255, 255, 255, 128 }, "debugAI2_rect", debugNode);
+    engine.createText({ posText, 90 }, "INFO", D_BLACK, "debugAI2_info", debugNode);
 
-    //         engine.beginMode3D();
-    //         //raycast
-    //         if (bb.launched) {
-    //             // engine.beginMode3D();
+    using SYSCMPss = MP::TypeList<AIComponent, ColliderComponent, RenderComponent>;
+    using SYSTAGss = MP::TypeList<EnemyTag>;
 
-    //             auto dir = bb.direction * 100;
-    //             DrawLine3D(bb.position_origin.toRaylib(), dir.toRaylib(), D_BLUE);
-    //             // engine.endMode3D();
-    //             bb.launched = false;
-    //         }
-    //         //Cone
-    //         //if(e.hasTag<SnowmanTag>())
-    //         auto& phy = em.getComponent<PhysicsComponent>(e);
-    //         drawVisionCone(phy.position, phy.orientation, bb.horizontalFOV);
-    //         // if(e.hasTag<GolemTag>())
-    //         //     drawVisionCone(bb.conegolem.first, bb.conegolem.second, bb.horizontalFOV);
-    //         engine.endMode3D();
-    //     }
-    // });
-    //  engine.endDrawing();
+    // AQUI PONDRIA
+    em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, ColliderComponent& col, RenderComponent& ren)
+    {
+        RayCast ray = engine.getMouseRay();
+        if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
+            if (engine.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+                isSelectedfordebug = !isSelectedfordebug;
+                debugsnglt.IA_id_debug = e.getID();
+            }
+        }
+        if (isSelectedfordebug && e.getID() == debugsnglt.IA_id_debug) {
+            auto& bb = em.getSingleton<BlackBoard_t>();
+            engine.drawCubeWires(ren.position, { ren.scale.x(), ren.scale.y(), ren.scale.z() }, D_VIOLET_DARK);
+            engine.createText({ posText, 110 }, "ID:", D_BLACK, "debugAI2_id", debugNode);
+            engine.createText({ posText + 90 ,110 }, std::to_string(e.getID()), D_GRAY, "debugAI2_id2", debugNode);
+            engine.createText({ posText, 130 }, "Node active:", D_BLACK, "debugAI2_node", debugNode);
+            // std::cout << debugsnglt.elapsed << "\n";
+             // std::cout << debugsnglt.countdown << "\n";
+            if (debugsnglt.elapsed >= debugsnglt.countdown) {
+                debugsnglt.elapsed = 0;
+                debugsnglt.text = aic.bh;
+            }
+            else {
+                debugsnglt.plusDeltatime(timeStep, debugsnglt.elapsed);
+            }
+            if (!debugsnglt.text)
+                debugsnglt.text = "a";
+            engine.createText({ posText + 130, 130 }, debugsnglt.text, D_GRAY, "debugAI2_text", debugNode);
+
+            engine.createText({ posText, 150 }, "TEID:", D_BLACK, "debugAI2_teid", debugNode);
+            engine.createText({ posText + 90, 150 }, std::to_string(aic.teid), D_GRAY, "debugAI2_teid2", debugNode);
+
+            engine.createText({ posText, 170 }, "TX:", D_BLACK, "debugAI2_tx", debugNode);
+            engine.createText({ posText + 80, 170 }, std::to_string(aic.tx), D_GRAY, "debugAI2_tx2", debugNode);
+
+            engine.createText({ posText, 190 }, "TZ:", D_BLACK, "debugAI2_tz", debugNode);
+            engine.createText({ posText + 80, 190 }, std::to_string(aic.tz), D_GRAY, "debugAI2_tz2", debugNode);
+
+            engine.createText({ posText, 210 }, "Culldown:", D_BLACK, "debugAI2_culldown", debugNode);
+            engine.createText({ posText + 90, 210 }, std::to_string(aic.elapsed_shoot), D_GRAY, "debugAI2_culldown2", debugNode);
+
+            engine.createText({ posText, 230 }, "Player Detected?:", D_BLACK, "debugAI2_playerdetected", debugNode);
+            engine.createText({ posText + 180, 230 }, (aic.playerdetected == 0) ? "No" : "Sí", D_GRAY, "debugAI2_playerdetected2", debugNode);
+
+            engine.createText({ posText, 250 }, "Player hunted?:", D_BLACK, "debugAI2_playerhunted", debugNode);
+            engine.createText({ posText + 180, 250 }, (bb.playerhunted == 0) ? "No" : "Sí", D_GRAY, "debugAI2_playerhunted2", debugNode);
+
+            engine.createText({ posText, 270 }, "Subditos alive:", D_BLACK, "debugAI2_subditos", debugNode);
+            engine.createText({ posText + 180, 270 }, std::to_string(bb.subditosData.size()), D_GRAY, "debugAI2_subditos2", debugNode);
+
+            engine.createText({ posText, 290 }, "Subditos id alive:", D_BLACK, "debugAI2_subditosid", debugNode);
+            engine.createText({ posText + 180, 290 }, std::to_string(bb.idsubditos.size()), D_GRAY, "debugAI2_subditosid2", debugNode);
+
+            engine.createText({ posText, 310 }, "Alert state:", D_BLACK, "debugAI2_alertstate", debugNode);
+            engine.createText({ posText + 180, 310 }, (aic.alert_state == 0) ? "No" : "Sí", D_GRAY, "debugAI2_alertstate2", debugNode);
+
+            //raycast
+            if (bb.launched) {
+                auto dir = bb.direction * 100;
+                engine.drawLine3D(bb.position_origin, dir, D_BLUE);
+                bb.launched = false;
+            }
+            //Cone
+            //if(e.hasTag<SnowmanTag>())
+            auto& phy = em.getComponent<PhysicsComponent>(e);
+            drawVisionCone(phy.position, phy.orientation, bb.horizontalFOV);
+            // if(e.hasTag<GolemTag>())
+            //     drawVisionCone(bb.conegolem.first, bb.conegolem.second, bb.horizontalFOV);
+
+        }
+    });
 }
 
 // Dentro de tu clase BTDecisionPlayerDetected, podrías tener un método para dibujar el cono de visión
@@ -1844,16 +1817,15 @@ void RenderSystem::drawVisionCone(vec3d, double, double) {
 }
 
 //Dibuja Slider en función de los parámetros
-double RenderSystem::SelectValue(GameEngine& engine, double value, int posx, int posy, int height, int width) {
+double RenderSystem::SelectValue(GameEngine& engine, double value, int posx, int posy, int height, int width, const char* name, Node* parent) {
     // pasamos a float el valor
     float floatValue = static_cast<float>(value) / 100.f;
     // dibujamos el slider para modificar su valor
-    auto* slider = engine.drawSlider({ posx, posy }, { height, width }, floatValue, D_VIOLET, D_BLUE_LIGHT);
+    auto* slider = engine.createSlider({ posx, posy }, { height, width }, floatValue, D_VIOLET, D_BLUE_LIGHT, name, parent);
     auto& sliderInfo = *slider->getEntity<Slider>();
 
     floatValue = sliderInfo.valor * 100.f;
-    engine.drawText(std::to_string(floatValue).c_str(), 300, posy + 5, 20, D_BLUE);
-    // seteamos el nuevo valor
+    engine.createText({ posx + width + 80, posy + 5 }, std::to_string(floatValue).c_str(), D_BLUE, (std::string(name) + "_text").c_str(), parent);    // seteamos el nuevo valor
     return static_cast<double>(floatValue);
 }
 
@@ -1883,14 +1855,9 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
     int windowRectWidth = 390;
     int windowRectHeight = 550;
 
-    if (!nodeExists(engine, "editorIA"))
-    {
-        auto* editAI = engine.createNode("editorIA", getNode(engine, "Debug"));
-        engine.createTextBox({ windowRectX, windowRectY }, { windowRectWidth, windowRectHeight }, { 255, 255, 255, 128 }, "Editor IA", engine.getFontDefault(), 20, D_BLUE_DARK, Aligned::TOP, Aligned::LEFT, "Editor IA", editAI);
-        engine.createText({ windowRectX + 20, windowRectY + 50 }, "PARAMETROS", engine.getFontDefault(), 20, D_RED, "text_parametros", editAI);
-    }
-
-    getNode(engine, "editorIA")->setVisible(true);
+    auto* debugAI = getNode(engine, "DebugAI1");
+    engine.createTextBox({ windowRectX, windowRectY }, { windowRectWidth, windowRectHeight }, { 255, 255, 255, 128 }, "Editor IA", engine.getFontDefault(), 20, D_BLUE_DARK, Aligned::TOP, Aligned::LEFT, "Editor IA", debugAI);
+    engine.createText({ windowRectX + 20, windowRectY + 50 }, "PARAMETROS", engine.getFontDefault(), 20, D_RED, "text_parametros", debugAI);
 
     auto& debugsglt = em.getSingleton<Debug_t>();
     using SYSCMPss = MP::TypeList<AIComponent, PhysicsComponent, ColliderComponent, RenderComponent>;
@@ -1917,22 +1884,22 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
             // si se seleccionada una entidad se muestra el Editor de parámetros
             if (isSelected) {
                 // ID DE LA ENTIDAD SELECCIONADA
-                engine.drawText("EID:", 15, 170, 20, D_BLACK);
-                engine.drawText(std::to_string(debugsglt.IA_id).c_str(), 55, 170, 20, D_GRAY);
+                engine.createText({ 15, 170 }, "EID:", D_BLACK, "text_eid", debugAI);
+                engine.createText({ 55, 170 }, std::to_string(debugsglt.IA_id).c_str(), D_GRAY, "text_eid_value", debugAI);
                 //Detect Radius
-                aic.detect_radius = SelectValue(engine, aic.detect_radius, 145.0, 200.0, 120.0, 30.0);
+                aic.detect_radius = SelectValue(engine, aic.detect_radius, 45.0, 200.0, 120.0, 30.0, "detect_radius", debugAI);
                 // Attack Radius
-                aic.attack_radius = SelectValue(engine, aic.attack_radius, 145.0, 240.0, 120.0, 30.0);
+                aic.attack_radius = SelectValue(engine, aic.attack_radius, 45.0, 240.0, 120.0, 30.0, "attack_radius", debugAI);
                 // Arrival Radius
-                aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 145.0, 280.0, 120.0, 30.0);
+                aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 45.0, 280.0, 120.0, 30.0, "arriv_rad", debugAI);
                 // Max Speed
-                phy.max_speed = SelectValue(engine, phy.max_speed, 145.0, 320.0, 120.0, 30.0);
+                phy.max_speed = SelectValue(engine, phy.max_speed, 45.0, 320.0, 120.0, 30.0, "max_speed", debugAI);
                 //COuntdown Perception
-                aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 145.0, 360.0, 120.0, 30.0);
+                aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 45.0, 360.0, 120.0, 30.0, "countdown_perception", debugAI);
                 //Countdown Shoot
-                aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 145.0, 400.0, 120.0, 30.0);
+                aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 45.0, 400.0, 120.0, 30.0, "countdown_shoot", debugAI);
                 //Countdown stop
-                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 145.0, 440.0, 120.0, 30.0);
+                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 45.0, 440.0, 120.0, 30.0, "countdown_stop", debugAI);
             }
         }
     });
@@ -2556,32 +2523,33 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em)
         // Dibujar el HUD de debug
         auto posTextX = 15;
         engine.drawNode(getNode(engine, "debugRectPhy"));
-        engine.drawText("Posición", posTextX, 70, 20, D_BLACK);
+        auto* debugNode = getNode(engine, "DebugPhy");
+        engine.createText({ posTextX,70 }, "Posición", D_BLACK, "debugPhyPos", debugNode);
         std::string posX = "X: " + std::to_string(phy.position.x());
-        engine.drawText(posX.c_str(), posTextX, 95, 20, D_BLACK);
+        engine.createText({ posTextX,95 }, posX.c_str(), D_BLACK, "debugPhyPosX", debugNode);
         std::string posY = "Y: " + std::to_string(phy.position.y());
-        engine.drawText(posY.c_str(), posTextX, 120, 20, D_BLACK);
+        engine.createText({ posTextX,120 }, posY.c_str(), D_BLACK, "debugPhyPosY", debugNode);
         std::string posZ = "Z: " + std::to_string(phy.position.z());
-        engine.drawText(posZ.c_str(), posTextX, 145, 20, D_BLACK);
+        engine.createText({ posTextX,145 }, posZ.c_str(), D_BLACK, "debugPhyPosZ", debugNode);
 
-        engine.drawText("Escala", posTextX, 175, 20, D_BLACK);
+        engine.createText({ posTextX,175 }, "Escala", D_BLACK, "debugPhyScale", debugNode);
         std::string sclX = "X: " + std::to_string(phy.scale.x());
-        engine.drawText(sclX.c_str(), posTextX, 200, 20, D_BLACK);
+        engine.createText({ posTextX,200 }, sclX.c_str(), D_BLACK, "debugPhyScaleX", debugNode);
         std::string sclY = "Y: " + std::to_string(phy.scale.y());
-        engine.drawText(sclY.c_str(), posTextX, 225, 20, D_BLACK);
+        engine.createText({ posTextX,225 }, sclY.c_str(), D_BLACK, "debugPhyScaleY", debugNode);
         std::string sclZ = "Z: " + std::to_string(phy.scale.z());
-        engine.drawText(sclZ.c_str(), posTextX, 250, 20, D_BLACK);
+        engine.createText({ posTextX,250 }, sclZ.c_str(), D_BLACK, "debugPhyScaleZ", debugNode);
 
-        engine.drawText("Velocidad", posTextX, 280, 20, D_BLACK);
+        engine.createText({ posTextX,280 }, "Velocidad", D_BLACK, "debugPhyVel", debugNode);
         std::string velX = "X: " + std::to_string(phy.velocity.x());
-        engine.drawText(velX.c_str(), posTextX, 305, 20, D_BLACK);
+        engine.createText({ posTextX,305 }, velX.c_str(), D_BLACK, "debugPhyVelX", debugNode);
         std::string velY = "Y: " + std::to_string(phy.velocity.y());
-        engine.drawText(velY.c_str(), posTextX, 330, 20, D_BLACK);
+        engine.createText({ posTextX,330 }, velY.c_str(), D_BLACK, "debugPhyVelY", debugNode);
         std::string velZ = "Z: " + std::to_string(phy.velocity.z());
-        engine.drawText(velZ.c_str(), posTextX, 355, 20, D_BLACK);
+        engine.createText({ posTextX,355 }, velZ.c_str(), D_BLACK, "debugPhyVelZ", debugNode);
 
         std::string id = "ID: " + std::to_string(e.getID());
-        engine.drawText(id.c_str(), posTextX, 385, 20, D_BLACK);
+        engine.createText({ posTextX,385 }, id.c_str(), D_BLACK, "debugPhyID", debugNode);
     }
 }
 

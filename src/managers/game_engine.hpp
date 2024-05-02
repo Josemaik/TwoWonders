@@ -30,7 +30,6 @@ namespace ENGI {
         void endDrawing();
         void beginMode3D();
         void endMode3D();
-        void drawCube(vec3d pos, float width, float height, float lenght, Color color);
         void drawCubeWires(vec3d position, vec3d size, Color color);
         // void drawModel(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
         // void drawModelWires(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
@@ -52,6 +51,7 @@ namespace ENGI {
         // Button
         Node* drawButton(vec2i position, vec2i size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor);
         Node* createButton(vec2i position, vec2i size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor, const char* nodeName, Node* parentNode);
+        Node* createButton(vec2i position, vec2i size, std::string text, const char* nodeName, Node* parentNode);
 
         // Cube
         Node* drawCube(vec3d position, vec3d size, DarkMoon::Color color);
@@ -60,6 +60,7 @@ namespace ENGI {
         // Text
         Node* drawText(const char* text, int posX, int posY, int fontSize, Color color, Aligned aligned = Aligned::LEFT);
         Node* createText(vec2i position, std::string text, Font* font, int fontSize, Color textColor, const char* nodeName, Node* parentNode, Aligned align = Aligned::LEFT);
+        Node* createText(vec2i position, std::string text, Color c, const char* nodeName, Node* parentNode, int fontSize = 20);
         Node* createTextBox(vec2i position, vec2i size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode);
         Font* getFontDefault();
 
@@ -125,14 +126,8 @@ namespace ENGI {
 
         DarkMoonEngine dmeg;
 
-        struct cmp_str
-        {
-            bool operator()(char const* a, char const* b) const
-            {
-                return std::strcmp(a, b) < 0;
-            }
-        };
-        std::map<const char*, Node*, cmp_str> nodes;
+        std::map<std::string, Node*> nodes;
+        std::map<Node*, std::pair<vec2i, vec2f>> nodesToDraw{};
 
         Node* createNode(const char* name, Node* parentNode);
         Node* createNode(Node* copyNode, Node* parentNode);

@@ -345,6 +345,12 @@ struct vec2D
         return *this;
     }
 
+    // Función para pasar de double a float o de float a double
+    template<typename OtherT>
+    vec2D<OtherT> to_other() const {
+        return vec2D<OtherT>(static_cast<OtherT>(x), static_cast<OtherT>(y));
+    }
+
     DataT x{}, y{};
 };
 
