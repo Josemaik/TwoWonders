@@ -192,6 +192,24 @@ void SoundSystem::sonido_amb_pradera() {
     update();
 }
 
+void SoundSystem::sonido_amb_biblioteca1(){
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_biblioteca1", &eventDescription_Ambiente));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_Ambiente));
+    FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
+    FMOD_Studio_System_Update(soundSystem);
+    play();
+    update();
+}
+
+void SoundSystem::sonido_amb_biblioteca2(){
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_biblioteca2", &eventDescription_Ambiente));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_Ambiente));
+    FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
+    FMOD_Studio_System_Update(soundSystem);
+    play();
+    update();
+}
+
 
 
 

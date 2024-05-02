@@ -122,9 +122,9 @@ struct SoundSystem {
     void sonido_escaleras_biblio();     //por integrar
     void sonido_h_meteorito();          //por integrar
     void sonido_pasos_madera();         //por integrar
-    
-    void sonido_amb_biblioteca1();      //por disenyar
-    void sonido_amb_biblioteca2();      //por disenyar
+    void sonido_amb_biblioteca1();      //por integrar
+    void sonido_amb_biblioteca2();      //por integrar
+
     void sonido_boss_mov();             //por disenyar
     void sonido_subdito_mov();          //por disenyar  
     void sonido_boss_resucitar();       //por disenyar
