@@ -203,6 +203,31 @@ namespace DarkMoon {
         return p_nodeSlider;
     }
 
+    // Create a option slider in node
+    Node* DarkMoonEngine::CreateOptionSlider(glm::vec2 pos, glm::vec2 sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, std::vector<std::string> opts, std::string firstOption, const char* nodeName, Node* parentNode) {
+        auto p_nodeOptionSlider = CreateNode(nodeName, parentNode);
+
+        // Create option slider
+        auto optionSliderE = std::make_unique<OptionSlider>(pos, sz, bCol, txt, f, fS, fsArrows, tCol, verAl, horAl, nColor, hColor, cColor, opts, firstOption);
+
+        p_nodeOptionSlider->translate({ pos.x, pos.y, 0.0f });
+        p_nodeOptionSlider->setEntity(std::move(optionSliderE));
+
+        return p_nodeOptionSlider;
+    }
+
+    // Create a float slider in node
+    Node* DarkMoonEngine::CreateFloatSlider(glm::vec2 pos, glm::vec2 sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, float initialValue, const char* nodeName, Node* parentNode) {
+        auto p_nodeFloatSlider = CreateNode(nodeName, parentNode);
+
+        // Create float slider
+        auto floatSliderE = std::make_unique<FloatSlider>(pos, sz, bCol, txt, f, fS, fsArrows, tCol, verAl, horAl, nColor, hColor, cColor, initialValue);
+
+        p_nodeFloatSlider->translate({ pos.x, pos.y, 0.0f });
+        p_nodeFloatSlider->setEntity(std::move(floatSliderE));
+
+        return p_nodeFloatSlider;
+    }
 
     // 3D
 
@@ -545,6 +570,21 @@ namespace DarkMoon {
     // Check if a key is not being pressed
     bool DarkMoonEngine::IsKeyUp(int key) {
         return m_inputManager.isKeyUp(key);
+    }
+
+    // Check if any key is being pressed
+    bool DarkMoonEngine::IsAnyKeyPressed() {
+        return m_inputManager.isAnyKeyPressed();
+    }
+
+    // Check if any key is down
+    bool DarkMoonEngine::IsAnyKeyDown() {
+        return m_inputManager.isAnyKeyDown();
+    }
+
+    // Check if any key has been released
+    bool DarkMoonEngine::IsAnyKeyReleased() {
+        return m_inputManager.isAnyKeyReleased();
     }
 
     // ------------------------------ //

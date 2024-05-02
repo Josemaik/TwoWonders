@@ -32,6 +32,33 @@ namespace DarkMoon {
             glfwSetWindowShouldClose(WindowsManager::getInstance().getWindow(), GLFW_TRUE);
     }
 
+    bool InputManager::isAnyKeyPressed() {
+        for (int i = 0; i < GLFW_KEY_LAST; i++) {
+            if (m_keyPressedStates[i])
+                return true;
+        }
+
+        return false;
+    }
+
+    bool InputManager::isAnyKeyDown() {
+        for (int i = 0; i < GLFW_KEY_LAST; i++) {
+            if (m_keyStates[i] == GLFW_PRESS || m_keyStates[i] == GLFW_REPEAT)
+                return true;
+        }
+
+        return false;
+    }
+
+    bool InputManager::isAnyKeyReleased() {
+        for (int i = 0; i < GLFW_KEY_LAST; i++) {
+            if (m_keyReleaseStates[i])
+                return true;
+        }
+
+        return false;
+    }
+
     // Input-related functions: gamepad
 
     bool InputManager::isGamePadAvailable(int gamepad) {

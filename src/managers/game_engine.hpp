@@ -42,11 +42,20 @@ namespace ENGI {
 
         // Rectangle
         Node* drawRectangle(vec2i pos, vec2i size, Color color);
+        Node* drawRectangle(vec2i pos, vec2i size, Color color, Node* parent);
         Node* createRectangle(vec2i pos, vec2i size, Color color, const char* name, Node* parentNode);
 
         // Slider
         Node* drawSlider(vec2i position, vec2i size, float value, Color backColor, Color sliderColor);
         Node* createSlider(vec2i position, vec2i size, float value, Color backColor, Color sliderColor, const char* nodeName, Node* parentNode);
+
+        // Option Slider
+        Node* drawOptionSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, std::vector<std::string> opts, std::string firstOption);
+        Node* createOptionSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, std::vector<std::string> opts, std::string firstOption, const char* nodeName, Node* parentNode);
+
+        // Float Slider
+        Node* drawFloatSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, float initialValue);
+        Node* createFloatSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, float initialValue, const char* nodeName, Node* parentNode);
 
         // Button
         Node* drawButton(vec2i position, vec2i size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor);
@@ -95,8 +104,11 @@ namespace ENGI {
 
         // Input Handling
         bool isKeyPressed(int key);
+        bool isAnyKeyPressed();
         bool isKeyDown(int key);
+        bool isAnyKeyDown();
         bool isKeyReleased(int key);
+        bool isAnyKeyReleased();
         bool isMouseButtonPressed(int button);
         bool isMouseButtonDown(int button);
         bool isGamepadAvailable(int gamepad);
@@ -121,6 +133,7 @@ namespace ENGI {
         Node* get3D();
         Font* getDefaultFont();
         void traverseRoot();
+        void nodeClear(Node* node);
 
         // DarkMoon Engine //
 

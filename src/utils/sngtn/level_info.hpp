@@ -59,6 +59,10 @@ struct LevelInfo
     std::size_t lockedEnemy{ max };
     std::size_t closestEnemy{ max };
 
+    // Variables de menú
+    bool anyButtonPressed{ false };
+    float elapsedPause{ 0.0f }, pauseLimit{ 0.5f };
+
     // Variables de carga de entidades
     notLoadSet dontLoad{};
 
@@ -105,7 +109,7 @@ struct LevelInfo
     //npc huya
     bool npcflee{ false }, investigatorstartwalk{ false };
     // Estado del juego
-    GameScreen currentScreen = GameScreen::LOGO;
+    GameScreen currentScreen = GameScreen::TITLE;
     GameScreen previousScreen = GameScreen::LOGO;
     GameScreen evenMorePreviousScreen = GameScreen::LOGO;
 

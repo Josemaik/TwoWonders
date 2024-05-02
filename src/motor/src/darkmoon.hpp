@@ -59,6 +59,10 @@ namespace DarkMoon {
         Node* CreateButton(glm::vec2 position, glm::vec2 size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor, const char* nodeName, Node* parentNode);
         // Create a slider in node
         Node* CreateSlider(glm::vec2 position, glm::vec2 size, float value, Color backColor, Color sliderColor, const char* nodeName, Node* parentNode);
+        // Create option slider in node
+        Node* CreateOptionSlider(glm::vec2 pos, glm::vec2 sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, std::vector<std::string> opts, std::string firstOption, const char* nodeName, Node* parentNode);
+        // Create float slider in node
+        Node* CreateFloatSlider(glm::vec2 pos, glm::vec2 sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, float initialValue, const char* nodeName, Node* parentNode);
 
         // 3D
 
@@ -178,6 +182,12 @@ namespace DarkMoon {
         bool IsKeyReleased(int key);
         // Check if a key is not being pressed
         bool IsKeyUp(int key);
+        // Check if any key is being pressed
+        bool IsAnyKeyPressed();
+        // Check if any key is down
+        bool IsAnyKeyDown();
+        // Check if any key has been released
+        bool IsAnyKeyReleased();
 
         // ------------------------------ //
         // Input-related functions: mouse //

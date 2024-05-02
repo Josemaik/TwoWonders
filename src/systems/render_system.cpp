@@ -49,14 +49,21 @@ void RenderSystem::restartScene(GameEngine& engine)
 }
 
 void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss) {
+
+    auto& li = em.getSingleton<LevelInfo>();
+
     ss.ambient_stop();
     ss.music_stop();
     ss.ambient_started = false;
 
+    // restartScene(engine);
     engine.beginDrawing();
     engine.clearBackground(D_WHITE);
+    getNode(engine, "MenuOpciones")->setVisible(false);
+    auto* menuNode = getNode(engine, "MenuPrincipal");
 
-    restartScene(engine);
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
 
     // Logo del videojuego
     auto* fondoTwoWonders = getNode(engine, "fondo_inicio");
@@ -73,10 +80,6 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
     int middleX = engine.getScreenWidth() / 2;
     int middleY = engine.getScreenHeight() / 2;
 
-    auto wRate = engine.getWidthRate();
-    auto hRate = engine.getHeightRate();
-    int downRate = static_cast<int>(83.33f * hRate);
-
     int posBackX = static_cast<int>(static_cast<float>(middleX) - static_cast<float>(fondoWidth) * wRate / 2);
     int posBackY = static_cast<int>(static_cast<float>(middleY) - static_cast<float>(fondoHeight) * hRate / 2);
 
@@ -86,140 +89,26 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
     engine.drawNode(fondoTwoWonders, { posBackX, posBackY });
     engine.drawNode(logoTwoWonders, { posX, posY });
 
-    // Datos de los botones
-    int buttonWidth = 303;
-    int buttonHeight = 75;
-
-    posX = engine.getScreenWidth() / 2 - static_cast<int>(static_cast<float>(buttonWidth) * wRate / 2.f);
-    posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.3f) - static_cast<int>(static_cast<float>(buttonHeight) * hRate / 2.f);
-
-    // Botones
-    std::vector<Node*> buttons;
-    auto* init = engine.createNode("initScreen", getNode(engine, "Menu"));
-
-    buttons.push_back(engine.createButton({ posX, posY }, { buttonWidth, buttonHeight }, "JUGAR",
-        engine.getFontDefault(), 15,
-        D_BLACK,
-        Aligned::CENTER, Aligned::CENTER,
-        { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
-        "Boton jugar", init));
-
-    buttons.push_back(engine.createButton({ posX, posY + downRate }, { buttonWidth, buttonHeight }, "CONFIGURACION",
-        engine.getFontDefault(), 15,
-        D_BLACK,
-        Aligned::CENTER, Aligned::CENTER,
-        { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
-        "Boton configuracion", init));
-
-    buttons.push_back(engine.createButton({ posX, posY + 2 * downRate }, { buttonWidth, buttonHeight }, "SALIR",
-        engine.getFontDefault(), 15,
-        D_BLACK,
-        Aligned::CENTER, Aligned::CENTER,
-        { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
-        "Boton salir", init));
-
-    for (auto& bt : buttons)
-        engine.drawNode(bt);
-
-    auto& li = em.getSingleton<LevelInfo>();
-    // auto& inpi = em.getSingleton<InputInfo>();
-
-    for (auto& bt : init->getChildren()) {
-        auto but = dynamic_cast<Button*>(bt->getEntity());
-
-        // Comprobar estado del boton
-        if (but->state == ButtonState::CLICK) {
-            if (bt->name == "Boton jugar") {
-                li.currentScreen = GameScreen::STORY;
-                ss.seleccion_menu();
-                ss.music_stop();
-            }
-            else if (bt->name == "Boton configuracion") {
-                li.currentScreen = GameScreen::OPTIONS;
-                li.previousScreen = GameScreen::TITLE;
-                ss.seleccion_menu();
-            }
-            else if (bt->name == "Boton salir") {
-                li.gameShouldEnd = true;
-                ss.sonido_salir();
-            }
-        }
-    }
-
-    // [ TODO ] -> Funcionalidad Mando
-
-    /*
-
-    // Funcionalidad de botones
-    Rectangle btn1Rec = { posX, posY, buttonWidth, buttonHeight };
-    Rectangle btn2Rec = { posX, posY + 55, buttonWidth, buttonHeight };
-    Rectangle btn3Rec = { posX, posY + 110, buttonWidth, buttonHeight };
-
-    auto& li = em.getSingleton<LevelInfo>();
-    auto& inpi = em.getSingleton<InputInfo>();
-
-    // Define the current button selection
-    auto& currentButton = inpi.currentButton;
-    bool buttonTouched = false;
-
-    // Define the buttons
-    ButtonRect buttons[] = {
-        { btn1Rec, "JUGAR", 0 },
-        { btn2Rec, "CONFIGURACION", 1 },
-        { btn3Rec, "SALIR", 2 }
-    };
-
-    // Control de botones de mando para cambiar el botón seleccionado
-    if (inpi.up || inpi.left) {
-        currentButton = (currentButton > 0) ? currentButton - 1 : sizeof(buttons) / sizeof(ButtonRect) - 1;
-        ss.sonido_mov();
-    }
-    if (inpi.down || inpi.right) {
-        currentButton = (currentButton < sizeof(buttons) / sizeof(ButtonRect) - 1) ? currentButton + 1 : 0;
-        ss.sonido_mov();
-    }
-
-    for (std::size_t i = 0; i < sizeof(buttons) / sizeof(ButtonRect); i++) {
-        ButtonRect& button = buttons[i];
-        bool isCurrent = (currentButton == i);
-        if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
-            (isCurrent && inpi.interact)) {
-            currentButton = i;
-            // Handle the button action
-            switch (button.action) {
-            case 0: // "JUGAR"
-                li.currentScreen = GameScreen::STORY;
-                ss.seleccion_menu();
-                ss.music_stop();
-                break;
-            case 1: // "CONFIGURACION"
-                li.currentScreen = GameScreen::OPTIONS;
-                li.previousScreen = GameScreen::TITLE;
-                ss.seleccion_menu();
-                break;
-            case 2: // "SALIR"
-                li.gameShouldEnd = true;
-                ss.sonido_salir();
-                break;
-            }
-
-            inpi.interact = false;
-        }
-
-        if (engine.checkCollisionPointRec(GetMousePosition(), button.rect) && !buttonTouched)
-            buttonTouched = true;
-    }
-
-    if (buttonTouched && !ss.pushed)
+    if (!li.anyButtonPressed)
     {
-        ss.sonido_mov();
-        ss.pushed = true;
-    }
-    else if (!buttonTouched && ss.pushed)
-        ss.pushed = false;
-    */
+        engine.createText({ engine.getScreenWidth() / 2, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.2f) },
+            "[Pulsa cualquier tecla]", engine.getDefaultFont(), 40, D_LAVENDER_LIGHT, "Texto inicio", menuNode, Aligned::CENTER);
 
-    // Dibujar arbol
+        if (engine.isAnyKeyPressed())
+        {
+            auto& inpi = em.getSingleton<InputInfo>();
+            inpi.interact = false;
+            li.anyButtonPressed = true;
+            ss.seleccion_menu();
+        }
+    }
+    else
+    {
+        getNode(engine, "Texto inicio")->getEntity<Text>()->text = L" ";
+        drawPauseMenu(engine, em, li, ss);
+    }
+
+    // Dibujar
     engine.traverseRoot();
     engine.endDrawing();
 }
@@ -295,340 +184,305 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
 }
 
 void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSystem& ss) {
+
+    restartScene(engine);
     engine.beginDrawing();
     engine.clearBackground(D_WHITE);
 
-    restartScene(engine);
+    // Fondo Opciones
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+    auto* fondoTwoWonders = getNode(engine, "fondo_inicio");
 
-    int buttonWidth = 200;
-    int buttonHeight = 50;
-    int middleScreen = engine.getScreenWidth() / 2;
+    auto* fondoText = fondoTwoWonders->getEntity<Texture2D>()->texture;
 
-    // Posición del botón de volver
-    int posX = middleScreen - (buttonWidth / 2);
-    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.1f - (static_cast<float>(buttonHeight) / .5f));
+    auto fondoWidth = fondoText->getWidth();
+    auto fondoHeight = fondoText->getHeight();
 
-    // Botones de resolución
-    int posResX = middleScreen - (buttonWidth / 2);
-    int posResY = 200 - (buttonHeight / 2);
-    int offSetY = 150;
+    int middleX = engine.getScreenWidth() / 2;
+    int middleY = engine.getScreenHeight() / 2;
 
-    // Botones
-    if (!nodeExists(engine, "opciones")) {
-        auto* options = engine.createNode("opciones", getNode(engine, "Menu"));
+    int posBackX = static_cast<int>(static_cast<float>(middleX) - static_cast<float>(fondoWidth) * wRate / 2);
+    int posBackY = static_cast<int>(static_cast<float>(middleY) - static_cast<float>(fondoHeight) * hRate / 2);
 
-        engine.createButton({}, { buttonWidth, buttonHeight }, "VOLVER",
-            engine.getFontDefault(), 15, D_BLACK,
-            Aligned::CENTER, Aligned::CENTER,
-            { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
-            "Boton volver", options);
+    engine.drawNode(fondoTwoWonders, { posBackX, posBackY });
 
-        engine.createButton({}, { buttonWidth, buttonHeight }, "800x600",
-            engine.getFontDefault(), 15, D_BLACK,
-            Aligned::CENTER, Aligned::CENTER,
-            { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
-            "Boton 800x600", options);
-
-        engine.createButton({}, { buttonWidth, buttonHeight }, "1280x720",
-            engine.getFontDefault(), 15, D_BLACK,
-            Aligned::CENTER, Aligned::CENTER,
-            { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
-            "Boton 1280x720", options);
-
-        engine.createButton({}, { buttonWidth, buttonHeight }, "1920x1080",
-            engine.getFontDefault(), 15, D_BLACK,
-            Aligned::CENTER, Aligned::CENTER,
-            { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
-            "Boton 1920x1080", options);
-
-        engine.createButton({}, { buttonWidth, buttonHeight }, "FULLSCREEN",
-            engine.getFontDefault(), 15, D_BLACK,
-            Aligned::CENTER, Aligned::CENTER,
-            { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
-            "Boton fullscreen", options);
-
-        engine.createButton({}, { buttonWidth + 50, buttonHeight }, "CONTROLES MANDO",
-            engine.getFontDefault(), 15, D_BLACK,
-            Aligned::CENTER, Aligned::CENTER,
-            { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
-            "Boton controles mando", options);
-
-        engine.createButton({}, { buttonWidth + 50, buttonHeight }, "CONTROLES TECLADO",
-            engine.getFontDefault(), 15, D_BLACK,
-            Aligned::CENTER, Aligned::CENTER,
-            { 140, 197, 214 , 255 }, D_AQUA, D_AQUA_LIGHT,
-            "Boton controles teclado", options);
-
-        engine.createSlider({}, { buttonWidth, 20 }, 0.5f, D_WHITE, D_AQUA, "Slider volumen", options);
-    }
-    getNode(engine, "opciones")->setVisible(true);
-
+    auto* menuNode = getNode(engine, "MenuOpciones");
     auto& li = em.getSingleton<LevelInfo>();
-    // auto& inpi = em.getSingleton<InputInfo>();
-
-    for (auto& bt : getNode(engine, "opciones")->getChildren()) {
-        // Recolocar botones
-        if (bt->name == "Boton volver")
-            bt->setTranslation({ posX, posY, 0.0f });
-        else if (bt->name == "Boton 800x600")
-            bt->setTranslation({ posResX - offSetY, posResY, 0.0f });
-        else if (bt->name == "Boton 1280x720")
-            bt->setTranslation({ posResX + offSetY, posResY, 0.0f });
-        else if (bt->name == "Boton 1920x1080")
-            bt->setTranslation({ posResX - offSetY, posResY + static_cast<int>(static_cast<float>(offSetY) / 2.5f), 0.0f });
-        else if (bt->name == "Boton fullscreen")
-            bt->setTranslation({ posResX + offSetY, posResY + static_cast<int>(static_cast<float>(offSetY) / 2.5f), 0.0f });
-        else if (bt->name == "Boton controles mando")
-            bt->setTranslation({ posX - offSetY - 40, posY - 100, 0.0f });
-        else if (bt->name == "Boton controles teclado")
-            bt->setTranslation({ posX + offSetY, posY - 100, 0.0f });
-        else if (bt->name == "Slider volumen")
-            bt->setTranslation({ middleScreen - buttonWidth, 100.0f, 0.0f });
-
-        // Estado de los botones
-        auto but = dynamic_cast<Button*>(bt->getEntity());
-        auto sli = dynamic_cast<Slider*>(bt->getEntity());
-
-        if (but != nullptr && but->state == ButtonState::CLICK) {
-            if (bt->name == "Boton volver")
-                li.currentScreen = li.previousScreen;
-            else if (bt->name == "Boton 800x600")
-                engine.setWindowSize(800, 600);
-            else if (bt->name == "Boton 1280x720")
-                engine.setWindowSize(1280, 720);
-            else if (bt->name == "Boton 1920x1080")
-                engine.setWindowSize(1920, 1080);
-            else if (bt->name == "Boton fullscreen")
-                engine.setWindowFullScreen();
-
-            else if (bt->name == "Boton controles mando") {
-                li.keyboardControls = false;
-                li.evenMorePreviousScreen = li.previousScreen;
-                li.currentScreen = GameScreen::CONTROLS;
-                li.previousScreen = GameScreen::OPTIONS;
-            }
-            else if (bt->name == "Boton controles teclado") {
-                li.keyboardControls = true;
-                li.evenMorePreviousScreen = li.previousScreen;
-                li.currentScreen = GameScreen::CONTROLS;
-                li.previousScreen = GameScreen::OPTIONS;
-            }
-
-            ss.seleccion_menu();
-        }
-        else if (sli != nullptr)
-            if (bt->name == "Slider volumen")
-                ss.setVolumeMaster(sli->valor);
-    }
-
-    // [ TODO ] -> MANDO
-
-    /*
-
-    // Slider del volumen
-    Rectangle volumenSlider = { middleScreen - buttonWidth, 100, buttonWidth, 20 };
-    auto& sosy = em.getSingleton<SoundSystem>();
-    float volumen = sosy.getVolumeMaster() * 100;
-    float* vol = &volumen;
-
-    // { volumenSlider, "Volumen", 5 },
-
-    // Define the current button selection
+    auto& inpi = em.getSingleton<InputInfo>();
     auto& currentButton = inpi.currentButton;
-    bool buttonTouched = false;
 
-    bool inpiCheck1 = inpi.up || inpi.left;
-    bool inpiCheck2 = inpi.down || inpi.right;
+    // Datos de los botones
+    int middleScreen = engine.getScreenWidth() / 2;
+    int buttonWidth = 300;
+    int buttonHeight = 50;
 
-    // Define the buttons
-    ButtonRect buttons[] = {
-        { btn1Rec, "VOLVER", 0 },
-        { btn2Rec, "800x600", 1 },
-        { btn3Rec, "1280x720", 2 },
-        { btn4Rec, "1920x1080", 3 },
-        { btn5Rec, "FULLSCREEN", 4 },
-        { volumenSlider, "Volumen", 5 },
-        { btn6Rec, "CONTROLES MANDO", 6},
-        { btn7Rec, "CONTROLES TECLADO", 7 }
+    // Título de Opciones
+    int posTitleY = engine.getScreenHeight() / 9;
+    engine.createText({ middleScreen,  posTitleY }, "Opciones", engine.getFontDefault(), 80, D_WHITE, "Titulo opciones", menuNode, Aligned::CENTER);
+
+    // Posición del slider
+    int posX = middleScreen + buttonWidth / 3;
+    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2.f);
+    int posYVol = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.5f);
+
+    std::string firstOpt = "";
+    switch (engine.getScreenWidth())
+    {
+    case 800:
+        firstOpt = "800x600";
+        break;
+    case 1280:
+        firstOpt = "1280x720";
+        break;
+    case 1920:
+        firstOpt = "1920x1080";
+        break;
+    default:
+        firstOpt = "FULLSCREEN";
+        break;
+    }
+    auto* sliderRes = engine.createOptionSlider({ posX, posY }, { buttonWidth, buttonHeight }, D_AQUA, "",
+        engine.getFontDefault(), 35, 45, D_AQUA, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA_LIGHT, D_AQUA_DARK,
+        { "800x600", "1280x720", "1920x1080", "FULLSCREEN" }, firstOpt, "Resolucion", menuNode);
+
+
+    auto* sliderVol = engine.createFloatSlider({ posX, posYVol }, { buttonWidth, buttonHeight }, D_AQUA, "",
+        engine.getFontDefault(), 35, 45, D_AQUA, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA_LIGHT, D_AQUA_DARK, ss.getVolumeMaster(), "Volumen", menuNode);
+
+    std::map<std::string, std::function<void()>> SliderData =
+    {
+        {"800x600", [&]() { engine.setWindowSize(800, 600); }},
+        {"1280x720", [&]() { engine.setWindowSize(1280, 720); }},
+        {"1920x1080", [&]() { engine.setWindowSize(1920, 1080); }},
+        {"FULLSCREEN", [&]() { engine.setWindowFullScreen(); }}
     };
 
-    std::string volName = "Volumen";
-    for (std::size_t i = 0; i < sizeof(buttons) / sizeof(ButtonRect); i++) {
-        ButtonRect& button = buttons[i];
-        bool isCurrent = (currentButton == i);
-        if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
-            (isCurrent && inpi.interact)) {
-            currentButton = i;
-            // Handle the button action
-            switch (button.action) {
-            case 5: // "Volumen"
-                break;
-            case 6: // "CONTROLES"
-                li.keyboardControls = false;
-                li.evenMorePreviousScreen = li.previousScreen;
-                li.currentScreen = GameScreen::CONTROLS;
-                li.previousScreen = GameScreen::OPTIONS;
-                break;
-            case 7: // "CONTROLES"
-                li.keyboardControls = true;
-                li.evenMorePreviousScreen = li.previousScreen;
-                li.currentScreen = GameScreen::CONTROLS;
-                li.previousScreen = GameScreen::OPTIONS;
-                break;
-            }
+    // Botones
+    std::map<std::string, std::tuple<Node*, std::string, std::function<void()>, vec2i>> buttonData = {
+    { "1_volver", { nullptr, "Volver", [&]() {
+        li.currentScreen = li.previousScreen;
+        ss.seleccion_menu();
+        return;
+    }, {middleScreen - buttonWidth, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.2f)} } },
+    { "2_aceptar", { nullptr, "Aceptar", [&]() {
+        auto& sliderInfo = *sliderRes->getEntity<OptionSlider>();
+        auto& sliderInfoVol = *sliderVol->getEntity<FloatSlider>();
 
+        auto& action = SliderData[sliderInfo.options[sliderInfo.currentOption]];
+        action();
+
+        ss.setVolumeMaster(sliderInfoVol.currentValue);
+        ss.seleccion_menu();
+        return;
+    }, {middleScreen + buttonWidth / 3, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.2f)} } },
+    { "3_controles", { nullptr, "Controles", [&]() {
+        li.currentScreen = GameScreen::CONTROLS;
+        li.previousScreen = GameScreen::OPTIONS;
+        ss.seleccion_menu();
+    }, {middleScreen - buttonWidth / 3, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 4.5f)} } },
+    { "4_sliderRes", { nullptr, "Resolución", [&]() {
+        auto& sliderInfo = *sliderRes->getEntity<OptionSlider>();
+        if (inpi.right)
+        {
+            sliderInfo.nextOption();
+            inpi.right = false;
+        }
+        else if (inpi.left)
+        {
+            sliderInfo.prevOption();
+            inpi.left = false;
+        }
+
+    }, {middleScreen - buttonWidth, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2.f)} } },
+    { "5_sliderVol", { nullptr, "Volumen", [&]() {
+        auto& sliderInfo = *sliderVol->getEntity<FloatSlider>();
+        if (engine.isKeyDown(D_KEY_RIGHT))
+        {
+            sliderInfo.nextOption();
+            ss.setVolumeMaster(sliderInfo.currentValue);
+            inpi.right = false;
+        }
+        else if (engine.isKeyDown(D_KEY_LEFT))
+        {
+            sliderInfo.prevOption();
+            ss.setVolumeMaster(sliderInfo.currentValue);
+            inpi.left = false;
+        }
+    }, {middleScreen - buttonWidth, posYVol} } }
+    };
+
+    int i{ 0 };
+    for (auto& [name, data] : buttonData)
+    {
+        auto& [button, buttonText, action, position] = data;
+
+        // Asignamos el botón
+        button = engine.createButton(position, { buttonWidth, buttonHeight },
+            buttonText,
+            engine.getFontDefault(), 40, D_BLACK,
+            Aligned::CENTER, Aligned::CENTER,
+            D_LAVENDER, D_LAVENDER_DARK, D_LAVENDER_LIGHT,
+            name.c_str(), menuNode);
+
+        // Sacamos la información del botón
+        auto& but = *button->getEntity<Button>();
+        but.textBox.drawBox = false;
+
+        // Sacamos la información del slider
+
+        if (currentButton == static_cast<std::size_t>(i) && but.state != ButtonState::CLICK)
+            but.isCurrent = true;
+
+        // Comprobar estado del boton
+        if ((but.state == ButtonState::CLICK || (but.isCurrent && inpi.interact)) && i < 3) {
+            action();
             inpi.interact = false;
         }
-        if (i == 5 && currentButton == i)
+        else if (i >= 3 && but.isCurrent)
         {
-            if (engine.isGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT) || engine.isKeyDown(KEY_RIGHT)) {
-                *vol = (*vol < 100) ? *vol + 1 : 100;
-                // ss.sonido_mov();
-            }
-            if (engine.isGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT) || engine.isKeyDown(KEY_LEFT)) {
-                *vol = (*vol > 0) ? *vol - 1 : 0;
-                // ss.sonido_mov();
-            }
-
-            inpiCheck1 = inpi.up;
-            inpiCheck2 = inpi.down;
-            volName = "[Volumen]";
+            action();
         }
 
-        if (engine.checkCollisionPointRec(GetMousePosition(), button.rect) && !buttonTouched)
-            buttonTouched = true;
-    }
-    GuiSliderBar(volumenSlider, NULL, volName.c_str(), vol, 0, 100);
-    ss.setVolumeMaster(*vol / 100.0f);
-
-    // Control de botones de mando para cambiar el botón seleccionado
-    if (inpiCheck1) {
-        currentButton = (currentButton > 0) ? currentButton - 1 : sizeof(buttons) / sizeof(ButtonRect) - 1;
-        ss.sonido_mov();
-    }
-    else if (inpiCheck2) {
-        currentButton = (currentButton < sizeof(buttons) / sizeof(ButtonRect) - 1) ? currentButton + 1 : 0;
-        ss.sonido_mov();
+        i += 1;
     }
 
-    if (buttonTouched && !ss.pushed)
-    {
+    if (inpi.up || inpi.left) {
+        currentButton = (currentButton > 0) ? currentButton - 1 : buttonData.size() - 1;
         ss.sonido_mov();
-        ss.pushed = true;
     }
-    else if (!buttonTouched && ss.pushed)
-        ss.pushed = false;
-
-    */
+    if (inpi.down || inpi.right) {
+        currentButton = (currentButton < buttonData.size() - 1) ? currentButton + 1 : 0;
+        ss.sonido_mov();
+    }
 
     engine.traverseRoot();
-
     engine.endDrawing();
 }
 
-void RenderSystem::drawPauseMenu(GameEngine&, EntityManager&)
+void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInfo& li, SoundSystem& ss)
 {
-    // auto& li = em.getSingleton<LevelInfo>();
-    // if (li.currentScreen != GameScreen::CONTROLS)
-    // {
-    //     auto& ss = em.getSingleton<SoundSystem>();
+    auto& inpi = em.getSingleton<InputInfo>();
+    // Nodo de los botones
+    if (inpi.pause)
+        getNode(engine, "2D")->setVisible(false);
 
-    //     float windowWidth = 330.0f;
-    //     float windowHeight = 460.0f;
-    //     float buttonWidth = 200.0f;
-    //     float buttonHeight = 50.0f;
+    auto* menuNode = getNode(engine, "MenuPrincipal");
 
-    //     Rectangle windowRect = {
-    //         static_cast<float>(engine.getScreenWidth()) / 2.0f - windowWidth / 2.0f,
-    //         static_cast<float>(engine.getScreenHeight()) / 2.0f - windowHeight / 2.0f,
-    //         windowWidth,
-    //         windowHeight
-    //     };
-    //     engine.drawRectangleLinesEx(windowRect, 2, D_BLACK);
-    //     engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
-    //     engine.drawTextEx(engine.getFontDefault(), "PAUSA", vec2d{ windowRect.x + 100, windowRect.y + 40 }, 40, 1, D_BLACK);
+    // Datos de los botones
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
 
-    //     float posX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2.0f);
-    //     float posY = static_cast<float>(engine.getScreenHeight() / 2) - (buttonHeight / .5f);
+    int buttonWidth = 400;
+    int buttonHeight = 75;
+    int downRate = static_cast<int>(150.f * hRate);
 
-    //     auto& inpi = em.getSingleton<InputInfo>();
+    int posX = engine.getScreenWidth() / 7 - static_cast<int>(static_cast<float>(buttonWidth) * wRate / 2.f);
+    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 3.8f) - static_cast<int>(static_cast<float>(buttonHeight) * hRate / 2.f);
 
-    //     // Define the current button selection
-    //     auto& currentButton = inpi.currentButton;
-    //     bool buttonTouched = false;
+    // Fondo de los botones
+    int initX = -static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 2.5f);
+    int initButtonX = posX + initX;
+    int finalX = 0;
+    float multiplier = 750.f;
+    if (!inpi.pause)
+        multiplier = 500.f;
 
-    //     ButtonRect buttons[] = {
-    //     { { posX, posY, buttonWidth, buttonHeight }, "CONTINUAR", 0 },
-    //     { { posX, posY + 70, buttonWidth, buttonHeight }, "OPCIONES", 1 },
-    //     { { posX, posY + 140, buttonWidth, buttonHeight }, "VOLVER AL INICIO", 2 },
-    //     { { posX, posY + 210, buttonWidth, buttonHeight }, "SALIR", 3 },
-    //     };
+    int movement = static_cast<int>(multiplier * li.elapsedPause);
 
-    //     for (std::size_t i = 0; i < sizeof(buttons) / sizeof(ButtonRect); i++) {
-    //         ButtonRect& button = buttons[i];
-    //         bool isCurrent = (currentButton == i);
-    //         if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
-    //             (isCurrent && inpi.interact)) {
-    //             currentButton = i;
-    //             inpi.mouseClick = true;
-    //             // Aquí puedes manejar la acción del botón
-    //             switch (button.action) {
-    //             case 0: // "CONTINUAR"
-    //             {
-    //                 inpi.pause = false;
-    //                 ss.seleccion_menu();
-    //                 ss.playAmbient();
-    //                 ss.play_music();
-    //                 break;
-    //             }
-    //             case 1: // "OPCIONES"
-    //             {
-    //                 inpi.currentButton = 0;
-    //                 li.currentScreen = GameScreen::OPTIONS;
-    //                 li.previousScreen = GameScreen::GAMEPLAY;
-    //                 ss.seleccion_menu();
-    //                 break;
-    //             }
-    //             case 2: // "VOLVER AL INICIO"
-    //             {
-    //                 li.currentScreen = GameScreen::TITLE;
-    //                 li.resetGame = true;
-    //                 ss.seleccion_menu();
-    //                 break;
-    //             }
-    //             case 3: // "SALIR"
-    //             {
-    //                 ss.sonido_salir();
-    //                 li.gameShouldEnd = true;
-    //                 return;
-    //             }
-    //             }
+    if (initX + movement > finalX)
+    {
+        movement = finalX - initX;
+    }
+    else
+        li.elapsedPause += engine.getFrameTime();
 
-    //             inpi.interact = false;
-    //         }
+    initX += movement;
+    initButtonX += movement;
 
-    //         if (engine.checkCollisionPointRec(GetMousePosition(), button.rect) && !buttonTouched)
-    //             buttonTouched = true;
-    //     }
+    engine.createRectangle({ initX, 0 },
+        { static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 2.5f), static_cast<int>(static_cast<float>(engine.getScreenHeight()) / hRate) },
+        { 0, 0, 0, 120 }, "Fondo_botones", menuNode);
 
-    //     if (buttonTouched && !ss.pushed)
-    //     {
-    //         ss.sonido_mov();
-    //         ss.pushed = true;
-    //     }
-    //     else if (!buttonTouched && ss.pushed)
-    //         ss.pushed = false;
+    // Botones
+    auto& currentButton = inpi.currentButton;
+    engine.clearBackground(D_WHITE);
+    std::map<std::string, std::tuple<Node*, std::string, std::function<void()>>> buttonData = {
+        { "1_jugar", { nullptr, inpi.pause ? "Reanudar" : "Jugar" , [&]() {
+            if (!inpi.pause)
+            {
+                li.currentScreen = GameScreen::STORY;
+                li.anyButtonPressed = false;
+            }
+            else
+                inpi.pause = false;
 
-    //     // Control de botones de mando para cambiar el botón seleccionado
-    //     if (inpi.up || inpi.left) {
-    //         currentButton = (currentButton > 0) ? currentButton - 1 : sizeof(buttons) / sizeof(ButtonRect) - 1;
-    //         ss.sonido_mov();
-    //     }
-    //     if (inpi.down || inpi.right) {
-    //         currentButton = (currentButton < sizeof(buttons) / sizeof(ButtonRect) - 1) ? currentButton + 1 : 0;
-    //         ss.sonido_mov();
-    //     }
-    // }
+            li.elapsedPause = 0.f;
+
+            ss.seleccion_menu();
+            ss.music_stop();
+        } } },
+        { "2_opciones", { nullptr, "Opciones", [&]() {
+            li.previousScreen = li.currentScreen;
+            li.currentScreen = GameScreen::OPTIONS;
+            ss.seleccion_menu();
+        } } },
+        { "3_creditos", { nullptr, "Créditos", [&]() {
+        // Por definir
+        } } },
+        { "4_salir", { nullptr, inpi.pause ? "Ir al menú" : "Salir", [&]() {
+            if (!inpi.pause)
+            {
+                li.gameShouldEnd = true;
+                ss.sonido_salir();
+            }
+            else
+            {
+                li.currentScreen = GameScreen::TITLE;
+                inpi.pause = false;
+                engine.nodeClear(menuNode);
+                engine.clearBackground(D_WHITE);
+            }
+        } } }
+    };
+
+    int i{ 0 };
+    for (auto& [name, data] : buttonData)
+    {
+        auto& [button, buttonText, action] = data;
+
+        // Asignamos el botón
+        button = engine.createButton({ initButtonX, posY + i * downRate }, { buttonWidth, buttonHeight },
+            buttonText,
+            engine.getFontDefault(), 50, D_BLACK,
+            Aligned::CENTER, Aligned::RIGHT,
+            D_LAVENDER, D_LAVENDER_DARK, D_LAVENDER_LIGHT,
+            name.c_str(), menuNode);
+
+        // Sacamos la información del botón
+        auto& but = *button->getEntity<Button>();
+        but.textBox.drawBox = false;
+
+        if (currentButton == static_cast<std::size_t>(i) && but.state != ButtonState::CLICK)
+            but.isCurrent = true;
+
+        // Comprobar estado del boton
+        if (but.state == ButtonState::CLICK || (but.isCurrent && inpi.interact)) {
+            action();
+            inpi.interact = false;
+        }
+
+        i += 1;
+    }
+
+    if (inpi.up || inpi.left) {
+        currentButton = (currentButton > 0) ? currentButton - 1 : buttonData.size() - 1;
+        ss.sonido_mov();
+    }
+    if (inpi.down || inpi.right) {
+        currentButton = (currentButton < buttonData.size() - 1) ? currentButton + 1 : 0;
+        ss.sonido_mov();
+    }
 }
 
 void RenderSystem::drawInventory(GameEngine&, EntityManager&)
@@ -1467,9 +1321,10 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
         drawTextBox(engine, em);
 
     if (inpi.pause)
-        drawPauseMenu(engine, em);
-    else if (inpi.pause)
-        inpi.pause = false;
+    {
+        auto& ss = em.getSingleton<SoundSystem>();
+        drawPauseMenu(engine, em, li, ss);
+    }
 
     // else if (inpi.inventory)
         // drawInventory(engine, em);
@@ -1484,6 +1339,9 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
 
     else if (inpi.pathfind)
         drawTestPathfindinf(engine, em);
+
+    if (li.elapsedPause > 0 && !inpi.pause)
+        li.elapsedPause = 0;
 
     getNode(engine, "TextCopy")->setVisibleOne(true);
 
@@ -2233,7 +2091,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
         // Dibujamos el número de monedas en pantalla
         drawCoinBar(engine, em);
 
-        drawFPSCounter(engine);
+        // drawFPSCounter(engine);
         // engine.node_sceneTextures->clearChildren();
 
         // Dibujar el bastón

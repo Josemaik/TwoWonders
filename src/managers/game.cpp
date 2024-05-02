@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -116.0, 4.0, 111.0 };
+        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -76,7 +76,7 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e);
+    // em.addComponent<AttackComponent>(e);
     auto& lis = em.addComponent<ListenerComponent>(e);
 
     // Listeners de eventos para el jugador
@@ -194,6 +194,8 @@ void Game::run()
         // CODIGO DE LA PANTALLA DE TITULO
         case GameScreen::TITLE:
         {
+            if (li.playerID == li.max)
+                createEntities();
             if (sound_system.music_started == false) {
                 sound_system.playMusicMenu();
                 sound_system.music_started = true;
@@ -219,13 +221,6 @@ void Game::run()
             input_system.update(em, engine);
             // render_system.update(em, engine);
             render_system.drawControls(em, engine);
-            break;
-        }
-
-        // CODIGO DE LA PANTALLA DE PAUSA
-        case GameScreen::PAUSE:
-        {
-            render_system.drawPauseMenu(engine, em);
             break;
         }
 

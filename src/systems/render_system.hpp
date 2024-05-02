@@ -40,7 +40,7 @@ struct RenderSystem
     void drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& em);
     void drawRay(vec3d origin, vec3d end);
     void drawVisionCone(vec3d pos_enemy, double orientation, double horizontalFOV);
-    void drawPauseMenu(GameEngine& engine, EntityManager& em);
+    void drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInfo& li, SoundSystem& ss);
     void drawInventory(GameEngine& engine, EntityManager& em);
     void drawItemDescription(GameEngine& engine, EntityManager& em, Item& item);
     // void setShader(Shader& shader) { shaderPtr = &shader; }

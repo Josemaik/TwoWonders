@@ -235,16 +235,16 @@ namespace DarkMoon {
 
         GLuint VAO{}, VBO{};
         GLint textColorLocation{};
-        RenderManager* rm{ nullptr };
-        WindowsManager* wm{ nullptr };
+        RenderManager& rm = RenderManager::getInstance();
+        WindowsManager& wm = WindowsManager::getInstance();
         float ratio{};
+        int numLines{ 1 };
 
         Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK, Aligned al = Aligned::LEFT)
             : position(pos), font(f), fontSize(fS), color(col), alignment(al)
         {
             // Get ratio
-            wm = &WindowsManager::getInstance();
-            ratio = wm->getHeightRatio();
+            ratio = wm.getHeightRatio();
 
             setText(txt);
 
@@ -252,9 +252,8 @@ namespace DarkMoon {
             setupBuffers();
 
             // Get uniform location
-            rm = &RenderManager::getInstance();
-            rm->useShader(rm->shaders["text"]);
-            textColorLocation = glGetUniformLocation(rm->getShader()->getIDShader(), "textColor");
+            rm.useShader(rm.shaders["text"]);
+            textColorLocation = glGetUniformLocation(rm.getShader()->getIDShader(), "textColor");
         };
 
         void setText(std::string text)
@@ -280,6 +279,7 @@ namespace DarkMoon {
                         if (maxWidth < lineWidth)
                             maxWidth = lineWidth;
 
+                        numLines += 1;
                         continue;
                     }
 #ifdef _WIN32
@@ -334,15 +334,22 @@ namespace DarkMoon {
         };
 
         void draw(glm::mat4 transMatrix) override {
-            RenderManager& rm = RenderManager::getInstance();
 
-            if (ratio != wm->getHeightRatio())
+            if (ratio != wm.getHeightRatio())
             {
                 auto lastRatio = ratio;
-                ratio = wm->getHeightRatio();
+                ratio = wm.getHeightRatio();
                 scale = static_cast<float>(fontSize) / 34.0f * ratio;
                 for (auto& w : widths)
                     w *= ratio / lastRatio;
+
+                for (wchar_t& c : text) {
+                    Character ch = font->characters[c];
+                    auto chY = static_cast<float>(ch.size.y);
+                    if (maxHeight < chY)
+                        maxHeight = chY;
+                }
+                maxHeight *= scale;
             }
 
             rm.useShader(rm.shaders["text"]);
@@ -367,20 +374,7 @@ namespace DarkMoon {
             if (alignment == Aligned::CENTER)
                 aux_x -= widths[0] / 2;
             else if (alignment == Aligned::RIGHT)
-                aux_x -= -widths[0];
-
-            int numLines = 1;
-
-            for (wchar_t& c : text) {
-                Character ch = font->characters[c];
-                auto chY = static_cast<float>(ch.size.y);
-                if (maxHeight < chY)
-                    maxHeight = chY;
-
-                if (c == '\n')
-                    numLines++;
-            }
-            maxHeight *= scale;
+                aux_x -= widths[0];
 
             // Iterate through all characters
             auto offSetY = maxHeight * 0.8f;
@@ -466,7 +460,6 @@ namespace DarkMoon {
             return text;
         }
 
-    private:
         std::wstring text{};
     };
 
@@ -501,6 +494,13 @@ namespace DarkMoon {
                 // Rectangle
                 box.draw(transMatrix);
             }
+            else {
+                boxBackground.position.x = transMatrix[3][0] - 1;
+                boxBackground.position.y = transMatrix[3][1] - 1;
+
+                box.position.x = transMatrix[3][0];
+                box.position.y = transMatrix[3][1];
+            }
 
             WindowsManager& wm = WindowsManager::getInstance();
             auto wRat = wm.getWidthRatio();
@@ -515,7 +515,7 @@ namespace DarkMoon {
                 transMatrix[3][1] = box.position.y + (box.size.y - text.maxHeight) * hRat / 2;
                 break;
             case Aligned::BOTTOM:
-                transMatrix[3][1] = box.position.y + box.size.y * hRat - text.maxHeight - padding;
+                transMatrix[3][1] = box.position.y + box.size.y * hRat - padding;
                 break;
             default:
                 break;
@@ -530,7 +530,7 @@ namespace DarkMoon {
                 transMatrix[3][0] = box.position.x + box.size.x * wRat / 2;
                 break;
             case Aligned::RIGHT:
-                transMatrix[3][0] = box.position.x + box.size.x * wRat - text.maxWidth - padding;
+                transMatrix[3][0] = box.position.x + box.size.x * wRat - padding;
                 break;
             default:
                 break;
@@ -552,6 +552,7 @@ namespace DarkMoon {
         ButtonState state{ ButtonState::NORMAL };
         WindowsManager& wm = WindowsManager::getInstance();
         InputManager& im = InputManager::getInstance();
+        bool isCurrent{ false };
 
         Button(glm::vec2 pos = { 0.0f, 0.0f },
             glm::vec2 sz = { 100.0f, 50.0f },
@@ -587,16 +588,35 @@ namespace DarkMoon {
             if (mPos.x >= topLeft.x && mPos.x <= bottomRight.x &&
                 mPos.y >= topLeft.y && mPos.y <= bottomRight.y) {
                 if (im.isMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT)) {
-                    textBox.box.color = clickColor;
+                    if (!textBox.drawBox)
+                        textBox.text.color = clickColor;
+                    else
+                        textBox.box.color = clickColor;
                     state = ButtonState::CLICK;
                 }
                 else {
-                    textBox.box.color = hoverColor;
+                    if (!textBox.drawBox)
+                        textBox.text.color = hoverColor;
+                    else
+                        textBox.box.color = hoverColor;
                     state = ButtonState::HOVER;
                 }
             }
+            else  if (isCurrent)
+            {
+                if (!textBox.drawBox)
+                    textBox.text.color = hoverColor;
+                else
+                    textBox.box.color = hoverColor;
+                state = ButtonState::HOVER;
+
+                isCurrent = false;
+            }
             else {
-                textBox.box.color = normalColor;
+                if (!textBox.drawBox)
+                    textBox.text.color = normalColor;
+                else
+                    textBox.box.color = normalColor;
                 state = ButtonState::NORMAL;
             }
         }
@@ -650,6 +670,165 @@ namespace DarkMoon {
                 mPos.y >= topLeft.y && mPos.y <= bottomRight.y)
                 if (im.isMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
                     valor = (mPos.x - topLeft.x) / (bottomRight.x - topLeft.x);
+        }
+    };
+
+    struct OptionSlider : Entity {
+        Button prevButton;
+        TextBox textBox;
+        Button nextButton;
+        Text name{};
+        std::vector<std::string> options{};
+        std::size_t currentOption{};
+        WindowsManager& wm = WindowsManager::getInstance();
+        InputManager& im = InputManager::getInstance();
+
+        OptionSlider(
+            glm::vec2 pos = { 0.0f, 0.0f },
+            glm::vec2 sz = { 100.0f, 50.0f },
+            Color bCol = D_WHITE,
+            std::string txt = "",
+            Font* f = nullptr,
+            int fS = 10,
+            int fsArrows = 20,
+            Color tCol = D_BLACK,
+            Aligned verAl = Aligned::CENTER,
+            Aligned horAl = Aligned::CENTER,
+            Color nColor = D_WHITE,
+            Color hColor = D_GRAY,
+            Color cColor = D_BLACK,
+            std::vector<std::string> opts = { "Option 1", "Option 2", "Option 3" },
+            std::string firstOption = "Option 1") :
+            prevButton(pos, { sz.y, sz.y }, D_WHITE, "<", f, fsArrows, D_BLACK, verAl, Aligned::CENTER, nColor, hColor, cColor),
+            textBox(pos, sz, bCol, "", f, fS, tCol, Aligned::TOP, horAl),
+            nextButton(pos, { sz.y, sz.y }, D_WHITE, ">", f, fsArrows, D_BLACK, verAl, Aligned::CENTER, nColor, hColor, cColor),
+            name(pos, txt, f, fS, tCol, horAl),
+            options(opts),
+            currentOption(0)
+        {
+            prevButton.textBox.drawBox = false;
+            nextButton.textBox.drawBox = false;
+            textBox.drawBox = false;
+
+            textBox.box.position = pos;
+            textBox.text.setText(opts[currentOption]);
+
+            if (firstOption != "")
+                findAndAssign(firstOption);
+
+            checkMouse();
+        };
+
+        void draw(glm::mat4 transmatrix) override
+        {
+            auto wRat = wm.getWidthRatio();
+
+            glm::mat4 aux = transmatrix;
+            aux[3][0] -= prevButton.textBox.box.size.x * wRat * 1.1f;
+            // aux[3][1] += 5;
+            prevButton.draw(aux);
+
+            aux = transmatrix;
+            aux[3][0] += textBox.box.size.x * wRat * 1.015f;
+            // aux[3][1] += 5;
+            nextButton.draw(aux);
+
+            // Text box
+            textBox.draw(transmatrix);
+
+            // Name
+            if (name.text != L"")
+            {
+                aux = transmatrix;
+                aux[3][0] -= textBox.box.size.x * wRat / 1.5f;
+                name.draw(aux);
+            }
+
+            // Check mouse
+            checkMouse();
+        }
+
+        void checkMouse()
+        {
+            if (prevButton.state == ButtonState::CLICK)
+                nextOption();
+            else if (nextButton.state == ButtonState::CLICK)
+                prevOption();
+        }
+
+        void setCurrentOption(std::size_t option)
+        {
+            currentOption = option;
+            textBox.text.setText(options[currentOption]);
+        }
+
+        void findAndAssign(std::string option)
+        {
+            for (std::size_t i = 0; i < options.size(); i++)
+                if (options[i] == option)
+                {
+                    setCurrentOption(i);
+                    break;
+                }
+        }
+
+        virtual void nextOption()
+        {
+            // Pasamos a la siguiente opción y si estamos en la última volvemos a la primera
+            currentOption = (currentOption + 1) % options.size();
+            textBox.text.setText(options[currentOption]);
+        }
+
+        virtual void prevOption()
+        {
+            // Pasamos a la anterior opción y si estamos en la primera volvemos a la última
+            currentOption = (currentOption - 1 + options.size()) % options.size();
+            textBox.text.setText(options[currentOption]);
+        }
+    };
+
+    struct FloatSlider : OptionSlider {
+        float currentValue;
+
+        FloatSlider(
+            glm::vec2 pos = { 0.0f, 0.0f },
+            glm::vec2 sz = { 100.0f, 50.0f },
+            Color bCol = D_WHITE,
+            std::string txt = "",
+            Font* f = nullptr,
+            int fS = 10,
+            int fsArrows = 20,
+            Color tCol = D_BLACK,
+            Aligned verAl = Aligned::CENTER,
+            Aligned horAl = Aligned::CENTER,
+            Color nColor = D_WHITE,
+            Color hColor = D_GRAY,
+            Color cColor = D_BLACK,
+            float initialValue = 0.0f) :
+            OptionSlider(pos, sz, bCol, txt, f, fS, fsArrows, tCol, verAl, horAl, nColor, hColor, cColor),
+            currentValue(initialValue)
+        {
+            prevButton.textBox.drawBox = false;
+            nextButton.textBox.drawBox = false;
+            textBox.drawBox = false;
+
+            textBox.box.position = pos;
+            textBox.text.setText(std::to_string(static_cast<int>(currentValue * 100)));
+            checkMouse();
+        };
+
+        void nextOption() override
+        {
+            // Incrementamos el valor actual y nos aseguramos de que no supere 1
+            currentValue = std::min(currentValue + 0.01f, 1.0f);
+            textBox.text.setText(std::to_string(static_cast<int>(currentValue * 100)));
+        }
+
+        void prevOption() override
+        {
+            // Decrementamos el valor actual y nos aseguramos de que no baje de 0
+            currentValue = std::max(currentValue - 0.01f, 0.0f);
+            textBox.text.setText(std::to_string(static_cast<int>(currentValue * 100)));
         }
     };
 

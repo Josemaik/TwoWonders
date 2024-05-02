@@ -14,9 +14,10 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     widthRate = static_cast<float>(width) / 1920.0f;
     heightRate = static_cast<float>(height) / 1080.0f;
 
-    nodes["3D"] = dmeg.CreateNode("Scene 3D", dmeg.GetRootNode());
-    nodes["2D"] = dmeg.CreateNode("Scene 2D", dmeg.GetRootNode());
-    nodes["Menu"] = dmeg.CreateNode("Menu", dmeg.GetRootNode());
+    auto* rootNode = dmeg.GetRootNode();
+    nodes["3D"] = dmeg.CreateNode("Scene 3D", rootNode);
+    nodes["2D"] = dmeg.CreateNode("Scene 2D", rootNode);
+    nodes["Menu"] = dmeg.CreateNode("Menu", rootNode);
     nodes["Particles"] = dmeg.CreateNode("Particles", nodes["3D"]);
     nodes["HUD"] = dmeg.CreateNode("HUD", nodes["2D"]);
     nodes["Book"] = dmeg.CreateNode("Book", nodes["HUD"]);
@@ -36,14 +37,16 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["DebugAI2"] = dmeg.CreateNode("DebugAI2", nodes["Debug"]);
     nodes["DebugAI3"] = dmeg.CreateNode("DebugAI3", nodes["Debug"]);
     nodes["DebugAI4"] = dmeg.CreateNode("DebugAI4", nodes["Debug"]);
+    nodes["MenuPrincipal"] = dmeg.CreateNode("MenuPrincipal", nodes["Menu"]);
+    nodes["MenuOpciones"] = dmeg.CreateNode("MenuOpciones", nodes["Menu"]);
 
     ENGI::GameEngine::setExitKey(D_KEY_F8);
 
     // Fondo Inicio
-    loadAndResizeImage("fondo_inicio", "assets/Inicio_fondo.png", nodes["2D"]);
+    loadAndResizeImage("fondo_inicio", "assets/Inicio_fondo.png", nodes["MenuPrincipal"]);
 
     // Logo TwoWonders
-    loadAndResizeImage("logo_twowonders", "assets/logo_two_wonders.png", nodes["2D"]);
+    loadAndResizeImage("logo_twowonders", "assets/logo_two_wonders.png", nodes["MenuPrincipal"]);
 
     // Logo Kaiwa
     loadAndResizeImage("logo_kaiwa", "assets/logo_kaiwa_games.png", nodes["2D"]);
@@ -483,6 +486,11 @@ bool ENGI::GameEngine::isKeyPressed(int key)
         return gameData->isKeyPressed(key);
 }
 
+bool ENGI::GameEngine::isAnyKeyPressed()
+{
+    return dmeg.IsAnyKeyPressed();
+}
+
 bool ENGI::GameEngine::isKeyDown(int key)
 {
     if (!replayMode)
@@ -503,6 +511,11 @@ bool ENGI::GameEngine::isKeyDown(int key)
     }
     else
         return gameData->isKeyDown(key);
+}
+
+bool ENGI::GameEngine::isAnyKeyDown()
+{
+    return dmeg.IsAnyKeyDown();
 }
 
 bool ENGI::GameEngine::isKeyReleased(int key)
@@ -540,6 +553,11 @@ bool ENGI::GameEngine::isKeyReleased(int key)
     }
     else
         return gameData->isKeyReleased(key);
+}
+
+bool ENGI::GameEngine::isAnyKeyReleased()
+{
+    return dmeg.IsAnyKeyReleased();
 }
 
 bool ENGI::GameEngine::isMouseButtonPressed(int button)
@@ -749,6 +767,12 @@ Node* ENGI::GameEngine::drawRectangle(vec2i pos, vec2i size, Color color)
     return dmeg.CreateRectangle({ pos.x, pos.y }, size.toGlm(), color, "rectangle", nodes["Copy"]);
 }
 
+Node* ENGI::GameEngine::drawRectangle(vec2i pos, vec2i size, Color color, Node* parent)
+{
+    return dmeg.CreateRectangle({ pos.x, pos.y }, size.toGlm(), color, "rectangle", parent);
+}
+
+
 ///// TextBox /////
 
 Node* ENGI::GameEngine::createTextBox(vec2i position, vec2i size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode)
@@ -818,9 +842,49 @@ Node* ENGI::GameEngine::drawSlider(vec2i position, vec2i size, float value, Colo
     return dmeg.CreateSlider(position.toGlm(), size.toGlm(), value, backColor, sliderColor, "slider", nodes["TextCopy"]);
 }
 
+///// Option Slider /////
+
+Node* ENGI::GameEngine::drawOptionSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, std::vector<std::string> opts, std::string firstOption)
+{
+    return dmeg.CreateOptionSlider(pos.toGlm(), sz.toGlm(), bCol, txt, f, fS, fsArrows, tCol, verAl, horAl, nColor, hColor, cColor, opts, firstOption, "optionSlider", nodes["TextCopy"]);
+}
+
+Node* ENGI::GameEngine::createOptionSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, std::vector<std::string> opts, std::string firstOption, const char* nodeName, Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateOptionSlider(pos.toGlm(), sz.toGlm(), bCol, txt, f, fS, fsArrows, tCol, verAl, horAl, nColor, hColor, cColor, opts, firstOption, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(pos.x, pos.y), sz.to_other<float>() };
+        nodes[nodeName]->getEntity<OptionSlider>()->name.setText(txt);
+    }
+
+    return nodes[nodeName];
+}
+
+///// Float Slider /////
+
+Node* ENGI::GameEngine::drawFloatSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, float initialValue)
+{
+    return dmeg.CreateFloatSlider(pos.toGlm(), sz.toGlm(), bCol, txt, f, fS, fsArrows, tCol, verAl, horAl, nColor, hColor, cColor, initialValue, "floatSlider", nodes["TextCopy"]);
+}
+
+Node* ENGI::GameEngine::createFloatSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, float initialValue, const char* nodeName, Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateFloatSlider(pos.toGlm(), sz.toGlm(), bCol, txt, f, fS, fsArrows, tCol, verAl, horAl, nColor, hColor, cColor, initialValue, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(pos.x, pos.y), sz.to_other<float>() };
+        nodes[nodeName]->getEntity<FloatSlider>()->name.setText(txt);
+    }
+
+    return nodes[nodeName];
+}
+
 ///// Button /////
 
-Node* ENGI::GameEngine::createButton(vec2i position, vec2i size, std::string text, DarkMoon::Font* font, int fontSize, DarkMoon::Color textColor, DarkMoon::Aligned verticalAligned, DarkMoon::Aligned horizontalAligned, DarkMoon::Color normalColor, DarkMoon::Color hoverColor, DarkMoon::Color clickColor, const char* nodeName, DarkMoon::Node* parentNode)
+Node* ENGI::GameEngine::createButton(vec2i position, vec2i size, std::string text, Font* font, int fontSize, DarkMoon::Color textColor, DarkMoon::Aligned verticalAligned, DarkMoon::Aligned horizontalAligned, DarkMoon::Color normalColor, DarkMoon::Color hoverColor, DarkMoon::Color clickColor, const char* nodeName, DarkMoon::Node* parentNode)
 {
     if (!nodes[nodeName])
         nodes[nodeName] = dmeg.CreateButton(position.toGlm(), size.toGlm(), text, font, fontSize, textColor, verticalAligned, horizontalAligned, normalColor, hoverColor, clickColor, nodeName, parentNode);
@@ -846,7 +910,7 @@ Node* ENGI::GameEngine::createButton(vec2i position, vec2i size, std::string tex
     return nodes[nodeName];
 }
 
-Node* ENGI::GameEngine::drawButton(vec2i position, vec2i size, std::string text, DarkMoon::Font* font, int fontSize, DarkMoon::Color textColor, DarkMoon::Aligned verticalAligned, DarkMoon::Aligned horizontalAligned, DarkMoon::Color normalColor, DarkMoon::Color hoverColor, DarkMoon::Color clickColor)
+Node* ENGI::GameEngine::drawButton(vec2i position, vec2i size, std::string text, Font* font, int fontSize, DarkMoon::Color textColor, DarkMoon::Aligned verticalAligned, DarkMoon::Aligned horizontalAligned, DarkMoon::Color normalColor, DarkMoon::Color hoverColor, DarkMoon::Color clickColor)
 {
     return dmeg.CreateButton(position.toGlm(), size.toGlm(), text, font, fontSize, textColor, verticalAligned, horizontalAligned, normalColor, hoverColor, clickColor, "button", nodes["TextCopy"]);
 }
@@ -940,4 +1004,13 @@ void ENGI::GameEngine::traverseRoot()
     dmeg.GetRootNode()->traverse(glm::mat4());
 
     nodesToDraw.clear();
+}
+
+void ENGI::GameEngine::nodeClear(Node* node)
+{
+    for (auto& child : node->getChildren())
+    {
+        if (nodesToDraw.find(child) != nodesToDraw.end())
+            nodesToDraw.erase(child);
+    }
 }

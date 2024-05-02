@@ -24,6 +24,9 @@ namespace DarkMoon {
         bool isKeyDown(int key);
         bool isKeyReleased(int key);
         bool isKeyUp(int key);
+        bool isAnyKeyPressed();
+        bool isAnyKeyDown();
+        bool isAnyKeyReleased();
 
         void setExitKey(int key);
 
