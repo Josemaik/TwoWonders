@@ -1,9 +1,13 @@
 #pragma once
-#include <raylib.h>
-#include "utils/BBox.hpp"
+#include "../motor/src/utils/color.hpp"
+#include "../motor/src/darkmoon.hpp"
+#include "../utils/BBox.hpp"
 
 struct RenderComponent
 {
+    using Color = DarkMoon::Color;
+    using Node = DarkMoon::Node;
+
     void setAll(vec3d p, vec3d s, Color c);
     void setPosition(vec3d p);
     void setScale(vec3d s);
@@ -22,7 +26,6 @@ struct RenderComponent
     double offset{};
     BBox bbox{};
 
-    Model model{};
-    Mesh mesh{};
+    Node* node{ nullptr };
     bool meshLoaded{ false };
 };

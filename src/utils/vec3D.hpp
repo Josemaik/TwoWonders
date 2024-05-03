@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include <optional>
-#include <raylib.h>
+#include <glm/glm.hpp>
 #include <array>
 // Si queremos que la serialización sea en json, descomentar las siguientes líneas
 // #define CEREAL_RAPIDJSON_NAMESPACE cereal_rapidjson
@@ -232,9 +232,9 @@ struct vec3D
             return 0;
     }
 
-    constexpr Vector3 toRaylib() const noexcept
+    constexpr glm::vec3 toGlm() const noexcept
     {
-        return Vector3{ static_cast<float>(x_),  static_cast<float>(y_),  static_cast<float>(z_) };
+        return glm::vec3{ x_, y_, z_ };
     }
 
     friend std::ostream& operator<<(std::ostream& os, vec3D const& v)
@@ -322,9 +322,33 @@ struct vec2D
 {
     constexpr vec2D() = default;
     constexpr vec2D(DataT x, DataT y) : x{ x }, y{ y } {}
-    constexpr Vector2 toRaylib() const noexcept
+
+    constexpr glm::vec2 toGlm() const noexcept
     {
-        return Vector2{ static_cast<float>(x),  static_cast<float>(y) };
+        return glm::vec2{ x, y };
+    }
+
+    constexpr bool operator==(vec2D const& rhs) const
+    {
+        return x == rhs.x && y == rhs.y;
+    }
+
+    constexpr vec2D operator*(vec2D const& rhs) const
+    {
+        return { x * rhs.x, y * rhs.y };
+    }
+
+    constexpr vec2D operator*=(vec2D const& rhs)
+    {
+        x *= rhs.x;
+        y *= rhs.y;
+        return *this;
+    }
+
+    // Función para pasar de double a float o de float a double
+    template<typename OtherT>
+    vec2D<OtherT> to_other() const {
+        return vec2D<OtherT>(static_cast<OtherT>(x), static_cast<OtherT>(y));
     }
 
     DataT x{}, y{};
@@ -332,3 +356,4 @@ struct vec2D
 
 using vec2f = vec2D<float>;
 using vec2d = vec2D<double>;
+using vec2i = vec2D<int>;

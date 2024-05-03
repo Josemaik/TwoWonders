@@ -1,7 +1,6 @@
 #pragma once
 #ifndef INPUT_MANAGER
 #define INPUT_MANAGER
-#include <raylib.h>
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
 

@@ -6,7 +6,7 @@
 void Game::createShield(Entity& ent)
 {
     auto& e{ em.newEntity() };
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = DARKBROWN });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = D_ORANGE_DARK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
     em.addComponent<ShieldComponent>(e, ShieldComponent{ .createdby = EntitieswithShield::Player });
@@ -15,26 +15,26 @@ void Game::createShield(Entity& ent)
 void Game::createEnding()
 {
     auto& e{ em.newEntity() };
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = {83.0f, 1.0f, -87.0f}, .scale = {1.0f, 1.0f, 1.0f}, .color = WHITE });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = {83.0f, 1.0f, -87.0f}, .scale = {1.0f, 1.0f, 1.0f}, .color = D_WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
 }
 
-Shader Game::createShader()
-{
-    Shader shader = engine.loadShader(TextFormat("assets/shaders/lighting.vs", 330),
-        TextFormat("assets/shaders/lighting.fs", 330));
+// ShaderType Game::createShader()
+// {
+//     ShaderType shader = engine.loadShader(TextFormat("assets/shaders/lighting.vs", 330),
+//         TextFormat("assets/shaders/lighting.fs", 330));
 
-    // Get some required shader locations
-    shader.locs[SHADER_LOC_VECTOR_VIEW] = engine.getShaderLocation(shader, "viewPos");
+//     // Get some required shader locations
+//     shader.locs[SHADER_LOC_VECTOR_VIEW] = engine.getShaderLocation(shader, "viewPos");
 
-    // Ambient light level (some basic lighting)
-    int ambientLoc = engine.getShaderLocation(shader, "ambient");
-    float ambientValue[4] = { 3.1f, 3.1f, 3.1f, 20.0f };
-    engine.setShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
+//     // Ambient light level (some basic lighting)
+//     int ambientLoc = engine.getShaderLocation(shader, "ambient");
+//     float ambientValue[4] = { 3.1f, 3.1f, 3.1f, 20.0f };
+//     engine.setShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
 
-    return shader;
-}
+//     return shader;
+// }
 
 void Game::createEntities()
 {
@@ -69,7 +69,7 @@ void Game::createEntities()
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 6.0, 2.0 }, .color = WHITE });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 6.0, 2.0 }, .color = D_WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
     // p.gravity = 0;
 
@@ -131,9 +131,9 @@ void Game::run()
     auto& gami = em.getSingleton<GameData>();
 
     // Shader ambiente
-    Shader shader = createShader();
+    // ShaderType shader = createShader();
 
-    render_system.setShader(shader);
+    // render_system.setShader(shader);
     collision_system.setEventManager(evm);
     auto& sound_system = em.getSingleton<SoundSystem>();
 
@@ -169,7 +169,7 @@ void Game::run()
 
     while (!li.gameShouldEnd)
     {
-        elapsed += timeStep120;
+        elapsed += engine.getFrameTime();
         gami.updateFrame();
 
         switch (li.currentScreen)
@@ -180,7 +180,7 @@ void Game::run()
             if (li.playerID == li.max)
                 createEntities();
             // Contador para que pasen X segundos
-            currentTime += timeStep;
+            currentTime += timeStep40;
             if (currentTime > 4.0 || inpi.interact) {
                 li.currentScreen = GameScreen::TITLE;
                 currentTime = 0;
@@ -194,6 +194,8 @@ void Game::run()
         // CODIGO DE LA PANTALLA DE TITULO
         case GameScreen::TITLE:
         {
+            if (li.playerID == li.max)
+                createEntities();
             if (sound_system.music_started == false) {
                 sound_system.playMusicMenu();
                 sound_system.music_started = true;
@@ -222,23 +224,16 @@ void Game::run()
             break;
         }
 
-        // CODIGO DE LA PANTALLA DE PAUSA
-        case GameScreen::PAUSE:
-        {
-            render_system.drawPauseMenu(engine, em);
-            break;
-        }
-
         // CODIGO DE LA PANTALLA DE HISTORIA
         case GameScreen::STORY:
         {
             // Input del enter para empezar la partida
+            input_system.update(em, engine);
             if (inpi.interact)
             {
                 li.currentScreen = GameScreen::GAMEPLAY;
                 inpi.interact = false;
             }
-            input_system.update(em, engine);
             render_system.drawStory(engine);
 
             if (li.replay)
@@ -278,9 +273,6 @@ void Game::run()
             else if (map.isRespawning())
                 map.spawnReset(em, iam);
 
-            if (li.isCharging())
-                render_system.drawChargeScreen(engine, em);
-
             if (li.resetFromDeath)
                 resetDeath();
 
@@ -291,9 +283,9 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
             {
-                while (elapsed >= timeStep)
+                if (elapsed >= timeStep40)
                 {
-                    elapsed -= timeStep;
+                    elapsed -= timeStep40;
 
                     ai_system.update(em);
                     npc_system.update(em);
@@ -307,7 +299,7 @@ void Game::run()
                     attack_system.update(em);
                     life_system.update(em, object_system);
                     sound_system.update();
-                    // if (elapsed < timeStep) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
+                    // if (elapsed < timeStep45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     camera_system.update(em, engine, evm);
                     event_system.update(em, evm, iam, map, object_system, sound_system);
                     particle_system.update(em);
@@ -344,7 +336,7 @@ void Game::run()
         default:
             break;
         }
-        if (elapsed >= timeStep)
+        if (elapsed >= timeStep40)
             elapsed = 0; // Para que no se acumule el tiempo
 
         if (engine.windowShouldClose())
@@ -372,8 +364,7 @@ void Game::run()
     sound_system.clear();
     render_system.unloadModels(em, engine);
 
-    engine.unloadGifsAndTextures();
-    engine.unloadShader(shader);
+    // engine.unloadShader(shader);
     engine.closeWindow();
 }
 

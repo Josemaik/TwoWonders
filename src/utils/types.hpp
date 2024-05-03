@@ -57,6 +57,7 @@
 static constexpr double K_PI = 3.14159265358979323846;
 static constexpr double DEGTORAD = static_cast<double>(K_PI / 180.0);
 static constexpr float timeStep30 = 1.0f / 30.0f;  // Actualiza el juego 30 veces por segundo
+static constexpr float timeStep40 = 1.0f / 40.0f;  // Actualiza el juego 45 veces por segundo
 static constexpr float timeStep = 1.0f / 60.0f;  // Actualiza el juego 60 veces por segundo
 static constexpr float timeStep120 = 1.0f / 120.0f;  // Actualiza el juego 120 veces por segundo
 static constexpr float timeStep240 = 1.0f / 240.0f;  // Actualiza el juego 240 veces por segundo
@@ -64,6 +65,7 @@ static constexpr float timeStep360 = 1.0f / 360.0f;  // Actualiza el juego 360 v
 static constexpr float timeStep480 = 1.0f / 480.0f;  // Actualiza el juego 480 veces por segundo
 static constexpr double timeStepDouble = 1.0 / 60.0;  // Actualiza el juego 60 veces por segundo
 static constexpr double timeStepDouble240 = 1.0 / 240.0;  // Actualiza el juego 240 veces por segundo
+
 // Forward Declarations
 namespace ENGI { struct GameEngine; }
 
@@ -213,6 +215,26 @@ using deathSet = std::set<std::size_t, std::greater<std::size_t>>;
 using mapType = rapidjson::Document;
 using valueType = rapidjson::Value;
 using mapSizeType = rapidjson::SizeType;
+using ShaderType = DarkMoon::Shader;
+using ModelType = DarkMoon::Model;
 using Effects = ParticleMakerComponent::ParticleEffect;
 using FrustPos = FrustumInfo::Position;
 using FrustOut = MP::TypeList<GroundTag, NPCTag>;
+using Color = DarkMoon::Color;
+using Font = DarkMoon::Font;
+using Aligned = DarkMoon::Aligned;
+using Node = DarkMoon::Node;
+using Texture = DarkMoon::Texture;
+using Texture2D = DarkMoon::Texture2D;
+using Gif = DarkMoon::AnimatedTexture2D;
+using Rectangle = DarkMoon::Rectangle;
+using Slider = DarkMoon::Slider;
+using OptionSlider = DarkMoon::OptionSlider;
+using FloatSlider = DarkMoon::FloatSlider;
+using Camera = DarkMoon::Camera;
+using CameraProjection = DarkMoon::CameraProjection;
+using Button = DarkMoon::Button;
+using ButtonState = DarkMoon::ButtonState;
+using Text = DarkMoon::Text;
+using TextBox = DarkMoon::TextBox;
+using DarkMoonEngine = DarkMoon::DarkMoonEngine;

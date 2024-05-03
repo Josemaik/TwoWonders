@@ -293,7 +293,7 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
     em.addTag<SubjectTag>(e);
     em.addTag<EnemyTag>(e);
 
-    auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getRandomPosAroundBoss(generate_radius,boss_pos), .scale = vec3d{ 1.0,2.0,1.0 }, .color = GRAY });
+    auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getRandomPosAroundBoss(generate_radius,boss_pos), .scale = vec3d{ 1.0,2.0,1.0 }, .color = D_GRAY });
     auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .max_speed = 0.4 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 2 });

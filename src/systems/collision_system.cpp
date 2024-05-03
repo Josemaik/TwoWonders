@@ -1,5 +1,4 @@
 #include "collision_system.hpp"
-#include <raylib.h>
 #include <chrono>
 
 void CollisionSystem::update(EntityManager& em)

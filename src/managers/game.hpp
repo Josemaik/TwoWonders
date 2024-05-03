@@ -45,7 +45,7 @@ private:
     void createSound();
     void resetGame();
     void resetDeath();
-    Shader createShader();
+    ShaderType createShader();
 
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};

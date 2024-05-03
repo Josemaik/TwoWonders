@@ -2,8 +2,10 @@
 
 void RenderComponent::destroyMesh()
 {
-    UnloadModel(model);
+    //UnloadModel(model);
     meshLoaded = false;
+    if (node)
+        node->setVisible(false);
 }
 
 void RenderComponent::setAll(vec3d p, vec3d s, Color c)

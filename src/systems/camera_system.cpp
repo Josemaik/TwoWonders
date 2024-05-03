@@ -134,11 +134,16 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
     ge.setTargetCamera(newCameraTarget);
     ge.setFovyCamera(newCameraFovy);
 
-    updateFrustum(em, ge, newCameraPos, newCameraTarget, newCameraFovy);
+    if (elapsedFrutum >= limitFrustum)
+        updateFrustum(em, ge, newCameraPos, newCameraTarget, newCameraFovy);
+    else
+        elapsedFrutum += timeStep;
 }
 
 void CameraSystem::updateFrustum(EntityManager& em, GameEngine& ge, vec3d& cameraPos, vec3d& cameraTar, float cameraFovy)
 {
+    elapsedFrutum = 0.0f;
+
     // Actualizamos el FrustumInfo de la cámara
     auto& frustum = em.getSingleton<FrustumInfo>();
     vec3f cameraUp = ge.getUpCamera().to_other<float>();

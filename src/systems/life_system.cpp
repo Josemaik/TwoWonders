@@ -168,7 +168,15 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             if (!ent.hasTag<EnemyTag>())
                 li.insertDeath(ent.getID());
             else
+            {
                 em.addTag<EnemyDeathTag>(ent);
+
+                if (ent.hasComponent<RenderComponent>())
+                {
+                    auto& ren = em.getComponent<RenderComponent>(ent);
+                    ren.node->setVisible(false);
+                }
+            }
         }
     });
 }
@@ -182,17 +190,17 @@ void LifeSystem::createObject(EntityManager&, ObjectSystem& os, vec3d pos) {
         if (random_value % 4 == 1)
         {
             tipo_nuevo_objeto = ObjectType::Coin;
-            color_nuevo_objeto = YELLOW;
+            color_nuevo_objeto = D_YELLOW;
         }
         else if (random_value % 4 == 2)
         {
             tipo_nuevo_objeto = ObjectType::Life;
-            color_nuevo_objeto = RED;
+            color_nuevo_objeto = D_RED;
         }
         else if (random_value % 4 == 3)
         {
             tipo_nuevo_objeto = ObjectType::Mana_Potion;
-            color_nuevo_objeto = SKYBLUE;
+            color_nuevo_objeto = D_BLUE_LIGHT;
         }
         else
         {

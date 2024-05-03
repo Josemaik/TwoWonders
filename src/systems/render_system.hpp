@@ -11,30 +11,20 @@ struct RenderSystem
 {
     struct AnimatedTexture
     {
-        std::string textureName;
-        int targetPosX;
-        int targetPosY;
-        int width;
-        int height;
-        float scaleChange;
-        float scaleFactor{};
-        float lerpFactor{ 0.0f };
-        float lerpSpeed{ 0.02f };
-        float elapsed{ 0.0f };
-    };
-
-    struct ButtonRect
-    {
-        Rectangle rect{};
-        const char* text{};
-        int action{};
+        std::string textureName{};
+        int targetPosX{};
+        int targetPosY{};
+        float scaleChange{};
+        float scaleFactorX{};
+        float scaleFactorY{};
+        float lerpFactor{};
+        float lerpSpeed{ 0.01f };
+        float elapsed{};
     };
 
     // Se van a buscar las entidad que tengan estos componentes y tags
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
-
-    RenderSystem() { init(); };
 
     void update(EntityManager& em, GameEngine& engine);
     void drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss);
@@ -50,10 +40,10 @@ struct RenderSystem
     void drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& em);
     void drawRay(vec3d origin, vec3d end);
     void drawVisionCone(vec3d pos_enemy, double orientation, double horizontalFOV);
-    void drawPauseMenu(GameEngine& engine, EntityManager& em);
+    void drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInfo& li, SoundSystem& ss);
     void drawInventory(GameEngine& engine, EntityManager& em);
     void drawItemDescription(GameEngine& engine, EntityManager& em, Item& item);
-    void setShader(Shader& shader) { shaderPtr = &shader; }
+    // void setShader(Shader& shader) { shaderPtr = &shader; }
     void resetAnimatedTexture() { animatedTextures.clear(); }
     // Funciones double dtprivadas para organizar el codigo
 private:
@@ -61,36 +51,46 @@ private:
     void beginFrame(GameEngine& engine, EntityManager& em);
     void endFrame(GameEngine& engine, EntityManager& em);
     void drawHUD(EntityManager& em, GameEngine& engine);
+    void initHUD(EntityManager& em, GameEngine& engine);
     void drawEntities(EntityManager& em, GameEngine& engine);
     void drawParticles(EntityManager& em, GameEngine& engine);
     void drawDeath(GameEngine& engine);
     void drawCoinBar(GameEngine& engine, EntityManager& em);
-    void drawHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
-    void drawManaBar(GameEngine& engine, EntityManager& em);
     void drawSpellSlots(GameEngine& engine, EntityManager& em);
-    void drawSpellExp(GameEngine& engine, std::string name);
+    void drawSpellExplanation(GameEngine& engine, std::string name);
     void drawStaff(GameEngine& engine, EntityManager& em);
     void drawLockInfo(GameEngine& engine, EntityManager& em);
     void drawBoatParts(GameEngine& engine, EntityManager& em);
-    void drawDebugPhysics(GameEngine& engine, EntityManager& em, LevelInfo& li);
+    void drawDebugPhysics(GameEngine& engine, EntityManager& em);
     void drawAnimatedTextures(GameEngine& engine);
+    void drawCheatMenu(GameEngine& engine, EntityManager& em);
     void drawSmallButtons(GameEngine& engine, const std::string& name, int posX, int posY, int width, int height);
-    void handleAnimatedTexture(const std::string& name, const std::string& textureName, int x, int y, const Texture2D& texture, float scaleFactor);
+    void handleAnimatedTexture(const std::string& name, const std::string& textureName, int x, int y, float scaleFactor);
     void drawAlerts_IA(EntityManager& em, GameEngine& engine);
     void drawFPSCounter(GameEngine& engine);
     void loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r);
-    void loadShaders(Model& model);
+    // void loadShaders(Model& model);
     void drawTextBox(GameEngine& engine, EntityManager& em);
-    void displayGif(GameEngine& engine, Texture2D& copy, GameEngine::Gif& gif, int& posX, int& posY);
     double shakeDouble(double value);
 
+    void updateHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
+    void updateManaBar(GameEngine& engine, EntityManager& em);
+    Node* getNode(GameEngine& engine, const char* name);
+    bool nodeExists(GameEngine& engine, const char* name);
+    double SelectValue(GameEngine& engine, double value, int posx, int posy, int height, int width, const char* name, Node* parentNode);
+    uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::map<uint16_t, vec3d>& nodes);
+
     bool isSelected{ false };
-    bool isSelectedfordebug{ false }, fullScreen{ false };
+    bool isSelectedfordebug{ false };
     std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
-    std::map<std::string, AnimatedTexture> animatedTextures;
+    double pointedDistance{ std::numeric_limits<double>::max() };
+    std::map<std::string, AnimatedTexture> animatedTextures{};
     // bool chunk0Charged{ false };
     // bool chunk1Charged{ false };
-    Shader* shaderPtr{ nullptr };
+    // ShaderType* shaderPtr{ nullptr };
+
+    void restartScene(GameEngine& engine);
+    void changeScene(GameEngine& engine);
 
     float elapsed{ 0.0f }, elapsed_limit{ 0.4f };
     float elapsed_WASD{ 0.0f }, elapsed_limit_WASD{ 5.0f };

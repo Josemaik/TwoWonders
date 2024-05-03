@@ -142,7 +142,7 @@ public:
                         em.addTag<BarricadeTag>(e);
                         em.addTag<WallTag>(e);
                         em.addTag<SeparateModelTag>(e);
-                        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = vec3d::zero(), .scale = vec3d::zero(), .color = DARKBROWN, .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, -1.0, 0.0 } });
+                        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = vec3d::zero(), .scale = vec3d::zero(), .color = D_ORANGE_DARK, .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, -1.0, 0.0 } });
                         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = { -37.852, 7.0, 139.238 }, .scale = { 19.127, 10.0, 15.979 }, .gravity = 0, .orientation = r.orientation, .rotationVec = r.rotationVec });
                         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, p.scale, BehaviorType::STATIC });
                         break;
@@ -233,7 +233,7 @@ public:
 
                             auto& newBoat{ em.newEntity() };
                             em.addTag<BoatTag>(newBoat);
-                            em.addComponent<RenderComponent>(newBoat, RenderComponent{ .position = pos, .scale = { 1.0, 1.0, 1.0 }, .color = WHITE, .orientation = 0.0, .rotationVec = { 0.0, 1.0, 0.0 } });
+                            em.addComponent<RenderComponent>(newBoat, RenderComponent{ .position = pos, .scale = { 1.0, 1.0, 1.0 }, .color = D_WHITE, .orientation = 0.0, .rotationVec = { 0.0, 1.0, 0.0 } });
                         }
 
                         break;
