@@ -387,13 +387,16 @@ void ZoneSystem::checkVolcanoLava(EntityManager& em)
     auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
     auto& playerPos = playerPhy.position;
     using noCMP = MP::TypeList<>;
-    using enemyTag = MP::TypeList<LavaTag>;
+    using lavaTag = MP::TypeList<LavaTag>;
     li.volcanoLava.clear();
 
-    em.forEachAny<noCMP, enemyTag>([&](Entity& e)
+    double minDistance = std::numeric_limits<double>::max();
+    em.forEachAny<noCMP, lavaTag>([&](Entity& e)
     {
         auto& phy = em.getComponent<PhysicsComponent>(e);
         double distance = playerPos.distance(phy.position);
+        if (distance < minDistance)
+            minDistance = distance;
 
         double range = 15.0;
 
@@ -402,6 +405,9 @@ void ZoneSystem::checkVolcanoLava(EntityManager& em)
             li.volcanoLava.push_back(e.getID());
         }
     });
+
+    // auto& ss = em.getSingleton<SoundSystem>();
+    // if(minDistance >70.0)
 }
 
 void ZoneSystem::checkLadders(EntityManager& em)
