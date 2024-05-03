@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -26.0, 4.0, 235.0 };
+        plfi.spawnPoint = { -28.0, 49.0, -30.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -76,7 +76,7 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    // em.addComponent<AttackComponent>(e);
+    em.addComponent<AttackComponent>(e);
     auto& lis = em.addComponent<ListenerComponent>(e);
 
     // Listeners de eventos para el jugador
@@ -138,7 +138,7 @@ void Game::run()
     auto& sound_system = em.getSingleton<SoundSystem>();
 
     // Incializamos FPSs
-    engine.setTargetFPS(60);
+    engine.setTargetFPS(30);
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
@@ -241,7 +241,7 @@ void Game::run()
 
             // TODO - Cuando se implemente el sistema de guardado, cargar el nivel en el que se quedó
             if (!map.isComplete())
-                map.createMap(em, 1, iam);
+                map.createMap(em, 2, iam);
 
             break;
         }
@@ -283,33 +283,33 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
             {
-                if (elapsed >= timeStep40)
+                // if (elapsed >= timeStep)
+                // {
+                //     elapsed -= timeStep;
+
+                ai_system.update(em);
+                npc_system.update(em);
+                physics_system.update(em);
+                collision_system.update(em);
+                zone_system.update(em, engine, iam, evm, map);
+                lock_system.update(em);
+                shield_system.update(em);
+                object_system.update(em);
+                projectile_system.update(em);
+                attack_system.update(em);
+                life_system.update(em, object_system);
+                sound_system.update();
+                // if (elapsed < timeStep45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
+                camera_system.update(em, engine, evm);
+                event_system.update(em, evm, iam, map, object_system, sound_system);
+                particle_system.update(em);
+
+                if (!li.getDeath().empty())
                 {
-                    elapsed -= timeStep40;
-
-                    ai_system.update(em);
-                    npc_system.update(em);
-                    physics_system.update(em);
-                    collision_system.update(em);
-                    zone_system.update(em, engine, iam, evm, map);
-                    lock_system.update(em);
-                    shield_system.update(em);
-                    object_system.update(em);
-                    projectile_system.update(em);
-                    attack_system.update(em);
-                    life_system.update(em, object_system);
-                    sound_system.update();
-                    // if (elapsed < timeStep45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
-                    camera_system.update(em, engine, evm);
-                    event_system.update(em, evm, iam, map, object_system, sound_system);
-                    particle_system.update(em);
-
-                    if (!li.getDeath().empty())
-                    {
-                        em.destroyEntities(li.getDeath());
-                        li.clearDeath();
-                    }
+                    em.destroyEntities(li.getDeath());
+                    li.clearDeath();
                 }
+                // }
                 render_system.update(em, engine);
             }
             else if (!resets && debugs)
@@ -336,7 +336,7 @@ void Game::run()
         default:
             break;
         }
-        if (elapsed >= timeStep40)
+        if (elapsed >= timeStep)
             elapsed = 0; // Para que no se acumule el tiempo
 
         if (engine.windowShouldClose())
