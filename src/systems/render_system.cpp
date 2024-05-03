@@ -277,6 +277,7 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
         return;
     }, {middleScreen + buttonWidth / 3, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.2f)} } },
     { "3_controles", { nullptr, "Controles", [&]() {
+        li.evenMorePreviousScreen = li.previousScreen;
         li.currentScreen = GameScreen::CONTROLS;
         li.previousScreen = GameScreen::OPTIONS;
         ss.seleccion_menu();
