@@ -95,7 +95,6 @@ void SoundSystem::initEvents(){
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_boss_final", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica_boss_final));
 
-    sonido_pasos_pradera();
 
 
 }

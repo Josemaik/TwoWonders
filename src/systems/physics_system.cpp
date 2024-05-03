@@ -119,29 +119,20 @@ void PhysicsSystem::update(EntityManager& em)
                 }
             }
         }
+         if (e.hasTag<PlayerTag>()){
 
-        auto& ss = em.getSingleton<SoundSystem>();
-        if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
-            auto& li = em.getSingleton<LevelInfo>();
-            ss.play_pasos();
-
-           /* switch (li.mapID)
+            auto& ss = em.getSingleton<SoundSystem>();
+            if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
+                auto& li = em.getSingleton<LevelInfo>();
+                ss.play_pasos();
+                playerWalking = true;
+                
+            }
+            else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) &&  playerWalking)
             {
-            case 0:
-                //ss.sonido_pasos_pradera();
-                break;
-            case 1:
-                //ss.sonido_pasos_prision();
-                break;
-            }*/
-            
-             playerWalking = true;
-            
-        }
-        else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) &&  playerWalking)
-        {
-            playerWalking = false;
-            ss.SFX_pasos_stop();
+                playerWalking = false;
+                ss.SFX_pasos_stop();
+            }
         }
         // }
     });
