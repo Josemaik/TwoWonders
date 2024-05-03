@@ -45,13 +45,13 @@ namespace DarkMoon {
         auto& getboneInfoMap() { return m_BoneInfomap; };
         int& getBoneCount() { return m_BoneCounter; };
         void SetVertexBoneDataToDefault(Vertex& vertex){
-            for(int i = 0; i < AI_MAX_BONE_WEIGHTS;i++){
+            for(int i = 0; i < MAX_NUM_BONES_PER_VERTEX;i++){
                 vertex.m_BonesIDs[i] = -1;
                 vertex.m_Weights[i] = 0.0f;
             }
         }
         void SetVertexBoneData(Vertex& vertex, int bondeID,float weight){
-            for(int i = 0; i < AI_MAX_BONE_WEIGHTS;i++){
+            for(int i = 0; i < MAX_NUM_BONES_PER_VERTEX;i++){
                 if(vertex.m_BonesIDs[i] < 0){
                     vertex.m_Weights[i] = weight;
                     vertex.m_BonesIDs[i] = bondeID;

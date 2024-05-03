@@ -79,7 +79,10 @@ namespace DarkMoon {
         for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
             Vertex vertex;
 
-            SetVertexBoneDataToDefault(vertex);
+            if(mesh->HasBones()){
+                std::cout << mesh->mNumBones << "\n";
+                SetVertexBoneDataToDefault(vertex);
+            }
             
             // Position
             if (mesh->HasPositions()) {
