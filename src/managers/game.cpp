@@ -40,14 +40,13 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -28.0, 49.0, -30.0 };
+        plfi.spawnPoint = { -65.0, 13.0, 104.0 };
 
-    // 33.0, 4.0, -25.9 - Posición Incial
-    // 32.0, 4.0, 43.0 - Primer cofre
-    // 32.0, 4.0, 130.0 - Segundo cofre
-    // -72.0, 4.0, 72.9 - Cofre con llave
-    // -116.0, 4.0, 111.0 - Apisonadora
-    // -125, 4.0, 138.68 - `pos chunck 3
+    // 33.0, 4.0, -25.9 - Posición Incial lvl0
+    // 32.0, 4.0, 43.0 - Primer cofre lvl0
+    // 32.0, 4.0, 130.0 - Segundo cofre lvl0
+    // -72.0, 4.0, 72.9 - Cofre con llave lvl0
+    // -116.0, 4.0, 111.0 - Apisonadora lvl0
     // 7.0, 22.0, -21.0 - Posición Incial lvl1
     // -68.0, 4.0, -22.0 - Primera rampa lvl1
     // -126.0, 4.0, 152.0 - Segundo altar lvl1
@@ -65,6 +64,9 @@ void Game::createEntities()
     // -30.24, 49.0, -26.59 - Spawn crater lvl2
     // -58.26,31.0,16.54 - spawn ramp muñeco
     // 40.0, 50.0, -3.0 - Nomada lvl2
+    // 4.6, 7.0, -32.9 - Posición Incial lvl3
+    // -33.0, 13.0, -0.5 - Hacia detrás casa lvl3
+    // -65.0, 13.0, 104.0 - Campamento lvl3
 
     // Player
     auto& e{ em.newEntity() };
@@ -253,8 +255,16 @@ void Game::run()
                 //sound_system.playAmbient();
                 sound_system.ambient_started = true;
             }
+
             if (em.getEntities().empty() || li.resetGame)
                 resetGame();
+
+            if (li.mapToLoad != li.u8max)
+            {
+                li.mapID = li.mapToLoad;
+                map.changeMap(em, li.mapID, iam);
+                li.mapToLoad = li.u8max;
+            }
 
             if (!map.isComplete())
             {

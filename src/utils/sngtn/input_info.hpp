@@ -27,6 +27,7 @@ struct InputInfo
     bool debugAI1{ false };
     bool debugAI2{ false };
     bool pathfind{ false };
+    bool cheats{ false };
 
     // Teclas de mecánicas
     bool lockOn{ false };

@@ -38,6 +38,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["DebugAI4"] = dmeg.CreateNode("DebugAI4", nodes["Debug"]);
     nodes["MenuPrincipal"] = dmeg.CreateNode("MenuPrincipal", nodes["Menu"]);
     nodes["MenuOpciones"] = dmeg.CreateNode("MenuOpciones", nodes["Menu"]);
+    nodes["MenuCheats"] = dmeg.CreateNode("MenuCheats", nodes["Menu"]);
 
     ENGI::GameEngine::setExitKey(D_KEY_F8);
 

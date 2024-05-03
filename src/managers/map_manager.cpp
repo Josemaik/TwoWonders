@@ -26,13 +26,21 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
             break;
         }
         case 2:
+        {
             li.mapID = 2;
             map = loadMap("assets/Niveles/Lvl_2/Lvl_2.kaiwa");
             em.getSingleton<SoundSystem>().sonido_amb_volcan();
             em.getSingleton<SoundSystem>().sonido_music_volcan();
 
             break;
-
+        }
+        case 3:
+        {
+            li.mapID = 3;
+            map = loadMap("assets/Niveles/Lvl_3/Lvl_3.kaiwa");
+            em.getSingleton<SoundSystem>().sonido_amb_bosque();
+            break;
+        }
         default:
             break;
         }
@@ -147,6 +155,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             {
                 if (li.mapID == 2)
                     generateNavmeshes(em);
+                generateCheats(em);
                 break;
             }
             default:
@@ -797,10 +806,10 @@ void MapManager::generateNavmeshes(EntityManager& em)
         // if(xd==NULL){
         //     hasramp = true;
         // }        
-        
+
         const rapidjson::Value::ConstMemberIterator& xd = navmesh.FindMember("ramp");
-        if(xd != navmesh.MemberEnd()){
-            if(xd->value.GetBool())
+        if (xd != navmesh.MemberEnd()) {
+            if (xd->value.GetBool())
                 hasramp = true;
         }
         // bool hasramp = navmesh["ramp"].GetBool();
@@ -1022,17 +1031,17 @@ void MapManager::generateNavmeshes(EntityManager& em)
     auxconex.push_back(Conection{ 1,647,648 });
     auxconex.push_back(Conection{ 1,630,639 });
     //
-    auxconex.push_back(Conection{ 1,801,808});
-    auxconex.push_back(Conection{ 1,808,819});
-    auxconex.push_back(Conection{ 1,742,801});
-    auxconex.push_back(Conection{ 1,799,801});
-    auxconex.push_back(Conection{ 1,731,801});
-    auxconex.push_back(Conection{ 1,736,801});
-    auxconex.push_back(Conection{ 1,745,801});
-    auxconex.push_back(Conection{ 1,792,742});
-    auxconex.push_back(Conection{ 1,800,742});
-    auxconex.push_back(Conection{ 1,644,808});
-    auxconex.push_back(Conection{ 1,632,639});
+    auxconex.push_back(Conection{ 1,801,808 });
+    auxconex.push_back(Conection{ 1,808,819 });
+    auxconex.push_back(Conection{ 1,742,801 });
+    auxconex.push_back(Conection{ 1,799,801 });
+    auxconex.push_back(Conection{ 1,731,801 });
+    auxconex.push_back(Conection{ 1,736,801 });
+    auxconex.push_back(Conection{ 1,745,801 });
+    auxconex.push_back(Conection{ 1,792,742 });
+    auxconex.push_back(Conection{ 1,800,742 });
+    auxconex.push_back(Conection{ 1,644,808 });
+    auxconex.push_back(Conection{ 1,632,639 });
 
     for (auto& c : auxconex) {
         navs.conexiones.push_back(c);
@@ -1279,6 +1288,28 @@ void MapManager::checkDispatcher(EntityManager& em, Entity& e, const valueType& 
         for (mapSizeType j = 0; j < value["events"].Size(); j++)
         {
             dc.eventCodes.push_back(value["events"][j].GetInt());
+        }
+    }
+}
+
+void MapManager::generateCheats(EntityManager& em)
+{
+    auto& cheatPositions = em.getSingleton<CheatsInfo>().cheatPositions;
+    if (!cheatPositions.empty())
+        return;
+
+    mapType cheatsKaiwa = loadMap("assets/cheats.kaiwa");
+    const valueType& levels = cheatsKaiwa["Niveles"];
+    for (mapSizeType i = 0; i < levels.Size(); i++)
+    {
+        uint8_t levelNum = static_cast<uint8_t>(levels[i]["Nombre"].GetUint());
+        auto& positions = levels[i]["Puntos"];
+        for (mapSizeType j = 0; j < positions.Size(); j++)
+        {
+            std::string positionName = positions[j]["Nombre"].GetString();
+            auto& positionLabel = positions[j]["Posición"];
+            vec3d position = { positionLabel[0].GetDouble(), positionLabel[1].GetDouble(), positionLabel[2].GetDouble() };
+            cheatPositions[cheatPositions.size()] = std::make_tuple(levelNum, positionName, position);
         }
     }
 }
