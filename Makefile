@@ -12,7 +12,7 @@ else
 	CCACHE 	   	:= ccache
     LIBS 		:= -L./fmodlibs -lfmod -lfmodstudio -lglfw -lGLEW -lGLU -lGL -lm -lassimp -lfreetype -lgif
 	SANITIZE   	:= -fsanitize=address,undefined
-	LIBS_COPY  	:= fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13
+	LIBS_COPY  	:= fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13 libs/*.so* 
 endif
 
 # agregar g++ | clang++
