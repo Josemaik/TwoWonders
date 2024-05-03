@@ -267,6 +267,9 @@ namespace DarkMoon {
             if (font && !text.empty() && this->text != textW) {
                 // Reset values
                 widths.clear();
+                maxWidth = 0.0f;
+                maxHeight = 0.0f;
+                numLines = 1;
                 float lineWidth = position.x;
 
                 // Seteamos la escala con el ratio
@@ -370,6 +373,7 @@ namespace DarkMoon {
 
             // Assign the position
             float aux_x = position.x;
+            float aux_y = position.y;
 
             if (alignment == Aligned::CENTER)
                 aux_x -= widths[0] / 2;
@@ -381,7 +385,7 @@ namespace DarkMoon {
             if (numLines != 1)
             {
                 offSetY = maxHeight / 2;
-                position.y -= maxHeight * static_cast<float>(numLines) * 0.6f;
+                aux_y -= maxHeight * static_cast<float>(numLines) * 0.6f;
             }
 
             int i{ 1 };
@@ -399,7 +403,7 @@ namespace DarkMoon {
                         aux_x -= widths[i];
 
                     i += 1;
-                    position.y += maxHeight * 1.2f;
+                    aux_y += maxHeight * 1.2f;
                     // Skip the rest of the loop
                     continue;
                 }
@@ -419,7 +423,7 @@ namespace DarkMoon {
                 Character ch = font->characters[c];
 
                 float posX = aux_x + static_cast<float>(ch.bearing.x) * scale;
-                float posY = position.y - static_cast<float>(ch.bearing.y) * scale + offSetY;
+                float posY = aux_y - static_cast<float>(ch.bearing.y) * scale + offSetY;
 
                 float w = static_cast<float>(ch.size.x) * scale;
                 float h = static_cast<float>(ch.size.y) * scale;

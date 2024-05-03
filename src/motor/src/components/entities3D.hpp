@@ -2,8 +2,8 @@
 #include "entity.hpp"
 #include "../utils/color.hpp"
 #include "../managers/render_manager.hpp"
-#include <chrono>
 
+#include <vector>
 #include <GL/gl.h>
 #include <glm/glm.hpp>
 namespace DarkMoon {
@@ -11,42 +11,51 @@ namespace DarkMoon {
         glm::vec3 position;
         float pointSize;
         Color color;
-        RenderManager* rm{};
-
         GLuint VBO, VAO;
-        GLint colorUniform, modelUniform, viewUniform, projectionUniform, kdUniform, kaUniform, ksUniform, shininessUniform;
+        GLint colorUniform, modelUniform, viewUniform, projectionUniform, KdUniform, KaUniform, KsUniform, ShininessUniform;
+        RenderManager& rm = RenderManager::getInstance();
 
         Point3D(glm::vec3 pos = { 0.0f, 0.0f, 0.0f }, float pSize = 1.0f, Color c = D_BLACK)
             : position(pos), pointSize(pSize), color(c) {
-            rm = &RenderManager::getInstance();
 
-            rm->useShader(rm->shaders["3D"]);
+            // Define vertices for the point
+            float vertices[] = {
+                position.x, position.y, position.z, 0.0f, 0.0f, 0.0f,
+            };
 
             // Create and configure VAO, VBO
+            rm.beginMode3D();
+            rm.useShader(rm.shaders["3D"]);
             glGenVertexArrays(1, &VAO);
             glGenBuffers(1, &VBO);
 
             glBindVertexArray(VAO);
 
             glBindBuffer(GL_ARRAY_BUFFER, VBO);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
             // position attribute
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+            constexpr size_t VertexSize = 6;
+            constexpr size_t VertexByteSize = VertexSize * sizeof(float);
+            constexpr size_t ColorOffset = 3 * sizeof(float);
+
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VertexByteSize, (void*)0);
             glEnableVertexAttribArray(0);
 
             // color attribute
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VertexByteSize, (void*)ColorOffset);
             glEnableVertexAttribArray(1);
 
             // Get uniform locations
-            colorUniform = glGetUniformLocation(rm->getShader()->getIDShader(), "customColor");
-            modelUniform = glGetUniformLocation(rm->getShader()->getIDShader(), "model");
-            viewUniform = glGetUniformLocation(rm->getShader()->getIDShader(), "view");
-            projectionUniform = glGetUniformLocation(rm->getShader()->getIDShader(), "projection");
-            kdUniform = glGetUniformLocation(rm->getShader()->getIDShader(), "Kd");
-            kaUniform = glGetUniformLocation(rm->getShader()->getIDShader(), "Ka");
-            ksUniform = glGetUniformLocation(rm->getShader()->getIDShader(), "Ks");
-            shininessUniform = glGetUniformLocation(rm->getShader()->getIDShader(), "Shininess");
+            colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+            modelUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "model");
+            viewUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "view");
+            projectionUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "projection");
+            KdUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "Kd");
+            KaUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "Ka");
+            KsUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "Ks");
+            ShininessUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "Shininess");
+            rm.endMode3D();
         };
 
         ~Point3D() {
@@ -57,49 +66,48 @@ namespace DarkMoon {
 
         void draw(glm::mat4 transMatrix) override {
 
+            rm.beginMode3D();
 
-            rm->beginMode3D();
+            auto nColor = rm.normalizeColor(color);
 
-            auto nColor = rm->normalizeColor(color);
-
-            // Define vertices for the point
+            // Update vertices for the point
             float vertices[] = {
                 position.x, position.y, position.z, nColor.x, nColor.y, nColor.z,
             };
 
-            glBindVertexArray(VAO);
             glBindBuffer(GL_ARRAY_BUFFER, VBO);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 
             // Colors
             glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
 
             // Transform
-            glUniformMatrix4fv(modelUniform, 1, GL_FALSE, glm::value_ptr(transMatrix));
-            glm::mat4 view = rm->m_camera->getViewMatrix();
-            glm::mat4 projection = rm->m_camera->getProjectionMatrix(rm->getWidth(), rm->getHeight());
+            glm::mat4 model = transMatrix; // Apply transformation matrix
+            glm::mat4 view = rm.m_camera->getViewMatrix();
+            glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
+            glUniformMatrix4fv(modelUniform, 1, GL_FALSE, glm::value_ptr(model));
             glUniformMatrix4fv(viewUniform, 1, GL_FALSE, glm::value_ptr(view));
             glUniformMatrix4fv(projectionUniform, 1, GL_FALSE, glm::value_ptr(projection));
 
             // Bind default texture
-            glBindTexture(GL_TEXTURE_2D, rm->defaultMaterial->texture->getIDTexture());
+            glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
 
             // Material
-            glUniform3fv(kdUniform, 1, glm::value_ptr(rm->defaultMaterial->getDiffuseColor()));
-            glUniform3fv(kaUniform, 1, glm::value_ptr(rm->defaultMaterial->getAmbientColor()));
-            glUniform3fv(ksUniform, 1, glm::value_ptr(rm->defaultMaterial->getSpecularColor()));
-            glUniform1f(shininessUniform, rm->defaultMaterial->getShininess());
+            glUniform3fv(KdUniform, 1, glm::value_ptr(rm.defaultMaterial->getDiffuseColor()));
+            glUniform3fv(KaUniform, 1, glm::value_ptr(rm.defaultMaterial->getAmbientColor()));
+            glUniform3fv(KsUniform, 1, glm::value_ptr(rm.defaultMaterial->getSpecularColor()));
+            glUniform1f(ShininessUniform, rm.defaultMaterial->getShininess());
 
             // Draw the point
             glPointSize(pointSize);
+            glBindVertexArray(VAO);
             glDrawArrays(GL_POINTS, 0, 1);
             glPointSize(1.0f);
 
             // Unbind default texture
             glBindTexture(GL_TEXTURE_2D, 0);
 
-            rm->endMode3D();
-
+            rm.endMode3D();
         };
     };
 
@@ -136,11 +144,15 @@ namespace DarkMoon {
             glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
             // position attribute
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+            constexpr size_t VertexSize = 6;
+            constexpr size_t VertexByteSize = VertexSize * sizeof(float);
+            constexpr size_t ColorOffset = 3 * sizeof(float);
+
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VertexByteSize, (void*)0);
             glEnableVertexAttribArray(0);
 
             // color attribute
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VertexByteSize, (void*)ColorOffset);
             glEnableVertexAttribArray(1);
 
             // Colors

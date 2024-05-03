@@ -18,7 +18,6 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["3D"] = dmeg.CreateNode("Scene 3D", rootNode);
     nodes["2D"] = dmeg.CreateNode("Scene 2D", rootNode);
     nodes["Menu"] = dmeg.CreateNode("Menu", rootNode);
-    nodes["Particles"] = dmeg.CreateNode("Particles", nodes["3D"]);
     nodes["HUD"] = dmeg.CreateNode("HUD", nodes["2D"]);
     nodes["Book"] = dmeg.CreateNode("Book", nodes["HUD"]);
     nodes["Dialog"] = dmeg.CreateNode("Dialog", nodes["HUD"]);
@@ -934,19 +933,19 @@ Node* ENGI::GameEngine::drawCube(vec3d position, vec3d size, DarkMoon::Color col
 
 ///// Line 3D /////
 
-Node* ENGI::GameEngine::createLine3D(vec3d startPos, vec3d endPos, Color color, const char* nodeName, Node* parentNode)
+Node* ENGI::GameEngine::createLine3D(vec3d startPos, vec3d endPos, float lSize, Color color, const char* nodeName, Node* parentNode)
 {
     if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreateLine3D(startPos.toGlm(), endPos.toGlm(), 20.0f, color, nodeName, parentNode);
+        nodes[nodeName] = dmeg.CreateLine3D(startPos.toGlm(), endPos.toGlm(), lSize, color, nodeName, parentNode);
     else
         nodes[nodeName]->setVisibleOne(true);
 
     return nodes[nodeName];
 }
 
-Node* ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color)
+Node* ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, float lSize, Color color)
 {
-    return dmeg.CreateLine3D(startPos.toGlm(), endPos.toGlm(), 20.0f, color, "line", nodes["Copy"]);
+    return dmeg.CreateLine3D(startPos.toGlm(), endPos.toGlm(), lSize, color, "line", nodes["Copy"]);
 }
 
 ///// Point 3D /////
@@ -963,7 +962,7 @@ Node* ENGI::GameEngine::createPoint3D(vec3d position, float pointSize, Color col
 
 Node* ENGI::GameEngine::drawPoint3D(vec3d position, float pointSize, Color color)
 {
-    return dmeg.CreatePoint3D(position.toGlm(), pointSize, color, "point", nodes["Particles"]);
+    return dmeg.CreatePoint3D(position.toGlm(), pointSize, color, "point", nodes["Copy"]);
 }
 
 Font* ENGI::GameEngine::getDefaultFont()

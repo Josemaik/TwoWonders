@@ -180,7 +180,7 @@ void Game::run()
             if (li.playerID == li.max)
                 createEntities();
             // Contador para que pasen X segundos
-            currentTime += timeStep45;
+            currentTime += timeStep40;
             if (currentTime > 4.0 || inpi.interact) {
                 li.currentScreen = GameScreen::TITLE;
                 currentTime = 0;
@@ -283,9 +283,9 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
             {
-                if (elapsed >= timeStep45)
+                if (elapsed >= timeStep40)
                 {
-                    elapsed -= timeStep45;
+                    elapsed -= timeStep40;
 
                     ai_system.update(em);
                     npc_system.update(em);
@@ -336,7 +336,7 @@ void Game::run()
         default:
             break;
         }
-        if (elapsed >= timeStep45)
+        if (elapsed >= timeStep40)
             elapsed = 0; // Para que no se acumule el tiempo
 
         if (engine.windowShouldClose())

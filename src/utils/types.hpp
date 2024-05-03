@@ -57,7 +57,7 @@
 static constexpr double K_PI = 3.14159265358979323846;
 static constexpr double DEGTORAD = static_cast<double>(K_PI / 180.0);
 static constexpr float timeStep30 = 1.0f / 30.0f;  // Actualiza el juego 30 veces por segundo
-static constexpr float timeStep45 = 1.0f / 45.0f;  // Actualiza el juego 45 veces por segundo
+static constexpr float timeStep40 = 1.0f / 40.0f;  // Actualiza el juego 45 veces por segundo
 static constexpr float timeStep = 1.0f / 60.0f;  // Actualiza el juego 60 veces por segundo
 static constexpr float timeStep120 = 1.0f / 120.0f;  // Actualiza el juego 120 veces por segundo
 static constexpr float timeStep240 = 1.0f / 240.0f;  // Actualiza el juego 240 veces por segundo

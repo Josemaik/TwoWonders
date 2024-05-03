@@ -32,13 +32,11 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine)
 void RenderSystem::restartScene(GameEngine& engine)
 {
     auto* tresde = getNode(engine, "3D");
-    auto* particles = getNode(engine, "Particles");
     auto* dosde = getNode(engine, "2D");
     auto* menu = getNode(engine, "Menu");
     auto* copyNode = getNode(engine, "Copy");
     auto* textCopy = getNode(engine, "TextCopy");
 
-    particles->clearChildren();
     copyNode->clearChildren();
     textCopy->clearChildren();
 
@@ -680,10 +678,13 @@ void RenderSystem::drawStory(GameEngine& engine) {
 
     restartScene(engine);
 
-    int boxWidth = 700;
-    int boxHeight = 400;
-    int posX = static_cast<int>(engine.getScreenWidth() / 2 - (boxWidth / 2));
-    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2.5f - static_cast<float>(boxHeight / 2));
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+    int boxWidth = 1050;
+    int boxHeight = 600;
+    int posX = static_cast<int>(engine.getScreenWidth() / 2 - static_cast<int>(static_cast<float>(boxWidth) * wRate / 2.f));
+    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 3.f - static_cast<float>(boxHeight) * hRate / 2.f);
+    int downRate = static_cast<int>(75.f * hRate);
 
     if (!nodeExists(engine, "historia")) {
         auto* hist = engine.createNode("historia", getNode(engine, "Dialog"));
@@ -692,20 +693,20 @@ void RenderSystem::drawStory(GameEngine& engine) {
             "¡Bienvenido a la aventura!", engine.getDefaultFont(), 40,
             D_BLACK, Aligned::CENTER, Aligned::CENTER,
             "Texto 1", hist);
-        engine.createTextBox({ posX, posY + 50 }, { boxWidth, boxHeight }, D_WHITE,
+        engine.createTextBox({ posX, posY + downRate }, { boxWidth, boxHeight }, D_WHITE,
             "Estas perdido por el bosque y", engine.getDefaultFont(), 40,
             D_BLACK, Aligned::CENTER, Aligned::CENTER,
             "Texto 2", hist);
-        engine.createTextBox({ posX, posY + 100 }, { boxWidth, boxHeight }, D_WHITE,
+        engine.createTextBox({ posX, posY + downRate * 2 }, { boxWidth, boxHeight }, D_WHITE,
             "debes encontrar a tu maestro.", engine.getDefaultFont(), 40,
             D_BLACK, Aligned::CENTER, Aligned::CENTER,
             "Texto 3", hist);
-        engine.createTextBox({ posX, posY + 150 }, { boxWidth, boxHeight }, D_WHITE,
+        engine.createTextBox({ posX, posY + downRate * 3 }, { boxWidth, boxHeight }, D_WHITE,
             "¡Mucha suerte!", engine.getDefaultFont(), 40,
             D_BLACK, Aligned::CENTER, Aligned::CENTER,
             "Texto 4", hist);
 
-        engine.createTextBox({ posX, posY + 250 }, { boxWidth, boxHeight }, D_WHITE,
+        engine.createTextBox({ posX, posY + downRate * 5 }, { boxWidth, boxHeight }, D_WHITE,
             "", engine.getDefaultFont(), 40,
             D_BLACK, Aligned::CENTER, Aligned::CENTER,
             "Texto 5", hist);
@@ -1254,7 +1255,7 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
                 {
                     // Dibujamos 4 partćulas arriba, abajo, izquierda y derecha de la posición
                     engine.drawPoint3D(p.position.to_other<double>(), 3.f, { p.r, p.g, p.b, p.a });
-                    // engine.createLine3D(p.position.toGlm(), (p.position + vec3f{ 0.0f, .3f, 0.0f }).toGlm(), 1.5f, { p.r, p.g, p.b, p.a }, "particula", getNode(engine, "Particles"));
+                    // engine.drawLine3D(p.position.to_other<double>(), (p.position + vec3f{ 0.0f, .3f, 0.0f }).to_other<double>(), 1.5f, { p.r, p.g, p.b, p.a });
                     // engine.drawPoint3D(p.position.to_other<double>(), { p.r, p.g, p.b, p.a });
                     // engine.drawPoint3D((p.position + vec3f{ 0.0f, 0.1f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
                     // engine.drawPoint3D((p.position + vec3f{ 0.1f, 0.0f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
@@ -1543,7 +1544,7 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     }
     if (debug.seeconex) {
         for (auto& conex : navs.conexpos) {
-            engine.drawLine3D(conex.first, conex.second, D_GREEN);
+            engine.drawLine3D(conex.first, conex.second, .5f, D_GREEN);
         }
         for (auto& bbox : navs.boundingnavmesh) {
             auto boxSize = bbox.max - bbox.min;
@@ -1642,7 +1643,7 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
             //raycast
             if (bb.launched) {
                 auto dir = bb.direction * 100;
-                engine.drawLine3D(bb.position_origin, dir, D_BLUE);
+                engine.drawLine3D(bb.position_origin, dir, 0.5f, D_BLUE);
                 bb.launched = false;
             }
             //Cone
@@ -1898,14 +1899,13 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
 
             // Datos para la barra para la barra de vida
             auto wRate = engine.getWidthRate();
-            int barWidth = 60;
-            int barHeight = 6;
-            int barX = static_cast<int>(engine.getWorldToScreenX(r.position)) - static_cast<int>(static_cast<float>(barWidth) * wRate / 2);
-            int barY = static_cast<int>(engine.getWorldToScreenY(r.position)) - static_cast<int>(r.scale.y() * 10);
+            auto hRate = engine.getHeightRate();
+            int barWidth = static_cast<int>(60.f * wRate);
+            int barHeight = static_cast<int>(6.f * hRate);
+            int barX = static_cast<int>(engine.getWorldToScreenX(r.position)) - static_cast<int>(static_cast<float>(barWidth) / 2);
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position)) - static_cast<int>(r.scale.y() * 13 * hRate);
 
-            auto* copy = getNode(engine, "Copy");
-            auto* bar = engine.createRectangle({ 0, 0 }, { barWidth, barHeight }, { D_GRAY }, "borde_vida", copy);
-            engine.drawNode(bar, { barX, barY });
+            engine.drawRectangle({ barX, barY }, { barWidth, barHeight }, { D_GRAY });
 
             // Normaliza la vida actual del personaje
             float normalizedLife = (static_cast<float>(l.life) / static_cast<float>(l.maxLife));
@@ -1917,8 +1917,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                 lifeWidth = l.life_width + (static_cast<float>(lifeWidth) - static_cast<float>(l.life_width)) * 0.25f;
 
             // Dibujamos la barra de vida
-            auto* lifeBar = engine.createRectangle({ 0, 0 }, { 1, 4 }, { D_RED }, "vida_rect", copy);
-            engine.drawNode(lifeBar, { barX, barY }, { lifeWidth, 1.0f });
+            engine.drawRectangle({ barX, barY }, { static_cast<int>(lifeWidth), barHeight }, { D_RED });
 
             l.life_width = lifeWidth;
 
@@ -2186,8 +2185,14 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
             }
 
             auto joystickL = getNode(engine, text);
-            int posX = static_cast<int>(engine.getWorldToScreenX(phy.position) - 40);
-            int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 37);
+            auto& gifInfo = *joystickL->getEntity<Gif>();
+            auto& frames = gifInfo.frames;
+            auto& currentFrame = frames[gifInfo.currentFrame];
+            auto wRate = engine.getWidthRate() * 0.5f;
+
+            auto point = phy.position.y() + phy.scale.y() / 2 + 150;
+            int posX = static_cast<int>(engine.getWorldToScreenX(phy.position) - static_cast<float>(currentFrame->getWidth()) * wRate * 0.5f);
+            int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - point);
 
             engine.drawNode(joystickL, { posX, posY }, { 0.5f, 0.5f });
 
@@ -2659,17 +2664,17 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
     if (plfi.coins == 0)
         return;
 
-    const float multip = 3.5f;
+    const float multip = 5.5f;
     if (plfi.elapsed_coins < plfi.elapsed_limit_coins)
     {
-        elapsed_CoinBar += timeStep * multip;
+        elapsed_CoinBar += engine.getFrameTime() * multip;
         if (elapsed_CoinBar > elapsed_limit_CoinBar) elapsed_CoinBar = elapsed_limit_CoinBar;
 
-        plfi.elapsed_coins += timeStep;
+        plfi.elapsed_coins += engine.getFrameTime() * 2;
     }
     else
     {
-        elapsed_CoinBar -= timeStep * multip;
+        elapsed_CoinBar -= engine.getFrameTime() * multip;
         if (elapsed_CoinBar < 0) elapsed_CoinBar = 0;
     }
 
@@ -2699,13 +2704,14 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
     auto sum = static_cast<float>(digits.size()) * 16.5f; // 16.5 es la mitad del ancho de la textura de la moneda
     float offSetX = 180.f * wRate + sum;
     float screenWidth = static_cast<float>(engine.getScreenWidth());
+    float screenHeight = static_cast<float>(engine.getScreenHeight());
 
     // Interpolación
-    coinBarX = static_cast<int>(1.f - div * screenWidth + div * screenWidth - offSetX);
+    coinBarX = static_cast<int>(((1.f - div) * screenWidth + div * (screenWidth - offSetX)));
 
     // Barra para los destellos
     int posX = coinBarX;
-    int posY = static_cast<int>(screenWidth - 195 * hRate);
+    int posY = static_cast<int>(screenHeight - 195 * hRate);
 
     auto* numsCopy = getNode(engine, "Copy");
     auto* destellos = getNode(engine, "destellos");
@@ -2714,8 +2720,9 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
 
     // Interpolación de la posición de los números
     int offSetCoinNum = static_cast<int>(60.f * wRate + sum);
-    coinNumberX = static_cast<int>((1.f - div) * (screenWidth + (offSetX - static_cast<float>(offSetCoinNum))) + div * screenWidth - static_cast<float>(offSetCoinNum));
-    posY = static_cast<int>(screenWidth - 175.5f * hRate);
+    coinNumberX = static_cast<int>((1.f - div) * (screenWidth + offSetX - static_cast<float>(offSetCoinNum)) + div * (screenWidth - static_cast<float>(offSetCoinNum)));
+    posY = static_cast<int>(screenHeight - 175.5f * hRate);
+
     auto coinNumberX2 = coinNumberX;
     std::string plusMinus = "+";
 

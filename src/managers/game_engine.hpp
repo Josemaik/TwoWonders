@@ -74,8 +74,8 @@ namespace ENGI {
         Font* getFontDefault();
 
         // Line 3D
-        Node* drawLine3D(vec3d startPos, vec3d endPos, Color color);
-        Node* createLine3D(vec3d startPos, vec3d endPos, Color color, const char* nodeName, Node* parentNode);
+        Node* drawLine3D(vec3d startPos, vec3d endPos, float lSize, Color color);
+        Node* createLine3D(vec3d startPos, vec3d endPos, float lSize, Color color, const char* nodeName, Node* parentNode);
 
         // Point 3D
         Node* drawPoint3D(vec3d position, float pointSize, Color color);
