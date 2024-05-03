@@ -792,16 +792,15 @@ void MapManager::generateNavmeshes(EntityManager& em)
 
         //Rampa?
         bool hasramp{ false };
+
         // const valueType& xd = navmesh["ramp"];
         // if(xd==NULL){
         //     hasramp = true;
-        // }
-
-
-
+        // }        
+        
         const rapidjson::Value::ConstMemberIterator& xd = navmesh.FindMember("ramp");
-        if (xd != navmesh.MemberEnd()) {
-            if (xd->value.GetBool())
+        if(xd != navmesh.MemberEnd()){
+            if(xd->value.GetBool())
                 hasramp = true;
         }
         // bool hasramp = navmesh["ramp"].GetBool();
@@ -852,7 +851,6 @@ void MapManager::generateNavmeshes(EntityManager& em)
             }
         }
     }
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////7
     // Guardamos info 
     // std::vector<Conection> auxconex;
@@ -1024,17 +1022,18 @@ void MapManager::generateNavmeshes(EntityManager& em)
     auxconex.push_back(Conection{ 1,647,648 });
     auxconex.push_back(Conection{ 1,630,639 });
     //
-    auxconex.push_back(Conection{ 1,801,808 });
-    auxconex.push_back(Conection{ 1,808,819 });
-    auxconex.push_back(Conection{ 1,742,801 });
-    auxconex.push_back(Conection{ 1,799,801 });
-    auxconex.push_back(Conection{ 1,731,801 });
-    auxconex.push_back(Conection{ 1,736,801 });
-    auxconex.push_back(Conection{ 1,745,801 });
-    auxconex.push_back(Conection{ 1,792,742 });
-    auxconex.push_back(Conection{ 1,800,742 });
-    auxconex.push_back(Conection{ 1,644,808 });
-    auxconex.push_back(Conection{ 1,632,639 });
+    auxconex.push_back(Conection{ 1,801,808});
+    auxconex.push_back(Conection{ 1,808,819});
+    auxconex.push_back(Conection{ 1,742,801});
+    auxconex.push_back(Conection{ 1,799,801});
+    auxconex.push_back(Conection{ 1,731,801});
+    auxconex.push_back(Conection{ 1,736,801});
+    auxconex.push_back(Conection{ 1,745,801});
+    auxconex.push_back(Conection{ 1,792,742});
+    auxconex.push_back(Conection{ 1,800,742});
+    auxconex.push_back(Conection{ 1,644,808});
+    auxconex.push_back(Conection{ 1,632,639});
+
     for (auto& c : auxconex) {
         navs.conexiones.push_back(c);
         //debug
@@ -1140,17 +1139,14 @@ void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
 
 void MapManager::spawnReset(EntityManager& em, Ia_man&)
 {
-    using CMPS = MP::TypeList<RenderComponent, PhysicsComponent, LifeComponent, AIComponent>;
+    using CMPS = MP::TypeList<PhysicsComponent, LifeComponent, AIComponent>;
     using TAGS = MP::TypeList<EnemyTag>;
     //auto& li = em.getSingleton<LevelInfo>();
 
-    em.forEach<CMPS, TAGS>([&](Entity& e, RenderComponent& ren, PhysicsComponent& phy, LifeComponent& lic, AIComponent& aic)
+    em.forEach<CMPS, TAGS>([&](Entity& e, PhysicsComponent& phy, LifeComponent& lic, AIComponent& aic)
     {
         if (e.hasTag<EnemyDeathTag>())
             em.destroyTag<EnemyDeathTag>(e);
-
-        if (ren.node)
-            ren.node->setVisible(true);
         lic.life = lic.maxLife;
         lic.markedForDeletion = false;
         phy.position = aic.initialPos;

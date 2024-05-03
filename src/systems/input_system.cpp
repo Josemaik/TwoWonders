@@ -101,6 +101,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     if (ge.isKeyReleased(D_KEY_F11))
         ge.setWindowFullScreen();
 
+
     // Sacamos las físicas y el input del jugador
     auto& phy = em.getComponent<PhysicsComponent>(player);
     if (phy.stopped && phy.elapsed_afterStop >= phy.countdown_afterStop)

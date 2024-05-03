@@ -562,7 +562,7 @@ void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
     using spawnTag = MP::TypeList<SpawnTag>;
 
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<CMPs, spawnTag>([&](Entity&, PhysicsComponent& phy, ColliderComponent& col, InteractiveComponent& ic, SpawnComponent& sc)
+    em.forEach<CMPs, spawnTag>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col, InteractiveComponent& ic, SpawnComponent& sc)
     {
         if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
             return;
