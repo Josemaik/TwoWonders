@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -7.55, 40.0, 16.0 };
+        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -76,7 +76,7 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e);
+    // em.addComponent<AttackComponent>(e);
     auto& lis = em.addComponent<ListenerComponent>(e);
 
     // Listeners de eventos para el jugador
@@ -241,7 +241,7 @@ void Game::run()
 
             // TODO - Cuando se implemente el sistema de guardado, cargar el nivel en el que se quedó
             if (!map.isComplete())
-                map.createMap(em, 2, iam);
+                map.createMap(em, 0, iam);
 
             break;
         }
