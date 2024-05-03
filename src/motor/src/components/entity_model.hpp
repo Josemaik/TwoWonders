@@ -27,23 +27,11 @@ namespace DarkMoon {
         bool m_loaded{ false };
 
         //#############Aniamtion data#############################
-        struct BoneInfo
-        {
-            //id of index in finalbonematrices
-            int id{};
-            //offset matrix transform vertex from model space to bone space
-            glm::mat4 offset{};
-        };
         //vector of vertex data influence by bone
         // std::vector<Vertex> m_Bones{};
         // // //num of vertex
         // std::vector<int> mesh_base_vertex{};
         // Name and id of each bone
-        std::map<std::string,BoneInfo> m_BoneInfomap{};
-        int m_BoneCounter { 0 };
-
-        auto& getboneInfoMap() { return m_BoneInfomap; };
-        int& getBoneCount() { return m_BoneCounter; };
         void SetVertexBoneDataToDefault(Vertex& vertex){
             for(int i = 0; i < MAX_NUM_BONES_PER_VERTEX;i++){
                 vertex.m_BonesIDs[i] = -1;
@@ -72,6 +60,21 @@ namespace DarkMoon {
         
 
     public:
+        struct BoneInfo
+        {
+            //id of index in finalbonematrices
+            int id{};
+            //offset matrix transform vertex from model space to bone space
+            glm::mat4 offset{};
+        };
+        
+        std::map<std::string,BoneInfo> m_BoneInfomap{};
+        int m_BoneCounter { 0 };
+
+        auto& getboneInfoMap() { return m_BoneInfomap; };
+        int& getBoneCount() { return m_BoneCounter; };
+
+
         Color color = D_WHITE;
         bool drawModel{ true }, drawWires{ false };
 

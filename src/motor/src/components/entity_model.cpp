@@ -80,7 +80,7 @@ namespace DarkMoon {
             Vertex vertex;
 
             if(mesh->HasBones()){
-                std::cout << mesh->mNumBones << "\n";
+                //std::cout << mesh->mNumBones << "\n";
                 SetVertexBoneDataToDefault(vertex);
             }
             
