@@ -52,9 +52,9 @@ namespace DarkMoon {
         // GUI
 
         // Create text in node
-        Node* CreateText(glm::vec2 position, std::string text, Font* font, int fontSize, Color color, Aligned align, const char* nodeName, Node* parentNode);
+        Node* CreateText(glm::vec2 position, std::string text, Font* font, int fontSize, Color color, Aligned align, bool charByChar, const char* nodeName, Node* parentNode);
         // Create a text box in node
-        Node* CreateTextBox(glm::vec2 position, glm::vec2 size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode);
+        Node* CreateTextBox(glm::vec2 position, glm::vec2 size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, bool charByChar, const char* nodeName, Node* parentNode);
         // Create a button in node
         Node* CreateButton(glm::vec2 position, glm::vec2 size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor, const char* nodeName, Node* parentNode);
         // Create a slider in node

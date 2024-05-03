@@ -226,10 +226,14 @@ namespace DarkMoon {
         Font* font{};
         int fontSize{};
         Color color{};
+        static constexpr float charSpeed{ 0.035f };
 
         float scale{};
         float maxWidth{};
         float maxHeight{};
+        float timeElapsed{};
+        size_t charIndex{};
+        bool charIndexChanged{ false };
         std::vector<float> widths{};
         Aligned alignment{};
 
@@ -239,9 +243,10 @@ namespace DarkMoon {
         WindowsManager& wm = WindowsManager::getInstance();
         float ratio{};
         int numLines{ 1 };
+        bool charByChar{ false };
 
-        Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK, Aligned al = Aligned::LEFT)
-            : position(pos), font(f), fontSize(fS), color(col), alignment(al)
+        Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK, Aligned al = Aligned::LEFT, bool cbc = false)
+            : position(pos), font(f), fontSize(fS), color(col), alignment(al), charByChar(cbc)
         {
             // Get ratio
             ratio = wm.getHeightRatio();
@@ -270,6 +275,7 @@ namespace DarkMoon {
                 maxWidth = 0.0f;
                 maxHeight = 0.0f;
                 numLines = 1;
+                charIndex = 0;
                 float lineWidth = position.x;
 
                 // Seteamos la escala con el ratio
@@ -388,21 +394,45 @@ namespace DarkMoon {
                 aux_y -= maxHeight * static_cast<float>(numLines) * 0.6f;
             }
 
-            int i{ 1 };
+            float deltaTime = static_cast<float>(wm.getFrameTime());
+
+            if (charByChar)
+            {
+                timeElapsed += deltaTime;
+                if (timeElapsed >= charSpeed) {
+                    timeElapsed -= charSpeed;
+                    if (charIndex < text.size()) {
+                        ++charIndex;
+
+                        if (charIndex % static_cast<std::size_t>(8) == 0)
+                            charIndexChanged = true;
+                    }
+                }
+                else
+                    charIndexChanged = false;
+            }
+            else
+                charIndex = text.size();
+
+            if (text[charIndex] == '\n')
+                std::cout << "New Line" << std::endl;
+
 #ifdef _WIN32
             bool checkSpecial = false;
 #endif
-            for (wchar_t& c : text) {
+            int k{ 1 }; // Pa la anchura de las líneas
+            for (size_t i = 0; i < charIndex; ++i) {
+                wchar_t& c = text[i];
                 if (c == '\n') {
                     // Reset the x position to the start of the line
                     aux_x = position.x;
 
                     if (alignment == Aligned::CENTER)
-                        aux_x -= widths[i] / 2;
+                        aux_x -= widths[k] / 2;
                     else
-                        aux_x -= widths[i];
+                        aux_x -= widths[k];
 
-                    i += 1;
+                    k += 1;
                     aux_y += maxHeight * 1.2f;
                     // Skip the rest of the loop
                     continue;
@@ -464,6 +494,10 @@ namespace DarkMoon {
             return text;
         }
 
+        bool charChanged() {
+            return charIndexChanged;
+        }
+
         std::wstring text{};
     };
 
@@ -486,8 +520,9 @@ namespace DarkMoon {
             int fS = 10,
             Color tCol = D_BLACK,
             Aligned verAl = Aligned::CENTER,
-            Aligned horAl = Aligned::CENTER) :
-            box(pos, sz, bCol), boxBackground({ pos.x - 1, pos.y - 1 }, { sz.x + 2, sz.y + 2 }, D_GRAY), text(pos, txt, f, fS, tCol, horAl), verAligned(verAl), horAligned(horAl) {};
+            Aligned horAl = Aligned::CENTER,
+            bool cbc = false) :
+            box(pos, sz, bCol), boxBackground({ pos.x - 1, pos.y - 1 }, { sz.x + 2, sz.y + 2 }, D_GRAY), text(pos, txt, f, fS, tCol, horAl, cbc), verAligned(verAl), horAligned(horAl) {};
 
         void draw(glm::mat4 transMatrix) override {
             if (drawBox) {

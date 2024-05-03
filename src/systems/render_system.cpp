@@ -3025,13 +3025,13 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
 
     auto& ss = em.getSingleton<SoundSystem>();
 
-    std::map<SpeakerType, std::pair<std::string, std::function<void()>> speakerTextures = {
-        {SpeakerType::PLAYER, {"mago_happy", [&] (){ss.sonido_DPlayer();}}},
-        {SpeakerType::PLAYER_SAD, {"mago_meh", [&] (){ss.sonido_DPlayer();}}},
-        {SpeakerType::PLAYER_DANGER, {"mago_sos", [&] (){ss.sonido_DPlayer();}}},
-        {SpeakerType::CAT, {"investigador", [&] (){ss.sonido_DInvestigador();}}},
-        {SpeakerType::NOMAD, {"nomada", [&] (){ss.sonido_DCalabaza();}}},
-        {SpeakerType::INVESTIGATOR, {"investigador", [&] (){ss.sonido_DInvestigador();}}}
+    std::map<SpeakerType, std::pair<std::string, std::function<void()>>> speakerTextures = {
+        {SpeakerType::PLAYER, {"mago_happy", [&]() {ss.sonido_DPlayer();}}},
+        {SpeakerType::PLAYER_SAD, {"mago_meh", [&]() {ss.sonido_DPlayer();}}},
+        {SpeakerType::PLAYER_DANGER, {"mago_sos", [&]() {ss.sonido_DPlayer();}}},
+        {SpeakerType::CAT, {"investigador", [&]() {ss.sonido_DInvestigador();}}},
+        {SpeakerType::NOMAD, {"nomada", [&]() {ss.sonido_DCalabaza();}}},
+        {SpeakerType::INVESTIGATOR, {"investigador", [&]() {ss.sonido_DInvestigador();}}}
     };
 
     auto* box = getNode(engine, "cuadroDialogo");
@@ -3056,7 +3056,9 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
         auto& [name, sound] = speakerTextures[str.first];
         auto* speaker = engine.createNode(getNode(engine, name.c_str()), getNode(engine, "Copy"));
         engine.drawNode(speaker, { posX - offSetX, posY - offSetY });
-        sound();
+
+        if (boxInfo.text.charChanged())
+            sound();
     }
 
     auto& inpi = em.getSingleton<InputInfo>();
@@ -3065,10 +3067,13 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
         txti.popText();
         inpi.interact = false;
 
-        if (textQueue.empty() && li.openChest)
+        if (textQueue.empty())
         {
-            em.getSingleton<SoundSystem>().sonido_cerrar_cofre();
-            li.openChest = false;
+            if (li.openChest)
+            {
+                em.getSingleton<SoundSystem>().sonido_cerrar_cofre();
+                li.openChest = false;
+            }
         }
     }
 

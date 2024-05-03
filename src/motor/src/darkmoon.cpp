@@ -152,11 +152,11 @@ namespace DarkMoon {
     // GUI
 
     // Create text in node
-    Node* DarkMoonEngine::CreateText(glm::vec2 position, std::string text, Font* font, int fontSize, Color color, Aligned align, const char* nodeName, Node* parentNode) {
+    Node* DarkMoonEngine::CreateText(glm::vec2 position, std::string text, Font* font, int fontSize, Color color, Aligned align, bool charByChar, const char* nodeName, Node* parentNode) {
         auto p_nodeText = CreateNode(nodeName, parentNode);
 
         // Create text
-        auto textE = std::make_unique<Text>(position, text, font, fontSize, color, align);
+        auto textE = std::make_unique<Text>(position, text, font, fontSize, color, align, charByChar);
 
         p_nodeText->translate({ position.x, position.y, 0.0f });
         p_nodeText->setEntity(std::move(textE));
@@ -165,11 +165,11 @@ namespace DarkMoon {
     }
 
     // Create a text box in node
-    Node* DarkMoonEngine::CreateTextBox(glm::vec2 position, glm::vec2 size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode) {
+    Node* DarkMoonEngine::CreateTextBox(glm::vec2 position, glm::vec2 size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, bool charByChar, const char* nodeName, Node* parentNode) {
         auto p_nodeTextBox = CreateNode(nodeName, parentNode);
 
         // Create text box
-        auto textBoxE = std::make_unique<TextBox>(position, size, boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned);
+        auto textBoxE = std::make_unique<TextBox>(position, size, boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned, charByChar);
 
         p_nodeTextBox->translate({ position.x, position.y, 0.0f });
         p_nodeTextBox->setEntity(std::move(textBoxE));

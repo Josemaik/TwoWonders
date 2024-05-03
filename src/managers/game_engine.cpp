@@ -112,7 +112,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Cuadro de diálogo
     createTextBox({ 0, 0 }, { 900, 180 }, D_WHITE, "", dmeg.GetDefaultFont(),
-        20, D_BLACK, Aligned::CENTER, Aligned::CENTER, "cuadroDialogo", nodes["Dialog"]);
+        20, D_BLACK, Aligned::CENTER, Aligned::CENTER, "cuadroDialogo", nodes["Dialog"], true);
 
     // Diálogo Siguiente HUD
     loadAndResizeImage("sig", "assets/HUD/dialog_siguiente.png", nodes["Dialog"]);
@@ -774,10 +774,10 @@ Node* ENGI::GameEngine::drawRectangle(vec2i pos, vec2i size, Color color, Node* 
 
 ///// TextBox /////
 
-Node* ENGI::GameEngine::createTextBox(vec2i position, vec2i size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode)
+Node* ENGI::GameEngine::createTextBox(vec2i position, vec2i size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode, bool cbc)
 {
     if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreateTextBox(position.toGlm(), size.toGlm(), boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned, nodeName, parentNode);
+        nodes[nodeName] = dmeg.CreateTextBox(position.toGlm(), size.toGlm(), boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned, cbc, nodeName, parentNode);
     else
     {
         nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), size.to_other<float>() };
@@ -789,10 +789,10 @@ Node* ENGI::GameEngine::createTextBox(vec2i position, vec2i size, Color boxColor
 
 ///// Text /////
 
-Node* ENGI::GameEngine::createText(vec2i position, std::string text, Font* font, int fontSize, Color color, const char* nodeName, Node* parentNode, Aligned align)
+Node* ENGI::GameEngine::createText(vec2i position, std::string text, Font* font, int fontSize, Color color, const char* nodeName, Node* parentNode, Aligned align, bool cbc)
 {
     if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreateText(position.toGlm(), text, font, fontSize, color, align, nodeName, parentNode);
+        nodes[nodeName] = dmeg.CreateText(position.toGlm(), text, font, fontSize, color, align, cbc, nodeName, parentNode);
     else
     {
         nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {1.f, 1.f} };
@@ -805,7 +805,7 @@ Node* ENGI::GameEngine::createText(vec2i position, std::string text, Font* font,
 Node* ENGI::GameEngine::createText(vec2i position, std::string text, Color c, const char* nodeName, Node* parentNode, int fontSize)
 {
     if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreateText(position.toGlm(), text, getDefaultFont(), fontSize, c, Aligned::LEFT, nodeName, parentNode);
+        nodes[nodeName] = dmeg.CreateText(position.toGlm(), text, getDefaultFont(), fontSize, c, Aligned::LEFT, false, nodeName, parentNode);
     else
     {
         nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {1.f, 1.f} };
@@ -816,7 +816,7 @@ Node* ENGI::GameEngine::createText(vec2i position, std::string text, Color c, co
 }
 
 Node* ENGI::GameEngine::drawText(const char* text, int x, int y, int fontSize, Color c, Aligned align) {
-    return dmeg.CreateText({ x, y }, text, getDefaultFont(), fontSize, c, align, "text", nodes["TextCopy"]);
+    return dmeg.CreateText({ x, y }, text, getDefaultFont(), fontSize, c, align, false, "text", nodes["TextCopy"]);
 }
 
 Font* ENGI::GameEngine::getFontDefault() {
