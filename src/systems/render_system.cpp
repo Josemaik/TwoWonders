@@ -3023,13 +3023,15 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     auto& str = textQueue.front();
     auto text = const_cast<char*>(str.second.c_str());
 
-    std::map<SpeakerType, std::string> speakerTextures = {
-        {SpeakerType::PLAYER, "mago_happy"},
-        {SpeakerType::PLAYER_SAD, "mago_meh"},
-        {SpeakerType::PLAYER_DANGER, "mago_sos"},
-        {SpeakerType::CAT, "investigador"},
-        {SpeakerType::NOMAD, "nomada"},
-        {SpeakerType::INVESTIGATOR, "investigador"}
+    auto& ss = em.getSingleton<SoundSystem>();
+
+    std::map<SpeakerType, std::pair<std::string, std::function<void()>> speakerTextures = {
+        {SpeakerType::PLAYER, {"mago_happy", [&] (){ss.sonido_DPlayer();}}},
+        {SpeakerType::PLAYER_SAD, {"mago_meh", [&] (){ss.sonido_DPlayer();}}},
+        {SpeakerType::PLAYER_DANGER, {"mago_sos", [&] (){ss.sonido_DPlayer();}}},
+        {SpeakerType::CAT, {"investigador", [&] (){ss.sonido_DInvestigador();}}},
+        {SpeakerType::NOMAD, {"nomada", [&] (){ss.sonido_DCalabaza();}}},
+        {SpeakerType::INVESTIGATOR, {"investigador", [&] (){ss.sonido_DInvestigador();}}}
     };
 
     auto* box = getNode(engine, "cuadroDialogo");
@@ -3051,8 +3053,10 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     int offSetX = 40;
     int offSetY = 50;
     if (speakerTextures.count(str.first) > 0) {
-        auto* speaker = engine.createNode(getNode(engine, speakerTextures[str.first].c_str()), getNode(engine, "Copy"));
+        auto& [name, sound] = speakerTextures[str.first];
+        auto* speaker = engine.createNode(getNode(engine, name.c_str()), getNode(engine, "Copy"));
         engine.drawNode(speaker, { posX - offSetX, posY - offSetY });
+        sound();
     }
 
     auto& inpi = em.getSingleton<InputInfo>();
