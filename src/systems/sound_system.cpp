@@ -95,6 +95,8 @@ void SoundSystem::initEvents(){
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/music_boss_final", &eventDescription));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica, &eventInstance_Musica_boss_final));
 
+    sonido_pasos_pradera();
+
 
 }
 
@@ -167,12 +169,19 @@ void SoundSystem::sonido_mazmorra() {
 }
 
 void SoundSystem::sonido_amb_volcan() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_volcan_2", &eventDescription_Ambiente));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Ambiente, &eventInstance_Ambiente));
-    //FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
-    //FMOD_Studio_System_Update(soundSystem);
-    playAmbient();
-    //update();
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_volcan", &eventDescription_Ambiente));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Ambiente, &eventInstance_Ambiente_volcan));
+    FMOD_Studio_EventInstance_Start(eventInstance_Ambiente_volcan);
+    FMOD_Studio_System_Update(soundSystem);
+    update();
+}
+
+void SoundSystem::ambiente_parameter_lava(float lava){
+    FMOD_BOOL boolean= true;
+    if( lava < 3){
+    ERRCHECK( FMOD_Studio_EventInstance_SetParameterByName(eventInstance_Ambiente_volcan, "Lava", lava, boolean));
+    }
+    update();
 }
 
 void SoundSystem::sonido_amb_monte() {
@@ -640,21 +649,21 @@ ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Arany
 
     void SoundSystem::sonido_pasos_prision() {
         ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_prision", &eventDescription_pasos));
-        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance_SFX_pasos));
     }
 
     void SoundSystem::sonido_pasos_volcan() {
         ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_volcan", &eventDescription_pasos));
-        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance_SFX_pasos));
     }
     void SoundSystem::sonido_pasos_nieve() {
         ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_monte", &eventDescription_pasos));
-        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance_SFX_pasos));
     }
 
     void SoundSystem::sonido_pasos_madera(){
         ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_biblioteca", &eventDescription_pasos));
-        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance_SFX_pasos));
     }               
 
     

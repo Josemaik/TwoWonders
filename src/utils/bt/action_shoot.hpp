@@ -82,9 +82,6 @@ struct BTActionShoot : BTNode_t {
                 else
                     att.attack(AttackType::Ranged);
 
-                if (ectx.ent.hasTag<SnowmanTag>()) {
-                    ectx.em.getSingleton<SoundSystem>().sonido_munyeco_ataque();
-                }
                 return BTNodeStatus_t::success;
                 break;
             }

@@ -406,8 +406,12 @@ void ZoneSystem::checkVolcanoLava(EntityManager& em)
         }
     });
 
-    // auto& ss = em.getSingleton<SoundSystem>();
-    // if(minDistance >70.0)
+     auto& ss = em.getSingleton<SoundSystem>();
+     if(minDistance > 80.0){
+        ss.ambiente_parameter_lava(2);
+     }else if(minDistance > 45){
+        ss.ambiente_parameter_lava(1);
+     } else ss.ambiente_parameter_lava(0);
 }
 
 void ZoneSystem::checkLadders(EntityManager& em)

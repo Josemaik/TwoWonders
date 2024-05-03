@@ -134,9 +134,10 @@ struct SoundSystem {
     void sonido_boss_muere();           //por disenyar
     void sonido_inicio_batalla();       //por disenyar
     void sonido_cambio_fase();          //por disenyar
+    void sonido_win();                  //por disenyar
 
-    void sonido_win();
 
+    void ambiente_parameter_lava(float lava);
 
    
 
@@ -181,6 +182,7 @@ private:
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_pasos;  
     FMOD_STUDIO_EVENTINSTANCE* eventInstance;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente_volcan;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_SFX_pasos;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_volcan;

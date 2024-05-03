@@ -120,11 +120,12 @@ void PhysicsSystem::update(EntityManager& em)
             }
         }
 
-        // auto& ss = em.getSingleton<SoundSystem>();
+        auto& ss = em.getSingleton<SoundSystem>();
         if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
             auto& li = em.getSingleton<LevelInfo>();
+            ss.play_pasos();
 
-            switch (li.mapID)
+           /* switch (li.mapID)
             {
             case 0:
                 //ss.sonido_pasos_pradera();
@@ -132,13 +133,15 @@ void PhysicsSystem::update(EntityManager& em)
             case 1:
                 //ss.sonido_pasos_prision();
                 break;
-            }
-            playerWalking = true;
+            }*/
+            
+             playerWalking = true;
+            
         }
-        else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) && playerWalking)
+        else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) &&  playerWalking)
         {
             playerWalking = false;
-            //ss.SFX_stop();
+            ss.SFX_pasos_stop();
         }
         // }
     });
