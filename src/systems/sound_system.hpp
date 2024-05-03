@@ -53,9 +53,9 @@ struct SoundSystem {
     //SONIDOS PENDIENTES
     void sonido_music_mazmorra();   //por realizar mejora
     //dialogos
-    void sonido_DInvestigador();    //por integrar
-    void sonido_DPlayer();          //por integrar
-    void sonido_DCalabaza();        //por integrar
+    void sonido_DInvestigador();    
+    void sonido_DPlayer();          
+    void sonido_DCalabaza();        
     void sonido_DEsquimal();        //por integrar
     void sonido_DPescador();        //por integrar
     void sonido_DSacerdotisa();     //por integrar
