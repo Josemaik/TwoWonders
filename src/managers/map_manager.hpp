@@ -55,6 +55,7 @@ private:
     void generateNPCs(EntityManager& em, const valueType& npcArray);
     void generateInteractables(EntityManager& em, const valueType& interactableArray);
     void generateNavmeshes(EntityManager& em);
+    void generateCheats(EntityManager& em);
     void addToZone(EntityManager& em, Entity& e, InteractableType type);
     void checkDispatcher(EntityManager& em, Entity& e, const valueType& value);
     void addMessageCmp(EntityManager& em, Entity& e, const valueType& value);

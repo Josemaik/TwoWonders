@@ -44,6 +44,7 @@
 #include "./sngtn/navmesh_info.hpp"
 #include "./sngtn/zonecheck_info.hpp"
 #include "./sngtn/frustum_info.hpp"
+#include "./sngtn/cheats_info.hpp"
 
 // GameData
 #include "../utils/sngtn/GameData.hpp"
@@ -207,7 +208,7 @@ using TL = MP::TypeList <
     MagmaBallTag,
     EnemyDeathTag
 > ;
-using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem, FrustumInfo>;
+using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem, FrustumInfo, CheatsInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;

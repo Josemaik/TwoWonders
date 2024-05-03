@@ -72,6 +72,7 @@ private:
     // void loadShaders(Model& model);
     void drawTextBox(GameEngine& engine, EntityManager& em);
     double shakeDouble(double value);
+    void drawCheats(EntityManager& em, GameEngine& engine);
 
     void updateHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
     void updateManaBar(GameEngine& engine, EntityManager& em);

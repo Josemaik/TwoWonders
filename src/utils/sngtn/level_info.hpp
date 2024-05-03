@@ -91,6 +91,8 @@ struct LevelInfo
     // Variables de zona y el nivel
     uint16_t num_zone{};
     uint8_t mapID{ 0 };
+    static constexpr uint8_t u8max = std::numeric_limits<uint8_t>::max();
+    uint8_t mapToLoad{ u8max };
     bool levelChanged{ false };
 
     // Para estado de pausa y cerrar el juego

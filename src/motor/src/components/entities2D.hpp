@@ -760,6 +760,12 @@ namespace DarkMoon {
                 prevOption();
         }
 
+        void setOptions(std::vector<std::string> opts)
+        {
+            options = opts;
+            textBox.text.setText(options[currentOption]);
+        }
+
         void setCurrentOption(std::size_t option)
         {
             currentOption = option;

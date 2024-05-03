@@ -155,6 +155,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             {
                 if (li.mapID == 2)
                     generateNavmeshes(em);
+                generateCheats(em);
                 break;
             }
             default:
@@ -1287,6 +1288,28 @@ void MapManager::checkDispatcher(EntityManager& em, Entity& e, const valueType& 
         for (mapSizeType j = 0; j < value["events"].Size(); j++)
         {
             dc.eventCodes.push_back(value["events"][j].GetInt());
+        }
+    }
+}
+
+void MapManager::generateCheats(EntityManager& em)
+{
+    auto& cheatPositions = em.getSingleton<CheatsInfo>().cheatPositions;
+    if (!cheatPositions.empty())
+        return;
+
+    mapType cheatsKaiwa = loadMap("assets/cheats.kaiwa");
+    const valueType& levels = cheatsKaiwa["Niveles"];
+    for (mapSizeType i = 0; i < levels.Size(); i++)
+    {
+        uint8_t levelNum = static_cast<uint8_t>(levels[i]["Nombre"].GetUint());
+        auto& positions = levels[i]["Puntos"];
+        for (mapSizeType j = 0; j < positions.Size(); j++)
+        {
+            std::string positionName = positions[j]["Nombre"].GetString();
+            auto& positionLabel = positions[j]["Posición"];
+            vec3d position = { positionLabel[0].GetDouble(), positionLabel[1].GetDouble(), positionLabel[2].GetDouble() };
+            cheatPositions[cheatPositions.size()] = std::make_tuple(levelNum, positionName, position);
         }
     }
 }

@@ -1351,6 +1351,9 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
     else if (inpi.pathfind)
         drawTestPathfindinf(engine, em);
 
+    else if (inpi.cheats)
+        drawCheats(em, engine);
+
     if (li.elapsedPause > 0 && !inpi.pause)
         li.elapsedPause = 0;
 
@@ -3214,4 +3217,81 @@ Node* RenderSystem::getNode(GameEngine& engine, const char* name)
 bool RenderSystem::nodeExists(GameEngine& engine, const char* name)
 {
     return engine.nodes.find(name) != engine.nodes.end();
+}
+
+void RenderSystem::drawCheats(EntityManager& em, GameEngine& engine)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& player = *em.getEntityByID(li.playerID);
+    auto& phy = em.getComponent<PhysicsComponent>(player);
+    auto& cheatPositions = em.getSingleton<CheatsInfo>().cheatPositions;
+
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+    float middleScreenX = static_cast<float>(engine.getScreenWidth()) * wRate / 2;
+    float middleScreenY = static_cast<float>(engine.getScreenHeight()) * hRate / 2;
+
+    int posRectX = 0;
+    int posRectY = engine.getScreenHeight() / 3;
+    int rectWidth = static_cast<int>(middleScreenX * 1.5f);
+    int rectHeight = static_cast<int>(middleScreenY * 3.f);
+
+    auto* cheatsNode = getNode(engine, "MenuCheats");
+    auto* rect = engine.createRectangle({ posRectX, posRectY }, { rectWidth, rectHeight }, D_WHITE, "cheatRect", cheatsNode);
+    engine.drawNode(rect);
+
+    int posTextX = 20;
+    int posY = posRectY + static_cast<int>(30.f * hRate);
+    int posButtonX = static_cast<int>(360.f * wRate);
+    int posButtonY = posY - static_cast<int>(10.f * hRate);
+    int posButtonWidth = static_cast<int>(230.f * wRate);
+    int posButtonHeight = static_cast<int>(90.f * hRate);
+    int downRate = static_cast<int>(60.f * hRate);
+
+    int i{ 0 };
+    std::vector<Button*> buttons{};
+    for (auto& [_, data] : cheatPositions)
+    {
+        auto& [levelNum, posName, pos] = data;
+        if (levelNum == li.mapID)
+        {
+            engine.createText({ posTextX, posY + i * downRate }, posName.c_str(), D_BLACK, (posName + std::to_string(levelNum)).c_str(), cheatsNode);
+            auto* btn = engine.createButton({ posButtonX, posButtonY + i * downRate }, { posButtonWidth, posButtonHeight }, pos.toString(), pos.toString().c_str(), cheatsNode);
+            buttons.push_back(btn->getEntity<Button>());
+            i++;
+        }
+    }
+
+    for (auto& btn : buttons)
+    {
+        if (btn->state == ButtonState::CLICK)
+        {
+            phy.position = vec3d::fromWString(btn->textBox.text.getText());
+        }
+    }
+
+    std::vector<std::string> levels = { "3", "2", "1", "0" };
+    for (auto it = levels.begin(); it != levels.end();)
+    {
+        if (li.mapID == static_cast<uint8_t>(std::stoi(*it)))
+            it = levels.erase(it);
+        else
+            ++it;
+    }
+
+    auto* slider = engine.createOptionSlider({ posButtonX + 45, posButtonY + i * downRate }, { posButtonWidth / 5, posButtonHeight }, D_BLACK, "",
+        engine.getDefaultFont(), 20, 30, D_LAVENDER_DARK, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA, D_AQUA, levels,
+        levels[0], "levelSlider", cheatsNode);
+    auto* sliderInfo = slider->getEntity<OptionSlider>();
+    sliderInfo->setOptions(levels);
+
+    auto* btnLevel = engine.createButton({ posTextX, posButtonY + i * downRate }, { static_cast<int>(static_cast<float>(posButtonWidth) * 1.5f), posButtonHeight },
+        "Cambiar Nivel", "levelChangeButton", cheatsNode);
+
+    auto* btnInfo = btnLevel->getEntity<Button>();
+    if (btnInfo->state == ButtonState::CLICK)
+    {
+        li.mapToLoad = static_cast<uint8_t>(std::stoi(sliderInfo->options[sliderInfo->currentOption]));
+        li.transition = true;
+    }
 }
