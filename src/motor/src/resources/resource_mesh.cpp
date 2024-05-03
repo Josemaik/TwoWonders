@@ -57,11 +57,12 @@ namespace DarkMoon {
         // Enable and specify vertex coords
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, textCoords));
-        // Enable and specify bones
-        // glEnableVertexAttribArray(BONE_ID_LOCATION);
-        // glVertexAttribPointer(BONE_ID_LOCATION,MAX_NUM_BONES_PER_VERTEX,GL_INT,sizeof(VertexBoneData),(void*)offsetof(Vertex,num_bones));
-        // glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
-        // glVertexAttribPointer(BONE_WEIGHT_LOCATION,MAX_NUM_BONES_PER_VERTEX,GL_FLOAT,GL_FALSE,sizeof(VertexBoneData),(void*)offsetof(Vertex,num_bones));
+        // Enable and specify bones ids
+        glEnableVertexAttribArray(BONE_ID_LOCATION);
+        glVertexAttribPointer(BONE_ID_LOCATION,MAX_NUM_BONES_PER_VERTEX,GL_INT, GL_FALSE,sizeof(Vertex) , (void*)offsetof(Vertex, m_BonesIDs));
+        //weights
+        glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
+        glVertexAttribPointer(BONE_WEIGHT_LOCATION,MAX_NUM_BONES_PER_VERTEX,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)offsetof(Vertex,m_Weights));
         
         // Unbind vertex array
         glBindVertexArray(0);

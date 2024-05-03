@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 #include <array>
+#include <map>
 #include <cstdint>
 #include <glm/glm.hpp>
 
@@ -20,18 +21,43 @@
 
 namespace DarkMoon {
     //data for vertex influnced by bones
-    struct VertexBoneData
-    {
-        std::array<uint,MAX_NUM_BONES_PER_VERTEX> BoneIDs{0};
-        std::array<float,MAX_NUM_BONES_PER_VERTEX> weights{0.0f};
+    // struct VertexBoneData
+    // {
+    //     std::array<uint,MAX_NUM_BONES_PER_VERTEX> BoneIDs{0};
+    //     std::array<float,MAX_NUM_BONES_PER_VERTEX> weights{0.0f};
 
-        VertexBoneData() {}
+    //     VertexBoneData() {}
+
+    //     void AddBoneata(uint BondeID , float weight){
+    //         for(uint i = 0; i < BoneIDs.size() ; i++){
+    //             if(weights[i] == 0.0){
+    //                 BoneIDs[i] = BondeID;
+    //                 weights[i] = weight;
+    //                 return;
+    //             }
+    //         }  
+    //         //si salta, aumentar ,max_nume_bones_per_vertex
+    //         assert(0);
+    //     }
+    // };
+    struct Vertex {
+        glm::vec3 position;
+        glm::vec3 normal;
+        glm::vec2 textCoords;
+        //tangent
+        glm::vec3 Tangent;
+        //bitangent
+        glm::vec3 BiTangent;
+        //bone indexes which will influence this vertex
+        int m_BonesIDs[MAX_NUM_BONES_PER_VERTEX];
+        //weights from each bone
+        float m_Weights[MAX_NUM_BONES_PER_VERTEX];
 
         void AddBoneata(uint BondeID , float weight){
-            for(uint i = 0; i < BoneIDs.size() ; i++){
-                if(weights[i] == 0.0){
-                    BoneIDs[i] = BondeID;
-                    weights[i] = weight;
+            for(uint i = 0; i < MAX_NUM_BONES_PER_VERTEX ; i++){
+                if(m_Weights[i] == 0.0){
+                    m_BonesIDs[i] = BondeID;
+                    m_Weights[i] = weight;
                     return;
                 }
             }  
@@ -39,17 +65,13 @@ namespace DarkMoon {
             assert(0);
         }
     };
-    struct Vertex {
-        glm::vec3 position;
-        glm::vec3 normal;
-        glm::vec2 textCoords;
-    };
+    
     struct Mesh : public Resource {
     public:
         // Mesh data
         std::vector<Vertex> vertices;
         std::vector<uint16_t> indices;
-        std::vector<VertexBoneData>num_bones{};
+        //std::vector<VertexBoneData>num_bones{};
         Material* material;
 
         Mesh(std::size_t, std::vector<Vertex>, std::vector<uint16_t>, Material*);
