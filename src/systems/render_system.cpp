@@ -953,6 +953,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         case 2:
             r.node = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_0.obj");
             break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_3/Objs/lvl_3-cnk_0.obj");
+            break;
         }
     else if (e.hasTag<Chunk1Tag>())
         switch (li.mapID)
@@ -967,6 +970,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         case 2:
             r.node = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_1.obj");
             break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_3/Objs/lvl_3-cnk_1.obj");
+            break;
         }
     else if (e.hasTag<Chunk2Tag>())
         switch (li.mapID)
@@ -980,6 +986,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
         case 2:
             r.node = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_2.obj");
+            break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_3/Objs/lvl_3-cnk_2.obj");
             break;
         }
     else if (e.hasTag<Chunk3Tag>())

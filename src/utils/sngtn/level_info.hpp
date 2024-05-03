@@ -182,7 +182,7 @@ struct LevelInfo
         npcflee = false;
         investigatorstartwalk = false;
         num_zone = 0;
-        mapID = 2;
+        mapID = 3;
         chestToOpen = max;
         dungeonKeyCreated = false;
         openChest = false;

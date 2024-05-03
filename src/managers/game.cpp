@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -28.0, 49.0, -30.0 };
+        plfi.spawnPoint = { -65.0, 13.0, 104.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial
     // 32.0, 4.0, 43.0 - Primer cofre
@@ -65,6 +65,9 @@ void Game::createEntities()
     // -30.24, 49.0, -26.59 - Spawn crater lvl2
     // -58.26,31.0,16.54 - spawn ramp muñeco
     // 40.0, 50.0, -3.0 - Nomada lvl2
+    // 4.6, 7.0, -32.9 - Posición Incial lvl3
+    // -33.0, 13.0, -0.5 - Hacia detrás casa lvl3
+    // -65.0, 13.0, 104.0 - Campamento lvl3
 
     // Player
     auto& e{ em.newEntity() };
