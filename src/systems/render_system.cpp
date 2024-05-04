@@ -50,8 +50,6 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
 
     auto& li = em.getSingleton<LevelInfo>();
 
-    ss.ambient_stop();
-    ss.music_stop();
     ss.ambient_started = false;
 
     // restartScene(engine);
@@ -286,11 +284,15 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
         {
             sliderInfo.nextOption();
             inpi.right = false;
+
+            ss.sonido_mov();
         }
         else if (inpi.left)
         {
             sliderInfo.prevOption();
             inpi.left = false;
+
+            ss.sonido_mov();
         }
 
     }, {middleScreen - buttonWidth, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2.f)} } },
@@ -301,12 +303,14 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
             sliderInfo.nextOption();
             ss.setVolumeMaster(sliderInfo.currentValue);
             inpi.right = false;
+            ss.sonido_mov();
         }
         else if (engine.isKeyDown(D_KEY_LEFT))
         {
             sliderInfo.prevOption();
             ss.setVolumeMaster(sliderInfo.currentValue);
             inpi.left = false;
+            ss.sonido_mov();
         }
     }, {middleScreen - buttonWidth, posYVol} } }
     };
@@ -362,6 +366,7 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
 void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInfo& li, SoundSystem& ss)
 {
     auto& inpi = em.getSingleton<InputInfo>();
+
     // Nodo de los botones
     if (inpi.pause)
         getNode(engine, "2D")->setVisible(false);
@@ -412,6 +417,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
             {
                 li.currentScreen = GameScreen::STORY;
                 li.anyButtonPressed = false;
+                ss.music_stop();
             }
             else
                 inpi.pause = false;
@@ -419,7 +425,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
             li.elapsedPause = 0.f;
 
             ss.seleccion_menu();
-            ss.music_stop();
+            
         } } },
         { "2_opciones", { nullptr, "Opciones", [&]() {
             li.previousScreen = li.currentScreen;
