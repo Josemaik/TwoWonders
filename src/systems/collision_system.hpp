@@ -80,6 +80,7 @@ private:
     matrixType checkedPairs{};
     pairsType2 checkedPairsRamp{};
     std::vector<PhysicsComponent*> previousEntsOnRamp{};
+    std::vector<std::pair<std::size_t, double>> rampHeights{};
     EventManager* evm{ nullptr };
     // void checkBorderCollision(EntityManager& em, Octree& boxes);
 };

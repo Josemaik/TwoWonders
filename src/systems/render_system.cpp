@@ -1225,6 +1225,26 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
                 }
             }
         }
+        case 3:
+        {
+            if (e.hasComponent<RelayComponent>())
+            {
+                auto& rc = em.getComponent<RelayComponent>(e);
+
+                switch (rc.type)
+                {
+                case ElementalType::Water:
+                    r.node = engine.loadModel("assets/Assets/Balizas/Baliza_agua.obj");
+                    break;
+                case ElementalType::Fire:
+                    r.node = engine.loadModel("assets/Assets/Balizas/Baliza_fuego.obj");
+                    break;
+                case ElementalType::Ice:
+                    r.node = engine.loadModel("assets/Assets/Balizas/Baliza_hielo.obj");
+                    break;
+                }
+            }
+        }
 
         default:
             break;

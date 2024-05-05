@@ -22,6 +22,7 @@
 #include "../components/boat_component.hpp"
 #include "../components/particle_component.hpp"
 #include "../components/spawn_component.hpp"
+#include "../components/relay_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
 #include "../components/navmesh_component.hpp"
@@ -153,7 +154,8 @@ using CL = MP::TypeList <
     MessageComponent,
     BoatComponent,
     ParticleMakerComponent,
-    SpawnComponent
+    SpawnComponent,
+    RelayComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,

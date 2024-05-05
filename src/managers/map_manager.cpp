@@ -605,8 +605,8 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
 
                 auto yMin = c.bbox.min.y();
                 auto yMax = c.bbox.max.y();
-                auto rot2 = (orientation - 90.0) * DEGTORAD;
-                em.addComponent<LadderComponent>(entity, LadderComponent{.orientation = rot2, .yMin = yMin, .yMax = yMax });
+                // auto rot2 = (orientation - 90.0) * DEGTORAD;
+                em.addComponent<LadderComponent>(entity, LadderComponent{.orientation = rot, .yMin = yMin, .yMax = yMax });
             }},
             {InteractableType::Sign, [&]()
             {
@@ -631,11 +631,11 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             {InteractableType::MissionOBJ, [&]()
             {
                 auto& li = em.getSingleton<LevelInfo>();
+                em.addTag<MissionObjTag>(entity);
                 switch (li.mapID)
                 {
                 case 2:
                 {
-                    em.addTag<MissionObjTag>(entity);
                     em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{.active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
                     auto& bc = em.addComponent<BoatComponent>(entity);
                     bc.setPart(boatParts);
@@ -646,6 +646,12 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                     {
                         r.offset = interactable["offsetZ"][0].GetDouble();
                     }
+                    break;
+                }
+                case 3:
+                {
+                    auto relayType = static_cast<ElementalType>(interactable["relay"].GetUint());
+                    em.addComponent<RelayComponent>(entity, RelayComponent({.type = relayType }));
                     break;
                 }
                 default:

@@ -102,6 +102,7 @@ private:
     float elapsed_book{ 0.0f };
 
     int coinBarX{}, coinNumberX{};
+    bool jaja = false;
 };
 
 #endif // !RENDER_SYSTEM

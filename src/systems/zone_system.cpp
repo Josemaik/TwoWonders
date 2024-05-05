@@ -434,8 +434,7 @@ void ZoneSystem::checkLadders(EntityManager& em)
         {
             playerPos = { phy.position.x(), playerPos.y() + 0.5, phy.position.z() };
             playerPhy.gravity = 0;
-            playerPhy.orientation = ldc.orientation;
-
+            playerPhy.orientation = -(ldc.orientation * phy.rotationVec.y());
             plfi.onLadder = true;
             inpi.interact = false;
             ic.showButton = false;

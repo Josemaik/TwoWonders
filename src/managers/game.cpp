@@ -68,6 +68,8 @@ void Game::createEntities()
     // -33.0, 13.0, -0.5 - Hacia detrás casa lvl3
     // -65.0, 13.0, 104.0 - Campamento lvl3
     // -19.0, 14.0, 185.0 - Primera rampa montaña lvl3
+    // 35.0, 32.0, 182.0 - Primera escalera montaña lvl3
+    // 38.0, 59.0, 305.0 - Casi cima lvl3
 
     // Player
     auto& e{ em.newEntity() };
