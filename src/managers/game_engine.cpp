@@ -918,6 +918,37 @@ Node* ENGI::GameEngine::drawButton(vec2i position, vec2i size, std::string text,
     return dmeg.CreateButton(position.toGlm(), size.toGlm(), text, font, fontSize, textColor, verticalAligned, horizontalAligned, normalColor, hoverColor, clickColor, "button", nodes["TextCopy"]);
 }
 
+///// CheckBox /////
+
+Node* ENGI::GameEngine::createCheckBox(vec2i position, float size, bool checked, Color backgroundColor, DarkMoon::Color normalColor, DarkMoon::Color hoverColor, const char* nodeName, DarkMoon::Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateCheckbox(position.toGlm(), size, checked, backgroundColor, normalColor, hoverColor, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {size, size} };
+    }
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::createCheckBoxPtr(vec2i position, float size, bool* checked, Color backgroundColor, DarkMoon::Color normalColor, DarkMoon::Color hoverColor, const char* nodeName, DarkMoon::Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateCheckboxPtr(position.toGlm(), size, checked, backgroundColor, normalColor, hoverColor, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {size, size} };
+    }
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::drawCheckBox(vec2i position, float size, bool checked, Color backgroundColor, DarkMoon::Color normalColor, DarkMoon::Color hoverColor)
+{
+    return dmeg.CreateCheckbox(position.toGlm(), size, checked, backgroundColor, normalColor, hoverColor, "checkbox", nodes["TextCopy"]);
+}
+
 ///// Cube /////
 
 Node* ENGI::GameEngine::createCube(vec3d position, vec3d size, DarkMoon::Color color, const char* nodeName, DarkMoon::Node* parentNode)

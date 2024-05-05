@@ -63,6 +63,10 @@ namespace DarkMoon {
         Node* CreateOptionSlider(glm::vec2 pos, glm::vec2 sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, std::vector<std::string> opts, std::string firstOption, const char* nodeName, Node* parentNode);
         // Create float slider in node
         Node* CreateFloatSlider(glm::vec2 pos, glm::vec2 sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, float initialValue, const char* nodeName, Node* parentNode);
+        // Create checkbox in node
+        Node* CreateCheckbox(glm::vec2 pos, float size, bool checked, Color bCol, Color nCol, Color hCol, const char* nodeName, Node* parentNode);
+        // CReate checkbox with pointer in node
+        Node* CreateCheckboxPtr(glm::vec2 pos, float size, bool* checked, Color bCol, Color nCol, Color hCol, const char* nodeName, Node* parentNode);
 
         // 3D
 

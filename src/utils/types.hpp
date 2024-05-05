@@ -238,4 +238,5 @@ using Button = DarkMoon::Button;
 using ButtonState = DarkMoon::ButtonState;
 using Text = DarkMoon::Text;
 using TextBox = DarkMoon::TextBox;
+using CheckBox = DarkMoon::CheckBox;
 using DarkMoonEngine = DarkMoon::DarkMoonEngine;

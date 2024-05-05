@@ -626,6 +626,112 @@ namespace DarkMoon {
         }
     };
 
+    struct CheckBoxBase : Entity {
+        TextBox textBox;
+        Color normalColor;
+        Color hoverColor;
+        ButtonState state{ ButtonState::NORMAL };
+        WindowsManager& wm = WindowsManager::getInstance();
+        InputManager& im = InputManager::getInstance();
+
+        CheckBoxBase(glm::vec2 pos = { 0.0f, 0.0f },
+            float size = 50.0f,
+            Color bCol = D_WHITE,
+            Color nColor = D_WHITE,
+            Color hColor = D_GRAY) :
+            textBox(pos, { size, size }, bCol, "", nullptr, 18, D_BLACK, Aligned::CENTER, Aligned::CENTER),
+            normalColor(nColor), hoverColor(hColor)
+        {
+            textBox.box.position = pos;
+            checkMouse();
+        };
+
+        void draw(glm::mat4 transMatrix) override {
+            checkMouse();
+            if (checkChecked()) {
+                textBox.text.setText("X");
+            }
+            else {
+                textBox.text.setText(" ");
+            }
+            textBox.draw(transMatrix);
+        };
+
+        void checkMouse()
+        {
+            glm::vec2 mPos = { im.getMouseX(wm.getWindow()), im.getMouseY(wm.getWindow()) };
+            glm::vec2 topLeft = textBox.box.position;
+            glm::vec2 bottomRight = { topLeft.x + textBox.box.size.x, topLeft.y + textBox.box.size.y };
+
+            if (mPos.x >= topLeft.x && mPos.x <= bottomRight.x &&
+                mPos.y >= topLeft.y && mPos.y <= bottomRight.y) {
+                if (im.isMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT)) {
+                    state = ButtonState::CLICK;
+                    toggleChecked();
+                }
+                else {
+                    textBox.box.color = hoverColor;
+                    state = ButtonState::HOVER;
+                }
+            }
+            else {
+                textBox.box.color = normalColor;
+                state = ButtonState::NORMAL;
+            }
+        }
+
+        bool isClicked() {
+            return state == ButtonState::CLICK;
+        }
+
+        virtual bool checkChecked() = 0;
+        virtual void toggleChecked() = 0;
+    };
+
+    struct CheckBox : CheckBoxBase {
+        bool checked{ false };
+
+        CheckBox(glm::vec2 pos = { 0.0f, 0.0f },
+            float size = 50.0f,
+            bool checked = false,
+            Color bCol = D_WHITE,
+            Color nColor = D_WHITE,
+            Color hColor = D_GRAY) :
+            CheckBoxBase(pos, size, bCol, nColor, hColor), checked(checked)
+        {};
+
+        bool checkChecked() override {
+            return checked;
+        }
+
+        void toggleChecked() override {
+            checked = !checked;
+        }
+    };
+
+    struct CheckBoxPtr : CheckBoxBase {
+        bool* checked{ nullptr };
+
+        CheckBoxPtr(glm::vec2 pos = { 0.0f, 0.0f },
+            float size = 50.0f,
+            bool* checked = nullptr,
+            Color bCol = D_WHITE,
+            Color nColor = D_WHITE,
+            Color hColor = D_GRAY) :
+            CheckBoxBase(pos, size, bCol, nColor, hColor), checked(checked)
+        {};
+
+        bool checkChecked() override {
+            return *checked;
+        }
+
+        void toggleChecked() override {
+            if (checked) {
+                *checked = !*checked;
+            }
+        }
+    };
+
     struct Slider : Entity {
         Rectangle background;
         Rectangle boxBackground;
@@ -840,11 +946,5 @@ namespace DarkMoon {
             currentValue = std::max(currentValue - 0.01f, 0.0f);
             textBox.text.setText(std::to_string(static_cast<int>(currentValue * 100)));
         }
-    };
-
-    // TODO
-
-    struct CheckBox : Entity {
-
     };
 }

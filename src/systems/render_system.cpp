@@ -3232,9 +3232,9 @@ void RenderSystem::drawCheats(EntityManager& em, GameEngine& engine)
     float middleScreenY = static_cast<float>(engine.getScreenHeight()) * hRate / 2;
 
     int posRectX = 0;
-    int posRectY = engine.getScreenHeight() / 3;
+    int posRectY = engine.getScreenHeight() / 4;
     int rectWidth = static_cast<int>(middleScreenX * 1.5f);
-    int rectHeight = static_cast<int>(middleScreenY * 3.f);
+    int rectHeight = static_cast<int>(middleScreenY * 3.5f);
 
     auto* cheatsNode = getNode(engine, "MenuCheats");
     auto* rect = engine.createRectangle({ posRectX, posRectY }, { rectWidth, rectHeight }, D_WHITE, "cheatRect", cheatsNode);
@@ -3293,5 +3293,38 @@ void RenderSystem::drawCheats(EntityManager& em, GameEngine& engine)
     {
         li.mapToLoad = static_cast<uint8_t>(std::stoi(sliderInfo->options[sliderInfo->currentOption]));
         li.transition = true;
+    }
+
+    i += 1;
+    engine.createText({ posTextX, posY + i * downRate }, "Gravedad", D_BLACK, "gravityCheckText", cheatsNode);
+
+    bool grav = phy.gravity > 0;
+    auto* gravCheckBox = engine.createCheckBox({ posButtonX + 45, posButtonY + i * downRate }, 40.f, grav, D_WHITE, D_LAVENDER, D_LAVENDER_LIGHT, "gravCheckBox", cheatsNode);
+    auto* gravInfo = gravCheckBox->getEntity<CheckBox>();
+
+    if (gravInfo->isClicked())
+    {
+        if (gravInfo->checked)
+            phy.gravity = phy.KGravity;
+        else
+            phy.gravity = 0;
+    }
+
+    i += 1;
+
+    engine.createText({ posTextX, posY + i * downRate }, "Llave", D_BLACK, "keyCheckText", cheatsNode);
+
+    auto& plfi = em.getSingleton<PlayerInfo>();
+    engine.createCheckBoxPtr({ posButtonX + 45, posButtonY + i * downRate }, 40.f, &plfi.hasKey, D_WHITE, D_LAVENDER, D_LAVENDER_LIGHT, "keyCheckBox", cheatsNode);
+
+    i += 1;
+
+    engine.createText({ posTextX, posY + i * downRate }, "Invencible", D_BLACK, "invincibleCheckText", cheatsNode);
+    engine.createCheckBoxPtr({ posButtonX + 45, posButtonY + i * downRate }, 40.f, &plfi.invincible, D_WHITE, D_LAVENDER, D_LAVENDER_LIGHT, "invincibleCheckBox", cheatsNode);
+
+    if (plfi.invincible)
+    {
+        auto& lc = em.getComponent<LifeComponent>(player);
+        lc.life = lc.maxLife;
     }
 }

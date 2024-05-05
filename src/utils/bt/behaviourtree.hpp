@@ -18,7 +18,7 @@ struct BehaviourTree_t {
 
     BTNodeStatus_t run(EntityContext_t&& ectx) noexcept { return run(ectx); };
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept {
-        if (!nodes.empty() && nodes.size() > 0)
+        if (nodes.size() > 0)
             return nodes.back()->run(ectx);
         return BTNodeStatus_t::fail;
     }
