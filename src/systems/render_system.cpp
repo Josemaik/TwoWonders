@@ -190,7 +190,7 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     // Fondo Opciones
     auto wRate = engine.getWidthRate();
     auto hRate = engine.getHeightRate();
-    auto* fondoTwoWonders = getNode(engine, "fondo_inicio");
+    auto* fondoTwoWonders = getNode(engine, "fondo_opciones");
 
     auto* fondoText = fondoTwoWonders->getEntity<Texture2D>()->texture;
 

@@ -43,7 +43,10 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     ENGI::GameEngine::setExitKey(D_KEY_F8);
 
     // Fondo Inicio
-    loadAndResizeImage("fondo_inicio", "assets/Inicio_fondo.png", nodes["MenuPrincipal"]);
+    loadAndResizeImage("fondo_inicio", "assets/Principal_fondo.png", nodes["MenuPrincipal"]);
+
+    // Fondo Opciones
+    loadAndResizeImage("fondo_opciones", "assets/Opciones_fondo.png", nodes["MenuOpciones"]);
 
     // Logo TwoWonders
     loadAndResizeImage("logo_twowonders", "assets/logo_two_wonders.png", nodes["MenuPrincipal"]);

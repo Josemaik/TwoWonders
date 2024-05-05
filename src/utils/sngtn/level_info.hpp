@@ -111,7 +111,7 @@ struct LevelInfo
     //npc huya
     bool npcflee{ false }, investigatorstartwalk{ false };
     // Estado del juego
-    GameScreen currentScreen = GameScreen::GAMEPLAY;
+    GameScreen currentScreen = GameScreen::TITLE;
     GameScreen previousScreen = GameScreen::LOGO;
     GameScreen evenMorePreviousScreen = GameScreen::LOGO;
 
