@@ -2,6 +2,7 @@
 
 #include "../utils/animation.hpp"
 
+
 struct animator_manager
 {
     animator_manager(animation* currentAnimation)
@@ -47,12 +48,14 @@ struct animator_manager
 	
         glm::mat4 globalTransformation = parentTransform * nodeTransform;
 	
-        auto boneInfoMap = m_CurrentAnimation->GetBoneIDMap();
-        if (boneInfoMap.find(nodeName) != boneInfoMap.end())
-        {
-            int index = boneInfoMap[nodeName].id;
-            glm::mat4 offset = boneInfoMap[nodeName].offset;
-            m_FinalBoneMatrices[index] = globalTransformation * offset;
+        auto boneInfoVector = m_CurrentAnimation->GetBonesVector();
+        for (auto& boneInfo : boneInfoVector) {
+            if (boneInfo.GetBoneName() == nodeName) {
+                int index = boneInfo.GetBoneID();
+                glm::mat4 offset = boneInfo.Getoffset();
+                m_FinalBoneMatrices[index] = globalTransformation * offset;
+                break; // Salir del bucle una vez que se ha encontrado el hueso
+            }
         }
 	
         for (int i = 0; i < node->childrenCount; i++)
@@ -63,8 +66,17 @@ struct animator_manager
     { 
         return m_FinalBoneMatrices;  
     }
+
+    
+
+    static animator_manager& getInstance() {
+            static animator_manager instance;
+            return instance;
+    }
 		
 private:
+    animator_manager() = default;
+
     std::vector<glm::mat4> m_FinalBoneMatrices;
     animation* m_CurrentAnimation;
     float m_CurrentTime;

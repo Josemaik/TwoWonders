@@ -16,7 +16,31 @@ namespace DarkMoon {
         std::cout << " - Load a model -> " << m_name << std::endl;
 
         processNode(scene->mRootNode, scene, rm);
+        if(scene->HasAnimations()){
+            for(uint i = 0; i < scene->mNumAnimations;i++){
+                ReadMissingBones(scene->mAnimations[i]);
+            }
+        }
     };
+
+    void Model::ReadMissingBones(const aiAnimation* animation){
+        int size = animation->mNumChannels;
+
+        auto& boneInfoMap = getboneInfoMap();
+        int& boneCount = getBoneCount();
+
+        for (int i = 0; i < size; i++)
+        {
+            auto channel = animation->mChannels[i];
+            std::string boneName = channel->mNodeName.data;
+
+            if (boneInfoMap.find(boneName) == boneInfoMap.end())
+            {
+                boneInfoMap[boneName].id = boneCount;
+                boneCount++;
+            }
+        }
+    }
 
     void Model::unload() {
         //ResourceManager rm = ResourceManager::getInstance();

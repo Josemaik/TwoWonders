@@ -73,7 +73,7 @@ namespace DarkMoon {
 
         auto& getboneInfoMap() { return m_BoneInfomap; };
         int& getBoneCount() { return m_BoneCounter; };
-
+        void ReadMissingBones(const aiAnimation* animation);
 
         Color color = D_WHITE;
         bool drawModel{ true }, drawWires{ false };

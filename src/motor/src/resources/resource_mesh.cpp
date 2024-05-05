@@ -73,6 +73,8 @@ namespace DarkMoon {
 
     void Mesh::draw(glm::mat4 transMatrix, Color color) {
         RenderManager& rm = RenderManager::getInstance();
+        animator_manager& am = animator_manager::getInstance();
+
 
         rm.beginMode3D();
 
@@ -89,6 +91,12 @@ namespace DarkMoon {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "model"), 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "view"), 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+        auto transforms = am.GetFinalBoneMatrices();
+        for (std::size_t i = 0; i < transforms.size(); ++i) {
+            std::string uniformName = "finalBonesMatrices[" + std::to_string(i) + "]";
+            glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), uniformName.c_str()), 1, GL_FALSE, glm::value_ptr(transforms[i]));
+        }
 
         // Texture
         if (!material->texture)

@@ -48,6 +48,7 @@ struct bone
 
         //Transformación local, nombre e ID del hueso
         glm::mat4 m_LocalTransform{};
+        glm::mat4 offset{};
         std::string m_Name{};
         int m_ID{};
 
@@ -66,6 +67,7 @@ struct bone
         bone(const std::string& name,int ID, const aiNodeAnim* channel)
         : 
         m_LocalTransform(1.0f),
+        offset (1.0f),
         m_Name(name),
         m_ID(ID)
         {
@@ -103,6 +105,10 @@ struct bone
         std::string GetBoneName() const {return m_Name; }
         //get bone id
         int GetBoneID() { return m_ID; }
+        //set bone id
+        void SetBoneID(int id){ m_ID = id; }
+        //get bone offset
+        glm::mat4 Getoffset() { return offset; }
         //get local transform
         glm::mat4 GetLocalTransform() { return m_LocalTransform; }
         //obtener índices

@@ -4,6 +4,7 @@
 #include "resource_material.hpp"
 #include "../utils/color.hpp"
 #include "../managers/render_manager.hpp"
+#include "../managers/animator_manager.hpp"
 
 #include <vector>
 #include <memory>

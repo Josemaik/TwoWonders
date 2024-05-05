@@ -100,7 +100,7 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
 
 DarkMoon::Node* createMainCharacter(DarkMoon::DarkMoonEngine& engine) {
     // Node: Modelo
-    auto model = engine.CreateModel("assets/Apisonadora/Apisonadora0.fbx", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
+    auto model = engine.CreateModel("assets/Apisonadora/Apisonadora.fbx", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
     //model->scale({0.02f, 0.02f, 0.02f});
     //model->translate({0.0f, 0.0f, 0.0f});
     model->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
@@ -176,7 +176,19 @@ int main() {
         createScene3D(engine);
         auto mainCharacter = createMainCharacter(engine);
         auto modelcharacter = dynamic_cast<DarkMoon::Model*>(mainCharacter->getEntity());
-        animation crusheranimation("assets/Apisonadora/Apisonadora0.fbx",modelcharacter);
+        auto boneInfoMap = modelcharacter->getboneInfoMap();
+        animation crusheranimation("assets/Apisonadora/Apisonadora.fbx");
+        auto m_bones = crusheranimation.GetBonesVector();
+        for(auto& bone : m_bones){
+            std::string boneName = bone.GetBoneName();
+            if (boneInfoMap.find(boneName) == boneInfoMap.end()){
+                bone.SetBoneID(boneInfoMap[boneName].id);
+            }
+        }
+        // copiar mapbones en mbones
+        // crusheranimation.m_Bones
+        // crusheranimation.m_Bones.push_back(bone(channel->mNodeName.data,
+        //         boneInfoMap[channel->mNodeName.data].id, channel));
         animator_manager animator(&crusheranimation);
         //         auto textBox = createHUD(engine);
 
@@ -200,13 +212,14 @@ int main() {
 
             // float currentframe = glfwGetTime();
             // float deltatime = currentframe - lastframe;
+            float deltatime = static_cast<float>(engine.GetFrameTime());
 
             // Logic
 
             inputManager(engine, mainCharacter);
 
             //textBoxEntity->text.text = std::to_string(engine.GetFPS());            
-            animator.UpdateAnimation();
+            animator.UpdateAnimation(deltatime);
             // Draw
 
             engine.BeginDrawing();
