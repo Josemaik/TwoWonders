@@ -1000,6 +1000,40 @@ Node* ENGI::GameEngine::drawPoint3D(vec3d position, float pointSize, Color color
     return dmeg.CreatePoint3D(position.toGlm(), pointSize, color, "point", nodes["Copy"]);
 }
 
+///// Lights /////
+
+void ENGI::GameEngine::toggleLights()
+{
+    dmeg.ToggleLights();
+}
+
+void ENGI::GameEngine::activateLights()
+{
+    dmeg.ActivateLights();
+}
+
+void ENGI::GameEngine::deactivateLights()
+{
+    dmeg.DeactivateLights();
+}
+
+///// Puntual Light /////
+
+Node* ENGI::GameEngine::drawPuntualLight(vec3d position, Color color)
+{
+    return dmeg.CreatePointLight(position.toGlm(), color, "puntualLight", nodes["TextCopy"]);
+}
+
+Node* ENGI::GameEngine::createPuntualLight(vec3d position, Color color, const char* nodeName, Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreatePointLight(position.toGlm(), color, nodeName, parentNode);
+    else
+        nodes[nodeName]->setVisibleOne(true);
+
+    return nodes[nodeName];
+}
+
 Font* ENGI::GameEngine::getDefaultFont()
 {
     return dmeg.GetDefaultFont();

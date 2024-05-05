@@ -86,6 +86,15 @@ namespace ENGI {
         Node* drawPoint3D(vec3d position, float pointSize, Color color);
         Node* createPoint3D(vec3d position, float pointSize, Color color, const char* nodeName, Node* parentNode);
 
+        // Lights
+        void toggleLights();
+        void activateLights();
+        void deactivateLights();
+
+        // Puntual Light
+        Node* drawPuntualLight(vec3d position, Color color);
+        Node* createPuntualLight(vec3d position, Color color, const char* nodeName, Node* parentNode);
+
         // Window
         void initWindow(int width, int height, const char* title);
         void closeWindow();

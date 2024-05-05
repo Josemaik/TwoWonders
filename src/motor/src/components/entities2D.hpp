@@ -904,9 +904,9 @@ namespace DarkMoon {
 
         void checkMouse()
         {
-            if (prevButton.state == ButtonState::CLICK)
+            if (nextButton.state == ButtonState::CLICK)
                 nextOption();
-            else if (nextButton.state == ButtonState::CLICK)
+            else if (prevButton.state == ButtonState::CLICK)
                 prevOption();
         }
 

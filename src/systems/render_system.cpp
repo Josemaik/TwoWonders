@@ -31,6 +31,7 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine)
 
 void RenderSystem::restartScene(GameEngine& engine)
 {
+    // engine.deactivateLights();
     auto* tresde = getNode(engine, "3D");
     auto* dosde = getNode(engine, "2D");
     auto* menu = getNode(engine, "Menu");
@@ -879,6 +880,9 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
 
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / K_PI));
 
+                // if (e.hasTag<ChestTag>())
+                //     engine.drawPuntualLight(pos, { 255, 215, 0, 255 });
+
                 if (r.node) {
                     r.node->setTranslation({ pos.x(), pos.y(), pos.z() });
                     r.node->setScale({ scl.x(), scl.y(), scl.z() });
@@ -906,6 +910,8 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
             }
         }
     });
+
+    // engine.activateLights();
 }
 
 void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r)
@@ -1007,6 +1013,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         case 2:
             r.node = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_3.obj");
             break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_4/Objs/lvl_4-cnk_0.obj");
+            break;
         }
         // loadShaders(r.model);
     }
@@ -1022,6 +1031,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         case 1:
             // r.model = engine.loadModelRaylib("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_4.obj");
             r.node = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_4.obj");
+            break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_4/Objs/lvl_4-cnk_1.obj");
             break;
         }
         // loadShaders(r.model);
@@ -1039,6 +1051,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             // r.model = engine.loadModelRaylib("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_5.obj");
             r.node = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_5.obj");
             break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_4/Objs/lvl_4-cnk_2.obj");
+            break;
         }
         // loadShaders(r.model);
     }
@@ -1046,14 +1061,8 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     {
         switch (li.mapID)
         {
-        case 0:
-            // r.model = engine.loadModelRaylib("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_6.obj");
-            r.node = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_6.obj");
-            break;
-
-        case 1:
-            // r.model = engine.loadModelRaylib("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_6.obj");
-            r.node = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_6.obj");
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_4/Objs/lvl_4-cnk_3.obj");
             break;
         }
         // loadShaders(r.model);
@@ -3270,7 +3279,7 @@ void RenderSystem::drawCheats(EntityManager& em, GameEngine& engine)
         }
     }
 
-    std::vector<std::string> levels = { "3", "2", "1", "0" };
+    std::vector<std::string> levels = { "0", "1", "2", "3" };
     for (auto it = levels.begin(); it != levels.end();)
     {
         if (li.mapID == static_cast<uint8_t>(std::stoi(*it)))

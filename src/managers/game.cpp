@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -28.0, 49.0, -30.0 };
+        plfi.spawnPoint = { -19.0, 14.0, 185.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial lvl0
     // 32.0, 4.0, 43.0 - Primer cofre lvl0
@@ -67,6 +67,7 @@ void Game::createEntities()
     // 4.6, 7.0, -32.9 - Posición Incial lvl3
     // -33.0, 13.0, -0.5 - Hacia detrás casa lvl3
     // -65.0, 13.0, 104.0 - Campamento lvl3
+    // -19.0, 14.0, 185.0 - Primera rampa montaña lvl3
 
     // Player
     auto& e{ em.newEntity() };
