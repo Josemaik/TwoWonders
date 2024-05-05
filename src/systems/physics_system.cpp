@@ -119,7 +119,7 @@ void PhysicsSystem::update(EntityManager& em)
                 }
             }
         }
-         if (e.hasTag<PlayerTag>()){
+        if (e.hasTag<PlayerTag>()){
 
             auto& ss = em.getSingleton<SoundSystem>();
             if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
@@ -134,6 +134,20 @@ void PhysicsSystem::update(EntityManager& em)
                 ss.SFX_pasos_stop();
             }
         }
+        if (e.hasTag<GolemTag>() ){
+
+            //auto& playerPhy = em.getComponent<PhysicsComponent>(e);
+            //auto& playerPos = playerPhy.position;
+
+            auto& ss = em.getSingleton<SoundSystem>();
+            if (phy.velocity.x() != 0 || phy.velocity.z() != 0) {
+                auto& li = em.getSingleton<LevelInfo>();
+                //ss.sonido_golem_mov();
+                //playerWalking = true;
+                
+            }
+        }
+        
         // }
     });
 }
