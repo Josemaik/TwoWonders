@@ -221,7 +221,7 @@
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 1.0],
 							"message": [
-								"Volcán Agni - Nos gustan las visitas cortas"
+								"\tVolcán Agni\t - Nos gustan las visitas \bcortas\b"
 							]
 						}
 					]

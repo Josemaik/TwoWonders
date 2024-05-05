@@ -239,6 +239,8 @@ namespace DarkMoon {
         WindowsManager& wm = WindowsManager::getInstance();
         float ratio{};
         int numLines{ 1 };
+        bool bold{ false };
+        bool italic{ false };
 
         Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK, Aligned al = Aligned::LEFT)
             : position(pos), font(f), fontSize(fS), color(col), alignment(al)
@@ -407,6 +409,12 @@ namespace DarkMoon {
                     // Skip the rest of the loop
                     continue;
                 }
+                else if (c == '\b') {
+                    bold = !bold;
+                }
+                else if (c == '\t') {
+                    italic = !italic;
+                }
 #ifdef _WIN32
                 else if (checkSpecial)
                 {
@@ -430,14 +438,37 @@ namespace DarkMoon {
 
                 // Update VBO for each character
                 float vertices[6][4] = {
-                    { rm.normalizeX(posX)    , rm.normalizeY(posY + h), 0.0f, 1.0f },
-                    { rm.normalizeX(posX)    , rm.normalizeY(posY)    , 0.0f, 0.0f },
-                    { rm.normalizeX(posX + w), rm.normalizeY(posY)    , 1.0f, 0.0f },
+                    { posX    , posY + h, 0.0f, 1.0f },
+                    { posX    , posY    , 0.0f, 0.0f },
+                    { posX + w, posY    , 1.0f, 0.0f },
 
-                    { rm.normalizeX(posX)    , rm.normalizeY(posY + h), 0.0f, 1.0f },
-                    { rm.normalizeX(posX + w), rm.normalizeY(posY)    , 1.0f, 0.0f },
-                    { rm.normalizeX(posX + w), rm.normalizeY(posY + h), 1.0f, 1.0f }
+                    { posX    , posY + h, 0.0f, 1.0f },
+                    { posX + w, posY    , 1.0f, 0.0f },
+                    { posX + w, posY + h, 1.0f, 1.0f }
                 };
+
+                // If italic, apply a shear transformation to the vertices
+                if (italic) {
+                    float shearAmount = -0.2f; // Adjust as needed
+                    for (int i = 0; i < 6; i++) {
+                        float shear = shearAmount * vertices[i][1];
+                        vertices[i][0] += shear;
+                    }
+                }
+
+                // Normalize the vertices
+                for (int i = 0; i < 6; i++) {
+                    vertices[i][0] = rm.normalizeX(vertices[i][0]);
+                    vertices[i][1] = rm.normalizeY(vertices[i][1]);
+                }
+
+                // If italic, adjust the x position of the characters
+                if (italic) {
+                    float adjustment = 0.181f; // Adjust as needed
+                    for (int i = 0; i < 6; i++) {
+                        vertices[i][0] += adjustment;
+                    }
+                }
 
                 // Configure VAO/VBO for texture quads
                 glBindVertexArray(VAO);
@@ -447,6 +478,19 @@ namespace DarkMoon {
 
                 glBindTexture(GL_TEXTURE_2D, ch.textureID);
                 glDrawArrays(GL_TRIANGLES, 0, 6);
+
+                if (bold)
+                {
+                    float offset = 0.001f;
+
+                    for (int l = 0; l < 6; l++)
+                    {
+                        vertices[l][0] += offset;
+                    }
+
+                    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+                    glDrawArrays(GL_TRIANGLES, 0, 6);
+                }
 
                 // Advance cursors for next glyph
                 aux_x += static_cast<float>(ch.advance >> 6) * scale;
