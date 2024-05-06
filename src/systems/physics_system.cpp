@@ -134,11 +134,14 @@ void PhysicsSystem::update(EntityManager& em)
                 ss.SFX_pasos_stop();
             }
         }
+        auto& li = em.getSingleton<LevelInfo>();
         if (e.hasTag<GolemTag>() ){
-
-            //auto& playerPhy = em.getComponent<PhysicsComponent>(e);
-            //auto& playerPos = playerPhy.position;
-
+            
+            auto& player = *em.getEntityByID(li.playerID);
+            auto& playerPhy = em.getComponent<PhysicsComponent>(player);
+            auto& playerPos = playerPhy.position;
+            //phy.position
+            //phy.position.distance(playerPos);
             auto& ss = em.getSingleton<SoundSystem>();
             if (phy.velocity.x() != 0 || phy.velocity.z() != 0) {
                 auto& li = em.getSingleton<LevelInfo>();

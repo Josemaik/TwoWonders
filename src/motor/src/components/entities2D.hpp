@@ -589,6 +589,7 @@ namespace DarkMoon {
         Color hoverColor;
         Color clickColor;
         ButtonState state{ ButtonState::NORMAL };
+        ButtonState prevState{ ButtonState::NORMAL };
         WindowsManager& wm = WindowsManager::getInstance();
         InputManager& im = InputManager::getInstance();
         bool isCurrent{ false };
@@ -631,6 +632,7 @@ namespace DarkMoon {
                         textBox.text.color = clickColor;
                     else
                         textBox.box.color = clickColor;
+                    prevState = state;
                     state = ButtonState::CLICK;
                 }
                 else {
@@ -638,6 +640,7 @@ namespace DarkMoon {
                         textBox.text.color = hoverColor;
                     else
                         textBox.box.color = hoverColor;
+                    prevState = state;
                     state = ButtonState::HOVER;
                 }
             }
@@ -647,6 +650,7 @@ namespace DarkMoon {
                     textBox.text.color = hoverColor;
                 else
                     textBox.box.color = hoverColor;
+                prevState = state;
                 state = ButtonState::HOVER;
 
                 isCurrent = false;
@@ -656,6 +660,7 @@ namespace DarkMoon {
                     textBox.text.color = normalColor;
                 else
                     textBox.box.color = normalColor;
+                prevState = state;
                 state = ButtonState::NORMAL;
             }
         }

@@ -312,8 +312,10 @@ void Game::run()
                 // }
                 render_system.update(em, engine);
             }
-            else if (!resets && debugs)
+            else if (!resets && debugs){
+                sound_system.update();
                 render_system.update(em, engine);
+            }
 
             break;
         }

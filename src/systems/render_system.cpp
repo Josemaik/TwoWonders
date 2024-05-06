@@ -241,7 +241,23 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     auto* sliderRes = engine.createOptionSlider({ posX, posY }, { buttonWidth, buttonHeight }, D_AQUA, "",
         engine.getFontDefault(), 35, 45, D_AQUA, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA_LIGHT, D_AQUA_DARK,
         { "800x600", "1280x720", "1920x1080", "FULLSCREEN" }, firstOpt, "Resolucion", menuNode);
+    
+    auto& sliderInfo = *sliderRes->getEntity<OptionSlider>();
+    auto& nextBut = sliderInfo.nextButton;
+    auto& prevBut = sliderInfo.prevButton;
 
+    if(nextBut.state == ButtonState::HOVER && nextBut.prevState != ButtonState::HOVER)
+    {
+        ss.sonido_mov();
+    }
+    if(prevBut.state == ButtonState::HOVER && prevBut.prevState != ButtonState::HOVER)
+    {
+        ss.sonido_mov();
+    }
+    if(prevBut.state == ButtonState::CLICK || nextBut.prevState == ButtonState::CLICK)
+    {
+        ss.seleccion_menu();
+    }
 
     auto* sliderVol = engine.createFloatSlider({ posX, posYVol }, { buttonWidth, buttonHeight }, D_AQUA, "",
         engine.getFontDefault(), 35, 45, D_AQUA, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA_LIGHT, D_AQUA_DARK, ss.getVolumeMaster(), "Volumen", menuNode);
@@ -279,7 +295,6 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
         ss.seleccion_menu();
     }, {middleScreen - buttonWidth / 3, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 4.5f)} } },
     { "4_sliderRes", { nullptr, "Resolución", [&]() {
-        auto& sliderInfo = *sliderRes->getEntity<OptionSlider>();
         if (inpi.right)
         {
             sliderInfo.nextOption();
@@ -342,6 +357,9 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
             action();
             inpi.interact = false;
         }
+        else if( but.state == ButtonState::HOVER  && but.prevState != ButtonState::HOVER){
+            ss.sonido_mov();
+        }
         else if (i >= 3 && but.isCurrent)
         {
             action();
@@ -366,6 +384,7 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
 void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInfo& li, SoundSystem& ss)
 {
     auto& inpi = em.getSingleton<InputInfo>();
+    ss.music_stop();
 
     // Nodo de los botones
     if (inpi.pause)
@@ -475,6 +494,9 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
         if (but.state == ButtonState::CLICK || (but.isCurrent && inpi.interact)) {
             action();
             inpi.interact = false;
+        }
+        else if( but.state == ButtonState::HOVER  && but.prevState != ButtonState::HOVER){
+            ss.sonido_mov();
         }
 
         i += 1;
