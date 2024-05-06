@@ -15,6 +15,8 @@ private:
     float elapsed{ 0.f }, elapsed_limit{ 1.0f };
     float elapsedSound{ 0.f }, elapsedSound_limit{ 1.0f };
     bool playerWalking{ false };
+    bool golemWalking{ false };
+    bool munyecoWalking{ false };
 };
 
 #endif // !PHYSICS_SYSTEM

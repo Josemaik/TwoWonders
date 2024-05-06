@@ -394,10 +394,12 @@ void SoundSystem::sonido_h_bola_fuego() {
 
 void SoundSystem::sonido_golem_mov() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Golem/Golem_mov", &eventDescription));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
-    play();
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_mov_golem));
+    FMOD_Studio_EventInstance_Start(eventInstance_mov_golem);
     update();
 }
+
+
 
 void SoundSystem::sonido_golem_ataque() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Golem/Golem_ataque", &eventDescription));
@@ -421,8 +423,8 @@ void SoundSystem::sonido_golem_muere() {
 
 void SoundSystem::sonido_munyeco_mov() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Munyeco/Munyeco_mov", &eventDescription));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
-    play();
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_mov_munyeco));
+    FMOD_Studio_EventInstance_Start(eventInstance_mov_munyeco);
     update();
 }
 
@@ -770,6 +772,20 @@ void SoundSystem::SFX_pasos_stop() {
     update();
 }
 
+    //parar movimiento de enemigos
+void SoundSystem::stop_golem_mov(){
+    FMOD_Studio_EventInstance_Stop(eventInstance_mov_golem, FMOD_STUDIO_STOP_ALLOWFADEOUT);
+    update();
+}
+
+void SoundSystem::stop_munyeco_mov(){
+    FMOD_Studio_EventInstance_Stop(eventInstance_mov_munyeco, FMOD_STUDIO_STOP_ALLOWFADEOUT);
+    update();
+}
+void SoundSystem::stop_pasos(){
+    stop_munyeco_mov();
+    stop_golem_mov();
+}
 
 
 

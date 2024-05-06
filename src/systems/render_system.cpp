@@ -386,6 +386,8 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
 {
     auto& inpi = em.getSingleton<InputInfo>();
     ss.music_stop();
+    ss.ambient_stop();
+    ss.stop_pasos();
 
     // Nodo de los botones
     if (inpi.pause)
@@ -438,6 +440,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
                 li.currentScreen = GameScreen::STORY;
                 li.anyButtonPressed = false;
                 ss.music_stop();
+                
             }
             else
                 inpi.pause = false;

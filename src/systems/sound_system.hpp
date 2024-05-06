@@ -147,6 +147,9 @@ struct SoundSystem {
     void music_stop();
     void ambient_stop();
     void SFX_pasos_stop();
+    void stop_golem_mov();
+    void stop_munyeco_mov();
+    void stop_pasos();
 
     void update();
     void clear();
@@ -190,6 +193,8 @@ private:
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente_volcan;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_SFX_pasos;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_mov_golem;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_mov_munyeco;
 
     FMOD_STUDIO_BUS* bus;
     FMOD_STUDIO_BUS* sfxBus;

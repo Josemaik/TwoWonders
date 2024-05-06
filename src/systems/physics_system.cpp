@@ -119,19 +119,21 @@ void PhysicsSystem::update(EntityManager& em)
                 }
             }
         }
+        //SONIDOS DE MOVIMIENTO
+        auto& ss = em.getSingleton<SoundSystem>();
         if (e.hasTag<PlayerTag>()){
 
-            auto& ss = em.getSingleton<SoundSystem>();
+          
             if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
                 auto& li = em.getSingleton<LevelInfo>();
-                ss.play_pasos();
+                //ss.play_pasos();
                 playerWalking = true;
                 
             }
             else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) &&  playerWalking)
             {
                 playerWalking = false;
-                ss.SFX_pasos_stop();
+                //ss.SFX_pasos_stop();
             }
         }
         auto& li = em.getSingleton<LevelInfo>();
@@ -140,15 +142,50 @@ void PhysicsSystem::update(EntityManager& em)
             auto& player = *em.getEntityByID(li.playerID);
             auto& playerPhy = em.getComponent<PhysicsComponent>(player);
             auto& playerPos = playerPhy.position;
-            //phy.position
-            //phy.position.distance(playerPos);
             auto& ss = em.getSingleton<SoundSystem>();
-            if (phy.velocity.x() != 0 || phy.velocity.z() != 0) {
-                auto& li = em.getSingleton<LevelInfo>();
-                //ss.sonido_golem_mov();
-                //playerWalking = true;
+            if( phy.position.distance(playerPos) < 30.0 )
+            {
+                if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !golemWalking)
+                {
+                    auto& li = em.getSingleton<LevelInfo>();
+                    ss.sonido_golem_mov();
+                    golemWalking = true;
                 
-            }
+                } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  golemWalking)
+                {
+                    golemWalking = false;
+                    ss.stop_golem_mov();
+                }
+            } else
+            {
+                ss.stop_golem_mov();
+                //golemWalking = false;
+            } 
+        }
+        if ( e.hasTag<SnowmanTag>() ){
+            
+            auto& player = *em.getEntityByID(li.playerID);
+            auto& playerPhy = em.getComponent<PhysicsComponent>(player);
+            auto& playerPos = playerPhy.position;
+            auto& ss = em.getSingleton<SoundSystem>();
+            if( phy.position.distance(playerPos) < 30.0 )
+            {
+                if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !munyecoWalking)
+                {
+                    auto& li = em.getSingleton<LevelInfo>();
+                    ss.sonido_munyeco_mov();
+                    munyecoWalking = true;
+                
+                } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  munyecoWalking)
+                {
+                    munyecoWalking = false;
+                    //ss.stop_munyeco_mov();
+                }
+            } else
+            {
+                ss.stop_munyeco_mov();
+                munyecoWalking = false;
+            } 
         }
         
         // }
