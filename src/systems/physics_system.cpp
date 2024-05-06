@@ -119,38 +119,38 @@ void PhysicsSystem::update(EntityManager& em)
                 }
             }
         }
-        if (e.hasTag<PlayerTag>()){
+        if (e.hasTag<PlayerTag>()) {
 
             auto& ss = em.getSingleton<SoundSystem>();
             if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
-                auto& li = em.getSingleton<LevelInfo>();
+                [[maybe_unused]] auto& li = em.getSingleton<LevelInfo>();
                 ss.play_pasos();
                 playerWalking = true;
-                
+
             }
-            else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) &&  playerWalking)
+            else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) && playerWalking)
             {
                 playerWalking = false;
                 ss.SFX_pasos_stop();
             }
         }
         auto& li = em.getSingleton<LevelInfo>();
-        if (e.hasTag<GolemTag>() ){
-            
-            auto& player = *em.getEntityByID(li.playerID);
-            auto& playerPhy = em.getComponent<PhysicsComponent>(player);
-            auto& playerPos = playerPhy.position;
+        if (e.hasTag<GolemTag>()) {
+
+            [[maybe_unused]] auto& player = *em.getEntityByID(li.playerID);
+            [[maybe_unused]] auto& playerPhy = em.getComponent<PhysicsComponent>(player);
+            [[maybe_unused]] auto& playerPos = playerPhy.position;
             //phy.position
             //phy.position.distance(playerPos);
-            auto& ss = em.getSingleton<SoundSystem>();
+            [[maybe_unused]] auto& ss = em.getSingleton<SoundSystem>();
             if (phy.velocity.x() != 0 || phy.velocity.z() != 0) {
-                auto& li = em.getSingleton<LevelInfo>();
+                [[maybe_unused]] auto& li = em.getSingleton<LevelInfo>();
                 //ss.sonido_golem_mov();
                 //playerWalking = true;
-                
+
             }
         }
-        
+
         // }
     });
 }

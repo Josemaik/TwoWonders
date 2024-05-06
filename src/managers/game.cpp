@@ -207,8 +207,6 @@ void Game::run()
             }
             input_system.update(em, engine);
             render_system.drawLogoGame(engine, em, sound_system);
-            if (li.playerID == li.max)
-                createEntities();
             break;
         }
 
@@ -296,10 +294,6 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
             {
-                // if (elapsed >= timeStep)
-                // {
-                //     elapsed -= timeStep;
-
                 ai_system.update(em);
                 npc_system.update(em);
                 physics_system.update(em);
@@ -315,17 +309,18 @@ void Game::run()
                 // if (elapsed < timeStep45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                 camera_system.update(em, engine, evm);
                 event_system.update(em, evm, iam, map, object_system, sound_system);
-                particle_system.update(em);
+                if (li.showParticles)
+                    particle_system.update(em);
 
                 if (!li.getDeath().empty())
                 {
                     em.destroyEntities(li.getDeath());
                     li.clearDeath();
                 }
-                // }
+
                 render_system.update(em, engine);
             }
-            else if (!resets && debugs){
+            else if (!resets && debugs) {
                 sound_system.update();
                 render_system.update(em, engine);
             }

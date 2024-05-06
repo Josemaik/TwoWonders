@@ -436,10 +436,10 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         std::swap(behaviorType1, behaviorType2);
     }
 
-    if (behaviorType2 & BehaviorType::ZONE)
+    if (behaviorType2 & BehaviorType::ZONE || behaviorType2 & BehaviorType::LADDER)
         return;
 
-    if (!staticEntPtr->hasComponent<ObjectComponent>() && behaviorType2 & BehaviorType::RAMP || behaviorType2 & BehaviorType::LADDER)
+    if (!staticEntPtr->hasComponent<ObjectComponent>() && behaviorType2 & BehaviorType::RAMP)
         return;
 
     if (staticEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<WallTag>())

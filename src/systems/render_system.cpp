@@ -23,7 +23,10 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine)
 
     // Dibuja todas las entidades con componente de render
     drawEntities(em, engine);
-    drawParticles(em, engine);
+
+    auto& li = em.getSingleton<LevelInfo>();
+    if (li.showParticles)
+        drawParticles(em, engine);
 
     // Terminamos el frame
     endFrame(engine, em);
@@ -221,7 +224,8 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     // Posición del slider
     int posX = middleScreen + buttonWidth / 3;
     int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2.f);
-    int posYVol = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.5f);
+    int posYPart = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.7f);
+    int posYVol = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.4f);
 
     std::string firstOpt = "";
     switch (engine.getScreenWidth())
@@ -239,29 +243,22 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
         firstOpt = "FULLSCREEN";
         break;
     }
+
     auto* sliderRes = engine.createOptionSlider({ posX, posY }, { buttonWidth, buttonHeight }, D_AQUA, "",
         engine.getFontDefault(), 35, 45, D_AQUA, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA_LIGHT, D_AQUA_DARK,
         { "800x600", "1280x720", "1920x1080", "FULLSCREEN" }, firstOpt, "Resolucion", menuNode);
-    
-    auto& sliderInfo = *sliderRes->getEntity<OptionSlider>();
-    auto& nextBut = sliderInfo.nextButton;
-    auto& prevBut = sliderInfo.prevButton;
 
-    if(nextBut.state == ButtonState::HOVER && nextBut.prevState != ButtonState::HOVER)
-    {
-        ss.sonido_mov();
-    }
-    if(prevBut.state == ButtonState::HOVER && prevBut.prevState != ButtonState::HOVER)
-    {
-        ss.sonido_mov();
-    }
-    if(prevBut.state == ButtonState::CLICK || nextBut.prevState == ButtonState::CLICK)
-    {
-        ss.seleccion_menu();
-    }
+    auto& sliderInfo = *sliderRes->getEntity<OptionSlider>();
+    checkSliderSound(ss, sliderInfo);
 
     auto* sliderVol = engine.createFloatSlider({ posX, posYVol }, { buttonWidth, buttonHeight }, D_AQUA, "",
         engine.getFontDefault(), 35, 45, D_AQUA, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA_LIGHT, D_AQUA_DARK, ss.getVolumeMaster(), "Volumen", menuNode);
+
+    auto& sliderInfoVol = *sliderVol->getEntity<FloatSlider>();
+    checkSliderSound(ss, sliderInfoVol);
+
+    // CheckBox de partículas
+    engine.createCheckBoxPtr({ posX, posYPart }, 40.f, &li.showParticles, D_WHITE, D_LAVENDER, D_LAVENDER_LIGHT, "particleCheckBox", menuNode);
 
     std::map<std::string, std::function<void()>> SliderData =
     {
@@ -279,8 +276,6 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
         return;
     }, {middleScreen - buttonWidth, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.2f)} } },
     { "2_aceptar", { nullptr, "Aceptar", [&]() {
-        auto& sliderInfo = *sliderRes->getEntity<OptionSlider>();
-        auto& sliderInfoVol = *sliderVol->getEntity<FloatSlider>();
 
         auto& action = SliderData[sliderInfo.options[sliderInfo.currentOption]];
         action();
@@ -310,21 +305,23 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
 
             ss.sonido_mov();
         }
-
     }, {middleScreen - buttonWidth, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2.f)} } },
-    { "5_sliderVol", { nullptr, "Volumen", [&]() {
-        auto& sliderInfo = *sliderVol->getEntity<FloatSlider>();
+    { "5_particleCheck", { nullptr, "Partículas", [&]() {
+        if (inpi.interact)
+            li.showParticles = !li.showParticles;
+    }, {middleScreen - buttonWidth, posYPart}}},
+    { "6_sliderVol", { nullptr, "Volumen", [&]() {
         if (engine.isKeyDown(D_KEY_RIGHT))
         {
-            sliderInfo.nextOption();
-            ss.setVolumeMaster(sliderInfo.currentValue);
+            sliderInfoVol.nextOption();
+            ss.setVolumeMaster(sliderInfoVol.currentValue);
             inpi.right = false;
             ss.sonido_mov();
         }
         else if (engine.isKeyDown(D_KEY_LEFT))
         {
-            sliderInfo.prevOption();
-            ss.setVolumeMaster(sliderInfo.currentValue);
+            sliderInfoVol.prevOption();
+            ss.setVolumeMaster(sliderInfoVol.currentValue);
             inpi.left = false;
             ss.sonido_mov();
         }
@@ -354,16 +351,13 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
             but.isCurrent = true;
 
         // Comprobar estado del boton
-        if ((but.state == ButtonState::CLICK || (but.isCurrent && inpi.interact)) && i < 3) {
+        if (but.state == ButtonState::CLICK || (but.isCurrent && inpi.interact) || (i >= 3 && but.isCurrent)) {
             action();
             inpi.interact = false;
+            but.state = ButtonState::NORMAL;
         }
-        else if( but.state == ButtonState::HOVER  && but.prevState != ButtonState::HOVER){
+        else if (but.state == ButtonState::HOVER && but.prevState != ButtonState::HOVER) {
             ss.sonido_mov();
-        }
-        else if (i >= 3 && but.isCurrent)
-        {
-            action();
         }
 
         i += 1;
@@ -380,6 +374,22 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
 
     engine.traverseRoot();
     engine.endDrawing();
+}
+
+void RenderSystem::checkSliderSound(SoundSystem& ss, OptionSlider& slider)
+{
+    auto& nextBut = slider.nextButton;
+    auto& prevBut = slider.prevButton;
+    if ((nextBut.state == ButtonState::HOVER && nextBut.prevState != ButtonState::HOVER)
+        || (prevBut.state == ButtonState::HOVER && prevBut.prevState != ButtonState::HOVER))
+    {
+        ss.sonido_mov();
+    }
+
+    if (prevBut.state == ButtonState::CLICK || nextBut.state == ButtonState::CLICK)
+    {
+        ss.seleccion_menu();
+    }
 }
 
 void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInfo& li, SoundSystem& ss)
@@ -445,7 +455,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
             li.elapsedPause = 0.f;
 
             ss.seleccion_menu();
-            
+
         } } },
         { "2_opciones", { nullptr, "Opciones", [&]() {
             li.previousScreen = li.currentScreen;
@@ -495,8 +505,9 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
         if (but.state == ButtonState::CLICK || (but.isCurrent && inpi.interact)) {
             action();
             inpi.interact = false;
+            but.state = ButtonState::NORMAL;
         }
-        else if( but.state == ButtonState::HOVER  && but.prevState != ButtonState::HOVER){
+        else if (but.state == ButtonState::HOVER && but.prevState != ButtonState::HOVER) {
             ss.sonido_mov();
         }
 
@@ -1252,6 +1263,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
                 }
                 }
             }
+            break;
         }
         case 3:
         {
@@ -1262,16 +1274,23 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
                 switch (rc.type)
                 {
                 case ElementalType::Water:
+                    // if (engine.isKeyReleased(D_KEY_Y))
                     r.node = engine.loadModel("assets/Assets/Balizas/Baliza_agua.obj");
+                    // else return;
                     break;
                 case ElementalType::Fire:
                     r.node = engine.loadModel("assets/Assets/Balizas/Baliza_fuego.obj");
                     break;
                 case ElementalType::Ice:
+                    // if (engine.isKeyReleased(D_KEY_O))
                     r.node = engine.loadModel("assets/Assets/Balizas/Baliza_hielo.obj");
+                    // else return;
+                    break;
+                default:
                     break;
                 }
             }
+            break;
         }
 
         default:
@@ -1319,19 +1338,12 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
             {
                 if (p.type == Particle::ParticleType::Pixel)
                 {
-                    // Dibujamos 4 partćulas arriba, abajo, izquierda y derecha de la posición
+                    // Dibujamos la partícula en un punto de 3x3 píxeles
                     engine.drawPoint3D(p.position.to_other<double>(), 3.f, { p.r, p.g, p.b, p.a });
-                    // engine.drawLine3D(p.position.to_other<double>(), (p.position + vec3f{ 0.0f, .3f, 0.0f }).to_other<double>(), 1.5f, { p.r, p.g, p.b, p.a });
-                    // engine.drawPoint3D(p.position.to_other<double>(), { p.r, p.g, p.b, p.a });
-                    // engine.drawPoint3D((p.position + vec3f{ 0.0f, 0.1f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
-                    // engine.drawPoint3D((p.position + vec3f{ 0.1f, 0.0f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
-                    // engine.drawPoint3D((p.position + vec3f{ 0.0f, -0.1f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
-                    // engine.drawPoint3D((p.position + vec3f{ -0.1f, 0.0f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
                 }
             }
         }
     });
-
 }
 
 // Empieza el dibujado y se limpia la pantalla

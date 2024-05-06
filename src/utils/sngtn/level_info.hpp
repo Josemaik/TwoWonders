@@ -65,6 +65,7 @@ struct LevelInfo
 
     // Variables de carga de entidades
     notLoadSet dontLoad{};
+    bool showParticles{ true };
 
     // Pantalla de carga
     double loadingLimit{ 3.0 }, loadingTime{ loadingLimit };
@@ -166,6 +167,7 @@ struct LevelInfo
         loadingTime = loadingLimit;
         loading = false;
         dontLoad.clear();
+        showParticles = true;
         dead_entities.clear();
         debugIA2 = false;
         resetGame = false;

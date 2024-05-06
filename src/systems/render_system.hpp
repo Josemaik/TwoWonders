@@ -80,6 +80,7 @@ private:
     bool nodeExists(GameEngine& engine, const char* name);
     double SelectValue(GameEngine& engine, double value, int posx, int posy, int height, int width, const char* name, Node* parentNode);
     uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::map<uint16_t, vec3d>& nodes);
+    void checkSliderSound(SoundSystem& ss, OptionSlider& slider);
 
     bool isSelected{ false };
     bool isSelectedfordebug{ false };
@@ -102,7 +103,6 @@ private:
     float elapsed_book{ 0.0f };
 
     int coinBarX{}, coinNumberX{};
-    bool jaja = false;
 };
 
 #endif // !RENDER_SYSTEM
