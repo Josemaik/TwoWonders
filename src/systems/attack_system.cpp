@@ -276,9 +276,14 @@ void AttackSystem::createAttackType(EntityManager& em, Entity& ent, AttackCompon
             em.addTag<FireBallTag>(e);
             setPlayerAtkVel(em, ent, att);
             type = BehaviorType::ATK_PLAYER;
+            em.getSingleton<SoundSystem>().sonido_h_bola_fuego();
+
         }
-        else
+        else{
             em.addTag<MagmaBallTag>(e);
+            em.getSingleton<SoundSystem>().sonido_munyeco_ataque();
+
+        }
 
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = D_BLACK });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
@@ -287,8 +292,8 @@ void AttackSystem::createAttackType(EntityManager& em, Entity& ent, AttackCompon
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Fire });
         em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, type });
         em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::FIREBALL, .maxParticles = 20, .spawnRate = 0.01f, .lifeTime = 0.2f, });
-        em.getSingleton<SoundSystem>().sonido_h_bola_fuego();
         break;
+
     }
     case AttackType::WaterBombShot:
     {

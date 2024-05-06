@@ -73,9 +73,9 @@ namespace ENGI {
 
         // Text
         Node* drawText(const char* text, int posX, int posY, int fontSize, Color color, Aligned aligned = Aligned::LEFT);
-        Node* createText(vec2i position, std::string text, Font* font, int fontSize, Color textColor, const char* nodeName, Node* parentNode, Aligned align = Aligned::LEFT);
+        Node* createText(vec2i position, std::string text, Font* font, int fontSize, Color textColor, const char* nodeName, Node* parentNode, Aligned align = Aligned::LEFT, bool charByChar = false);
         Node* createText(vec2i position, std::string text, Color c, const char* nodeName, Node* parentNode, int fontSize = 20);
-        Node* createTextBox(vec2i position, vec2i size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode);
+        Node* createTextBox(vec2i position, vec2i size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode, bool charByChar = false);
         Font* getFontDefault();
 
         // Line 3D

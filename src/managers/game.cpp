@@ -246,7 +246,7 @@ void Game::run()
 
             // TODO - Cuando se implemente el sistema de guardado, cargar el nivel en el que se quedó
             if (!map.isComplete())
-                map.createMap(em, 0, iam);
+                map.createMap(em, 2, iam);
 
             break;
         }
@@ -296,38 +296,39 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
             {
-                if (!li.isCharging())
-                {
-                    elapsed -= timeStep40;
+                // if (elapsed >= timeStep)
+                // {
+                //     elapsed -= timeStep;
 
-                    ai_system.update(em);
-                    npc_system.update(em);
-                    physics_system.update(em);
-                    collision_system.update(em);
-                    zone_system.update(em, engine, iam, evm, map);
-                    lock_system.update(em);
-                    shield_system.update(em);
-                    object_system.update(em);
-                    projectile_system.update(em);
-                    attack_system.update(em);
-                    life_system.update(em, object_system);
-                    sound_system.update();
-                    // if (elapsed < timeStep45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
-                    camera_system.update(em, engine, evm);
-                    event_system.update(em, evm, iam, map, object_system, sound_system);
-                    particle_system.update(em);
+                ai_system.update(em);
+                npc_system.update(em);
+                physics_system.update(em);
+                collision_system.update(em);
+                zone_system.update(em, engine, iam, evm, map);
+                lock_system.update(em);
+                shield_system.update(em);
+                object_system.update(em);
+                projectile_system.update(em);
+                attack_system.update(em);
+                life_system.update(em, object_system);
+                sound_system.update();
+                // if (elapsed < timeStep45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
+                camera_system.update(em, engine, evm);
+                event_system.update(em, evm, iam, map, object_system, sound_system);
+                particle_system.update(em);
 
-                }
                 if (!li.getDeath().empty())
                 {
                     em.destroyEntities(li.getDeath());
                     li.clearDeath();
                 }
-
+                // }
                 render_system.update(em, engine);
             }
-            else if (!resets && debugs)
+            else if (!resets && debugs){
+                sound_system.update();
                 render_system.update(em, engine);
+            }
 
             break;
         }
@@ -350,7 +351,7 @@ void Game::run()
         default:
             break;
         }
-        if (elapsed >= timeStep40)
+        if (elapsed >= timeStep)
             elapsed = 0; // Para que no se acumule el tiempo
 
         if (engine.windowShouldClose())

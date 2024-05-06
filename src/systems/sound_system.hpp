@@ -53,9 +53,9 @@ struct SoundSystem {
     //SONIDOS PENDIENTES
     void sonido_music_mazmorra();   //por realizar mejora
     //dialogos
-    void sonido_DInvestigador();    //por integrar
-    void sonido_DPlayer();          //por integrar
-    void sonido_DCalabaza();        //por integrar
+    void sonido_DInvestigador();    
+    void sonido_DPlayer();          
+    void sonido_DCalabaza();        
     void sonido_DEsquimal();        //por integrar
     void sonido_DPescador();        //por integrar
     void sonido_DSacerdotisa();     //por integrar
@@ -134,9 +134,10 @@ struct SoundSystem {
     void sonido_boss_muere();           //por disenyar
     void sonido_inicio_batalla();       //por disenyar
     void sonido_cambio_fase();          //por disenyar
+    void sonido_win();                  //por disenyar
 
-    void sonido_win();
 
+    void ambiente_parameter_lava(float lava);
 
    
 
@@ -178,16 +179,18 @@ private:
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription;
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Ambiente;
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica;
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica_volcan;
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica_mazmorra;
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica_pradera;
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica_monte;
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica_boss_final;
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_pasos;  
     FMOD_STUDIO_EVENTINSTANCE* eventInstance;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente_volcan;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_SFX_pasos;
-    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_volcan;
-    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_mazmorra;
-    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_pradera;
-    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_monte;
-    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_boss_final;
+
     FMOD_STUDIO_BUS* bus;
     FMOD_STUDIO_BUS* sfxBus;
     FMOD_STUDIO_BUS* AmbientBus;

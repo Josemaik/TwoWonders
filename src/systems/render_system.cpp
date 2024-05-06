@@ -51,8 +51,6 @@ void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSyst
 
     auto& li = em.getSingleton<LevelInfo>();
 
-    ss.ambient_stop();
-    ss.music_stop();
     ss.ambient_started = false;
 
     // restartScene(engine);
@@ -244,7 +242,23 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     auto* sliderRes = engine.createOptionSlider({ posX, posY }, { buttonWidth, buttonHeight }, D_AQUA, "",
         engine.getFontDefault(), 35, 45, D_AQUA, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA_LIGHT, D_AQUA_DARK,
         { "800x600", "1280x720", "1920x1080", "FULLSCREEN" }, firstOpt, "Resolucion", menuNode);
+    
+    auto& sliderInfo = *sliderRes->getEntity<OptionSlider>();
+    auto& nextBut = sliderInfo.nextButton;
+    auto& prevBut = sliderInfo.prevButton;
 
+    if(nextBut.state == ButtonState::HOVER && nextBut.prevState != ButtonState::HOVER)
+    {
+        ss.sonido_mov();
+    }
+    if(prevBut.state == ButtonState::HOVER && prevBut.prevState != ButtonState::HOVER)
+    {
+        ss.sonido_mov();
+    }
+    if(prevBut.state == ButtonState::CLICK || nextBut.prevState == ButtonState::CLICK)
+    {
+        ss.seleccion_menu();
+    }
 
     auto* sliderVol = engine.createFloatSlider({ posX, posYVol }, { buttonWidth, buttonHeight }, D_AQUA, "",
         engine.getFontDefault(), 35, 45, D_AQUA, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA_LIGHT, D_AQUA_DARK, ss.getVolumeMaster(), "Volumen", menuNode);
@@ -282,16 +296,19 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
         ss.seleccion_menu();
     }, {middleScreen - buttonWidth / 3, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 4.5f)} } },
     { "4_sliderRes", { nullptr, "Resolución", [&]() {
-        auto& sliderInfo = *sliderRes->getEntity<OptionSlider>();
         if (inpi.right)
         {
             sliderInfo.nextOption();
             inpi.right = false;
+
+            ss.sonido_mov();
         }
         else if (inpi.left)
         {
             sliderInfo.prevOption();
             inpi.left = false;
+
+            ss.sonido_mov();
         }
 
     }, {middleScreen - buttonWidth, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2.f)} } },
@@ -302,12 +319,14 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
             sliderInfo.nextOption();
             ss.setVolumeMaster(sliderInfo.currentValue);
             inpi.right = false;
+            ss.sonido_mov();
         }
         else if (engine.isKeyDown(D_KEY_LEFT))
         {
             sliderInfo.prevOption();
             ss.setVolumeMaster(sliderInfo.currentValue);
             inpi.left = false;
+            ss.sonido_mov();
         }
     }, {middleScreen - buttonWidth, posYVol} } }
     };
@@ -339,6 +358,9 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
             action();
             inpi.interact = false;
         }
+        else if( but.state == ButtonState::HOVER  && but.prevState != ButtonState::HOVER){
+            ss.sonido_mov();
+        }
         else if (i >= 3 && but.isCurrent)
         {
             action();
@@ -363,6 +385,8 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
 void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInfo& li, SoundSystem& ss)
 {
     auto& inpi = em.getSingleton<InputInfo>();
+    ss.music_stop();
+
     // Nodo de los botones
     if (inpi.pause)
         getNode(engine, "2D")->setVisible(false);
@@ -413,6 +437,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
             {
                 li.currentScreen = GameScreen::STORY;
                 li.anyButtonPressed = false;
+                ss.music_stop();
             }
             else
                 inpi.pause = false;
@@ -420,7 +445,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
             li.elapsedPause = 0.f;
 
             ss.seleccion_menu();
-            ss.music_stop();
+            
         } } },
         { "2_opciones", { nullptr, "Opciones", [&]() {
             li.previousScreen = li.currentScreen;
@@ -470,6 +495,9 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
         if (but.state == ButtonState::CLICK || (but.isCurrent && inpi.interact)) {
             action();
             inpi.interact = false;
+        }
+        else if( but.state == ButtonState::HOVER  && but.prevState != ButtonState::HOVER){
+            ss.sonido_mov();
         }
 
         i += 1;
@@ -3064,13 +3092,15 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     auto& str = textQueue.front();
     auto text = const_cast<char*>(str.second.c_str());
 
-    std::map<SpeakerType, std::string> speakerTextures = {
-        {SpeakerType::PLAYER, "mago_happy"},
-        {SpeakerType::PLAYER_SAD, "mago_meh"},
-        {SpeakerType::PLAYER_DANGER, "mago_sos"},
-        {SpeakerType::CAT, "investigador"},
-        {SpeakerType::NOMAD, "nomada"},
-        {SpeakerType::INVESTIGATOR, "investigador"}
+    auto& ss = em.getSingleton<SoundSystem>();
+
+    std::map<SpeakerType, std::pair<std::string, std::function<void()>>> speakerTextures = {
+        {SpeakerType::PLAYER, {"mago_happy", [&]() {ss.sonido_DPlayer();}}},
+        {SpeakerType::PLAYER_SAD, {"mago_meh", [&]() {ss.sonido_DPlayer();}}},
+        {SpeakerType::PLAYER_DANGER, {"mago_sos", [&]() {ss.sonido_DPlayer();}}},
+        {SpeakerType::CAT, {"investigador", [&]() {ss.sonido_DInvestigador();}}},
+        {SpeakerType::NOMAD, {"nomada", [&]() {ss.sonido_DCalabaza();}}},
+        {SpeakerType::INVESTIGATOR, {"investigador", [&]() {ss.sonido_DInvestigador();}}}
     };
 
     auto* box = getNode(engine, "cuadroDialogo");
@@ -3092,8 +3122,12 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     int offSetX = 40;
     int offSetY = 50;
     if (speakerTextures.count(str.first) > 0) {
-        auto* speaker = engine.createNode(getNode(engine, speakerTextures[str.first].c_str()), getNode(engine, "Copy"));
+        auto& [name, sound] = speakerTextures[str.first];
+        auto* speaker = engine.createNode(getNode(engine, name.c_str()), getNode(engine, "Copy"));
         engine.drawNode(speaker, { posX - offSetX, posY - offSetY });
+
+        if (boxInfo.text.charChanged())
+            sound();
     }
 
     auto& inpi = em.getSingleton<InputInfo>();
@@ -3102,10 +3136,13 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
         txti.popText();
         inpi.interact = false;
 
-        if (textQueue.empty() && li.openChest)
+        if (textQueue.empty())
         {
-            em.getSingleton<SoundSystem>().sonido_cerrar_cofre();
-            li.openChest = false;
+            if (li.openChest)
+            {
+                em.getSingleton<SoundSystem>().sonido_cerrar_cofre();
+                li.openChest = false;
+            }
         }
     }
 

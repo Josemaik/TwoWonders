@@ -14,6 +14,7 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
             li.mapID = 0;
             map = loadMap("assets/Niveles/Lvl_0/Lvl_0.kaiwa");
             em.getSingleton<SoundSystem>().sonido_amb_bosque();
+            em.getSingleton<SoundSystem>().sonido_pasos_pradera();
             break;
         }
         case 1:
@@ -21,16 +22,20 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
             li.mapID = 1;
             map = loadMap("assets/Niveles/Lvl_1/Lvl_1.kaiwa");
 
+            em.getSingleton<SoundSystem>().SFX_pasos_stop();
             em.getSingleton<SoundSystem>().sonido_mazmorra();
             em.getSingleton<SoundSystem>().sonido_music_mazmorra();
+            em.getSingleton<SoundSystem>().sonido_pasos_prision();
             break;
         }
         case 2:
         {
             li.mapID = 2;
             map = loadMap("assets/Niveles/Lvl_2/Lvl_2.kaiwa");
+            em.getSingleton<SoundSystem>().SFX_pasos_stop();
             em.getSingleton<SoundSystem>().sonido_amb_volcan();
             em.getSingleton<SoundSystem>().sonido_music_volcan();
+            em.getSingleton<SoundSystem>().sonido_pasos_volcan();
 
             break;
         }

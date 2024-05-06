@@ -82,6 +82,7 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
                 em.getSingleton<SoundSystem>().sonido_movimiento_camara();
                 li.viewPointSound = false;
             }
+            em.getSingleton<SoundSystem>().SFX_pasos_stop();
 
             if (!phy.notMove)
                 phy.notMove = true;
