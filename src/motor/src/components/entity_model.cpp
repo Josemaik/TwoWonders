@@ -57,7 +57,7 @@ namespace DarkMoon {
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
             aiMaterial* aiMaterial = scene->mMaterials[mesh->mMaterialIndex];
             //std::cout << "Material: " << aiMaterial->GetName().C_Str() << std::endl;
-           // mesh_base_vertex[i] = 0;
+            // mesh_base_vertex[i] = 0;
             processMesh(mesh, aiMaterial, scene, rm);
         }
 
@@ -133,7 +133,9 @@ namespace DarkMoon {
         auto material = processMaterial(aiMaterial, rm);
         processTextures(aiMaterial, material, rm);
 
-        auto currentMesh = rm.loadResource<Mesh>(mesh->mName.C_Str(), vertices, indices, material);
+        std::string name = std::string(m_name) + mesh->mName.C_Str();
+
+        auto currentMesh = rm.loadResource<Mesh>(name.c_str(), vertices, indices, material);
 
         m_meshes.push_back(currentMesh);
     }
