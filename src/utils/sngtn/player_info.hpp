@@ -23,6 +23,7 @@ struct PlayerInfo
     bool onLadder{ false };
     bool showBook{ false };
     bool attackUpgrade{ false };
+    bool invincible{ false };
     std::vector<std::unique_ptr<Item>> inventory{};
     std::vector<Spell> spells{};
     Spell noSpell{ "None", "No spell", Spells::None, 0.0, 0 };
@@ -173,6 +174,6 @@ struct PlayerInfo
         showBook = false;
         attackUpgrade = false;
         boatParts.clear();
-        spawnPoint = { 33.0, 4.0, -25.9 };
+        // spawnPoint = { 33.0, 4.0, -25.9 };
     }
 };

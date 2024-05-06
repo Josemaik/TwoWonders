@@ -62,6 +62,11 @@ namespace ENGI {
         Node* createButton(vec2i position, vec2i size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor, const char* nodeName, Node* parentNode);
         Node* createButton(vec2i position, vec2i size, std::string text, const char* nodeName, Node* parentNode);
 
+        // CheckBox
+        Node* drawCheckBox(vec2i position, float size, bool checked, Color backgroundColor, Color normalColor, Color hoverColor);
+        Node* createCheckBox(vec2i position, float size, bool checked, Color backgroundColor, Color normalColor, Color hoverColor, const char* nodeName, Node* parentNode);
+        Node* createCheckBoxPtr(vec2i position, float size, bool* checked, Color backgroundColor, Color normalColor, Color hoverColor, const char* nodeName, Node* parentNode);
+
         // Cube
         Node* drawCube(vec3d position, vec3d size, DarkMoon::Color color);
         Node* createCube(vec3d position, vec3d size, DarkMoon::Color color, const char* nodeName, Node* parentNode);
@@ -80,6 +85,15 @@ namespace ENGI {
         // Point 3D
         Node* drawPoint3D(vec3d position, float pointSize, Color color);
         Node* createPoint3D(vec3d position, float pointSize, Color color, const char* nodeName, Node* parentNode);
+
+        // Lights
+        void toggleLights();
+        void activateLights();
+        void deactivateLights();
+
+        // Puntual Light
+        Node* drawPuntualLight(vec3d position, Color color);
+        Node* createPuntualLight(vec3d position, Color color, const char* nodeName, Node* parentNode);
 
         // Window
         void initWindow(int width, int height, const char* title);

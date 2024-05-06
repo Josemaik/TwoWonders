@@ -244,6 +244,9 @@ namespace DarkMoon {
         float ratio{};
         int numLines{ 1 };
         bool charByChar{ false };
+        bool bold{ false };
+        bool italic{ false };
+
 
         Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK, Aligned al = Aligned::LEFT, bool cbc = false)
             : position(pos), font(f), fontSize(fS), color(col), alignment(al), charByChar(cbc)
@@ -437,6 +440,12 @@ namespace DarkMoon {
                     // Skip the rest of the loop
                     continue;
                 }
+                else if (c == '\b') {
+                    bold = !bold;
+                }
+                else if (c == '\t') {
+                    italic = !italic;
+                }
 #ifdef _WIN32
                 else if (checkSpecial)
                 {
@@ -460,14 +469,37 @@ namespace DarkMoon {
 
                 // Update VBO for each character
                 float vertices[6][4] = {
-                    { rm.normalizeX(posX)    , rm.normalizeY(posY + h), 0.0f, 1.0f },
-                    { rm.normalizeX(posX)    , rm.normalizeY(posY)    , 0.0f, 0.0f },
-                    { rm.normalizeX(posX + w), rm.normalizeY(posY)    , 1.0f, 0.0f },
+                    { posX    , posY + h, 0.0f, 1.0f },
+                    { posX    , posY    , 0.0f, 0.0f },
+                    { posX + w, posY    , 1.0f, 0.0f },
 
-                    { rm.normalizeX(posX)    , rm.normalizeY(posY + h), 0.0f, 1.0f },
-                    { rm.normalizeX(posX + w), rm.normalizeY(posY)    , 1.0f, 0.0f },
-                    { rm.normalizeX(posX + w), rm.normalizeY(posY + h), 1.0f, 1.0f }
+                    { posX    , posY + h, 0.0f, 1.0f },
+                    { posX + w, posY    , 1.0f, 0.0f },
+                    { posX + w, posY + h, 1.0f, 1.0f }
                 };
+
+                // If italic, apply a shear transformation to the vertices
+                if (italic) {
+                    float shearAmount = -0.2f; // Adjust as needed
+                    for (int i = 0; i < 6; i++) {
+                        float shear = shearAmount * vertices[i][1];
+                        vertices[i][0] += shear;
+                    }
+                }
+
+                // Normalize the vertices
+                for (int i = 0; i < 6; i++) {
+                    vertices[i][0] = rm.normalizeX(vertices[i][0]);
+                    vertices[i][1] = rm.normalizeY(vertices[i][1]);
+                }
+
+                // If italic, adjust the x position of the characters
+                if (italic) {
+                    float adjustment = 0.181f; // Adjust as needed
+                    for (int i = 0; i < 6; i++) {
+                        vertices[i][0] += adjustment;
+                    }
+                }
 
                 // Configure VAO/VBO for texture quads
                 glBindVertexArray(VAO);
@@ -477,6 +509,19 @@ namespace DarkMoon {
 
                 glBindTexture(GL_TEXTURE_2D, ch.textureID);
                 glDrawArrays(GL_TRIANGLES, 0, 6);
+
+                if (bold)
+                {
+                    float offset = 0.001f;
+
+                    for (int l = 0; l < 6; l++)
+                    {
+                        vertices[l][0] += offset;
+                    }
+
+                    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+                    glDrawArrays(GL_TRIANGLES, 0, 6);
+                }
 
                 // Advance cursors for next glyph
                 aux_x += static_cast<float>(ch.advance >> 6) * scale;
@@ -666,6 +711,112 @@ namespace DarkMoon {
         }
     };
 
+    struct CheckBoxBase : Entity {
+        TextBox textBox;
+        Color normalColor;
+        Color hoverColor;
+        ButtonState state{ ButtonState::NORMAL };
+        WindowsManager& wm = WindowsManager::getInstance();
+        InputManager& im = InputManager::getInstance();
+
+        CheckBoxBase(glm::vec2 pos = { 0.0f, 0.0f },
+            float size = 50.0f,
+            Color bCol = D_WHITE,
+            Color nColor = D_WHITE,
+            Color hColor = D_GRAY) :
+            textBox(pos, { size, size }, bCol, "", nullptr, 18, D_BLACK, Aligned::CENTER, Aligned::CENTER),
+            normalColor(nColor), hoverColor(hColor)
+        {
+            textBox.box.position = pos;
+            checkMouse();
+        };
+
+        void draw(glm::mat4 transMatrix) override {
+            checkMouse();
+            if (checkChecked()) {
+                textBox.text.setText("X");
+            }
+            else {
+                textBox.text.setText(" ");
+            }
+            textBox.draw(transMatrix);
+        };
+
+        void checkMouse()
+        {
+            glm::vec2 mPos = { im.getMouseX(wm.getWindow()), im.getMouseY(wm.getWindow()) };
+            glm::vec2 topLeft = textBox.box.position;
+            glm::vec2 bottomRight = { topLeft.x + textBox.box.size.x, topLeft.y + textBox.box.size.y };
+
+            if (mPos.x >= topLeft.x && mPos.x <= bottomRight.x &&
+                mPos.y >= topLeft.y && mPos.y <= bottomRight.y) {
+                if (im.isMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT)) {
+                    state = ButtonState::CLICK;
+                    toggleChecked();
+                }
+                else {
+                    textBox.box.color = hoverColor;
+                    state = ButtonState::HOVER;
+                }
+            }
+            else {
+                textBox.box.color = normalColor;
+                state = ButtonState::NORMAL;
+            }
+        }
+
+        bool isClicked() {
+            return state == ButtonState::CLICK;
+        }
+
+        virtual bool checkChecked() = 0;
+        virtual void toggleChecked() = 0;
+    };
+
+    struct CheckBox : CheckBoxBase {
+        bool checked{ false };
+
+        CheckBox(glm::vec2 pos = { 0.0f, 0.0f },
+            float size = 50.0f,
+            bool checked = false,
+            Color bCol = D_WHITE,
+            Color nColor = D_WHITE,
+            Color hColor = D_GRAY) :
+            CheckBoxBase(pos, size, bCol, nColor, hColor), checked(checked)
+        {};
+
+        bool checkChecked() override {
+            return checked;
+        }
+
+        void toggleChecked() override {
+            checked = !checked;
+        }
+    };
+
+    struct CheckBoxPtr : CheckBoxBase {
+        bool* checked{ nullptr };
+
+        CheckBoxPtr(glm::vec2 pos = { 0.0f, 0.0f },
+            float size = 50.0f,
+            bool* checked = nullptr,
+            Color bCol = D_WHITE,
+            Color nColor = D_WHITE,
+            Color hColor = D_GRAY) :
+            CheckBoxBase(pos, size, bCol, nColor, hColor), checked(checked)
+        {};
+
+        bool checkChecked() override {
+            return *checked;
+        }
+
+        void toggleChecked() override {
+            if (checked) {
+                *checked = !*checked;
+            }
+        }
+    };
+
     struct Slider : Entity {
         Rectangle background;
         Rectangle boxBackground;
@@ -794,10 +945,16 @@ namespace DarkMoon {
 
         void checkMouse()
         {
-            if (prevButton.state == ButtonState::CLICK)
+            if (nextButton.state == ButtonState::CLICK)
                 nextOption();
-            else if (nextButton.state == ButtonState::CLICK)
+            else if (prevButton.state == ButtonState::CLICK)
                 prevOption();
+        }
+
+        void setOptions(std::vector<std::string> opts)
+        {
+            options = opts;
+            textBox.text.setText(options[currentOption]);
         }
 
         void setCurrentOption(std::size_t option)
@@ -874,11 +1031,5 @@ namespace DarkMoon {
             currentValue = std::max(currentValue - 0.01f, 0.0f);
             textBox.text.setText(std::to_string(static_cast<int>(currentValue * 100)));
         }
-    };
-
-    // TODO
-
-    struct CheckBox : Entity {
-
     };
 }

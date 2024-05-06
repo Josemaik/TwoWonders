@@ -1,0 +1,107 @@
+{
+	{
+		"type":0,
+		"position":[0.0, 0.0, 0.0],
+		"color":[1.0, 1.0, 1.0],
+		"diffuse_factor":1.0,
+		"specular_factor":1.0,
+		"energy":1.0 
+	},
+	{
+		"type":2,
+		"position":[42.825, -91.627, 16.901],
+		"color":[1.0, 1.0, 1.0],
+		"diffuse_factor":1.0,
+		"specular_factor":1.0,
+		"energy":30000.0 ,
+		"rotation":[0.0, 0.0, 0.0],
+		"spot_blend":[0.8511494398117065]
+	},
+	{
+		"type":2,
+		"position":[40.899, -42.316, 69.359],
+		"color":[1.0, 1.0, 1.0],
+		"diffuse_factor":1.0,
+		"specular_factor":1.0,
+		"energy":30000.0 ,
+		"rotation":[0.0, 0.0, 0.0],
+		"spot_blend":[0.8511494398117065]
+	},
+	{
+		"type":1,
+		"position":[29.727, 32.806, 55.531],
+		"color":[1.0, 1.0, 1.0],
+		"diffuse_factor":1.0,
+		"specular_factor":1.0,
+		"energy":10000.0 ,
+		"rotation":[0.0, 0.0, 0.0]
+	},
+	{
+		"type":2,
+		"position":[-56.71, 41.473, 48.083],
+		"color":[1.0, 1.0, 1.0],
+		"diffuse_factor":1.0,
+		"specular_factor":1.0,
+		"energy":30000.0 ,
+		"rotation":[0.0, 0.0, 0.0],
+		"spot_blend":[0.8511494398117065]
+	},
+	{
+		"type":2,
+		"position":[-85.733, 18.432, 25.527],
+		"color":[1.0, 1.0, 1.0],
+		"diffuse_factor":1.0,
+		"specular_factor":1.0,
+		"energy":30000.0 ,
+		"rotation":[0.0, 0.0, 0.0],
+		"spot_blend":[0.8511494398117065]
+	},
+	{
+		"type":2,
+		"position":[-142.667, 43.977, 42.077],
+		"color":[1.0, 1.0, 1.0],
+		"diffuse_factor":1.0,
+		"specular_factor":1.0,
+		"energy":30000.0 ,
+		"rotation":[0.0, 0.0, 0.0],
+		"spot_blend":[0.8511494398117065]
+	},
+	{
+		"type":1,
+		"position":[-90.082, -83.537, 18.934],
+		"color":[1.0, 1.0, 1.0],
+		"diffuse_factor":1.0,
+		"specular_factor":1.0,
+		"energy":10000.0 ,
+		"rotation":[0.0, 0.0, 0.0]
+	},
+	{
+		"type":2,
+		"position":[-120.824, -134.383, 42.077],
+		"color":[1.0, 1.0, 1.0],
+		"diffuse_factor":1.0,
+		"specular_factor":1.0,
+		"energy":30000.0 ,
+		"rotation":[0.0, 0.0, 0.0],
+		"spot_blend":[0.8511494398117065]
+	},
+	{
+		"type":2,
+		"position":[-61.723, -81.528, 28.349],
+		"color":[1.0, 1.0, 1.0],
+		"diffuse_factor":1.0,
+		"specular_factor":1.0,
+		"energy":30000.0 ,
+		"rotation":[0.0, 0.0, 0.0],
+		"spot_blend":[0.8511494398117065]
+	},
+	{
+		"type":1,
+		"position":[25.49, -127.839, 10.95],
+		"color":[1.0, 1.0, 1.0],
+		"diffuse_factor":1.0,
+		"specular_factor":1.0,
+		"energy":10000.0 ,
+		"rotation":[0.0, 0.0, 0.0]
+	}
+}

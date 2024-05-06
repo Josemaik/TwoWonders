@@ -29,6 +29,7 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
             break;
         }
         case 2:
+        {
             li.mapID = 2;
             map = loadMap("assets/Niveles/Lvl_2/Lvl_2.kaiwa");
             em.getSingleton<SoundSystem>().SFX_pasos_stop();
@@ -37,7 +38,14 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
             em.getSingleton<SoundSystem>().sonido_pasos_volcan();
 
             break;
-
+        }
+        case 3:
+        {
+            li.mapID = 3;
+            map = loadMap("assets/Niveles/Lvl_3/Lvl_3.kaiwa");
+            em.getSingleton<SoundSystem>().sonido_amb_bosque();
+            break;
+        }
         default:
             break;
         }
@@ -152,6 +160,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             {
                 if (li.mapID == 2)
                     generateNavmeshes(em);
+                generateCheats(em);
                 break;
             }
             default:
@@ -255,14 +264,15 @@ void MapManager::generateGround(EntityManager& em, const valueType& groundArray,
     vec3d center = { (min.x + max.x) / 2, minHeigth, (min.y + max.y) / 2 };
 
     auto& li = em.getSingleton<LevelInfo>();
-    double zoneHeight = 20.0;
-    if (li.mapID == 1)
-        zoneHeight = 30.0;
-    else if (li.mapID == 2)
-        zoneHeight = 65.0;
+
+    static std::map<uint8_t, double> zoneHeights = {
+        {1, 30.0},
+        {2, 65.0},
+        {3, 100.0}
+    };
 
     // Creamos 4 zonas para el chunk
-    vec3d zoneScale = { (max.x - min.x) / 2, zoneHeight, (max.y - min.y) / 2 };
+    vec3d zoneScale = { (max.x - min.x) / 2, zoneHeights[li.mapID], (max.y - min.y) / 2 };
     int k = 0;
     int limit = j + 4;
     for (; j < limit; j++)
@@ -402,268 +412,262 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         auto& c = em.addComponent<ColliderComponent>(entity, ColliderComponent{ p.position, r.scale, BehaviorType::STATIC });
         auto& ic = em.addComponent<InteractiveComponent>(entity);
 
-        switch (type)
+        std::map<InteractableType, std::function<void()>> interactableMap
         {
-        case InteractableType::Chest:
-        {
-            em.addTag<ChestTag>(entity);
-            em.addTag<WallTag>(entity);
-            ObjectType content{ static_cast<ObjectType>(interactable["content"].GetInt()) };
-
-            addMessageCmp(em, entity, interactable);
-
-            ic.range = 7.5;
-            em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
-            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
-            [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .content = content });
-
-            if (interactable.HasMember("offsetZ"))
+            {InteractableType::Chest, [&]()
             {
-                r.offset = interactable["offsetZ"][0].GetDouble();
-            }
+                em.addTag<ChestTag>(entity);
+                em.addTag<WallTag>(entity);
+                ObjectType content{ static_cast<ObjectType>(interactable["content"].GetInt()) };
 
-            if (interactable.HasMember("checkCrushers"))
-            {
-                cc.checkCrushers = true;
-            }
+                addMessageCmp(em, entity, interactable);
 
-            checkDispatcher(em, entity, interactable);
-            addToZone(em, entity, type);
-            break;
-        }
-        case InteractableType::Destructible:
-        {
-            auto& li = em.getSingleton<LevelInfo>();
-            em.addTag<DestructibleTag>(entity);
-            em.addTag<WallTag>(entity);
+                ic.range = 7.5;
+                em.addComponent<OneUseComponent>(entity, OneUseComponent{.id = unique_ids++ });
+                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{.active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
+                [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{.content = content });
 
-            int life{ interactable["life"].GetInt() };
-            em.addComponent<LifeComponent>(entity, LifeComponent{ .life = life });
-            auto& d = em.addComponent<DestructibleComponent>(entity);
-
-            for (mapSizeType j = 0; j < interactable["weaknesses"].Size(); j++)
-            {
-                auto& weakness = interactable["weaknesses"][j];
-                d.addWeakness(static_cast<ElementalType>(weakness.GetInt()));
-            }
-
-            if (interactable.HasMember("offsetZ"))
-            {
-                r.offset = interactable["offsetZ"][0].GetDouble();
-            }
-
-            if (li.mapID == 1)
-            {
-                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = Effects::PRISONDOOR, .maxParticles = 16, .spawnRate = 0.1f, .lifeTime = 0.3f });
-            }
-
-            em.destroyComponent<InteractiveComponent>(entity);
-            break;
-        }
-        case InteractableType::Door:
-        {
-            auto& li = em.getSingleton<LevelInfo>();
-
-            switch (li.mapID)
-            {
-            case 0:
-            {
-                em.addTag<SeparateModelTag>(entity);
-                r.position = vec3d::zero();
-                break;
-            }
-            case 1:
-            {
-                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = Effects::PRISONDOOR, .maxParticles = 16, .spawnRate = 0.1f, .lifeTime = 0.3f });
-                break;
-            }
-            }
-            em.addTag<DoorTag>(entity);
-            em.addTag<WallTag>(entity);
-
-            ic.range = 8.5;
-            if (interactable.HasMember("noKey"))
-                em.addTag<NoKeyTag>(entity);
-
-            addToZone(em, entity, type);
-            break;
-        }
-        case InteractableType::Level:
-        {
-            if (interactable.HasMember("offsetZ"))
-            {
-                r.offset = interactable["offsetZ"][0].GetDouble();
-                em.addTag<SeparateModelTag>(entity);
-                r.position = vec3d::zero();
-            }
-            else
-                r.visible = false;
-
-            em.addTag<LevelChangeTag>(entity);
-            c.behaviorType = BehaviorType::ZONE;
-
-            auto& zchi = em.getSingleton<ZoneCheckInfo>();
-            zchi.zoneBounds.insert({ zchi.zoneBounds.size(), c.bbox });
-
-            em.addComponent<ZoneComponent>(entity, ZoneComponent{ .zone = static_cast<uint16_t>(zchi.zoneBounds.size() - 1) });
-            break;
-        }
-        case InteractableType::Spawn:
-        {
-            em.addTag<SpawnTag>(entity);
-
-            auto& spc = em.addComponent<SpawnComponent>(entity);
-            c.behaviorType = BehaviorType::SPAWN;
-            ic.range = 12.5;
-
-            if (interactable.HasMember("offsetZ"))
-            {
-                r.offset = interactable["offsetZ"][0].GetDouble();
-            }
-
-            auto& pos = p.position;
-            auto posY = pos.y() - 2.0;
-            auto rotCopy = rot;
-
-            if (rotationVec[1] > 0.0)
-                rotCopy *= -1;
-
-            std::map<std::size_t, std::pair<vec3d, vec3d>> wallPoints = {
-                {0, {rotateAroundPoint(vec3d{pos.x() + 9.5, posY, pos.z() + 14.5}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
-                {1, {rotateAroundPoint(vec3d{pos.x() + 6.0, posY, pos.z() - 10.0}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
-                {2, {rotateAroundPoint(vec3d{pos.x() - 17.5, posY, pos.z() + 15.0}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
-                {3, {rotateAroundPoint(vec3d{pos.x() - 15.5, posY, pos.z() - 11.5}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
-                {4, {rotateAroundPoint(vec3d{pos.x() - 3.5, posY, pos.z() + 14.0}, pos, rotCopy), rotateScale(vec3d{ 14.0, 4.0, 4.0 }, rotCopy)}},
-                {5, {rotateAroundPoint(vec3d{pos.x() - 16.0, posY, pos.z() - 3.0}, pos, rotCopy), rotateScale(vec3d{ 5.0, 4.0, 13.0 }, rotCopy)}},
-                {6, {rotateAroundPoint(vec3d{pos.x() - 3.0, posY - 2.0, pos.z() + 3.5}, pos, rotCopy), rotateScale(vec3d{ 4.5, 2.0, 4.5 }, rotCopy)}},
-                {7, {rotateAroundPoint(vec3d{pos.x() + 7.0, posY, pos.z() + 8.0}, pos, rotCopy), rotateScale(vec3d{ 6.0, 7.0, 6.0 }, rotCopy)}},
-                {8, {rotateAroundPoint(vec3d{pos.x() - 10.5, posY, pos.z() + 8.0}, pos, rotCopy), rotateScale(vec3d{ 1.5, 4.0, 1.5 }, rotCopy)}},
-                {9, {rotateAroundPoint(vec3d{pos.x() + 4.2, posY + 2.0, pos.z() - 6.0}, pos, rotCopy), rotateScale(vec3d{ .5, 2.0, .5 }, rotCopy)}},
-                {10, {rotateAroundPoint(vec3d{pos.x() - 17.5, posY + 2.0, pos.z() - 9.5}, pos, rotCopy), rotateScale(vec3d{ .5, 2.0, .5 }, rotCopy)}}
-            };
-
-            std::map<std::size_t, std::tuple<Effects, uint8_t, float, float>> particleParts = {
-                {6, {Effects::FIRE, 10, 0.1f, 0.3f}},
-                {7, {Effects::SMOKE, 10, 0.1f, 0.3f}},
-                {8, {Effects::PURPLEM, 4, 0.1f, 0.3f}},
-                {9, {Effects::SPARKLES, 3, 0.05f, 0.3f}},
-                {10, {Effects::SPARKLES, 3, 0.05f, 0.3f}},
-            };
-
-            // Creamos 4 paredes para el spawn
-            for (std::size_t j = 0; j < wallPoints.size(); j++)
-            {
-                auto& wall{ em.newEntity() };
-                em.addTag<WallTag>(wall);
-                em.addComponent<RenderComponent>(wall, RenderComponent{ .position = wallPoints[j].first, .scale = wallPoints[j].second, .color = color, .visible = false, .orientation = 0.0, .rotationVec = rotationVec });
-                em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = wallPoints[j].first, .velocity = vec3d::zero(), .scale = wallPoints[j].second, .gravity = 0, .orientation = 0.0, .rotationVec = rotationVec });
-                em.addComponent<ColliderComponent>(wall, ColliderComponent{ position, scale, BehaviorType::STATIC });
-
-                if (j > 5)
+                if (interactable.HasMember("offsetZ"))
                 {
-                    auto& p = em.addComponent<ParticleMakerComponent>(wall, ParticleMakerComponent{ .active = true, .effect = std::get<0>(particleParts[j]), .maxParticles = std::get<1>(particleParts[j]), .spawnRate = std::get<2>(particleParts[j]), .lifeTime = std::get<3>(particleParts[j]) });
-                    spc.parts[static_cast<SpawnComponent::SpawnParts>(j)] = &p;
+                    r.offset = interactable["offsetZ"][0].GetDouble();
                 }
-            }
 
-            addToZone(em, entity, type);
-            checkDispatcher(em, entity, interactable);
-            break;
-        }
-        case InteractableType::Lever:
-        {
-            em.addTag<WallTag>(entity);
-            em.addTag<LeverTag>(entity);
-            em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
-            addToZone(em, entity, type);
+                if (interactable.HasMember("checkCrushers"))
+                {
+                    cc.checkCrushers = true;
+                }
 
-            ic.range = 7.5;
-            break;
-        }
-        case InteractableType::DamageObj:
-        {
-            em.addTag<LavaTag>(entity);
-            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::LAVA, .maxParticles = 20, .spawnRate = 0.1f });
-            c.behaviorType = BehaviorType::LAVA;
-
-            if (interactable.HasMember("offsetZ"))
+                checkDispatcher(em, entity, interactable);
+                addToZone(em, entity, type);
+            }},
+            {InteractableType::Destructible,[&]()
             {
-                r.offset = interactable["offsetZ"][0].GetDouble();
-            }
+                auto& li = em.getSingleton<LevelInfo>();
+                em.addTag<DestructibleTag>(entity);
+                em.addTag<WallTag>(entity);
 
-            break;
-        }
-        case InteractableType::Roca:
-        {
-            //em.addTag<WallTag>(entity);
-            em.addTag<ObstacleTag>(entity);
-            r.visible = false;
-            break;
-        }
-        case InteractableType::Ladder:
-        {
-            em.addTag<LadderTag>(entity);
-            r.visible = false;
-            c.behaviorType = BehaviorType::LADDER;
-            ic.range = 12.0;
-            addToZone(em, entity, type);
+                int life{ interactable["life"].GetInt() };
+                em.addComponent<LifeComponent>(entity, LifeComponent{.life = life });
+                auto& d = em.addComponent<DestructibleComponent>(entity);
 
-            auto yMin = c.bbox.min.y();
-            auto yMax = c.bbox.max.y();
-            auto rot2 = (orientation - 90.0) * DEGTORAD;
-            em.addComponent<LadderComponent>(entity, LadderComponent{ .orientation = rot2, .yMin = yMin, .yMax = yMax });
-            break;
-        }
-        case InteractableType::Sign:
-        {
-            em.addTag<SignTag>(entity);
+                for (mapSizeType j = 0; j < interactable["weaknesses"].Size(); j++)
+                {
+                    auto& weakness = interactable["weaknesses"][j];
+                    d.addWeakness(static_cast<ElementalType>(weakness.GetInt()));
+                }
 
-            ic.range = 12.0;
-            addMessageCmp(em, entity, interactable);
-            addToZone(em, entity, type);
-            if (interactable.HasMember("offsetZ"))
-            {
-                r.offset = interactable["offsetZ"][0].GetDouble();
-            }
-            break;
-        }
-        case InteractableType::Table:
-        {
-            em.addTag<TableTag>(entity);
-            if (interactable.HasMember("offsetZ"))
-            {
-                r.offset = interactable["offsetZ"][0].GetDouble();
-            }
-            break;
-        }
-        case InteractableType::MissionOBJ:
-        {
-            auto& li = em.getSingleton<LevelInfo>();
-            switch (li.mapID)
-            {
-            case 2:
-            {
-                em.addTag<MissionObjTag>(entity);
-                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
-                auto& bc = em.addComponent<BoatComponent>(entity);
-                bc.setPart(boatParts);
-                ic.range = 7.0;
+                if (interactable.HasMember("offsetZ"))
+                {
+                    r.offset = interactable["offsetZ"][0].GetDouble();
+                }
 
+                if (li.mapID == 1)
+                {
+                    em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{.active = true, .effect = Effects::PRISONDOOR, .maxParticles = 16, .spawnRate = 0.1f, .lifeTime = 0.3f });
+                }
+
+                em.destroyComponent<InteractiveComponent>(entity);
+            }},
+            {InteractableType::Door, [&]()
+            {
+                auto& li = em.getSingleton<LevelInfo>();
+
+                switch (li.mapID)
+                {
+                case 0:
+                {
+                    em.addTag<SeparateModelTag>(entity);
+                    r.position = vec3d::zero();
+                    break;
+                }
+                case 1:
+                {
+                    em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{.active = true, .effect = Effects::PRISONDOOR, .maxParticles = 16, .spawnRate = 0.1f, .lifeTime = 0.3f });
+                    break;
+                }
+                }
+                em.addTag<DoorTag>(entity);
+                em.addTag<WallTag>(entity);
+
+                ic.range = 8.5;
+                if (interactable.HasMember("noKey"))
+                    em.addTag<NoKeyTag>(entity);
+
+                addToZone(em, entity, type);
+            }},
+            {InteractableType::Level, [&]()
+            {
+                if (interactable.HasMember("offsetZ"))
+                {
+                    r.offset = interactable["offsetZ"][0].GetDouble();
+                    em.addTag<SeparateModelTag>(entity);
+                    r.position = vec3d::zero();
+                }
+                else
+                    r.visible = false;
+
+                em.addTag<LevelChangeTag>(entity);
+                c.behaviorType = BehaviorType::ZONE;
+
+                auto& zchi = em.getSingleton<ZoneCheckInfo>();
+                zchi.zoneBounds.insert({ zchi.zoneBounds.size(), c.bbox });
+
+                em.addComponent<ZoneComponent>(entity, ZoneComponent{.zone = static_cast<uint16_t>(zchi.zoneBounds.size() - 1) });
+            }},
+            {InteractableType::Spawn, [&]()
+            {
+                em.addTag<SpawnTag>(entity);
+
+                auto& spc = em.addComponent<SpawnComponent>(entity);
+                c.behaviorType = BehaviorType::SPAWN;
+                ic.range = 12.5;
+
+                if (interactable.HasMember("offsetZ"))
+                {
+                    r.offset = interactable["offsetZ"][0].GetDouble();
+                }
+
+                auto& pos = p.position;
+                auto posY = pos.y() - 2.0;
+                double rotCopy = rot;
+
+                if (rotationVec[1] > 0.0)
+                    rotCopy *= -1;
+
+                std::map<std::size_t, std::pair<vec3d, vec3d>> wallPoints = {
+                    {0, {rotateAroundPoint(vec3d{pos.x() + 9.5, posY, pos.z() + 14.5}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
+                    {1, {rotateAroundPoint(vec3d{pos.x() + 6.0, posY, pos.z() - 10.0}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
+                    {2, {rotateAroundPoint(vec3d{pos.x() - 17.5, posY, pos.z() + 15.0}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
+                    {3, {rotateAroundPoint(vec3d{pos.x() - 15.5, posY, pos.z() - 11.5}, pos, rotCopy), rotateScale(vec3d{ 3.0, 7.0, 3.0 }, rotCopy)}},
+                    {4, {rotateAroundPoint(vec3d{pos.x() - 3.5, posY, pos.z() + 14.0}, pos, rotCopy), rotateScale(vec3d{ 14.0, 4.0, 4.0 }, rotCopy)}},
+                    {5, {rotateAroundPoint(vec3d{pos.x() - 16.0, posY, pos.z() - 3.0}, pos, rotCopy), rotateScale(vec3d{ 5.0, 4.0, 13.0 }, rotCopy)}},
+                    {6, {rotateAroundPoint(vec3d{pos.x() - 3.0, posY - 2.0, pos.z() + 3.5}, pos, rotCopy), rotateScale(vec3d{ 4.5, 2.0, 4.5 }, rotCopy)}},
+                    {7, {rotateAroundPoint(vec3d{pos.x() + 7.0, posY, pos.z() + 8.0}, pos, rotCopy), rotateScale(vec3d{ 6.0, 7.0, 6.0 }, rotCopy)}},
+                    {8, {rotateAroundPoint(vec3d{pos.x() - 10.5, posY, pos.z() + 8.0}, pos, rotCopy), rotateScale(vec3d{ 1.5, 4.0, 1.5 }, rotCopy)}},
+                    {9, {rotateAroundPoint(vec3d{pos.x() + 4.2, posY + 2.0, pos.z() - 6.0}, pos, rotCopy), rotateScale(vec3d{ .5, 2.0, .5 }, rotCopy)}},
+                    {10, {rotateAroundPoint(vec3d{pos.x() - 17.5, posY + 2.0, pos.z() - 9.5}, pos, rotCopy), rotateScale(vec3d{ .5, 2.0, .5 }, rotCopy)}}
+                };
+
+                std::map<std::size_t, std::tuple<Effects, uint8_t, float, float>> particleParts = {
+                    {6, {Effects::FIRE, 10, 0.1f, 0.3f}},
+                    {7, {Effects::SMOKE, 10, 0.1f, 0.3f}},
+                    {8, {Effects::PURPLEM, 4, 0.1f, 0.3f}},
+                    {9, {Effects::SPARKLES, 3, 0.05f, 0.3f}},
+                    {10, {Effects::SPARKLES, 3, 0.05f, 0.3f}},
+                };
+
+                // Creamos 4 paredes para el spawn
+                for (std::size_t j = 0; j < wallPoints.size(); j++)
+                {
+                    auto& wall{ em.newEntity() };
+                    em.addTag<WallTag>(wall);
+                    em.addComponent<RenderComponent>(wall, RenderComponent{.position = wallPoints[j].first, .scale = wallPoints[j].second, .color = color, .visible = false, .orientation = 0.0, .rotationVec = rotationVec });
+                    em.addComponent<PhysicsComponent>(wall, PhysicsComponent{.position = wallPoints[j].first, .velocity = vec3d::zero(), .scale = wallPoints[j].second, .gravity = 0, .orientation = 0.0, .rotationVec = rotationVec });
+                    em.addComponent<ColliderComponent>(wall, ColliderComponent{ position, scale, BehaviorType::STATIC });
+
+                    if (j > 5)
+                    {
+                        auto& p = em.addComponent<ParticleMakerComponent>(wall, ParticleMakerComponent{.active = true, .effect = std::get<0>(particleParts[j]), .maxParticles = std::get<1>(particleParts[j]), .spawnRate = std::get<2>(particleParts[j]), .lifeTime = std::get<3>(particleParts[j]) });
+                        spc.parts[static_cast<SpawnComponent::SpawnParts>(j)] = &p;
+                    }
+                }
+
+                addToZone(em, entity, type);
+                checkDispatcher(em, entity, interactable);
+            }},
+            {InteractableType::Lever, [&]()
+            {
+                em.addTag<WallTag>(entity);
+                em.addTag<LeverTag>(entity);
+                em.addComponent<OneUseComponent>(entity, OneUseComponent{.id = unique_ids++ });
+                addToZone(em, entity, type);
+
+                ic.range = 7.5;
+            }},
+            {InteractableType::DamageObj, [&]()
+            {
+                em.addTag<LavaTag>(entity);
+                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{.active = true, .effect = ParticleMakerComponent::ParticleEffect::LAVA, .maxParticles = 20, .spawnRate = 0.1f });
+                c.behaviorType = BehaviorType::LAVA;
+
+                if (interactable.HasMember("offsetZ"))
+                {
+                    r.offset = interactable["offsetZ"][0].GetDouble();
+                }
+            }},
+            {InteractableType::Roca, [&]()
+            {
+                em.addTag<ObstacleTag>(entity);
+                r.visible = false;
+            }},
+            {InteractableType::Ladder, [&]()
+            {
+                em.addTag<LadderTag>(entity);
+                r.visible = false;
+                c.behaviorType = BehaviorType::LADDER;
+                ic.range = 12.0;
+                addToZone(em, entity, type);
+
+                auto yMin = c.bbox.min.y();
+                auto yMax = c.bbox.max.y();
+                // auto rot2 = (orientation - 90.0) * DEGTORAD;
+                em.addComponent<LadderComponent>(entity, LadderComponent{.orientation = rot, .yMin = yMin, .yMax = yMax });
+            }},
+            {InteractableType::Sign, [&]()
+            {
+                em.addTag<SignTag>(entity);
+
+                ic.range = 12.0;
+                addMessageCmp(em, entity, interactable);
                 addToZone(em, entity, type);
                 if (interactable.HasMember("offsetZ"))
                 {
                     r.offset = interactable["offsetZ"][0].GetDouble();
                 }
-                break;
-            }
-            default:
-                break;
-            }
-            break;
-        }
-        default:
-            break;
-        }
+            }},
+            {InteractableType::Table, [&]()
+            {
+                em.addTag<TableTag>(entity);
+                if (interactable.HasMember("offsetZ"))
+                {
+                    r.offset = interactable["offsetZ"][0].GetDouble();
+                }
+            }},
+            {InteractableType::MissionOBJ, [&]()
+            {
+                auto& li = em.getSingleton<LevelInfo>();
+                em.addTag<MissionObjTag>(entity);
+                switch (li.mapID)
+                {
+                case 2:
+                {
+                    em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{.active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
+                    auto& bc = em.addComponent<BoatComponent>(entity);
+                    bc.setPart(boatParts);
+                    ic.range = 7.0;
+
+                    addToZone(em, entity, type);
+                    if (interactable.HasMember("offsetZ"))
+                    {
+                        r.offset = interactable["offsetZ"][0].GetDouble();
+                    }
+                    break;
+                }
+                case 3:
+                {
+                    auto relayType = static_cast<ElementalType>(interactable["relay"].GetUint());
+                    em.addComponent<RelayComponent>(entity, RelayComponent({.type = relayType }));
+                    break;
+                }
+                default:
+                    break;
+                }
+            }},
+            {InteractableType::Camp, []() {}},
+            {InteractableType::NPC, []() {}}
+        };
+
+        interactableMap[type]();
     }
 }
 
@@ -1285,6 +1289,28 @@ void MapManager::checkDispatcher(EntityManager& em, Entity& e, const valueType& 
         for (mapSizeType j = 0; j < value["events"].Size(); j++)
         {
             dc.eventCodes.push_back(value["events"][j].GetInt());
+        }
+    }
+}
+
+void MapManager::generateCheats(EntityManager& em)
+{
+    auto& cheatPositions = em.getSingleton<CheatsInfo>().cheatPositions;
+    if (!cheatPositions.empty())
+        return;
+
+    mapType cheatsKaiwa = loadMap("assets/cheats.kaiwa");
+    const valueType& levels = cheatsKaiwa["Niveles"];
+    for (mapSizeType i = 0; i < levels.Size(); i++)
+    {
+        uint8_t levelNum = static_cast<uint8_t>(levels[i]["Nombre"].GetUint());
+        auto& positions = levels[i]["Puntos"];
+        for (mapSizeType j = 0; j < positions.Size(); j++)
+        {
+            std::string positionName = positions[j]["Nombre"].GetString();
+            auto& positionLabel = positions[j]["Posición"];
+            vec3d position = { positionLabel[0].GetDouble(), positionLabel[1].GetDouble(), positionLabel[2].GetDouble() };
+            cheatPositions[cheatPositions.size()] = std::make_tuple(levelNum, positionName, position);
         }
     }
 }

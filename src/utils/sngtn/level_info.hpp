@@ -91,6 +91,8 @@ struct LevelInfo
     // Variables de zona y el nivel
     uint16_t num_zone{};
     uint8_t mapID{ 0 };
+    static constexpr uint8_t u8max = std::numeric_limits<uint8_t>::max();
+    uint8_t mapToLoad{ u8max };
     bool levelChanged{ false };
 
     // Para estado de pausa y cerrar el juego
@@ -109,7 +111,7 @@ struct LevelInfo
     //npc huya
     bool npcflee{ false }, investigatorstartwalk{ false };
     // Estado del juego
-    GameScreen currentScreen = GameScreen::LOGO;
+    GameScreen currentScreen = GameScreen::GAMEPLAY;
     GameScreen previousScreen = GameScreen::LOGO;
     GameScreen evenMorePreviousScreen = GameScreen::LOGO;
 
@@ -182,7 +184,7 @@ struct LevelInfo
         npcflee = false;
         investigatorstartwalk = false;
         num_zone = 0;
-        mapID = 0;
+        mapID = 3;
         chestToOpen = max;
         dungeonKeyCreated = false;
         openChest = false;

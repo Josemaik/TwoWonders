@@ -63,6 +63,10 @@ namespace DarkMoon {
         Node* CreateOptionSlider(glm::vec2 pos, glm::vec2 sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, std::vector<std::string> opts, std::string firstOption, const char* nodeName, Node* parentNode);
         // Create float slider in node
         Node* CreateFloatSlider(glm::vec2 pos, glm::vec2 sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, float initialValue, const char* nodeName, Node* parentNode);
+        // Create checkbox in node
+        Node* CreateCheckbox(glm::vec2 pos, float size, bool checked, Color bCol, Color nCol, Color hCol, const char* nodeName, Node* parentNode);
+        // CReate checkbox with pointer in node
+        Node* CreateCheckboxPtr(glm::vec2 pos, float size, bool* checked, Color bCol, Color nCol, Color hCol, const char* nodeName, Node* parentNode);
 
         // 3D
 
@@ -98,8 +102,12 @@ namespace DarkMoon {
         Node* CreatePointLight(glm::vec3 position, Color color, const char* nodeName, Node* parentNode);
         // Create directional light in node
         Node* CreateDirectionalLight(glm::vec3 direction, Color color, const char* nodeName, Node* parentNode);
-        // Active lights
+        // Toggle lights
         void ToggleLights() { m_renderManager.activeLights = !m_renderManager.activeLights; };
+        // Activate lights
+        void ActivateLights() { m_renderManager.activeLights = true; };
+        // Deactivate lights
+        void DeactivateLights() { m_renderManager.activeLights = false; };
         // Update lights
         void UpdateLights(Node* parentNode);
 

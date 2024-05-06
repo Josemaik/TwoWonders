@@ -229,6 +229,30 @@ namespace DarkMoon {
         return p_nodeFloatSlider;
     }
 
+    Node* DarkMoonEngine::CreateCheckbox(glm::vec2 pos, float size, bool checked, Color bCol, Color nCol, Color hCol, const char* nodeName, Node* parentNode) {
+        auto p_nodeCheckbox = CreateNode(nodeName, parentNode);
+
+        // Create checkbox
+        auto checkboxE = std::make_unique<CheckBox>(pos, size, checked, bCol, nCol, hCol);
+
+        p_nodeCheckbox->translate({ pos.x, pos.y, 0.0f });
+        p_nodeCheckbox->setEntity(std::move(checkboxE));
+
+        return p_nodeCheckbox;
+    }
+
+    Node* DarkMoonEngine::CreateCheckboxPtr(glm::vec2 pos, float size, bool* checked, Color bCol, Color nCol, Color hCol, const char* nodeName, Node* parentNode) {
+        auto p_nodeCheckbox = CreateNode(nodeName, parentNode);
+
+        // Create checkbox
+        auto checkboxE = std::make_unique<CheckBoxPtr>(pos, size, checked, bCol, nCol, hCol);
+
+        p_nodeCheckbox->translate({ pos.x, pos.y, 0.0f });
+        p_nodeCheckbox->setEntity(std::move(checkboxE));
+
+        return p_nodeCheckbox;
+    }
+
     // 3D
 
     // Create point 3D in node

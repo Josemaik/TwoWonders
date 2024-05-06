@@ -22,6 +22,7 @@
 #include "../components/boat_component.hpp"
 #include "../components/particle_component.hpp"
 #include "../components/spawn_component.hpp"
+#include "../components/relay_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
 #include "../components/navmesh_component.hpp"
@@ -44,6 +45,7 @@
 #include "./sngtn/navmesh_info.hpp"
 #include "./sngtn/zonecheck_info.hpp"
 #include "./sngtn/frustum_info.hpp"
+#include "./sngtn/cheats_info.hpp"
 
 // GameData
 #include "../utils/sngtn/GameData.hpp"
@@ -152,7 +154,8 @@ using CL = MP::TypeList <
     MessageComponent,
     BoatComponent,
     ParticleMakerComponent,
-    SpawnComponent
+    SpawnComponent,
+    RelayComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,
@@ -207,7 +210,7 @@ using TL = MP::TypeList <
     MagmaBallTag,
     EnemyDeathTag
 > ;
-using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem, FrustumInfo>;
+using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem, FrustumInfo, CheatsInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;
@@ -237,4 +240,5 @@ using Button = DarkMoon::Button;
 using ButtonState = DarkMoon::ButtonState;
 using Text = DarkMoon::Text;
 using TextBox = DarkMoon::TextBox;
+using CheckBox = DarkMoon::CheckBox;
 using DarkMoonEngine = DarkMoon::DarkMoonEngine;

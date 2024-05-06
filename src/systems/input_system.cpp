@@ -91,8 +91,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         ge.dmeg.DrawTree();
 
     if (ge.isKeyReleased(D_KEY_F9)) {
-        auto& life = em.getComponent<LifeComponent>(player);
-        life.decreaseLife();
+        inpi.cheats = !inpi.cheats;
     }
 
     if (ge.isKeyReleased(D_KEY_F10))

@@ -31,6 +31,7 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine)
 
 void RenderSystem::restartScene(GameEngine& engine)
 {
+    // engine.deactivateLights();
     auto* tresde = getNode(engine, "3D");
     auto* dosde = getNode(engine, "2D");
     auto* menu = getNode(engine, "Menu");
@@ -188,7 +189,7 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     // Fondo Opciones
     auto wRate = engine.getWidthRate();
     auto hRate = engine.getHeightRate();
-    auto* fondoTwoWonders = getNode(engine, "fondo_inicio");
+    auto* fondoTwoWonders = getNode(engine, "fondo_opciones");
 
     auto* fondoText = fondoTwoWonders->getEntity<Texture2D>()->texture;
 
@@ -907,6 +908,9 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
 
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / K_PI));
 
+                // if (e.hasTag<ChestTag>())
+                //     engine.drawPuntualLight(pos, { 255, 215, 0, 255 });
+
                 if (r.node) {
                     r.node->setTranslation({ pos.x(), pos.y(), pos.z() });
                     r.node->setScale({ scl.x(), scl.y(), scl.z() });
@@ -934,6 +938,8 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
             }
         }
     });
+
+    // engine.activateLights();
 }
 
 void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r)
@@ -981,6 +987,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         case 2:
             r.node = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_0.obj");
             break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_3/Objs/lvl_3-cnk_0.obj");
+            break;
         }
     else if (e.hasTag<Chunk1Tag>())
         switch (li.mapID)
@@ -995,6 +1004,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         case 2:
             r.node = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_1.obj");
             break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_3/Objs/lvl_3-cnk_1.obj");
+            break;
         }
     else if (e.hasTag<Chunk2Tag>())
         switch (li.mapID)
@@ -1008,6 +1020,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
         case 2:
             r.node = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_2.obj");
+            break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_3/Objs/lvl_3-cnk_2.obj");
             break;
         }
     else if (e.hasTag<Chunk3Tag>())
@@ -1026,6 +1041,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         case 2:
             r.node = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_3.obj");
             break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_4/Objs/lvl_4-cnk_0.obj");
+            break;
         }
         // loadShaders(r.model);
     }
@@ -1041,6 +1059,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         case 1:
             // r.model = engine.loadModelRaylib("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_4.obj");
             r.node = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_4.obj");
+            break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_4/Objs/lvl_4-cnk_1.obj");
             break;
         }
         // loadShaders(r.model);
@@ -1058,6 +1079,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             // r.model = engine.loadModelRaylib("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_5.obj");
             r.node = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_5.obj");
             break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_4/Objs/lvl_4-cnk_2.obj");
+            break;
         }
         // loadShaders(r.model);
     }
@@ -1065,14 +1089,8 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     {
         switch (li.mapID)
         {
-        case 0:
-            // r.model = engine.loadModelRaylib("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_6.obj");
-            r.node = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_6.obj");
-            break;
-
-        case 1:
-            // r.model = engine.loadModelRaylib("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_6.obj");
-            r.node = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_6.obj");
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_4/Objs/lvl_4-cnk_3.obj");
             break;
         }
         // loadShaders(r.model);
@@ -1235,6 +1253,26 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
                 }
             }
         }
+        case 3:
+        {
+            if (e.hasComponent<RelayComponent>())
+            {
+                auto& rc = em.getComponent<RelayComponent>(e);
+
+                switch (rc.type)
+                {
+                case ElementalType::Water:
+                    r.node = engine.loadModel("assets/Assets/Balizas/Baliza_agua.obj");
+                    break;
+                case ElementalType::Fire:
+                    r.node = engine.loadModel("assets/Assets/Balizas/Baliza_fuego.obj");
+                    break;
+                case ElementalType::Ice:
+                    r.node = engine.loadModel("assets/Assets/Balizas/Baliza_hielo.obj");
+                    break;
+                }
+            }
+        }
 
         default:
             break;
@@ -1369,6 +1407,9 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
 
     else if (inpi.pathfind)
         drawTestPathfindinf(engine, em);
+
+    else if (inpi.cheats)
+        drawCheats(em, engine);
 
     if (li.elapsedPause > 0 && !inpi.pause)
         li.elapsedPause = 0;
@@ -3242,4 +3283,114 @@ Node* RenderSystem::getNode(GameEngine& engine, const char* name)
 bool RenderSystem::nodeExists(GameEngine& engine, const char* name)
 {
     return engine.nodes.find(name) != engine.nodes.end();
+}
+
+void RenderSystem::drawCheats(EntityManager& em, GameEngine& engine)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& player = *em.getEntityByID(li.playerID);
+    auto& phy = em.getComponent<PhysicsComponent>(player);
+    auto& cheatPositions = em.getSingleton<CheatsInfo>().cheatPositions;
+
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+    float middleScreenX = static_cast<float>(engine.getScreenWidth()) * wRate / 2;
+    float middleScreenY = static_cast<float>(engine.getScreenHeight()) * hRate / 2;
+
+    int posRectX = 0;
+    int posRectY = engine.getScreenHeight() / 4;
+    int rectWidth = static_cast<int>(middleScreenX * 1.5f);
+    int rectHeight = static_cast<int>(middleScreenY * 3.5f);
+
+    auto* cheatsNode = getNode(engine, "MenuCheats");
+    auto* rect = engine.createRectangle({ posRectX, posRectY }, { rectWidth, rectHeight }, D_WHITE, "cheatRect", cheatsNode);
+    engine.drawNode(rect);
+
+    int posTextX = 20;
+    int posY = posRectY + static_cast<int>(30.f * hRate);
+    int posButtonX = static_cast<int>(360.f * wRate);
+    int posButtonY = posY - static_cast<int>(10.f * hRate);
+    int posButtonWidth = static_cast<int>(230.f * wRate);
+    int posButtonHeight = static_cast<int>(90.f * hRate);
+    int downRate = static_cast<int>(60.f * hRate);
+
+    int i{ 0 };
+    std::vector<Button*> buttons{};
+    for (auto& [_, data] : cheatPositions)
+    {
+        auto& [levelNum, posName, pos] = data;
+        if (levelNum == li.mapID)
+        {
+            engine.createText({ posTextX, posY + i * downRate }, posName.c_str(), D_BLACK, (posName + std::to_string(levelNum)).c_str(), cheatsNode);
+            auto* btn = engine.createButton({ posButtonX, posButtonY + i * downRate }, { posButtonWidth, posButtonHeight }, pos.toString(), pos.toString().c_str(), cheatsNode);
+            buttons.push_back(btn->getEntity<Button>());
+            i++;
+        }
+    }
+
+    for (auto& btn : buttons)
+    {
+        if (btn->state == ButtonState::CLICK)
+        {
+            phy.position = vec3d::fromWString(btn->textBox.text.getText());
+        }
+    }
+
+    std::vector<std::string> levels = { "0", "1", "2", "3" };
+    for (auto it = levels.begin(); it != levels.end();)
+    {
+        if (li.mapID == static_cast<uint8_t>(std::stoi(*it)))
+            it = levels.erase(it);
+        else
+            ++it;
+    }
+
+    auto* slider = engine.createOptionSlider({ posButtonX + 45, posButtonY + i * downRate }, { posButtonWidth / 5, posButtonHeight }, D_BLACK, "",
+        engine.getDefaultFont(), 20, 30, D_LAVENDER_DARK, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA, D_AQUA, levels,
+        levels[0], "levelSlider", cheatsNode);
+    auto* sliderInfo = slider->getEntity<OptionSlider>();
+    sliderInfo->setOptions(levels);
+
+    auto* btnLevel = engine.createButton({ posTextX, posButtonY + i * downRate }, { static_cast<int>(static_cast<float>(posButtonWidth) * 1.5f), posButtonHeight },
+        "Cambiar Nivel", "levelChangeButton", cheatsNode);
+
+    auto* btnInfo = btnLevel->getEntity<Button>();
+    if (btnInfo->state == ButtonState::CLICK)
+    {
+        li.mapToLoad = static_cast<uint8_t>(std::stoi(sliderInfo->options[sliderInfo->currentOption]));
+        li.transition = true;
+    }
+
+    i += 1;
+    engine.createText({ posTextX, posY + i * downRate }, "Gravedad", D_BLACK, "gravityCheckText", cheatsNode);
+
+    bool grav = phy.gravity > 0;
+    auto* gravCheckBox = engine.createCheckBox({ posButtonX + 45, posButtonY + i * downRate }, 40.f, grav, D_WHITE, D_LAVENDER, D_LAVENDER_LIGHT, "gravCheckBox", cheatsNode);
+    auto* gravInfo = gravCheckBox->getEntity<CheckBox>();
+
+    if (gravInfo->isClicked())
+    {
+        if (gravInfo->checked)
+            phy.gravity = phy.KGravity;
+        else
+            phy.gravity = 0;
+    }
+
+    i += 1;
+
+    engine.createText({ posTextX, posY + i * downRate }, "Llave", D_BLACK, "keyCheckText", cheatsNode);
+
+    auto& plfi = em.getSingleton<PlayerInfo>();
+    engine.createCheckBoxPtr({ posButtonX + 45, posButtonY + i * downRate }, 40.f, &plfi.hasKey, D_WHITE, D_LAVENDER, D_LAVENDER_LIGHT, "keyCheckBox", cheatsNode);
+
+    i += 1;
+
+    engine.createText({ posTextX, posY + i * downRate }, "Invencible", D_BLACK, "invincibleCheckText", cheatsNode);
+    engine.createCheckBoxPtr({ posButtonX + 45, posButtonY + i * downRate }, 40.f, &plfi.invincible, D_WHITE, D_LAVENDER, D_LAVENDER_LIGHT, "invincibleCheckBox", cheatsNode);
+
+    if (plfi.invincible)
+    {
+        auto& lc = em.getComponent<LifeComponent>(player);
+        lc.life = lc.maxLife;
+    }
 }

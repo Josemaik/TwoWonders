@@ -105,6 +105,7 @@ void CollisionSystem::handleRampCollision(EntityManager& em)
     }
 
     previousEntsOnRamp.clear();
+    rampHeights.clear();
 
     for (auto [rID, eID] : checkedPairsRamp)
     {
@@ -129,55 +130,74 @@ void CollisionSystem::handleRampCollision(EntityManager& em)
         double baseHeight = 0.0;
         double newHeight{};
 
-        switch (ramp.type)
-        {
-        case RampType::Normal:
-        {
+        // switch (ramp.type)
+        // {
+        // case RampType::Normal:
+        // {
             // Calculamos la nueva altura dependiendo del slope
-            newHeight = baseHeight + ramp.slope;
+        newHeight = baseHeight + ramp.slope;
 
-            // Utilizamos el offset para saber la dirección de la rampa,
-            // si el offset en x es 0, la nueva altura se multiplica por la posición en z
-            // 
-            // Queremos que el offset siempre sea el contrario del punto donde empieza la rampa.
-            // Por ejemplo, si la rampa te mueve hacia arriba por desde un 9x a un 14x,
-            // el offset será -9x y el slope será positivo.
-            // Si queremos invertir la rampa, el offset será -14x y el slope será negativo.
-            if (offSet.x() == 0.0)
-                newHeight *= (pos.z() + offSet.z());
-            else
-                newHeight *= (pos.x() + offSet.x());
+        // Utilizamos el offset para saber la dirección de la rampa,
+        // si el offset en x es 0, la nueva altura se multiplica por la posición en z
+        // 
+        // Queremos que el offset siempre sea el contrario del punto donde empieza la rampa.
+        // Por ejemplo, si la rampa te mueve hacia arriba por desde un 9x a un 14x,
+        // el offset será -9x y el slope será positivo.
+        // Si queremos invertir la rampa, el offset será -14x y el slope será negativo.
+        if (offSet.x() == 0.0)
+            newHeight *= (pos.z() + offSet.z());
+        else
+            newHeight *= (pos.x() + offSet.x());
 
-            break;
-        }
-        case RampType::Triangular:
-        {
-            // El punto objetivo se encuentra en offset.x, offset.z
-            vec2d targetPoint = { offSet.x(), offSet.z() };
+        //     break;
+        // }
+        // case RampType::Triangular:
+        // {
+        //     // El punto objetivo se encuentra en offset.x, offset.z
+        //     vec2d targetPoint = { offSet.x(), offSet.z() };
 
-            // Calcula la distancia al punto objetivo
-            double distanceToTarget = sqrt(pow(pos.x() - targetPoint.x, 2) + pow(pos.z() - targetPoint.y, 2));
+        //     // Calcula la distancia al punto objetivo
+        //     double distanceToTarget = sqrt(pow(pos.x() - targetPoint.x, 2) + pow(pos.z() - targetPoint.y, 2));
 
-            // Episilon para evitar divisiones por debajo de cierto valor
-            double ep = 3;
-            if (distanceToTarget < ep)
-                distanceToTarget = ep;
+        //     // Episilon para evitar divisiones por debajo de cierto valor
+        //     double ep = 3;
+        //     std::cout << distanceToTarget << std::endl;
+        //     if (distanceToTarget < ep)
+        //         distanceToTarget = ep;
 
-            // Calcula la nueva altura basándose en la distancia al punto objetivo
-            newHeight = baseHeight + (ramp.slope / distanceToTarget);
-
-            break;
-        }
-        default:
-            break;
-        }
+        //     // Calcula la nueva altura basándose en la distancia al punto objetivo
+        //     newHeight = baseHeight + (ramp.slope / distanceToTarget);
+        //     std::cout << newHeight << std::endl;
+        //     break;
+        // }
+        // default:
+        //     break;
+        // }
 
         // Nos aseguramos de que la nueva altura no sea menor que baseHeight
         newHeight = std::max(newHeight, baseHeight);
         newHeight += offSet.y() + phy.scale.y() / 2;
 
         // Ajustamos la posición en y con la nueva altura
-        phy.position.setY(newHeight);
+        if (ramp.type == RampType::Normal)
+            rampHeights.push_back({ ePtr->getID(), newHeight });
+        else
+            rampHeights.push_back({ ePtr->getID(), -newHeight });
+    }
+
+    if (rampHeights.size() > 0)
+    {
+        std::sort(rampHeights.begin(), rampHeights.end(), [](const auto& a, const auto& b) { return a.second < b.second; });
+
+        for (auto& [eID, newHeight] : rampHeights)
+        {
+            auto* ePtr = em.getEntityByID(eID);
+            auto& phy = em.getComponent<PhysicsComponent>(*ePtr);
+            if (newHeight < 0)
+                newHeight = -newHeight;
+
+            phy.position.setY(newHeight);
+        }
     }
 
     checkedPairsRamp.clear();
@@ -419,7 +439,7 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     if (behaviorType2 & BehaviorType::ZONE)
         return;
 
-    if (!staticEntPtr->hasComponent<ObjectComponent>() && behaviorType2 & BehaviorType::RAMP)
+    if (!staticEntPtr->hasComponent<ObjectComponent>() && behaviorType2 & BehaviorType::RAMP || behaviorType2 & BehaviorType::LADDER)
         return;
 
     if (staticEntPtr->hasTag<WallTag>() || otherEntPtr->hasTag<WallTag>())
@@ -645,13 +665,13 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
                 // Si el jugador está por encima de la escalera, lo ponemos un poco más adelante de su posición
                 if ((box.min.y() + 1) >= ldc.yMax)
                 {
-                    newPos.setX(newPos.x() + sin(ori) * 2);
-                    newPos.setZ(newPos.z() + cos(ori) * 2);
+                    newPos.setX(newPos.x() + std::sin(ori) * 2.2);
+                    newPos.setZ(newPos.z() + std::cos(ori) * 2.2);
                 }
                 else
                 {
-                    newPos.setX(newPos.x() - sin(ori) * 2);
-                    newPos.setZ(newPos.z() - cos(ori) * 2);
+                    newPos.setX(newPos.x() - std::sin(ori) * 2.2);
+                    newPos.setZ(newPos.z() - std::cos(ori) * 2.2);
                 }
 
                 phy.position = newPos;
@@ -818,11 +838,11 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                 if (balaCol.behaviorType & BehaviorType::ATK_PLAYER)
                 {
                     //Si pegamos a un enemmigo nos detecta directamente
-                    if (ent2Ptr->hasTag<GolemTag>()){
+                    if (ent2Ptr->hasTag<GolemTag>()) {
                         em.getComponent<AIComponent>(*ent2Ptr).playerdetected = true;
                         // //empujar hacia atras si le impacta una bala
-                        if(ent2Ptr->hasComponent<PhysicsComponent>() && (ent2Ptr->hasTag<SnowmanTag>()
-                        || ent2Ptr->hasTag<GolemTag>())){
+                        if (ent2Ptr->hasComponent<PhysicsComponent>() && (ent2Ptr->hasTag<SnowmanTag>()
+                            || ent2Ptr->hasTag<GolemTag>())) {
                             auto& li = em.getSingleton<LevelInfo>();
                             auto& enpos = em.getComponent<PhysicsComponent>(*ent2Ptr).position;
                             auto& plphy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));

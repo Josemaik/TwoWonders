@@ -50,7 +50,7 @@ struct CollisionSystem
     // using octreeMap = std::unordered_map<std::size_t, std::unordered_set<Octree*>>;
 
     CollisionSystem()
-        : octree(0, BBox(vec3d{ 0.0, 0.0, 0.0 }, vec3d{ 600.0, 200.0, 600.0 })),
+        : octree(0, BBox(vec3d{ 0.0, 0.0, 0.0 }, vec3d{ 700.0, 200.0, 700.0 })),
         checkedPairs(EntityManager::MAX_ENTITIES, std::vector<bool>(EntityManager::MAX_ENTITIES, false)) {}
     void update(EntityManager& em);
     bool checkWallCollision(EntityManager& em, vec3d& pos, vec3d& normalDir);
@@ -80,6 +80,7 @@ private:
     matrixType checkedPairs{};
     pairsType2 checkedPairsRamp{};
     std::vector<PhysicsComponent*> previousEntsOnRamp{};
+    std::vector<std::pair<std::size_t, double>> rampHeights{};
     EventManager* evm{ nullptr };
     // void checkBorderCollision(EntityManager& em, Octree& boxes);
 };
