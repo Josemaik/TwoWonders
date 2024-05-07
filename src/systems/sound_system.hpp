@@ -146,12 +146,17 @@ struct SoundSystem {
     void play();
     void play_pasos();
     void play_music();
+    void play_music_level();
     void music_stop();
+    void music_stop_level();
     void ambient_stop();
     void SFX_pasos_stop();
     void stop_golem_mov();
     void stop_munyeco_mov();
     void stop_pasos();
+
+    void sonido_pause();
+    void sonido_unpause();
 
     void update();
     void clear();
@@ -170,6 +175,7 @@ struct SoundSystem {
     bool pushed{ false };
     bool music_started{ false };
     bool ambient_started{ false};
+
 
 private:
     FMOD_SYSTEM* coreSystem;
@@ -194,6 +200,7 @@ private:
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente_volcan;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_Level;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_SFX_pasos;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_mov_golem;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_mov_munyeco;
@@ -218,9 +225,15 @@ private:
     float ambientVolume;
     float generalVolume;
 
-    //FMOD_RESULT res;
-    //float* volume;
-    //float* finalvolume;
+
+    //Variables para comprobaciones de pausa
+    FMOD_BOOL ambiente {true};
+    FMOD_BOOL ambiente_volcan {true};
+    FMOD_BOOL ambiente_pradera {true};
+    FMOD_BOOL ambiente_biblioteca {true};
+    FMOD_BOOL musica_suena {true};
+
+
 
 
 };

@@ -103,30 +103,32 @@ void SoundSystem::playMusicMenu() {
 }
 
 void SoundSystem::sonido_music_volcan() {
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_volcan, &eventInstance_Musica));
-    play_music();
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_volcan, &eventInstance_Musica_Level));
+    play_music_level();
+   
 
 }
 
 void SoundSystem::sonido_music_mazmorra() {
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_mazmorra, &eventInstance_Musica));
-    play_music();
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_mazmorra, &eventInstance_Musica_Level));
+    play_music_level();
+    music_started = true;
 
 
 }
 void SoundSystem::sonido_music_monte() {
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_monte, &eventInstance_Musica));
-    play_music();
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_monte, &eventInstance_Musica_Level));
+    play_music_level();
 }
 
 void SoundSystem::sonido_music_pradera() {
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_pradera, &eventInstance_Musica));
-    play_music();
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_pradera, &eventInstance_Musica_Level));
+    play_music_level();
 }
 
 void SoundSystem::sonido_music_boss_final(){
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_boss_final, &eventInstance_Musica));
-    play_music();
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_boss_final, &eventInstance_Musica_Level));
+    play_music_level();
 
 }  
 
@@ -140,7 +142,8 @@ void SoundSystem::seleccion_menu() {
 
 void SoundSystem::playAmbient() {
     FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
-    FMOD_Studio_System_Update(soundSystem);
+    //FMOD_Studio_System_Update(soundSystem);
+    update();
 }
 
 void SoundSystem::sonido_amb_bosque() {
@@ -167,6 +170,7 @@ void SoundSystem::sonido_amb_volcan() {
     FMOD_Studio_EventInstance_Start(eventInstance_Ambiente_volcan);
     FMOD_Studio_System_Update(soundSystem);
     update();
+    ambient_started = true;
 }
 
 void SoundSystem::ambiente_parameter_lava(float lava){
@@ -838,11 +842,20 @@ void SoundSystem::play_music() {
     FMOD_Studio_EventInstance_Start(eventInstance_Musica);
     update();
 }
+    //accionar musica de nivel
+void SoundSystem::play_music_level() {
+    FMOD_Studio_EventInstance_Start(eventInstance_Musica_Level);
+    update();
+}
 
 
     //parar musica menu
 void SoundSystem::music_stop() {
     FMOD_Studio_EventInstance_Stop(eventInstance_Musica, FMOD_STUDIO_STOP_ALLOWFADEOUT);
+}
+    //parar musica nivel
+void SoundSystem::music_stop_level() {
+    FMOD_Studio_EventInstance_Stop(eventInstance_Musica_Level, FMOD_STUDIO_STOP_ALLOWFADEOUT);
 }
 
     //parar ambiente
@@ -851,6 +864,7 @@ void SoundSystem::ambient_stop() {
     FMOD_Studio_EventInstance_Stop(eventInstance_Ambiente_volcan, FMOD_STUDIO_STOP_ALLOWFADEOUT);
     // update();
 }
+
 
     //parar pasos
 void SoundSystem::SFX_pasos_stop() {
@@ -871,6 +885,48 @@ void SoundSystem::stop_munyeco_mov(){
 void SoundSystem::stop_pasos(){
     stop_munyeco_mov();
     stop_golem_mov();
+}
+
+
+//FUNCIONES PARA LLAMAR PARA MANEJAR LOS EVENTOS DURANTE EL MENU DE PAUSA
+void SoundSystem::sonido_pause(){
+    FMOD_BOOL pausa {true};
+    if(music_started){
+        ERRCHECK(FMOD_Studio_EventInstance_GetPaused(eventInstance_Musica_Level, &musica_suena));
+        if( !musica_suena )
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, pausa));
+    }
+    //Obtengo los estados de pausa de los diferentes ambientes
+    ERRCHECK(FMOD_Studio_EventInstance_GetPaused(eventInstance_Ambiente, &ambiente));
+    /*if( ambient_started ) {
+        ERRCHECK(FMOD_Studio_EventInstance_GetPaused(eventInstance_Ambiente_volcan, &ambiente_volcan));
+        if( !ambiente_volcan ){
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente_volcan, pausa));
+        }
+    }*/
+    if( !ambiente ){
+        ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente, pausa));
+
+    }
+
+
+    //update();
+}
+void SoundSystem::sonido_unpause(){
+    FMOD_BOOL despausa {false};
+
+    //ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, despausa));
+
+    if( ambiente ){
+        ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente, despausa));
+
+    }
+    /*if( ambiente_volcan ){
+        ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente_volcan, despausa));
+    }*/
+
+    update();
+
 }
 
 
