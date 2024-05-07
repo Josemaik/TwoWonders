@@ -251,7 +251,9 @@ namespace DarkMoon {
         bool charByChar{ false };
         bool bold{ false };
         bool italic{ false };
-
+        #ifdef _WIN32
+        bool skipBoldItalic{ false };
+        #endif
 
         Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK, Aligned al = Aligned::LEFT, bool cbc = false)
             : position(pos), font(f), fontSize(fS), color(col), alignment(al), charByChar(cbc)
@@ -269,24 +271,6 @@ namespace DarkMoon {
             textColorLocation = glGetUniformLocation(rm.getShader()->getIDShader(), "textColor");
         };
 
-        bool isDifferent(const std::wstring& a, const std::wstring& b) {
-            size_t minLength = std::min(a.size(), b.size());
-            size_t maxLength = std::max(a.size(), b.size());
-            size_t diffCount = maxLength - minLength;
-
-            for (size_t i = 0; i < minLength; ++i) {
-                if (a[i] != b[i]) {
-                    ++diffCount;
-                }
-            }
-
-            if (diffCount > 1) {
-                return true;
-            }
-
-            return false;
-        }
-
         void setText(std::string text)
         {
             std::wstring textW{};
@@ -295,13 +279,18 @@ namespace DarkMoon {
 #ifdef _WIN32
             bool checkSpecial = false;
 #endif
-            if (font && !text.empty() && isDifferent(textW, this->text)) {
+            if (font && !text.empty() && textW != this->text) {
                 // Reset values
                 widths.clear();
                 maxWidth = 0.0f;
                 maxHeight = 0.0f;
                 numLines = 1;
                 charIndex = 0;
+                bold = false;
+                italic = false;
+                #ifdef _WIN32
+                skipBoldItalic = false;
+                #endif
                 float lineWidth = position.x;
 
                 // Seteamos la escala con el ratio
@@ -329,7 +318,6 @@ namespace DarkMoon {
                         continue;
                     }
 #endif
-
                     // Max Height
                     Character ch = font->characters[c];
                     auto chY = static_cast<float>(ch.size.y);
@@ -439,16 +427,20 @@ namespace DarkMoon {
             }
             else
                 charIndex = text.size();
-
-            if (text[charIndex] == '\n')
-                std::cout << "New Line" << std::endl;
-
 #ifdef _WIN32
             bool checkSpecial = false;
 #endif
             int k{ 1 }; // Pa la anchura de las líneas
             for (size_t i = 0; i < charIndex; ++i) {
-                wchar_t& c = text[i];
+                wchar_t c = text[i];
+                #ifdef _WIN32
+                if(skipBoldItalic)
+                {
+                    skipBoldItalic = false;
+                    if(c == '\b' || c == '\t')
+                        continue;
+                }
+                #endif
                 if (c == '\n') {
                     // Reset the x position to the start of the line
                     aux_x = position.x;
@@ -465,9 +457,19 @@ namespace DarkMoon {
                 }
                 else if (c == '\b') {
                     bold = !bold;
+                    #ifdef _WIN32
+                    if(i != charIndex - 1)
+                        skipBoldItalic = true;
+                    #endif
+                    continue;
                 }
                 else if (c == '\t') {
                     italic = !italic;
+                    #ifdef _WIN32
+                    if(i != charIndex - 1)                    
+                        skipBoldItalic = true;
+                    #endif
+                    continue;
                 }
 #ifdef _WIN32
                 else if (checkSpecial)

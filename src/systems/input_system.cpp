@@ -341,17 +341,9 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     if (ge.isKeyDown(D_KEY_Z) && player.hasComponent<LifeComponent>())
         em.getComponent<LifeComponent>(player).increaseLife();
 
-    if (ge.isKeyReleased(D_KEY_F12))
-    {
-        if (phy.gravity == 0)
-            phy.gravity = 1.0;
-        else
-            phy.gravity = 0;
-    }
     if (ge.isKeyDown(D_KEY_M)) {
         li.npcflee = true;
     }
-
 }
 
 bool InputSystem::pressEnter(GameEngine& ge) {
