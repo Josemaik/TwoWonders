@@ -1118,7 +1118,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     {
         // r.model = engine.loadModelRaylib("assets/models/Cofre.obj");
         r.node = engine.loadModel("assets/models/Cofre.obj");
-        engine.createPuntualLight({}, { 255, 215, 0, 255 }, "Luz puntual cofre", r.node);
+        engine.dmeg.CreatePointLight({}, { 255, 215, 0, 255 }, "Luz puntual cofre", r.node);
         // loadShaders(r.model);
     }
     else if (e.hasTag<DestructibleTag>())
