@@ -355,20 +355,21 @@ void Game::run()
 
     // Creamos un archivo de salida con los datos de la partida
     // Para hacer replay con este archivo hay que colocarlo en la carpeta assets/data/input
-    if (!li.replay)
-    {
-        std::string name = "assets/data/output/data";
-        // le ponemos la fecha y hora al archivo
-        std::time_t t = std::time(nullptr);
-        std::tm tm = *std::localtime(&t);
-        std::stringstream ss;
-        ss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S");
-        name += ss.str();
-        name += ".cereal";
-        std::ofstream os(name, std::ios::binary);
-        cereal::BinaryOutputArchive archive(os);
-        archive(CEREAL_NVP(gami));
-    }
+    // Comentado hasta nuevo aviso
+    // if (!li.replay)
+    // {
+    //     std::string name = "assets/data/output/data";
+    //     // le ponemos la fecha y hora al archivo
+    //     std::time_t t = std::time(nullptr);
+    //     std::tm tm = *std::localtime(&t);
+    //     std::stringstream ss;
+    //     ss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S");
+    //     name += ss.str();
+    //     name += ".cereal";
+    //     std::ofstream os(name, std::ios::binary);
+    //     cereal::BinaryOutputArchive archive(os);
+    //     archive(CEREAL_NVP(gami));
+    // }
 
     //liberar bancos
     sound_system.clear();
