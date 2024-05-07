@@ -312,6 +312,8 @@ namespace DarkMoon {
         glDeleteBuffers(1, &m_VBO);
     };
 
+    void Circle::changeVAO(glm::mat4&) {}
+
     void Circle::changeVAO(glm::mat4& transMatrix, bool forceUpdate) {
         m_transMatrix = transMatrix;
 
@@ -344,7 +346,7 @@ namespace DarkMoon {
     void Circle::draw(glm::mat4 transMatrix) {
         // Apply Transformation Matrix
         if (m_transMatrix != transMatrix)
-            changeVAO(transMatrix);
+            changeVAO(transMatrix, false);
 
         // Set the uniform color in the shader
         GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");

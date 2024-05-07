@@ -80,6 +80,7 @@ namespace DarkMoon {
 
     struct Circle : Entity2D {
     private:
+        void changeVAO(glm::mat4& transMatrix) override;
         void changeVAO(glm::mat4& transMatrix, bool forceUpdate = false);
     public:
         glm::vec2 position = {};
@@ -268,6 +269,24 @@ namespace DarkMoon {
             textColorLocation = glGetUniformLocation(rm.getShader()->getIDShader(), "textColor");
         };
 
+        bool isDifferent(const std::wstring& a, const std::wstring& b) {
+            size_t minLength = std::min(a.size(), b.size());
+            size_t maxLength = std::max(a.size(), b.size());
+            size_t diffCount = maxLength - minLength;
+
+            for (size_t i = 0; i < minLength; ++i) {
+                if (a[i] != b[i]) {
+                    ++diffCount;
+                }
+            }
+
+            if (diffCount > 1) {
+                return true;
+            }
+
+            return false;
+        }
+
         void setText(std::string text)
         {
             std::wstring textW{};
@@ -276,7 +295,7 @@ namespace DarkMoon {
 #ifdef _WIN32
             bool checkSpecial = false;
 #endif
-            if (font && !text.empty() && this->text != textW) {
+            if (font && !text.empty() && isDifferent(textW, this->text)) {
                 // Reset values
                 widths.clear();
                 maxWidth = 0.0f;
