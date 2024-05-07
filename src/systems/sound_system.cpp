@@ -634,6 +634,91 @@ ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Arany
 
     }
 
+    void SoundSystem::sonido_boss_mov(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Boss/Boss_mov", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+    }            
+    void SoundSystem::sonido_subdito_mov(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Boss/Subdito_mov", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }           
+    void SoundSystem::sonido_boss_resucitar(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Boss/Boss_resucitar", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }           
+    void SoundSystem::sonido_boss_escudo(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Boss/Boss_escudo", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }              
+    void SoundSystem::sonido_boss_danyo(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Boss/Boss_danyo", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }              
+    void SoundSystem::sonido_boss_subdito_danyo(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Boss/Boss_Sub_danyo", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }
+    void SoundSystem::sonido_subdito_muere(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Boss/Subdito_muere", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }        
+    void SoundSystem::sonido_boss_muere(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Boss/Boss_muere", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }           
+    void SoundSystem::sonido_inicio_batalla(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Boss/Boss_inicio", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+
+    }       
+    void SoundSystem::sonido_cambio_fase(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Boss/Boss_fase", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }          
+    void SoundSystem::sonido_win(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Feedback/Ganar", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }                  
+    void SoundSystem::sonido_jugador_muere(){
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Jugador_muere", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+
+    }
+
 
     //PASOS
 
@@ -661,6 +746,7 @@ ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Arany
         ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance_SFX_pasos));
     }               
 
+  
     
     
 
