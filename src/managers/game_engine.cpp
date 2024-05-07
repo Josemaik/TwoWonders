@@ -1,5 +1,4 @@
 #include "game_engine.hpp"
-#include <chrono>
 
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
@@ -20,6 +19,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["Menu"] = dmeg.CreateNode("Menu", rootNode);
     nodes["HUD"] = dmeg.CreateNode("HUD", nodes["2D"]);
     nodes["Book"] = dmeg.CreateNode("Book", nodes["HUD"]);
+    nodes["SnowStarfield"] = dmeg.CreateNode("SnowStarfield", nodes["HUD"]);
     nodes["Dialog"] = dmeg.CreateNode("Dialog", nodes["HUD"]);
     nodes["Gifs"] = dmeg.CreateNode("Gifs", nodes["2D"]);
     nodes["Nums"] = dmeg.CreateNode("Nums", nodes["HUD"]);
@@ -349,10 +349,6 @@ void ENGI::GameEngine::drawNode(Node* node, vec2i pos, vec2f scale) {
     node->setVisibleOne(true);
 }
 
-void ENGI::GameEngine::drawCircle(int, int, float, Color) {
-    //DrawCircle(posX, posY, radius, color);
-}
-
 void ENGI::GameEngine::drawCircleSector(vec2d, float, float, float, int, Color) {
     //DrawCircleSector(center.toRaylib(), radius, startAngle, endAngle, segments, color);
 }
@@ -463,6 +459,11 @@ vec3d ENGI::GameEngine::getUpCamera()
 float ENGI::GameEngine::getFovyCamera()
 {
     return camera->fovy;
+}
+
+glm::mat4 ENGI::GameEngine::getViewMatrix()
+{
+    return camera->getViewMatrix();
 }
 
 ////// INPUT HANDLING //////
@@ -751,6 +752,23 @@ Node* ENGI::GameEngine::createNode(const char* name, Node* parentNode)
 Node* ENGI::GameEngine::createNode(Node* copyNode, Node* parentNode)
 {
     return dmeg.CreateNodeCopy(copyNode, parentNode);
+}
+
+///// Circle /////
+
+Node* ENGI::GameEngine::createCircle(vec2i position, float radius, int segments, Color color, const char* nodeName, Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateCircle({ position.x, position.y }, radius, segments, color, nodeName, parentNode);
+    else
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {radius * 2, radius * 2} };
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::drawCircle(vec2i position, float radius, int segments, Color color)
+{
+    return dmeg.CreateCircle({ position.x, position.y }, radius, segments, color, "circle", nodes["TextCopy"]);
 }
 
 ///// Rectangle /////

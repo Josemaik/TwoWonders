@@ -138,7 +138,7 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
     if (elapsedFrutum >= limitFrustum)
         updateFrustum(em, ge, newCameraPos, newCameraTarget, newCameraFovy);
     else
-        elapsedFrutum += timeStep30;
+        elapsedFrutum += ge.getFrameTime();
 }
 
 void CameraSystem::updateFrustum(EntityManager& em, GameEngine& ge, vec3d& cameraPos, vec3d& cameraTar, float cameraFovy)

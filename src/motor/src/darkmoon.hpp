@@ -95,6 +95,8 @@ namespace DarkMoon {
         Font* GetDefaultFont() { return m_renderManager.defaultFont; };
         // Get mouse ray cast
         Ray GetMouseRay();
+        // Get view matrix
+        glm::mat4 GetViewMatrix();
 
         // LIGHTS
 

@@ -375,11 +375,86 @@ struct vec2D
         return { x * rhs.x, y * rhs.y };
     }
 
+    constexpr vec2D operator-(vec2D const& rhs) const
+    {
+        return { x - rhs.x, y - rhs.y };
+    }
+
+    constexpr vec2D operator+(vec2D const& rhs) const
+    {
+        return { x + rhs.x, y + rhs.y };
+    }
+
+    constexpr vec2D operator/(vec2D const& rhs) const
+    {
+        return { x / rhs.x, y / rhs.y };
+    }
+
+    constexpr vec2D operator*(DataT const s) const
+    {
+        return { x * s, y * s };
+    }
+
+    constexpr vec2D operator/(DataT const s) const
+    {
+        return { static_cast<DataT>(x / s), static_cast<DataT>(y / s) };
+    }
+
     constexpr vec2D operator*=(vec2D const& rhs)
     {
         x *= rhs.x;
         y *= rhs.y;
         return *this;
+    }
+
+    constexpr vec2D operator/= (vec2D const& rhs)
+    {
+        x /= rhs.x;
+        y /= rhs.y;
+        return *this;
+    }
+
+    constexpr vec2D operator*=(DataT const s)
+    {
+        x *= s;
+        y *= s;
+        return *this;
+    }
+
+    constexpr vec2D operator/=(DataT const s)
+    {
+        x /= s;
+        y /= s;
+        return *this;
+    }
+
+    constexpr vec2D operator-= (vec2D const& rhs)
+    {
+        x -= rhs.x;
+        y -= rhs.y;
+        return *this;
+    }
+
+    constexpr DataT lengthSQ() const
+    {
+        return x * x + y * y;
+    }
+
+    constexpr double length() const
+    {
+        if (!length_)
+            length_ = std::sqrt(lengthSQ());
+        return *length_;
+    }
+
+    constexpr double distance(vec2D const& rhs) const
+    {
+        return (rhs - *this).length();
+    }
+
+    constexpr double dotProduct(vec2D const& rhs) const
+    {
+        return x * rhs.x + y * rhs.y;
     }
 
     // Función para pasar de double a float o de float a double
@@ -388,6 +463,13 @@ struct vec2D
         return vec2D<OtherT>(static_cast<OtherT>(x), static_cast<OtherT>(y));
     }
 
+    friend std::ostream& operator<<(std::ostream& os, vec2D const& v)
+    {
+        os << '(' << v.x << ", " << v.y << ')';
+        return os;
+    }
+
+    mutable std::optional<DataT> length_{};
     DataT x{}, y{};
 };
 

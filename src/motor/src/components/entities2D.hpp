@@ -80,12 +80,16 @@ namespace DarkMoon {
 
     struct Circle : Entity2D {
     private:
-        void changeVAO(glm::mat4& transMatrix) override;
+        void changeVAO(glm::mat4& transMatrix, bool forceUpdate = false);
     public:
         glm::vec2 position = {};
         float radius = { 10.0f };
+        float oldRadius = { 10.0f };
         int segments = { 20 };
+        int oldSegments = { 20 };
+        std::vector<float> vertices{};
         Color color = { D_BLACK };
+        RenderManager& rm = RenderManager::getInstance();
 
         Circle(glm::vec2 p, float rad, int seg, Color c);
         ~Circle();

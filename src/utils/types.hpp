@@ -230,6 +230,7 @@ using Node = DarkMoon::Node;
 using Texture = DarkMoon::Texture;
 using Texture2D = DarkMoon::Texture2D;
 using Gif = DarkMoon::AnimatedTexture2D;
+using Circle = DarkMoon::Circle;
 using Rectangle = DarkMoon::Rectangle;
 using Slider = DarkMoon::Slider;
 using OptionSlider = DarkMoon::OptionSlider;

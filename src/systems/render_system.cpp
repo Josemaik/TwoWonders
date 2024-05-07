@@ -2333,6 +2333,12 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                 }
             }
         }
+
+        if (li.mapID == 3 && pl.hasComponent<PhysicsComponent>())
+        {
+            auto& phy = em.getComponent<PhysicsComponent>(pl);
+            drawSnowEffect(engine, phy.position.z() >= 137, { static_cast<float>(phy.velocity.x()), static_cast<float>(phy.velocity.z()) });
+        }
     }
 }
 
@@ -3405,4 +3411,38 @@ void RenderSystem::drawCheats(EntityManager& em, GameEngine& engine)
         auto& lc = em.getComponent<LifeComponent>(player);
         lc.life = lc.maxLife;
     }
+}
+
+void RenderSystem::drawSnowEffect(GameEngine& engine, bool generate, vec2f)
+{
+    // auto cameraPos = engine.getPositionCamera();
+    auto screenH = engine.getScreenHeight();
+    for (std::size_t i = 0; i < 80; i++)
+    {
+        auto& snow = snowList[i];
+        if ((snow.position.x < 0 || snow.position.y > screenH) && generate)
+            generateSnow(engine, i);
+
+        engine.createCircle(snow.position.to_other<int>(), snow.size / 2, 5, D_WHITE, ("snow" + std::to_string(i)).c_str(), getNode(engine, "SnowStarfield"));
+
+        // Update snow position
+        snow.position -= snow.speed;
+        snow.speed *= 1.01f;
+    }
+
+    // Pa cuando se arregle el shader de transparencia
+    // if (generate)
+        // engine.drawRectangle({ 0, 0 }, { engine.getScreenWidth(), engine.getScreenHeight() }, { 255, 255, 255, 10 });
+}
+
+void RenderSystem::generateSnow(GameEngine& engine, std::size_t num)
+{
+    snowList[num] = {
+        vec2i{engine.getScreenWidth() + engine.getRandomValue(-300, 300), engine.getRandomValue(-300, 300)}.to_other<float>(),
+        {engine.getRandomValue(10.f, 30.f), engine.getRandomValue(-25.f, 0.f)},
+       engine.getRandomValue(8.f, 18.f)
+    };
+
+    if (snowList[num].position.x < engine.getScreenWidth() && snowList[num].position.y > 0)
+        generateSnow(engine, num);
 }

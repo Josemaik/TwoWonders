@@ -285,8 +285,25 @@ namespace DarkMoon {
         glGenVertexArrays(1, &m_VAO);
         glGenBuffers(1, &m_VBO);
 
-        auto TM = glm::mat4();
-        changeVAO(TM);
+        // Generate unit circle vertices
+        int vertexCount = segments * 2;
+        vertices.resize(vertexCount);
+        for (int i = 0; i < vertexCount; i += 2) {
+            float theta = static_cast<float>((i / 2) * (2.0f * K_PI2 / segments));
+            vertices[i] = std::cos(theta);
+            vertices[i + 1] = std::sin(theta);
+        }
+
+        // Upload vertices to GPU
+        glBindVertexArray(m_VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+        // Create a buffer with maximum size you expect
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 50 * 2, nullptr, GL_DYNAMIC_DRAW);
+        // Update the buffer with current vertices
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * vertices.size(), vertices.data());
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        glBindVertexArray(0);
     };
 
     Circle::~Circle() {
@@ -295,39 +312,36 @@ namespace DarkMoon {
         glDeleteBuffers(1, &m_VBO);
     };
 
-    void Circle::changeVAO(glm::mat4& transMatrix) {
-        RenderManager& rm = RenderManager::getInstance();
-
+    void Circle::changeVAO(glm::mat4& transMatrix, bool forceUpdate) {
         m_transMatrix = transMatrix;
 
         // Apply Transformation Matrix
-        position = glm::vec2(transMatrix[3][0], transMatrix[3][1]);
+        glm::vec2 newPosition = glm::vec2(transMatrix[3][0], transMatrix[3][1]);
         auto scale = glm::length(glm::vec2(transMatrix[0][0], transMatrix[1][0]));
 
-        // Calculate vertices for the circle
-        int vertexCount = segments * 2;
-        std::vector<float> vertices(vertexCount);
+        // Calculate vertices for the circle only if position, radius or segments have changed
+        if (forceUpdate || position != newPosition || radius != oldRadius || segments != oldSegments) {
+            position = newPosition;
+            oldRadius = radius;
+            oldSegments = segments;
 
-        for (int i = 0; i < vertexCount; i += 2) {
-            float theta = static_cast<float>((i / 2) * (2.0f * K_PI2 / segments));
-            vertices[i] = rm.normalizeX(position.x + (radius * scale) * std::cos(theta));
-            vertices[i + 1] = rm.normalizeY(position.y + (radius * scale) * std::sin(theta));
+            int vertexCount = segments * 2;
+            vertices.resize(vertexCount);
+
+            for (int i = 0; i < vertexCount; i += 2) {
+                float theta = static_cast<float>((i / 2) * (2.0f * K_PI2 / segments));
+                vertices[i] = rm.normalizeX(position.x + (radius * scale) * std::cos(theta));
+                vertices[i + 1] = rm.normalizeY(position.y + (radius * scale) * std::sin(theta));
+            }
+
+            glBindVertexArray(m_VAO);
+            glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * vertices.size(), vertices.data());
+            glBindVertexArray(0);
         }
-
-        glBindVertexArray(m_VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexCount, vertices.data(), GL_STATIC_DRAW);
-
-        // Set up vertex attribute pointers
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        glBindVertexArray(0);
     };
 
     void Circle::draw(glm::mat4 transMatrix) {
-        RenderManager& rm = RenderManager::getInstance();
-
         // Apply Transformation Matrix
         if (m_transMatrix != transMatrix)
             changeVAO(transMatrix);
@@ -340,7 +354,7 @@ namespace DarkMoon {
         // Draw the circle
         glBindVertexArray(m_VAO);
         glDrawArrays(GL_TRIANGLE_FAN, 0, segments);
-        glBindVertexArray(0);
+        // Don't unbind the VAO here. It will be unbound after all circles are drawn.
     };
 
     // TEXTURE 2D //

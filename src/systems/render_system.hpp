@@ -22,6 +22,13 @@ struct RenderSystem
         float elapsed{};
     };
 
+    struct Snow
+    {
+        vec2f position{ -1, -1 };
+        vec2f speed{};
+        float size{};
+    };
+
     // Se van a buscar las entidad que tengan estos componentes y tags
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
@@ -81,12 +88,15 @@ private:
     double SelectValue(GameEngine& engine, double value, int posx, int posy, int height, int width, const char* name, Node* parentNode);
     uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::map<uint16_t, vec3d>& nodes);
     void checkSliderSound(SoundSystem& ss, OptionSlider& slider);
+    void drawSnowEffect(GameEngine& engine, bool generate, vec2f aux);
+    void generateSnow(GameEngine& engine, std::size_t num);
 
     bool isSelected{ false };
     bool isSelectedfordebug{ false };
     std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
     double pointedDistance{ std::numeric_limits<double>::max() };
     std::map<std::string, AnimatedTexture> animatedTextures{};
+    std::map<std::size_t, Snow> snowList{};
     // bool chunk0Charged{ false };
     // bool chunk1Charged{ false };
     // ShaderType* shaderPtr{ nullptr };

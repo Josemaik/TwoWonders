@@ -360,6 +360,11 @@ namespace DarkMoon {
         return m_renderManager.m_camera->getMouseRay(GetMouseX(), GetMouseY(), m_windowsManager.getScreenWidth(), m_windowsManager.getScreenHeight());
     }
 
+    // Get view matrix
+    glm::mat4 DarkMoonEngine::GetViewMatrix() {
+        return m_renderManager.m_camera->getViewMatrix();
+    }
+
     // LIGHTS
 
     // Create point light in node
