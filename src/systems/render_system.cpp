@@ -919,14 +919,22 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
 
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / K_PI));
 
-                // if (e.hasTag<ChestTag>())
-                //     engine.drawPuntualLight(pos, { 255, 215, 0, 255 });
-
                 if (r.node) {
                     r.node->setTranslation({ pos.x(), pos.y(), pos.z() });
                     r.node->setScale({ scl.x(), scl.y(), scl.z() });
                     r.node->setRotation({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees);
                     r.node->setVisibleOne(true);
+
+                    // Luces cofre
+                    if (e.hasTag<ChestTag>()){
+                        auto& chest = em.getComponent<ChestComponent>(e);
+                        for(auto& child : r.node->getChildren())
+                            if(auto ent = child->getEntity<DarkMoon::PointLight>()){
+                                ent->position = pos.toGlm() + glm::vec3{0, 5, 0};
+                                ent->enabled = !chest.isOpen;
+                            }
+                        r.node->setVisible(true);
+                    }
                     /*
                     if (!in)
                     {
@@ -1110,6 +1118,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     {
         // r.model = engine.loadModelRaylib("assets/models/Cofre.obj");
         r.node = engine.loadModel("assets/models/Cofre.obj");
+        engine.createPuntualLight({}, { 255, 215, 0, 255 }, "Luz puntual cofre", r.node);
         // loadShaders(r.model);
     }
     else if (e.hasTag<DestructibleTag>())
