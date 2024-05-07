@@ -221,6 +221,7 @@ namespace DarkMoon {
         int boneID = -1;
         //obtenemos el nombre del hueso
         std::string boneName = pbone->mName.C_Str();
+        // std::cout << "bone name" << boneName << "\n";
         // comprobamos si existe en el map
         if(m_BoneInfomap.find(boneName) == m_BoneInfomap.end()){
             // si no existe se crea uno nuevo
@@ -240,9 +241,11 @@ namespace DarkMoon {
         auto weights = pbone->mWeights;
         int numWeights = pbone->mNumWeights;
         //recorremos el número de vértices afectados por este hueso
+        // std::cout << "vertex affected" << numWeights;
         for(int i = 0; i < numWeights; i++){
             int vertexID = weights[i].mVertexId;
             float weight = weights[i].mWeight;
+            // std::cout << "weight: " << weight << "\n";
             assert(vertexID <= static_cast<int>(vertices.size()));
             //se setean los datos a los vértices
             SetVertexBoneData(vertices[vertexID],boneID,weight);

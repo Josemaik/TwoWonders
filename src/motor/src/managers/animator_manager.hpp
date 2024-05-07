@@ -23,7 +23,7 @@ struct animator_manager
         {
             m_CurrentTime += m_CurrentAnimation->GetTicksPerSecond() * dt;
             m_CurrentTime = static_cast<float>(fmod(m_CurrentTime, m_CurrentAnimation->GetDuration()));
-            std::cout << "CurrentTime: " << m_CurrentTime << "\n";
+            // std::cout << "CurrentTime: " << m_CurrentTime << "\n";
             CalculateBoneTransform(&m_CurrentAnimation->GetRootNode(), glm::mat4(1.0f));
         }
     }
@@ -66,10 +66,23 @@ struct animator_manager
         auto boneInfoVector = m_CurrentAnimation->GetBonesVector();
         for (auto& boneInfo : boneInfoVector) {
             if (boneInfo.GetBoneName() == nodeName) {
-                std::cout << "name: " << nodeName << "\n";
+                // std::cout << "NameBone: " << nodeName << "\n";
                 int index = boneInfo.GetBoneID();
                 glm::mat4 offset = boneInfo.Getoffset();
+                //  for(int i = 0; i < 4; i++){
+                //     for(int j = 0; j < 4; j++){
+                //         std::cout << offset[i][j] << " ";
+                //     }
+                //     std::cout << "\n";
+                // }
+
                 m_FinalBoneMatrices[index] = globalTransformation * offset;
+                //  for(int i = 0; i < 4; i++){
+                //     for(int j = 0; j < 4; j++){
+                //         std::cout <<  m_FinalBoneMatrices[index][i][j] << " ";
+                //     }
+                //     std::cout << "\n";
+                // }
                 break; // Salir del bucle una vez que se ha encontrado el hueso
             }
         }

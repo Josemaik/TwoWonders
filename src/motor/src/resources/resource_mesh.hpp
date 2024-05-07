@@ -16,7 +16,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#define MAX_NUM_BONES_PER_VERTEX 4
+#define MAX_NUM_BONES_PER_VERTEX 300
 #define BONE_ID_LOCATION 3
 #define BONE_WEIGHT_LOCATION 4
 
