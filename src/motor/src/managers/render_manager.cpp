@@ -25,7 +25,7 @@ namespace DarkMoon {
     void RenderManager::beginMode3D() {
         useShader(activeLights ? shaders["lights"] : shaders["3D"]);
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+        //glEnable(GL_CULL_FACE);
     }
 
     void RenderManager::endMode3D() {
@@ -33,7 +33,7 @@ namespace DarkMoon {
         //glPopAttrib();
 
         glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
+        //glDisable(GL_CULL_FACE);
         useShader(shaders["color"]);
     }
 
@@ -62,9 +62,8 @@ namespace DarkMoon {
                     glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), linearUniformName.c_str()), pointLights[i]->linear);
                     glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), quadraticUniformName.c_str()), pointLights[i]->quadratic);
                 }
-
-                glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "NumPointLights"), static_cast<int>(pointLights.size()));
             }
+            glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "NumPointLights"), static_cast<int>(pointLights.size()));
 
             // Directional Lights //
 
@@ -77,8 +76,8 @@ namespace DarkMoon {
                     glUniform4fv(glGetUniformLocation(shaders["lights"]->getIDShader(), colorUniformName.c_str()), 1, glm::value_ptr(normalizeColor(directionalLights[i]->color)));
                 }
 
-                glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "NumDirectionalLights"), static_cast<int>(directionalLights.size()));
             }
+            glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "NumDirectionalLights"), static_cast<int>(directionalLights.size()));
 
         }
     }

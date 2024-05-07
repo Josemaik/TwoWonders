@@ -394,16 +394,25 @@ namespace DarkMoon {
     void DarkMoonEngine::UpdateLights(Node* parentNode) {
         m_renderManager.updateLights();
 
-        for (auto& child : parentNode->getChildren()) {
-            if (child->getVisible()) {
-                if (auto pLight = child->getEntity<PointLight>())
-                    m_renderManager.pointLights.push_back(pLight);
-                else if (auto dLight = child->getEntity<DirectionalLight>())
-                    m_renderManager.directionalLights.push_back(dLight);
-            }
-        }
+        AuxUpdateLights(parentNode);
 
         m_renderManager.checkLights();
+    }
+
+    // AuxUpdateLights
+    void DarkMoonEngine::AuxUpdateLights(Node* parentNode) {
+        for (auto& child : parentNode->getChildren()) {
+            if (auto pLight = child->getEntity<PointLight>()){
+                if (pLight->enabled)
+                    m_renderManager.pointLights.push_back(pLight);
+            }
+            else if (auto dLight = child->getEntity<DirectionalLight>()){
+                if (dLight->enabled)
+                    m_renderManager.directionalLights.push_back(dLight);
+            }
+            
+            AuxUpdateLights(child);
+        }
     }
 
     // ------------------------ //

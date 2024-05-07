@@ -112,6 +112,8 @@ namespace DarkMoon {
         void DeactivateLights() { m_renderManager.activeLights = false; };
         // Update lights
         void UpdateLights(Node* parentNode);
+        // AuxUpdateLights
+        void AuxUpdateLights(Node* parentNode);
 
         // ------------------------ //
         // Window-related functions //

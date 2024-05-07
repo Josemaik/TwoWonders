@@ -27,7 +27,7 @@ const float MIN_SHININESS = 0.1;
 // --- Lights --- //
 // -------------- //
 
-const int MAX_POINT_LIGHTS = 10;
+const int MAX_POINT_LIGHTS = 20;
 
 struct PointLight {
     vec4 position;
