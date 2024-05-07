@@ -222,10 +222,13 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     engine.createText({ middleScreen,  posTitleY }, "Opciones", engine.getFontDefault(), 80, D_WHITE, "Titulo opciones", menuNode, Aligned::CENTER);
 
     // Posición del slider
+    auto screenH = engine.getScreenHeight();
+    auto downRate = static_cast<int>(90.f * hRate);
     int posX = middleScreen + buttonWidth / 3;
-    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2.f);
-    int posYPart = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.7f);
-    int posYVol = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.4f);
+    int posYRes = static_cast<int>(static_cast<float>(screenH) / 3.1f);
+    int posYPart = posYRes + downRate;
+    int posYVol = static_cast<int>(static_cast<float>(screenH) / 2.f);
+    int posYBack = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.1f);
 
     std::string firstOpt = "";
     switch (engine.getScreenWidth())
@@ -244,18 +247,31 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
         break;
     }
 
-    auto* sliderRes = engine.createOptionSlider({ posX, posY }, { buttonWidth, buttonHeight }, D_AQUA, "",
+    std::map<std::size_t, std::pair<const char*, float>> volumeSliders =
+    {
+        {0, {"vol_gen", ss.getVolumeMaster()} },
+        {1, {"vol_sfx", ss.getVolumeSFX()} },
+        {2, {"vol_music", ss.getVolumeMusic()} },
+        {3, {"vol_ambient", ss.getVolumeAmbient()} }
+    };
+
+    auto* sliderRes = engine.createOptionSlider({ posX, posYRes }, { buttonWidth, buttonHeight }, D_AQUA, "",
         engine.getFontDefault(), 35, 45, D_AQUA, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA_LIGHT, D_AQUA_DARK,
         { "800x600", "1280x720", "1920x1080", "FULLSCREEN" }, firstOpt, "Resolucion", menuNode);
 
     auto& sliderInfo = *sliderRes->getEntity<OptionSlider>();
     checkSliderSound(ss, sliderInfo);
 
-    auto* sliderVol = engine.createFloatSlider({ posX, posYVol }, { buttonWidth, buttonHeight }, D_AQUA, "",
-        engine.getFontDefault(), 35, 45, D_AQUA, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA_LIGHT, D_AQUA_DARK, ss.getVolumeMaster(), "Volumen", menuNode);
+    std::vector<FloatSlider*> volSliders{};
+    for (int i = 0; i < static_cast<int>(volumeSliders.size()); i++)
+    {
+        auto* sliderNode = engine.createFloatSlider({ posX, posYVol + downRate * i }, { buttonWidth, buttonHeight }, D_AQUA, "",
+            engine.getFontDefault(), 35, 45, D_AQUA, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA_LIGHT, D_AQUA_DARK, volumeSliders[i].second, volumeSliders[i].first, menuNode);
 
-    auto& sliderInfoVol = *sliderVol->getEntity<FloatSlider>();
-    checkSliderSound(ss, sliderInfoVol);
+        auto* sldInfo = sliderNode->getEntity<FloatSlider>();
+        checkSliderSound(ss, *sldInfo);
+        volSliders.push_back(sldInfo);
+    }
 
     // CheckBox de partículas
     engine.createCheckBoxPtr({ posX, posYPart }, 40.f, &li.showParticles, D_WHITE, D_LAVENDER, D_LAVENDER_LIGHT, "particleCheckBox", menuNode);
@@ -268,22 +284,56 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
         {"FULLSCREEN", [&]() { engine.setWindowFullScreen(); }}
     };
 
+    // Comportamiendo volumen
+    auto createVolumeSliderBehavior = [&](int index) {
+        return [&, index]() {
+            auto& sliderInfoVol = *volSliders[index];
+            if (engine.isKeyDown(D_KEY_RIGHT))
+            {
+                sliderInfoVol.nextOption();
+                switch (index) {
+                case 0: ss.setVolumeMaster(sliderInfoVol.currentValue); break;
+                case 1: ss.setVolumeSFX(sliderInfoVol.currentValue); break;
+                case 2: ss.setVolumeMusic(sliderInfoVol.currentValue); break;
+                case 3: ss.setVolumeAmbient(sliderInfoVol.currentValue); break;
+                }
+                inpi.right = false;
+                ss.sonido_mov();
+            }
+            else if (engine.isKeyDown(D_KEY_LEFT))
+            {
+                sliderInfoVol.prevOption();
+                switch (index) {
+                case 0: ss.setVolumeMaster(sliderInfoVol.currentValue); break;
+                case 1: ss.setVolumeSFX(sliderInfoVol.currentValue); break;
+                case 2: ss.setVolumeMusic(sliderInfoVol.currentValue); break;
+                case 3: ss.setVolumeAmbient(sliderInfoVol.currentValue); break;
+                }
+                inpi.left = false;
+                ss.sonido_mov();
+            }
+        };
+    };
+
     // Botones
     std::map<std::string, std::tuple<Node*, std::string, std::function<void()>, vec2i>> buttonData = {
     { "1_volver", { nullptr, "Volver", [&]() {
         li.currentScreen = li.previousScreen;
         ss.seleccion_menu();
         return;
-    }, {middleScreen - buttonWidth, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.2f)} } },
+    }, {middleScreen - buttonWidth, posYBack} } },
     { "2_aceptar", { nullptr, "Aceptar", [&]() {
 
         auto& action = SliderData[sliderInfo.options[sliderInfo.currentOption]];
         action();
 
-        ss.setVolumeMaster(sliderInfoVol.currentValue);
+        ss.setVolumeMaster(volSliders[0]->currentValue);
+        ss.setVolumeSFX(volSliders[1]->currentValue);
+        ss.setVolumeMusic(volSliders[2]->currentValue);
+        ss.setVolumeAmbient(volSliders[3]->currentValue);
         ss.seleccion_menu();
         return;
-    }, {middleScreen + buttonWidth / 3, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.2f)} } },
+    }, {middleScreen + buttonWidth / 3, posYBack} } },
     { "3_controles", { nullptr, "Controles", [&]() {
         li.evenMorePreviousScreen = li.previousScreen;
         li.currentScreen = GameScreen::CONTROLS;
@@ -305,28 +355,20 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
 
             ss.sonido_mov();
         }
-    }, {middleScreen - buttonWidth, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2.f)} } },
+    }, {middleScreen - buttonWidth, posYRes} } },
     { "5_particleCheck", { nullptr, "Partículas", [&]() {
         if (inpi.interact)
             li.showParticles = !li.showParticles;
     }, {middleScreen - buttonWidth, posYPart}}},
-    { "6_sliderVol", { nullptr, "Volumen", [&]() {
-        if (engine.isKeyDown(D_KEY_RIGHT))
-        {
-            sliderInfoVol.nextOption();
-            ss.setVolumeMaster(sliderInfoVol.currentValue);
-            inpi.right = false;
-            ss.sonido_mov();
-        }
-        else if (engine.isKeyDown(D_KEY_LEFT))
-        {
-            sliderInfoVol.prevOption();
-            ss.setVolumeMaster(sliderInfoVol.currentValue);
-            inpi.left = false;
-            ss.sonido_mov();
-        }
-    }, {middleScreen - buttonWidth, posYVol} } }
+    { "6_sliderVol", { nullptr, "Volumen", createVolumeSliderBehavior(0), {middleScreen - buttonWidth, posYVol} } },
+    { "7_sliderVol", { nullptr, "SFX", createVolumeSliderBehavior(1), {middleScreen - buttonWidth, posYVol + downRate} } },
+    { "8_sliderVol", { nullptr, "Música", createVolumeSliderBehavior(2), {middleScreen - buttonWidth, posYVol + downRate * 2} } },
+    { "9_sliderVol", { nullptr, "Ambiente", createVolumeSliderBehavior(3), {middleScreen - buttonWidth, posYVol + downRate * 3} } },
     };
+
+    // Volver con escape
+    if (engine.isKeyReleased(D_KEY_ESCAPE))
+        std::get<2>(buttonData["1_volver"])();
 
     int i{ 0 };
     for (auto& [name, data] : buttonData)
@@ -926,11 +968,11 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     r.node->setVisibleOne(true);
 
                     // Luces cofre
-                    if (e.hasTag<ChestTag>()){
+                    if (e.hasTag<ChestTag>()) {
                         auto& chest = em.getComponent<ChestComponent>(e);
-                        for(auto& child : r.node->getChildren())
-                            if(auto ent = child->getEntity<DarkMoon::PointLight>()){
-                                ent->position = pos.toGlm() + glm::vec3{0, 5, 0};
+                        for (auto& child : r.node->getChildren())
+                            if (auto ent = child->getEntity<DarkMoon::PointLight>()) {
+                                ent->position = pos.toGlm() + glm::vec3{ 0, 5, 0 };
                                 ent->enabled = !chest.isOpen;
                             }
                         r.node->setVisible(true);
@@ -2343,7 +2385,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
             }
         }
 
-        if (li.mapID == 3 && pl.hasComponent<PhysicsComponent>())
+        if (li.showParticles && li.mapID == 3 && pl.hasComponent<PhysicsComponent>())
         {
             auto& phy = em.getComponent<PhysicsComponent>(pl);
             drawSnowEffect(engine, phy.position.z() >= 137, { static_cast<float>(phy.velocity.x()), static_cast<float>(phy.velocity.z()) });
@@ -3429,7 +3471,7 @@ void RenderSystem::drawSnowEffect(GameEngine& engine, bool generate, vec2f)
     for (std::size_t i = 0; i < 80; i++)
     {
         auto& snow = snowList[i];
-        if ((snow.position.x < 0 || snow.position.y > screenH) && generate)
+        if ((snow.position.x < 0 || snow.position.y > static_cast<float>(screenH)) && generate)
             generateSnow(engine, i);
 
         engine.createCircle(snow.position.to_other<int>(), snow.size / 2, 5, D_WHITE, ("snow" + std::to_string(i)).c_str(), getNode(engine, "SnowStarfield"));
@@ -3452,6 +3494,6 @@ void RenderSystem::generateSnow(GameEngine& engine, std::size_t num)
        engine.getRandomValue(8.f, 18.f)
     };
 
-    if (snowList[num].position.x < engine.getScreenWidth() && snowList[num].position.y > 0)
+    if (snowList[num].position.x < static_cast<float>(engine.getScreenWidth()) && snowList[num].position.y > 0)
         generateSnow(engine, num);
 }
