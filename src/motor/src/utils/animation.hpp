@@ -2,7 +2,7 @@
 
 #include "bone.hpp"
 #include <glm/gtc/type_ptr.hpp>
-// #include "../components/entity_model.hpp"
+#include "../utils/BoneIndo.hpp"
 
 struct AssimpNodeData
 {
@@ -17,7 +17,7 @@ struct animation
 public:
     animation() = default;
 
-    animation(const std::string& animationPath)
+    animation(const std::string& animationPath,std::map<std::string, BoneInfo>& BoneInfo)
     {
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
@@ -26,8 +26,8 @@ public:
         m_Duration = static_cast<float>(animation->mDuration);
         m_TicksPerSecond = static_cast<float>(animation->mTicksPerSecond);
         ReadHeirarchyData(m_RootNode, scene->mRootNode);
-        FillBones(animation);
-        // FindBoneReadMissingBones(animation, *model);
+        // FillBones(animation);
+        ReadMissingBones(animation,BoneInfo);
     }
 
     ~animation()
@@ -64,39 +64,52 @@ public:
     //     m_Bones[index].SetBoneID(id);
     // }
 private:
-    void FillBones(const aiAnimation* animation){
-        int size = animation->mNumChannels;
-        for (int i = 0; i < size; i++)
-        {
-            auto channel = animation->mChannels[i];
-            std::string boneName = channel->mNodeName.data;
-            m_Bones.push_back(bone(channel->mNodeName.data,
-                1, channel));
-        }
-    }
-    // template<typename ModelType>
-    // void ReadMissingBones(const aiAnimation* animation, ModelType& model) {
+    // void FillBones(const aiAnimation* animation){
     //     int size = animation->mNumChannels;
-
-    //     auto& boneInfoMap = model.getBoneInfoMap();
-    //     int& boneCount = model.getBoneCount();
-
     //     for (int i = 0; i < size; i++)
     //     {
     //         auto channel = animation->mChannels[i];
     //         std::string boneName = channel->mNodeName.data;
-
-    //         if (boneInfoMap.find(boneName) == boneInfoMap.end())
-    //         {
-    //             boneInfoMap[boneName].id = boneCount;
-    //             boneCount++;
-    //         }
     //         m_Bones.push_back(bone(channel->mNodeName.data,
-    //             boneInfoMap[channel->mNodeName.data].id, channel));
+    //             1, channel));
     //     }
-
-    //     m_BoneInfoMap = boneInfoMap;
     // }
+    // template<typename ModelType>
+    void ReadMissingBones(const aiAnimation* animation, std::map<std::string, BoneInfo>& boneInfoMap) {
+        int size = animation->mNumChannels;
+
+        // auto& boneInfoMap = model.getBoneInfoMap();
+        // int& boneCount = model.getBoneCount();
+
+        // for (int i = 0; i < size; i++)
+        // {
+        //     auto channel = animation->mChannels[i];
+        //     std::string boneName = channel->mNodeName.data;
+
+        //     // if (boneInfoMap.find(boneName) = boneInfoMap.end())
+        //     // {
+        //     //     boneInfoMap[boneName].id = boneCount;
+        //     //     boneCount++;
+            // }else{
+           
+        //     }
+        // } 
+        for(int i = 0; i < size; i++){
+            auto channel = animation->mChannels[i];
+            std::string boneName = channel->mNodeName.data;
+            if (boneInfoMap.find(boneName) != boneInfoMap.end()){
+                 m_Bones.push_back(bone(channel->mNodeName.data,
+                boneInfoMap[channel->mNodeName.data].id, channel));
+            }
+        }
+        
+        // for(auto& bone : boneInfoMap){
+        //  m_Bones.push_back(bone(channel->mNodeName.data,
+        //         boneInfoMap[channel->mNodeName.data].id, channel));
+        // }
+
+        // m_BoneInfoMap = boneInfoMap;
+    }
 
     void ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src) {
         assert(src);
@@ -117,5 +130,5 @@ private:
     float m_TicksPerSecond{};
     std::vector<bone> m_Bones{};
     AssimpNodeData m_RootNode{};
-    // std::map<std::string, typename ModelType::BoneInfo> m_BoneInfoMap{};
+    std::map<std::string, BoneInfo> m_BoneInfoMap{};
 };

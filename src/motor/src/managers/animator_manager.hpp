@@ -23,6 +23,7 @@ struct animator_manager
         {
             m_CurrentTime += m_CurrentAnimation->GetTicksPerSecond() * dt;
             m_CurrentTime = static_cast<float>(fmod(m_CurrentTime, m_CurrentAnimation->GetDuration()));
+            std::cout << "CurrentTime: " << m_CurrentTime << "\n";
             CalculateBoneTransform(&m_CurrentAnimation->GetRootNode(), glm::mat4(1.0f));
         }
     }
@@ -37,6 +38,13 @@ struct animator_manager
     {
         std::string nodeName = node->name;
         glm::mat4 nodeTransform = node->transformation;
+        // std::cout << "name: " << nodeName << "\n";
+        // for(int i = 0; i < 4; i++){
+        //     for(int j = 0; j < 4; j++){
+        //         std::cout << nodeTransform[i][j] << " ";
+        //     }
+        //     std::cout << "\n";
+        // }
 	
         bone* Bone = m_CurrentAnimation->FindBone(nodeName);
 	
@@ -44,6 +52,13 @@ struct animator_manager
         {
             Bone->Update(m_CurrentTime);
             nodeTransform = Bone->GetLocalTransform();
+            //  std::cout << "name: " << Bone->GetBoneName() << "\n";
+            //  for(int i = 0; i < 4; i++){
+            //     for(int j = 0; j < 4; j++){
+            //         std::cout << nodeTransform[i][j] << " ";
+            //     }
+            //     std::cout << "\n";
+            // }
         }
 	
         glm::mat4 globalTransformation = parentTransform * nodeTransform;
@@ -51,13 +66,13 @@ struct animator_manager
         auto boneInfoVector = m_CurrentAnimation->GetBonesVector();
         for (auto& boneInfo : boneInfoVector) {
             if (boneInfo.GetBoneName() == nodeName) {
+                std::cout << "name: " << nodeName << "\n";
                 int index = boneInfo.GetBoneID();
                 glm::mat4 offset = boneInfo.Getoffset();
                 m_FinalBoneMatrices[index] = globalTransformation * offset;
                 break; // Salir del bucle una vez que se ha encontrado el hueso
             }
         }
-	
         for (int i = 0; i < node->childrenCount; i++)
             CalculateBoneTransform(&node->children[i], globalTransformation);
     }

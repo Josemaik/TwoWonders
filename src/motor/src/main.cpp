@@ -177,14 +177,15 @@ int main() {
         auto mainCharacter = createMainCharacter(engine);
         auto modelcharacter = dynamic_cast<DarkMoon::Model*>(mainCharacter->getEntity());
         auto boneInfoMap = modelcharacter->getboneInfoMap();
-        animation crusheranimation("assets/Apisonadora/Apisonadora.fbx");
-        auto m_bones = crusheranimation.GetBonesVector();
-        for(auto& bone : m_bones){
-            std::string boneName = bone.GetBoneName();
-            if (boneInfoMap.find(boneName) == boneInfoMap.end()){
-                bone.SetBoneID(boneInfoMap[boneName].id);
-            }
-        }
+        // int count = modelcharacter->getBoneCount();
+        animation crusheranimation("assets/Apisonadora/Apisonadora.fbx",boneInfoMap);
+        // auto m_bones = crusheranimation.GetBonesVector();
+        // for(auto& bone : m_bones){
+        //     std::string boneName = bone.GetBoneName();
+        //     if (boneInfoMap.find(boneName) == boneInfoMap.end()){
+        //         bone.SetBoneID(boneInfoMap[boneName].id);
+        //     }
+        // }
         // copiar mapbones en mbones
         // crusheranimation.m_Bones
         // crusheranimation.m_Bones.push_back(bone(channel->mNodeName.data,

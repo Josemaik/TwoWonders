@@ -6,6 +6,7 @@
 #include "../resources/resource_material.hpp"
 #include "../managers/resource_manager.hpp"
 #include "../managers/render_manager.hpp"
+#include "../utils/BoneIndo.hpp"
 
 #include <vector>
 #include <map>
@@ -60,13 +61,6 @@ namespace DarkMoon {
         
 
     public:
-        struct BoneInfo
-        {
-            //id of index in finalbonematrices
-            int id{};
-            //offset matrix transform vertex from model space to bone space
-            glm::mat4 offset{};
-        };
         
         std::map<std::string,BoneInfo> m_BoneInfomap{};
         int m_BoneCounter { 0 };
