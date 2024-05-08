@@ -155,8 +155,8 @@ struct SoundSystem {
     void stop_munyeco_mov();
     void stop_pasos();
 
-    void sonido_pause();
-    void sonido_unpause();
+    void sonido_pause(int zona);
+    void sonido_unpause(int zona);
 
     void update();
     void clear();

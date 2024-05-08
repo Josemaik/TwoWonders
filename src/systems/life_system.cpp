@@ -141,6 +141,8 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             if (ent.hasTag<DestructibleTag>()) {
                 if (li.mapID == 1) {
                     li.door_open = true;
+                    em.getSingleton<SoundSystem>().sonido_abrir_puerta_magica();
+
                 }
             }
 

@@ -385,11 +385,9 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
 void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInfo& li, SoundSystem& ss)
 {
     auto& inpi = em.getSingleton<InputInfo>();
-    //ss.music_stop_level();
-   // ss.ambient_stop();
-    ss.sonido_pause();
+
+    ss.sonido_pause(li.mapID);
     ss.stop_pasos();
-    //    ss.playMusicMenu();
 
     // Nodo de los botones
     if (inpi.pause)
@@ -441,10 +439,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
             {
                 li.currentScreen = GameScreen::STORY;
                 li.anyButtonPressed = false;
-                //ss.music_stop();
-               // ss.play_music_level();
-                //ss.playAmbient();
-                ss.sonido_unpause();
+                
                 
             }
             else
@@ -453,6 +448,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
             li.elapsedPause = 0.f;
 
             ss.seleccion_menu();
+            ss.sonido_unpause(li.mapID);
             
         } } },
         { "2_opciones", { nullptr, "Opciones", [&]() {

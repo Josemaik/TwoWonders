@@ -112,7 +112,6 @@ void SoundSystem::sonido_music_volcan() {
 void SoundSystem::sonido_music_mazmorra() {
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_mazmorra, &eventInstance_Musica_Level));
     play_music_level();
-    music_started = true;
 
 
 }
@@ -889,9 +888,34 @@ void SoundSystem::stop_pasos(){
 
 
 //FUNCIONES PARA LLAMAR PARA MANEJAR LOS EVENTOS DURANTE EL MENU DE PAUSA
-void SoundSystem::sonido_pause(){
+void SoundSystem::sonido_pause(int zona){
     FMOD_BOOL pausa {true};
-    if(music_started){
+    switch (zona)
+    {
+        case 0:
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente, pausa));
+            break;
+        case 2:
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente_volcan, pausa));
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, pausa));
+            break;
+        case 3:
+            //ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, pausa));
+            break;
+        case 4:
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, pausa));
+            break;
+        default:
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente, pausa));
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, pausa));
+            break;
+    }
+    if(!music_started){
+        playMusicMenu();
+        music_started = true;
+    }
+  
+   /*if(music_started){
         ERRCHECK(FMOD_Studio_EventInstance_GetPaused(eventInstance_Musica_Level, &musica_suena));
         if( !musica_suena )
             ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, pausa));
@@ -903,21 +927,21 @@ void SoundSystem::sonido_pause(){
         if( !ambiente_volcan ){
             ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente_volcan, pausa));
         }
-    }*/
+    }
     if( !ambiente ){
         ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente, pausa));
 
-    }
+    }*/
 
 
     //update();
 }
-void SoundSystem::sonido_unpause(){
+void SoundSystem::sonido_unpause(int zona){
     FMOD_BOOL despausa {false};
 
     //ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, despausa));
 
-    if( ambiente ){
+   /* if( ambiente ){
         ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente, despausa));
 
     }
@@ -925,7 +949,31 @@ void SoundSystem::sonido_unpause(){
         ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente_volcan, despausa));
     }*/
 
-    update();
+    switch (zona)
+    {
+        case 0:
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente, despausa));
+            break;
+        case 2:
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente_volcan, despausa));
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, despausa));
+            break;
+        case 3:
+            //ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, despausa));
+            break;
+        case 4:
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, despausa));
+            break;
+        default:
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente, despausa));
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, despausa));
+            break;
+    }
+
+     if(music_started){
+        music_stop();
+        music_started = false;
+    }
 
 }
 
