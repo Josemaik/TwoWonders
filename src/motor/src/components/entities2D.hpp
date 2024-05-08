@@ -288,9 +288,6 @@ namespace DarkMoon {
                 charIndex = 0;
                 bold = false;
                 italic = false;
-                #ifdef _WIN32
-                skipBoldItalic = false;
-                #endif
                 float lineWidth = position.x;
 
                 // Seteamos la escala con el ratio
@@ -416,6 +413,8 @@ namespace DarkMoon {
                 if (timeElapsed >= charSpeed) {
                     timeElapsed -= charSpeed;
                     if (charIndex < text.size()) {
+                        bold = false;
+                        italic = false;
                         ++charIndex;
 
                         if (charIndex % static_cast<std::size_t>(8) == 0)
@@ -433,14 +432,6 @@ namespace DarkMoon {
             int k{ 1 }; // Pa la anchura de las líneas
             for (size_t i = 0; i < charIndex; ++i) {
                 wchar_t c = text[i];
-                #ifdef _WIN32
-                if(skipBoldItalic)
-                {
-                    skipBoldItalic = false;
-                    if(c == '\b' || c == '\t')
-                        continue;
-                }
-                #endif
                 if (c == '\n') {
                     // Reset the x position to the start of the line
                     aux_x = position.x;
@@ -457,18 +448,10 @@ namespace DarkMoon {
                 }
                 else if (c == '\b') {
                     bold = !bold;
-                    #ifdef _WIN32
-                    if(i != charIndex - 1)
-                        skipBoldItalic = true;
-                    #endif
                     continue;
                 }
                 else if (c == '\t') {
                     italic = !italic;
-                    #ifdef _WIN32
-                    if(i != charIndex - 1)                    
-                        skipBoldItalic = true;
-                    #endif
                     continue;
                 }
 #ifdef _WIN32
