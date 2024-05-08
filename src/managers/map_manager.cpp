@@ -1051,17 +1051,17 @@ void MapManager::generateNavmeshes(EntityManager& em)
         auto pair = std::make_pair(getNodeVec3d(c.fromNode, navs.nodes), getNodeVec3d(c.toNode, navs.nodes));
         navs.conexpos.insert(pair);
         //nodes
-        // for (auto& [n, vec] : navs.nodes) {
-        //     // if(n == 583){
-        //     //     vec = vec3d{vec.x(),vec.y(),vec.z()+10.0};
-        //     // }
-        //     if (n == c.toNode) {
-        //         navs.selectednodes.insert(std::make_pair(n, vec));
-        //     }
-        //     if (n == c.fromNode) {
-        //         navs.selectednodes.insert(std::make_pair(n, vec));
-        //     }
-        // }
+        for (auto& [n, vec] : navs.nodes) {
+            // if(n == 583){
+                vec = vec3d{vec.x(),vec.y(),vec.z()+10.0};
+            // }
+            if (n == c.toNode) {
+                navs.selectednodes.insert(std::make_pair(n, vec));
+            }
+            if (n == c.fromNode) {
+                navs.selectednodes.insert(std::make_pair(n, vec));
+            }
+        }
     }
     //Crear conexiones entre los centros
     // Crear conexiones entre los centros
