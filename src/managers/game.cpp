@@ -143,9 +143,7 @@ void Game::run()
 
     // Incializamos FPSs
     engine.setTargetFPS(30);
-#ifdef _WIN32
-    engine.setTargetFPS(30);
-#endif
+
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
 

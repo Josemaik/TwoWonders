@@ -25,7 +25,8 @@ namespace DarkMoon {
 
             // Create and configure VAO, VBO
             rm.beginMode3D();
-            rm.useShader(rm.shaders["3D"]);
+            auto& shaders = rm.shaders;
+            rm.useShader(rm.activeLights ? shaders["lights"] : shaders["3D"]);
             glGenVertexArrays(1, &VAO);
             glGenBuffers(1, &VBO);
 

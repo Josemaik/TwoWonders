@@ -188,8 +188,10 @@ namespace DarkMoon {
 
         double sleepTime = m_targetFrameTime - m_deltaTime;
         if (sleepTime > 0.0) {
-            std::chrono::milliseconds sleepDuration(static_cast<long long>(sleepTime * 1000));
-            std::this_thread::sleep_for(sleepDuration);
+            double endTime = currentFrameTime + sleepTime;
+            while (glfwGetTime() < endTime) {
+                // Bucle activo
+            }
             currentFrameTime = glfwGetTime();
             m_deltaTime = currentFrameTime - m_lastFrameTime;
             m_lastFrameTime = currentFrameTime;
