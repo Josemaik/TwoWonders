@@ -182,19 +182,13 @@ void SoundSystem::ambiente_parameter_lava(float lava){
 
 void SoundSystem::sonido_amb_monte() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_monte", &eventDescription_Ambiente));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_Ambiente));
-    FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
-    FMOD_Studio_System_Update(soundSystem);
-    play();
-    update();
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Ambiente, &eventInstance_Ambiente));
+    playAmbient();
 }
 void SoundSystem::sonido_amb_pradera() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_pradera", &eventDescription_Ambiente));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_Ambiente));
-    FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
-    FMOD_Studio_System_Update(soundSystem);
-    play();
-    update();
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Ambiente, &eventInstance_Ambiente));
+    playAmbient();
 }
 
 void SoundSystem::sonido_amb_biblioteca1(){
@@ -900,7 +894,8 @@ void SoundSystem::sonido_pause(int zona){
             ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, pausa));
             break;
         case 3:
-            //ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, pausa));
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, pausa));
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente, pausa));
             break;
         case 4:
             ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, pausa));
@@ -959,7 +954,8 @@ void SoundSystem::sonido_unpause(int zona){
             ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, despausa));
             break;
         case 3:
-            //ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, despausa));
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, despausa));
+            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente, despausa));
             break;
         case 4:
             ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, despausa));

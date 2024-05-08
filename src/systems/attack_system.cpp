@@ -446,6 +446,7 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
     }
     case Spells::IceShield:
     {
+        em.getSingleton<SoundSystem>().sonido_h_escudo();
         if (plfi.armor < plfi.max_armor)
             plfi.armor = plfi.max_armor;
         else

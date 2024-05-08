@@ -126,14 +126,14 @@ void PhysicsSystem::update(EntityManager& em)
           
             if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
                 auto& li = em.getSingleton<LevelInfo>();
-                //ss.play_pasos();
+                ss.play_pasos();
                 playerWalking = true;
                 
             }
             else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) &&  playerWalking)
             {
                 playerWalking = false;
-                //ss.SFX_pasos_stop();
+                ss.SFX_pasos_stop();
             }
         }
         auto& li = em.getSingleton<LevelInfo>();

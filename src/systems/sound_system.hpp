@@ -100,7 +100,7 @@ struct SoundSystem {
 
    void sonido_amb_pradera();           //por integrar
    void sonido_music_pradera();         //por integrar
-   void sonido_h_escudo();              //por integrar
+   void sonido_h_escudo();              //por comprobar
    void sonido_slime_ataque();          //por integrar
    void sonido_slime_danyo();           //por integrar
    void sonido_slime_mov();             //por integrar
