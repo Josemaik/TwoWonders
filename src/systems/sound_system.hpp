@@ -195,7 +195,9 @@ private:
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica_pradera;
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica_monte;
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica_boss_final;
-    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_pasos;  
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_pasos;
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_munyeco_mov;   
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_golem_mov; 
     FMOD_STUDIO_EVENTINSTANCE* eventInstance;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente_volcan;

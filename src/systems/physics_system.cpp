@@ -125,7 +125,6 @@ void PhysicsSystem::update(EntityManager& em)
 
           
             if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
-                auto& li = em.getSingleton<LevelInfo>();
                 ss.play_pasos();
                 playerWalking = true;
                 
@@ -143,48 +142,48 @@ void PhysicsSystem::update(EntityManager& em)
             auto& playerPhy = em.getComponent<PhysicsComponent>(player);
             auto& playerPos = playerPhy.position;
             auto& ss = em.getSingleton<SoundSystem>();
-            if( phy.position.distance(playerPos) < 30.0 )
+            auto& ia = em.getComponent<AIComponent>(e);
+            if( phy.position.distance(playerPos) < 40.0 )
             {
-                if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !golemWalking)
+                if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !ia.ismoving)
                 {
-                    auto& li = em.getSingleton<LevelInfo>();
                     ss.sonido_golem_mov();
-                    golemWalking = true;
+                    ia.ismoving = true;
                 
-                } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  golemWalking)
+                } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  ia.ismoving)
                 {
-                    golemWalking = false;
+                    ia.ismoving= false;
                     ss.stop_golem_mov();
                 }
             } else
             {
                 ss.stop_golem_mov();
-                //golemWalking = false;
+                ia.ismoving = false;
             } 
         }
         if ( e.hasTag<SnowmanTag>() ){
             
-            auto& player = *em.getEntityByID(li.playerID);
+           auto& player = *em.getEntityByID(li.playerID);
             auto& playerPhy = em.getComponent<PhysicsComponent>(player);
             auto& playerPos = playerPhy.position;
             auto& ss = em.getSingleton<SoundSystem>();
-            if( phy.position.distance(playerPos) < 30.0 )
+            auto& ia = em.getComponent<AIComponent>(e);
+            if( phy.position.distance(playerPos) < 40.0 )
             {
-                if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !munyecoWalking)
+                if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !ia.ismoving)
                 {
-                    auto& li = em.getSingleton<LevelInfo>();
                     ss.sonido_munyeco_mov();
-                    munyecoWalking = true;
+                    ia.ismoving = true;
                 
-                } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  munyecoWalking)
+                } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  ia.ismoving)
                 {
-                    munyecoWalking = false;
-                    //ss.stop_munyeco_mov();
+                    ia.ismoving= false;
+                    ss.stop_munyeco_mov();
                 }
             } else
             {
                 ss.stop_munyeco_mov();
-                munyecoWalking = false;
+                ia.ismoving = false;
             } 
         }
         

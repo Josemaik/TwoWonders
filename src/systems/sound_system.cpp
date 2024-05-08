@@ -58,23 +58,7 @@ void SoundSystem::initBuses(){
 void SoundSystem::initChannels(){
 
       ERRCHECK(FMOD_System_GetMasterChannelGroup(coreSystem, &masterGroup));
-      /*const char* name = "Ambience";
 
-      ERRCHECK( FMOD_System_CreateChannelGroup( coreSystem, name, &ambientGroup));
-
-     FMOD_RESULT result = FMOD_Studio_Bus_GetChannelGroup(sfxBus, &ambientGroup);
-      if (!ambientGroup) {
-        printf("Error: El grupo de canales del bus de ambiente es NULL.\n");
-        if(sfxBus==NULL){
-            printf("NULL");
-        }
-        // Realizar manejo de error adicional si es necesario
-    }
-    ERRCHECK(result);*/
-    
-   //ERRCHECK(FMOD_Studio_Bus_GetChannelGroup(AmbientBus, &ambientGroup));
-    //ERRCHECK(FMOD_Studio_Bus_GetChannelGroup(MusicBus, &musicGroup));
-    //ERRCHECK(FMOD_Studio_Bus_GetChannelGroup(sfxBus, &sfxGroup));
 }
 void SoundSystem::initEvents(){
 
@@ -91,6 +75,11 @@ void SoundSystem::initEvents(){
     
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Musica/Menu/menu_music", &eventDescription_Musica));
 
+    //Movimiento de los enemigos
+
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Munyeco/Munyeco_mov", &eventDescription_munyeco_mov));
+
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Golem/Golem_mov", &eventDescription_golem_mov));
 
 
 }
@@ -390,8 +379,7 @@ void SoundSystem::sonido_h_bola_fuego() {
 
 
 void SoundSystem::sonido_golem_mov() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Golem/Golem_mov", &eventDescription));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_mov_golem));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_golem_mov, &eventInstance_mov_golem));
     FMOD_Studio_EventInstance_Start(eventInstance_mov_golem);
     update();
 }
@@ -419,8 +407,7 @@ void SoundSystem::sonido_golem_muere() {
 }
 
 void SoundSystem::sonido_munyeco_mov() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Munyeco/Munyeco_mov", &eventDescription));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance_mov_munyeco));
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_munyeco_mov, &eventInstance_mov_munyeco));
     FMOD_Studio_EventInstance_Start(eventInstance_mov_munyeco);
     update();
 }
@@ -878,12 +865,15 @@ void SoundSystem::stop_munyeco_mov(){
 void SoundSystem::stop_pasos(){
     stop_munyeco_mov();
     stop_golem_mov();
+    update();
 }
 
 
 //FUNCIONES PARA LLAMAR PARA MANEJAR LOS EVENTOS DURANTE EL MENU DE PAUSA
 void SoundSystem::sonido_pause(int zona){
     FMOD_BOOL pausa {true};
+    stop_pasos();
+    SFX_pasos_stop();
     switch (zona)
     {
         case 0:
@@ -909,40 +899,11 @@ void SoundSystem::sonido_pause(int zona){
         playMusicMenu();
         music_started = true;
     }
-  
-   /*if(music_started){
-        ERRCHECK(FMOD_Studio_EventInstance_GetPaused(eventInstance_Musica_Level, &musica_suena));
-        if( !musica_suena )
-            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, pausa));
-    }
-    //Obtengo los estados de pausa de los diferentes ambientes
-    ERRCHECK(FMOD_Studio_EventInstance_GetPaused(eventInstance_Ambiente, &ambiente));
-    /*if( ambient_started ) {
-        ERRCHECK(FMOD_Studio_EventInstance_GetPaused(eventInstance_Ambiente_volcan, &ambiente_volcan));
-        if( !ambiente_volcan ){
-            ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente_volcan, pausa));
-        }
-    }
-    if( !ambiente ){
-        ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente, pausa));
 
-    }*/
-
-
-    //update();
 }
 void SoundSystem::sonido_unpause(int zona){
     FMOD_BOOL despausa {false};
-
-    //ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Musica_Level, despausa));
-
-   /* if( ambiente ){
-        ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente, despausa));
-
-    }
-    /*if( ambiente_volcan ){
-        ERRCHECK(FMOD_Studio_EventInstance_SetPaused(eventInstance_Ambiente_volcan, despausa));
-    }*/
+    stop_pasos();
 
     switch (zona)
     {
