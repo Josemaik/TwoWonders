@@ -74,10 +74,10 @@ struct AIComponent
     bool chargeattack{ false };
     double countdown_change_dir{ 1.5 }, countdown_stop{ 0.8 }, countdown_shoot{ 0.5 }, countdown_change_position{ 3.0 }
         , countdown_fleeing{ 3.0 }, countdown_perception{ 0.5 }, couldown_spawning{ 0.5 }, countdown_heal{ 1.5 }, countdown_shield{ 0.7 },
-        countdown_air_attack{ 1.0 }, countdown_show_icon{ 7.0 }; // seconds
+        countdown_air_attack{ 1.0 }, countdown_show_icon{ 7.0 }, countdown_evade{1.0}; // seconds
     double elapsed_change_position{ 1.0 }, elapsed_stop{ 1.0 }, elapsed_change_dir{ 1.0 }, elapsed_shoot{ 0.0 },
         elapsed_fleeing{ 1.0 }, elapsed_perception{ 1.0 }, elapsed_spawning{ 1.0 }, elapsed_heal{ 1.0 }, elapsed_shield{ 1.0 },
-        elapsed_air_attack{ 1.0 }, elapsed_show_icon{ 1.0 };
+        elapsed_air_attack{ 1.0 }, elapsed_show_icon{ 1.0 },elapsed_evade{1.0},elapsed_stop_evade{1.0};
 
     vec3d initialPos{};
 

@@ -102,7 +102,7 @@ void AttackSystem::createAttackType(EntityManager& em, Entity& ent, AttackCompon
         break;
 
     case AttackType::Melee:
-        createAttackRangedOrMelee(em, ent, att, false, att.scale_to_respawn_attack, 1.5);
+        createAttackRangedOrMelee(em, ent, att, false, att.scale_to_respawn_attack, 2.0);
         break;
 
     case AttackType::Bomb:

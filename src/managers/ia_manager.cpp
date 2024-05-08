@@ -92,10 +92,11 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     {
         em.addTag<SnowmanTag>(e);
 
+        auto* a_e_1 = &tree.createNode<BTAction_Evade>();
         auto* d_a_6 = &tree.createNode<BTDecisionReadyforAttack>();
         auto* a_a_6 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer, vec3d{}); // fail si disparo succes si no disparo
         auto* d_r_6 = &tree.createNode<BTDecisionOnAttackRadius>();
-        auto* sequence6_1 = &tree.createNode<BTNodeSequence_t>(d_a_6, a_a_6, d_r_6);
+        auto* sequence6_1 = &tree.createNode<BTNodeSequence_t>(a_e_1,d_a_6, a_a_6, d_r_6);
 
         auto* d_1_2 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* a_s_2 = &tree.createNode<BTAction_Seek>();
