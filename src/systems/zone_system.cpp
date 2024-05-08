@@ -567,13 +567,13 @@ void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
     auto& playerEnt = *em.getEntityByID(li.playerID);
     auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
     auto& playerPos = playerPhy.position;
-    using CMPs = MP::TypeList<PhysicsComponent, ColliderComponent, InteractiveComponent, SpawnComponent>;
+    using CMPs = MP::TypeList<PhysicsComponent, InteractiveComponent, SpawnComponent>;
     using spawnTag = MP::TypeList<SpawnTag>;
 
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<CMPs, spawnTag>([&](Entity&, PhysicsComponent& phy, ColliderComponent& col, InteractiveComponent& ic, SpawnComponent& sc)
+    em.forEach<CMPs, spawnTag>([&](Entity& e, PhysicsComponent& phy, InteractiveComponent& ic, SpawnComponent& sc)
     {
-        if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+        if (!frti.inFrustum(e.getID()))
             return;
 
         // Calculamos la distancia entre el jugador y el spawn

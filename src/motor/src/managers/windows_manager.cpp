@@ -165,6 +165,10 @@ namespace DarkMoon {
         m_targetFrameTime = 1.0 / targetFPS;
     }
 
+    double WindowsManager::getTargetFPS() {
+        return 1.0 / m_targetFrameTime;
+    }
+
     double WindowsManager::getFrameTime() {
         return m_deltaTime;
     }

@@ -299,8 +299,16 @@ void ENGI::GameEngine::setTargetFPS(int fps) {
     dmeg.SetTargetFPS(fps);
 }
 
+double ENGI::GameEngine::getTargetFPS() {
+    return dmeg.GetTargetFPS();
+}
+
 float ENGI::GameEngine::getFrameTime() {
     return static_cast<float>(dmeg.GetFrameTime());
+}
+
+double ENGI::GameEngine::getFrameTimeDouble() {
+    return dmeg.GetFrameTime();
 }
 
 ////// DRAWING //////
@@ -1015,7 +1023,7 @@ Node* ENGI::GameEngine::createPoint3D(vec3d position, float pointSize, Color col
 
 Node* ENGI::GameEngine::drawPoint3D(vec3d position, float pointSize, Color color)
 {
-    return dmeg.CreatePoint3D(position.toGlm(), pointSize, color, "point", nodes["Copy"]);
+    return dmeg.CreatePoint3D(position.toGlm(), pointSize, color, "point", nodes["TextCopy"]);
 }
 
 ///// Lights /////

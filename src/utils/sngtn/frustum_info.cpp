@@ -30,63 +30,56 @@ void FrustumInfo::setFrustum(float left, float right, float bottom, float top, f
     normal = pos - aux;
     planes[static_cast<uint8_t>(Plane::RIGHT)] = { normal.normalize(), aux };
 
-    fr_ents.clear();
-    outside_ents.clear();
+    frustSet.clear();
 }
 
-FrustumInfo::Position FrustumInfo::bboxIn(const BBox& bbox)
+void FrustumInfo::bboxIn(std::size_t id, const BBox& bbox)
 {
-    // Comprobar si la caja delimitadora ya ha sido comprobada y está fuera del frustum
-    if (outside_ents.find(&bbox) != outside_ents.end())
-        return Position::OUTSIDE;
-
-    // Comprobar si la caja delimitadora ya ha sido comprobada
-    if (fr_ents.find(&bbox) != fr_ents.end())
-        return Position::INSIDE;
-
     // Comprobar si el centro de la caja delimitadora está dentro del frustum
     vec3f center = bbox.center().to_other<float>();
-    if (pointInFrustum(center) == Position::INSIDE)
+    if (pointInFrustum(center))
     {
-        fr_ents.insert(&bbox);
-        return Position::INSIDE;
+        frustSet.insert(id);
+        return;
     }
 
     // Si el centro no está dentro, comprobar las esquinas
-    for (int i = 0; i < 8; ++i)
-    {
-        vec3f corner = vec3f(
-            i & 1 ? static_cast<float>(bbox.min.x()) : static_cast<float>(bbox.max.x()),
-            i & 2 ? static_cast<float>(bbox.min.y()) : static_cast<float>(bbox.max.y()),
-            i & 4 ? static_cast<float>(bbox.min.z()) : static_cast<float>(bbox.max.z())
-        );
-        if (pointInFrustum(corner) == Position::INSIDE)
+    for (auto& corner : bbox.getCorners())
+    {        
+        if (pointInFrustum(corner))
         {
-            fr_ents.insert(&bbox);
-            return Position::INSIDE;
+            frustSet.insert(id);
+            return;
         }
     }
-
-    outside_ents.insert(&bbox);
-    return Position::OUTSIDE;
 }
 
-FrustumInfo::Position FrustumInfo::pointInFrustum(vec3f const& point, float radius) const
+bool FrustumInfo::pointInFrustum(vec3f const& point, float radius) const
 {
     for (auto const& plane : planes)
     {
         if (plane.distance(point) < -radius)
-            return Position::OUTSIDE;
+            return false;
     }
-    return Position::INSIDE;
+    return true;
 }
 
-FrustumInfo::Position FrustumInfo::pointInFrustum(vec3f const& point) const
+bool FrustumInfo::pointInFrustum(vec3f const& point) const
 {
     for (auto const& plane : planes)
     {
         if (plane.distance(point) < 0)
-            return Position::OUTSIDE;
+            return false;
     }
-    return Position::INSIDE;
+    return true;
+}
+
+void FrustumInfo::addToFrustum(std::size_t id)
+{
+    frustSet.insert(id);
+}
+
+bool FrustumInfo::inFrustum(std::size_t id)
+{
+    return frustSet.find(id) != frustSet.end();
 }

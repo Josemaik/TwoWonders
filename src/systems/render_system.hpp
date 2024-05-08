@@ -33,7 +33,7 @@ struct RenderSystem
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, GameEngine& engine);
+    void update(EntityManager& em, GameEngine& engine, float alpha);
     void drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawLogoKaiwa(GameEngine& engine);
     void drawOptions(GameEngine& engine, EntityManager& em, SoundSystem& ss);

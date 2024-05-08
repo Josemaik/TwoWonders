@@ -754,6 +754,11 @@ namespace DarkMoon {
         m_windowsManager.setTargetFPS(fps);
     }
 
+    // Get target FPS
+    double DarkMoonEngine::GetTargetFPS() {
+        return m_windowsManager.getTargetFPS();
+    }
+
     // Get time in seconds for last frame drawn
     double DarkMoonEngine::GetFrameTime() {
         return m_windowsManager.getFrameTime();

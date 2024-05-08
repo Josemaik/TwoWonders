@@ -53,6 +53,7 @@ namespace DarkMoon {
 
         // Timing-related functions
         void setTargetFPS(int fps);
+        double getTargetFPS();
         double getFrameTime();
         double getTime();
         int getFPS();

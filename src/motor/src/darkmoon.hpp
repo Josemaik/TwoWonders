@@ -275,6 +275,8 @@ namespace DarkMoon {
 
         // Set target FPS (max)
         void SetTargetFPS(int fps);
+        // Get target FPS
+        double GetTargetFPS();
         // Get time in seconds for last frame drawn
         double GetFrameTime();
         // Get elapsed time in seconds

@@ -53,6 +53,9 @@ struct PhysicsComponent
     float countdown_afterStop{ 0.5f }, elapsed_afterStop{ countdown_afterStop };
     vec3d target{};
 
+    vec3d prevPosition{};
+    double prevOrientation{};
+
     void plusDeltatime(float deltaTime, float& elapsed) { elapsed += deltaTime; };
 
     static constexpr double kDrag{ 3.0 };

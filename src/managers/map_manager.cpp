@@ -205,6 +205,7 @@ void MapManager::generateChunkModel(EntityManager& em, mapSizeType& i)
         em.addTag<Chunk6Tag>(modelEntity);
         break;
     }
+    em.addTag<ChunkTag>(modelEntity);
     em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = vec3d::zero(), .scale = vec3d::zero(), .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, -1.0, 0.0 } });
 }
 

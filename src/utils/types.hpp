@@ -95,6 +95,7 @@ struct SubjectTag {};
 struct DestructibleTag {};
 struct ChestTag {};
 struct SpawnTag {};
+struct ChunkTag {};
 struct Chunk0Tag {};
 struct Chunk1Tag {};
 struct Chunk2Tag {};
@@ -176,6 +177,7 @@ using TL = MP::TypeList <
     DestructibleTag,
     ChestTag,
     SpawnTag,
+    ChunkTag,
     Chunk0Tag,
     Chunk1Tag,
     Chunk2Tag,
@@ -221,8 +223,7 @@ using mapSizeType = rapidjson::SizeType;
 using ShaderType = DarkMoon::Shader;
 using ModelType = DarkMoon::Model;
 using Effects = ParticleMakerComponent::ParticleEffect;
-using FrustPos = FrustumInfo::Position;
-using FrustOut = MP::TypeList<GroundTag, NPCTag>;
+using FrustOut = MP::TypeList<GroundTag, NPCTag, ChunkTag>;
 using Color = DarkMoon::Color;
 using Font = DarkMoon::Font;
 using Aligned = DarkMoon::Aligned;

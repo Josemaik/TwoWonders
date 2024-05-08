@@ -13,12 +13,12 @@ void LockSystem::update(EntityManager& em)
         auto& playerPos = playerPhy.position;
         enemies.clear();
 
-        em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
+        em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy)
         {
             if (e.hasTag<EnemyTag>() || e.hasTag<DestructibleTag>())
             {
                 if (e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>() ||
-                    frti.bboxIn(col.bbox) == FrustPos::OUTSIDE || e.hasTag<EnemyDeathTag>())
+                    !frti.inFrustum(e.getID()) || e.hasTag<EnemyDeathTag>())
                     return;
 
                 auto& pos = phy.position;

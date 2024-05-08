@@ -3,22 +3,22 @@
 // Función para insertar una entidad en el octree o en sus hijos
 void Octree::insert(Entity& entity, ColliderComponent& collider)
 {
-    if (!divided_ && octEntities_.size() < max_ent_)
+    if (!divided_)
     {
-        octEntities_.insert({ &entity, &collider });
+        if(octEntities_.size() < max_ent_)
+            octEntities_.insert({ &entity, &collider });
+        else
+            subdivide(entity, collider);
     }
     else if (depth_ < MAX_DEPTH)
     {
-        if (!divided_)
-            subdivide(entity, collider);
-        else
-            for (auto& octant : octants_)
+        for (auto& octant : octants_)
+        {
+            if (octant && octant->bounds_.intersects(collider.bbox))
             {
-                if (octant->bounds_.intersects(collider.bbox))
-                {
-                    octant->insert(entity, collider);
-                }
+                octant->insert(entity, collider);
             }
+        }
     }
 }
 
@@ -28,24 +28,21 @@ void Octree::subdivide(Entity& entity, ColliderComponent& collider)
     vec3d size = bounds_.size() / 2.0;
     vec3d center = bounds_.center();
 
+    octEntities_.insert({ &entity, &collider });
     for (std::size_t i = 0; i < 8; ++i)
     {
         vec3d octantCenter = center + offsets[i] * size;
         BBox octantBounds(octantCenter, size);
-        octants_[i] = std::make_unique<Octree>(depth_ + 1, octantBounds, this);
 
         for (auto& entity : octEntities_)
         {
-            if (octants_[i]->bounds_.intersects(entity.second->bbox))
+            if (octantBounds.intersects(entity.second->bbox))
             {
-                octants_[i]->insert(*entity.first, *entity.second);
-                // break; // Leer el comentario grande de getNeighbors
-            }
-        }
+                if (!octants_[i])
+                    octants_[i] = std::make_unique<Octree>(depth_ + 1, octantBounds, this);
 
-        if (octants_[i]->bounds_.intersects(collider.bbox))
-        {
-            octants_[i]->insert(entity, collider);
+                octants_[i]->insert(*entity.first, *entity.second);
+            }
         }
     }
 
@@ -57,20 +54,19 @@ void Octree::subdivide(Entity& entity, ColliderComponent& collider)
 
 void Octree::clear()
 {
-    octEntities_.clear();
-
     if (divided_)
     {
         for (auto& octant : octants_)
         {
-            if (octant != nullptr || !octant->octEntities_.empty() || octant->divided_)
+            if (octant)
                 octant->clear();
         }
+
+        divided_ = false;
     }
-
-    divided_ = false;
+    else 
+        octEntities_.clear();
 }
-
 
 // Funciones en desuso
 //

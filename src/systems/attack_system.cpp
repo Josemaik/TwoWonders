@@ -5,12 +5,8 @@ void AttackSystem::update(EntityManager& em) {
     auto& frti = em.getSingleton<FrustumInfo>();
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, AttackComponent& att)
     {
-        if (!e.hasTags(FrustOut{}) && e.hasComponent<ColliderComponent>())
-        {
-            auto& col = em.getComponent<ColliderComponent>(e);
-            if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
-                return;
-        }
+        if (!frti.inFrustum(e.getID()))
+            return;
 
         if (att.createAttack)
             createAttack(em, e, att);

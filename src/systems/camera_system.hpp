@@ -8,7 +8,7 @@
 
 struct CameraSystem
 {
-    void update(EntityManager& em, GameEngine& ge, EventManager& evm);
+    void update(EntityManager& em, GameEngine& ge, EventManager& evm, float alpha);
 
 private:
     void updateFrustum(EntityManager& em, GameEngine& ge, vec3d& cameraPos, vec3d& cameraTar, float cameraFovy);

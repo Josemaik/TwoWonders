@@ -6,7 +6,7 @@
 
 struct LockSystem
 {
-    using SYSCMPs = MP::TypeList<PhysicsComponent, ColliderComponent>;
+    using SYSCMPs = MP::TypeList<PhysicsComponent>;
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em);

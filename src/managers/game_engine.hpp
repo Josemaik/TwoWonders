@@ -22,7 +22,9 @@ namespace ENGI {
 
         // Timing Related Functions
         void setTargetFPS(int fps);
+        double getTargetFPS();
         float getFrameTime();
+        double getFrameTimeDouble();
 
         // Drawing
         void beginDrawing();

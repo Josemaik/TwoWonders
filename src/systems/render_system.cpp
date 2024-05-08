@@ -5,14 +5,18 @@
 float ENGI::GameEngine::widthRate = 1.0;
 float ENGI::GameEngine::heightRate = 1.0f;
 
-void RenderSystem::update(EntityManager& em, GameEngine& engine)
+void RenderSystem::update(EntityManager& em, GameEngine& engine, float alpha)
 {
     // Actualizamos la posicion de render del componente de fisicas
-    em.forEach<SYSCMPs, SYSTAGs>([](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
     {
         if (e.hasTag<SeparateModelTag>())
             return;
-        ren.setPosition(phy.position);
+
+        // Interpolamos la posicion
+        auto interPos = phy.prevPosition + (phy.position - phy.prevPosition) * alpha / alpha;
+
+        ren.setPosition(interPos);
         ren.setOrientation(phy.orientation);
         ren.setScale(phy.scale);
         // ren.updateBBox();
@@ -819,12 +823,8 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, RenderComponent& r)
     {
-        if ((!e.hasTags(FrustOut{}) && r.meshLoaded && e.hasComponent<ColliderComponent>()))
-        {
-            auto& col = em.getComponent<ColliderComponent>(e);
-            if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
-                return;
-        }
+        if (!frti.inFrustum(e.getID()) && r.meshLoaded)
+            return;
 
         if (e.hasTag<EnemyDeathTag>())
             return;
@@ -1374,13 +1374,13 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
 
 void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
 {
-    using partCMPs = MP::TypeList<ColliderComponent, ParticleMakerComponent>;
+    using partCMPs = MP::TypeList<ParticleMakerComponent>;
     using noTAGs = MP::TypeList<>;
 
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<partCMPs, noTAGs>([&](Entity&, ColliderComponent& col, ParticleMakerComponent& pmc)
+    em.forEach<partCMPs, noTAGs>([&](Entity& e, ParticleMakerComponent& pmc)
     {
-        if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+        if (!frti.inFrustum(e.getID()))
             return;
 
         if (pmc.active)
@@ -1479,7 +1479,6 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
 
     getNode(engine, "TextCopy")->setVisibleOne(true);
 
-    // engine.drawTree();
     engine.traverseRoot();
     engine.endDrawing();
 }
@@ -3468,17 +3467,20 @@ void RenderSystem::drawSnowEffect(GameEngine& engine, bool generate, vec2f)
 {
     // auto cameraPos = engine.getPositionCamera();
     auto screenH = engine.getScreenHeight();
+    auto* snowNode = getNode(engine, "SnowStarfield");
     for (std::size_t i = 0; i < 80; i++)
     {
         auto& snow = snowList[i];
         if ((snow.position.x < 0 || snow.position.y > static_cast<float>(screenH)) && generate)
             generateSnow(engine, i);
+        else if (snow.position.x > 0 && snow.position.y < static_cast<float>(screenH))
+        {
+            engine.createCircle(snow.position.to_other<int>(), snow.size / 2, 5, D_WHITE, ("snow" + std::to_string(i)).c_str(), snowNode);
 
-        engine.createCircle(snow.position.to_other<int>(), snow.size / 2, 5, D_WHITE, ("snow" + std::to_string(i)).c_str(), getNode(engine, "SnowStarfield"));
-
-        // Update snow position
-        snow.position -= snow.speed;
-        snow.speed *= 1.01f;
+            // Update snow position
+            snow.position -= snow.speed;
+            snow.speed *= 1.01f;
+        }
     }
 
     // Pa cuando se arregle el shader de transparencia

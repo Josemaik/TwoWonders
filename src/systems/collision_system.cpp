@@ -10,7 +10,7 @@ void CollisionSystem::update(EntityManager& em)
     octree.clear();
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
     {
-        if ((!e.hasTags(FrustOut{}) && frti.bboxIn(col.bbox) == FrustPos::OUTSIDE) || e.hasTag<EnemyDeathTag>())
+        if (!frti.inFrustum(e.getID()) || e.hasTag<EnemyDeathTag>())
             return;
 
         // Si la entidad está por debajo del suelo, se destruye
@@ -41,23 +41,24 @@ void CollisionSystem::update(EntityManager& em)
 }
 
 // Función recursiva qué revisa las colisiones de las entidades del octree actual con otras entidades
-void CollisionSystem::checkCollision(EntityManager& em, Octree& octree)
+void CollisionSystem::checkCollision(EntityManager& em, Octree& octant)
 {
     // Si el octree está dividido, revisar sus hijos
-    if (octree.isDivided())
+    if (octant.isDivided())
     {
-        for (auto& octant : octree.getOctants())
+        for (auto& octant : octant.getOctants())
         {
             // Si el octante tiene entidades o está dividido, revisar sus colisiones
-            if (octant.get()->getNumEntities() > 0 || octant.get()->isDivided())
+            if (octant && (octant.get()->getNumEntities() > 0 || octant.get()->isDivided()))
                 checkCollision(em, *octant);
         }
         return;
     }
 
-    for (auto it1 = octree.getOctEntities().begin(); it1 != octree.getOctEntities().end(); ++it1)
+    auto octEntities = octant.getOctEntities();
+    for (auto it1 = octEntities.begin(); it1 != octEntities.end(); ++it1)
     {
-        for (auto it2 = std::next(it1); it2 != octree.getOctEntities().end(); ++it2)
+        for (auto it2 = std::next(it1); it2 != octEntities.end(); ++it2)
         {
             auto [e, c] = *it1;
             auto [nEnt, nCol] = *it2;
@@ -999,7 +1000,7 @@ bool CollisionSystem::checkWallCollision(EntityManager& em, vec3d& pos, vec3d& n
     auto& frti = em.getSingleton<FrustumInfo>();
     em.forEach<noCMPs, wallTag>([&](Entity& e, ColliderComponent& col)
     {
-        if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+        if (!frti.inFrustum(e.getID()))
             return;
         if (col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::LAVA)
         {

@@ -115,15 +115,14 @@ void Game::createSound() {
 void Game::run()
 {
     // Cosas para medir el tiempo de ejecución
-    using std::chrono::high_resolution_clock;
-    using std::chrono::duration_cast;
-    using std::chrono::duration;
-    using std::chrono::milliseconds;
+    // using std::chrono::high_resolution_clock;
+    // using std::chrono::duration_cast;
+    // using std::chrono::duration;
+    // using std::chrono::microseconds;
 
     // Codigo para medir el tiempo de ejecucion
     //
     // - Colocar antes de donde se quiere medir el tiempo
-    // auto t1 = high_resolution_clock::now();
     // - Colocar despues de donde se quiere medir el tiempo
     // auto t2 = high_resolution_clock::now();
     // auto duration = duration_cast<milliseconds>(t2 - t1);
@@ -145,7 +144,7 @@ void Game::run()
     // Incializamos FPSs
     engine.setTargetFPS(30);
     #ifdef _WIN32
-    engine.setTargetFPS(40);
+    engine.setTargetFPS(30);
     #endif
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
@@ -168,7 +167,7 @@ void Game::run()
 
     // Inicializa una variable donde tener el tiempo entre frames
     float currentTime{};
-    float elapsed{};
+    float elapsed{ timeStep120 };
     bool debugs{ false }, resets{ false };
 
     createSound();
@@ -181,7 +180,7 @@ void Game::run()
 
         switch (li.currentScreen)
         {
-            // CODIGO DE LA PANTALLA DE LOGO DE EMPRESA
+        // CODIGO DE LA PANTALLA DE LOGO DE EMPRESA
         case GameScreen::LOGO:
         {
             if (li.playerID == li.max)
@@ -296,23 +295,27 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
             {
-                ai_system.update(em);
-                npc_system.update(em);
-                physics_system.update(em);
-                collision_system.update(em);
-                zone_system.update(em, engine, iam, evm, map);
-                lock_system.update(em);
-                shield_system.update(em);
-                object_system.update(em);
-                projectile_system.update(em);
-                attack_system.update(em);
-                life_system.update(em, object_system);
+                // while (elapsed >= timeStep)
+                // {
+                    // elapsed -= timeStep;
+                    ai_system.update(em);
+                    npc_system.update(em);
+                    physics_system.update(em);
+                    collision_system.update(em);
+                    zone_system.update(em, engine, iam, evm, map);
+                    lock_system.update(em);
+                    shield_system.update(em);
+                    object_system.update(em);
+                    projectile_system.update(em);
+                    attack_system.update(em);
+                    life_system.update(em, object_system);
+                    // if (elapsed < timeStep45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
+                    // if(elapsed < target)
+                    event_system.update(em, evm, iam, map, object_system, sound_system);
+                    if (li.showParticles)
+                        particle_system.update(em);
+                // }
                 sound_system.update();
-                // if (elapsed < timeStep45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
-                camera_system.update(em, engine, evm);
-                event_system.update(em, evm, iam, map, object_system, sound_system);
-                if (li.showParticles)
-                    particle_system.update(em);
 
                 if (!li.getDeath().empty())
                 {
@@ -320,11 +323,13 @@ void Game::run()
                     li.clearDeath();
                 }
 
-                render_system.update(em, engine);
+                // auto alpha = elapsed / timeStep;
+                camera_system.update(em, engine, evm, 1.f);
+                render_system.update(em, engine, 1.f);
             }
             else if (!resets && debugs) {
                 sound_system.update();
-                render_system.update(em, engine);
+                render_system.update(em, engine, 1.f);
             }
 
             break;

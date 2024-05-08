@@ -22,9 +22,9 @@ void ParticleSystem::update(EntityManager& em)
     // La parte del motor gráfico será poder colocar puntos de luz desde donde se generen las partículas sjsjsj
 
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col, ParticleMakerComponent& pmc)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ParticleMakerComponent& pmc)
     {
-        if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+        if (!frti.inFrustum(e.getID()))
             return;
 
         // Si el componente tiene activo su efecto de partículas
