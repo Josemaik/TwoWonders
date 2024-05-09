@@ -1248,7 +1248,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         {
             auto& [ren, _, plc] = comps;
             ren->node = r.node;
-            setPointLight(engine, em, *plc, *r.node, ren->position, D_YELLOW);
+            setPointLight(engine, *plc, *r.node, ren->position, D_YELLOW);
         }
     }
     else if (e.hasTag<LevelChangeTag>())
@@ -1390,14 +1390,14 @@ void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, Entity& 
     else
         plc = &em.addComponent<PointLightComponent>(e);
 
-    setPointLight(engine, em, *plc, n, pos, c);
+    setPointLight(engine, *plc, n, pos, c);
 }
 
-void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, PointLightComponent& plc, Node& n, vec3d pos, Color c)
+void RenderSystem::setPointLight(GameEngine& engine, PointLightComponent& plc, Node& n, vec3d pos, Color c)
 {
     if (!plc.light)
     {
-        auto* light = engine.createPointLight(pos, { 255, 215, 0, 255 }, "light", &n);
+        auto* light = engine.createPointLight(pos, c, "light", &n);
         plc.light = light->getEntity<PointLight>();
     }
     else
@@ -2109,26 +2109,58 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
             // }
         }
 
+        // Vidas Relay HUD
+        if (li.mapID == 3 && e.hasTag<MissionObjTag>() && e.hasComponent<LifeComponent>())
+        {
+            auto const& r{ em.getComponent<RenderComponent>(e) };
+            auto& l{ em.getComponent<LifeComponent>(e) };
+
+            // Datos para la barra para la barra de vida
+            auto wRate = engine.getWidthRate();
+            auto hRate = engine.getHeightRate();
+            int barWidth = static_cast<int>(60.f * wRate);
+            int barHeight = static_cast<int>(6.f * hRate);
+            int barX = static_cast<int>(engine.getWorldToScreenX(r.position)) - static_cast<int>(static_cast<float>(barWidth) / 2);
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position)) - static_cast<int>(r.scale.y() * 13 * hRate);
+
+            engine.drawRectangle({ barX, barY }, { barWidth, barHeight }, { D_GRAY });
+
+            // Normaliza la vida perdida del relay
+            float normalizedLostLife = 1.0f - (static_cast<float>(l.life) / static_cast<float>(l.maxLife));
+
+            // Calcula la anchura de la barra de vida
+            float lifeWidth = static_cast<float>(barWidth) * normalizedLostLife;
+
+            if (!l.vidaMax())
+                lifeWidth = l.life_width + (static_cast<float>(lifeWidth) - static_cast<float>(l.life_width)) * 0.25f;
+
+            // Dibujamos la barra de vida
+            engine.drawRectangle({ barX, barY }, { static_cast<int>(lifeWidth), barHeight }, { D_VIOLET });
+
+            l.life_width = lifeWidth;
+        }
+
         if (e.hasComponent<InteractiveComponent>() && (e.hasComponent<RenderComponent>() || e.hasComponent<PhysicsComponent>()))
         {
             auto& inter{ em.getComponent<InteractiveComponent>(e) };
             vec3d pos{};
-            double sclY{};
+            double point{};
             if (e.hasTag<SeparateModelTag>())
             {
                 auto phy = em.getComponent<PhysicsComponent>(e);
                 pos = phy.position;
-                sclY = phy.scale.y();
+                point = phy.position.y() + phy.scale.y() / 2 + 150;
             }
             else
             {
                 auto& ren = em.getComponent<RenderComponent>(e);
                 pos = ren.position;
-                sclY = ren.scale.y();
+                point = ren.position.y() + ren.scale.y() / 2 + 150;
             }
 
             if (inter.showButton)
             {
+
                 std::string text = "";
                 int sum;
 
@@ -2152,7 +2184,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                 offSetX *= engine.getWidthRate() * 0.75f;
 
                 int posX = static_cast<int>(engine.getWorldToScreenX(pos) - offSetX);
-                int posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 11);
+                int posY = static_cast<int>(engine.getWorldToScreenY(pos) - point);
 
                 engine.drawNode(gif, { posX, posY }, { 0.75f, 0.75f });
 
@@ -2161,7 +2193,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                     auto* lock = getNode(engine, "candado_abierto");
                     auto& lockText = *dynamic_cast<Texture2D*>(lock->getEntity());
                     posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(lockText.texture->getWidth() / 2));
-                    posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13);
+                    posY = static_cast<int>(engine.getWorldToScreenY(pos) - point - 50);
                     engine.drawNode(lock, { posX, posY });
                 }
             }
@@ -2170,7 +2202,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                 auto* lock = getNode(engine, "candado_cerrado");
                 auto& lockText = *dynamic_cast<Texture2D*>(lock->getEntity());
                 int posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(lockText.texture->getWidth() / 2));
-                int posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13);
+                int posY = static_cast<int>(engine.getWorldToScreenY(pos) - point - 50);
                 engine.drawNode(lock, { posX, posY });
 
                 if (e.hasTag<ChestTag>())
@@ -2178,7 +2210,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                     auto* sword = getNode(engine, "batalla");
                     auto& swordText = *dynamic_cast<Texture2D*>(sword->getEntity());
                     posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(swordText.texture->getWidth() / 2));
-                    posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9.5);
+                    posY = static_cast<int>(engine.getWorldToScreenY(pos) - point + 50);
                     engine.drawNode(sword, { posX, posY }, { 0.5f, 0.5f });
 
                     auto& ch = em.getComponent<ChestComponent>(e);
@@ -2194,7 +2226,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                         auto* barText = dynamic_cast<Texture2D*>(textureBar->getEntity())->texture;
 
                         auto posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(numText->getWidth() / 2) - 100);
-                        auto posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 12);
+                        auto posY = static_cast<int>(engine.getWorldToScreenY(pos) - point);
 
                         // Dibujamos el num / 4
                         engine.drawNode(textureNum, { posX, posY });
@@ -2222,7 +2254,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                             auto* lock = getNode(engine, "candado_abierto");
                             auto& lockText = *dynamic_cast<Texture2D*>(lock->getEntity());
                             int posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(lockText.texture->getWidth() / 2));
-                            int posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9);
+                            int posY = static_cast<int>(engine.getWorldToScreenY(pos) - point);
                             engine.drawNode(lock, { posX, posY });
 
                             elapsed_Lock += timeStep;

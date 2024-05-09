@@ -25,6 +25,7 @@ enum BehaviorType
     LADDER = 0x10000,
     LAVA = 0x20000,
     OBJECT = 0x40000,
+    RELAY = 0x80000,
 };
 
 struct ColliderComponent

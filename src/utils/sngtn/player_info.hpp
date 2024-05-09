@@ -28,6 +28,7 @@ struct PlayerInfo
     std::vector<Spell> spells{};
     Spell noSpell{ "None", "No spell", Spells::None, 0.0, 0 };
     Spell currentSpell{ noSpell };
+    Spell previousSpell{ noSpell };
     std::array<Spell, 3> spellSlots{ noSpell, noSpell, noSpell };
     std::size_t selectedItem{ max };
     vec3d spawnPoint{};

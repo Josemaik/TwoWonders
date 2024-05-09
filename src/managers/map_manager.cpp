@@ -447,6 +447,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 auto& li = em.getSingleton<LevelInfo>();
                 em.addTag<DestructibleTag>(entity);
                 em.addTag<WallTag>(entity);
+                em.addTag<LockableTag>(entity);
 
                 int life{ interactable["life"].GetInt() };
                 em.addComponent<LifeComponent>(entity, LifeComponent{.life = life });
@@ -658,8 +659,11 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 }
                 case 3:
                 {
+                    em.addTag<LockableTag>(entity);
+                    c.behaviorType = BehaviorType::RELAY;
                     auto relayType = static_cast<ElementalType>(interactable["relay"].GetUint());
                     em.addComponent<RelayComponent>(entity, RelayComponent({.type = relayType }));
+                    em.addComponent<LifeComponent>(entity, LifeComponent({.life = 20}));
                     break;
                 }
                 default:

@@ -77,7 +77,6 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             {
                 createSpellAttack(em, ent, att);
                 att.createAttack = false;
-                plfi.currentSpell = plfi.noSpell;
                 inpi.setAttackFalse();
                 return;
             }
@@ -448,7 +447,13 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
         if (plfi.armor < plfi.max_armor)
             plfi.armor = plfi.max_armor;
         else
+        {
+            auto& inpi = em.getSingleton<InputInfo>();
+            inpi.setAttackFalse();
+            plfi.previousSpell = plfi.currentSpell;
+            plfi.currentSpell = plfi.noSpell;
             return;
+        }
         break;
     }
     case Spells::WaterDash:
@@ -510,6 +515,7 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
 
     auto& inpi = em.getSingleton<InputInfo>();
     inpi.setAttackFalse();
+    plfi.previousSpell = plfi.currentSpell;
     plfi.currentSpell = plfi.noSpell;
 }
 
