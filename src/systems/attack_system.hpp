@@ -3,6 +3,7 @@
 #define ATTACK_SYSTEM
 #include "../utils/types.hpp"
 #include "collision_system.hpp"
+#include "../managers/attack_manager.hpp"
 
 struct AttackSystem
 {
@@ -10,7 +11,7 @@ struct AttackSystem
     using SYSCMPs = MP::TypeList<AttackComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em);
+    void update(EntityManager& em, AttackManager& am);
     void setCollisionSystem(CollisionSystem* col_sys);
 
 private:

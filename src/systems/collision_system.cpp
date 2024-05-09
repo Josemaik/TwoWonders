@@ -718,33 +718,33 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
 
 
     // Daño en área
-    if (behaviorType2 & BehaviorType::AREADAMAGE)
-    {
-        em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
-        return;
-    }
+    // if (behaviorType2 & BehaviorType::AREADAMAGE)
+    // {
+    //     em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
+    //     return;
+    // }
 
-    if (behaviorType2 & BehaviorType::AREADAMAGECRUSHER)
-    {
-        auto& bb = em.getSingleton<BlackBoard_t>();
-        if (bb.playerdamagebycrusher == false) {
-            em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife(2);
-            bb.playerdamagebycrusher = true;
+    // if (behaviorType2 & BehaviorType::AREADAMAGECRUSHER)
+    // {
+    //     auto& bb = em.getSingleton<BlackBoard_t>();
+    //     if (bb.playerdamagebycrusher == false) {
+    //         em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife(2);
+    //         bb.playerdamagebycrusher = true;
 
-            // El jugador se mueve hacia atrás de la posición del crusher
-            resolvePlayerDirection(*staticPhy, *otherPhy, false);
-            em.getSingleton<SoundSystem>().sonido_rebote();
-        }
-        return;
-    }
+    //         // El jugador se mueve hacia atrás de la posición del crusher
+    //         resolvePlayerDirection(*staticPhy, *otherPhy, false);
+    //         em.getSingleton<SoundSystem>().sonido_rebote();
+    //     }
+    //     return;
+    // }
 
     //Telaraña
-    if (behaviorType2 & BehaviorType::SPIDERWEB)
-    {
-        em.getSingleton<BlackBoard_t>().playerhunted = true;
-        staticPhy->dragActivated = true;
-        return;
-    }
+    // if (behaviorType2 & BehaviorType::SPIDERWEB)
+    // {
+    //     em.getSingleton<BlackBoard_t>().playerhunted = true;
+    //     staticPhy->dragActivated = true;
+    //     return;
+    // }
 
     //Meteorit
     if (behaviorType2 & BehaviorType::METEORITE)

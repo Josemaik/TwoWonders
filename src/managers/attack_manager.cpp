@@ -1,116 +1,28 @@
-#include "attack_system.hpp"
+#include "attack_manager.hpp"
 
-void AttackSystem::update(EntityManager& em, AttackManager& am) {
-
-    auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, AttackComponent& att)
-    {
-        if (!frti.inFrustum(e.getID()))
-            return;
-
-        if (att.createAttack)
-            createAttack(em, e, att);
-
-        att.decreaseCountdown(timeStep, att.elapsed);
-    });
-}
-
-vec3d AttackSystem::getPosMeteorito(uint16_t fase, vec3d posplayer) {
-    switch (fase)
-    {
-    case 3: return vec3d{ posplayer.x() - 5, posplayer.y() + 20, posplayer.z() };
-          break;
-    case 2: return vec3d{ posplayer.x() + 5, posplayer.y() + 20, posplayer.z() + 5 };
-          break;
-    case 1: return vec3d{ posplayer.x() + 5 ,posplayer.y() + 20, posplayer.z() - 5 };
-          break;
-    default: break;
-    }
-    return vec3d{};
-}
-
-void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent& att) {
-    // att.vel += vec3d{ 0, 0, -0.5f } *(att.vel == vec3d{ 0, 0, 0 });
-
-
-    // Se pone la direccion en la que este mirando el player
-    if (ent.hasTag<PlayerTag>() && ent.hasComponent<InputComponent>()) {
-        auto& plfi = em.getSingleton<PlayerInfo>();
-        auto& phy = em.getComponent<PhysicsComponent>(ent);
-        auto& inpi = em.getSingleton<InputInfo>();
-        if (plfi.mana <= MANA_CUT && !inpi.melee)
-        {
-            att.createAttack = false;
-            return;
-        }
-
-        // Calculamos la velocidad basada en la orientación del jugador
-        static const double ATTACK_SPEED = 1.5f;
-
-        double velX = std::sin(phy.orientation) * ATTACK_SPEED;
-        double velZ = std::cos(phy.orientation) * ATTACK_SPEED;
-
-        // Asignamos la velocidad al ataque
-        att.vel = { velX , 0 , velZ };
-
-        // Comprobar si la vida de la entidad es la maxima y elegir que tipo de ataque usa
-        if (att.type == AttackType::AttackPlayer)
-        {
-            auto& plfi = em.getSingleton<PlayerInfo>();
-            auto& inpi = em.getSingleton<InputInfo>();
-
-            if (inpi.spell1)
-                plfi.currentSpell = plfi.spells[0];
-            else if (inpi.spell2)
-                plfi.currentSpell = plfi.spells[1];
-            else if (inpi.spell3)
-                plfi.currentSpell = plfi.spells[2];
-            else if (inpi.melee)
-                plfi.currentSpell = plfi.noSpell;
-
-            if (plfi.currentSpell.spell == Spells::None)
-            {
-                att.type = AttackType::Melee;
-                em.getSingleton<SoundSystem>().sonido_melee();
-            }
-            else
-            {
-                createSpellAttack(em, ent, att);
-                att.createAttack = false;
-                inpi.setAttackFalse();
-                return;
-            }
-
-            inpi.setAttackFalse();
-        }
-    }
-
-    createAttackType(em, ent, att);
-}
-
-void AttackSystem::createAttackType(EntityManager& em, Entity& ent, AttackComponent& att)
+void AttackManager::createAttackType(EntityManager& em, Entity& e, AttackComponent& att)
 {
-    auto& phy = em.getComponent<PhysicsComponent>(ent);
+    auto& phy = em.getComponent<PhysicsComponent>(e);
     bool is_air_attack{ false };
     // Tipo de ataque
     switch (att.type)
     {
     case AttackType::Ranged:
-        if (ent.hasTag<SpiderTag>()) {
-            createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack, 0.5);
+        if (e.hasTag<SpiderTag>()) {
+            createAttackRangedOrMelee(em, e, att, true, att.scale_to_respawn_attack, 0.5);
         }
         else
-            createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack, 1.5);
+            createAttackRangedOrMelee(em, e, att, true, att.scale_to_respawn_attack, 1.5);
         break;
 
     case AttackType::Melee:
-        createAttackRangedOrMelee(em, ent, att, false, att.scale_to_respawn_attack, 2.0);
+        createAttackRangedOrMelee(em, e, att, false, att.scale_to_respawn_attack, 2.0);
         break;
 
     case AttackType::Bomb:
     {
         auto& li = em.getSingleton<LevelInfo>();
-        if (li.playerID == ent.getID())
+        if (li.playerID == e.getID())
         {
             auto& plfi = em.getSingleton<PlayerInfo>();
             if (plfi.bombs > 0) {
@@ -137,19 +49,19 @@ void AttackSystem::createAttackType(EntityManager& em, Entity& ent, AttackCompon
     }
     case AttackType::AttackPlayer:
         break;
-    case AttackType::TripleShot: createAttackMultipleShot(em, ent, att, 3);
+    case AttackType::TripleShot: createAttackMultipleShot(em, e, att, 3);
         break;
     case AttackType::AreaAttack: {
         // auto& li = em.getSingleton<LevelInfo>();
-        if (ent.hasTag<GolemTag>()) {
+        if (e.hasTag<GolemTag>()) {
             auto& e{ em.newEntity() };
             em.addTag<HitPlayerTag>(e);
             auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 18.0f, 0.5f, 18.0f }, .color = D_GREEN });
             auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
             em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::AreaAttack, .life_time = 3.5f });
             ElementalType tipoElemental;
-            if (ent.hasComponent<TypeComponent>())
-                tipoElemental = em.getComponent<TypeComponent>(ent).type;
+            if (e.hasComponent<TypeComponent>())
+                tipoElemental = em.getComponent<TypeComponent>(e).type;
             else
                 tipoElemental = ElementalType::Fire;
             em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
@@ -159,14 +71,14 @@ void AttackSystem::createAttackType(EntityManager& em, Entity& ent, AttackCompon
         break;
     }
     case AttackType::Spiderweb: {
-        //createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack,1.0);
+        //createAttackRangedOrMelee(em, e, att, true, att.scale_to_respawn_attack,1.0);
         auto& e{ em.newEntity() };
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position + att.vel * 2, .scale = { 6.0f, 0.1f, 6.0f }, .color = D_GREEN });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Spiderweb, .life_time = 2.0f });
         ElementalType tipoElemental;
-        if (ent.hasComponent<TypeComponent>())
-            tipoElemental = em.getComponent<TypeComponent>(ent).type;
+        if (e.hasComponent<TypeComponent>())
+            tipoElemental = em.getComponent<TypeComponent>(e).type;
         else
             tipoElemental = ElementalType::Neutral;
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
@@ -231,8 +143,8 @@ void AttackSystem::createAttackType(EntityManager& em, Entity& ent, AttackCompon
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.0 });
         em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 0.2f });
         ElementalType tipoElemental;
-        if (ent.hasComponent<TypeComponent>())
-            tipoElemental = em.getComponent<TypeComponent>(ent).type;
+        if (e.hasComponent<TypeComponent>())
+            tipoElemental = em.getComponent<TypeComponent>(e).type;
         else
             tipoElemental = ElementalType::Neutral;
         em.addComponent<TypeComponent>(e, TypeComponent{ .type = tipoElemental });
@@ -269,10 +181,10 @@ void AttackSystem::createAttackType(EntityManager& em, Entity& ent, AttackCompon
         em.addTag<HitPlayerTag>(e);
 
         BehaviorType type = BehaviorType::ATK_ENEMY;
-        if (ent.hasTag<PlayerTag>())
+        if (e.hasTag<PlayerTag>())
         {
             em.addTag<FireBallTag>(e);
-            setPlayerAtkVel(em, ent, att);
+            setPlayerAtkVel(em, e, att);
             type = BehaviorType::ATK_PLAYER;
             em.getSingleton<SoundSystem>().sonido_h_bola_fuego();
 
@@ -283,7 +195,7 @@ void AttackSystem::createAttackType(EntityManager& em, Entity& ent, AttackCompon
 
         }
 
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = D_BLACK });
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(e).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = D_BLACK });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
         em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
         em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.07f });
@@ -301,13 +213,13 @@ void AttackSystem::createAttackType(EntityManager& em, Entity& ent, AttackCompon
         em.addTag<WaterBombTag>(e);
 
         BehaviorType type = BehaviorType::ATK_ENEMY;
-        if (ent.hasTag<PlayerTag>())
+        if (e.hasTag<PlayerTag>())
         {
-            setPlayerAtkVel(em, ent, att);
+            setPlayerAtkVel(em, e, att);
             type = BehaviorType::ATK_PLAYER;
         }
 
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(ent).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = D_BLACK });
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(e).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = D_BLACK });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
         em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
         em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.07f });
@@ -322,9 +234,24 @@ void AttackSystem::createAttackType(EntityManager& em, Entity& ent, AttackCompon
     //if air attack not running reset createattack
     if (!is_air_attack)
         att.createAttack = false;
+
 }
 
-void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, AttackComponent& att, int numShots) {
+vec3d AttackManager::getPosMeteorito(uint16_t fase, vec3d posplayer) {
+    switch (fase)
+    {
+    case 3: return vec3d{ posplayer.x() - 5, posplayer.y() + 20, posplayer.z() };
+          break;
+    case 2: return vec3d{ posplayer.x() + 5, posplayer.y() + 20, posplayer.z() + 5 };
+          break;
+    case 1: return vec3d{ posplayer.x() + 5 ,posplayer.y() + 20, posplayer.z() - 5 };
+          break;
+    default: break;
+    }
+    return vec3d{};
+}
+
+void AttackManager::createAttackMultipleShot(EntityManager& em, Entity& ent, AttackComponent& att, int numShots) {
     float spread = 0.5f; // Ángulo de dispersión entre los disparos
     vec3d vel = att.vel;
     int i = 0;
@@ -352,7 +279,8 @@ void AttackSystem::createAttackMultipleShot(EntityManager& em, Entity& ent, Atta
         createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack, 0.5);
     }
 }
-void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack, double const ranged) {
+
+void AttackManager::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack, double const ranged) {
     auto const& phy = em.getComponent<PhysicsComponent>(ent);
 
     // Crear la entidad ataque
@@ -395,7 +323,7 @@ void AttackSystem::createAttackRangedOrMelee(EntityManager& em, Entity& ent, Att
     }
 }
 
-void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackComponent& att)
+void AttackManager::createSpellAttack(EntityManager& em, Entity& ent, AttackComponent& att)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     auto& spell = plfi.currentSpell;
@@ -519,12 +447,12 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
     plfi.currentSpell = plfi.noSpell;
 }
 
-void AttackSystem::setCollisionSystem(CollisionSystem* col)
+void AttackManager::setCollisionSystem(CollisionSystem* col)
 {
     col_sys = col;
 }
 
-void AttackSystem::setPlayerAtkVel(EntityManager& em, Entity& e, AttackComponent& att)
+void AttackManager::setPlayerAtkVel(EntityManager& em, Entity& e, AttackComponent& att)
 {
     auto& li = em.getSingleton<LevelInfo>();
     if (li.lockedEnemy != li.max)
@@ -536,4 +464,57 @@ void AttackSystem::setPlayerAtkVel(EntityManager& em, Entity& e, AttackComponent
     }
     else
         att.vel.setY(0.7);
+}
+
+void AttackManager::resolvePlayerDirection(PhysicsComponent& playerPhy, PhysicsComponent& enemyPhy, bool isEnemy)
+{
+    auto& pos = playerPhy.position;
+    auto& otherPos = enemyPhy.position;
+    auto& enemyVel = enemyPhy.velocity;
+    vec3d dir = { pos.x() - otherPos.x(), 0, pos.z() - otherPos.z() };
+    int multiplier = 7;
+
+    dir.normalize();
+
+    if (isEnemy)
+    {
+        // Si la dirección del enemigo y la del jugador tienen menos de 20 grados de diferencia, el jugador se le suman 45º en la dirección contraria
+        vec3d dirEnemy = { otherPos.x() - enemyVel.x(), 0, otherPos.z() - enemyVel.z() };
+        dirEnemy.normalize();
+
+        // Calcular el ángulo entre las dos direcciones
+        double dot = dir.x() * dirEnemy.x() + dir.z() * dirEnemy.z(); // producto punto
+        double det = dir.x() * dirEnemy.z() - dir.z() * dirEnemy.x(); // determinante
+        double angle = atan2(det, dot); // atan2(y, x) o atan2(sin, cos)
+
+        // Convertir el ángulo a grados
+        double angleDeg = angle * 180 / K_PI;
+
+        // Si el ángulo es menor de 20 grados, ajustar la dirección del jugador
+        if (std::abs(angleDeg) < 20)
+        {
+            // Rotar la dirección del jugador 45 grados en la dirección contraria
+            double angleRad = -135 * K_PI / 180; // Convertir a radianes
+            double cosAngle = cos(angleRad);
+            double sinAngle = sin(angleRad);
+            vec3d newDir = { dir.x() * cosAngle - dir.z() * sinAngle, 0.0, dir.x() * sinAngle + dir.z() * cosAngle };
+
+            dir = newDir;
+        }
+        multiplier = 7;
+    }
+    else
+        playerPhy.gravity = playerPhy.gravity / 1.5;
+
+    playerPhy.velocity = dir * multiplier;
+    playerPhy.stopped = true;
+}
+
+void AttackManager::createSpiderWeb(EntityManager& em, vec3d& pos)
+{
+    auto& e{ em.newEntity() };
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = { 6.0f, 0.1f, 6.0f }, .color = D_GREEN });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.01 });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_ENEMY });
+    em.addComponent<Attack>(e, Attack{ .atkType = AttackType::Spiderweb, .lifeTime = 2.0f });
 }

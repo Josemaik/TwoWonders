@@ -20,6 +20,39 @@ enum AttackType
     FireBall = 0x1000,
     FireBallShot = 0x2000,
     WaterBombShot = 0x4000,
+    MeleePlayer = 0x8000,
+    SpiderShot = 0x10000,
+    AreaCrusher = 0x20000,
+    WaterDashArea = 0x40000,
+    MeteoritePlayer = 0x80000,
+    IceShard = 0x100000,
+    SnowmanBall = 0x200000,
+};
+
+struct Attack
+{
+    AttackType atkType{ AttackType::Ranged };
+    uint16_t damage{};
+    float lifeTime{};
+    vec3d initialVel{};
+    std::vector<std::size_t> targets{};
+    ElementalType type{ ElementalType::Neutral };
+
+    float resolveType(ElementalType t)
+    {
+        if (t == ElementalType::Neutral || type == t)
+            return 1.f;
+        else if ((type == ElementalType::Fire && t == ElementalType::Water)
+            || (type == ElementalType::Water && t == ElementalType::Ice)
+            || (type == ElementalType::Ice && t == ElementalType::Fire))
+            return .5f;
+        else if ((type == ElementalType::Fire && t == ElementalType::Ice)
+            || (type == ElementalType::Water && t == ElementalType::Fire)
+            || (type == ElementalType::Ice && t == ElementalType::Water))
+            return 2.f;
+    }
+
+    std::function<void(EntityManager&, Entity&, AttackComponent&)> attackEffect;
 };
 
 struct AttackComponent

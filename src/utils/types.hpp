@@ -160,7 +160,8 @@ using CL = MP::TypeList <
     ParticleMakerComponent,
     SpawnComponent,
     RelayComponent,
-    PointLightComponent
+    PointLightComponent,
+    Attack
 > ;
 using TL = MP::TypeList <
     PlayerTag,
