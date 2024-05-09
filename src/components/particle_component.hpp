@@ -2,6 +2,7 @@
 #include <vector>
 #include <cstdint>
 #include "../utils/vec3D.hpp"
+#include "../motor/src/darkmoon.hpp"
 
 struct Particle
 {
@@ -14,7 +15,7 @@ struct Particle
 
     float lifeTime{ .6f };
     float remainingLife{ lifeTime };
-    unsigned char r{}, g{}, b{}, a{};
+    DarkMoon::Color color{};
     ParticleType type{ ParticleType::Pixel };
 };
 

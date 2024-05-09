@@ -23,6 +23,7 @@
 #include "../components/particle_component.hpp"
 #include "../components/spawn_component.hpp"
 #include "../components/relay_component.hpp"
+#include "../components/pointlight_component.hpp"
 //ia
 #include "../components/ai_component.hpp"
 #include "../components/navmesh_component.hpp"
@@ -157,7 +158,8 @@ using CL = MP::TypeList <
     BoatComponent,
     ParticleMakerComponent,
     SpawnComponent,
-    RelayComponent
+    RelayComponent,
+    PointLightComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,
@@ -244,4 +246,5 @@ using ButtonState = DarkMoon::ButtonState;
 using Text = DarkMoon::Text;
 using TextBox = DarkMoon::TextBox;
 using CheckBox = DarkMoon::CheckBox;
+using PointLight = DarkMoon::PointLight;
 using DarkMoonEngine = DarkMoon::DarkMoonEngine;

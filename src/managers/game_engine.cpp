@@ -1013,12 +1013,7 @@ Node* ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, float lSize, Co
 
 Node* ENGI::GameEngine::createPoint3D(vec3d position, float pointSize, Color color, const char* nodeName, Node* parentNode)
 {
-    if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreatePoint3D(position.toGlm(), pointSize, color, nodeName, parentNode);
-    else
-        nodes[nodeName]->setVisibleOne(true);
-
-    return nodes[nodeName];
+    return dmeg.CreatePoint3D(position.toGlm(), pointSize, color, nodeName, parentNode);
 }
 
 Node* ENGI::GameEngine::drawPoint3D(vec3d position, float pointSize, Color color)
@@ -1043,21 +1038,16 @@ void ENGI::GameEngine::deactivateLights()
     dmeg.DeactivateLights();
 }
 
-///// Puntual Light /////
+///// Point Light /////
 
-Node* ENGI::GameEngine::drawPuntualLight(vec3d position, Color color)
+Node* ENGI::GameEngine::drawPointLight(vec3d position, Color color)
 {
-    return dmeg.CreatePointLight(position.toGlm(), color, "puntualLight", nodes["TextCopy"]);
+    return dmeg.CreatePointLight(position.toGlm(), color, "pointLight", nodes["TextCopy"]);
 }
 
-Node* ENGI::GameEngine::createPuntualLight(vec3d position, Color color, const char* nodeName, Node* parentNode)
+Node* ENGI::GameEngine::createPointLight(vec3d position, Color color, const char* nodeName, Node* parentNode)
 {
-    if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreatePointLight(position.toGlm(), color, nodeName, parentNode);
-    else
-        nodes[nodeName]->setVisibleOne(true);
-
-    return nodes[nodeName];
+    return dmeg.CreatePointLight(position.toGlm(), color, nodeName, parentNode);
 }
 
 Font* ENGI::GameEngine::getDefaultFont()

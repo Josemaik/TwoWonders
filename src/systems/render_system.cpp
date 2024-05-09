@@ -973,15 +973,15 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     r.node->setVisibleOne(true);
 
                     // Luces cofre
-                    if (e.hasTag<ChestTag>()) {
-                        auto& chest = em.getComponent<ChestComponent>(e);
-                        for (auto& child : r.node->getChildren())
-                            if (auto ent = child->getEntity<DarkMoon::PointLight>()) {
-                                ent->position = pos.toGlm() + glm::vec3{ 0, 5, 0 };
-                                ent->enabled = !chest.isOpen;
-                            }
-                        r.node->setVisible(true);
-                    }
+                    // if (e.hasTag<ChestTag>()) {
+                    //     auto& chest = em.getComponent<ChestComponent>(e);
+                    //     for (auto& child : r.node->getChildren())
+                    //         if (auto ent = child->getEntity<DarkMoon::PointLight>()) {
+                    //             ent->position = pos.toGlm() + glm::vec3{ 0, 5, 0 };
+                    //             ent->enabled = !chest.isOpen;
+                    //         }
+                    //     r.node->setVisible(true);
+                    // }
                     /*
                     if (!in)
                     {
@@ -1165,7 +1165,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     {
         // r.model = engine.loadModelRaylib("assets/models/Cofre.obj");
         r.node = engine.loadModel("assets/models/Cofre.obj");
-        engine.dmeg.CreatePointLight({}, { 255, 215, 0, 255 }, "Luz puntual cofre", r.node);
+        setPointLight(engine, em, e, *r.node, r.position + vec3d{ 0, 5, 0 });
         // loadShaders(r.model);
     }
     else if (e.hasTag<DestructibleTag>())
@@ -1243,6 +1243,13 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<SpawnTag>())
     {
         r.node = engine.loadModel("assets/Assets/Checkpoint/Checkpoint.obj");
+        auto& spc = em.getComponent<SpawnComponent>(e);
+        for (auto& [name, comps] : spc.parts)
+        {
+            auto& [ren, _, plc] = comps;
+            ren->node = r.node;
+            setPointLight(engine, em, *plc, *r.node, ren->position, D_YELLOW);
+        }
     }
     else if (e.hasTag<LevelChangeTag>())
     {
@@ -1272,8 +1279,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<LavaTag>())
     {
         r.node = engine.loadModel("assets/Assets/Charco_lava/Charco_lava.obj");
-
-        // loadShaders(r.model);
+        setPointLight(engine, em, e, *r.node, r.position + vec3d{ 0, 3, 0 }, D_RED);
     }
     else if (e.hasTag<SignTag>())
     {
@@ -1376,14 +1382,35 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     r.meshLoaded = true;
 }
 
+void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, Entity& e, Node& n, vec3d pos, Color c)
+{
+    PointLightComponent* plc{ nullptr };
+    if (e.hasComponent<PointLightComponent>())
+        plc = &em.getComponent<PointLightComponent>(e);
+    else
+        plc = &em.addComponent<PointLightComponent>(e);
+
+    setPointLight(engine, em, *plc, n, pos, c);
+}
+
+void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, PointLightComponent& plc, Node& n, vec3d pos, Color c)
+{
+    if (!plc.light)
+    {
+        auto* light = engine.createPointLight(pos, { 255, 215, 0, 255 }, "light", &n);
+        plc.light = light->getEntity<PointLight>();
+    }
+    else
+        plc.light->position = pos.toGlm();
+}
 
 void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
 {
-    using partCMPs = MP::TypeList<ParticleMakerComponent>;
+    using partCMPs = MP::TypeList<RenderComponent, ParticleMakerComponent>;
     using noTAGs = MP::TypeList<>;
 
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<partCMPs, noTAGs>([&](Entity& e, ParticleMakerComponent& pmc)
+    em.forEach<partCMPs, noTAGs>([&](Entity& e, RenderComponent& ren, ParticleMakerComponent& pmc)
     {
         if (!frti.inFrustum(e.getID()))
             return;
@@ -1395,7 +1422,7 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
                 if (p.type == Particle::ParticleType::Pixel)
                 {
                     // Dibujamos la partícula en un punto de 3x3 píxeles
-                    engine.drawPoint3D(p.position.to_other<double>(), 3.f, { p.r, p.g, p.b, p.a });
+                    engine.drawPoint3D(p.position.to_other<double>(), 3.f, p.color);
                 }
             }
         }

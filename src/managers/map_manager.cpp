@@ -424,6 +424,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 addMessageCmp(em, entity, interactable);
 
                 ic.range = 7.5;
+                em.addComponent<PointLightComponent>(entity);
                 em.addComponent<OneUseComponent>(entity, OneUseComponent{.id = unique_ids++ });
                 em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{.active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
                 [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{.content = content });
@@ -562,14 +563,15 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 {
                     auto& wall{ em.newEntity() };
                     em.addTag<WallTag>(wall);
-                    em.addComponent<RenderComponent>(wall, RenderComponent{.position = wallPoints[j].first, .scale = wallPoints[j].second, .color = color, .visible = false, .orientation = 0.0, .rotationVec = rotationVec });
+                    auto& rWall = em.addComponent<RenderComponent>(wall, RenderComponent{.position = wallPoints[j].first, .scale = wallPoints[j].second, .color = color, .visible = false, .orientation = 0.0, .rotationVec = rotationVec });
                     em.addComponent<PhysicsComponent>(wall, PhysicsComponent{.position = wallPoints[j].first, .velocity = vec3d::zero(), .scale = wallPoints[j].second, .gravity = 0, .orientation = 0.0, .rotationVec = rotationVec });
                     em.addComponent<ColliderComponent>(wall, ColliderComponent{ position, scale, BehaviorType::STATIC });
 
                     if (j > 5)
                     {
+                        auto& plc = em.addComponent<PointLightComponent>(wall);
                         auto& p = em.addComponent<ParticleMakerComponent>(wall, ParticleMakerComponent{.active = true, .effect = std::get<0>(particleParts[j]), .maxParticles = std::get<1>(particleParts[j]), .spawnRate = std::get<2>(particleParts[j]), .lifeTime = std::get<3>(particleParts[j]) });
-                        spc.parts[static_cast<SpawnComponent::SpawnParts>(j)] = &p;
+                        spc.parts[static_cast<SpawnComponent::SpawnParts>(j)] = { &rWall, &p, &plc };
                     }
                 }
 
@@ -1053,7 +1055,7 @@ void MapManager::generateNavmeshes(EntityManager& em)
         //nodes
         for (auto& [n, vec] : navs.nodes) {
             // if(n == 583){
-                vec = vec3d{vec.x(),vec.y(),vec.z()+10.0};
+            vec = vec3d{ vec.x(),vec.y(),vec.z() + 10.0 };
             // }
             if (n == c.toNode) {
                 navs.selectednodes.insert(std::make_pair(n, vec));

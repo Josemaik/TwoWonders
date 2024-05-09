@@ -92,10 +92,7 @@ void ParticleSystem::update(EntityManager& em)
                     // Asignamos el color
                     std::vector<Color>& colors = particleEffects[pmc.effect].second;
                     Color& color = colors[std::rand() % colors.size()];
-                    p.r = color.r;
-                    p.g = color.g;
-                    p.b = color.b;
-                    p.a = color.a;
+                    p.color = color;
 
                     // La metemos en el vector de partículas
                     pmc.particles.push_back(p);
@@ -116,8 +113,10 @@ void ParticleSystem::update(EntityManager& em)
                 }
                 else
                 {
+                    // Si el efecto es de agua, hacemos que suba para dar efecto de splash
                     if (pmc.effect == Effects::WATERSPLASH && p.remainingLife <= p.lifeTime / 1.3 && p.velocity.y() > 0)
                         p.velocity.setY(-p.velocity.y() * 4);
+
                     // Movemos las partículas acorde con el efecto del creador de partículas
                     if (pmc.multiply)
                         p.position += p.velocity * 1.2f;

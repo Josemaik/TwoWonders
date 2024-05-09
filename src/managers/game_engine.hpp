@@ -97,9 +97,9 @@ namespace ENGI {
         void activateLights();
         void deactivateLights();
 
-        // Puntual Light
-        Node* drawPuntualLight(vec3d position, Color color);
-        Node* createPuntualLight(vec3d position, Color color, const char* nodeName, Node* parentNode);
+        // Point Light
+        Node* drawPointLight(vec3d position, Color color);
+        Node* createPointLight(vec3d position, Color color, const char* nodeName, Node* parentNode);
 
         // Window
         void initWindow(int width, int height, const char* title);

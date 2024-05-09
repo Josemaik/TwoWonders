@@ -238,6 +238,10 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
                 li.dontLoad.insert(pair);
                 em.getSingleton<SoundSystem>().sonido_interaccion_e();
                 inpi.interact = false;
+
+                // Apagamos la luz del cofre
+                auto& plc = em.getComponent<PointLightComponent>(e);
+                plc.light->enabled = false;
             }
         }
     });
@@ -406,12 +410,14 @@ void ZoneSystem::checkVolcanoLava(EntityManager& em)
         }
     });
 
-     auto& ss = em.getSingleton<SoundSystem>();
-     if(minDistance > 80.0){
+    auto& ss = em.getSingleton<SoundSystem>();
+    if (minDistance > 80.0) {
         ss.ambiente_parameter_lava(2);
-     }else if(minDistance > 45){
+    }
+    else if (minDistance > 45) {
         ss.ambiente_parameter_lava(1);
-     } else ss.ambiente_parameter_lava(0);
+    }
+    else ss.ambiente_parameter_lava(0);
 }
 
 void ZoneSystem::checkLadders(EntityManager& em)
@@ -581,18 +587,20 @@ void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
 
         if (distance < ic.range && !sc.active)
         {
-            for (auto& [_, part] : sc.parts)
+            for (auto& [_, parts] : sc.parts)
             {
-                part->multiply = true;
+                auto& [rc, pmc, plc] = parts;
+                pmc->multiply = true;
             }
             sc.active = true;
             ic.showButton = true;
         }
         else if (distance > ic.range && sc.active)
         {
-            for (auto& [_, part] : sc.parts)
+            for (auto& [_, parts] : sc.parts)
             {
-                part->multiply = false;
+                auto& [rc, pmc, plc] = parts;
+                pmc->multiply = false;
             }
             sc.active = false;
             ic.showButton = false;
