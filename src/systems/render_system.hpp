@@ -18,7 +18,7 @@ struct RenderSystem
         float scaleFactorX{};
         float scaleFactorY{};
         float lerpFactor{};
-        float lerpSpeed{ 0.01f };
+        float lerpSpeed{ 0.03f };
         float elapsed{};
     };
 
@@ -33,7 +33,7 @@ struct RenderSystem
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, GameEngine& engine, float alpha);
+    void update(EntityManager& em, GameEngine& engine, double alpha);
     void drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawLogoKaiwa(GameEngine& engine);
     void drawOptions(GameEngine& engine, EntityManager& em, SoundSystem& ss);

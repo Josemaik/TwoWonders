@@ -1,6 +1,6 @@
 #include "camera_system.hpp"
 
-void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm, float)
+void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm, double)
 {
     // Constantes de los distintos estados de la cámara
     static constexpr vec3d cameraPosSum = { -60.f, 66.f, -60.f };
@@ -24,7 +24,6 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm, 
         auto& phy = em.getComponent<PhysicsComponent>(playerEn);
         if (li.viewPoint == vec3d::zero())
         {
-            // auto interPos = phy.prevPosition + (phy.position - phy.prevPosition) * alpha;
             cameraPos = phy.position + cameraPosSum;
             cameraTar = phy.position;
             cameraFovy = cameraFovyNormal;
@@ -132,16 +131,11 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm, 
     ge.setTargetCamera(newCameraTarget);
     ge.setFovyCamera(newCameraFovy);
 
-    if (elapsedFrutum >= limitFrustum)
-        updateFrustum(em, ge, newCameraPos, newCameraTarget, newCameraFovy);
-    else
-        elapsedFrutum += ge.getFrameTime() * 1.5f;
+    updateFrustum(em, ge, newCameraPos, newCameraTarget, newCameraFovy);
 }
 
 void CameraSystem::updateFrustum(EntityManager& em, GameEngine& ge, vec3d& cameraPos, vec3d& cameraTar, float cameraFovy)
 {
-    elapsedFrutum = 0.0f;
-
     // Actualizamos el FrustumInfo de la cámara
     auto& frustum = em.getSingleton<FrustumInfo>();
     vec3f cameraUp = ge.getUpCamera().to_other<float>();
@@ -151,8 +145,8 @@ void CameraSystem::updateFrustum(EntityManager& em, GameEngine& ge, vec3d& camer
     float halfHeight = static_cast<float>(std::tan(((cameraFovy) / 2.0f) * DEGTORAD) * cameraPos.distance(cameraTar));
     float halfWidth = aspectRatio * halfHeight;
 
-    float nearPlane = 0.1f;
-    float farPlane = 1000.0f;
+    constexpr static float nearPlane = 0.1f;
+    constexpr static float farPlane = 1000.0f;
 
     frustum.setFrustum(-halfWidth, halfWidth, -halfHeight, halfHeight, nearPlane, farPlane, cameraPos.to_other<float>(), cameraTar.to_other<float>(), cameraUp);
 
@@ -161,7 +155,7 @@ void CameraSystem::updateFrustum(EntityManager& em, GameEngine& ge, vec3d& camer
 
     em.forEach<CMPs, TAGs>([&](Entity& e)
     {
-        if(!e.hasTags(FrustOut{}) && e.hasComponent<ColliderComponent>())
+        if (!e.hasTags(FrustOut{}) && e.hasComponent<ColliderComponent>())
         {
             auto& col = em.getComponent<ColliderComponent>(e);
             frustum.bboxIn(e.getID(), col.bbox);

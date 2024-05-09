@@ -66,6 +66,7 @@ static constexpr float timeStep240 = 1.0f / 240.0f;  // Actualiza el juego 240 v
 static constexpr float timeStep360 = 1.0f / 360.0f;  // Actualiza el juego 360 veces por segundo
 static constexpr float timeStep480 = 1.0f / 480.0f;  // Actualiza el juego 480 veces por segundo
 static constexpr double timeStepDouble = 1.0 / 60.0;  // Actualiza el juego 60 veces por segundo
+static constexpr double timeStepDouble120 = 1.0 / 120.0;  // Actualiza el juego 120 veces por segundo
 static constexpr double timeStepDouble240 = 1.0 / 240.0;  // Actualiza el juego 240 veces por segundo
 
 // Forward Declarations
@@ -223,7 +224,7 @@ using mapSizeType = rapidjson::SizeType;
 using ShaderType = DarkMoon::Shader;
 using ModelType = DarkMoon::Model;
 using Effects = ParticleMakerComponent::ParticleEffect;
-using FrustOut = MP::TypeList<GroundTag, NPCTag, ChunkTag>;
+using FrustOut = MP::TypeList<GroundTag, NPCTag, ChunkTag, HitPlayerTag>;
 using Color = DarkMoon::Color;
 using Font = DarkMoon::Font;
 using Aligned = DarkMoon::Aligned;

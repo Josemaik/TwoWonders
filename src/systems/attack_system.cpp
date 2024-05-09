@@ -37,7 +37,8 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
     if (ent.hasTag<PlayerTag>() && ent.hasComponent<InputComponent>()) {
         auto& plfi = em.getSingleton<PlayerInfo>();
         auto& phy = em.getComponent<PhysicsComponent>(ent);
-        if (plfi.mana <= MANA_CUT)
+        auto& inpi = em.getSingleton<InputInfo>();
+        if (plfi.mana <= MANA_CUT && !inpi.melee)
         {
             att.createAttack = false;
             return;
@@ -67,7 +68,7 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             else if (inpi.melee)
                 plfi.currentSpell = plfi.noSpell;
 
-            if (plfi.currentSpell == Spells::None)
+            if (plfi.currentSpell.spell == Spells::None)
             {
                 att.type = AttackType::Melee;
                 em.getSingleton<SoundSystem>().sonido_melee();
@@ -76,6 +77,8 @@ void AttackSystem::createAttack(EntityManager& em, Entity& ent, AttackComponent&
             {
                 createSpellAttack(em, ent, att);
                 att.createAttack = false;
+                plfi.currentSpell = plfi.noSpell;
+                inpi.setAttackFalse();
                 return;
             }
 
@@ -275,7 +278,7 @@ void AttackSystem::createAttackType(EntityManager& em, Entity& ent, AttackCompon
             em.getSingleton<SoundSystem>().sonido_h_bola_fuego();
 
         }
-        else{
+        else {
             em.addTag<MagmaBallTag>(e);
             em.getSingleton<SoundSystem>().sonido_munyeco_ataque();
 
@@ -507,6 +510,7 @@ void AttackSystem::createSpellAttack(EntityManager& em, Entity& ent, AttackCompo
 
     auto& inpi = em.getSingleton<InputInfo>();
     inpi.setAttackFalse();
+    plfi.currentSpell = plfi.noSpell;
 }
 
 void AttackSystem::setCollisionSystem(CollisionSystem* col)

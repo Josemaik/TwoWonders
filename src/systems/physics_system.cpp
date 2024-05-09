@@ -7,7 +7,7 @@ void PhysicsSystem::update(EntityManager& em)
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy)
     {
         if (!frti.inFrustum(e.getID()) || e.hasTag<EnemyDeathTag>())
-            return;        
+            return;
 
         if (phy.notMove)
         {
@@ -17,6 +17,7 @@ void PhysicsSystem::update(EntityManager& em)
                     phy.velocity = vec3d::zero();
                 else
                 {
+                    phy.prevPosition = phy.position;
                     phy.position += phy.velocity;
                 }
             }

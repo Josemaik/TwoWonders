@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = {-28.0, 49.0, -30.0 };
+        plfi.spawnPoint = { -28.0, 49.0, -30.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial lvl0
     // 32.0, 4.0, 43.0 - Primer cofre lvl0
@@ -143,9 +143,9 @@ void Game::run()
 
     // Incializamos FPSs
     engine.setTargetFPS(30);
-    #ifdef _WIN32
+#ifdef _WIN32
     engine.setTargetFPS(30);
-    #endif
+#endif
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
 
@@ -167,7 +167,7 @@ void Game::run()
 
     // Inicializa una variable donde tener el tiempo entre frames
     float currentTime{};
-    float elapsed{ timeStep120 };
+    double elapsed{ 0 }, frameTime{}, alpha{};
     bool debugs{ false }, resets{ false };
 
     createSound();
@@ -175,12 +175,15 @@ void Game::run()
 
     while (!li.gameShouldEnd)
     {
-        elapsed += engine.getFrameTime();
+        frameTime = engine.getFrameTimeDouble();
+        if (frameTime > timeStepDouble)
+            frameTime = timeStepDouble;
+        elapsed += frameTime;
         gami.updateFrame();
 
         switch (li.currentScreen)
         {
-        // CODIGO DE LA PANTALLA DE LOGO DE EMPRESA
+            // CODIGO DE LA PANTALLA DE LOGO DE EMPRESA
         case GameScreen::LOGO:
         {
             if (li.playerID == li.max)
@@ -295,27 +298,26 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
             {
-                // while (elapsed >= timeStep)
-                // {
-                    // elapsed -= timeStep;
+                while (elapsed >= timeStepDouble)
+                {
+                    elapsed -= timeStepDouble;
                     ai_system.update(em);
                     npc_system.update(em);
                     physics_system.update(em);
                     collision_system.update(em);
                     zone_system.update(em, engine, iam, evm, map);
-                    lock_system.update(em);
                     shield_system.update(em);
                     object_system.update(em);
                     projectile_system.update(em);
                     attack_system.update(em);
                     life_system.update(em, object_system);
-                    // if (elapsed < timeStep45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
+                    // if (elapsed < timeStepDouble45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     // if(elapsed < target)
+                    camera_system.update(em, engine, evm);
                     event_system.update(em, evm, iam, map, object_system, sound_system);
                     if (li.showParticles)
                         particle_system.update(em);
-                // }
-                sound_system.update();
+                }
 
                 if (!li.getDeath().empty())
                 {
@@ -323,9 +325,11 @@ void Game::run()
                     li.clearDeath();
                 }
 
-                // auto alpha = elapsed / timeStep;
-                camera_system.update(em, engine, evm, 1.f);
-                render_system.update(em, engine, 1.f);
+                // Sistemas que no hacen cálculos con las físicas
+                alpha = elapsed / timeStepDouble;
+                sound_system.update();
+                lock_system.update(em);
+                render_system.update(em, engine, alpha);
             }
             else if (!resets && debugs) {
                 sound_system.update();
@@ -353,7 +357,7 @@ void Game::run()
         default:
             break;
         }
-        if (elapsed >= timeStep)
+        if (elapsed >= timeStepDouble)
             elapsed = 0; // Para que no se acumule el tiempo
 
         if (engine.windowShouldClose())

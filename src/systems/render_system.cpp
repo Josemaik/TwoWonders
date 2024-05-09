@@ -5,7 +5,7 @@
 float ENGI::GameEngine::widthRate = 1.0;
 float ENGI::GameEngine::heightRate = 1.0f;
 
-void RenderSystem::update(EntityManager& em, GameEngine& engine, float alpha)
+void RenderSystem::update(EntityManager& em, GameEngine& engine, double alpha)
 {
     // Actualizamos la posicion de render del componente de fisicas
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
@@ -14,7 +14,9 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine, float alpha)
             return;
 
         // Interpolamos la posicion
-        auto interPos = phy.prevPosition + (phy.position - phy.prevPosition) * alpha / alpha;
+        auto interPos = phy.position;
+        if (phy.prevPosition != vec3d::zero() && phy.prevPosition != phy.position)
+            interPos = phy.prevPosition + (phy.position - phy.prevPosition) * alpha;
 
         ren.setPosition(interPos);
         ren.setOrientation(phy.orientation);
@@ -951,10 +953,13 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 {
                     pos.setY(pos.y() - 3.54);
                 }
-                else if (e.hasTag<DoorTag>() || e.hasTag<LeverTag>() || e.hasTag<FireBallTag>()
-                    || e.hasTag<CoinTag>() || e.hasTag<WaterBombTag>() || e.hasTag<BoatTag>())
-                {
-                }
+
+                // else if (e.hasTag<HitPlayerTag>() && e.hasComponent<PhysicsComponent>())
+                // {
+                //     auto& phy = em.getComponent<PhysicsComponent>(e);
+                //     if (phy.position == phy.prevPosition)
+                //         return;
+                // }
 
                 if (r.rotationVec == vec3d::zero())
                     r.rotationVec = { 0.0, -1.0, 0.0 };
@@ -3023,7 +3028,7 @@ void RenderSystem::drawSpellExplanation(GameEngine& engine, std::string name)
     engine.drawNode(gif, { posX, posY });
 
     // Incremento
-    elapsed_book += timeStep240;
+    elapsed_book += timeStep120;
 
     if (elapsed_book > 1.0f)
         elapsed_book = 1.0f;
@@ -3083,10 +3088,10 @@ void RenderSystem::drawAnimatedTextures(GameEngine& engine)
         engine.drawNode(texture, { posX, posY }, { textureInfo.scaleFactorX, textureInfo.scaleFactorY });
 
         // Si el tiempo transcurrido es menor que 1.5 segundos, no hagas nada
-        if (textureInfo.elapsed < 2.5f)
+        if (textureInfo.elapsed < 1.5f)
         {
             // Incrementamos el tiempo transcurrido
-            textureInfo.elapsed += timeStep * 2;
+            textureInfo.elapsed += engine.getFrameTime();
         }
         else
         {
@@ -3201,8 +3206,10 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     auto& inpi = em.getSingleton<InputInfo>();
     if (inpi.interact && !txti.notPass)
     {
-        txti.popText();
-        inpi.interact = false;
+        if (boxInfo.text.isTextFinished())
+            txti.popText();
+        else
+            boxInfo.text.skipText();
 
         if (textQueue.empty())
         {
@@ -3212,6 +3219,7 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
                 li.openChest = false;
             }
         }
+        inpi.interact = false;
     }
 
     int posButtonX = posX + static_cast<int>(boxWidth * wRate);

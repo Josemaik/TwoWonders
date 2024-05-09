@@ -262,7 +262,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         inpi.lockOn = !inpi.lockOn;
         elapsedLockIn = 0.f;
     }
-    elapsedLockIn += timeStep;
+    elapsedLockIn += timeStep30;
 
     bb.tx = phy.position.x();
     bb.tz = phy.position.z();

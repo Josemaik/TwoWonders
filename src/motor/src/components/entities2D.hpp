@@ -251,9 +251,6 @@ namespace DarkMoon {
         bool charByChar{ false };
         bool bold{ false };
         bool italic{ false };
-        #ifdef _WIN32
-        bool skipBoldItalic{ false };
-        #endif
 
         Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK, Aligned al = Aligned::LEFT, bool cbc = false)
             : position(pos), font(f), fontSize(fS), color(col), alignment(al), charByChar(cbc)
@@ -448,11 +445,11 @@ namespace DarkMoon {
                 }
                 else if (c == '\b') {
                     bold = !bold;
-                    continue;
+                    // continue;
                 }
                 else if (c == '\t') {
                     italic = !italic;
-                    continue;
+                    // continue;
                 }
 #ifdef _WIN32
                 else if (checkSpecial)
@@ -545,6 +542,14 @@ namespace DarkMoon {
 
         std::wstring getText() {
             return text;
+        }
+
+        void skipText() {
+            charIndex = text.size();
+        }
+
+        bool isTextFinished() {
+            return charIndex == text.size();
         }
 
         bool charChanged() {
