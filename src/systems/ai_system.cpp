@@ -44,7 +44,7 @@ void AISystem::update(EntityManager& em)
         AIComponent* aiptr = &ai;
         LifeComponent* lcptr = &lc;
         //percibir el entorno
-        if (e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()) {
+        if (e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>() || e.hasTag<SlimeTag>()) {
             perception(bb, ai);
         }
 
