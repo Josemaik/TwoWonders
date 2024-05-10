@@ -862,6 +862,7 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
             if (!balalaunchedbyspider)
             {
                 auto& li = em.getComponent<LifeComponent>(*ent2Ptr);
+                auto& lei = em.getSingleton<LevelInfo>();
                 int damage = 2;
 
                 if (balaCol.behaviorType & BehaviorType::ATK_PLAYER)
@@ -870,17 +871,20 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                         return;
 
                     //Si pegamos a un enemmigo nos detecta directamente
-                    if (ent2Ptr->hasTag<GolemTag>()) {
+                    if (ent2Ptr->hasTag<GolemTag>() || ent2Ptr->hasTag<SnowmanTag>() ||
+                    ent2Ptr->hasTag<SlimeTag>()) {
                         em.getComponent<AIComponent>(*ent2Ptr).playerdetected = true;
                         // //empujar hacia atras si le impacta una bala
-                        if (ent2Ptr->hasComponent<PhysicsComponent>() && (ent2Ptr->hasTag<SnowmanTag>()
-                            || ent2Ptr->hasTag<GolemTag>())) {
-                            auto& li = em.getSingleton<LevelInfo>();
-                            auto& enpos = em.getComponent<PhysicsComponent>(*ent2Ptr).position;
-                            auto& plphy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
-                            vec3d plorientation = vec3d(std::sin(plphy.orientation), 0.0, std::cos(plphy.orientation));
-                            enpos.setX(enpos.x() + plorientation.x() * 4.0);
-                            enpos.setZ(enpos.z() + plorientation.z() * 4.0);
+                        if(lei.mapID == 3){
+                            if (ent2Ptr->hasComponent<PhysicsComponent>() && (ent2Ptr->hasTag<SnowmanTag>()
+                                || ent2Ptr->hasTag<GolemTag>())) {
+                                auto& li = em.getSingleton<LevelInfo>();
+                                auto& enpos = em.getComponent<PhysicsComponent>(*ent2Ptr).position;
+                                auto& plphy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+                                vec3d plorientation = vec3d(std::sin(plphy.orientation), 0.0, std::cos(plphy.orientation));
+                                enpos.setX(enpos.x() + plorientation.x() * 4.0);
+                                enpos.setZ(enpos.z() + plorientation.z() * 4.0);
+                            }
                         }
                     }
 

@@ -35,7 +35,7 @@ namespace ETMG {
 
         // CONSTANTES
         //
-        static constexpr std::size_t MAX_ENTITIES{ 300 };
+        static constexpr std::size_t MAX_ENTITIES{ 320 };
 
         // VARIABLES ESTÁTICAS
         //

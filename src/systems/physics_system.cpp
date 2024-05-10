@@ -121,7 +121,7 @@ void PhysicsSystem::update(EntityManager& em)
             }
         }
         if (e.hasTag<PlayerTag>()) {
-
+            //std::cout << pos.x() << "," << pos.y() << "," << pos.z() << "\n";
             auto& ss = em.getSingleton<SoundSystem>();
             if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
                 [[maybe_unused]] auto& li = em.getSingleton<LevelInfo>();
