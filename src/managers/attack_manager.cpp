@@ -1,5 +1,84 @@
 #include "attack_manager.hpp"
 
+void AttackManager::createAttackType(EntityManager& em, Entity& ent, AttackType type)
+{
+    auto& phy = em.getComponent<PhysicsComponent>(ent);
+    // Tipo de ataque
+    switch (type)
+    {
+    case AttackType::MeleePlayer:
+    {
+        auto position = phy.position;
+        auto& orientation = phy.orientation;
+        position += vec3d{ std::sin(orientation) * 2.0, 0, std::cos(orientation) * 2.0 };
+        createAttackRangedOrMelee(em, position, orientation, vec3d::zero(), type, 2, ElementalType::Neutral, BehaviorType::ATK_PLAYER);
+        break;
+    }
+    case AttackType::WaterBombShot:
+    {
+        // Creamos el hechizo
+        auto& e{ em.newEntity() };
+        em.addTag<HitPlayerTag>(e);
+        em.addTag<WaterBombTag>(e);
+
+        vec3d vel{};
+        setPlayerAtkVel(em, phy.position, phy.orientation, vel);
+
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 2.f, 2.f, 2.f }, .color = D_BLACK });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = vel, .scale = r.scale, .gravity = 0 });
+        em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
+        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.07f });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+        em.addComponent<Attack>(e, Attack{ .atkType = type, .damage = 3, .type = ElementalType::Water });
+        em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::WATER, .maxParticles = 10, .spawnRate = 0.01f, .lifeTime = 0.5f, });
+        break;
+    }
+    case AttackType::WaterBomb:
+    {
+        auto& e{ em.newEntity() };
+        em.addTag<HitPlayerTag>(e);
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 10.0f, 0.1f, 10.0f }, .color = D_BLUE });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ phy.position }, .scale = { 10.0f, 0.1f, 10.0f }, .gravity = 0.001 });
+        em.addComponent<Attack>(e, Attack{ .atkType = type, .damage = 1, .type = ElementalType::Water, .lifeTime = 0.5f });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, p.scale, BehaviorType::ATK_PLAYER });
+        em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::WATERSPLASH, .maxParticles = 25, .spawnRate = 0.01f, .lifeTime = 0.3f, });
+        break;
+    }
+    case AttackType::FireBallShot:
+    {
+        // Creamos el hechizo
+        auto& e{ em.newEntity() };
+        em.addTag<HitPlayerTag>(e);
+        em.addTag<FireBallTag>(e);
+
+        vec3d vel{};
+        setPlayerAtkVel(em, phy.position, phy.orientation, vel);
+
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 2.f, 2.f, 2.f }, .color = D_BLACK });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = vel, .scale = r.scale, .gravity = 0 });
+        em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
+        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.07f });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ATK_PLAYER });
+        em.addComponent<Attack>(e, Attack{ .atkType = type, .damage = 3, .type = ElementalType::Fire });
+        em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::FIREBALL, .maxParticles = 10, .spawnRate = 0.01f, .lifeTime = 0.5f, });
+        break;
+    }
+    case AttackType::FireBall:
+    {
+        auto& e{ em.newEntity() };
+        em.addTag<HitPlayerTag>(e);
+        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 10.0f, 0.1f, 10.0f }, .color = D_BLUE });
+        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ phy.position }, .scale = { 10.0f, 0.1f, 10.0f }, .gravity = 0.001 });
+        em.addComponent<Attack>(e, Attack{ .atkType = type, .damage = 1, .type = ElementalType::Fire, .lifeTime = 0.5f });
+        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, p.scale, BehaviorType::ATK_PLAYER });
+        em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::FIRESPLASH, .maxParticles = 25, .spawnRate = 0.01f, .lifeTime = 0.3f, });
+        break;
+    }
+    default:
+        break;
+    }
+}
+
 void AttackManager::createAttackType(EntityManager& em, Entity& e, AttackComponent& att)
 {
     auto& phy = em.getComponent<PhysicsComponent>(e);
@@ -7,6 +86,14 @@ void AttackManager::createAttackType(EntityManager& em, Entity& e, AttackCompone
     // Tipo de ataque
     switch (att.type)
     {
+    case AttackType::MeleePlayer:
+    {
+        auto position = phy.position;
+        auto& orientation = phy.orientation;
+        position += vec3d{ std::sin(orientation) * 2.0, 0, std::cos(orientation) * 2.0 };
+        createAttackRangedOrMelee(em, position, orientation, vec3d::zero(), AttackType::MeleePlayer, 2, ElementalType::Neutral, BehaviorType::ATK_PLAYER);
+        break;
+    }
     case AttackType::Ranged:
         if (e.hasTag<SpiderTag>()) {
             createAttackRangedOrMelee(em, e, att, true, att.scale_to_respawn_attack, 0.5);
@@ -154,14 +241,6 @@ void AttackManager::createAttackType(EntityManager& em, Entity& e, AttackCompone
     }
     case AttackType::WaterBomb:
     {
-        auto& e{ em.newEntity() };
-        // auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = phy.position, .scale = { 10.0f, 0.1f, 10.0f }, .color = SKYBLUE });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ phy.position }, .scale = { 10.0f, 0.1f, 10.0f }, .gravity = 0.001 });
-        em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::None, .life_time = 0.4f });
-        em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Water });
-        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, p.scale, BehaviorType::ATK_PLAYER });
-        em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::WATERSPLASH, .maxParticles = 25, .spawnRate = 0.01f, .lifeTime = 0.3f, });
-        break;
     }
     case AttackType::FireBall:
     {
@@ -207,26 +286,6 @@ void AttackManager::createAttackType(EntityManager& em, Entity& e, AttackCompone
     }
     case AttackType::WaterBombShot:
     {
-        // Creamos el hechizo
-        auto& e{ em.newEntity() };
-        em.addTag<HitPlayerTag>(e);
-        em.addTag<WaterBombTag>(e);
-
-        BehaviorType type = BehaviorType::ATK_ENEMY;
-        if (e.hasTag<PlayerTag>())
-        {
-            setPlayerAtkVel(em, e, att);
-            type = BehaviorType::ATK_PLAYER;
-        }
-
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<PhysicsComponent>(e).position, .scale = { 1.5f, 1.5f, 1.5f }, .color = D_BLACK });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = att.vel, .scale = r.scale, .gravity = 0 });
-        em.addComponent<LifeComponent>(e, LifeComponent{ .life = 1 });
-        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.07f });
-        em.addComponent<TypeComponent>(e, TypeComponent{ .type = ElementalType::Water });
-        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, type });
-        em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::WATER, .maxParticles = 10, .spawnRate = 0.01f, .lifeTime = 0.5f, });
-        break;
     }
     default:
         break;
@@ -278,6 +337,17 @@ void AttackManager::createAttackMultipleShot(EntityManager& em, Entity& ent, Att
         att.vel = rotatedVel;
         createAttackRangedOrMelee(em, ent, att, true, att.scale_to_respawn_attack, 0.5);
     }
+}
+
+void AttackManager::createAttackRangedOrMelee(EntityManager& em, vec3d pos, double ori, vec3d vel, AttackType atkType, uint16_t damage, ElementalType type, BehaviorType behavior)
+{
+    auto& e{ em.newEntity() };
+    em.addTag<HitPlayerTag>(e);
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = vel == vec3d::zero() ? vec3d{ 6.0, 3.0, 6.0 } : vec3d{ 1.5, 1.5, 1.5 }, .color = D_BLACK });
+    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = vel, .scale = r.scale, .gravity = 0, .orientation = ori });
+    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, behavior });
+    em.addComponent<TypeComponent>(e, TypeComponent{ .type = type });
+    em.addComponent<Attack>(e, Attack{ .atkType = atkType, .damage = damage, .type = type });
 }
 
 void AttackManager::createAttackRangedOrMelee(EntityManager& em, Entity& ent, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack, double const ranged) {
@@ -464,6 +534,20 @@ void AttackManager::setPlayerAtkVel(EntityManager& em, Entity& e, AttackComponen
     }
     else
         att.vel.setY(0.7);
+}
+
+void AttackManager::setPlayerAtkVel(EntityManager& em, vec3d& pos, double ori, vec3d& vel)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    if (li.lockedEnemy != li.max)
+    {
+        auto& lockedEnemy = *em.getEntityByID(li.lockedEnemy);
+        auto& lockedEnemyPos = em.getComponent<PhysicsComponent>(lockedEnemy).position;
+        vel = (lockedEnemyPos - pos).normalize();
+        vel.setY(vel.y() + 0.7);
+    }
+    else
+        vel = { 1.5 * std::sin(ori), 0.7, 1.5 * std::cos(ori) };
 }
 
 void AttackManager::resolvePlayerDirection(PhysicsComponent& playerPhy, PhysicsComponent& enemyPhy, bool isEnemy)

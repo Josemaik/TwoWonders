@@ -15,6 +15,7 @@ struct AttackSystem
     void setCollisionSystem(CollisionSystem* col_sys);
 
 private:
+    void resolvePlayerDirection(PhysicsComponent& playerPhy, PhysicsComponent& enemyPhy, bool isEnemy);
     void createAttack(EntityManager& em, Entity& e, AttackComponent& att);
     void createAttackType(EntityManager& em, Entity& e, AttackComponent& att);
     vec3d getPosMeteorito(uint16_t fase, vec3d posplayer);
@@ -26,6 +27,324 @@ private:
     static constexpr double MANA_CUT = 15.0f;
 
     CollisionSystem* col_sys{ nullptr };
+
+private:
+    std::map<AttackType, std::function<void(EntityManager&, Entity&, Attack&, AttackManager&)>> attackMap = {
+    { AttackType::MeleePlayer, [&](EntityManager& em, Entity&, Attack& att, AttackManager&)
+    {
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        float baseDamage = plfi.attackUpgrade ? att.damage + 1 : att.damage;
+        for (auto& targetID : att.targets)
+        {
+            auto& target = *em.getEntityByID(targetID);
+            if (target.hasComponent<LifeComponent>() && target.hasComponent<TypeComponent>())
+            {
+                auto& tpc = em.getComponent<TypeComponent>(target);
+                auto& life = em.getComponent<LifeComponent>(target);
+
+                baseDamage *= att.resolveType(tpc.type);
+
+                life.decreaseLife(static_cast<int>(baseDamage));
+            }
+        }
+        att.targets.clear();
+    }},
+    { AttackType::SpiderShot, [&](EntityManager& em, Entity& atkEnt, Attack&, AttackManager&)
+    {
+        auto& li = em.getSingleton<LevelInfo>();
+        // auto& phy = em.getComponent<PhysicsComponent>(atkEnt);
+
+        // createSpiderWeb(em, phy.position);
+        li.insertDeath(atkEnt.getID());
+    }},
+    { AttackType::Spiderweb, [&](EntityManager& em, Entity&, Attack& att, AttackManager&)
+    {
+        for (auto& targetID : att.targets)
+        {
+            auto& target = *em.getEntityByID(targetID);
+            if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
+            {
+                auto& playerPhy = em.getComponent<PhysicsComponent>(target);
+                em.getSingleton<BlackBoard_t>().playerhunted = true;
+                playerPhy.dragActivated = true;
+                return;
+            }
+        }
+        att.targets.clear();
+    }},
+    { AttackType::AreaCrusher, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    {
+        if (atkEnt.hasComponent<PhysicsComponent>())
+        {
+            for (auto& targetID : att.targets)
+            {
+                auto& target = *em.getEntityByID(targetID);
+                if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
+                {
+                    auto& playerPhy = em.getComponent<PhysicsComponent>(target);
+                    auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
+                    auto& bb = em.getSingleton<BlackBoard_t>();
+                    if (bb.playerdamagebycrusher == false) {
+                        em.getComponent<LifeComponent>(target).decreaseLife(att.damage);
+                        bb.playerdamagebycrusher = true;
+
+                        // El jugador se mueve hacia atrás de la posición del crusher
+                        resolvePlayerDirection(playerPhy, atkPhy, false);
+                        em.getSingleton<SoundSystem>().sonido_rebote();
+                    }
+                    return;
+                }
+            }
+            att.targets.clear();
+        }
+    }},
+    { AttackType::WaterBombShot, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager& am)
+    {
+        auto& li = em.getSingleton<LevelInfo>();
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        float baseDamage = plfi.attackUpgrade ? att.damage + 1 : att.damage;
+
+        for (auto& targetID : att.targets)
+        {
+            auto& target = *em.getEntityByID(targetID);
+            if (target.hasComponent<LifeComponent>())
+            {
+                if (target.hasComponent<TypeComponent>())
+                {
+                auto& tpc = em.getComponent<TypeComponent>(target);
+                baseDamage *= att.resolveType(tpc.type);
+                }
+
+                auto& life = em.getComponent<LifeComponent>(target);
+                life.decreaseLife(static_cast<int>(baseDamage));
+
+                am.createAttackType(em, atkEnt, AttackType::WaterBomb);
+            }
+        }
+        li.insertDeath(atkEnt.getID());
+    }},
+    { AttackType::FireBallShot, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    {
+        auto& li = em.getSingleton<LevelInfo>();
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        float baseDamage = plfi.attackUpgrade ? att.damage + 1 : att.damage;
+        for (auto& targetID : att.targets)
+        {
+            auto& target = *em.getEntityByID(targetID);
+            if (target.hasComponent<LifeComponent>() && target.hasComponent<TypeComponent>())
+            {
+                auto& tpc = em.getComponent<TypeComponent>(target);
+                auto& life = em.getComponent<LifeComponent>(target);
+
+                baseDamage *= att.resolveType(tpc.type);
+
+                life.decreaseLife(static_cast<int>(baseDamage));
+
+                // Función de crear ataques -> fireball
+            }
+        }
+        li.insertDeath(atkEnt.getID());
+    }},
+    { AttackType::WaterBomb, [&](EntityManager& em, Entity&, Attack& att, AttackManager&)
+    {
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        float baseDamage = plfi.attackUpgrade ? att.damage + 1 : att.damage;
+        for (auto& targetID : att.targets)
+        {
+            auto& target = *em.getEntityByID(targetID);
+            if (target.hasComponent<LifeComponent>() && target.hasComponent<TypeComponent>())
+            {
+                auto& tpc = em.getComponent<TypeComponent>(target);
+                auto& life = em.getComponent<LifeComponent>(target);
+
+                baseDamage *= att.resolveType(tpc.type);
+
+                life.decreaseLife(static_cast<int>(baseDamage));
+            }
+        }
+        att.targets.clear();
+    }},
+    { AttackType::FireBall, [&](EntityManager& em, Entity&, Attack& att, AttackManager&)
+    {
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        float baseDamage = plfi.attackUpgrade ? att.damage + 1 : att.damage;
+        for (auto& targetID : att.targets)
+        {
+            auto& target = *em.getEntityByID(targetID);
+            if (target.hasComponent<LifeComponent>() && target.hasComponent<TypeComponent>())
+            {
+                auto& tpc = em.getComponent<TypeComponent>(target);
+                auto& life = em.getComponent<LifeComponent>(target);
+
+                baseDamage *= att.resolveType(tpc.type);
+
+                life.decreaseLife(static_cast<int>(baseDamage));
+            }
+        }
+        att.targets.clear();
+    }},
+    { AttackType::WaterDashArea, [&](EntityManager& em, Entity&, Attack& att, AttackManager&)
+    {
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        float baseDamage = plfi.attackUpgrade ? att.damage + 1 : att.damage;
+        for (auto& targetID : att.targets)
+        {
+            auto& target = *em.getEntityByID(targetID);
+            if (target.hasComponent<LifeComponent>() && target.hasComponent<TypeComponent>())
+            {
+                auto& tpc = em.getComponent<TypeComponent>(target);
+                auto& life = em.getComponent<LifeComponent>(target);
+
+                baseDamage *= att.resolveType(tpc.type);
+
+                life.decreaseLife(static_cast<int>(baseDamage));
+            }
+        }
+        att.targets.clear();
+    }},
+    { AttackType::MeteoritePlayer, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    {
+        auto& li = em.getSingleton<LevelInfo>();
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        float baseDamage = plfi.attackUpgrade ? att.damage + 1 : att.damage;
+        for (auto& targetID : att.targets)
+        {
+            auto& target = *em.getEntityByID(targetID);
+            if (target.hasComponent<LifeComponent>() && target.hasComponent<TypeComponent>())
+            {
+                auto& tpc = em.getComponent<TypeComponent>(target);
+                auto& life = em.getComponent<LifeComponent>(target);
+
+                baseDamage *= att.resolveType(tpc.type);
+
+                life.decreaseLife(static_cast<int>(baseDamage));
+            }
+        }
+        li.insertDeath(atkEnt.getID());
+    }},
+    { AttackType::IceShard, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    {
+        auto& li = em.getSingleton<LevelInfo>();
+        auto& plfi = em.getSingleton<PlayerInfo>();
+        float baseDamage = plfi.attackUpgrade ? att.damage + 1 : att.damage;
+        for (auto& targetID : att.targets)
+        {
+            auto& target = *em.getEntityByID(targetID);
+            if (target.hasComponent<LifeComponent>() && target.hasComponent<TypeComponent>())
+            {
+                auto& tpc = em.getComponent<TypeComponent>(target);
+                auto& life = em.getComponent<LifeComponent>(target);
+
+                baseDamage *= att.resolveType(tpc.type);
+
+                life.decreaseLife(static_cast<int>(baseDamage));
+            }
+        }
+        li.insertDeath(atkEnt.getID());
+    } },
+    { AttackType::GollemAttack, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    {
+        if (atkEnt.hasComponent<PhysicsComponent>())
+        {
+            for (auto& targetID : att.targets)
+            {
+                auto& target = *em.getEntityByID(targetID);
+                if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
+                {
+                    auto& playerPhy = em.getComponent<PhysicsComponent>(target);
+                    auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
+
+                    em.getComponent<LifeComponent>(target).decreaseLife(att.damage);
+
+                    // El jugador se mueve hacia atrás de la posición del crusher
+                    resolvePlayerDirection(playerPhy, atkPhy, false);
+                    playerPhy.dragActivatedTime = true;
+                    em.getSingleton<SoundSystem>().sonido_rebote();
+
+                    auto& li = em.getSingleton<LevelInfo>();
+                    li.insertDeath(atkEnt.getID());
+                    return;
+                }
+            }
+            att.targets.clear();
+        }
+    }},
+    { AttackType::SnowmanBall, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    {
+        if (atkEnt.hasComponent<PhysicsComponent>())
+        {
+            for (auto& targetID : att.targets)
+            {
+                auto& target = *em.getEntityByID(targetID);
+                if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
+                {
+                    auto& playerPhy = em.getComponent<PhysicsComponent>(target);
+                    auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
+
+                    em.getComponent<LifeComponent>(target).decreaseLife(att.damage);
+
+                    // El jugador se mueve hacia atrás de la posición del crusher
+                    resolvePlayerDirection(playerPhy, atkPhy, false);
+                    em.getSingleton<SoundSystem>().sonido_rebote();
+
+                    auto& li = em.getSingleton<LevelInfo>();
+                    li.insertDeath(atkEnt.getID());
+                    return;
+                }
+            }
+            att.targets.clear();
+        }
+    }},
+    { AttackType::AirAttack, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    {
+        if (atkEnt.hasComponent<PhysicsComponent>())
+        {
+            for (auto& targetID : att.targets)
+            {
+                auto& target = *em.getEntityByID(targetID);
+                if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
+                {
+                    auto& playerPhy = em.getComponent<PhysicsComponent>(target);
+                    auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
+
+                    em.getComponent<LifeComponent>(target).decreaseLife(att.damage);
+
+                    // El jugador se mueve hacia atrás de la posición del crusher
+                    resolvePlayerDirection(playerPhy, atkPhy, false);
+                    em.getSingleton<SoundSystem>().sonido_rebote();
+
+                    return;
+                }
+            }
+            att.targets.clear();
+        }
+    }},
+    { AttackType::HealSpell, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    {
+        for (auto& targetID : att.targets)
+        {
+            auto& target = *em.getEntityByID(targetID);
+            if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
+            {
+                auto& playerPhy = em.getComponent<PhysicsComponent>(target);
+                auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
+
+                em.getComponent<LifeComponent>(target).decreaseLife(att.damage);
+
+                // El jugador se mueve hacia atrás de la posición del crusher
+                resolvePlayerDirection(playerPhy, atkPhy, false);
+                em.getSingleton<SoundSystem>().sonido_rebote();
+            }
+            else if (target.hasTag<SlimeTag>() && target.hasComponent<LifeComponent>())
+            {
+                auto& life = em.getComponent<LifeComponent>(target);
+                life.increaseLife(att.damage);
+            }
+        }
+        att.targets.clear();
+    }}
+    };
+
 };
 
 #endif // !ATTACK_SYSTEM

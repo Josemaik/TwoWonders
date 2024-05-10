@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include "../components/type_component.hpp"
+#include <map>
+#include "../components/attack_component.hpp"
 
 inline static std::size_t itemID{ 0 };
 
@@ -31,34 +32,24 @@ enum struct Spells : uint8_t
     WaterDash,
 };
 
+static std::map<Spells, std::pair<ElementalType, AttackType>> spellType
+{
+    { Spells::FireBall, {ElementalType::Fire, AttackType::FireBallShot } },
+    { Spells::FireMeteorites, {ElementalType::Fire, AttackType::MeteoritePlayer } },
+    { Spells::IceShards, {ElementalType::Ice, AttackType::IceShard } },
+    { Spells::IceShield, {ElementalType::Ice, AttackType::MeleePlayer } },
+    { Spells::WaterBomb, {ElementalType::Water, AttackType::WaterBombShot } },
+    { Spells::WaterDash, {ElementalType::Water, AttackType::WaterDashArea } },
+};
+
 struct Spell : public Item
 {
+
     Spell(std::string name, std::string description, Spells spell, double cost, uint16_t damage)
         : Item{ name, description }, spell{ spell }, cost{ cost }, damage{ damage }
     {
-        switch (spell)
-        {
-        case Spells::FireBall:
-            type = ElementalType::Fire;
-            break;
-        case Spells::FireMeteorites:
-            type = ElementalType::Fire;
-            break;
-        case Spells::IceShards:
-            type = ElementalType::Ice;
-            break;
-        case Spells::IceShield:
-            type = ElementalType::Ice;
-            break;
-        case Spells::WaterBomb:
-            type = ElementalType::Water;
-            break;
-        case Spells::WaterDash:
-            type = ElementalType::Water;
-            break;
-        default:
-            break;
-        }
+        type = spellType[spell].first;
+        atkType = spellType[spell].second;
     }
 
     ~Spell() override = default;
@@ -73,6 +64,7 @@ struct Spell : public Item
         return spell == other;
     }
     Spells spell{};
+    AttackType atkType{};
     ElementalType type{};
     double cost{};
     uint16_t damage{};

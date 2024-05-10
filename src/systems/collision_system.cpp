@@ -382,27 +382,29 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
 
     if (isAtkPlayer1 || isAtkPlayer2 || isAtkEnemy1 || isAtkEnemy2)
     {
-        if ((behaviorType2 & BehaviorType::SHIELD || behaviorType1 & BehaviorType::SHIELD)
-            && (isAtkEnemy1 || isAtkEnemy2) && behaviorType1 != BehaviorType::AREADAMAGE && behaviorType2 != BehaviorType::AREADAMAGE)
+        auto* staticEntPtr = &staticEnt;
+        auto* otherEntPtr = &otherEnt;
+
+        if (isAtkPlayer2 || isAtkEnemy2)
         {
-            auto* staticEntPtr = &staticEnt;
-            auto* otherEntPtr = &otherEnt;
-
-            if (isAtkEnemy2)
-                std::swap(staticEntPtr, otherEntPtr);
-
-            // Si cualquiera de las dos entidades es una bala y es generada por una araña
-            // creo una telaraña antes de borrar la bala
-            auto& balaCol = em.getComponent<ColliderComponent>(*staticEntPtr);
-            if (balaCol.attackType & AttackType::Spiderweb)
-                em.getComponent<AttackComponent>(*staticEntPtr).attack(AttackType::Spiderweb);
-
-            auto& li = em.getSingleton<LevelInfo>();
-            li.insertDeath(staticEntPtr->getID());
-            return;
+            std::swap(staticEntPtr, otherEntPtr);
+            std::swap(isAtkPlayer1, isAtkPlayer2);
+            std::swap(isAtkEnemy1, isAtkEnemy2);
         }
 
-        handleAtkCollision(em, isAtkPlayer1, isAtkPlayer2, isAtkEnemy1, isAtkEnemy2, staticEnt, otherEnt);
+        if (staticEntPtr->hasComponent<Attack>())
+        {
+            auto& attack = em.getComponent<Attack>(*staticEntPtr);
+            if (isAtkPlayer1 && !otherEntPtr->hasTag<PlayerTag>())
+                attack.targets.push_back(otherEntPtr->getID());
+            else if (isAtkEnemy1 && !otherEntPtr->hasTag<EnemyTag>())
+                attack.targets.push_back(otherEntPtr->getID());
+
+            if (!attack.targets.empty())
+                attack.doEffect = true;
+        }
+
+        // handleAtkCollision(em, isAtkPlayer1, isAtkPlayer2, isAtkEnemy1, isAtkEnemy2, staticEnt, otherEnt);
         return;
     }
 
@@ -887,14 +889,14 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                     auto& plfi = em.getSingleton<PlayerInfo>();
                     damage = plfi.previousSpell.damage;
 
-                    if (ent1Ptr->hasComponent<ObjectComponent>())
-                        damage = static_cast<int>(damage * 1.5f);
+                    // if (ent1Ptr->hasComponent<ObjectComponent>())
+                    //     damage = static_cast<int>(damage * 1.5f);
 
-                    if (damage == 0)
-                        damage = 2;
+                    // if (damage == 0)
+                    //     damage = 2;
 
-                    if (plfi.attackUpgrade)
-                        damage += 1;
+                    // if (plfi.attackUpgrade)
+                    //     damage += 1;
                 }
 
                 // Comprobar el tipo de la bala y el enemigo/player
@@ -902,7 +904,7 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                     (typeBala == ElementalType::Ice && typeEnemyPlayer == ElementalType::Water) ||
                     (typeBala == ElementalType::Water && typeEnemyPlayer == ElementalType::Fire))
                 {
-                    li.decreaseLife(static_cast<int>(damage * 1.5f));
+                    li.decreaseLife(static_cast<int>(damage * 1.5));
                 }
                 else if (typeBala == ElementalType::Neutral) {
                     li.decreaseLife(damage);

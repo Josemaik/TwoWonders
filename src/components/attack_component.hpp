@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include "../utils/vec3D.hpp"
+#include "../components/type_component.hpp"
 
 enum AttackType
 {
@@ -33,10 +34,11 @@ struct Attack
 {
     AttackType atkType{ AttackType::Ranged };
     uint16_t damage{};
-    float lifeTime{};
-    vec3d initialVel{};
-    std::vector<std::size_t> targets{};
     ElementalType type{ ElementalType::Neutral };
+    float lifeTime{ 0.5f };
+
+    bool doEffect{ false };
+    std::vector<std::size_t> targets{};
 
     float resolveType(ElementalType t)
     {
@@ -50,9 +52,9 @@ struct Attack
             || (type == ElementalType::Water && t == ElementalType::Fire)
             || (type == ElementalType::Ice && t == ElementalType::Water))
             return 2.f;
-    }
 
-    std::function<void(EntityManager&, Entity&, AttackComponent&)> attackEffect;
+        return 1.f;
+    }
 };
 
 struct AttackComponent

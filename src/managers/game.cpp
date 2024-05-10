@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -19.0, 14.0, 185.0 };
+        plfi.spawnPoint = { 32.0, 4.0, 43.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial lvl0
     // 32.0, 4.0, 43.0 - Primer cofre lvl0
@@ -306,8 +306,8 @@ void Game::run()
                     zone_system.update(em, engine, iam, evm, map);
                     shield_system.update(em);
                     object_system.update(em);
-                    projectile_system.update(em);
-                    attack_system.update(em);
+                    // projectile_system.update(em);
+                    attack_system.update(em, am);
                     life_system.update(em, object_system);
                     // if (elapsed < timeStepDouble45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     // if(elapsed < target)

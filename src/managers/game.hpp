@@ -24,6 +24,7 @@
 #include "game_engine.hpp"
 #include "ia_manager.hpp"
 #include "map_manager.hpp"
+#include "attack_manager.hpp"
 
 struct Game
 {
@@ -45,11 +46,11 @@ private:
     void createSound();
     void resetGame();
     void resetDeath();
-    ShaderType createShader();
 
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};
     EventManager evm{};
+    AttackManager am{};
     Ia_man iam{};
     PhysicsSystem physics_system{};
     RenderSystem render_system{};
