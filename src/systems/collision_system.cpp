@@ -26,8 +26,6 @@ void CollisionSystem::update(EntityManager& em)
             li.insertDeath(e.getID());
             return;
         }
-        if (e.getID() == 195)
-            std::cout << "aqui\n";
 
         // Actualizar bounding box
         col.updateBox(pos, phy.scale, phy.gravity, phy.orientation, phy.rotationVec);

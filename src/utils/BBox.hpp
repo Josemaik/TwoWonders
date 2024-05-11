@@ -112,5 +112,17 @@ struct BBox
             vec3d(min.x(), max.y(), max.z()).to_other<float>()
         };
     }
+
+    void expand(const BBox& other) {
+        min = vec3d::min(min, other.min);
+        max = vec3d::max(max, other.max);
+    }
+
+    int longestAxis() const {
+        vec3d size = this->size();
+        if (size.x() > size.y() && size.x() > size.z()) return 0;
+        if (size.y() > size.z()) return 1;
+        return 2;
+    }
 };
 
