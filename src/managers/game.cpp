@@ -40,7 +40,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -65.0, 13.0, 104.0 };
+        plfi.spawnPoint = { -48.5514,22.068,255.46 };
 
     // 33.0, 4.0, -25.9 - Posición Incial lvl0
     // 32.0, 4.0, 43.0 - Primer cofre lvl0

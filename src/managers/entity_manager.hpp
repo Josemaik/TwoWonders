@@ -25,7 +25,7 @@ struct cmp_traits : tag_traits<CMPS> {};
 
 namespace ETMG {
 
-    template <typename CMPList, typename SNGCMPLIST, typename TAGList, std::size_t SlotCapacity = 300>
+    template <typename CMPList, typename SNGCMPLIST, typename TAGList, std::size_t SlotCapacity = 350>
 
     struct EntityManager
     {
@@ -35,7 +35,7 @@ namespace ETMG {
 
         // CONSTANTES
         //
-        static constexpr std::size_t MAX_ENTITIES{ 320 };
+        static constexpr std::size_t MAX_ENTITIES{ 350 };
 
         // VARIABLES ESTÁTICAS
         //
