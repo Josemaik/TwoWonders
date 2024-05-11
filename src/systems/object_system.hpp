@@ -14,7 +14,6 @@ struct ObjectSystem
 
 private:
     // Shop
-    bool buyBomb(EntityManager& em);
     bool buyExtraLife(EntityManager& em, Entity* ent);
     bool buyLife(EntityManager& em, Entity* ent);
     void createObjects(EntityManager& em);

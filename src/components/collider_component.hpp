@@ -1,7 +1,6 @@
 #pragma once
 #include <functional>
 #include "../utils/BBox.hpp"
-#include "attack_component.hpp"
 
 enum BehaviorType
 {

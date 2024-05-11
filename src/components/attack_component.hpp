@@ -8,7 +8,7 @@ enum AttackType
     None = 0x00,
     MeleeEnemy = 0x01,
     RangedEnemy = 0x02,
-    AreaCrusher = 0x04,
+    CrusherAttack = 0x04,
     MeleePlayer = 0x08,
     HealSpellSetup = 0x10,
     HealSpell = 0x20,
@@ -16,7 +16,7 @@ enum AttackType
     Spiderweb = 0x80,
     GollemAttack = 0x100,
     AirAttack = 0x200,
-    CrusherAttack = 0x400,
+    SnowmanBall = 0x400,
     WaterBomb = 0x800,
     FireBall = 0x1000,
     FireBallShot = 0x2000,
@@ -26,8 +26,7 @@ enum AttackType
     TripleShot = 0x20000,
     WaterDashArea = 0x40000,
     MeteoritePlayer = 0x80000,
-    IceShard = 0x100000,
-    SnowmanBall = 0x200000
+    IceShard = 0x100000
 };
 
 struct AttackComponent

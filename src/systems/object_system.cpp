@@ -7,14 +7,10 @@ void ObjectSystem::update(EntityManager& em) {
     {
         if (obj.decreaseLifeTime(timeStep) && (!obj.inmortal))
         {
-            if (obj.type == ObjectType::BombExplode || obj.type == ObjectType::Heal_Spell)
-                obj.effect();
-            else
-            {
-                li.insertDeath(ent.getID());
-                if (ent.hasComponent<RenderComponent>())
-                    em.getComponent<RenderComponent>(ent).visible = false;
-            }
+            li.insertDeath(ent.getID());
+            if (ent.hasComponent<RenderComponent>())
+                em.getComponent<RenderComponent>(ent).visible = false;
+
         }
 
         // Recuperamos la entidad del player
@@ -59,10 +55,6 @@ void ObjectSystem::update(EntityManager& em) {
                 em.getSingleton<SoundSystem>().sonido_destello();
                 break;
 
-            case ObjectType::ShopItem_Bomb:
-                shop_object = buyBomb(em);
-                break;
-
             case ObjectType::ShopItem_Life:
                 shop_object = buyLife(em, playerEnt);
                 break;
@@ -79,12 +71,6 @@ void ObjectSystem::update(EntityManager& em) {
                 }
                 break;
             }
-            case ObjectType::BombExplode:
-                explodeBomb(em, ent);
-                break;
-            case ObjectType::Heal_Spell:
-                explodeBombHeal(em, ent);
-                break;
             case ObjectType::Key:
             {
                 plfi.addKey();
@@ -119,12 +105,6 @@ void ObjectSystem::update(EntityManager& em) {
 }
 
 // ent->hasComponent<LifeComponent<()
-
-bool ObjectSystem::buyBomb(EntityManager& em) {
-    auto& plfi = em.getSingleton<PlayerInfo>();
-
-    return plfi.buyBomb();
-}
 
 bool ObjectSystem::buyLife(EntityManager& em, Entity* ent) {
     auto& plfi = em.getSingleton<PlayerInfo>();

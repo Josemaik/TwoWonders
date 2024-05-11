@@ -92,7 +92,10 @@ struct BTActionShoot : BTNode_t {
             }
             case AIComponent::TypeShoot::Melee: {
                 //shoot three time
-                att.attack(AttackType::MeleeEnemy);
+                if (!ectx.ent.hasTag<GolemTag>())
+                    att.attack(AttackType::MeleeEnemy);
+                else
+                    att.attack(AttackType::GollemAttack);
                 return BTNodeStatus_t::success;
                 break;
             }

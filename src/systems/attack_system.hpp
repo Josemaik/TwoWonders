@@ -57,7 +57,7 @@ private:
         }
         att.targets.clear();
     }},
-    { AttackType::AreaCrusher, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager&)
+    { AttackType::CrusherAttack, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager&)
     {
         if (atkEnt.hasComponent<PhysicsComponent>())
         {
@@ -261,6 +261,7 @@ private:
     }},
     { AttackType::SnowmanBall, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager&)
     {
+        auto& li = em.getSingleton<LevelInfo>();
         if (atkEnt.hasComponent<PhysicsComponent>())
         {
             for (auto& targetID : att.targets)
@@ -284,6 +285,7 @@ private:
             }
             att.targets.clear();
         }
+        li.insertDeath(atkEnt.getID());
     }},
     { AttackType::AirAttack, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager&)
     {
@@ -336,7 +338,53 @@ private:
             }
         }
         att.targets.clear();
-    }}
+    }},
+    { AttackType::MeleeEnemy, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager&)
+    {
+        if (atkEnt.hasComponent<PhysicsComponent>())
+        {
+            for (auto& targetID : att.targets)
+            {
+                auto& target = *em.getEntityByID(targetID);
+                if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
+                {
+                    auto& playerPhy = em.getComponent<PhysicsComponent>(target);
+                    auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
+
+                    em.getComponent<LifeComponent>(target).decreaseLife(att.damage);
+
+                    // El jugador se mueve hacia atrás de la posición del crusher
+                    resolvePlayerDirection(playerPhy, atkPhy, false);
+                    return;
+                }
+            }
+            att.targets.clear();
+        }
+    }},
+    { AttackType::RangedEnemy, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager&)
+    {
+        auto& li = em.getSingleton<LevelInfo>();
+        if (atkEnt.hasComponent<PhysicsComponent>())
+        {
+            for (auto& targetID : att.targets)
+            {
+                auto& target = *em.getEntityByID(targetID);
+                if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
+                {
+                    auto& playerPhy = em.getComponent<PhysicsComponent>(target);
+                    auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
+
+                    em.getComponent<LifeComponent>(target).decreaseLife(att.damage);
+
+                    // El jugador se mueve hacia atrás de la posición del crusher
+                    resolvePlayerDirection(playerPhy, atkPhy, false);
+                    return;
+                }
+            }
+            att.targets.clear();
+        }
+        li.insertDeath(atkEnt.getID());
+    }},
     };
 };
 

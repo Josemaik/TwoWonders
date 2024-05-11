@@ -8,16 +8,18 @@
 
 struct Octree
 {
-    using OctMap = std::map<Entity*, ColliderComponent*>;
+    using OctMap = std::vector<std::pair<Entity*, ColliderComponent*>>;
+    using OctType = std::array<std::unique_ptr<Octree>, 8>;
 
     Octree(uint8_t depth, const BBox& bounds, const Octree* parent = nullptr, std::size_t max = MAX_ENTITIES)
         : bounds_(bounds), depth_(depth), parent_(const_cast<Octree*>(parent)), max_ent_(max)
     {
-        // octEntities_.reserve(max_ent_);
+        octEntities_.reserve(max_ent_);
     };
 
     void insert(Entity& entity, ColliderComponent& collider);
     void subdivide(Entity& entity, ColliderComponent& collider);
+    bool isNeighbor(Octree* node);
     void clear();
     std::size_t countEntities() const;
 
@@ -46,7 +48,7 @@ struct Octree
     [[nodiscard]] BBox const& getBounds() const noexcept { return bounds_; }
 
     // Función que nos devuelve los hijos del nodo
-    [[nodiscard]] std::array<std::unique_ptr<Octree>, 8> const& getOctants() const noexcept { return octants_; }
+    [[nodiscard]] OctType const& getOctants() const noexcept { return octants_; }
 
     // Función que nos devuelve la profundidad del nodo
     [[nodiscard]] uint8_t getDepth() const noexcept { return depth_; }
@@ -56,6 +58,9 @@ struct Octree
 
     // Función que nos devuelve el número máximo de entidades en el nodo
     [[nodiscard]] std::size_t getMaxEntities() const noexcept { return max_ent_; }
+
+    // Función que devuelve el id del nodo
+    [[nodiscard]] std::size_t getId() const noexcept { return id_; }
 
     static const std::size_t MAX_ENTITIES = 15;
     static const std::size_t MAX_DEPTH = 10;
@@ -73,11 +78,12 @@ struct Octree
 
 private:
     OctMap octEntities_;
-    std::array<std::unique_ptr<Octree>, 8> octants_{};
+    OctType octants_{};
+    std::unordered_map<std::size_t, BBox> nullOcts;
     BBox bounds_{};
     uint8_t depth_{};
     bool divided_ = false;
     Octree* parent_;
     std::size_t max_ent_{ MAX_ENTITIES };
-    std::unordered_set<Octree*> neighbors;
+    std::size_t id_;
 };

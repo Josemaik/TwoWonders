@@ -230,7 +230,7 @@ void AttackManager::createAttackType(EntityManager& em, Entity& ent, AttackType 
 
             auto& e{ em.newEntity() };
             auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = playerPos, .scale = { 12.0f, 0.3f, 12.0f }, .color = D_ORANGE });
-            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::Meteorit, .life_time = 2.5f });
+            em.addComponent<ObjectComponent>(e, ObjectComponent{ .type = ObjectType::WarningZone, .life_time = 2.5f });
             auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .gravity = 0.03 });
             em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::WARNINGZONE });
 
@@ -315,6 +315,15 @@ void AttackManager::createAttackType(EntityManager& em, Entity& ent, AttackType 
         break;
     }
     case AttackType::MeleeEnemy:
+    {
+        ElementalType eleType = ElementalType::Neutral;
+        if (ent.hasComponent<TypeComponent>())
+            eleType = em.getComponent<TypeComponent>(ent).type;
+
+        createAttackRangedOrMelee(em, phy.position, vec3d::zero(), phy.orientation, type, 2, eleType, BehaviorType::ATK_ENEMY);
+        break;
+    }
+    case AttackType::GollemAttack:
     {
         if (ent.hasTag<GolemTag>())
             em.getSingleton<SoundSystem>().sonido_golem_ataque();

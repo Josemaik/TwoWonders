@@ -39,6 +39,7 @@ private:
     void createSound();
     void resetGame();
     void resetDeath();
+    void emptyDeathList(LevelInfo& li);
 
     GameEngine engine{ SCREEN_WIDTH, SCREEN_HEIGHT };
     EntityManager em{};

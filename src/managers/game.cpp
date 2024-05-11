@@ -7,7 +7,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 32.0, 4.0, 43.0 };
+        plfi.spawnPoint = { 30.0, 13.0, 213.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial lvl0
     // 32.0, 4.0, 43.0 - Primer cofre lvl0
@@ -251,7 +251,7 @@ void Game::run()
                 resetDeath();
 
             input_system.update(em, engine);
-            debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();
+            debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText() || li.isCharging();
             resets = li.resetGame || li.resetFromDeath;
 
             // seleccionar modo de debug ( physics o AI)
@@ -276,11 +276,8 @@ void Game::run()
                         particle_system.update(em);
                 }
 
-                if (!li.getDeath().empty())
-                {
-                    em.destroyEntities(li.getDeath());
-                    li.clearDeath();
-                }
+                // Borramos las entidades muertas
+                emptyDeathList(li);
 
                 // Sistemas que no hacen cálculos con las físicas
                 alpha = elapsed / timeStepDouble;
@@ -289,6 +286,7 @@ void Game::run()
                 render_system.update(em, engine, alpha);
             }
             else if (!resets && debugs) {
+                emptyDeathList(li);
                 sound_system.update();
                 render_system.update(em, engine, 1.f);
             }
@@ -345,6 +343,15 @@ void Game::run()
 
     // engine.unloadShader(shader);
     engine.closeWindow();
+}
+
+void Game::emptyDeathList(LevelInfo& li)
+{
+    if (!li.getDeath().empty())
+    {
+        em.destroyEntities(li.getDeath());
+        li.clearDeath();
+    }
 }
 
 void Game::resetDeath()

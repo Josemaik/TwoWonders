@@ -5,18 +5,40 @@ void Octree::insert(Entity& entity, ColliderComponent& collider)
 {
     if (!divided_)
     {
-        if(octEntities_.size() < max_ent_)
-            octEntities_.insert({ &entity, &collider });
+        if (octEntities_.size() < max_ent_)
+            octEntities_.push_back({ &entity, &collider });
         else
             subdivide(entity, collider);
     }
     else if (depth_ < MAX_DEPTH)
     {
+        bool inserted{ false };
         for (auto& octant : octants_)
         {
             if (octant && octant->bounds_.intersects(collider.bbox))
             {
                 octant->insert(entity, collider);
+                inserted = true;
+            }
+        }
+
+        if (!inserted)
+        {
+            std::vector<std::size_t> toRemove{};
+            for (auto [index, bounds] : nullOcts)
+            {
+                if (bounds.intersects(collider.bbox))
+                {
+                    octants_[index] = std::make_unique<Octree>(depth_ + 1, bounds, this);
+                    octants_[index]->insert(entity, collider);
+                    toRemove.push_back(index);
+                }
+            }
+
+            if (!toRemove.empty())
+            {
+                for (auto index : toRemove)
+                    nullOcts.erase(index);
             }
         }
     }
@@ -27,11 +49,11 @@ void Octree::subdivide(Entity& entity, ColliderComponent& collider)
 {
     vec3d size = bounds_.size() / 2.0;
     vec3d center = bounds_.center();
+    vec3d octantCenter{};
 
-    octEntities_.insert({ &entity, &collider });
     for (std::size_t i = 0; i < 8; ++i)
     {
-        vec3d octantCenter = center + offsets[i] * size;
+        octantCenter = center + offsets[i] * size;
         BBox octantBounds(octantCenter, size);
 
         for (auto& entity : octEntities_)
@@ -44,6 +66,17 @@ void Octree::subdivide(Entity& entity, ColliderComponent& collider)
                 octants_[i]->insert(*entity.first, *entity.second);
             }
         }
+
+        if (octantBounds.intersects(collider.bbox))
+        {
+            if (!octants_[i])
+                octants_[i] = std::make_unique<Octree>(depth_ + 1, octantBounds, this);
+
+            octants_[i]->insert(entity, collider);
+        }
+
+        if (!octants_[i])
+            nullOcts[i] = octantBounds;
     }
 
     // Liberamos el espacio del nodo padre
@@ -64,7 +97,7 @@ void Octree::clear()
 
         divided_ = false;
     }
-    else 
+    else
         octEntities_.clear();
 }
 

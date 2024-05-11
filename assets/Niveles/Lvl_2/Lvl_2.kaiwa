@@ -173,7 +173,7 @@
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 1.0],
-							"content": 22,
+							"content": 15,
 							"message": [
 								"¡Encontraste un sombrero de brujo!",
 								"Te ayudará a canalizar tu magia."
@@ -637,7 +637,7 @@
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 2.0],
-							"content": 6,
+							"content": 5,
 							"message": ["¡Encontraste 30 destellos!"]
 						},
 						{
@@ -655,7 +655,7 @@
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": -180.0,
 							"rotVector":[0.0, 0.0, -1.0],
-							"content": 8,
+							"content": 6,
 							"message": [
 								"¡Encontraste una poción de vitalidad superior!", 
 								"Ahora te sientes mucho más vigoroso que antes."
@@ -724,7 +724,7 @@
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": -90.0,
 							"rotVector":[0.0, 0.0, 2.0],
-							"content": 6,
+							"content": 5,
 							"message": ["¡Encontraste 30 destellos!"]
 						},
 						{
@@ -1106,7 +1106,7 @@
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 180.0,
 							"rotVector":[0.0, 0.0, -1.0],
-							"content": 6,
+							"content": 5,
 							"message": ["¡Encontraste 30 destellos!"]
 						},
 						{
@@ -1116,7 +1116,7 @@
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, -1.0],
-							"content": 23,
+							"content": 16,
 							"message": [
 								"¡Encontraste una poción de fuerza!", 
 								"Sientes que tu magia y tus músculos son más poderosos..."
@@ -1129,7 +1129,7 @@
 							"scale":[5.726, 5.463, 10.0],
 							"rotation": -90.0,
 							"rotVector":[0.0, 0.0, -1.0],
-							"content": 21,
+							"content": 14,
 							"message": [
 								"¡Encontraste unas botas de la suerte!", 
 								"Te protegen y te hacen sentir más rápido..."
