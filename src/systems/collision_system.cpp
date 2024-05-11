@@ -892,7 +892,7 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                     damage = plfi.previousSpell.damage;
 
                     if (ent1Ptr->hasComponent<ObjectComponent>())
-                        damage = static_cast<int>(damage * 1.5f);
+                        damage = static_cast<int>(static_cast<float>(damage) * 1.5f);
 
                     if (damage == 0)
                         damage = 2;
@@ -906,7 +906,7 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                     (typeBala == ElementalType::Ice && typeEnemyPlayer == ElementalType::Water) ||
                     (typeBala == ElementalType::Water && typeEnemyPlayer == ElementalType::Fire))
                 {
-                    li.decreaseLife(static_cast<int>(damage * 1.5f));
+                    li.decreaseLife(static_cast<int>(static_cast<float>(damage) * 1.5f));
                 }
                 else if (typeBala == ElementalType::Neutral) {
                     li.decreaseLife(damage);

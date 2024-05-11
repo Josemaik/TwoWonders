@@ -1406,11 +1406,11 @@ void RenderSystem::setPointLight(GameEngine& engine, PointLightComponent& plc, N
 
 void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
 {
-    using partCMPs = MP::TypeList<RenderComponent, ParticleMakerComponent>;
+    using partCMPs = MP::TypeList<ParticleMakerComponent>;
     using noTAGs = MP::TypeList<>;
 
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<partCMPs, noTAGs>([&](Entity& e, RenderComponent& ren, ParticleMakerComponent& pmc)
+    em.forEach<partCMPs, noTAGs>([&](Entity& e, ParticleMakerComponent& pmc)
     {
         if (!frti.inFrustum(e.getID()))
             return;
