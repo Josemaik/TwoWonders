@@ -113,11 +113,6 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     // Actualizar la velocidad
     int keysPressed = 0;
 
-    if (ge.isKeyDown(in.air_attack) && player.hasComponent<AttackComponent>()) {
-        em.getComponent<AttackComponent>(player).pos_respawn_air_attack = phy.position;
-        em.getComponent<AttackComponent>(player).attack(AttackType::AirAttack);
-    }
-
     // Código de movimiento
     // std::chrono::duration<float, std::milli> velTime{};
     if (!phy.notMove)
@@ -235,19 +230,19 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
 
     if (ge.isKeyReleased(D_KEY_Z))
     {
-        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 4 };
+        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", AttackType::WaterBombShot };
         plfi.addSpell(spell);
     }
 
     if (ge.isKeyReleased(D_KEY_X))
     {
-        Spell spell{ "Pompa de fuego", "Disparas una potente concentración de fuego que explota al impacto", Spells::WaterDash, 20.0, 4 };
+        Spell spell{ "Pompa de fuego", "Disparas una potente concentración de fuego que explota al impacto", AttackType::WaterDashArea };
         plfi.addSpell(spell);
     }
 
     if (ge.isKeyReleased(D_KEY_C))
     {
-        Spell spell{ "Pompa de aire", "Disparas una potente concentración de aire que explota al impacto", Spells::FireBall, 20.0, 4 };
+        Spell spell{ "Pompa de aire", "Disparas una potente concentración de aire que explota al impacto", AttackType::FireBallShot };
         plfi.addSpell(spell);
     }
 
@@ -270,34 +265,48 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     bb.teid = player.getID();
 
     // Codigo para el ataque
-    if (player.hasComponent<AttackComponent>())
+    if (player.hasComponent<AttackerComponent>())
     {
         if ((ge.isKeyDown(in.space) || ge.getGamepadAxisMovement(0, in.m_space) > 0.1))
         {
-            inpi.melee = true;
-            em.getComponent<AttackComponent>(player).attack(AttackType::MeleePlayer);
+            plfi.currentSpell = plfi.noSpell;
+            em.getComponent<AttackerComponent>(player).attack(AttackType::MeleePlayer);
         }
 
-        auto& atc = em.getComponent<AttackComponent>(player);
+        auto& atc = em.getComponent<AttackerComponent>(player);
+        playerSpelled = false;
         if (atc.isAttackReady()) {
             if ((ge.isKeyDown(in.spell1) || ge.isGamepadButtonPressed(0, in.m_spell1)) && plfi.spellSlots[0] != plfi.noSpell)
             {
-                inpi.spell1 = true;
-                em.getComponent<AttackComponent>(player).attack(plfi.spellSlots[0].atkType);
+                playerSpelled = true;
+                plfi.currentSpell = plfi.spellSlots[0];
+                em.getComponent<AttackerComponent>(player).attack(plfi.spellSlots[0].atkType);
             }
             else if ((ge.isKeyDown(in.spell2) || ge.isGamepadButtonPressed(0, in.m_spell2)) && plfi.spellSlots[1] != plfi.noSpell)
             {
-                inpi.spell2 = true;
-                em.getComponent<AttackComponent>(player).attack(plfi.spellSlots[1].atkType);
+                playerSpelled = true;
+                plfi.currentSpell = plfi.spellSlots[1];
+                em.getComponent<AttackerComponent>(player).attack(plfi.spellSlots[1].atkType);
             }
             else if ((ge.isKeyDown(in.spell3) || ge.isGamepadButtonPressed(0, in.m_spell3)) && plfi.spellSlots[2] != plfi.noSpell)
             {
-                inpi.spell3 = true;
-                em.getComponent<AttackComponent>(player).attack(plfi.spellSlots[2].atkType);
+                playerSpelled = true;
+                plfi.currentSpell = plfi.spellSlots[2];
+                em.getComponent<AttackerComponent>(player).attack(plfi.spellSlots[2].atkType);
+            }
+
+            // Restamos el maná
+            if (playerSpelled)
+            {
+                plfi.mana -= plfi.currentSpell.cost;
+
+                if (plfi.mana < 0.0)
+                    plfi.mana = 0;
             }
         }
 
-        if (plfi.mana < plfi.max_mana)
+        // Vamos sumando maná poco a poco
+        if (plfi.mana < plfi.max_mana && playerSpelled)
         {
             if (!plfi.hasHat)
                 plfi.mana += .07;

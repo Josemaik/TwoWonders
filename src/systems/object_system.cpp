@@ -36,8 +36,8 @@ void ObjectSystem::update(EntityManager& em) {
                 break;
 
             case ObjectType::Sword:
-                if (!playerEnt->hasComponent<AttackComponent>())
-                    em.addComponent<AttackComponent>(*playerEnt, AttackComponent{});
+                if (!playerEnt->hasComponent<AttackerComponent>())
+                    em.addComponent<AttackerComponent>(*playerEnt, AttackerComponent{});
                 break;
 
             case ObjectType::Mana_Potion:
@@ -91,26 +91,14 @@ void ObjectSystem::update(EntityManager& em) {
                 em.getSingleton<SoundSystem>().sonido_llave();
                 Item key = { "Llave", "Una llave, parece que solo puede abrir una puerta" };
                 plfi.addItem(std::make_unique<Item>(key));
-
-
-                break;
-            }
-            case ObjectType::Fire_Spell:
-            {
-                Spell fire_pell("Bola de fuego", "Una bola de destrucción masiva", Spells::FireBall, 15.0, 1.0);
-
-                plfi.addSpell(fire_pell);
-                // auto& type = em.getComponent<TypeComponent>(*playerEnt);
-                // if (!type.hasType(ElementalType::Fire))
-                //     type.addType(ElementalType::Fire);
                 break;
             }
             case ObjectType::Basic_Staff:
             {
                 Staff staff("Bastón Básico", "É un bastón", ElementalType::Neutral, 1.0);
                 plfi.addItem(std::make_unique<Staff>(staff));
-                if (!playerEnt->hasComponent<AttackComponent>())
-                    em.addComponent<AttackComponent>(*playerEnt, AttackComponent{});
+                if (!playerEnt->hasComponent<AttackerComponent>())
+                    em.addComponent<AttackerComponent>(*playerEnt, AttackerComponent{});
                 break;
             }
             default:
@@ -162,30 +150,6 @@ bool ObjectSystem::buyExtraLife(EntityManager& em, Entity* ent) {
         }
     }
     return false;
-}
-
-void ObjectSystem::explodeBombHeal(EntityManager& em, Entity& ent) {
-    createExplodeBomb(em, ent, BehaviorType::HEAL, D_GREEN);
-    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY, D_GREEN);
-}
-
-void ObjectSystem::explodeBomb(EntityManager& em, Entity& ent) {
-    createExplodeBomb(em, ent, BehaviorType::ATK_PLAYER, D_BLACK);
-    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY, D_BLACK);
-}
-
-void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type, Color color) {
-    if (ent.hasComponent<RenderComponent>()) {
-        auto& ren = em.getComponent<RenderComponent>(ent);
-        // Crear una entidad que quite vida
-        auto& e{ em.newEntity() };
-        em.addTag<HitPlayerTag>(e);
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = ren.position, .scale = { 3.0f, 1.0f, 3.0f }, .color = color });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0 });
-        em.addComponent<LifeComponent>(e, LifeComponent{ .life = 5, .countdown = 0.0f });
-        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f });
-        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, type });
-    }
 }
 
 void ObjectSystem::addObject(ObjectType type, vec3d pos)
@@ -261,13 +225,6 @@ void ObjectSystem::createObjects(EntityManager& em)
             scl = { 10.5, 10.5, 10.5 };
             inmortal = true;
             visible = false;
-            break;
-        }
-        case ObjectType::Fire_Spell:
-        {
-            color = D_RED;
-            scl = { 1.5, 0.3, 0.3 };
-            inmortal = true;
             break;
         }
         case ObjectType::GoodBoots:

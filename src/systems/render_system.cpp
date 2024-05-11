@@ -1267,6 +1267,10 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     {
         r.node = engine.loadModel("assets/Assets/Props/Hechizos/Agua_1.obj");
     }
+    else if (e.hasTag<FireBallTag>())
+    {
+        r.node = engine.loadModel("assets/Assets/Props/Hechizos/Fuego_1.obj");
+    }
     else if (e.hasTag<NomadTag>())
     {
         r.node = engine.loadModel("assets/Personajes/NPCs/Nomada/Nomada.obj");
@@ -1329,9 +1333,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         }
         case 3:
         {
-            if (e.hasComponent<RelayComponent>())
+            if (e.hasComponent<TypeComponent>())
             {
-                auto& rc = em.getComponent<RelayComponent>(e);
+                auto& rc = em.getComponent<TypeComponent>(e);
 
                 switch (rc.type)
                 {
@@ -1406,11 +1410,11 @@ void RenderSystem::setPointLight(GameEngine& engine, PointLightComponent& plc, N
 
 void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
 {
-    using partCMPs = MP::TypeList<RenderComponent, ParticleMakerComponent>;
+    using partCMPs = MP::TypeList<ParticleMakerComponent>;
     using noTAGs = MP::TypeList<>;
 
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<partCMPs, noTAGs>([&](Entity& e, RenderComponent& ren, ParticleMakerComponent& pmc)
+    em.forEach<partCMPs, noTAGs>([&](Entity& e, ParticleMakerComponent& pmc)
     {
         if (!frti.inFrustum(e.getID()))
             return;
@@ -2300,7 +2304,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
         if (li.mapID == 2 && li.volcanoMission)
             drawBoatParts(engine, em);
 
-        if ((li.mapID == 0 || li.mapID == 1) && pl.hasComponent<AttackComponent>() && !li.tutorialEnemies.empty())
+        if ((li.mapID == 0 || li.mapID == 1) && pl.hasComponent<AttackerComponent>() && !li.tutorialEnemies.empty())
         {
 
             for (auto& enemy : li.tutorialEnemies)
@@ -2394,7 +2398,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
             elapsed_WASD += 1.0f / 60.0f;
         }
 
-        if (li.mapID == 2 && pl.hasComponent<AttackComponent>() && !li.volcanoLava.empty())
+        if (li.mapID == 2 && pl.hasComponent<AttackerComponent>() && !li.volcanoLava.empty())
         {
             auto& plfi = em.getSingleton<PlayerInfo>();
             std::size_t spellID{ 5 };
@@ -2408,7 +2412,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
 
             for (std::size_t i = 0; i < plfi.spellSlots.size(); ++i)
             {
-                if (plfi.spellSlots[i].spell == Spells::WaterDash)
+                if (plfi.spellSlots[i].atkType == AttackType::WaterDashArea)
                 {
                     spellID = i;
                     break;
@@ -3000,19 +3004,19 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
             {2, {screenWidth - 165 * wRate, 247.5f * hRate}}
         };
 
-        static std::map<Spells, std::tuple<std::string, std::string, float, float, float>> spellToTexture = {
-            {Spells::WaterBomb, {"pompas", "exp_pompa", 10.0f, 15.5f, 2.5f}},
-            {Spells::WaterDash, {"dash", "exp_dash", 7.5f, 7.5f, 2.5f}},
-            {Spells::FireBall, {"bola_fuego", "exp_bola_f", 22.5f, 25.5f, 2.55f}},
-            {Spells::FireMeteorites, {"meteoritos", "exp_pompa", 22.5f, 25.5f, 2.5f}},
-            {Spells::IceShards, {"estacas", "exp_pompa", 22.5f, 25.5f, 2.5f}},
-            {Spells::IceShield, {"escudo", "exp_pompa", 22.5f, 25.5f, 2.5f}},
+        static std::map<AttackType, std::tuple<std::string, std::string, float, float, float>> spellToTexture = {
+            {AttackType::WaterBombShot, {"pompas", "exp_pompa", 10.0f, 15.5f, 2.5f}},
+            {AttackType::WaterDashArea, {"dash", "exp_dash", 7.5f, 7.5f, 2.5f}},
+            {AttackType::FireBallShot, {"bola_fuego", "exp_bola_f", 22.5f, 25.5f, 2.55f}},
+            {AttackType::MeteoritePlayer, {"meteoritos", "exp_pompa", 22.5f, 25.5f, 2.5f}},
+            {AttackType::IceShard, {"estacas", "exp_pompa", 22.5f, 25.5f, 2.5f}},
+            {AttackType::IceShield, {"escudo", "exp_pompa", 22.5f, 25.5f, 2.5f}},
         };
 
         for (std::size_t i = 0; i < plfi.spellSlots.size(); i++)
         {
             auto& spell = plfi.spellSlots[i];
-            if (spell.spell != plfi.noSpell)
+            if (spell != plfi.noSpell)
             {
                 if (!plfi.showBook)
                 {
@@ -3020,7 +3024,7 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
                     handleAnimatedTexture(std::to_string(i + 1) + "_pl", "placeholder", static_cast<int>(spellPositions[i].first), static_cast<int>(spellPositions[i].second), 2.45f);
 
                     // Usar el mapa para obtener el nombre de la textura, posiciones y factor de escala
-                    auto textureDetails = spellToTexture[spell.spell];
+                    auto textureDetails = spellToTexture[spell.atkType];
                     handleAnimatedTexture(spellName, std::get<0>(textureDetails), static_cast<int>(spellPositions[i].first + std::get<2>(textureDetails) * wRate), static_cast<int>(spellPositions[i].second + std::get<3>(textureDetails) * hRate), std::get<4>(textureDetails));
                 }
                 else
@@ -3028,7 +3032,7 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
                     if (getNode(engine, "libro")->isVisible())
                         break;
                     // Usar el mapa para obtener el nombre de la textura de explosión
-                    auto textureDetails = spellToTexture[plfi.spells.back().spell];
+                    auto textureDetails = spellToTexture[plfi.spells.back().atkType];
                     drawSpellExplanation(engine, std::get<1>(textureDetails));
 
                     auto& inpi = em.getSingleton<InputInfo>();

@@ -11,10 +11,8 @@
 #include "../systems/life_system.hpp"
 #include "../systems/ai_system.hpp"
 #include "../systems/attack_system.hpp"
-#include "../systems/projectile_system.hpp"
 #include "../systems/object_system.hpp"
 #include "../systems/zone_system.hpp"
-#include "../systems/shield_system.hpp"
 #include "../systems/event_system.hpp"
 #include "../systems/sound_system.hpp"
 #include "../systems/camera_system.hpp"
@@ -38,11 +36,6 @@ struct Game
 
 private:
     void createEntities();
-    void createSword();
-    void createShield(Entity& ent);
-    void createCoin();
-    void createShop();
-    void createEnding();
     void createSound();
     void resetGame();
     void resetDeath();
@@ -61,10 +54,8 @@ private:
     AISystem   ai_system{};
     // GameTimer gtime{};
     AttackSystem attack_system{};
-    ProjectileSystem projectile_system{};
     ObjectSystem object_system{};
     ZoneSystem zone_system{};
-    ShieldSystem shield_system{};
     EventSystem event_system{};
     MapManager map{};
     CameraSystem camera_system{};

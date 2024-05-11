@@ -18,7 +18,6 @@ enum struct ObjectType
     AreaAttack,
     Spiderweb,
     Meteorit,
-    Fire_Spell,
     Ice_Spell,
     Water_Spell,
     Basic_Staff,

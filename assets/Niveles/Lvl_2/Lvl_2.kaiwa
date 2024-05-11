@@ -256,8 +256,7 @@
 							],
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.0,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.0
 						},
 						{
 							"position": [19.52, 45.0, -40.78],
@@ -285,8 +284,7 @@
 							],
 							"countdown_stop": 0.0,
 							"countdown_shoot": 1.0,
-							"countdown_perception": 0.1,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.1
 						},
 						{
 							"position": [-64.37,24.0,-45.38],
@@ -314,8 +312,7 @@
 							],
 							"countdown_stop": 2.5,
 							"countdown_shoot": 0.0,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [-64.37,24.0,-24.19],
@@ -343,8 +340,7 @@
 							],
 							"countdown_stop": 2.5,
 							"countdown_shoot": 0.0,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [6.05,49.0,33.5],
@@ -372,8 +368,7 @@
 							],
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.0,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.0
 						},
 						{
 							"position": [-12.12,49.0,47.5],
@@ -401,8 +396,7 @@
 							],
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.0,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.0
 						},
 						{
 							"position": [-26.8,49.0,33.5],
@@ -430,8 +424,7 @@
 							],
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.0,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.0
 						}
 						
 					],
@@ -782,8 +775,7 @@
 							],
 							"countdown_stop": 0.0,
 							"countdown_shoot": 1.0,
-							"countdown_perception": 0.1,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.1
 						},
 						{
 							"position": [-31.8,10.0,-82.9],
@@ -811,8 +803,7 @@
 							],
 							"countdown_stop": 0.0,
 							"countdown_shoot": 0.0,
-							"countdown_perception": 0.21,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.21
 						},
 						{
 							"position": [-15.10,8.0,-82.9],
@@ -840,8 +831,7 @@
 							],
 							"countdown_stop": 0.0,
 							"countdown_shoot": 0.0,
-							"countdown_perception": 0.22,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.22
 						},
 						{
 							"position": [14.94,22.0,-123.5],
@@ -869,8 +859,7 @@
 							],
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.03,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.03
 						},
 						{
 							"position": [-7.0,22.0,-145.7],
@@ -898,8 +887,7 @@
 							],
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.0,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.0
 						},
 						{
 							"position": [-26.9,26.0,-136.08],
@@ -927,8 +915,7 @@
 							],
 							"countdown_stop": 0.0,
 							"countdown_shoot": 0.0,
-							"countdown_perception": 0.07,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.07
 						},
 						{
 							"position": [-23.81,50.0,23.11],
@@ -956,8 +943,7 @@
 							],
 							"countdown_stop": 0.0,
 							"countdown_shoot": 0.0,
-							"countdown_perception": 0.01,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.01
 						}
 					],
 					"NPCs":[],
@@ -1237,8 +1223,7 @@
 							],
 							"countdown_stop": 0.0,
 							"countdown_shoot": 1.0,
-							"countdown_perception": 0.1,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.1
 						},
 						{
 							"position": [-105.9,22.0,-146.4],
@@ -1266,8 +1251,7 @@
 							],
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.0,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.0
 						}
 					],
 					"NPCs":[],
@@ -1449,8 +1433,7 @@
 							],
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.0,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.0
 						},
 						{
 							"position": [-133.80,28.0,-4.67],
@@ -1478,8 +1461,7 @@
 							],
 							"countdown_stop": 0.2,
 							"countdown_shoot": 0.3,
-							"countdown_perception": 0.10,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.10
 						},
 						{
 							"position": [-80.8,9.0,7.2],
@@ -1507,8 +1489,7 @@
 							],
 							"countdown_stop": 0.2,
 							"countdown_shoot": 0.3,
-							"countdown_perception": 0.02,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.02
 						},
 						{
 							"position": [-94.0,9.0,8.6],
@@ -1536,8 +1517,7 @@
 							],
 							"countdown_stop": 0.0,
 							"countdown_shoot": 0.0,
-							"countdown_perception": 0.06,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.06
 						}
 						
 					],

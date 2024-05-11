@@ -81,10 +81,10 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 else
                     lif.decreaseNextFrame = false;
                 if (em.getComponent<AIComponent>(ent).healbeforedie) {
-                    em.getComponent<AttackComponent>(ent).attack(AttackType::HealSpell);
+                    em.getComponent<AttackerComponent>(ent).attack(AttackType::HealSpellSetup);
                 }
                 else {
-                    em.getComponent<AttackComponent>(ent).attack(AttackType::HealSpell);
+                    em.getComponent<AttackerComponent>(ent).attack(AttackType::HealSpellSetup);
                 }
             }
             //si es un golem
@@ -95,8 +95,8 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 }
                 else
                     lif.decreaseNextFrame = false;
-                //  if (ent.hasComponent<AttackComponent>()) {
-                //     em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
+                //  if (ent.hasComponent<AttackerComponent>()) {
+                //     em.getComponent<AttackerComponent>(ent).attack(AttackType::AreaAttack);
                 //  }
             }
 
@@ -112,12 +112,6 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                     lif.decreaseNextFrame = true;
                 else
                     lif.decreaseNextFrame = false;
-
-                if (ent.hasComponent<ColliderComponent>() && ent.hasComponent<AttackComponent>()) {
-                    if (em.getComponent<ColliderComponent>(ent).attackType == AttackType::Spiderweb) {
-                        em.getComponent<AttackComponent>(ent).attack(AttackType::Spiderweb);
-                    }
-                }
             }
 
             if (ent.hasTag<SubjectTag>()) {

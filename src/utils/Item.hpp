@@ -32,42 +32,39 @@ enum struct Spells : uint8_t
     WaterDash,
 };
 
-static std::map<Spells, std::pair<ElementalType, AttackType>> spellType
-{
-    { Spells::FireBall, {ElementalType::Fire, AttackType::FireBallShot } },
-    { Spells::FireMeteorites, {ElementalType::Fire, AttackType::MeteoritePlayer } },
-    { Spells::IceShards, {ElementalType::Ice, AttackType::IceShard } },
-    { Spells::IceShield, {ElementalType::Ice, AttackType::MeleePlayer } },
-    { Spells::WaterBomb, {ElementalType::Water, AttackType::WaterBombShot } },
-    { Spells::WaterDash, {ElementalType::Water, AttackType::WaterDashArea } },
+static std::map<AttackType, double> spellType = {
+    { AttackType::None, 0 },
+    { AttackType::FireBallShot, 20 },
+    { AttackType::MeteoritePlayer, 20 },
+    { AttackType::IceShard, 20 },
+    { AttackType::IceShield, 20 },
+    { AttackType::WaterBombShot, 20 },
+    { AttackType::WaterDashArea, 20 },
 };
 
 struct Spell : public Item
 {
 
-    Spell(std::string name, std::string description, Spells spell, double cost, uint16_t damage)
-        : Item{ name, description }, spell{ spell }, cost{ cost }, damage{ damage }
+    Spell(std::string name, std::string description, AttackType atkType)
+        : Item{ name, description }, atkType{ atkType }
     {
-        type = spellType[spell].first;
-        atkType = spellType[spell].second;
+        cost = spellType[atkType];
     }
 
     ~Spell() override = default;
 
     bool operator==(const Spell& other) const
     {
-        return spell == other.spell;
+        return atkType == other.atkType;
     }
 
-    bool operator==(const Spells& other) const
+    bool operator==(const AttackType& other) const
     {
-        return spell == other;
+        return atkType == other;
     }
-    Spells spell{};
+
     AttackType atkType{};
-    ElementalType type{};
     double cost{};
-    uint16_t damage{};
 };
 
 struct Staff : public Item

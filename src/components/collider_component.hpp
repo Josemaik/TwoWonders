@@ -12,20 +12,15 @@ enum BehaviorType
     ATK_PLAYER = 0x08,
     ATK_ENEMY = 0x10,
     ZONE = 0x20,
-    SHIELD = 0x40,
+    LADDER = 0x40,
     ENDING = 0x80,
     HEAL = 0x100,
-    AREADAMAGE = 0x200,
-    SPIDERWEB = 0x400,
+    OBJECT = 0x200,
+    RAMP = 0x400,
     WARNINGZONE = 0x800,
-    METEORITE = 0X1000,
-    AREADAMAGECRUSHER = 0x2000,
+    RELAY = 0X1000,
+    LAVA = 0x2000,
     SPAWN = 0x4000,
-    RAMP = 0x8000,
-    LADDER = 0x10000,
-    LAVA = 0x20000,
-    OBJECT = 0x40000,
-    RELAY = 0x80000,
 };
 
 struct ColliderComponent
@@ -39,5 +34,4 @@ struct ColliderComponent
 
     BBox bbox{};
     BehaviorType behaviorType;
-    AttackType attackType{ AttackType::None };
 };

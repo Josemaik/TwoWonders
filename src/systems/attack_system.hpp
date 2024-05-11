@@ -8,29 +8,16 @@
 struct AttackSystem
 {
     // Se van a buscar las entidad que tengan estos componentes y tags
-    using SYSCMPs = MP::TypeList<AttackComponent>;
+    using SYSCMPs = MP::TypeList<AttackerComponent>;
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em, AttackManager& am);
-    void setCollisionSystem(CollisionSystem* col_sys);
 
 private:
     void resolvePlayerDirection(PhysicsComponent& playerPhy, PhysicsComponent& enemyPhy, bool isEnemy);
-    void createAttack(EntityManager& em, Entity& e, AttackComponent& att);
-    void createAttackType(EntityManager& em, Entity& e, AttackComponent& att);
-    vec3d getPosMeteorito(uint16_t fase, vec3d posplayer);
 
-    void createAttackRangedOrMelee(EntityManager& em, Entity& e, AttackComponent& att, bool isRanged, double const scale_to_respawn_attack, double const ranged);
-    void createAttackMultipleShot(EntityManager& em, Entity& ent, AttackComponent& att, int numShots);
-    void createSpellAttack(EntityManager& em, Entity& e, AttackComponent& att);
-    void setPlayerAtkVel(EntityManager& em, Entity& e, AttackComponent& att);
-    static constexpr double MANA_CUT = 15.0f;
-
-    CollisionSystem* col_sys{ nullptr };
-
-private:
-    std::map<AttackType, std::function<void(EntityManager&, Entity&, Attack&, AttackManager&)>> attackMap = {
-    { AttackType::MeleePlayer, [&](EntityManager& em, Entity&, Attack& att, AttackManager&)
+    std::map<AttackType, std::function<void(EntityManager&, Entity&, AttackComponent&, AttackManager&)>> attackMap = {
+    { AttackType::MeleePlayer, [&](EntityManager& em, Entity&, AttackComponent& att, AttackManager&)
     {
         auto& plfi = em.getSingleton<PlayerInfo>();
         float baseDamage = plfi.attackUpgrade ? att.damage + 1 : att.damage;
@@ -49,15 +36,13 @@ private:
         }
         att.targets.clear();
     }},
-    { AttackType::SpiderShot, [&](EntityManager& em, Entity& atkEnt, Attack&, AttackManager&)
+    { AttackType::SpiderShot, [&](EntityManager& em, Entity& atkEnt, AttackComponent&, AttackManager& am)
     {
         auto& li = em.getSingleton<LevelInfo>();
-        // auto& phy = em.getComponent<PhysicsComponent>(atkEnt);
-
-        // createSpiderWeb(em, phy.position);
+        am.createAttackType(em, atkEnt, AttackType::Spiderweb);
         li.insertDeath(atkEnt.getID());
     }},
-    { AttackType::Spiderweb, [&](EntityManager& em, Entity&, Attack& att, AttackManager&)
+    { AttackType::Spiderweb, [&](EntityManager& em, Entity&, AttackComponent& att, AttackManager&)
     {
         for (auto& targetID : att.targets)
         {
@@ -72,7 +57,7 @@ private:
         }
         att.targets.clear();
     }},
-    { AttackType::AreaCrusher, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    { AttackType::AreaCrusher, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager&)
     {
         if (atkEnt.hasComponent<PhysicsComponent>())
         {
@@ -98,7 +83,7 @@ private:
             att.targets.clear();
         }
     }},
-    { AttackType::WaterBombShot, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager& am)
+    { AttackType::WaterBombShot, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager& am)
     {
         auto& li = em.getSingleton<LevelInfo>();
         auto& plfi = em.getSingleton<PlayerInfo>();
@@ -123,7 +108,7 @@ private:
         }
         li.insertDeath(atkEnt.getID());
     }},
-    { AttackType::FireBallShot, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    { AttackType::FireBallShot, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager& am)
     {
         auto& li = em.getSingleton<LevelInfo>();
         auto& plfi = em.getSingleton<PlayerInfo>();
@@ -140,12 +125,12 @@ private:
 
                 life.decreaseLife(static_cast<int>(baseDamage));
 
-                // Función de crear ataques -> fireball
+                am.createAttackType(em, atkEnt, AttackType::FireBall);
             }
         }
         li.insertDeath(atkEnt.getID());
     }},
-    { AttackType::WaterBomb, [&](EntityManager& em, Entity&, Attack& att, AttackManager&)
+    { AttackType::WaterBomb, [&](EntityManager& em, Entity&, AttackComponent& att, AttackManager&)
     {
         auto& plfi = em.getSingleton<PlayerInfo>();
         float baseDamage = plfi.attackUpgrade ? att.damage + 1 : att.damage;
@@ -164,7 +149,7 @@ private:
         }
         att.targets.clear();
     }},
-    { AttackType::FireBall, [&](EntityManager& em, Entity&, Attack& att, AttackManager&)
+    { AttackType::FireBall, [&](EntityManager& em, Entity&, AttackComponent& att, AttackManager&)
     {
         auto& plfi = em.getSingleton<PlayerInfo>();
         float baseDamage = plfi.attackUpgrade ? att.damage + 1 : att.damage;
@@ -183,7 +168,7 @@ private:
         }
         att.targets.clear();
     }},
-    { AttackType::WaterDashArea, [&](EntityManager& em, Entity&, Attack& att, AttackManager&)
+    { AttackType::WaterDashArea, [&](EntityManager& em, Entity&, AttackComponent& att, AttackManager&)
     {
         auto& plfi = em.getSingleton<PlayerInfo>();
         float baseDamage = plfi.attackUpgrade ? att.damage + 1 : att.damage;
@@ -202,7 +187,7 @@ private:
         }
         att.targets.clear();
     }},
-    { AttackType::MeteoritePlayer, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    { AttackType::MeteoritePlayer, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager&)
     {
         auto& li = em.getSingleton<LevelInfo>();
         auto& plfi = em.getSingleton<PlayerInfo>();
@@ -210,39 +195,44 @@ private:
         for (auto& targetID : att.targets)
         {
             auto& target = *em.getEntityByID(targetID);
-            if (target.hasComponent<LifeComponent>() && target.hasComponent<TypeComponent>())
+            if (target.hasComponent<LifeComponent>())
             {
-                auto& tpc = em.getComponent<TypeComponent>(target);
+                if (target.hasComponent<TypeComponent>())
+                {
+                    auto& tpc = em.getComponent<TypeComponent>(target);
+                    baseDamage *= att.resolveType(tpc.type);
+                }
+
                 auto& life = em.getComponent<LifeComponent>(target);
-
-                baseDamage *= att.resolveType(tpc.type);
-
                 life.decreaseLife(static_cast<int>(baseDamage));
             }
         }
         li.insertDeath(atkEnt.getID());
     }},
-    { AttackType::IceShard, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    { AttackType::IceShard, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager&)
     {
         auto& li = em.getSingleton<LevelInfo>();
         auto& plfi = em.getSingleton<PlayerInfo>();
         float baseDamage = plfi.attackUpgrade ? att.damage + 1 : att.damage;
+
         for (auto& targetID : att.targets)
         {
             auto& target = *em.getEntityByID(targetID);
-            if (target.hasComponent<LifeComponent>() && target.hasComponent<TypeComponent>())
+            if (target.hasComponent<LifeComponent>())
             {
-                auto& tpc = em.getComponent<TypeComponent>(target);
+                if (target.hasComponent<TypeComponent>())
+                {
+                    auto& tpc = em.getComponent<TypeComponent>(target);
+                    baseDamage *= att.resolveType(tpc.type);
+                }
+
                 auto& life = em.getComponent<LifeComponent>(target);
-
-                baseDamage *= att.resolveType(tpc.type);
-
                 life.decreaseLife(static_cast<int>(baseDamage));
             }
         }
         li.insertDeath(atkEnt.getID());
     } },
-    { AttackType::GollemAttack, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    { AttackType::GollemAttack, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager&)
     {
         if (atkEnt.hasComponent<PhysicsComponent>())
         {
@@ -269,7 +259,7 @@ private:
             att.targets.clear();
         }
     }},
-    { AttackType::SnowmanBall, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    { AttackType::SnowmanBall, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager&)
     {
         if (atkEnt.hasComponent<PhysicsComponent>())
         {
@@ -295,7 +285,7 @@ private:
             att.targets.clear();
         }
     }},
-    { AttackType::AirAttack, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    { AttackType::AirAttack, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager&)
     {
         if (atkEnt.hasComponent<PhysicsComponent>())
         {
@@ -319,7 +309,11 @@ private:
             att.targets.clear();
         }
     }},
-    { AttackType::HealSpell, [&](EntityManager& em, Entity& atkEnt, Attack& att, AttackManager&)
+    { AttackType::HealSpellSetup, [&](EntityManager& em, Entity& atkEnt, AttackComponent&, AttackManager& am)
+    {
+        am.createAttackType(em, atkEnt, AttackType::HealSpell);
+    }},
+    { AttackType::HealSpell, [&](EntityManager& em, Entity& atkEnt, AttackComponent& att, AttackManager&)
     {
         for (auto& targetID : att.targets)
         {
@@ -344,7 +338,6 @@ private:
         att.targets.clear();
     }}
     };
-
 };
 
 #endif // !ATTACK_SYSTEM

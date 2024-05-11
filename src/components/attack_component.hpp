@@ -6,11 +6,11 @@
 enum AttackType
 {
     None = 0x00,
-    Melee = 0x01,
-    Ranged = 0x02,
-    Bomb = 0x04,
-    AttackPlayer = 0x08,
-    TripleShot = 0x10,
+    MeleeEnemy = 0x01,
+    RangedEnemy = 0x02,
+    AreaCrusher = 0x04,
+    MeleePlayer = 0x08,
+    HealSpellSetup = 0x10,
     HealSpell = 0x20,
     AreaAttack = 0x40,
     Spiderweb = 0x80,
@@ -21,18 +21,18 @@ enum AttackType
     FireBall = 0x1000,
     FireBallShot = 0x2000,
     WaterBombShot = 0x4000,
-    MeleePlayer = 0x8000,
+    IceShield = 0x8000,
     SpiderShot = 0x10000,
-    AreaCrusher = 0x20000,
+    TripleShot = 0x20000,
     WaterDashArea = 0x40000,
     MeteoritePlayer = 0x80000,
     IceShard = 0x100000,
-    SnowmanBall = 0x200000,
+    SnowmanBall = 0x200000
 };
 
-struct Attack
+struct AttackComponent
 {
-    AttackType atkType{ AttackType::Ranged };
+    AttackType atkType{ AttackType::None };
     uint16_t damage{};
     ElementalType type{ ElementalType::Neutral };
     float lifeTime{ 0.5f };
@@ -57,20 +57,12 @@ struct Attack
     }
 };
 
-struct AttackComponent
+struct AttackerComponent
 {
-    AttackType type{ AttackType::Ranged };
-    uint16_t damage{};
-    float range{}; // en segundos
-    float scale_to_respawn_attack{ 2.0f };
-    float countdown{ 0.5f }, elapsed{ countdown }, countdown_air_attk{ 0.2f }, elapsed_air_attk{ 1.0f },
-        countdown_warning_airatk{ 0.75f }, elapsed_warning_airatk{ 0.5f }; // en segundos
-    vec3d vel{};
-    //air attack
-    bool warning_created{ false };
-    uint16_t air_attack_fases{ 4 };
+    AttackType type{ AttackType::None };
+    float countdown{ 0.5f }, elapsed{ countdown };
     bool createAttack{ false };
-    vec3d pos_respawn_air_attack{}, pos_respawn_crush_attack{};
+    vec3d vel{};
 
     void attack(AttackType typeAttack) {
         if (isAttackReady()) {

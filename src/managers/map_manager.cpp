@@ -662,7 +662,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                     em.addTag<LockableTag>(entity);
                     c.behaviorType = BehaviorType::RELAY;
                     auto relayType = static_cast<ElementalType>(interactable["relay"].GetUint());
-                    em.addComponent<RelayComponent>(entity, RelayComponent({.type = relayType }));
+                    em.addComponent<TypeComponent>(entity, TypeComponent({.type = relayType }));
                     em.addComponent<LifeComponent>(entity, LifeComponent({.life = 20}));
                     break;
                 }
