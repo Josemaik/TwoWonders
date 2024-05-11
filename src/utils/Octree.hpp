@@ -62,8 +62,7 @@ struct Octree
     // Función que devuelve el id del nodo
     [[nodiscard]] std::size_t getId() const noexcept { return id_; }
 
-    static const std::size_t MAX_ENTITIES = 15;
-    static const std::size_t MAX_DEPTH = 10;
+    static const std::size_t MAX_ENTITIES = 40;
     static constexpr std::array<vec3d, 8> offsets =
     {
         vec3d(-0.5, -0.5, -0.5),

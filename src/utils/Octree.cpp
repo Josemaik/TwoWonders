@@ -10,7 +10,7 @@ void Octree::insert(Entity& entity, ColliderComponent& collider)
         else
             subdivide(entity, collider);
     }
-    else if (depth_ < MAX_DEPTH)
+    else
     {
         bool inserted{ false };
         for (auto& octant : octants_)
@@ -35,11 +35,8 @@ void Octree::insert(Entity& entity, ColliderComponent& collider)
                 }
             }
 
-            if (!toRemove.empty())
-            {
-                for (auto index : toRemove)
-                    nullOcts.erase(index);
-            }
+            for (auto index : toRemove)
+                nullOcts.erase(index);
         }
     }
 }

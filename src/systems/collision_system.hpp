@@ -49,8 +49,8 @@ struct CollisionSystem
     using pairsType2 = std::set<std::pair<std::size_t, std::size_t>>;
     // using octreeMap = std::unordered_map<std::size_t, std::unordered_set<Octree*>>;
 
-    CollisionSystem()
-        : octree(0, BBox(vec3d{ 0.0, 0.0, 0.0 }, vec3d{ 700.0, 200.0, 700.0 })),
+    CollisionSystem() :
+        octree(0, BBox(vec3d{ 0.0, 0.0, 0.0 }, vec3d{ 700.0, 200.0, 700.0 })),
         checkedPairs(EntityManager::MAX_ENTITIES, std::vector<bool>(EntityManager::MAX_ENTITIES, false)) {}
     void update(EntityManager& em);
     bool checkWallCollision(EntityManager& em, vec3d& pos, vec3d& normalDir);
