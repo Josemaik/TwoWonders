@@ -13,14 +13,17 @@ struct BTDecisionReadyforHeal : BTNode_t {
         if (ectx.ent.hasTag<SlimeTag>()) {
             //obtenemos blackboard
             auto& bb = ectx.em.getSingleton<BlackBoard_t>();
-            // si encuentro un slime que tenga menos de 3 vidas, guardo como objetivo su posición
+            // si encuentro un slime que tenga menos de 3 vidas y se encuentre cerca, guardo como objetivo su posición
             for (auto& slime : bb.slimeData){
-                if (slime.first != ectx.ent.getID()) {
-                    ectx.ai->slimex = slime.second.position.x();
-                    ectx.ai->slimez = slime.second.position.z();
-                    ectx.ai->slimetarget = slime.first;
-                    ectx.ai->arrival_radius = 2.0;
-                    return BTNodeStatus_t::success;
+                if (slime.first != ectx.ent.getID() && slime.second.life < 3) {
+                    auto const& dis = ectx.phy.position.distance(slime.second.position);
+                    if(dis < (ectx.ai->detect_radius * ectx.ai->detect_radius)){
+                        ectx.ai->slimex = slime.second.position.x();
+                        ectx.ai->slimez = slime.second.position.z();
+                        ectx.ai->slimetarget = slime.first;
+                        ectx.ai->arrival_radius = 8.0;
+                        return BTNodeStatus_t::success;
+                    }
                 }
             }
             return BTNodeStatus_t::fail;
