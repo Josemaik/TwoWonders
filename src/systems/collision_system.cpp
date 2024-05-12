@@ -3,12 +3,12 @@
 
 void CollisionSystem::update(EntityManager& em)
 {
-    using std::chrono::high_resolution_clock;
-    using std::chrono::duration_cast;
-    using std::chrono::duration;
-    using std::chrono::microseconds;
+    // using std::chrono::high_resolution_clock;
+    // using std::chrono::duration_cast;
+    // using std::chrono::duration;
+    // using std::chrono::microseconds;
 
-    auto t1 = high_resolution_clock::now();
+    // auto t1 = high_resolution_clock::now();
     auto& li = em.getSingleton<LevelInfo>();
     auto& frti = em.getSingleton<FrustumInfo>();
 
@@ -43,9 +43,9 @@ void CollisionSystem::update(EntityManager& em)
     // Comprobar colisiones con rampas
     handleRampCollision(em);
 
-    auto t2 = high_resolution_clock::now();
-    auto dur = duration_cast<microseconds>(t2 - t1);
-    std::cout << "CollisionSystem: " << dur.count() << " microseconds" << std::endl;
+    // auto t2 = high_resolution_clock::now();
+    // auto dur = duration_cast<microseconds>(t2 - t1);
+    // std::cout << "CollisionSystem: " << dur.count() << " microseconds" << std::endl;
 }
 
 // Función recursiva qué revisa las colisiones de las entidades del octree actual con otras entidades

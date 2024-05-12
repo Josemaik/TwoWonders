@@ -17,8 +17,9 @@ struct Octree
         octEntities_.reserve(max_ent_);
     };
 
+    std::size_t hash(const vec3d& point) const;
     void insert(Entity& entity, ColliderComponent& collider);
-    void subdivide(Entity& entity, ColliderComponent& collider);
+    void subdivide();
     bool isNeighbor(Octree* node);
     void clear();
     std::size_t countEntities() const;
@@ -74,6 +75,9 @@ struct Octree
         vec3d(-0.5, 0.5, 0.5),
         vec3d(0.5, 0.5, 0.5)
     };
+
+    static const std::array<std::vector<std::size_t>, 8> faceSharingNeighbors;
+    static const std::array<std::vector<std::size_t>, 8> sameHeightNeighbors;
 
 private:
     OctMap octEntities_;
