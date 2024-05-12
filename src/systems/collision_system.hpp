@@ -49,8 +49,8 @@ struct CollisionSystem
     using pairsType2 = std::set<std::pair<std::size_t, std::size_t>>;
     // using octreeMap = std::unordered_map<std::size_t, std::unordered_set<Octree*>>;
 
-    CollisionSystem()
-        : octree(0, BBox(vec3d{ 0.0, 0.0, 0.0 }, vec3d{ 700.0, 200.0, 700.0 })),
+    CollisionSystem() :
+        octree(0, BBox(vec3d{ 0.0, 0.0, 0.0 }, vec3d{ 700.0, 200.0, 700.0 })),
         checkedPairs(EntityManager::MAX_ENTITIES, std::vector<bool>(EntityManager::MAX_ENTITIES, false)) {}
     void update(EntityManager& em);
     bool checkWallCollision(EntityManager& em, vec3d& pos, vec3d& normalDir);
@@ -67,7 +67,6 @@ private:
     void handleStaticCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
     void handleZoneCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, BehaviorType behaviorType1, BehaviorType behaviorType2);
     void handlePlayerCollision(EntityManager& em, Entity& entity1, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2);
-    void handleAtkCollision(EntityManager& em, bool& atkPl1, bool& atkPl2, bool& atkEn1, bool& atkEn2, Entity& entity1, Entity& entity2);
     void enemiesWallCollision(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, vec3d& minOverlap);
     void classicCollision(PhysicsComponent& phy1, PhysicsComponent& phy2, vec3d& minOverlap);
     void resolveEnemyDirection(EntityManager& em, Entity& entity2, PhysicsComponent& staticPhy, PhysicsComponent& otherPhy, double overlap, bool isZAxis);

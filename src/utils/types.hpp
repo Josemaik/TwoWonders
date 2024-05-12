@@ -22,16 +22,13 @@
 #include "../components/boat_component.hpp"
 #include "../components/particle_component.hpp"
 #include "../components/spawn_component.hpp"
-#include "../components/relay_component.hpp"
 #include "../components/pointlight_component.hpp"
-//ia
 #include "../components/ai_component.hpp"
 #include "../components/navmesh_component.hpp"
 #include "../components/npc_component.hpp"
 #include "../components/projectile_component.hpp"
 #include "../components/object_component.hpp"
 #include "../components/zone_component.hpp"
-#include "../components/shield_component.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
 #include "../utils/Item.hpp"
@@ -139,10 +136,10 @@ using CL = MP::TypeList <
     RampComponent,
     AIComponent,
     AttackComponent,
+    AttackerComponent,
     ProjectileComponent,
     ObjectComponent,
     ZoneComponent,
-    ShieldComponent,
     TypeComponent,
     ChestComponent,
     ListenerComponent,
@@ -159,7 +156,6 @@ using CL = MP::TypeList <
     BoatComponent,
     ParticleMakerComponent,
     SpawnComponent,
-    RelayComponent,
     PointLightComponent
 > ;
 using TL = MP::TypeList <

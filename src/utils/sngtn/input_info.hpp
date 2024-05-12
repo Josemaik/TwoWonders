@@ -2,14 +2,6 @@
 
 struct InputInfo
 {
-    void setAttackFalse()
-    {
-        melee = false;
-        spell1 = false;
-        spell2 = false;
-        spell3 = false;
-    }
-
     // Teclas de movimiento
     bool up{ false };
     bool down{ false };
@@ -32,12 +24,6 @@ struct InputInfo
     // Teclas de mecánicas
     bool lockOn{ false };
     bool interact{ false };
-
-    // Bools de ataque
-    bool melee{ false };
-    bool spell1{ false };
-    bool spell2{ false };
-    bool spell3{ false };
 
     // Menú
     std::size_t currentButton{ 0 };

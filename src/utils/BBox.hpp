@@ -31,9 +31,17 @@ struct BBox
 
     constexpr vec3d size() const { return max - min; }
     constexpr vec3d center() const { return (min + max) / 2.0; }
-    bool intersects(const BBox& other) const { return !(max < other.min || min > other.max); }
-    bool intersects(const vec3d& point) const { return point >= min && point <= max; }
+    bool intersects(const BBox& other) const {
+        return !(max.x() < other.min.x() || min.x() > other.max.x() ||
+            max.y() < other.min.y() || min.y() > other.max.y() ||
+            max.z() < other.min.z() || min.z() > other.max.z());
+    }
 
+    bool intersects(const vec3d& point) const {
+        return !(point.x() < min.x() || point.x() > max.x() ||
+            point.y() < min.y() || point.y() > max.y() ||
+            point.z() < min.z() || point.z() > max.z());
+    }
     // Función para comprobar si un rayo intersecta con la caja delimitadora
     bool intersectsRay(vec3d& rayOrigin, vec3d& rayDirection) const {
         vec3d t1 = (min - rayOrigin) / rayDirection;
@@ -112,5 +120,59 @@ struct BBox
             vec3d(min.x(), max.y(), max.z()).to_other<float>()
         };
     }
+
+    void expand(const BBox& other) {
+        min = vec3d::min(min, other.min);
+        max = vec3d::max(max, other.max);
+    }
+
+    int longestAxis() const {
+        vec3d size = this->size();
+        if (size.x() > size.y() && size.x() > size.z()) return 0;
+        if (size.y() > size.z()) return 1;
+        return 2;
+    }
 };
 
+struct Sphere
+{
+    vec3d center{};
+    double radius{};
+
+    Sphere() = default;
+    Sphere(const vec3d& center, double radius) : center(center), radius(radius) {}
+
+    static Sphere boundingSphere(const std::vector<vec3d>& points) {
+        vec3d min = points[0];
+        vec3d max = points[0];
+        for (const auto& point : points) {
+            min = vec3d::min(min, point);
+            max = vec3d::max(max, point);
+        }
+        vec3d center = (min + max) / 2.0;
+        double radius = 0.0;
+        for (const auto& point : points) {
+            double distance = (point - center).length();
+            radius = std::max(radius, distance);
+        }
+        return Sphere(center, radius);
+    }
+
+    bool intersects(const BBox& bbox) const {
+        vec3d closestPoint = bbox.center().clamp(bbox.min, bbox.max);
+        vec3d distance = closestPoint - center;
+        return distance.length() <= radius * radius;
+    }
+
+    bool intersects(const Sphere& other) const {
+        vec3d distance = other.center - center;
+        return distance.length() <= (radius + other.radius) * (radius + other.radius);
+    }
+
+    bool intersects(const vec3d& point) const {
+        vec3d distance = point - center;
+        return distance.length() <= radius * radius;
+    }
+
+    double size() const { return radius * 2.0; }
+};

@@ -13,12 +13,7 @@ struct ObjectSystem
     void addObject(ObjectType type, vec3d pos);
 
 private:
-    void explodeBomb(EntityManager& em, Entity& ent);
-    void createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type, Color color);
-    void explodeBombHeal(EntityManager& em, Entity& ent);
-
     // Shop
-    bool buyBomb(EntityManager& em);
     bool buyExtraLife(EntityManager& em, Entity* ent);
     bool buyLife(EntityManager& em, Entity* ent);
     void createObjects(EntityManager& em);

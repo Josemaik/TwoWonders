@@ -21,7 +21,6 @@ struct InputComponent
     int spell3{ D_KEY_L };
 
     // Teclas de mecánicas
-    int air_attack{ D_KEY_T };
     int lockIn{ D_KEY_Q };
     int interact{ D_KEY_E };
 

@@ -5,49 +5,41 @@ void Octree::insert(Entity& entity, ColliderComponent& collider)
 {
     if (!divided_)
     {
-        if(octEntities_.size() < max_ent_)
-            octEntities_.insert({ &entity, &collider });
+        if (octEntities_.size() < max_ent_)
+            octEntities_.push_back({ &entity, &collider });
         else
-            subdivide(entity, collider);
+        {
+            subdivide();
+            for (auto& ent : octEntities_)
+                insert(*ent.first, *ent.second);
+            insert(entity, collider);
+            octEntities_.clear();
+        }
     }
-    else if (depth_ < MAX_DEPTH)
+    else
     {
         for (auto& octant : octants_)
         {
-            if (octant && octant->bounds_.intersects(collider.bbox))
-            {
+            if (octant->bounds_.intersects(collider.bbox))
                 octant->insert(entity, collider);
-            }
         }
     }
 }
 
 // Cuando el octree excede su capacidad de entidades, se divide en 8 octantes
-void Octree::subdivide(Entity& entity, ColliderComponent& collider)
+void Octree::subdivide()
 {
     vec3d size = bounds_.size() / 2.0;
     vec3d center = bounds_.center();
+    vec3d octantCenter{};
 
-    octEntities_.insert({ &entity, &collider });
     for (std::size_t i = 0; i < 8; ++i)
     {
-        vec3d octantCenter = center + offsets[i] * size;
+        octantCenter = center + offsets[i] * size;
         BBox octantBounds(octantCenter, size);
 
-        for (auto& entity : octEntities_)
-        {
-            if (octantBounds.intersects(entity.second->bbox))
-            {
-                if (!octants_[i])
-                    octants_[i] = std::make_unique<Octree>(depth_ + 1, octantBounds, this);
-
-                octants_[i]->insert(*entity.first, *entity.second);
-            }
-        }
+        octants_[i] = std::make_unique<Octree>(depth_ + 1, octantBounds, this);
     }
-
-    // Liberamos el espacio del nodo padre
-    octEntities_.clear();
 
     divided_ = true;
 }
@@ -64,7 +56,7 @@ void Octree::clear()
 
         divided_ = false;
     }
-    else 
+    else
         octEntities_.clear();
 }
 
