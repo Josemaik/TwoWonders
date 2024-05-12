@@ -70,11 +70,11 @@ namespace DarkMoon {
 
             if(!directionalLights.empty()){
                 for(int i=0; i<static_cast<int>(directionalLights.size()); i++){
-                    std::string directionUniformName  = "directionalLights[" + std::to_string(i) + "].direction";
-                    std::string colorUniformName     = "directionalLights[" + std::to_string(i) + "].color";
+                    std::string directionUniformName  = "gDirectionalLight.direction";
+                    std::string colorUniformName      = "gDirectionalLight.base.color";
 
-                    glUniform4fv(glGetUniformLocation(shaders["lights"]->getIDShader(), directionUniformName.c_str()), 1, glm::value_ptr(directionalLights[i]->direction));
-                    glUniform4fv(glGetUniformLocation(shaders["lights"]->getIDShader(), colorUniformName.c_str()), 1, glm::value_ptr(normalizeColor(directionalLights[i]->color)));
+                    glUniform3fv(glGetUniformLocation(shaders["lights"]->getIDShader(), directionUniformName.c_str()), 1, glm::value_ptr(directionalLights[i]->direction));
+                    glUniform3fv(glGetUniformLocation(shaders["lights"]->getIDShader(), colorUniformName.c_str()), 1, glm::value_ptr(normalizeColor(directionalLights[i]->color)));
                 }
 
             }

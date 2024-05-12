@@ -15,14 +15,14 @@ namespace DarkMoon {
 
         std::cout << " - Load a model -> " << m_name << std::endl;
 
-        if(scene->HasAnimations()){
-            std::cout << "\n┌────────────┐\n";
-            std::cout << "│ ANIMATIONS │ : " << m_name << "\n";
-            std::cout << "└────────────┘\n";
-            for(int i = 0; i < scene->mNumAnimations; i++)
-                std::cout << "└── " << scene->mAnimations[i]->mName.C_Str() << "\n";
-            std::cout << "\n";
-        }
+        // if(scene->HasAnimations()){
+        //     std::cout << "\n┌────────────┐\n";
+        //     std::cout << "│ ANIMATIONS │ : " << m_name << "\n";
+        //     std::cout << "└────────────┘\n";
+        //     for(int i = 0; i < scene->mNumAnimations; i++)
+        //         std::cout << "└── " << scene->mAnimations[i]->mName.C_Str() << "\n";
+        //     std::cout << "\n";
+        // }
 
         processNode(scene->mRootNode, scene, rm);
     };

@@ -101,10 +101,10 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
 
 DarkMoon::Node* createMainCharacter(DarkMoon::DarkMoonEngine& engine) {
     // Node: Modelo
-    auto model = engine.CreateModel("assets/Apisonadora/Apisonadora.fbx", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
+    auto model = engine.CreateModel("assets/lvl_0-cnk_0.obj", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
     //model->scale({0.02f, 0.02f, 0.02f});
     //model->translate({0.0f, 0.0f, 0.0f});
-    model->setRotation({ 1.0f, 0.0f, 0.0f }, -90.0f);
+    //model->setRotation({ 1.0f, 0.0f, 0.0f }, -90.0f);
 
     auto eModel = dynamic_cast<DarkMoon::Model*>(model->getEntity());
     eModel->drawModel = true;
@@ -186,8 +186,7 @@ int main() {
         camera->fovy = 60.0f;
 
         //engine.CreatePointLight({0, 10, 0}, D_YELLOW, "Luz amarilla prueba", engine.GetRootNode());
-        auto node_light = engine.CreateSpotLight({0, 10, 0}, {0, -1, 0}, 0.2f, D_RED, "Linterna roja", engine.GetRootNode());
-        
+        auto node_light = engine.CreateSpotLight({0, 100, 0}, {0, -1, 0}, 0.2f, D_RED, "Linterna roja", engine.GetRootNode()); 
         auto light = node_light->getEntity<DarkMoon::SpotLight>();
 
         engine.SetExitKey(D_KEY_F8);
