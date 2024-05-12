@@ -104,6 +104,8 @@ namespace DarkMoon {
         Node* CreatePointLight(glm::vec3 position, Color color, const char* nodeName, Node* parentNode);
         // Create directional light in node
         Node* CreateDirectionalLight(glm::vec3 direction, Color color, const char* nodeName, Node* parentNode);
+        // Create spot light in node
+        Node* CreateSpotLight(glm::vec3 position, glm::vec3 direction, float cutOff, Color color, const char* nodeName, Node* parentNode);
         // Toggle lights
         void ToggleLights() { m_renderManager.activeLights = !m_renderManager.activeLights; };
         // Activate lights

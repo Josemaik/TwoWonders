@@ -37,6 +37,7 @@ namespace DarkMoon {
 
         std::vector<PointLight*> pointLights {};
         std::vector<DirectionalLight*> directionalLights {};
+        std::vector<SpotLight*> spotLights {};
 
         // Shaders
         std::map<std::string, Shader*> shaders;

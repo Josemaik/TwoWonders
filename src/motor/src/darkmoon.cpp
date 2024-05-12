@@ -8,7 +8,7 @@ namespace DarkMoon {
         m_rootNode->name = "Scene";
 
         // Create Default Light
-        CreateDirectionalLight({ 0.0f, tan(-45.0f), -1.0f }, D_WHITE, "Default directional light", GetRootNode());
+        CreateDirectionalLight({ 0.0f, -1.0f, 0.0f }, D_WHITE, "Default directional light", GetRootNode());
 
         // Create Default Camera
         auto eCamera = CreateCamera("Default Camera", GetRootNode());
@@ -374,8 +374,6 @@ namespace DarkMoon {
         p_nodeLight->setEntity(std::move(light));
         p_nodeLight->translate({ position.x, position.y, position.z });
 
-        // m_renderManager.lights.push_back(dynamic_cast<Light*>(p_nodeLight->getEntity()));
-
         return p_nodeLight;
     }
 
@@ -385,10 +383,18 @@ namespace DarkMoon {
         auto light = std::make_unique<DirectionalLight>(direction, color);
         p_nodeLight->setEntity(std::move(light));
 
-        // m_renderManager.lights.push_back(dynamic_cast<Light*>(p_nodeLight->getEntity()));
-
         return p_nodeLight;
     }
+
+    // Create spot light in node
+    Node* DarkMoonEngine::CreateSpotLight(glm::vec3 position, glm::vec3 direction, float cutOff, Color color, const char* nodeName, Node* parentNode){
+        auto p_nodeLight = CreateNode(nodeName, parentNode);
+        auto light = std::make_unique<SpotLight>(position, direction, cutOff, color);
+        p_nodeLight->setEntity(std::move(light));
+        p_nodeLight->translate({ position.x, position.y, position.z });
+
+        return p_nodeLight;
+    }    
 
     // Update lights
     void DarkMoonEngine::UpdateLights(Node* parentNode) {
@@ -402,13 +408,20 @@ namespace DarkMoon {
     // AuxUpdateLights
     void DarkMoonEngine::AuxUpdateLights(Node* parentNode) {
         for (auto& child : parentNode->getChildren()) {
+            // Point Light
             if (auto pLight = child->getEntity<PointLight>()){
                 if (pLight->enabled)
                     m_renderManager.pointLights.push_back(pLight);
             }
+            // Directional Light
             else if (auto dLight = child->getEntity<DirectionalLight>()){
                 if (dLight->enabled)
                     m_renderManager.directionalLights.push_back(dLight);
+            }
+            // Spot Light
+            else if (auto sLight = child->getEntity<SpotLight>()){
+                if (sLight->enabled)
+                    m_renderManager.spotLights.push_back(sLight);
             }
             
             AuxUpdateLights(child);

@@ -30,4 +30,13 @@ namespace DarkMoon {
         DirectionalLight(glm::vec3 dir, Color c)
             : Light(c), direction(dir) {};
     };
+
+    struct SpotLight : Light {
+        glm::vec3 position{};
+        glm::vec3 direction{};
+        float cutOff{};
+
+        SpotLight(glm::vec3 pos, glm::vec3 dir, float cut, Color c)
+            : Light(c), position(pos), direction(dir), cutOff(cut) {};
+    };
 }

@@ -160,7 +160,7 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
     if (engine.IsKeyDown(D_KEY_G)) {
         nodeCharacter->scale({ 0.9,0.9,0.9 });
     }
-    if (engine.IsKeyDown(D_KEY_J)) {
+    if (engine.IsKeyDown(D_KEY_H)) {
         nodeCharacter->scale({ 1.1,1.1,1.1 });
     }
 
@@ -185,23 +185,34 @@ int main() {
         camera->position = { -60.0f, 60.0f, -60.0f };
         camera->fovy = 60.0f;
 
-        engine.CreatePointLight({0, 10, 0}, D_YELLOW, "Luz amarilla prueba", engine.GetRootNode());
+        //engine.CreatePointLight({0, 10, 0}, D_YELLOW, "Luz amarilla prueba", engine.GetRootNode());
+        auto node_light = engine.CreateSpotLight({0, 10, 0}, {0, -1, 0}, 0.2f, D_RED, "Linterna roja", engine.GetRootNode());
+        
+        auto light = node_light->getEntity<DarkMoon::SpotLight>();
 
         engine.SetExitKey(D_KEY_F8);
         engine.SetTargetFPS(60);
 
         //scene3D->getParent()->removeChild(scene3D);
 
-        std::cout << "┌──────┐" << std::endl;
-        std::cout << "│ Tree │" << std::endl;
-        std::cout << "└──────┘" << std::endl;
-        engine.GetRootNode()->drawTree();
+        engine.DrawTree();
 
         while (!engine.WindowShouldClose()) {
 
             // Logic
 
             inputManager(engine, mainCharacter);
+
+            if(engine.IsKeyDown(D_KEY_I))
+                light->position.y -= 1.0f;
+            if(engine.IsKeyDown(D_KEY_K))
+                light->position.y += 1.0f;
+
+            DarkMoon::Ray ray = engine.GetMouseRay();
+            light->position = ray.origin;
+            light->direction = ray.direction;
+
+            //std::cout << "Posicion: " << light->position.y << "\n";
 
             //textBoxEntity->text.text = std::to_string(engine.GetFPS());            
 

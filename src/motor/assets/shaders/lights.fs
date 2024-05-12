@@ -27,6 +27,8 @@ const float MIN_SHININESS = 0.1;
 // --- Lights --- //
 // -------------- //
 
+// POINT LIGHT //
+
 const int MAX_POINT_LIGHTS = 10;
 
 struct PointLight {
@@ -40,6 +42,8 @@ struct PointLight {
 uniform PointLight pointsLights[MAX_POINT_LIGHTS];
 uniform int NumPointLights;
 
+// DIRECTIONAL LIGHT //
+
 const int MAX_DIRECTIONAL_LIGHTS = 2;
 
 struct DirectionalLight {
@@ -50,6 +54,20 @@ struct DirectionalLight {
 uniform DirectionalLight directionalLights[MAX_DIRECTIONAL_LIGHTS];
 uniform int NumDirectionalLights;
 
+// SPOT LIGHT //
+
+const int MAX_SPOT_LIGHTS = 2;
+
+struct SpotLight {
+    vec3 position;
+    vec3 direction;
+    float cutOff;
+    vec4 color;
+};
+
+uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
+uniform int NumSpotLights;
+
 // ------------- //
 // --- Phong --- //
 // ------------- //
@@ -58,12 +76,12 @@ vec3 Phong(){
 
     vec3 totalLight = vec3(0.0);
 
-    // pointsLights
-
     vec3 n = normalize(Normal);
     vec3 v = normalize(vec3(-FragPos));
 
     float ShininessAux = max(Shininess, MIN_SHININESS);
+
+    // pointsLights
 
     int pLightCount = min(NumPointLights, MAX_POINT_LIGHTS);
     for(int i = 0; i < pLightCount; i++){
@@ -96,6 +114,26 @@ vec3 Phong(){
         vec3 specularTerm = Ks * spec * directionalLights[i].color.rgb;
 
         totalLight += (ambientTerm + diffuseTerm + specularTerm);
+    }
+
+    // spotLights
+    int sLightCount = min(NumSpotLights, MAX_SPOT_LIGHTS);
+    for(int i = 0; i < sLightCount; i++){
+        vec3 lightDir = normalize(spotLights[i].position - FragPos);
+        float theta = dot(lightDir, normalize(-spotLights[i].direction));
+        if(theta > spotLights[i].cutOff){
+            float diff = max(dot(n, lightDir), 0.0);
+
+            vec3 viewDir = normalize(v - FragPos);
+            vec3 reflectDir = reflect(-lightDir, n);
+            float spec = pow(max(dot(viewDir, reflectDir), 0.0), ShininessAux);
+
+            vec3 ambientTerm = Ka * spotLights[i].color.rgb;
+            vec3 diffuseTerm = Kd * diff * spotLights[i].color.rgb;
+            vec3 specularTerm = Ks * spec * spotLights[i].color.rgb;
+
+            totalLight += (ambientTerm + diffuseTerm + specularTerm);
+        }
     }
 
     return totalLight;
