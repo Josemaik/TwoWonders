@@ -51,20 +51,20 @@ namespace DarkMoon {
 
             if(!pointLights.empty()){
                 for(int i=0; i<static_cast<int>(pointLights.size()); i++){
-                    std::string positionUniformName  = "pointsLights[" + std::to_string(i) + "].position";
-                    std::string colorUniformName     = "pointsLights[" + std::to_string(i) + "].color";
-                    std::string constantUniformName  = "pointsLights[" + std::to_string(i) + "].constant";
-                    std::string linearUniformName    = "pointsLights[" + std::to_string(i) + "].linear";
-                    std::string quadraticUniformName = "pointsLights[" + std::to_string(i) + "].quadratic";
+                    std::string positionUniformName  = "gPointLights[" + std::to_string(i) + "].position";
+                    std::string colorUniformName     = "gPointLights[" + std::to_string(i) + "].base.color";
+                    std::string constantUniformName  = "gPointLights[" + std::to_string(i) + "].attenuation.constant";
+                    std::string linearUniformName    = "gPointLights[" + std::to_string(i) + "].attenuation.linear";
+                    std::string quadraticUniformName = "gPointLights[" + std::to_string(i) + "].attenuation.exp";
                 
-                    glUniform4fv(glGetUniformLocation(shaders["lights"]->getIDShader(), positionUniformName.c_str()), 1, glm::value_ptr(pointLights[i]->position));
-                    glUniform4fv(glGetUniformLocation(shaders["lights"]->getIDShader(), colorUniformName.c_str()), 1, glm::value_ptr(normalizeColor(pointLights[i]->color)));
+                    glUniform3fv(glGetUniformLocation(shaders["lights"]->getIDShader(), positionUniformName.c_str()), 1, glm::value_ptr(pointLights[i]->position));
+                    glUniform3fv(glGetUniformLocation(shaders["lights"]->getIDShader(), colorUniformName.c_str()), 1, glm::value_ptr(normalizeColor(pointLights[i]->color)));
                     glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), constantUniformName.c_str()), pointLights[i]->constant);
                     glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), linearUniformName.c_str()), pointLights[i]->linear);
                     glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), quadraticUniformName.c_str()), pointLights[i]->quadratic);
                 }
             }
-            glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "NumPointLights"), static_cast<int>(pointLights.size()));
+            glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "gNumPointLights"), static_cast<int>(pointLights.size()));
 
             // Directional Lights //
 
@@ -78,24 +78,32 @@ namespace DarkMoon {
                 }
 
             }
-            glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "NumDirectionalLights"), static_cast<int>(directionalLights.size()));
+            //glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "NumDirectionalLights"), static_cast<int>(directionalLights.size()));
 
             // Spot Lights //
 
             if(!spotLights.empty()){
                 for(int i=0; i<static_cast<int>(spotLights.size()); i++){
-                    std::string positionUniformName  = "spotLights[" + std::to_string(i) + "].position";
-                    std::string directionUniformName  = "spotLights[" + std::to_string(i) + "].direction";
-                    std::string cutOffUniformName  = "spotLights[" + std::to_string(i) + "].cutOff";
-                    std::string colorUniformName     = "spotLights[" + std::to_string(i) + "].color";
+                    std::string colorUniformName      = "gSpotLights[" + std::to_string(i) + "].base.base.color";
+                    std::string positionUniformName   = "gSpotLights[" + std::to_string(i) + "].base.position";
+                    std::string directionUniformName  = "gSpotLights[" + std::to_string(i) + "].direction";
+                    std::string cutOffUniformName     = "gSpotLights[" + std::to_string(i) + "].cutOff";
+
+                    std::string constantUniformName   = "gSpotLights[" + std::to_string(i) + "].base.attenuation.constant";
+                    std::string linearUniformName     = "gSpotLights[" + std::to_string(i) + "].base.attenuation.linear";
+                    std::string quadraticUniformName  = "gSpotLights[" + std::to_string(i) + "].base.attenuation.exp";
                 
-                    glUniform4fv(glGetUniformLocation(shaders["lights"]->getIDShader(), positionUniformName.c_str()), 1, glm::value_ptr(spotLights[i]->position));
-                    glUniform4fv(glGetUniformLocation(shaders["lights"]->getIDShader(), directionUniformName.c_str()), 1, glm::value_ptr(spotLights[i]->direction));
+                    glUniform3fv(glGetUniformLocation(shaders["lights"]->getIDShader(), positionUniformName.c_str()), 1, glm::value_ptr(spotLights[i]->position));
+                    glUniform3fv(glGetUniformLocation(shaders["lights"]->getIDShader(), directionUniformName.c_str()), 1, glm::value_ptr(spotLights[i]->direction));
                     glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), cutOffUniformName.c_str()), spotLights[i]->cutOff);
-                    glUniform4fv(glGetUniformLocation(shaders["lights"]->getIDShader(), colorUniformName.c_str()), 1, glm::value_ptr(normalizeColor(spotLights[i]->color)));
+                    glUniform3fv(glGetUniformLocation(shaders["lights"]->getIDShader(), colorUniformName.c_str()), 1, glm::value_ptr(normalizeColor(spotLights[i]->color)));
+
+                    glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), constantUniformName.c_str()), spotLights[i]->constant);
+                    glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), linearUniformName.c_str()), spotLights[i]->linear);
+                    glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), quadraticUniformName.c_str()), spotLights[i]->quadratic);
                 }
             }
-            glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "NumSpotLights"), static_cast<int>(spotLights.size()));
+            glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "gNumSpotLights"), static_cast<int>(spotLights.size()));
 
         }
     }

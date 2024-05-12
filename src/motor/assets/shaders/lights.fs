@@ -1,6 +1,7 @@
 #version 330 core
 
 const int MAX_POINT_LIGHTS = 10;
+const int MAX_SPOT_LIGHTS  = 10;
 
 in vec3 FragPos;
 in vec3 Normal;
@@ -12,6 +13,13 @@ out vec4 FragColor;
 
 uniform sampler2D texture0;
 uniform vec4 customColor;
+
+// MATERIAL //
+
+uniform vec3 Kd;
+uniform vec3 Ka;
+uniform vec3 Ks;
+uniform float Shininess;
 
 // LIGHTS //
 
@@ -39,20 +47,24 @@ struct Attenuation
 struct PointLight
 {
     BaseLight base;
-    vec3 localPos;
-    Attenuation at;
+    vec3 position;
+    Attenuation attenuation;
 };
 
-// MATERIAL //
-
-uniform vec3 Kd;
-uniform vec3 Ka;
-uniform vec3 Ks;
-uniform float Shininess;
+struct SpotLight
+{
+    PointLight base;
+    vec3 direction;
+    float cutOff;
+};
 
 uniform DirectionalLight gDirectionalLight;
+
 uniform int gNumPointLights;
 uniform PointLight gPointLights[MAX_POINT_LIGHTS];
+
+uniform int gNumSpotLights;
+uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
 
 // FUNCTIONS //
 
@@ -96,9 +108,42 @@ vec4 CalcDirectionalLight(vec3 normal)
     return CalcLightInternal(gDirectionalLight.base, gDirectionalLight.direction, normal);
 }
 
+vec4 CalcPointLight(PointLight l, vec3 normal)
+{
+    vec3 lightDirection = FragPos - l.position;
+    float distance = length(lightDirection);
+    lightDirection = normalize(lightDirection);
+
+    vec4 color = CalcLightInternal(l.base, lightDirection, normal);
+    float attenuation = l.attenuation.constant +
+                        l.attenuation.linear * distance +
+                        l.attenuation.exp * distance * distance;
+
+    return color / attenuation;
+}
+
+vec4 CalcSpotLight(SpotLight l, vec3 normal)
+{
+    float auxCutOff = cos(radians(l.cutOff));
+
+    vec3 lightToPixel = normalize(FragPos - l.base.position);
+    float spotFactor = dot(lightToPixel, l.direction);
+
+    if(spotFactor > auxCutOff)
+        return CalcPointLight(l.base, normal) * (1.0 - (1.0 - spotFactor) * 1.0 / (1.0 - auxCutOff));
+    else 
+        return vec4(0.0);
+}
+
 void main(){
     vec3 normal = normalize(Normal);
     vec4 totalLight = CalcDirectionalLight(normal);
+
+    for(int i = 0; i < gNumPointLights; i++)
+        totalLight += CalcPointLight(gPointLights[i], normal);
+
+    for(int i = 0; i < gNumSpotLights; i++)
+        totalLight += CalcSpotLight(gSpotLights[i], normal);
 
     FragColor = texture(texture0, TextCoord) * customColor * totalLight;
 }

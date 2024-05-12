@@ -79,6 +79,10 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     // Node: Wireframe
     engine.CreateCubeWires({ 20.0f, 0.0f, -30.0f }, { 10.0f, 10.0f, 10.0f }, D_BLACK, "Wireframe", p_node3D);
 
+    //engine.CreatePointLight({ 0.0f, 10.0f, -30.0f }, D_RED, "Luz roja", p_node3D);
+    //engine.CreatePointLight({ 0.0f, 10.0f,  30.0f }, D_BLUE, "Luz azul", p_node3D);
+    //engine.CreatePointLight({ 30.0f, 10.0f,  0.0f }, D_MAGENTA, "Luz magenta", p_node3D);
+
     // Node: Modelo Dummy 1
     auto modelDummy = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 1", p_node3D);
     //modelDummy->scale({0.2f, 0.2f, 0.2f});
@@ -186,7 +190,7 @@ int main() {
         camera->fovy = 60.0f;
 
         //engine.CreatePointLight({0, 10, 0}, D_YELLOW, "Luz amarilla prueba", engine.GetRootNode());
-        auto node_light = engine.CreateSpotLight({0, 100, 0}, {0, -1, 0}, 0.2f, D_RED, "Linterna roja", engine.GetRootNode()); 
+        auto node_light = engine.CreateSpotLight({0, 10, 0}, {0, -1, 0}, 30.0f, D_RED, "Linterna roja", engine.GetRootNode()); 
         auto light = node_light->getEntity<DarkMoon::SpotLight>();
 
         engine.SetExitKey(D_KEY_F8);
@@ -203,13 +207,18 @@ int main() {
             inputManager(engine, mainCharacter);
 
             if(engine.IsKeyDown(D_KEY_I))
-                light->position.y -= 1.0f;
-            if(engine.IsKeyDown(D_KEY_K))
                 light->position.y += 1.0f;
+            if(engine.IsKeyDown(D_KEY_K))
+                light->position.y -= 1.0f;
 
-            DarkMoon::Ray ray = engine.GetMouseRay();
-            light->position = ray.origin;
-            light->direction = ray.direction;
+            if(engine.IsKeyDown(D_KEY_J))
+                light->cutOff -= 1.0f;
+            if(engine.IsKeyDown(D_KEY_L))
+                light->cutOff += 1.0f;
+
+            //DarkMoon::Ray ray = engine.GetMouseRay();
+            //light->position = ray.origin;
+            //light->direction = ray.direction;
 
             //std::cout << "Posicion: " << light->position.y << "\n";
 

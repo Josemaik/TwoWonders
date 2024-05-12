@@ -8,7 +8,7 @@ namespace DarkMoon {
         m_rootNode->name = "Scene";
 
         // Create Default Light
-        CreateDirectionalLight({ 0.0f, -1.0f, 0.0f }, D_YELLOW_LIGHT, "Default directional light", GetRootNode());
+        //CreateDirectionalLight({ 0.0f, -1.0f, 0.0f }, D_WHITE, "Default directional light", GetRootNode());
 
         // Create Default Camera
         auto eCamera = CreateCamera("Default Camera", GetRootNode());
