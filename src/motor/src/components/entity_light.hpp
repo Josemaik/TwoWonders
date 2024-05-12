@@ -9,9 +9,18 @@ namespace DarkMoon {
     struct Light : Entity {
         Color color = D_WHITE;
         bool enabled = { true };
+        float ambientIntensity = { 1.0f };
+        float diffuseIntensity = { 0.5f };
 
         Light(Color c)
             : color(c) {};
+    };
+
+    struct DirectionalLight : Light {
+        glm::vec3 direction{};
+
+        DirectionalLight(glm::vec3 dir, Color c)
+            : Light(c), direction(dir) {};
     };
 
     struct PointLight : Light {
@@ -22,13 +31,6 @@ namespace DarkMoon {
 
         PointLight(glm::vec3 pos, Color c)
             : Light(c), position(pos) {};
-    };
-
-    struct DirectionalLight : Light {
-        glm::vec3 direction{};
-
-        DirectionalLight(glm::vec3 dir, Color c)
-            : Light(c), direction(dir) {};
     };
 
     struct SpotLight : Light {

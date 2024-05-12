@@ -79,9 +79,9 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     // Node: Wireframe
     engine.CreateCubeWires({ 20.0f, 0.0f, -30.0f }, { 10.0f, 10.0f, 10.0f }, D_BLACK, "Wireframe", p_node3D);
 
-    //engine.CreatePointLight({ 0.0f, 10.0f, -30.0f }, D_RED, "Luz roja", p_node3D);
-    //engine.CreatePointLight({ 0.0f, 10.0f,  30.0f }, D_BLUE, "Luz azul", p_node3D);
-    //engine.CreatePointLight({ 30.0f, 10.0f,  0.0f }, D_MAGENTA, "Luz magenta", p_node3D);
+    engine.CreatePointLight({ 0.0f, 10.0f, -30.0f }, D_RED, "Luz roja", p_node3D);
+    engine.CreatePointLight({ 0.0f, 10.0f,  30.0f }, D_BLUE, "Luz azul", p_node3D);
+    engine.CreatePointLight({ 30.0f, 10.0f,  0.0f }, D_MAGENTA, "Luz magenta", p_node3D);
 
     // Node: Modelo Dummy 1
     auto modelDummy = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 1", p_node3D);
@@ -192,6 +192,7 @@ int main() {
         //engine.CreatePointLight({0, 10, 0}, D_YELLOW, "Luz amarilla prueba", engine.GetRootNode());
         auto node_light = engine.CreateSpotLight({0, 10, 0}, {0, -1, 0}, 30.0f, D_RED, "Linterna roja", engine.GetRootNode()); 
         auto light = node_light->getEntity<DarkMoon::SpotLight>();
+        light->diffuseIntensity = 1.0f;
 
         engine.SetExitKey(D_KEY_F8);
         engine.SetTargetFPS(60);

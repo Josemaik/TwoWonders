@@ -23,12 +23,11 @@ uniform float Shininess;
 
 // LIGHTS //
 
-const float AMBIENT_INTENSITY = 1.0;
-const float DIFFUSE_INTENSITY = 0.5;
-
 struct BaseLight
 {
     vec3 color;
+    float ambientIntensity;
+    float diffuseIntensity;
 };
 
 struct DirectionalLight
@@ -71,7 +70,7 @@ uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
 vec4 CalcLightInternal(BaseLight light, vec3 lightDirection, vec3 normal)
 {
     vec4 ambientColor = vec4(light.color, 1.0f) * 
-                        AMBIENT_INTENSITY * 
+                        light.ambientIntensity * 
                         vec4(Ka, 1.0f);
 
     vec4 diffuseColor = vec4(0.0);
@@ -82,7 +81,7 @@ vec4 CalcLightInternal(BaseLight light, vec3 lightDirection, vec3 normal)
     if(diffuseFactor > 0)
     {
         diffuseColor = vec4(light.color, 1.0f) * 
-                       DIFFUSE_INTENSITY * 
+                       light.diffuseIntensity * 
                        vec4(Kd, 1.0f) *
                        diffuseFactor;
     }
