@@ -1,6 +1,7 @@
 #include "render_system.hpp"
 #include "../motor/src/darkmoon.hpp"
 #include <iomanip>
+#include <variant>
 
 float ENGI::GameEngine::widthRate = 1.0;
 float ENGI::GameEngine::heightRate = 1.0f;
@@ -1406,11 +1407,14 @@ void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, PointLig
 
 void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
 {
-    using partCMPs = MP::TypeList<RenderComponent, ParticleMakerComponent>;
+    using partCMPs = MP::TypeList<ParticleMakerComponent>;
     using noTAGs = MP::TypeList<>;
 
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<partCMPs, noTAGs>([&](Entity& e, RenderComponent& ren, ParticleMakerComponent& pmc)
+    em.forEach<partCMPs, noTAGs>([&](Entity& e, ParticleMakerComponent& pmc)
     {
         if (!frti.inFrustum(e.getID()))
             return;
@@ -1419,11 +1423,25 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
         {
             for (auto& p : pmc.particles)
             {
-                if (p.type == Particle::ParticleType::Pixel)
-                {
-                    // Dibujamos la partícula en un punto de 3x3 píxeles
-                    engine.drawPoint3D(p.position.to_other<double>(), 3.f, p.color);
-                }
+                std::variant<Color, std::string>& variant = p.color;
+                std::visit([&](auto&& arg) {
+                    using T = std::decay_t<decltype(arg)>;
+                    if constexpr (std::is_same_v<T, Color>)
+                    {
+                        // Dibujamos la partícula en un punto de 3x3 píxeles
+                        engine.drawPoint3D(p.position.to_other<double>(), 3.f, std::get<Color>(p.color));
+                    }
+                    else if constexpr (std::is_same_v<T, std::string>)
+                    {
+                        std::string& textura = std::get<std::string>(p.color);
+                        auto* p_texture = engine.createNode(getNode(engine, textura.c_str()), getNode(engine, "TextCopy"));
+                        auto& textureInfo = *p_texture->getEntity<Texture2D>()->texture;
+                        int posX = static_cast<int>(engine.getWorldToScreenX(p.position.toDouble()) - static_cast<float>(textureInfo.getWidth()) * wRate / 2);
+                        int posY = static_cast<int>(engine.getWorldToScreenY(p.position.toDouble()) - static_cast<float>(textureInfo.getHeight()) * hRate / 2);
+
+                        engine.drawNode(p_texture, { posX, posY });
+                    }
+                }, variant);
             }
         }
     });
