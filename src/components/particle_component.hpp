@@ -22,7 +22,7 @@ struct Particle
 
 struct ParticleMakerComponent
 {
-    enum struct ParticleEffect { FIRE, FIREBALL, FIRESPLASH, SPARKLES, LAVA, CHEST, WATERSPLASH, SPARKS, WATER, SMOKE, OBJECT, PURPLEM, PRISONDOOR, MAX };
+    enum struct ParticleEffect { FIRE, FIREBALL, FIRESPLASH, SPARKLES, LAVA, CHEST, WATERSPLASH, SPARKS, WATER, SMOKE, OBJECT, PURPLEM, PRISONDOOR, PLAYER, MAX };
 
     bool active{ false };
     ParticleEffect effect{ ParticleEffect::CHEST };

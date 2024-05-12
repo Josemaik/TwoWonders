@@ -279,21 +279,34 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         }
 
         auto& atc = em.getComponent<AttackComponent>(player);
-        if (atc.isAttackReady()) {
+        if (atc.isAttackReady())
+        {
+            auto& pmc = em.getComponent<ParticleMakerComponent>(player);
             if ((ge.isKeyDown(in.spell1) || ge.isGamepadButtonPressed(0, in.m_spell1)) && plfi.spellSlots[0] != plfi.noSpell)
             {
                 inpi.spell1 = true;
+                pmc.active = true;
                 em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
             }
             else if ((ge.isKeyDown(in.spell2) || ge.isGamepadButtonPressed(0, in.m_spell2)) && plfi.spellSlots[1] != plfi.noSpell)
             {
                 inpi.spell2 = true;
+                pmc.active = true;
                 em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
             }
             else if ((ge.isKeyDown(in.spell3) || ge.isGamepadButtonPressed(0, in.m_spell3)) && plfi.spellSlots[2] != plfi.noSpell)
             {
                 inpi.spell3 = true;
+                pmc.active = true;
                 em.getComponent<AttackComponent>(player).attack(AttackType::AttackPlayer);
+            }
+
+            if (pmc.active) {
+                elapsedParticle -= ge.getFrameTime();
+                if (elapsedParticle < 0) {
+                    pmc.active = false;
+                    elapsedParticle = elapsedParticleLimit;
+                }
             }
         }
 
