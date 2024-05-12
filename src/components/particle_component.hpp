@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <cstdint>
+#include <variant>
 #include "../utils/vec3D.hpp"
 #include "../motor/src/darkmoon.hpp"
 
@@ -15,13 +16,13 @@ struct Particle
 
     float lifeTime{ .6f };
     float remainingLife{ lifeTime };
-    DarkMoon::Color color{};
+    std::variant<DarkMoon::Color, std::string> color{};
     ParticleType type{ ParticleType::Pixel };
 };
 
 struct ParticleMakerComponent
 {
-    enum struct ParticleEffect { FIRE, FIREBALL, FIRESPLASH, SPARKLES, LAVA, CHEST, WATERSPLASH, WATER, SMOKE, OBJECT, PURPLEM, PRISONDOOR, MAX };
+    enum struct ParticleEffect { FIRE, FIREBALL, FIRESPLASH, SPARKLES, LAVA, CHEST, WATERSPLASH, WATER, SMOKE, OBJECT, PURPLEM, PRISONDOOR, PLAYER, MAX };
 
     bool active{ false };
     ParticleEffect effect{ ParticleEffect::CHEST };

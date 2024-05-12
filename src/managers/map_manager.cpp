@@ -426,7 +426,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             ic.range = 7.5;
             em.addComponent<PointLightComponent>(entity);
             em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
-            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
+            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 10 .spawnRate = 0.1f });
             [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .content = content });
 
             if (interactable.HasMember("offsetZ"))

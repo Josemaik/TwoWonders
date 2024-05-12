@@ -274,22 +274,26 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         }
 
         auto& atc = em.getComponent<AttackerComponent>(player);
+        auto& pmc = em.getComponent<ParticleMakerComponent>(player);
         playerSpelled = false;
         if (atc.isAttackReady()) {
             if ((ge.isKeyDown(in.spell1) || ge.isGamepadButtonPressed(0, in.m_spell1)) && plfi.spellSlots[0] != plfi.noSpell)
             {
+                pmc.active = true;
                 playerSpelled = true;
                 plfi.currentSpell = plfi.spellSlots[0];
                 em.getComponent<AttackerComponent>(player).attack(plfi.spellSlots[0].atkType);
             }
             else if ((ge.isKeyDown(in.spell2) || ge.isGamepadButtonPressed(0, in.m_spell2)) && plfi.spellSlots[1] != plfi.noSpell)
             {
+                pmc.active = true;
                 playerSpelled = true;
                 plfi.currentSpell = plfi.spellSlots[1];
                 em.getComponent<AttackerComponent>(player).attack(plfi.spellSlots[1].atkType);
             }
             else if ((ge.isKeyDown(in.spell3) || ge.isGamepadButtonPressed(0, in.m_spell3)) && plfi.spellSlots[2] != plfi.noSpell)
             {
+                pmc.active = true;
                 playerSpelled = true;
                 plfi.currentSpell = plfi.spellSlots[2];
                 em.getComponent<AttackerComponent>(player).attack(plfi.spellSlots[2].atkType);
@@ -304,6 +308,14 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
                     plfi.mana = 0;
             }
         }
+      
+        if (pmc.active) {
+                elapsedParticle -= ge.getFrameTime();
+                if (elapsedParticle < 0) {
+                    pmc.active = false;
+                    elapsedParticle = elapsedParticleLimit;
+                }
+            }
 
         // Vamos sumando maná poco a poco
         if (plfi.mana < plfi.max_mana && playerSpelled)

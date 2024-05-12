@@ -49,9 +49,10 @@ void Game::createEntities()
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     em.addComponent<AttackerComponent>(e);
-    auto& lis = em.addComponent<ListenerComponent>(e);
+    em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{.active = false, .effect = Effects::PLAYER, .maxParticles = 4, .spawnRate = 0.05f });
 
     // Listeners de eventos para el jugador
+    auto& lis = em.addComponent<ListenerComponent>(e);
     for (auto i = 0; i < EventCodes::MAX; i++)
         lis.addCode(static_cast<EventCodes>(i));
 
