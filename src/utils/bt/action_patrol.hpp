@@ -6,7 +6,9 @@
 #include <algorithm>
 #include <utils/sb/steeringbehaviour.hpp>
 
+static double MIN_DISTANCE_ARRIVE_SPAWN { 3.0 };
 static const double dist_to_spawn{ 35.0 };
+
 struct BTAction_Patrol : BTNode_t {
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         if (!ectx.ai->tactive) return BTNodeStatus_t::fail;
@@ -20,7 +22,7 @@ struct BTAction_Patrol : BTNode_t {
         current = *ectx.ai->pathIt;
         if (!ectx.ai->followpatrol) {
             double xd = ectx.phy.position.distance(current);
-            if (xd <= 1.0) {
+            if (xd <= MIN_DISTANCE_ARRIVE_SPAWN){
                 ectx.phy.velocity = vec3d{};
                 // if(ectx.phy.orientation != ectx.phy.previousState.orientation)
                 ectx.phy.orientation = ectx.phy.orientationonrespawn;

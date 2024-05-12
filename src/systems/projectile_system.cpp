@@ -4,6 +4,7 @@ void ProjectileSystem::update(EntityManager& em) {
 
     auto& li = em.getSingleton<LevelInfo>();
     auto& plfi = em.getSingleton<PlayerInfo>();
+    auto& deadEnts = li.getDeath();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, ProjectileComponent& pro)
     {
@@ -31,11 +32,11 @@ void ProjectileSystem::update(EntityManager& em) {
             }
         }
 
-        if (plfi.currentSpell == Spells::WaterBomb || plfi.currentSpell == Spells::FireBall || plfi.currentSpell == Spells::FireMeteorites)
+        // Vemos si el hechizo está en la lista de destrucción
+        if (deadEnts.find(e.getID()) != deadEnts.end())
         {
-            // Vemos si el hechizo está en la lista de destrucción
-            auto& dead_ents = li.getDeath();
-            if (dead_ents.find(e.getID()) != dead_ents.end())
+            if (plfi.currentSpell == Spells::WaterBomb || plfi.currentSpell == Spells::FireBall
+                || plfi.currentSpell == Spells::FireMeteorites)
             {
                 auto& col = em.getComponent<ColliderComponent>(e);
                 if (col.behaviorType & BehaviorType::ATK_PLAYER)
@@ -50,6 +51,8 @@ void ProjectileSystem::update(EntityManager& em) {
                     }
                 }
             }
+            else
+                plfi.previousSpell = plfi.noSpell;
         }
     });
 }

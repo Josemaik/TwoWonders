@@ -192,6 +192,8 @@ struct BTDecisionPlayerDetected : BTNode_t {
                     }
                     else {
                         // No hay obstáculo, eres detectado
+                        // realizar diferencia de altura
+                        // si eres golem o slime no puedes ser detectaddo al estar en diferentes nieveles de altura
                         ectx.ai->alert_state = false;
                         ectx.ai->playerdetected = true;
                         return BTNodeStatus_t::success;

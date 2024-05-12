@@ -285,6 +285,44 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         return;
     }
 
+    // RELAY
+    if (behaviorType1 & BehaviorType::RELAY || behaviorType2 & BehaviorType::RELAY)
+    {
+        auto* staticEntPtr = &staticEnt;
+        auto* otherEntPtr = &otherEnt;
+
+        auto* staticPhyPtr = &staticPhy;
+        auto* otherPhyPtr = &otherPhy;
+
+        if (behaviorType2 & BehaviorType::RELAY)
+        {
+            std::swap(staticEntPtr, otherEntPtr);
+            std::swap(staticPhyPtr, otherPhyPtr);
+            std::swap(behaviorType1, behaviorType2);
+        }
+
+        if (behaviorType2 & BehaviorType::ATK_PLAYER)
+        {
+            if (staticEntPtr->hasComponent<RelayComponent>())
+            {
+                auto& plfi = em.getSingleton<PlayerInfo>();
+                auto& rlc = em.getComponent<RelayComponent>(*staticEntPtr);
+
+                if (plfi.previousSpell.type == rlc.type && staticEntPtr->hasComponent<LifeComponent>())
+                {
+                    auto& li = em.getSingleton<LevelInfo>();
+                    auto& life = em.getComponent<LifeComponent>(*staticEntPtr);
+                    life.decreaseLife(2);
+                    li.insertDeath(otherEntPtr->getID());
+                }
+            }
+        }
+        else
+            staticCollision(*otherPhyPtr, *staticPhyPtr, minOverlap);
+
+        return;
+    }
+
     // LAVA
     if (behaviorType1 & BehaviorType::LAVA || behaviorType2 & BehaviorType::LAVA)
     {
@@ -480,23 +518,15 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Si cualquiera de los impactos es con una bala, se baja la vida del otro
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
-        if (staticEntPtr->hasTag<DestructibleTag>() && staticEntPtr->hasComponent<LifeComponent>())
+        if (staticEntPtr->hasTag<DestructibleTag>() && staticEntPtr->hasComponent<LifeComponent>() && otherEntPtr->hasComponent<TypeComponent>())
         {
-            if (otherEntPtr->hasComponent<TypeComponent>())
-            {
-                auto& bulletType = em.getComponent<TypeComponent>(*otherEntPtr);
-                if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(bulletType.type)) {
-                    em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
-                    if (staticEntPtr->hasTag<EnemyTag>()) {
-                        //Detectar al player si  te impacta una bala
-                        if (staticEntPtr->hasComponent<AIComponent>()) {
-                            em.getComponent<AIComponent>(*staticEntPtr).playerdetected = true;
-                        }
-                    }
-                }
+            auto& bulletType = em.getComponent<TypeComponent>(*otherEntPtr);
+            if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(bulletType.type)) {
+                em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
             }
         }
 
+        // Esto es para efectos secundarios de los ataques
         if (!otherEntPtr->hasComponent<ObjectComponent>())
             li.insertDeath(otherEntPtr->getID());
 
@@ -517,7 +547,8 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
         behaviorType2 & BehaviorType::LAVA ||
         behaviorType2 & BehaviorType::SPAWN ||
         behaviorType2 & BehaviorType::RAMP ||
-        behaviorType2 & BehaviorType::OBJECT)
+        behaviorType2 & BehaviorType::OBJECT ||
+        behaviorType2 & BehaviorType::RELAY)
         return;
 
     if (behaviorType2 & BehaviorType::METEORITE)
@@ -821,43 +852,47 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                 em.getComponent<AttackComponent>(*ent1Ptr).attack(AttackType::Spiderweb);
                 balalaunchedbyspider = true;
             }
-            else
+            else if (!ent1Ptr->hasComponent<ObjectComponent>())
             {
-                if (!ent1Ptr->hasComponent<ObjectComponent>())
-                {
-                    auto& li = em.getSingleton<LevelInfo>();
-                    li.insertDeath(ent1Ptr->getID());
-                }
+                auto& li = em.getSingleton<LevelInfo>();
+                li.insertDeath(ent1Ptr->getID());
             }
 
             //Si la bala es lanzada por una araña no quita vida
             if (!balalaunchedbyspider)
             {
                 auto& li = em.getComponent<LifeComponent>(*ent2Ptr);
+                auto& lei = em.getSingleton<LevelInfo>();
                 int damage = 2;
 
                 if (balaCol.behaviorType & BehaviorType::ATK_PLAYER)
                 {
+                    if (li.invulnerable)
+                        return;
+
                     //Si pegamos a un enemmigo nos detecta directamente
-                    if (ent2Ptr->hasTag<GolemTag>()) {
+                    if (ent2Ptr->hasTag<GolemTag>() || ent2Ptr->hasTag<SnowmanTag>() ||
+                    ent2Ptr->hasTag<SlimeTag>()) {
                         em.getComponent<AIComponent>(*ent2Ptr).playerdetected = true;
                         // //empujar hacia atras si le impacta una bala
-                        if (ent2Ptr->hasComponent<PhysicsComponent>() && (ent2Ptr->hasTag<SnowmanTag>()
-                            || ent2Ptr->hasTag<GolemTag>())) {
-                            auto& li = em.getSingleton<LevelInfo>();
-                            auto& enpos = em.getComponent<PhysicsComponent>(*ent2Ptr).position;
-                            auto& plphy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
-                            vec3d plorientation = vec3d(std::sin(plphy.orientation), 0.0, std::cos(plphy.orientation));
-                            enpos.setX(enpos.x() + plorientation.x() * 4.0);
-                            enpos.setZ(enpos.z() + plorientation.z() * 4.0);
+                        if(lei.mapID == 3){
+                            if (ent2Ptr->hasComponent<PhysicsComponent>() && (ent2Ptr->hasTag<SnowmanTag>()
+                                || ent2Ptr->hasTag<GolemTag>())) {
+                                auto& li = em.getSingleton<LevelInfo>();
+                                auto& enpos = em.getComponent<PhysicsComponent>(*ent2Ptr).position;
+                                auto& plphy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
+                                vec3d plorientation = vec3d(std::sin(plphy.orientation), 0.0, std::cos(plphy.orientation));
+                                enpos.setX(enpos.x() + plorientation.x() * 4.0);
+                                enpos.setZ(enpos.z() + plorientation.z() * 4.0);
+                            }
                         }
                     }
 
                     auto& plfi = em.getSingleton<PlayerInfo>();
-                    damage = plfi.currentSpell.damage;
+                    damage = plfi.previousSpell.damage;
 
                     if (ent1Ptr->hasComponent<ObjectComponent>())
-                        damage = static_cast<int>(damage * 1.5);
+                        damage = static_cast<int>(static_cast<float>(damage) * 1.5f);
 
                     if (damage == 0)
                         damage = 2;
@@ -866,27 +901,21 @@ void CollisionSystem::handleAtkCollision(EntityManager& em, bool& atkPl1, bool& 
                         damage += 1;
                 }
 
-                if (li.invulnerable)
-                    return;
                 // Comprobar el tipo de la bala y el enemigo/player
                 if ((typeBala == ElementalType::Fire && typeEnemyPlayer == ElementalType::Ice) ||
                     (typeBala == ElementalType::Ice && typeEnemyPlayer == ElementalType::Water) ||
                     (typeBala == ElementalType::Water && typeEnemyPlayer == ElementalType::Fire))
                 {
-                    li.decreaseLife(static_cast<int>(damage * 1.5));
+                    li.decreaseLife(static_cast<int>(static_cast<float>(damage) * 1.5f));
                 }
                 else if (typeBala == ElementalType::Neutral) {
                     li.decreaseLife(damage);
-                    // if (balaCol.attackType & AttackType::GollemAttack) {
-                    //     em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
-                    // }
+
                 }
                 else
                 {
                     li.decreaseLife(damage / 2);
-                    // if(ent2Ptr->hasTag<GolemTag>()){
-                    //     em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
-                    // }
+
                     if (balaCol.attackType & AttackType::GollemAttack) {
                         em.getComponent<PhysicsComponent>(*ent2Ptr).dragActivatedTime = true;
                     }

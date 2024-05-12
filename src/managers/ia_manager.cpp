@@ -48,6 +48,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     // Creamos el enemigo
     auto& e{ em.newEntity() };
     em.addTag<EnemyTag>(e);
+    em.addTag<LockableTag>(e);
 
     auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = position, .scale = scale, .color = color,.orientation = rot,.rotationVec = rotationVec });
     auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.orientationonrespawn = rot,.rotationVec = rotationVec, .max_speed = max_speed });
@@ -96,7 +97,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         auto* d_a_6 = &tree.createNode<BTDecisionReadyforAttack>();
         auto* a_a_6 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer, vec3d{}); // fail si disparo succes si no disparo
         auto* d_r_6 = &tree.createNode<BTDecisionOnAttackRadius>();
-        auto* sequence6_1 = &tree.createNode<BTNodeSequence_t>(a_e_1,d_a_6, a_a_6, d_r_6);
+        auto* sequence6_1 = &tree.createNode<BTNodeSequence_t>(a_e_1, d_a_6, a_a_6, d_r_6);
 
         auto* d_1_2 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* a_s_2 = &tree.createNode<BTAction_Seek>();
@@ -130,9 +131,9 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
 
         auto* d_a_3 = &tree.createNode<BTDecisionReadyforAttack>();
         auto* a_j_3 = &tree.createNode<BTAction_JumptoPlayer>();
-        //auto* a_a_3 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee); // fail si disparo succes si no disparo
+        auto* a_a_3 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee,vec3d{}); // fail si disparo succes si no disparo
         auto* d_r_3 = &tree.createNode<BTDecisionOnAttackRadius>();
-        auto* sequence3_2 = &tree.createNode<BTNodeSequence_t>(d_a_3, a_j_3, d_r_3);
+        auto* sequence3_2 = &tree.createNode<BTNodeSequence_t>(d_a_3, a_j_3, a_a_3,d_r_3);
 
         auto* d_1_3 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* a_s_3 = &tree.createNode<BTAction_Seek>();
@@ -205,6 +206,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     break;
     case 5: {
         em.addTag<AngryBushTag>(e);
+        em.destroyTag<LockableTag>(e);
         auto& abc = em.addComponent<AngryBushComponent>(e);
         abc.max_speed = wp.max_speed;
         wl.invulnerable = true;
@@ -214,7 +216,10 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     case 6:
         em.addTag<DummyTag>(e);
         break;
-    case 7: em.addTag<AngryBushTag2>(e); tree.createNode<BTAction_Patrol>();
+    case 7:
+        em.addTag<AngryBushTag2>(e);
+        em.destroyTag<LockableTag>(e);
+        tree.createNode<BTAction_Patrol>();
         break;
     case 8: {
         em.addTag<CrusherTag>(e);
