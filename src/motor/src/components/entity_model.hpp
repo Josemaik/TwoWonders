@@ -26,50 +26,10 @@ namespace DarkMoon {
         std::vector<Mesh*> m_meshes;
         bool m_loaded{ false };
 
-        //#############Aniamtion data#############################
-        struct BoneInfo
-        {
-            //id of index in finalbonematrices
-            int id{};
-            //offset matrix transform vertex from model space to bone space
-            glm::mat4 offset{};
-        };
-        //vector of vertex data influence by bone
-        // std::vector<Vertex> m_Bones{};
-        // // //num of vertex
-        // std::vector<int> mesh_base_vertex{};
-        // Name and id of each bone
-        std::map<std::string,BoneInfo> m_BoneInfomap{};
-        int m_BoneCounter { 0 };
-
-        auto& getboneInfoMap() { return m_BoneInfomap; };
-        int& getBoneCount() { return m_BoneCounter; };
-        void SetVertexBoneDataToDefault(Vertex& vertex){
-            for(int i = 0; i < MAX_NUM_BONES_PER_VERTEX;i++){
-                vertex.m_BonesIDs[i] = -1;
-                vertex.m_Weights[i] = 0.0f;
-            }
-        }
-        void SetVertexBoneData(Vertex& vertex, int bondeID,float weight){
-            for(int i = 0; i < MAX_NUM_BONES_PER_VERTEX;i++){
-                if(vertex.m_BonesIDs[i] < 0){
-                    vertex.m_Weights[i] = weight;
-                    vertex.m_BonesIDs[i] = bondeID;
-                    break;
-                }
-            }
-        }
-        void processBone(const aiBone* pbone,std::vector<Vertex>& vertices);
-        // int getBoneID(const aiBone* pBone);
-        //##############################################################
-
-
         void processNode(aiNode*, const aiScene*, ResourceManager& rm);
         void processMesh(aiMesh*, aiMaterial*, const aiScene*, ResourceManager& rm);
         Material* processMaterial(aiMaterial*, ResourceManager& rm);
         void processTextures(aiMaterial*, Material*, ResourceManager& rm);
-        
-        
 
     public:
         Color color = D_WHITE;

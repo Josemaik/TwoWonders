@@ -15,6 +15,15 @@ namespace DarkMoon {
 
         std::cout << " - Load a model -> " << m_name << std::endl;
 
+        if(scene->HasAnimations()){
+            std::cout << "\n┌────────────┐\n";
+            std::cout << "│ ANIMATIONS │ : " << m_name << "\n";
+            std::cout << "└────────────┘\n";
+            for(int i = 0; i < scene->mNumAnimations; i++)
+                std::cout << "└── " << scene->mAnimations[i]->mName.C_Str() << "\n";
+            std::cout << "\n";
+        }
+
         processNode(scene->mRootNode, scene, rm);
     };
 
@@ -79,10 +88,10 @@ namespace DarkMoon {
         for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
             Vertex vertex;
 
-            if(mesh->HasBones()){
-                std::cout << mesh->mNumBones << "\n";
-                SetVertexBoneDataToDefault(vertex);
-            }
+            //if(mesh->HasBones()){
+            //    std::cout << mesh->mNumBones << "\n";
+            //    SetVertexBoneDataToDefault(vertex);
+            //}
             
             // Position
             if (mesh->HasPositions()) {
@@ -120,11 +129,11 @@ namespace DarkMoon {
         }
 
         //Process bones
-        if(mesh->HasBones()){
-            for(unsigned int i = 0;i < mesh->mNumBones;++i){
-                processBone(mesh->mBones[i],vertices);
-            }        
-        }
+        //if(mesh->HasBones()){
+        //    for(unsigned int i = 0;i < mesh->mNumBones;++i){
+        //        processBone(mesh->mBones[i],vertices);
+        //    }        
+        //}
 
         //std::cout << aiMaterial->GetName().C_Str() << "\n";
         //std::cout << mesh->mName.C_Str() << "\n";
@@ -195,35 +204,35 @@ namespace DarkMoon {
     //     }
     //     return bone_id;
     // }
-    void Model::processBone(const aiBone* pbone,std::vector<Vertex>& vertices){
-        int boneID = -1;
-        //obtenemos el nombre del hueso
-        std::string boneName = pbone->mName.C_Str();
-        // comprobamos si existe en el map
-        if(m_BoneInfomap.find(boneName) == m_BoneInfomap.end()){
-            // si no existe se crea uno nuevo
-            BoneInfo newBoneInfo{};
-            newBoneInfo.id = m_BoneCounter;
-            newBoneInfo.offset = glm::make_mat4(&pbone->mOffsetMatrix.a1);
-            m_BoneInfomap[boneName] = newBoneInfo;
-            boneID = m_BoneCounter;
-            m_BoneCounter++;
-        }
-        else{
-            // si existe se asigna el id
-            boneID = m_BoneInfomap[boneName].id;
-        }
-        assert(boneID != -1);
-        //obtenemos la influencia de pesos de este hueso
-        auto weights = pbone->mWeights;
-        int numWeights = pbone->mNumWeights;
-        //recorremos el número de vértices afectados por este hueso
-        for(int i = 0; i < numWeights; i++){
-            int vertexID = weights[i].mVertexId;
-            float weight = weights[i].mWeight;
-            assert(vertexID <= static_cast<int>(vertices.size()));
-            //se setean los datos a los vértices
-            SetVertexBoneData(vertices[vertexID],boneID,weight);
-        }
-    }
+    //void Model::processBone(const aiBone* pbone,std::vector<Vertex>& vertices){
+    //    int boneID = -1;
+    //    //obtenemos el nombre del hueso
+    //    std::string boneName = pbone->mName.C_Str();
+    //    // comprobamos si existe en el map
+    //    if(m_BoneInfomap.find(boneName) == m_BoneInfomap.end()){
+    //        // si no existe se crea uno nuevo
+    //        BoneInfo newBoneInfo{};
+    //        newBoneInfo.id = m_BoneCounter;
+    //        newBoneInfo.offset = glm::make_mat4(&pbone->mOffsetMatrix.a1);
+    //        m_BoneInfomap[boneName] = newBoneInfo;
+    //        boneID = m_BoneCounter;
+    //        m_BoneCounter++;
+    //    }
+    //    else{
+    //        // si existe se asigna el id
+    //        boneID = m_BoneInfomap[boneName].id;
+    //    }
+    //    assert(boneID != -1);
+    //    //obtenemos la influencia de pesos de este hueso
+    //    auto weights = pbone->mWeights;
+    //    int numWeights = pbone->mNumWeights;
+    //    //recorremos el número de vértices afectados por este hueso
+    //    for(int i = 0; i < numWeights; i++){
+    //        int vertexID = weights[i].mVertexId;
+    //        float weight = weights[i].mWeight;
+    //        assert(vertexID <= static_cast<int>(vertices.size()));
+    //        //se setean los datos a los vértices
+    //        SetVertexBoneData(vertices[vertexID],boneID,weight);
+    //    }
+    //}
 }

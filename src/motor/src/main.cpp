@@ -101,10 +101,10 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
 
 DarkMoon::Node* createMainCharacter(DarkMoon::DarkMoonEngine& engine) {
     // Node: Modelo
-    auto model = engine.CreateModel("assets/lvl_0-cnk_0.obj", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
+    auto model = engine.CreateModel("assets/Apisonadora/Apisonadora.fbx", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
     //model->scale({0.02f, 0.02f, 0.02f});
     //model->translate({0.0f, 0.0f, 0.0f});
-    //model->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
+    model->setRotation({ 1.0f, 0.0f, 0.0f }, -90.0f);
 
     auto eModel = dynamic_cast<DarkMoon::Model*>(model->getEntity());
     eModel->drawModel = true;
