@@ -150,7 +150,7 @@ void PhysicsSystem::update(EntityManager& em)
             {
                 if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !ia.ismoving)
                 {
-                    ss.sonido_golem_mov();
+                    //ss.sonido_golem_mov();
                     ia.ismoving = true;
                 
                 } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  ia.ismoving)
@@ -175,7 +175,7 @@ void PhysicsSystem::update(EntityManager& em)
             {
                 if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !ia.ismoving)
                 {
-                    ss.sonido_munyeco_mov();
+                    //ss.sonido_munyeco_mov();
                     ia.ismoving = true;
                 
                 } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  ia.ismoving)

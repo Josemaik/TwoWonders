@@ -12,6 +12,8 @@ void AttackManager::createAttackType(EntityManager& em, Entity& ent, AttackType 
         auto& orientation = phy.orientation;
         position += vec3d{ std::sin(orientation) * 2.0, 0, std::cos(orientation) * 2.0 };
         createAttackRangedOrMelee(em, position, vel, orientation, type, 2, ElementalType::Neutral, BehaviorType::ATK_PLAYER);
+
+        em.getSingleton<SoundSystem>().sonido_melee();
         break;
     }
     case AttackType::WaterBombShot:
@@ -49,6 +51,7 @@ void AttackManager::createAttackType(EntityManager& em, Entity& ent, AttackType 
         auto& e{ em.newEntity() };
         em.addTag<HitPlayerTag>(e);
         em.addTag<FireBallTag>(e);
+        em.getSingleton<SoundSystem>().sonido_h_bola_fuego();
 
         setPlayerAtkVel(em, phy.position, vel, phy.orientation);
 
@@ -298,6 +301,8 @@ void AttackManager::createAttackType(EntityManager& em, Entity& ent, AttackType 
             em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = true, .effect = Effects::FIREBALL, .maxParticles = 10, .spawnRate = 0.01f, .lifeTime = 0.5f, });
         }
         em.addComponent<AttackComponent>(e, AttackComponent{ .atkType = type, .damage = 3, .type = eleType });
+
+        em.getSingleton<SoundSystem>().sonido_munyeco_ataque();
 
         break;
     }
