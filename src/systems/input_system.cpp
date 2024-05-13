@@ -26,7 +26,15 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     if ((ge.isKeyReleased(D_KEY_ESCAPE) || ge.isGamepadButtonReleased(0, GLFW_GAMEPAD_BUTTON_START)) && li.currentScreen == GameScreen::GAMEPLAY)
     {
         if (li.currentScreen != GameScreen::CONTROLS)
+        {
             inpi.pause = !inpi.pause;
+            em.getSingleton<SoundSystem>().seleccion_menu();
+            if(em.getSingleton<SoundSystem>().music_started)
+            {
+                em.getSingleton<SoundSystem>().sonido_unpause(li.mapID);
+            }
+        }
+           
         inpi.debugAI1 = false;
         inpi.debugAI2 = false;
         inpi.debugPhy = false;

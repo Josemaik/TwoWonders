@@ -43,7 +43,9 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
         {
             li.mapID = 3;
             map = loadMap("assets/Niveles/Lvl_3/Lvl_3.kaiwa");
-            em.getSingleton<SoundSystem>().sonido_amb_bosque();
+            em.getSingleton<SoundSystem>().sonido_amb_pradera();
+            em.getSingleton<SoundSystem>().sonido_music_pradera();
+            em.getSingleton<SoundSystem>().sonido_pasos_pradera();  
             break;
         }
         default:

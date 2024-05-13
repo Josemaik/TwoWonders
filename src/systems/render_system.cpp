@@ -444,7 +444,9 @@ void RenderSystem::checkSliderSound(SoundSystem& ss, OptionSlider& slider)
 void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInfo& li, SoundSystem& ss)
 {
     auto& inpi = em.getSingleton<InputInfo>();
-    ss.music_stop();
+
+    ss.sonido_pause(li.mapID);
+    ss.stop_pasos();
 
     // Nodo de los botones
     if (inpi.pause)
@@ -496,7 +498,8 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
             {
                 li.currentScreen = GameScreen::STORY;
                 li.anyButtonPressed = false;
-                ss.music_stop();
+                
+                
             }
             else
                 inpi.pause = false;
@@ -504,6 +507,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
             li.elapsedPause = 0.f;
 
             ss.seleccion_menu();
+            ss.sonido_unpause(li.mapID);
 
         } } },
         { "2_opciones", { nullptr, "Opciones", [&]() {

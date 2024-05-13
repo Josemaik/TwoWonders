@@ -64,6 +64,9 @@ struct AIComponent
     std::vector<vec3d> found_path{};
     vec3d* it_path{ nullptr };
 
+
+    //enemigo moviendose
+    bool ismoving { false };
     // SB behaviour {SB::Arrive};
     double txp{}, tzp{};
     bool target_obtained{ false };

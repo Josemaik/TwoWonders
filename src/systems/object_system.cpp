@@ -216,6 +216,7 @@ void ObjectSystem::createObjects(EntityManager& em)
 
             auto& plfi = em.getSingleton<PlayerInfo>();
             plfi.hasBoots = true;
+            em.getSingleton<SoundSystem>().sonido_equipar_botas();
 
             Item boots = { "Botas de la suerte", "Botas que te hacen correr más rápido" };
             break;
@@ -229,6 +230,8 @@ void ObjectSystem::createObjects(EntityManager& em)
 
             auto& plfi = em.getSingleton<PlayerInfo>();
             plfi.hasHat = true;
+
+             em.getSingleton<SoundSystem>().sonido_equipar_gorro();
 
             Item boots = { "Sombrero de Mago", "Te ayuda a canalizar mejor tu uso de magia" };
             break;
