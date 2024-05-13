@@ -95,6 +95,8 @@ namespace DarkMoon {
         Font* GetDefaultFont() { return m_renderManager.defaultFont; };
         // Get mouse ray cast
         Ray GetMouseRay();
+        // Get view matrix
+        glm::mat4 GetViewMatrix();
 
         // LIGHTS
 
@@ -110,6 +112,8 @@ namespace DarkMoon {
         void DeactivateLights() { m_renderManager.activeLights = false; };
         // Update lights
         void UpdateLights(Node* parentNode);
+        // AuxUpdateLights
+        void AuxUpdateLights(Node* parentNode);
 
         // ------------------------ //
         // Window-related functions //
@@ -271,6 +275,8 @@ namespace DarkMoon {
 
         // Set target FPS (max)
         void SetTargetFPS(int fps);
+        // Get target FPS
+        double GetTargetFPS();
         // Get time in seconds for last frame drawn
         double GetFrameTime();
         // Get elapsed time in seconds

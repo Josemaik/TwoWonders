@@ -22,15 +22,13 @@
 #include "../components/boat_component.hpp"
 #include "../components/particle_component.hpp"
 #include "../components/spawn_component.hpp"
-#include "../components/relay_component.hpp"
-//ia
+#include "../components/pointlight_component.hpp"
 #include "../components/ai_component.hpp"
 #include "../components/navmesh_component.hpp"
 #include "../components/npc_component.hpp"
 #include "../components/projectile_component.hpp"
 #include "../components/object_component.hpp"
 #include "../components/zone_component.hpp"
-#include "../components/shield_component.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
 #include "../utils/Item.hpp"
@@ -66,6 +64,7 @@ static constexpr float timeStep240 = 1.0f / 240.0f;  // Actualiza el juego 240 v
 static constexpr float timeStep360 = 1.0f / 360.0f;  // Actualiza el juego 360 veces por segundo
 static constexpr float timeStep480 = 1.0f / 480.0f;  // Actualiza el juego 480 veces por segundo
 static constexpr double timeStepDouble = 1.0 / 60.0;  // Actualiza el juego 60 veces por segundo
+static constexpr double timeStepDouble120 = 1.0 / 120.0;  // Actualiza el juego 120 veces por segundo
 static constexpr double timeStepDouble240 = 1.0 / 240.0;  // Actualiza el juego 240 veces por segundo
 
 // Forward Declarations
@@ -95,6 +94,7 @@ struct SubjectTag {};
 struct DestructibleTag {};
 struct ChestTag {};
 struct SpawnTag {};
+struct ChunkTag {};
 struct Chunk0Tag {};
 struct Chunk1Tag {};
 struct Chunk2Tag {};
@@ -124,6 +124,7 @@ struct FireBallTag {};
 struct SnowBallTag {};
 struct MagmaBallTag {};
 struct EnemyDeathTag {};
+struct LockableTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -135,10 +136,10 @@ using CL = MP::TypeList <
     RampComponent,
     AIComponent,
     AttackComponent,
+    AttackerComponent,
     ProjectileComponent,
     ObjectComponent,
     ZoneComponent,
-    ShieldComponent,
     TypeComponent,
     ChestComponent,
     ListenerComponent,
@@ -155,7 +156,7 @@ using CL = MP::TypeList <
     BoatComponent,
     ParticleMakerComponent,
     SpawnComponent,
-    RelayComponent
+    PointLightComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,
@@ -176,6 +177,7 @@ using TL = MP::TypeList <
     DestructibleTag,
     ChestTag,
     SpawnTag,
+    ChunkTag,
     Chunk0Tag,
     Chunk1Tag,
     Chunk2Tag,
@@ -208,7 +210,8 @@ using TL = MP::TypeList <
     ObstacleTag,
     SnowBallTag,
     MagmaBallTag,
-    EnemyDeathTag
+    EnemyDeathTag,
+    LockableTag
 > ;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem, FrustumInfo, CheatsInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
@@ -221,8 +224,7 @@ using mapSizeType = rapidjson::SizeType;
 using ShaderType = DarkMoon::Shader;
 using ModelType = DarkMoon::Model;
 using Effects = ParticleMakerComponent::ParticleEffect;
-using FrustPos = FrustumInfo::Position;
-using FrustOut = MP::TypeList<GroundTag, NPCTag>;
+using FrustOut = MP::TypeList<GroundTag, NPCTag, ChunkTag, HitPlayerTag>;
 using Color = DarkMoon::Color;
 using Font = DarkMoon::Font;
 using Aligned = DarkMoon::Aligned;
@@ -230,6 +232,7 @@ using Node = DarkMoon::Node;
 using Texture = DarkMoon::Texture;
 using Texture2D = DarkMoon::Texture2D;
 using Gif = DarkMoon::AnimatedTexture2D;
+using Circle = DarkMoon::Circle;
 using Rectangle = DarkMoon::Rectangle;
 using Slider = DarkMoon::Slider;
 using OptionSlider = DarkMoon::OptionSlider;
@@ -241,4 +244,5 @@ using ButtonState = DarkMoon::ButtonState;
 using Text = DarkMoon::Text;
 using TextBox = DarkMoon::TextBox;
 using CheckBox = DarkMoon::CheckBox;
+using PointLight = DarkMoon::PointLight;
 using DarkMoonEngine = DarkMoon::DarkMoonEngine;

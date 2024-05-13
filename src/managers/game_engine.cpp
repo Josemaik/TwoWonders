@@ -1,5 +1,4 @@
 #include "game_engine.hpp"
-#include <chrono>
 
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
@@ -20,6 +19,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["Menu"] = dmeg.CreateNode("Menu", rootNode);
     nodes["HUD"] = dmeg.CreateNode("HUD", nodes["2D"]);
     nodes["Book"] = dmeg.CreateNode("Book", nodes["HUD"]);
+    nodes["SnowStarfield"] = dmeg.CreateNode("SnowStarfield", nodes["HUD"]);
     nodes["Dialog"] = dmeg.CreateNode("Dialog", nodes["HUD"]);
     nodes["Gifs"] = dmeg.CreateNode("Gifs", nodes["2D"]);
     nodes["Nums"] = dmeg.CreateNode("Nums", nodes["HUD"]);
@@ -30,6 +30,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["Copy"] = dmeg.CreateNode("Copy", nodes["HUD"]);
     nodes["Boat"] = dmeg.CreateNode("Boat", nodes["HUD"]);
     nodes["AnimTextures"] = dmeg.CreateNode("AnimTextures", nodes["HUD"]);
+    nodes["PartTextures"] = dmeg.CreateNode("PartTextures", nodes["HUD"]);
     nodes["Debug"] = dmeg.CreateNode("Debug", nodes["HUD"]);
     nodes["DebugPhy"] = dmeg.CreateNode("DebugPhy", nodes["Debug"]);
     nodes["DebugAI1"] = dmeg.CreateNode("DebugAI1", nodes["Debug"]);
@@ -204,6 +205,13 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImage("-", "assets/HUD/numeros/-.png", nodes["Nums"]);
     loadAndResizeImage("barra", "assets/HUD/barra.png", nodes["Nums"]);
 
+    // TEXTURAS PARTÍCULAS
+    //
+    loadAndResizeImage("p_est1", "assets/HUD/p_texturas/p_est1.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est2", "assets/HUD/p_texturas/p_est2.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est3", "assets/HUD/p_texturas/p_est3.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est4", "assets/HUD/p_texturas/p_est4.png", nodes["PartTextures"]);
+
     // GIFS
     //
     // Joystick Izquierdo
@@ -299,8 +307,16 @@ void ENGI::GameEngine::setTargetFPS(int fps) {
     dmeg.SetTargetFPS(fps);
 }
 
+double ENGI::GameEngine::getTargetFPS() {
+    return dmeg.GetTargetFPS();
+}
+
 float ENGI::GameEngine::getFrameTime() {
     return static_cast<float>(dmeg.GetFrameTime());
+}
+
+double ENGI::GameEngine::getFrameTimeDouble() {
+    return dmeg.GetFrameTime();
 }
 
 ////// DRAWING //////
@@ -347,10 +363,6 @@ void ENGI::GameEngine::drawNode(Node* node, vec2i pos, vec2f scale) {
     node->setTranslation({ pos.x, pos.y, 0.0f });
     node->setScale({ scale.x, scale.y, 1.0f });
     node->setVisibleOne(true);
-}
-
-void ENGI::GameEngine::drawCircle(int, int, float, Color) {
-    //DrawCircle(posX, posY, radius, color);
 }
 
 void ENGI::GameEngine::drawCircleSector(vec2d, float, float, float, int, Color) {
@@ -463,6 +475,11 @@ vec3d ENGI::GameEngine::getUpCamera()
 float ENGI::GameEngine::getFovyCamera()
 {
     return camera->fovy;
+}
+
+glm::mat4 ENGI::GameEngine::getViewMatrix()
+{
+    return camera->getViewMatrix();
 }
 
 ////// INPUT HANDLING //////
@@ -753,6 +770,23 @@ Node* ENGI::GameEngine::createNode(Node* copyNode, Node* parentNode)
     return dmeg.CreateNodeCopy(copyNode, parentNode);
 }
 
+///// Circle /////
+
+Node* ENGI::GameEngine::createCircle(vec2i position, float radius, int segments, Color color, const char* nodeName, Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateCircle({ position.x, position.y }, radius, segments, color, nodeName, parentNode);
+    else
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {radius * 2, radius * 2} };
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::drawCircle(vec2i position, float radius, int segments, Color color)
+{
+    return dmeg.CreateCircle({ position.x, position.y }, radius, segments, color, "circle", nodes["TextCopy"]);
+}
+
 ///// Rectangle /////
 
 Node* ENGI::GameEngine::createRectangle(vec2i pos, vec2i size, Color color, const char* name, Node* parentNode)
@@ -987,17 +1021,12 @@ Node* ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, float lSize, Co
 
 Node* ENGI::GameEngine::createPoint3D(vec3d position, float pointSize, Color color, const char* nodeName, Node* parentNode)
 {
-    if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreatePoint3D(position.toGlm(), pointSize, color, nodeName, parentNode);
-    else
-        nodes[nodeName]->setVisibleOne(true);
-
-    return nodes[nodeName];
+    return dmeg.CreatePoint3D(position.toGlm(), pointSize, color, nodeName, parentNode);
 }
 
 Node* ENGI::GameEngine::drawPoint3D(vec3d position, float pointSize, Color color)
 {
-    return dmeg.CreatePoint3D(position.toGlm(), pointSize, color, "point", nodes["Copy"]);
+    return dmeg.CreatePoint3D(position.toGlm(), pointSize, color, "point", nodes["TextCopy"]);
 }
 
 ///// Lights /////
@@ -1017,21 +1046,16 @@ void ENGI::GameEngine::deactivateLights()
     dmeg.DeactivateLights();
 }
 
-///// Puntual Light /////
+///// Point Light /////
 
-Node* ENGI::GameEngine::drawPuntualLight(vec3d position, Color color)
+Node* ENGI::GameEngine::drawPointLight(vec3d position, Color color)
 {
-    return dmeg.CreatePointLight(position.toGlm(), color, "puntualLight", nodes["TextCopy"]);
+    return dmeg.CreatePointLight(position.toGlm(), color, "pointLight", nodes["TextCopy"]);
 }
 
-Node* ENGI::GameEngine::createPuntualLight(vec3d position, Color color, const char* nodeName, Node* parentNode)
+Node* ENGI::GameEngine::createPointLight(vec3d position, Color color, const char* nodeName, Node* parentNode)
 {
-    if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreatePointLight(position.toGlm(), color, nodeName, parentNode);
-    else
-        nodes[nodeName]->setVisibleOne(true);
-
-    return nodes[nodeName];
+    return dmeg.CreatePointLight(position.toGlm(), color, nodeName, parentNode);
 }
 
 Font* ENGI::GameEngine::getDefaultFont()

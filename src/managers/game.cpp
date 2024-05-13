@@ -3,44 +3,11 @@
 // #include "../utils/memory_viewer.hpp"
 // #include <chrono>
 
-void Game::createShield(Entity& ent)
-{
-    auto& e{ em.newEntity() };
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = D_ORANGE_DARK });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
-    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
-    em.addComponent<ShieldComponent>(e, ShieldComponent{ .createdby = EntitieswithShield::Player });
-}
-
-void Game::createEnding()
-{
-    auto& e{ em.newEntity() };
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = {83.0f, 1.0f, -87.0f}, .scale = {1.0f, 1.0f, 1.0f}, .color = D_WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0 });
-    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
-}
-
-// ShaderType Game::createShader()
-// {
-//     ShaderType shader = engine.loadShader(TextFormat("assets/shaders/lighting.vs", 330),
-//         TextFormat("assets/shaders/lighting.fs", 330));
-
-//     // Get some required shader locations
-//     shader.locs[SHADER_LOC_VECTOR_VIEW] = engine.getShaderLocation(shader, "viewPos");
-
-//     // Ambient light level (some basic lighting)
-//     int ambientLoc = engine.getShaderLocation(shader, "ambient");
-//     float ambientValue[4] = { 3.1f, 3.1f, 3.1f, 20.0f };
-//     engine.setShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
-
-//     return shader;
-// }
-
 void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -19.0, 14.0, 185.0 };
+        plfi.spawnPoint = { -65.0, 13.0, 104.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial lvl0
     // 32.0, 4.0, 43.0 - Primer cofre lvl0
@@ -81,10 +48,11 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e);
-    auto& lis = em.addComponent<ListenerComponent>(e);
+    em.addComponent<AttackerComponent>(e);
+    em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = false, .effect = Effects::PLAYER, .maxParticles = 4, .spawnRate = 0.05f, .lifeTime = 0.3f });
 
     // Listeners de eventos para el jugador
+    auto& lis = em.addComponent<ListenerComponent>(e);
     for (auto i = 0; i < EventCodes::MAX; i++)
         lis.addCode(static_cast<EventCodes>(i));
 
@@ -96,11 +64,6 @@ void Game::createEntities()
     // Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };
     // plfi.addItem(std::make_unique<Potion>(pot));
 
-    // Shield
-    // createShield(em, e);
-
-    // Ending
-    // createEnding(em);
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
 }
@@ -115,15 +78,14 @@ void Game::createSound() {
 void Game::run()
 {
     // Cosas para medir el tiempo de ejecución
-    using std::chrono::high_resolution_clock;
-    using std::chrono::duration_cast;
-    using std::chrono::duration;
-    using std::chrono::milliseconds;
+    // using std::chrono::high_resolution_clock;
+    // using std::chrono::duration_cast;
+    // using std::chrono::duration;
+    // using std::chrono::microseconds;
 
     // Codigo para medir el tiempo de ejecucion
     //
     // - Colocar antes de donde se quiere medir el tiempo
-    // auto t1 = high_resolution_clock::now();
     // - Colocar despues de donde se quiere medir el tiempo
     // auto t2 = high_resolution_clock::now();
     // auto duration = duration_cast<milliseconds>(t2 - t1);
@@ -166,15 +128,17 @@ void Game::run()
 
     // Inicializa una variable donde tener el tiempo entre frames
     float currentTime{};
-    float elapsed{};
+    double elapsed{ 0 }, frameTime{}, alpha{};
     bool debugs{ false }, resets{ false };
 
     createSound();
-    attack_system.setCollisionSystem(&collision_system);
 
     while (!li.gameShouldEnd)
     {
-        elapsed += engine.getFrameTime();
+        frameTime = engine.getFrameTimeDouble();
+        if (frameTime > timeStepDouble)
+            frameTime = timeStepDouble;
+        elapsed += frameTime;
         gami.updateFrame();
 
         switch (li.currentScreen)
@@ -207,8 +171,6 @@ void Game::run()
             }
             input_system.update(em, engine);
             render_system.drawLogoGame(engine, em, sound_system);
-            if (li.playerID == li.max)
-                createEntities();
             break;
         }
 
@@ -246,7 +208,7 @@ void Game::run()
 
             // TODO - Cuando se implemente el sistema de guardado, cargar el nivel en el que se quedó
             if (!map.isComplete())
-                map.createMap(em, 2, iam);
+                map.createMap(em, 3, iam);
 
             break;
         }
@@ -266,6 +228,7 @@ void Game::run()
             {
                 li.mapID = li.mapToLoad;
                 map.changeMap(em, li.mapID, iam);
+                collision_system.updateOctreeSize(li.mapID);
                 li.mapToLoad = li.u8max;
             }
 
@@ -274,6 +237,7 @@ void Game::run()
                 if (!li.isCharging() && li.loading)
                 {
                     li.loadingTime = 0;
+                    collision_system.updateOctreeSize(li.mapID);
                     if (!li.replay)
                     {
                         auto& gami = em.getSingleton<GameData>();
@@ -290,44 +254,44 @@ void Game::run()
                 resetDeath();
 
             input_system.update(em, engine);
-            debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();
+            debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText() || li.isCharging();
             resets = li.resetGame || li.resetFromDeath;
 
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
             {
-                // if (elapsed >= timeStep)
-                // {
-                //     elapsed -= timeStep;
-
-                ai_system.update(em);
-                npc_system.update(em);
-                physics_system.update(em);
-                collision_system.update(em);
-                zone_system.update(em, engine, iam, evm, map);
-                lock_system.update(em);
-                shield_system.update(em);
-                object_system.update(em);
-                projectile_system.update(em);
-                attack_system.update(em);
-                life_system.update(em, object_system);
-                sound_system.update();
-                // if (elapsed < timeStep45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
-                camera_system.update(em, engine, evm);
-                event_system.update(em, evm, iam, map, object_system, sound_system);
-                particle_system.update(em);
-
-                if (!li.getDeath().empty())
+                while (elapsed >= timeStepDouble)
                 {
-                    em.destroyEntities(li.getDeath());
-                    li.clearDeath();
+                    elapsed -= timeStepDouble;
+                    ai_system.update(em);
+                    npc_system.update(em);
+                    physics_system.update(em);
+                    collision_system.update(em);
+                    zone_system.update(em, engine, iam, evm, map);
+                    object_system.update(em);
+                    attack_system.update(em, am);
+                    life_system.update(em, object_system);
+                    // if (elapsed < timeStepDouble45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
+                    // if(elapsed < target)
+                    camera_system.update(em, engine, evm);
+                    event_system.update(em, evm, iam, map, object_system, sound_system);
+                    if (li.showParticles)
+                        particle_system.update(em);
                 }
-                // }
-                render_system.update(em, engine);
-            }
-            else if (!resets && debugs){
+
+                // Borramos las entidades muertas
+                emptyDeathList(li);
+
+                // Sistemas que no hacen cálculos con las físicas
+                alpha = elapsed / timeStepDouble;
                 sound_system.update();
-                render_system.update(em, engine);
+                lock_system.update(em);
+                render_system.update(em, engine, alpha);
+            }
+            else if (!resets && debugs) {
+                emptyDeathList(li);
+                sound_system.update();
+                render_system.update(em, engine, 1.f);
             }
 
             break;
@@ -351,7 +315,7 @@ void Game::run()
         default:
             break;
         }
-        if (elapsed >= timeStep)
+        if (elapsed >= timeStepDouble)
             elapsed = 0; // Para que no se acumule el tiempo
 
         if (engine.windowShouldClose())
@@ -360,20 +324,21 @@ void Game::run()
 
     // Creamos un archivo de salida con los datos de la partida
     // Para hacer replay con este archivo hay que colocarlo en la carpeta assets/data/input
-    if (!li.replay)
-    {
-        std::string name = "assets/data/output/data";
-        // le ponemos la fecha y hora al archivo
-        std::time_t t = std::time(nullptr);
-        std::tm tm = *std::localtime(&t);
-        std::stringstream ss;
-        ss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S");
-        name += ss.str();
-        name += ".cereal";
-        std::ofstream os(name, std::ios::binary);
-        cereal::BinaryOutputArchive archive(os);
-        archive(CEREAL_NVP(gami));
-    }
+    // Comentado hasta nuevo aviso
+    // if (!li.replay)
+    // {
+    //     std::string name = "assets/data/output/data";
+    //     // le ponemos la fecha y hora al archivo
+    //     std::time_t t = std::time(nullptr);
+    //     std::tm tm = *std::localtime(&t);
+    //     std::stringstream ss;
+    //     ss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S");
+    //     name += ss.str();
+    //     name += ".cereal";
+    //     std::ofstream os(name, std::ios::binary);
+    //     cereal::BinaryOutputArchive archive(os);
+    //     archive(CEREAL_NVP(gami));
+    // }
 
     //liberar bancos
     sound_system.clear();
@@ -381,6 +346,15 @@ void Game::run()
 
     // engine.unloadShader(shader);
     engine.closeWindow();
+}
+
+void Game::emptyDeathList(LevelInfo& li)
+{
+    if (!li.getDeath().empty())
+    {
+        em.destroyEntities(li.getDeath());
+        li.clearDeath();
+    }
 }
 
 void Game::resetDeath()
@@ -416,6 +390,7 @@ void Game::resetGame()
     plfi.reset();
     lock_system.reset();
     render_system.resetAnimatedTexture();
+    collision_system.updateOctreeSize(li.mapID);
     map.reset(em, li.mapID, iam);
     createEntities();
 }

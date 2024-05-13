@@ -81,11 +81,16 @@ namespace DarkMoon {
     struct Circle : Entity2D {
     private:
         void changeVAO(glm::mat4& transMatrix) override;
+        void changeVAO(glm::mat4& transMatrix, bool forceUpdate = false);
     public:
         glm::vec2 position = {};
         float radius = { 10.0f };
+        float oldRadius = { 10.0f };
         int segments = { 20 };
+        int oldSegments = { 20 };
+        std::vector<float> vertices{};
         Color color = { D_BLACK };
+        RenderManager& rm = RenderManager::getInstance();
 
         Circle(glm::vec2 p, float rad, int seg, Color c);
         ~Circle();
@@ -247,7 +252,6 @@ namespace DarkMoon {
         bool bold{ false };
         bool italic{ false };
 
-
         Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK, Aligned al = Aligned::LEFT, bool cbc = false)
             : position(pos), font(f), fontSize(fS), color(col), alignment(al), charByChar(cbc)
         {
@@ -272,13 +276,15 @@ namespace DarkMoon {
 #ifdef _WIN32
             bool checkSpecial = false;
 #endif
-            if (font && !text.empty() && this->text != textW) {
+            if (font && !text.empty() && textW != this->text) {
                 // Reset values
                 widths.clear();
                 maxWidth = 0.0f;
                 maxHeight = 0.0f;
                 numLines = 1;
                 charIndex = 0;
+                bold = false;
+                italic = false;
                 float lineWidth = position.x;
 
                 // Seteamos la escala con el ratio
@@ -306,7 +312,6 @@ namespace DarkMoon {
                         continue;
                     }
 #endif
-
                     // Max Height
                     Character ch = font->characters[c];
                     auto chY = static_cast<float>(ch.size.y);
@@ -405,6 +410,8 @@ namespace DarkMoon {
                 if (timeElapsed >= charSpeed) {
                     timeElapsed -= charSpeed;
                     if (charIndex < text.size()) {
+                        bold = false;
+                        italic = false;
                         ++charIndex;
 
                         if (charIndex % static_cast<std::size_t>(8) == 0)
@@ -416,16 +423,12 @@ namespace DarkMoon {
             }
             else
                 charIndex = text.size();
-
-            if (text[charIndex] == '\n')
-                std::cout << "New Line" << std::endl;
-
 #ifdef _WIN32
             bool checkSpecial = false;
 #endif
             int k{ 1 }; // Pa la anchura de las líneas
             for (size_t i = 0; i < charIndex; ++i) {
-                wchar_t& c = text[i];
+                wchar_t c = text[i];
                 if (c == '\n') {
                     // Reset the x position to the start of the line
                     aux_x = position.x;
@@ -440,12 +443,14 @@ namespace DarkMoon {
                     // Skip the rest of the loop
                     continue;
                 }
-                else if (c == '\b') {
+                // Poner o quitar negrita
+                else if (c == '\b')
                     bold = !bold;
-                }
-                else if (c == '\t') {
+
+                // Poner o quitar cursiva
+                else if (c == '\t')
                     italic = !italic;
-                }
+
 #ifdef _WIN32
                 else if (checkSpecial)
                 {
@@ -478,24 +483,24 @@ namespace DarkMoon {
                     { posX + w, posY + h, 1.0f, 1.0f }
                 };
 
-                // If italic, apply a shear transformation to the vertices
+                // Transformamos los vértices
                 if (italic) {
-                    float shearAmount = -0.2f; // Adjust as needed
+                    static constexpr float shearAmount = -0.2f;
                     for (int i = 0; i < 6; i++) {
                         float shear = shearAmount * vertices[i][1];
                         vertices[i][0] += shear;
                     }
                 }
 
-                // Normalize the vertices
+                // Normalizamos los vértices
                 for (int i = 0; i < 6; i++) {
                     vertices[i][0] = rm.normalizeX(vertices[i][0]);
                     vertices[i][1] = rm.normalizeY(vertices[i][1]);
                 }
 
-                // If italic, adjust the x position of the characters
+                // Movemos los caracteres a donde queremos que estén
                 if (italic) {
-                    float adjustment = 0.181f; // Adjust as needed
+                    static constexpr float adjustment = 0.181f;
                     for (int i = 0; i < 6; i++) {
                         vertices[i][0] += adjustment;
                     }
@@ -512,12 +517,10 @@ namespace DarkMoon {
 
                 if (bold)
                 {
-                    float offset = 0.001f;
+                    static constexpr float offset = 0.001f;
 
                     for (int l = 0; l < 6; l++)
-                    {
                         vertices[l][0] += offset;
-                    }
 
                     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
                     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -537,6 +540,14 @@ namespace DarkMoon {
 
         std::wstring getText() {
             return text;
+        }
+
+        void skipText() {
+            charIndex = text.size();
+        }
+
+        bool isTextFinished() {
+            return charIndex == text.size();
         }
 
         bool charChanged() {
@@ -875,6 +886,8 @@ namespace DarkMoon {
         Text name{};
         std::vector<std::string> options{};
         std::size_t currentOption{};
+
+
         WindowsManager& wm = WindowsManager::getInstance();
         InputManager& im = InputManager::getInstance();
 
@@ -989,7 +1002,7 @@ namespace DarkMoon {
     };
 
     struct FloatSlider : OptionSlider {
-        float currentValue;
+        float currentValue{};
 
         FloatSlider(
             glm::vec2 pos = { 0.0f, 0.0f },

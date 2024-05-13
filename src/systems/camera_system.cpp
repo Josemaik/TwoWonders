@@ -24,7 +24,6 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
         auto& phy = em.getComponent<PhysicsComponent>(playerEn);
         if (li.viewPoint == vec3d::zero())
         {
-
             cameraPos = phy.position + cameraPosSum;
             cameraTar = phy.position;
             cameraFovy = cameraFovyNormal;
@@ -33,9 +32,6 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
             {
                 if (!li.enemyPositions.empty())
                 {
-                    auto& player = *em.getEntityByID(li.playerID);
-                    auto& phy = em.getComponent<PhysicsComponent>(player);
-
                     // Calcular la posición media de los enemigos
                     double x{}, y{}, z{};
                     for (auto& e : li.enemyPositions)
@@ -135,32 +131,36 @@ void CameraSystem::update(EntityManager& em, GameEngine& ge, EventManager& evm)
     ge.setTargetCamera(newCameraTarget);
     ge.setFovyCamera(newCameraFovy);
 
-    if (elapsedFrutum >= limitFrustum)
-        updateFrustum(em, ge, newCameraPos, newCameraTarget, newCameraFovy);
-    else
-        elapsedFrutum += timeStep30;
+    updateFrustum(em, ge, newCameraPos, newCameraTarget, newCameraFovy);
 }
 
 void CameraSystem::updateFrustum(EntityManager& em, GameEngine& ge, vec3d& cameraPos, vec3d& cameraTar, float cameraFovy)
 {
-    elapsedFrutum = 0.0f;
-
     // Actualizamos el FrustumInfo de la cámara
     auto& frustum = em.getSingleton<FrustumInfo>();
     vec3f cameraUp = ge.getUpCamera().to_other<float>();
     float aspectRatio = ge.getAspectRat();
 
+    // Calculate the bounds of the orthographic projection
     float halfHeight = static_cast<float>(std::tan(((cameraFovy) / 2.0f) * DEGTORAD) * cameraPos.distance(cameraTar));
     float halfWidth = aspectRatio * halfHeight;
 
-    // Calculate the bounds of the orthographic projection
-    float left = -halfWidth;
-    float right = halfWidth;
-    float bottom = -halfHeight;
-    float top = halfHeight;
+    constexpr static float nearPlane = 0.1f;
+    constexpr static float farPlane = 1000.0f;
 
-    float nearPlane = 0.1f;
-    float farPlane = 100.0f;
+    frustum.setFrustum(-halfWidth, halfWidth, -halfHeight, halfHeight, nearPlane, farPlane, cameraPos.to_other<float>(), cameraTar.to_other<float>(), cameraUp);
 
-    frustum.setFrustum(left, right, bottom, top, nearPlane, farPlane, cameraPos.to_other<float>(), cameraTar.to_other<float>(), cameraUp);
+    using CMPs = MP::TypeList<>; // No components
+    using TAGs = MP::TypeList<>; // No tags
+
+    em.forEach<CMPs, TAGs>([&](Entity& e)
+    {
+        if (!e.hasTags(FrustOut{}) && e.hasComponent<ColliderComponent>())
+        {
+            auto& col = em.getComponent<ColliderComponent>(e);
+            frustum.bboxIn(e.getID(), col.bbox);
+        }
+        else
+            frustum.addToFrustum(e.getID());
+    });
 }

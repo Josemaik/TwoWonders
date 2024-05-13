@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <array>
-#include <set>
+#include <unordered_set>
 #include "../BBox.hpp"
 
 struct FrustumInfo
@@ -14,13 +14,6 @@ struct FrustumInfo
         RIGHT,
         TOP,
         BOTTOM
-    };
-
-    enum struct Position : uint8_t
-    {
-        INSIDE = 0,
-        OUTSIDE,
-        INTERSECT
     };
 
     struct Plane_t
@@ -38,13 +31,14 @@ struct FrustumInfo
 
     void setFrustum(float left, float right, float bottom, float top, float near, float far, vec3f const& pos, vec3f const& dir, vec3f const& up);
     void calculateCorners(vec3f pos, vec3f target, vec3f up, float fovy, float near, float far);
+    void addToFrustum(std::size_t id);
+    bool inFrustum(std::size_t id);
 
-    Position pointInFrustum(vec3f const& point) const;
-    Position pointInFrustum(vec3f const& point, float radius) const;
-    Position bboxIn(const BBox& bbox);
+    bool pointInFrustum(vec3f const& point) const;
+    bool pointInFrustum(vec3f const& point, float radius) const;
+    void bboxIn(std::size_t id, const BBox& bbox);
 
 private:
     std::array<Plane_t, 6> planes{};
-    std::set<const BBox*> fr_ents{};
-    std::set<const BBox*> outside_ents{};
+    std::unordered_set<std::size_t> frustSet{};
 };

@@ -360,6 +360,11 @@ namespace DarkMoon {
         return m_renderManager.m_camera->getMouseRay(GetMouseX(), GetMouseY(), m_windowsManager.getScreenWidth(), m_windowsManager.getScreenHeight());
     }
 
+    // Get view matrix
+    glm::mat4 DarkMoonEngine::GetViewMatrix() {
+        return m_renderManager.m_camera->getViewMatrix();
+    }
+
     // LIGHTS
 
     // Create point light in node
@@ -389,16 +394,25 @@ namespace DarkMoon {
     void DarkMoonEngine::UpdateLights(Node* parentNode) {
         m_renderManager.updateLights();
 
-        for (auto& child : parentNode->getChildren()) {
-            if (child->getVisible()) {
-                if (auto pLight = child->getEntity<PointLight>())
-                    m_renderManager.pointLights.push_back(pLight);
-                else if (auto dLight = child->getEntity<DirectionalLight>())
-                    m_renderManager.directionalLights.push_back(dLight);
-            }
-        }
+        AuxUpdateLights(parentNode);
 
         m_renderManager.checkLights();
+    }
+
+    // AuxUpdateLights
+    void DarkMoonEngine::AuxUpdateLights(Node* parentNode) {
+        for (auto& child : parentNode->getChildren()) {
+            if (auto pLight = child->getEntity<PointLight>()){
+                if (pLight->enabled)
+                    m_renderManager.pointLights.push_back(pLight);
+            }
+            else if (auto dLight = child->getEntity<DirectionalLight>()){
+                if (dLight->enabled)
+                    m_renderManager.directionalLights.push_back(dLight);
+            }
+            
+            AuxUpdateLights(child);
+        }
     }
 
     // ------------------------ //
@@ -738,6 +752,11 @@ namespace DarkMoon {
     // Set target FPS (max)
     void DarkMoonEngine::SetTargetFPS(int fps) {
         m_windowsManager.setTargetFPS(fps);
+    }
+
+    // Get target FPS
+    double DarkMoonEngine::GetTargetFPS() {
+        return m_windowsManager.getTargetFPS();
     }
 
     // Get time in seconds for last frame drawn

@@ -22,6 +22,11 @@ struct vec3D
         return { x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_ };
     }
 
+    constexpr vec3D operator+(DataT const s) const
+    {
+        return { x_ + s, y_ + s, z_ + s };
+    }
+
     constexpr vec3D operator-() const
     {
         return vec3D{ -x_, -y_, -z_ };
@@ -220,7 +225,7 @@ struct vec3D
         return false;
     }
 
-    DataT operator[](int i) const
+    DataT operator[](std::size_t i) const
     {
         if (i == 0)
             return x_;
@@ -327,6 +332,11 @@ struct vec3D
         archive(x_, y_, z_);
     }
 
+    constexpr vec3D<DataT> clamp(vec3D<DataT> const& min, vec3D<DataT> const& max) const
+    {
+        return vec3D<DataT>{ std::clamp(x_, min.x_, max.x_), std::clamp(y_, min.y_, max.y_), std::clamp(z_, min.z_, max.z_) };
+    }
+
     //Calculate point distance
     constexpr DataT calculatePointDistance(vec3D const& target) const {
         auto dx{ target.x_ - x_ };
@@ -339,6 +349,9 @@ struct vec3D
     vec3D<OtherT> to_other() const {
         return vec3D<OtherT>(static_cast<OtherT>(x_), static_cast<OtherT>(y_), static_cast<OtherT>(z_));
     }
+
+    DataT* begin() { return &x_; }
+    DataT* end() { return &z_ + 1; }
 
 private:
     DataT x_{}, y_{}, z_{};
@@ -375,11 +388,86 @@ struct vec2D
         return { x * rhs.x, y * rhs.y };
     }
 
+    constexpr vec2D operator-(vec2D const& rhs) const
+    {
+        return { x - rhs.x, y - rhs.y };
+    }
+
+    constexpr vec2D operator+(vec2D const& rhs) const
+    {
+        return { x + rhs.x, y + rhs.y };
+    }
+
+    constexpr vec2D operator/(vec2D const& rhs) const
+    {
+        return { x / rhs.x, y / rhs.y };
+    }
+
+    constexpr vec2D operator*(DataT const s) const
+    {
+        return { x * s, y * s };
+    }
+
+    constexpr vec2D operator/(DataT const s) const
+    {
+        return { static_cast<DataT>(x / s), static_cast<DataT>(y / s) };
+    }
+
     constexpr vec2D operator*=(vec2D const& rhs)
     {
         x *= rhs.x;
         y *= rhs.y;
         return *this;
+    }
+
+    constexpr vec2D operator/= (vec2D const& rhs)
+    {
+        x /= rhs.x;
+        y /= rhs.y;
+        return *this;
+    }
+
+    constexpr vec2D operator*=(DataT const s)
+    {
+        x *= s;
+        y *= s;
+        return *this;
+    }
+
+    constexpr vec2D operator/=(DataT const s)
+    {
+        x /= s;
+        y /= s;
+        return *this;
+    }
+
+    constexpr vec2D operator-= (vec2D const& rhs)
+    {
+        x -= rhs.x;
+        y -= rhs.y;
+        return *this;
+    }
+
+    constexpr DataT lengthSQ() const
+    {
+        return x * x + y * y;
+    }
+
+    constexpr double length() const
+    {
+        if (!length_)
+            length_ = std::sqrt(lengthSQ());
+        return *length_;
+    }
+
+    constexpr double distance(vec2D const& rhs) const
+    {
+        return (rhs - *this).length();
+    }
+
+    constexpr double dotProduct(vec2D const& rhs) const
+    {
+        return x * rhs.x + y * rhs.y;
     }
 
     // Función para pasar de double a float o de float a double
@@ -388,6 +476,13 @@ struct vec2D
         return vec2D<OtherT>(static_cast<OtherT>(x), static_cast<OtherT>(y));
     }
 
+    friend std::ostream& operator<<(std::ostream& os, vec2D const& v)
+    {
+        os << '(' << v.x << ", " << v.y << ')';
+        return os;
+    }
+
+    mutable std::optional<DataT> length_{};
     DataT x{}, y{};
 };
 

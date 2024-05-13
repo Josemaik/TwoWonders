@@ -164,7 +164,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
                 for (Entity& ent : ectx.em.getEntities()) {
                     // Comprobamos entidades Pared y que tengan colisión component
                     if (ent.hasComponent<ColliderComponent>()) {
-                        if (ent.hasTag<WallTag>()) {
+                        if (ent.hasTag<WallTag>() || ent.hasTag<LavaTag>()) {
                             auto& col = ectx.em.getComponent<ColliderComponent>(ent);
                             if (col.bbox.intersectsRay(ray.origin, ray.direction, intersection_wall)) {
                                 //col.boundingBox.intersectsRay(ray.origin, ray.direction,intersection_wall);
@@ -192,6 +192,8 @@ struct BTDecisionPlayerDetected : BTNode_t {
                     }
                     else {
                         // No hay obstáculo, eres detectado
+                        // realizar diferencia de altura
+                        // si eres golem o slime no puedes ser detectaddo al estar en diferentes nieveles de altura
                         ectx.ai->alert_state = false;
                         ectx.ai->playerdetected = true;
                         return BTNodeStatus_t::success;

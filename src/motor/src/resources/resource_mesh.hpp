@@ -53,8 +53,8 @@ namespace DarkMoon {
         //weights from each bone
         float m_Weights[MAX_NUM_BONES_PER_VERTEX];
 
-        void AddBoneata(uint BondeID , float weight){
-            for(uint i = 0; i < MAX_NUM_BONES_PER_VERTEX ; i++){
+        void AddBoneata(uint8_t BondeID , float weight){
+            for(uint8_t i = 0; i < MAX_NUM_BONES_PER_VERTEX ; i++){
                 if(m_Weights[i] == 0.0){
                     m_BonesIDs[i] = BondeID;
                     m_Weights[i] = weight;

@@ -4,9 +4,9 @@
 void PhysicsSystem::update(EntityManager& em)
 {
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy)
     {
-        if ((!e.hasTags(FrustOut{}) && frti.bboxIn(col.bbox) == FrustPos::OUTSIDE) || e.hasTag<EnemyDeathTag>())
+        if (!frti.inFrustum(e.getID()) || e.hasTag<EnemyDeathTag>())
             return;
 
         if (phy.notMove)
@@ -17,6 +17,7 @@ void PhysicsSystem::update(EntityManager& em)
                     phy.velocity = vec3d::zero();
                 else
                 {
+                    phy.prevPosition = phy.position;
                     phy.position += phy.velocity;
                 }
             }
@@ -98,16 +99,16 @@ void PhysicsSystem::update(EntityManager& em)
         }
 
         // Colocamos la posición
-        pos.setX((pos.x() + vel.x()));
-        pos.setY((pos.y() + vel.y()));
-        pos.setZ((pos.z() + vel.z()));
+        phy.prevPosition = pos;
+        pos += vel;
 
         if (!phy.stopped && (vel.x() != 0 || vel.z() != 0)) {
+            phy.prevOrientation = phy.orientation;
             phy.orientation = std::atan2(vel.x(), vel.z());
         }
 
         //Orientamos a enemigos hacia el player si están parados
-        if (e.hasTag<SpiderTag>() || e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()) {
+        if (e.hasTag<SpiderTag>() || e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>() || e.hasTag<SlimeTag>()) {
             if (e.hasComponent<AIComponent>())
             {
                 auto& ia = em.getComponent<AIComponent>(e);
@@ -119,6 +120,7 @@ void PhysicsSystem::update(EntityManager& em)
                 }
             }
         }
+
         //SONIDOS DE MOVIMIENTO
         auto& ss = em.getSingleton<SoundSystem>();
         if (e.hasTag<PlayerTag>()){
@@ -127,15 +129,16 @@ void PhysicsSystem::update(EntityManager& em)
             if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
                 ss.play_pasos();
                 playerWalking = true;
-                
+
             }
-            else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) &&  playerWalking)
+            else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) && playerWalking)
             {
                 playerWalking = false;
                 ss.SFX_pasos_stop();
             }
         }
         auto& li = em.getSingleton<LevelInfo>();
+
         if (e.hasTag<GolemTag>() ){
             
             auto& player = *em.getEntityByID(li.playerID);
@@ -186,7 +189,5 @@ void PhysicsSystem::update(EntityManager& em)
                 ia.ismoving = false;
             } 
         }
-        
-        // }
     });
 }

@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
+#include <random>
 #include "../utils/types.hpp"
 #include "../utils/vec3D.hpp"
 #include "../motor/src/darkmoon.hpp"
@@ -21,7 +22,9 @@ namespace ENGI {
 
         // Timing Related Functions
         void setTargetFPS(int fps);
+        double getTargetFPS();
         float getFrameTime();
+        double getFrameTimeDouble();
 
         // Drawing
         void beginDrawing();
@@ -36,9 +39,12 @@ namespace ENGI {
         void drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color);
 
         void drawNode(Node* node, vec2i pos = { -1, -1 }, vec2f scale = { 1.0f, 1.0f });
-        void drawCircle(int posX, int posY, float radius, Color color);
         void drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color);
         void drawTriangle(vec2d v1, vec2d v2, vec2d v3, Color color);
+
+        // Circle
+        Node* drawCircle(vec2i position, float radius, int segments, Color color);
+        Node* createCircle(vec2i position, float radius, int segments, Color color, const char* nodeName, Node* parentNode);
 
         // Rectangle
         Node* drawRectangle(vec2i pos, vec2i size, Color color);
@@ -91,9 +97,9 @@ namespace ENGI {
         void activateLights();
         void deactivateLights();
 
-        // Puntual Light
-        Node* drawPuntualLight(vec3d position, Color color);
-        Node* createPuntualLight(vec3d position, Color color, const char* nodeName, Node* parentNode);
+        // Point Light
+        Node* drawPointLight(vec3d position, Color color);
+        Node* createPointLight(vec3d position, Color color, const char* nodeName, Node* parentNode);
 
         // Window
         void initWindow(int width, int height, const char* title);
@@ -115,6 +121,7 @@ namespace ENGI {
         vec3d getTargetCamera();
         vec3d getUpCamera();
         float getFovyCamera();
+        glm::mat4 getViewMatrix();
 
         // Input Handling
         bool isKeyPressed(int key);
@@ -148,6 +155,21 @@ namespace ENGI {
         Font* getDefaultFont();
         void traverseRoot();
         void nodeClear(Node* node);
+        template<typename T>
+        T getRandomValue(T min, T max)
+        {
+            static std::random_device rd; // obtiene una semilla aleatoria para el generador
+            static std::mt19937 generator(rd()); // usa Mersenne twister para generar números aleatorios
+
+            if constexpr (std::is_integral<T>::value) {
+                std::uniform_int_distribution<T> distribution(min, max); // distribución uniforme entre min y max para enteros
+                return distribution(generator);
+            }
+            else if constexpr (std::is_floating_point<T>::value) {
+                std::uniform_real_distribution<T> distribution(min, max); // distribución uniforme entre min y max para flotantes
+                return distribution(generator);
+            }
+        }
 
         // DarkMoon Engine //
 

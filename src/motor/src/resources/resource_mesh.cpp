@@ -75,6 +75,7 @@ namespace DarkMoon {
         RenderManager& rm = RenderManager::getInstance();
 
         rm.beginMode3D();
+        glEnable(GL_CULL_FACE);
 
         // Set the uniform color in the shader
         GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
@@ -111,6 +112,7 @@ namespace DarkMoon {
         glActiveTexture(GL_TEXTURE0);
 
         rm.endMode3D();
+        glDisable(GL_CULL_FACE);
     }
 
     void Mesh::drawLines(glm::mat4 transMatrix, Color color) {
