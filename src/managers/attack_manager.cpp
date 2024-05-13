@@ -108,8 +108,7 @@ void AttackManager::createAttackType(EntityManager& em, Entity& ent, AttackType 
         auto& plfi = em.getSingleton<PlayerInfo>();
         if (plfi.armor < plfi.max_armor)
             plfi.armor = plfi.max_armor;
-
-        plfi.currentSpell = plfi.noSpell;
+        em.getSingleton<SoundSystem>().sonido_h_escudo();
         break;
     }
     case AttackType::MeteoritePlayer:
