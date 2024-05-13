@@ -54,6 +54,14 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             {
                 em.getSingleton<SoundSystem>().sonido_munyeco_danyo();
             }
+            else if (ent.hasTag<SlimeTag>())
+            {
+                em.getSingleton<SoundSystem>().sonido_slime_danyo();
+            }
+            else if (ent.hasTag<SpiderTag>()) 
+            {
+
+            }
 
             lif.lifeLost = 0;
         }
@@ -104,6 +112,10 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             if (ent.hasTag<SnowmanTag>()) {
                 if (!lif.decreaseNextFrame)
                     em.getSingleton<SoundSystem>().sonido_munyeco_muere();
+            }
+            if (ent.hasTag<SlimeTag>()) {
+                if (!lif.decreaseNextFrame)
+                    em.getSingleton<SoundSystem>().sonido_slime_muere();
             }
 
             //Si es una bala
