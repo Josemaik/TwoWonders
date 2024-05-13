@@ -6,10 +6,10 @@ struct BBox
     vec3d min{};
     vec3d max{};
 
-    BBox() = default;
+    constexpr BBox() = default;
 
     // Constructor de bounding box a partir de un centro un tamaño
-    BBox(const vec3d& center, const vec3d& size)
+    constexpr BBox(const vec3d& center, const vec3d& size)
     {
         min = center - size / 2.0;
         max = center + size / 2.0;

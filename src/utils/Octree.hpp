@@ -20,8 +20,10 @@ struct Octree
     std::size_t hash(const vec3d& point) const;
     void insert(Entity& entity, ColliderComponent& collider);
     void subdivide();
-    bool isNeighbor(Octree* node);
+    bool isBalanced();
+    void rebalance();
     void clear();
+    void setBounds(const BBox& bounds) { bounds_ = bounds; }
     std::size_t countEntities() const;
 
     // Funciones en desuso
@@ -60,11 +62,8 @@ struct Octree
     // Función que nos devuelve el número máximo de entidades en el nodo
     [[nodiscard]] std::size_t getMaxEntities() const noexcept { return max_ent_; }
 
-    // Función que devuelve el id del nodo
-    [[nodiscard]] std::size_t getId() const noexcept { return id_; }
-
-    static const std::size_t MAX_ENTITIES = 40;
-    static constexpr std::array<vec3d, 8> offsets =
+    inline static const std::size_t MAX_ENTITIES = 40;
+    inline static constexpr std::array<vec3d, 8> offsets =
     {
         vec3d(-0.5, -0.5, -0.5),
         vec3d(0.5, -0.5, -0.5),
@@ -76,17 +75,12 @@ struct Octree
         vec3d(0.5, 0.5, 0.5)
     };
 
-    static const std::array<std::vector<std::size_t>, 8> faceSharingNeighbors;
-    static const std::array<std::vector<std::size_t>, 8> sameHeightNeighbors;
-
 private:
-    OctMap octEntities_;
+    OctMap octEntities_{};
     OctType octants_{};
-    std::unordered_map<std::size_t, BBox> nullOcts;
     BBox bounds_{};
     uint8_t depth_{};
-    bool divided_ = false;
-    Octree* parent_;
+    bool divided_{ false };
+    Octree* parent_{ nullptr };
     std::size_t max_ent_{ MAX_ENTITIES };
-    std::size_t id_;
 };

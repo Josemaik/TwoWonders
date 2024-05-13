@@ -7,7 +7,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 30.0, 13.0, 213.0 };
+        plfi.spawnPoint = { -65.0, 13.0, 104.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial lvl0
     // 32.0, 4.0, 43.0 - Primer cofre lvl0
@@ -228,6 +228,7 @@ void Game::run()
             {
                 li.mapID = li.mapToLoad;
                 map.changeMap(em, li.mapID, iam);
+                collision_system.updateOctreeSize(li.mapID);
                 li.mapToLoad = li.u8max;
             }
 
@@ -236,6 +237,7 @@ void Game::run()
                 if (!li.isCharging() && li.loading)
                 {
                     li.loadingTime = 0;
+                    collision_system.updateOctreeSize(li.mapID);
                     if (!li.replay)
                     {
                         auto& gami = em.getSingleton<GameData>();
@@ -388,6 +390,7 @@ void Game::resetGame()
     plfi.reset();
     lock_system.reset();
     render_system.resetAnimatedTexture();
+    collision_system.updateOctreeSize(li.mapID);
     map.reset(em, li.mapID, iam);
     createEntities();
 }

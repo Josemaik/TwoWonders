@@ -57,7 +57,7 @@ void CollisionSystem::checkCollision(EntityManager& em, Octree& octant)
         for (auto& octant : octant.getOctants())
         {
             // Si el octante tiene entidades o está dividido, revisar sus colisiones
-            if (octant && (octant.get()->getNumEntities() > 0 || octant.get()->isDivided()))
+            if (octant.get()->getNumEntities() > 0 || octant.get()->isDivided())
                 checkCollision(em, *octant);
         }
         return;
@@ -928,6 +928,11 @@ void CollisionSystem::resetCollisionsMatrix()
 {
     for (auto& row : checkedPairs)
         std::fill(row.begin(), row.end(), false);
+}
+
+void CollisionSystem::updateOctreeSize(uint8_t size)
+{
+    octree.setBounds(octreeSizes[static_cast<std::size_t>(size)]);
 }
 
 // Función para que no se salgan de los bordes, no se usa
