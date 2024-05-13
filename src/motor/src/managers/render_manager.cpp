@@ -49,6 +49,11 @@ namespace DarkMoon {
 
             // Directional Lights //
 
+            std::cout << "-----------------------------\n";
+            std::cout << "Luces direccionales: " << directionalLights.size() << "\n";
+            std::cout << "Luces puntuales: " << pointLights.size() << "\n";
+            std::cout << "Luces focales: " << spotLights.size() << "\n";
+
             if(!directionalLights.empty()){
                 for(int i=0; i<static_cast<int>(directionalLights.size()); i++){
                     std::string directionUniformName  = "gDirectionalLight.direction";

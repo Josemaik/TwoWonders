@@ -10,7 +10,7 @@ namespace DarkMoon {
         Color color = D_WHITE;
         bool enabled = { true };
         float ambientIntensity = { 1.0f };
-        float diffuseIntensity = { 0.5f };
+        float diffuseIntensity = { 1.0f };
 
         Light(Color c)
             : color(c) {};
