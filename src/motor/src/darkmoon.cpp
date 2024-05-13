@@ -339,6 +339,20 @@ namespace DarkMoon {
         return p_nodeModel;
     }
 
+    // Create billboard in node
+    Node* DarkMoonEngine::CreateBillboard(const char* filePath, glm::vec3 position, const char* nodeName, Node* parentNode){
+        auto p_nodeBillboard = CreateNode(nodeName, parentNode);
+
+        // Load Texture
+        auto texture = LoadTexture2D(filePath);
+
+        // Load Billboard
+        auto billboard = std::make_unique<Billboard>(texture, position);
+        p_nodeBillboard->setEntity(std::move(billboard));
+
+        return p_nodeBillboard;
+    }
+
     // EXTRA
 
     // Create camera in node
@@ -463,6 +477,7 @@ namespace DarkMoon {
             m_renderManager.shaders["3D"] = LoadShader("shader3D", "assets/shaders/3D.vs", "assets/shaders/3D.fs");
             m_renderManager.shaders["text"] = LoadShader("shaderText", "assets/shaders/text.vs", "assets/shaders/text.fs");
             m_renderManager.shaders["lights"] = LoadShader("shaderLights", "assets/shaders/lights.vs", "assets/shaders/lights.fs");
+            m_renderManager.shaders["billboard"] = LoadShader("shaderBillboard", "assets/shaders/billboard.vs", "assets/shaders/billboard.fs", "assets/shaders/billboard.gs");
 
             //----- Font -----//
             m_renderManager.defaultFont = LoadFont("assets/fonts/Capriola-Regular.ttf");
@@ -742,8 +757,8 @@ namespace DarkMoon {
     }
 
     // Load shader from file into GPU memory
-    Shader* DarkMoonEngine::LoadShader(const char* idShader, const char* vsFilePath, const char* fsFilePath) {
-        return m_resourceManager.loadResource<Shader>(idShader, vsFilePath, fsFilePath);
+    Shader* DarkMoonEngine::LoadShader(const char* idShader, const char* vsFilePath, const char* fsFilePath, const char* gsFilePath) {
+        return m_resourceManager.loadResource<Shader>(idShader, vsFilePath, fsFilePath, gsFilePath);
     }
 
     // Unload shader from CPU and GPU

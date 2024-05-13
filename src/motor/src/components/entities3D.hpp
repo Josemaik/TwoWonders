@@ -6,6 +6,7 @@
 #include <vector>
 #include <GL/gl.h>
 #include <glm/glm.hpp>
+
 namespace DarkMoon {
     struct Point3D : Entity {
         glm::vec3 position;
@@ -577,5 +578,49 @@ namespace DarkMoon {
 
             rm.endMode3D();
         };
+    };
+
+    struct Billboard : Entity {
+    private:
+        GLuint m_VAO {}, m_VBO {};
+    public:
+        Texture* texture = { nullptr };
+        glm::vec3 position {};
+        Color color = { D_WHITE };
+        
+        Billboard(Texture* text, glm::vec3 pos)
+            : texture(text), position(pos) {
+                // Create Positions Buffer
+                glGenVertexArrays(1, &m_VAO);
+                glBindVertexArray(m_VAO);
+
+                glGenBuffers(1, &m_VBO);
+                glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(position), &position, GL_STATIC_DRAW);
+
+                glEnableVertexAttribArray(0);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0); // position
+
+                glBindVertexArray(0);
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+            };
+
+        ~Billboard(){
+            glDeleteBuffers(1, &m_VBO);
+            glDeleteVertexArrays(1, &m_VAO);
+        }
+
+        void draw(glm::mat4 ) override {
+            RenderManager& rm = RenderManager::getInstance();
+
+            rm.beginMode3D();
+
+            rm.useShader(rm.shaders["billboard"]);
+
+            glBindTexture(GL_TEXTURE_2D, rm.defaultMaterial->texture->getIDTexture());
+
+
+            rm.endMode3D();
+        }
     };
 }

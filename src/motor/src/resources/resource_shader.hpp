@@ -15,7 +15,7 @@
 namespace DarkMoon {
     struct Shader : public Resource {
     public:
-        Shader(std::size_t, const char*, const char*);
+        Shader(std::size_t id, const char* vertexPath = "", const char* fragmentPath = "", const char* geometryPath = "");
         ~Shader() { unload(); };
 
         void use();
@@ -28,8 +28,9 @@ namespace DarkMoon {
 
     private:
         GLuint m_idShader;
-        const char* m_vertexPath;
-        const char* m_fragmentPath;
+        std::string m_vertexPath;
+        std::string m_fragmentPath;
+        std::string m_geometryPath;
 
         void setup() override;
     };
