@@ -279,6 +279,8 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         if (atc.isAttackReady()) {
             if ((ge.isKeyDown(in.spell1) || ge.isGamepadButtonPressed(0, in.m_spell1)) && plfi.spellSlots[0] != plfi.noSpell)
             {
+                if (plfi.spellSlots[0].cost > plfi.mana)
+                    return;
                 pmc.active = true;
                 playerSpelled = true;
                 plfi.currentSpell = plfi.spellSlots[0];
@@ -286,6 +288,8 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             }
             else if ((ge.isKeyDown(in.spell2) || ge.isGamepadButtonPressed(0, in.m_spell2)) && plfi.spellSlots[1] != plfi.noSpell)
             {
+                if (plfi.spellSlots[1].cost > plfi.mana)
+                    return;
                 pmc.active = true;
                 playerSpelled = true;
                 plfi.currentSpell = plfi.spellSlots[1];
@@ -293,6 +297,8 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             }
             else if ((ge.isKeyDown(in.spell3) || ge.isGamepadButtonPressed(0, in.m_spell3)) && plfi.spellSlots[2] != plfi.noSpell)
             {
+                if (plfi.spellSlots[2].cost > plfi.mana)
+                    return;
                 pmc.active = true;
                 playerSpelled = true;
                 plfi.currentSpell = plfi.spellSlots[2];
@@ -308,17 +314,18 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
                     plfi.mana = 0;
             }
         }
-      
+
         if (pmc.active) {
-                elapsedParticle -= ge.getFrameTime();
-                if (elapsedParticle < 0) {
-                    pmc.active = false;
-                    elapsedParticle = elapsedParticleLimit;
-                }
+            elapsedParticle -= ge.getFrameTime();
+            if (elapsedParticle < 0) {
+                pmc.active = false;
+                pmc.particles.clear();
+                elapsedParticle = elapsedParticleLimit;
             }
+        }
 
         // Vamos sumando maná poco a poco
-        if (plfi.mana < plfi.max_mana && playerSpelled)
+        if (!playerSpelled && plfi.mana < plfi.max_mana)
         {
             if (!plfi.hasHat)
                 plfi.mana += .07;

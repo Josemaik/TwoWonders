@@ -20,16 +20,16 @@ namespace DarkMoon {
 
     int Node::removeChild(Node* child) {
         auto it = std::find_if(m_children.begin(), m_children.end(),
-                        [child](const std::unique_ptr<Node>& node) {
-                            return node.get() == child;
-                        });
+            [child](const std::unique_ptr<Node>& node) {
+            return node.get() == child;
+        });
 
         if (it != m_children.end()) {
             (*it)->m_parent = nullptr;
             m_children.erase(it);
             return 0; // Éxito
         }
-        return -1; 
+        return -1;
     }
 
     void Node::setVisible(bool visible) {
@@ -45,7 +45,7 @@ namespace DarkMoon {
             m_parent->setVisibleOne(visible);
     }
 
-    void Node::destroy(){
+    void Node::destroy() {
         if (m_parent)
             m_parent->removeChild(this);
     }

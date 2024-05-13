@@ -115,7 +115,7 @@ void ParticleSystem::update(EntityManager& em)
                 p.remainingLife -= timeStep;
                 if (p.remainingLife <= 0.f)
                 {
-                    if (pmc.effect != Effects::WATER && pmc.effect != Effects::FIREBALL)
+                    if (pmc.effect != Effects::WATER && pmc.effect != Effects::FIREBALL && pmc.effect != Effects::PLAYER)
                         p.position = p.initialPos;
                     else
                         p.position = phy.position.to_other<float>();

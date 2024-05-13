@@ -17,7 +17,7 @@ struct InputSystem
 
 private:
     float elapsedLockInLimit{ 1.0f }, elapsedLockIn{ elapsedLockInLimit };
-    float elapsedParticleLimit{ 1.5f }, elapsedParticle{ elapsedParticleLimit };
+    float elapsedParticleLimit{ .5f }, elapsedParticle{ elapsedParticleLimit };
     bool playerSpelled{ false };
 };
 
