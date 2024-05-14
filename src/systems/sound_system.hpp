@@ -24,6 +24,9 @@ struct SoundSystem {
     void recoger_mana();
     void sonido_mov();
     void sonido_salir();
+
+    FMOD_STUDIO_EVENTINSTANCE* createNewEventInstance();
+
    
     void sonido_abrir_cofre();
     void sonido_abrir_puerta();
@@ -70,7 +73,7 @@ struct SoundSystem {
     void sonido_h_bola_fuego();     
     void sonido_amb_volcan();       
     void sonido_pasos_volcan();     
-    void sonido_golem_mov();        //por mejorar 
+    void sonido_golem_mov( FMOD_STUDIO_EVENTINSTANCE*& sonido);        //por mejorar 
     void sonido_golem_ataque();     
     void sonido_golem_danyo();      
     void sonido_golem_muere();      
@@ -151,7 +154,7 @@ struct SoundSystem {
     void music_stop_level();
     void ambient_stop();
     void SFX_pasos_stop();
-    void stop_golem_mov();
+    void stop_golem_mov( FMOD_STUDIO_EVENTINSTANCE* sonido);
     void stop_munyeco_mov();
     void stop_pasos();
 

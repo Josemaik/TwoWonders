@@ -29,6 +29,7 @@
 #include "../components/projectile_component.hpp"
 #include "../components/object_component.hpp"
 #include "../components/zone_component.hpp"
+#include "../components/sound_component.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
 #include "../utils/Item.hpp"
@@ -156,7 +157,8 @@ using CL = MP::TypeList <
     BoatComponent,
     ParticleMakerComponent,
     SpawnComponent,
-    PointLightComponent
+    PointLightComponent,
+    SoundComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,
