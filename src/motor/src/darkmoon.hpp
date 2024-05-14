@@ -280,5 +280,6 @@ namespace DarkMoon {
         RenderManager& m_renderManager = RenderManager::getInstance();
         WindowsManager& m_windowsManager = WindowsManager::getInstance();
         ResourceManager& m_resourceManager = ResourceManager::getInstance();
+        AnimationManager& m_animationManager = AnimationManager::getInstance();
     };
 }

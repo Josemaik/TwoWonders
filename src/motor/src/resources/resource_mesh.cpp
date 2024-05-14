@@ -59,11 +59,11 @@ namespace DarkMoon {
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, textCoords));
         // Enable and specify bones ids
         glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3,MAX_NUM_BONES_PER_VERTEX,GL_INT, GL_FALSE,sizeof(Vertex) , (void*)offsetof(Vertex, m_BonesIDs));
+        glVertexAttribPointer(3, MAX_NUM_BONES_PER_VERTEX, GL_INT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_BonesIDs));
         //weights
         glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4,MAX_NUM_BONES_PER_VERTEX,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)offsetof(Vertex,m_Weights));
-        
+        glVertexAttribPointer(4, MAX_NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_Weights));
+
         // Unbind vertex array
         glBindVertexArray(0);
 
@@ -72,13 +72,10 @@ namespace DarkMoon {
     }
 
     void Mesh::draw(glm::mat4 transMatrix, Color color) {
-        for(auto& ver : vertices){
-            std::cout << "BEFORE: posvertex: " <<"(" << ver.position.x << "," << ver.position.y << "," << ver.position.z << ") \n";
-        }
+        // for (auto& ver : vertices) {
+        //     std::cout << "BEFORE: posvertex: " << "(" << ver.position.x << "," << ver.position.y << "," << ver.position.z << ") \n";
+        // }
         RenderManager& rm = RenderManager::getInstance();
-        animator_manager& am = animator_manager::getInstance();
-
-
         rm.beginMode3D();
 
         // Set the uniform color in the shader
@@ -105,7 +102,7 @@ namespace DarkMoon {
         if (!material->texture)
             material->texture = rm.defaultMaterial->texture;
         glBindTexture(GL_TEXTURE_2D, material->texture->getIDTexture());
-        
+
         // Material
         glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Kd"), 1, glm::value_ptr(material->getDiffuseColor()));
         glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ka"), 1, glm::value_ptr(material->getAmbientColor()));
@@ -122,9 +119,9 @@ namespace DarkMoon {
         glActiveTexture(GL_TEXTURE0);
 
         rm.endMode3D();
-        for(auto& ver : vertices){
-            std::cout << "AFTER: posvertex: " <<"(" << ver.position.x << "," << ver.position.y << "," << ver.position.z << ") \n";
-        }
+        // for(auto& ver : vertices){
+        //     std::cout << "AFTER: posvertex: " <<"(" << ver.position.x << "," << ver.position.y << "," << ver.position.z << ") \n";
+        // }
     }
 
     void Mesh::drawLines(glm::mat4 transMatrix, Color color) {

@@ -26,22 +26,22 @@
 namespace DarkMoon {
     struct RenderManager {
     private:
-        Shader* m_shaderProgram {};
-        int m_width {}, m_height {};
+        Shader* m_shaderProgram{};
+        int m_width{}, m_height{};
 
     public:
-        Camera* m_camera {};
-        Material* defaultMaterial {};
-        Font* defaultFont {};
-        std::vector<Light*> lights {};
+        Camera* m_camera{};
+        Material* defaultMaterial{};
+        Font* defaultFont{};
+        std::vector<Light*> lights{};
 
-        std::vector<PointLight*> pointLights {};
-        std::vector<DirectionalLight*> directionalLights {};
+        std::vector<PointLight*> pointLights{};
+        std::vector<DirectionalLight*> directionalLights{};
 
         // Shaders
         std::map<std::string, Shader*> shaders;
 
-        bool activeLights { false };
+        bool activeLights{ false };
         void updateLights();
         void checkLights();
 

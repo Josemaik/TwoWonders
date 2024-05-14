@@ -54,19 +54,19 @@ namespace DarkMoon {
         //weights from each bone
         float m_Weights[MAX_NUM_BONES_PER_VERTEX];
 
-        void AddBoneata(uint BondeID , float weight){
-            for(uint i = 0; i < MAX_NUM_BONES_PER_VERTEX ; i++){
-                if(m_Weights[i] == 0.0){
+        void AddBoneata(uint BondeID, float weight) {
+            for (uint i = 0; i < MAX_NUM_BONES_PER_VERTEX; i++) {
+                if (m_Weights[i] == 0.0) {
                     m_BonesIDs[i] = BondeID;
                     m_Weights[i] = weight;
                     return;
                 }
-            }  
+            }
             //si salta, aumentar ,max_nume_bones_per_vertex
             assert(0);
         }
     };
-    
+
     struct Mesh : public Resource {
     public:
         // Mesh data
@@ -74,6 +74,7 @@ namespace DarkMoon {
         std::vector<uint16_t> indices;
         //std::vector<VertexBoneData>num_bones{};
         Material* material;
+        AnimationManager& am = AnimationManager::getInstance();
 
         Mesh(std::size_t, std::vector<Vertex>, std::vector<uint16_t>, Material*);
         ~Mesh() { unload(); };

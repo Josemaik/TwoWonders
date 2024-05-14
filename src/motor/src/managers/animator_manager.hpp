@@ -3,9 +3,11 @@
 #include "../utils/animation.hpp"
 
 
-struct animator_manager
+struct AnimationManager
 {
-    animator_manager(animation* currentAnimation)
+    AnimationManager() = default;
+
+    void setCurrentAnimation(animation* currentAnimation)
     {
         m_CurrentTime = 0.0;
         m_CurrentAnimation = currentAnimation;
@@ -15,7 +17,7 @@ struct animator_manager
         for (int i = 0; i < 100; i++)
             m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
     }
-	
+
     void UpdateAnimation(float dt)
     {
         m_DeltaTime = dt;
@@ -27,13 +29,13 @@ struct animator_manager
             CalculateBoneTransform(&m_CurrentAnimation->GetRootNode(), glm::mat4(1.0f));
         }
     }
-	
+
     void PlayAnimation(animation* pAnimation)
     {
         m_CurrentAnimation = pAnimation;
         m_CurrentTime = 0.0f;
     }
-	
+
     void CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform)
     {
         std::string nodeName = node->name;
@@ -45,9 +47,9 @@ struct animator_manager
         //     }
         //     std::cout << "\n";
         // }
-	
+
         bone* Bone = m_CurrentAnimation->FindBone(nodeName);
-	
+
         if (Bone)
         {
             Bone->Update(m_CurrentTime);
@@ -60,9 +62,9 @@ struct animator_manager
             //     std::cout << "\n";
             // }
         }
-	
+
         glm::mat4 globalTransformation = parentTransform * nodeTransform;
-	
+
         auto boneInfoVector = m_CurrentAnimation->GetBonesVector();
         for (auto& boneInfo : boneInfoVector) {
             if (boneInfo.GetBoneName() == nodeName) {
@@ -89,24 +91,27 @@ struct animator_manager
         for (int i = 0; i < node->childrenCount; i++)
             CalculateBoneTransform(&node->children[i], globalTransformation);
     }
-	
-    std::vector<glm::mat4> GetFinalBoneMatrices() 
-    { 
-        return m_FinalBoneMatrices;  
+
+    std::vector<glm::mat4> GetFinalBoneMatrices()
+    {
+        return m_FinalBoneMatrices;
     }
 
-    
-
-    static animator_manager& getInstance() {
-            static animator_manager instance;
-            return instance;
+    void AddAnimation(animation* newAnimation)
+    {
+        m_Animations.push_back(newAnimation);
     }
-		
+
+    static AnimationManager& getInstance() {
+        static AnimationManager instance;
+        return instance;
+    }
+
 private:
-    animator_manager() = default;
 
     std::vector<glm::mat4> m_FinalBoneMatrices;
+    std::vector<animation*> m_Animations;
     animation* m_CurrentAnimation;
     float m_CurrentTime;
-    float m_DeltaTime;	
+    float m_DeltaTime;
 };

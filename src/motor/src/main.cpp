@@ -178,7 +178,7 @@ int main() {
         auto modelcharacter = dynamic_cast<DarkMoon::Model*>(mainCharacter->getEntity());
         auto boneInfoMap = modelcharacter->getboneInfoMap();
         // int count = modelcharacter->getBoneCount();
-        animation crusheranimation("assets/Apisonadora/Apisonadora.fbx",boneInfoMap);
+        animation crusheranimation("assets/Apisonadora/Apisonadora.fbx", boneInfoMap);
         // auto m_bones = crusheranimation.GetBonesVector();
         // for(auto& bone : m_bones){
         //     std::string boneName = bone.GetBoneName();
@@ -190,7 +190,8 @@ int main() {
         // crusheranimation.m_Bones
         // crusheranimation.m_Bones.push_back(bone(channel->mNodeName.data,
         //         boneInfoMap[channel->mNodeName.data].id, channel));
-        animator_manager animator(&crusheranimation);
+        auto& am = AnimationManager::getInstance();
+        am.setCurrentAnimation(&crusheranimation);
         //         auto textBox = createHUD(engine);
 
                 //auto textBoxEntity = dynamic_cast<DarkMoon::TextBox*>(textBox->getEntity());
@@ -220,7 +221,7 @@ int main() {
             inputManager(engine, mainCharacter);
 
             //textBoxEntity->text.text = std::to_string(engine.GetFPS());            
-            animator.UpdateAnimation(deltatime);
+            am.UpdateAnimation(deltatime);
             // Draw
 
             engine.BeginDrawing();
