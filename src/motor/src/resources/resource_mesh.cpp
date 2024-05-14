@@ -63,6 +63,12 @@ namespace DarkMoon {
         //weights
         glEnableVertexAttribArray(4);
         glVertexAttribPointer(4, MAX_NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_Weights));
+        // Enable and specify tangent
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
+        // Enable and specify bitangent
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, BiTangent));
 
         // Unbind vertex array
         glBindVertexArray(0);
@@ -93,9 +99,21 @@ namespace DarkMoon {
         glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         auto transforms = am.GetFinalBoneMatrices();
+        for (std::size_t i = 0; i < transforms.size(); i++) {
+            for (int j = 0; j < 4; j++) {
+                for (int k = 0; k < 4; k++) {
+                    std::cout << transforms[i][j][k] << " ";
+                }
+                std::cout << "\n";
+            }
+            std::cout << "\n";
+        }
+
+        auto& shaders = rm.shaders;
+
         for (std::size_t i = 0; i < transforms.size(); ++i) {
             std::string uniformName = "finalBonesMatrices[" + std::to_string(i) + "]";
-            glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), uniformName.c_str()), 1, GL_FALSE, glm::value_ptr(transforms[i]));
+            glUniformMatrix4fv(glGetUniformLocation(shaders["3D"]->getIDShader(), uniformName.c_str()), 1, GL_FALSE, glm::value_ptr(transforms[i]));
         }
 
         // Texture

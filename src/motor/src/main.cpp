@@ -176,9 +176,10 @@ int main() {
         createScene3D(engine);
         auto mainCharacter = createMainCharacter(engine);
         auto modelcharacter = dynamic_cast<DarkMoon::Model*>(mainCharacter->getEntity());
-        auto boneInfoMap = modelcharacter->getboneInfoMap();
+        auto& boneInfoMap = modelcharacter->getboneInfoMap();
+        auto& boneCount = modelcharacter->getBoneCount();
         // int count = modelcharacter->getBoneCount();
-        animation crusheranimation("assets/Apisonadora/Apisonadora.fbx", boneInfoMap);
+        animation crusheranimation("assets/Apisonadora/Apisonadora.fbx", boneInfoMap, boneCount);
         // auto m_bones = crusheranimation.GetBonesVector();
         // for(auto& bone : m_bones){
         //     std::string boneName = bone.GetBoneName();
@@ -205,16 +206,22 @@ int main() {
 
         //scene3D->getParent()->removeChild(scene3D);
 
-        std::cout << "┌──────┐" << std::endl;
-        std::cout << "│ Tree │" << std::endl;
-        std::cout << "└──────┘" << std::endl;
-        engine.GetRootNode()->drawTree();
+        // std::cout << "┌──────┐" << std::endl;
+        // std::cout << "│ Tree │" << std::endl;
+        // std::cout << "└──────┘" << std::endl;
+        // engine.GetRootNode()->drawTree();
+        bool a = false;
 
         while (!engine.WindowShouldClose()) {
 
             // float currentframe = glfwGetTime();
             // float deltatime = currentframe - lastframe;
             float deltatime = static_cast<float>(engine.GetFrameTime());
+            if (!a)
+            {
+                am.PlayAnimation(&crusheranimation);
+                a = true;
+            }
 
             // Logic
 

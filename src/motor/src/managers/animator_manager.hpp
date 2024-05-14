@@ -12,10 +12,8 @@ struct AnimationManager
         m_CurrentTime = 0.0;
         m_CurrentAnimation = currentAnimation;
 
-        m_FinalBoneMatrices.reserve(100);
-
-        for (int i = 0; i < 100; i++)
-            m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
+        // for (int i = 0; i < 100; i++)
+        //     m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
     }
 
     void UpdateAnimation(float dt)
@@ -52,11 +50,11 @@ struct AnimationManager
 
         if (Bone)
         {
+            std::cout << "name: " << Bone->GetBoneName() << "\n";
             Bone->Update(m_CurrentTime);
             nodeTransform = Bone->GetLocalTransform();
-            //  std::cout << "name: " << Bone->GetBoneName() << "\n";
-            //  for(int i = 0; i < 4; i++){
-            //     for(int j = 0; j < 4; j++){
+            // for (int i = 0; i < 4; i++) {
+            //     for (int j = 0; j < 4; j++) {
             //         std::cout << nodeTransform[i][j] << " ";
             //     }
             //     std::cout << "\n";
@@ -92,7 +90,7 @@ struct AnimationManager
             CalculateBoneTransform(&node->children[i], globalTransformation);
     }
 
-    std::vector<glm::mat4> GetFinalBoneMatrices()
+    std::map<std::size_t, glm::mat4> GetFinalBoneMatrices()
     {
         return m_FinalBoneMatrices;
     }
@@ -109,7 +107,7 @@ struct AnimationManager
 
 private:
 
-    std::vector<glm::mat4> m_FinalBoneMatrices;
+    std::map<std::size_t, glm::mat4> m_FinalBoneMatrices{};
     std::vector<animation*> m_Animations;
     animation* m_CurrentAnimation;
     float m_CurrentTime;
