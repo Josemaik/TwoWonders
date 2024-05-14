@@ -498,8 +498,6 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
             {
                 li.currentScreen = GameScreen::STORY;
                 li.anyButtonPressed = false;
-                
-                
             }
             else
                 inpi.pause = false;
@@ -1008,9 +1006,45 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 }
             }
         }
+        else if (e.hasTag<GroundTag>() && e.hasComponent<GrassComponent>())
+        {
+            drawGrass(engine, r, em.getComponent<GrassComponent>(e));
+        }
     });
 
     // engine.activateLights();
+}
+
+void RenderSystem::drawGrass(GameEngine& engine, RenderComponent& ren, GrassComponent& grc)
+{
+    // TODO implementar textura con billboards
+    vec3d surfaceMax = ren.position + ren.scale / 2;
+    if (!grc.created)
+    {
+        // Conseguimos 20 posiciones random que estén entre la x y la z de la superficie
+        vec3d surfaceMin = ren.position - ren.scale / 2;
+
+        for (auto& grass : grc.grass)
+        {
+            double x = engine.getRandomValue(surfaceMin.x(), surfaceMax.x());
+            double z = engine.getRandomValue(surfaceMin.z(), surfaceMax.z());
+            double wiggleX = engine.getRandomValue(-0.5, 0.5);
+            double wiggleZ = engine.getRandomValue(-0.5, 0.5);
+            double y = engine.getRandomValue(1.0, 3.0);
+
+            grass.startPos = { x, surfaceMax.y(), z };
+            grass.endPos = { x + wiggleX, surfaceMax.y() + y, z + wiggleZ };
+        }
+
+        grc.created = true;
+    }
+    else
+    {
+        for (auto& grass : grc.grass)
+        {
+            engine.drawLine3D(grass.startPos, grass.endPos, 1.1f, D_GREEN_DARK);
+        }
+    }
 }
 
 void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r)

@@ -178,6 +178,7 @@ namespace ENGI {
         std::map<std::string, Node*> nodes;
         std::map<Node*, std::pair<vec2i, vec2f>> nodesToDraw{};
 
+        Node* createNode3D(const char* name);
         Node* createNode(const char* name, Node* parentNode);
         Node* createNode(Node* copyNode, Node* parentNode);
 

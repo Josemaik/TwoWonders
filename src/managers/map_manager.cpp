@@ -43,9 +43,9 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
         {
             li.mapID = 3;
             map = loadMap("assets/Niveles/Lvl_3/Lvl_3.kaiwa");
-             em.getSingleton<SoundSystem>().sonido_amb_pradera();
-             em.getSingleton<SoundSystem>().sonido_music_pradera();
-            em.getSingleton<SoundSystem>().sonido_pasos_pradera();  
+            em.getSingleton<SoundSystem>().sonido_amb_pradera();
+            em.getSingleton<SoundSystem>().sonido_music_pradera();
+            em.getSingleton<SoundSystem>().sonido_pasos_pradera();
             break;
         }
         default:
@@ -230,31 +230,37 @@ void MapManager::generateGround(EntityManager& em, const valueType& groundArray,
         Color color{ D_WHITE };
 
         // Sacamos los máximos y los mínimos
+        vec3d groundMax = groundPosition + groundScale / 2;
+        vec3d groundMin = groundPosition - groundScale / 2;
         if (i == 0)
         {
-            min.x = groundPosition.x() - groundScale.x() / 2;
-            min.y = groundPosition.z() - groundScale.z() / 2;
+            min.x = groundMin.x();
+            min.y = groundMin.z();
 
-            max.x = groundPosition.x() + groundScale.x() / 2;
-            max.y = groundPosition.z() + groundScale.z() / 2;
+            max.x = groundMax.x();
+            max.y = groundMax.z();
 
             minHeigth = groundPosition.y();
         }
         else
         {
-            if (min.x > groundPosition.x() - groundScale.x() / 2)
-                min.x = groundPosition.x() - groundScale.x() / 2;
-            if (min.y > groundPosition.z() - groundScale.z() / 2)
-                min.y = groundPosition.z() - groundScale.z() / 2;
+            if (min.x > groundMin.x())
+                min.x = groundMin.x();
+            if (min.y > groundMin.z())
+                min.y = groundMin.z();
 
-            if (max.x < groundPosition.x() + groundScale.x() / 2)
-                max.x = groundPosition.x() + groundScale.x() / 2;
-            if (max.y < groundPosition.z() + groundScale.z() / 2)
-                max.y = groundPosition.z() + groundScale.z() / 2;
+            if (max.x < groundMax.x())
+                max.x = groundMax.x();
+            if (max.y < groundMax.z())
+                max.y = groundMax.z();
 
             if (minHeigth > groundPosition.y())
                 minHeigth = groundPosition.y();
         }
+
+        auto& li = em.getSingleton<LevelInfo>();
+        if (li.mapID == 0)
+            em.addComponent<GrassComponent>(groundEntity);
 
         // Creamos los componentes del suelo
         auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .visible = false, .orientation = rot, .rotationVec = rotationVec });

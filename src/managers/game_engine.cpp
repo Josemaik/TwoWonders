@@ -757,6 +757,11 @@ double ENGI::GameEngine::getTime()
     return static_cast<double>(microseconds.count()) / 1e6;
 }
 
+Node* ENGI::GameEngine::createNode3D(const char* name)
+{
+    return dmeg.CreateNode(name, nodes["3D"]);
+}
+
 Node* ENGI::GameEngine::createNode(const char* name, Node* parentNode)
 {
     if (!nodes[name])
@@ -1004,12 +1009,7 @@ Node* ENGI::GameEngine::drawCube(vec3d position, vec3d size, DarkMoon::Color col
 
 Node* ENGI::GameEngine::createLine3D(vec3d startPos, vec3d endPos, float lSize, Color color, const char* nodeName, Node* parentNode)
 {
-    if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreateLine3D(startPos.toGlm(), endPos.toGlm(), lSize, color, nodeName, parentNode);
-    else
-        nodes[nodeName]->setVisibleOne(true);
-
-    return nodes[nodeName];
+    return dmeg.CreateLine3D(startPos.toGlm(), endPos.toGlm(), lSize, color, nodeName, parentNode);
 }
 
 Node* ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, float lSize, Color color)

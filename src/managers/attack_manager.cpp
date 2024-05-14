@@ -331,7 +331,10 @@ void AttackManager::createAttackType(EntityManager& em, Entity& ent, AttackType 
         if (ent.hasComponent<TypeComponent>())
             eleType = em.getComponent<TypeComponent>(ent).type;
 
-        createAttackRangedOrMelee(em, phy.position, vec3d::zero(), phy.orientation, type, 2, eleType, BehaviorType::ATK_ENEMY);
+        auto position = phy.position;
+        auto& orientation = phy.orientation;
+        position += vec3d{ std::sin(orientation) * 3.0, 0, std::cos(orientation) * 3.0 };
+        createAttackRangedOrMelee(em, position, vec3d::zero(), phy.orientation, type, 2, eleType, BehaviorType::ATK_ENEMY);
         break;
     }
     default:
