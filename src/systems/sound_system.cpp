@@ -407,9 +407,9 @@ void SoundSystem::sonido_golem_muere() {
     update();
 }
 
-void SoundSystem::sonido_munyeco_mov() {
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_munyeco_mov, &eventInstance_mov_munyeco));
-    FMOD_Studio_EventInstance_Start(eventInstance_mov_munyeco);
+void SoundSystem::sonido_munyeco_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido) {
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_munyeco_mov, &sonido));
+    FMOD_Studio_EventInstance_Start(sonido);
     update();
 }
 
@@ -861,12 +861,12 @@ void SoundSystem::stop_golem_mov( FMOD_STUDIO_EVENTINSTANCE* sonido){
 
 }
 
-void SoundSystem::stop_munyeco_mov(){
-    FMOD_Studio_EventInstance_Stop(eventInstance_mov_munyeco, FMOD_STUDIO_STOP_ALLOWFADEOUT);
+void SoundSystem::stop_munyeco_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido){
+    FMOD_Studio_EventInstance_Stop(sonido, FMOD_STUDIO_STOP_ALLOWFADEOUT);
     update();
 }
 void SoundSystem::stop_pasos(){
-    stop_munyeco_mov();
+    //stop_munyeco_mov();
     //stop_golem_mov();
     update();
 }

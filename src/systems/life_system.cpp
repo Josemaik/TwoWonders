@@ -109,15 +109,19 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 }
                 else
                     lif.decreaseNextFrame = false;
-                //  if (ent.hasComponent<AttackerComponent>()) {
-                //     em.getComponent<AttackerComponent>(ent).attack(AttackType::AreaAttack);
-                //  }
             }
 
             //si es un snowman
             if (ent.hasTag<SnowmanTag>()) {
                 if (!lif.decreaseNextFrame)
+                {
                     em.getSingleton<SoundSystem>().sonido_munyeco_muere();
+                       if(ent.hasComponent<SoundComponent>())
+                       {
+                        auto& sc = em.getComponent<SoundComponent>(ent);
+                        em.getSingleton<SoundSystem>().stop_munyeco_mov(sc.sound_mov);
+                       }
+                }
             }
             if (ent.hasTag<SlimeTag>()) {
                 if (!lif.decreaseNextFrame)

@@ -171,29 +171,36 @@ void PhysicsSystem::update(EntityManager& em)
             }
         }
         if ( e.hasTag<SnowmanTag>() ){
-            
-           auto& player = *em.getEntityByID(li.playerID);
+             auto& player = *em.getEntityByID(li.playerID);
             auto& playerPhy = em.getComponent<PhysicsComponent>(player);
             auto& playerPos = playerPhy.position;
             auto& ss = em.getSingleton<SoundSystem>();
-            auto& ia = em.getComponent<AIComponent>(e);
-            if( phy.position.distance(playerPos) < 40.0 )
-            {
-                if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !ia.ismoving)
+            auto& ia = em.getComponent<AIComponent>(e);                    
+
+            if(e.hasComponent<SoundComponent>()){
+                auto& sc = em.getComponent<SoundComponent>(e);
+                if( phy.position.distance(playerPos) < 40.0 )
                 {
-                    //ss.sonido_munyeco_mov();
-                    ia.ismoving = true;
-                
-                } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  ia.ismoving)
+                    if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !ia.ismoving)
+                    {
+                        ss.sonido_munyeco_mov(sc.sound_mov);
+                        ia.ismoving = true;
+                    
+                    } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  ia.ismoving)
+                    {
+                        ia.ismoving= false;
+                        ss.stop_munyeco_mov(sc.sound_mov);
+
+                    }
+                } else  if ( ia.ismoving)
                 {
-                    ia.ismoving= false;
-                    ss.stop_munyeco_mov();
-                }
-            } else
-            {
-                ss.stop_munyeco_mov();
-                ia.ismoving = false;
-            } 
+                    ss.stop_munyeco_mov(sc.sound_mov);
+                    ia.ismoving = false;
+
+                } 
+            }
+            
+           
         }
     });
 }

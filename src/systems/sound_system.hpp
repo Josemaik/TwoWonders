@@ -77,7 +77,7 @@ struct SoundSystem {
     void sonido_golem_ataque();     
     void sonido_golem_danyo();      
     void sonido_golem_muere();      
-    void sonido_munyeco_mov();      //por integrar
+    void sonido_munyeco_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido);      //por integrar
     void sonido_munyeco_ataque();   
     void sonido_munyeco_danyo();    
     void sonido_munyeco_muere();    
@@ -154,8 +154,8 @@ struct SoundSystem {
     void music_stop_level();
     void ambient_stop();
     void SFX_pasos_stop();
-    void stop_golem_mov( FMOD_STUDIO_EVENTINSTANCE* sonido);
-    void stop_munyeco_mov();
+    void stop_golem_mov(FMOD_STUDIO_EVENTINSTANCE* sonido);
+    void stop_munyeco_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido);
     void stop_pasos();
 
     void sonido_pause(int zona);
