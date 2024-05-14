@@ -205,17 +205,18 @@ struct BTDecisionPlayerDetected : BTNode_t {
                         for (auto it = bb.slimeData.begin(); it != bb.slimeData.end(); ++it) {
                                     // size_t id = ectx.ent.getID();
                         //         size_t slimeid = it->first;
-                                if (it->first != ectx.ent.getID()) {
+                                auto& slime = *ectx.em.getEntityByID(it->first);
+                                if (it->first != ectx.ent.getID() && slime.hasComponent<AIComponent>()) {
                                     auto const dis = ectx.phy.position.distance(it->second.position);
-                                    auto& aic = ectx.em.getComponent<AIComponent>(*ectx.em.getEntityByID(it->first));
+                                    auto& aic = ectx.em.getComponent<AIComponent>(slime);
                                     if (dis < (5.0 * 5.0) && !aic.playerdetected) {
-                                         std::cout << "hola:" << it->first << "\n";
+                                        //  std::cout << "hola:" << it->first << "\n";
                                         aic.playerdetected = true;
                                         // return BTNodeStatus_t::success;
                                     }
                                 }
                         }
-                        std::cout << "finalizo";
+                        // std::cout << "finalizo";
                         return BTNodeStatus_t::success;
                     }
                 }
