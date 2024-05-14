@@ -445,12 +445,13 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
 {
     auto& inpi = em.getSingleton<InputInfo>();
 
-    ss.sonido_pause(li.mapID);
-    ss.stop_pasos();
-
     // Nodo de los botones
     if (inpi.pause)
+    {
         getNode(engine, "2D")->setVisible(false);
+        ss.sonido_pause(li.mapID);
+        ss.stop_pasos();
+    }
 
     auto* menuNode = getNode(engine, "MenuPrincipal");
 
@@ -494,19 +495,20 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
     engine.clearBackground(D_WHITE);
     std::map<std::string, std::tuple<Node*, std::string, std::function<void()>>> buttonData = {
         { "1_jugar", { nullptr, inpi.pause ? "Reanudar" : "Jugar" , [&]() {
+
             if (!inpi.pause)
             {
                 li.currentScreen = GameScreen::STORY;
                 li.anyButtonPressed = false;
             }
             else
+            {
                 inpi.pause = false;
-
-            li.elapsedPause = 0.f;
+                ss.sonido_unpause(li.mapID);
+            }
 
             ss.seleccion_menu();
-            ss.sonido_unpause(li.mapID);
-
+            li.elapsedPause = 0.f;
         } } },
         { "2_opciones", { nullptr, "Opciones", [&]() {
             li.previousScreen = li.currentScreen;
