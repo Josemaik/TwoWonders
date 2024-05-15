@@ -171,7 +171,10 @@ namespace DarkMoon {
         {
             processBone(boneIDs, weights, mesh, scene);
         }
-
+        //check cofre
+        // if(mesh->mNumBones == 1){
+        //     hasBones = false;
+        // }
         for (std::size_t i = 0; i < vertices.size(); i++) {
             vertices[i].boneIDs = boneIDs[i];
             vertices[i].weights = weights[i];

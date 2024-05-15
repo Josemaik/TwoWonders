@@ -80,21 +80,21 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     engine.CreateCubeWires({ 20.0f, 0.0f, -30.0f }, { 10.0f, 10.0f, 10.0f }, D_BLACK, "Wireframe", p_node3D);
 
     // Node: Modelo Dummy 1
-    auto modelDummy = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 1", p_node3D);
-    //modelDummy->scale({0.2f, 0.2f, 0.2f});
-    modelDummy->translate({ 0.0f, 0.0f, -30.0f });
+    // auto modelDummy = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 1", p_node3D);
+    // //modelDummy->scale({0.2f, 0.2f, 0.2f});
+    // modelDummy->translate({ 0.0f, 0.0f, -30.0f });
 
-    // Node: Modelo Dummy 2
-    auto modelDummy2 = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 2", p_node3D);
-    //modelDummy2->scale({0.2f, 0.2f, 0.2f});
-    modelDummy2->translate({ 0.0f, 0.0f, 30.0f });
-    modelDummy2->rotate({ 0.0f, 1.0f, 0.0f }, 180.0f);
+    // // Node: Modelo Dummy 2
+    // auto modelDummy2 = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 2", p_node3D);
+    // //modelDummy2->scale({0.2f, 0.2f, 0.2f});
+    // modelDummy2->translate({ 0.0f, 0.0f, 30.0f });
+    // modelDummy2->rotate({ 0.0f, 1.0f, 0.0f }, 180.0f);
 
     // Node: Modelo Dummy 3
     auto modelDummy3 = engine.CreateModel("assets/Cofre/Texturas/Cofre.fbx", D_WHITE, "Modelo: Dummy 3", p_node3D);
     //modelDummy3->scale({0.2f, 0.2f, 0.2f});
     modelDummy3->translate({ 30.0f, 0.0f, 0.0f });
-    modelDummy3->rotate({ 0.0f, 1.0f, 0.0f }, 90.0f);
+    modelDummy3->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
     auto eModel = dynamic_cast<DarkMoon::Model*>(modelDummy3->getEntity());
     auto& m_meshes = eModel->getMeshes();
 
@@ -104,6 +104,20 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     auto id = am.PlayAnimation(animation);
     for (auto& mesh : m_meshes) {
         mesh->animID = id;
+    }
+
+    auto modelCharacter = engine.CreateModel("assets/MainCharacter/Main_character.fbx",D_WHITE,"Modelo MAin character",p_node3D);
+    modelCharacter->translate({ 0.0f, 0.0f, 30.0f });
+    modelCharacter->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
+    modelCharacter->rotate({ 0.0f, 1.0f, 0.0f }, 90.0f);
+    auto eModel1 = dynamic_cast<DarkMoon::Model*>(modelCharacter->getEntity());
+    auto& m_meshes1 = eModel1->getMeshes();
+
+    auto* animation1 = am.createAnimation("assets/MainCharacter/Main_character.fbx", eModel1->getboneInfoMap());
+
+    auto id1 = am.PlayAnimation(animation1);
+    for (auto& mesh : m_meshes1) {
+        mesh->animID = id1;
     }
 
     return p_node3D;
