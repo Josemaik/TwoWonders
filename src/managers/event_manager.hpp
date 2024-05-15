@@ -328,7 +328,7 @@ public:
                         };
 
                         // Le damos el hechizo
-                        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 3 };
+                        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", AttackType::WaterBombShot };
                         plfi.addSpell(spell);
                         plfi.showBook = true;
 
@@ -373,7 +373,7 @@ public:
                         };
 
                         // Le damos el hechizo
-                        Spell spell{ "Dash de agua", "Esquivas a la velocidad de la marea", Spells::WaterDash, 20.0, 1 };
+                        Spell spell{ "Dash de agua", "Esquivas a la velocidad de la marea", AttackType::WaterDashArea };
                         plfi.addSpell(spell);
                         plfi.showBook = true;
 
@@ -450,7 +450,7 @@ public:
                         };
 
                         // Le damos el hechizo
-                        Spell spell{ "Bola de fuego", "Tiras una poderosa bola de destrucción", Spells::FireBall, 20.0, 4 };
+                        Spell spell{ "Bola de fuego", "Tiras una poderosa bola de destrucción", AttackType::FireBallShot };
                         plfi.addSpell(spell);
                         plfi.showBook = true;
 

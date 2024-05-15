@@ -1,6 +1,7 @@
 #include "render_system.hpp"
 #include "../motor/src/darkmoon.hpp"
 #include <iomanip>
+#include <variant>
 
 float ENGI::GameEngine::widthRate = 1.0;
 float ENGI::GameEngine::heightRate = 1.0f;
@@ -443,11 +444,14 @@ void RenderSystem::checkSliderSound(SoundSystem& ss, OptionSlider& slider)
 void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInfo& li, SoundSystem& ss)
 {
     auto& inpi = em.getSingleton<InputInfo>();
-    ss.music_stop();
 
     // Nodo de los botones
     if (inpi.pause)
+    {
         getNode(engine, "2D")->setVisible(false);
+        ss.sonido_pause(li.mapID);
+        ss.stop_pasos();
+    }
 
     auto* menuNode = getNode(engine, "MenuPrincipal");
 
@@ -491,19 +495,20 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
     engine.clearBackground(D_WHITE);
     std::map<std::string, std::tuple<Node*, std::string, std::function<void()>>> buttonData = {
         { "1_jugar", { nullptr, inpi.pause ? "Reanudar" : "Jugar" , [&]() {
+
             if (!inpi.pause)
             {
                 li.currentScreen = GameScreen::STORY;
                 li.anyButtonPressed = false;
-                ss.music_stop();
             }
             else
+            {
                 inpi.pause = false;
-
-            li.elapsedPause = 0.f;
+                ss.sonido_unpause(li.mapID);
+            }
 
             ss.seleccion_menu();
-
+            li.elapsedPause = 0.f;
         } } },
         { "2_opciones", { nullptr, "Opciones", [&]() {
             li.previousScreen = li.currentScreen;
@@ -1003,9 +1008,45 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 }
             }
         }
+        else if (e.hasTag<GroundTag>() && e.hasComponent<GrassComponent>())
+        {
+            drawGrass(engine, r, em.getComponent<GrassComponent>(e));
+        }
     });
 
     // engine.activateLights();
+}
+
+void RenderSystem::drawGrass(GameEngine& engine, RenderComponent& ren, GrassComponent& grc)
+{
+    // TODO implementar textura con billboards
+    vec3d surfaceMax = ren.position + ren.scale / 2;
+    if (!grc.created)
+    {
+        // Conseguimos 20 posiciones random que estén entre la x y la z de la superficie
+        vec3d surfaceMin = ren.position - ren.scale / 2;
+
+        for (auto& grass : grc.grass)
+        {
+            double x = engine.getRandomValue(surfaceMin.x(), surfaceMax.x());
+            double z = engine.getRandomValue(surfaceMin.z(), surfaceMax.z());
+            double wiggleX = engine.getRandomValue(-0.5, 0.5);
+            double wiggleZ = engine.getRandomValue(-0.5, 0.5);
+            double y = engine.getRandomValue(1.0, 3.0);
+
+            grass.startPos = { x, surfaceMax.y(), z };
+            grass.endPos = { x + wiggleX, surfaceMax.y() + y, z + wiggleZ };
+        }
+
+        grc.created = true;
+    }
+    else
+    {
+        for (auto& grass : grc.grass)
+        {
+            engine.drawLine3D(grass.startPos, grass.endPos, 1.1f, D_GREEN_DARK);
+        }
+    }
 }
 
 void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r)
@@ -1267,6 +1308,10 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     {
         r.node = engine.loadModel("assets/Assets/Props/Hechizos/Agua_1.obj");
     }
+    else if (e.hasTag<FireBallTag>())
+    {
+        r.node = engine.loadModel("assets/Assets/Props/Hechizos/Fuego_1.obj");
+    }
     else if (e.hasTag<NomadTag>())
     {
         r.node = engine.loadModel("assets/Personajes/NPCs/Nomada/Nomada.obj");
@@ -1329,9 +1374,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         }
         case 3:
         {
-            if (e.hasComponent<RelayComponent>())
+            if (e.hasComponent<TypeComponent>())
             {
-                auto& rc = em.getComponent<RelayComponent>(e);
+                auto& rc = em.getComponent<TypeComponent>(e);
 
                 switch (rc.type)
                 {
@@ -1409,6 +1454,9 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
     using partCMPs = MP::TypeList<ParticleMakerComponent>;
     using noTAGs = MP::TypeList<>;
 
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+
     auto& frti = em.getSingleton<FrustumInfo>();
     em.forEach<partCMPs, noTAGs>([&](Entity& e, ParticleMakerComponent& pmc)
     {
@@ -1419,11 +1467,25 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
         {
             for (auto& p : pmc.particles)
             {
-                if (p.type == Particle::ParticleType::Pixel)
-                {
-                    // Dibujamos la partícula en un punto de 3x3 píxeles
-                    engine.drawPoint3D(p.position.to_other<double>(), 3.f, p.color);
-                }
+                std::variant<Color, std::string>& variant = p.color;
+                std::visit([&](auto&& arg) {
+                    using T = std::decay_t<decltype(arg)>;
+                    if constexpr (std::is_same_v<T, Color>)
+                    {
+                        // Dibujamos la partícula en un punto de 3x3 píxeles
+                        engine.drawPoint3D(p.position.to_other<double>(), 3.f, std::get<Color>(p.color));
+                    }
+                    else if constexpr (std::is_same_v<T, std::string>)
+                    {
+                        std::string& textura = std::get<std::string>(p.color);
+                        auto* p_texture = engine.createNode(getNode(engine, textura.c_str()), getNode(engine, "TextCopy"));
+                        auto& textureInfo = *p_texture->getEntity<Texture2D>()->texture;
+                        int posX = static_cast<int>(engine.getWorldToScreenX(p.position.toDouble()) - static_cast<float>(textureInfo.getWidth()) * wRate / 2);
+                        int posY = static_cast<int>(engine.getWorldToScreenY(p.position.toDouble()) - static_cast<float>(textureInfo.getHeight()) * hRate / 2);
+
+                        engine.drawNode(p_texture, { posX, posY });
+                    }
+                }, variant);
             }
         }
     });
@@ -2300,7 +2362,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
         if (li.mapID == 2 && li.volcanoMission)
             drawBoatParts(engine, em);
 
-        if ((li.mapID == 0 || li.mapID == 1) && pl.hasComponent<AttackComponent>() && !li.tutorialEnemies.empty())
+        if ((li.mapID == 0 || li.mapID == 1) && pl.hasComponent<AttackerComponent>() && !li.tutorialEnemies.empty())
         {
 
             for (auto& enemy : li.tutorialEnemies)
@@ -2394,7 +2456,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
             elapsed_WASD += 1.0f / 60.0f;
         }
 
-        if (li.mapID == 2 && pl.hasComponent<AttackComponent>() && !li.volcanoLava.empty())
+        if (li.mapID == 2 && pl.hasComponent<AttackerComponent>() && !li.volcanoLava.empty())
         {
             auto& plfi = em.getSingleton<PlayerInfo>();
             std::size_t spellID{ 5 };
@@ -2408,7 +2470,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
 
             for (std::size_t i = 0; i < plfi.spellSlots.size(); ++i)
             {
-                if (plfi.spellSlots[i].spell == Spells::WaterDash)
+                if (plfi.spellSlots[i].atkType == AttackType::WaterDashArea)
                 {
                     spellID = i;
                     break;
@@ -3000,19 +3062,19 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
             {2, {screenWidth - 165 * wRate, 247.5f * hRate}}
         };
 
-        static std::map<Spells, std::tuple<std::string, std::string, float, float, float>> spellToTexture = {
-            {Spells::WaterBomb, {"pompas", "exp_pompa", 10.0f, 15.5f, 2.5f}},
-            {Spells::WaterDash, {"dash", "exp_dash", 7.5f, 7.5f, 2.5f}},
-            {Spells::FireBall, {"bola_fuego", "exp_bola_f", 22.5f, 25.5f, 2.55f}},
-            {Spells::FireMeteorites, {"meteoritos", "exp_pompa", 22.5f, 25.5f, 2.5f}},
-            {Spells::IceShards, {"estacas", "exp_pompa", 22.5f, 25.5f, 2.5f}},
-            {Spells::IceShield, {"escudo", "exp_pompa", 22.5f, 25.5f, 2.5f}},
+        static std::map<AttackType, std::tuple<std::string, std::string, float, float, float>> spellToTexture = {
+            {AttackType::WaterBombShot, {"pompas", "exp_pompa", 10.0f, 15.5f, 2.5f}},
+            {AttackType::WaterDashArea, {"dash", "exp_dash", 7.5f, 7.5f, 2.5f}},
+            {AttackType::FireBallShot, {"bola_fuego", "exp_bola_f", 22.5f, 25.5f, 2.55f}},
+            {AttackType::MeteoritePlayer, {"meteoritos", "exp_pompa", 22.5f, 25.5f, 2.5f}},
+            {AttackType::IceShard, {"estacas", "exp_pompa", 22.5f, 25.5f, 2.5f}},
+            {AttackType::IceShield, {"escudo", "exp_pompa", 22.5f, 25.5f, 2.5f}},
         };
 
         for (std::size_t i = 0; i < plfi.spellSlots.size(); i++)
         {
             auto& spell = plfi.spellSlots[i];
-            if (spell.spell != plfi.noSpell)
+            if (spell != plfi.noSpell)
             {
                 if (!plfi.showBook)
                 {
@@ -3020,7 +3082,7 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
                     handleAnimatedTexture(std::to_string(i + 1) + "_pl", "placeholder", static_cast<int>(spellPositions[i].first), static_cast<int>(spellPositions[i].second), 2.45f);
 
                     // Usar el mapa para obtener el nombre de la textura, posiciones y factor de escala
-                    auto textureDetails = spellToTexture[spell.spell];
+                    auto textureDetails = spellToTexture[spell.atkType];
                     handleAnimatedTexture(spellName, std::get<0>(textureDetails), static_cast<int>(spellPositions[i].first + std::get<2>(textureDetails) * wRate), static_cast<int>(spellPositions[i].second + std::get<3>(textureDetails) * hRate), std::get<4>(textureDetails));
                 }
                 else
@@ -3028,7 +3090,7 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
                     if (getNode(engine, "libro")->isVisible())
                         break;
                     // Usar el mapa para obtener el nombre de la textura de explosión
-                    auto textureDetails = spellToTexture[plfi.spells.back().spell];
+                    auto textureDetails = spellToTexture[plfi.spells.back().atkType];
                     drawSpellExplanation(engine, std::get<1>(textureDetails));
 
                     auto& inpi = em.getSingleton<InputInfo>();

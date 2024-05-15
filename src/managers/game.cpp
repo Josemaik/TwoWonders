@@ -3,44 +3,11 @@
 // #include "../utils/memory_viewer.hpp"
 // #include <chrono>
 
-void Game::createShield(Entity& ent)
-{
-    auto& e{ em.newEntity() };
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = em.getComponent<RenderComponent>(ent).position, .scale = { 1.0f, 1.0f, 0.5f }, .color = D_ORANGE_DARK });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
-    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::SHIELD });
-    em.addComponent<ShieldComponent>(e, ShieldComponent{ .createdby = EntitieswithShield::Player });
-}
-
-void Game::createEnding()
-{
-    auto& e{ em.newEntity() };
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = {83.0f, 1.0f, -87.0f}, .scale = {1.0f, 1.0f, 1.0f}, .color = D_WHITE });
-    auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale, .gravity = 0 });
-    em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::ENDING });
-}
-
-// ShaderType Game::createShader()
-// {
-//     ShaderType shader = engine.loadShader(TextFormat("assets/shaders/lighting.vs", 330),
-//         TextFormat("assets/shaders/lighting.fs", 330));
-
-//     // Get some required shader locations
-//     shader.locs[SHADER_LOC_VECTOR_VIEW] = engine.getShaderLocation(shader, "viewPos");
-
-//     // Ambient light level (some basic lighting)
-//     int ambientLoc = engine.getShaderLocation(shader, "ambient");
-//     float ambientValue[4] = { 3.1f, 3.1f, 3.1f, 20.0f };
-//     engine.setShaderValue(shader, ambientLoc, ambientValue, SHADER_UNIFORM_VEC4);
-
-//     return shader;
-// }
-
 void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 4.6, 7.0, -32.9  };
+        plfi.spawnPoint = { -65.0, 13.0, 104.0 };
 
     // 33.0, 4.0, -25.9 - Posición Incial lvl0
     // 32.0, 4.0, 43.0 - Primer cofre lvl0
@@ -81,10 +48,11 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackComponent>(e);
-    auto& lis = em.addComponent<ListenerComponent>(e);
+    em.addComponent<AttackerComponent>(e);
+    em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = false, .effect = Effects::PLAYER, .maxParticles = 4, .spawnRate = 0.05f, .lifeTime = 0.3f });
 
     // Listeners de eventos para el jugador
+    auto& lis = em.addComponent<ListenerComponent>(e);
     for (auto i = 0; i < EventCodes::MAX; i++)
         lis.addCode(static_cast<EventCodes>(i));
 
@@ -96,11 +64,6 @@ void Game::createEntities()
     // Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };
     // plfi.addItem(std::make_unique<Potion>(pot));
 
-    // Shield
-    // createShield(em, e);
-
-    // Ending
-    // createEnding(em);
     auto& li = em.getSingleton<LevelInfo>();
     li.playerID = e.getID();
 }
@@ -169,7 +132,6 @@ void Game::run()
     bool debugs{ false }, resets{ false };
 
     createSound();
-    attack_system.setCollisionSystem(&collision_system);
 
     while (!li.gameShouldEnd)
     {
@@ -266,6 +228,7 @@ void Game::run()
             {
                 li.mapID = li.mapToLoad;
                 map.changeMap(em, li.mapID, iam);
+                collision_system.updateOctreeSize(li.mapID);
                 li.mapToLoad = li.u8max;
             }
 
@@ -274,6 +237,7 @@ void Game::run()
                 if (!li.isCharging() && li.loading)
                 {
                     li.loadingTime = 0;
+                    collision_system.updateOctreeSize(li.mapID);
                     if (!li.replay)
                     {
                         auto& gami = em.getSingleton<GameData>();
@@ -290,7 +254,7 @@ void Game::run()
                 resetDeath();
 
             input_system.update(em, engine);
-            debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText();
+            debugs = inpi.debugAI1 || inpi.pause || inpi.inventory || txti.hasText() || li.isCharging();
             resets = li.resetGame || li.resetFromDeath;
 
             // seleccionar modo de debug ( physics o AI)
@@ -304,10 +268,8 @@ void Game::run()
                     physics_system.update(em);
                     collision_system.update(em);
                     zone_system.update(em, engine, iam, evm, map);
-                    shield_system.update(em);
                     object_system.update(em);
-                    projectile_system.update(em);
-                    attack_system.update(em);
+                    attack_system.update(em, am);
                     life_system.update(em, object_system);
                     // if (elapsed < timeStepDouble45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     // if(elapsed < target)
@@ -317,11 +279,8 @@ void Game::run()
                         particle_system.update(em);
                 }
 
-                if (!li.getDeath().empty())
-                {
-                    em.destroyEntities(li.getDeath());
-                    li.clearDeath();
-                }
+                // Borramos las entidades muertas
+                emptyDeathList(li);
 
                 // Sistemas que no hacen cálculos con las físicas
                 alpha = elapsed / timeStepDouble;
@@ -330,6 +289,7 @@ void Game::run()
                 render_system.update(em, engine, alpha);
             }
             else if (!resets && debugs) {
+                emptyDeathList(li);
                 sound_system.update();
                 render_system.update(em, engine, 1.f);
             }
@@ -388,6 +348,15 @@ void Game::run()
     engine.closeWindow();
 }
 
+void Game::emptyDeathList(LevelInfo& li)
+{
+    if (!li.getDeath().empty())
+    {
+        em.destroyEntities(li.getDeath());
+        li.clearDeath();
+    }
+}
+
 void Game::resetDeath()
 {
     auto& li = em.getSingleton<LevelInfo>();
@@ -421,6 +390,7 @@ void Game::resetGame()
     plfi.reset();
     lock_system.reset();
     render_system.resetAnimatedTexture();
+    collision_system.updateOctreeSize(li.mapID);
     map.reset(em, li.mapID, iam);
     createEntities();
 }

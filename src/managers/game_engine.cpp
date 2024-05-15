@@ -30,6 +30,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["Copy"] = dmeg.CreateNode("Copy", nodes["HUD"]);
     nodes["Boat"] = dmeg.CreateNode("Boat", nodes["HUD"]);
     nodes["AnimTextures"] = dmeg.CreateNode("AnimTextures", nodes["HUD"]);
+    nodes["PartTextures"] = dmeg.CreateNode("PartTextures", nodes["HUD"]);
     nodes["Debug"] = dmeg.CreateNode("Debug", nodes["HUD"]);
     nodes["DebugPhy"] = dmeg.CreateNode("DebugPhy", nodes["Debug"]);
     nodes["DebugAI1"] = dmeg.CreateNode("DebugAI1", nodes["Debug"]);
@@ -203,6 +204,13 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImage("+", "assets/HUD/numeros/mas.png", nodes["Nums"]);
     loadAndResizeImage("-", "assets/HUD/numeros/-.png", nodes["Nums"]);
     loadAndResizeImage("barra", "assets/HUD/barra.png", nodes["Nums"]);
+
+    // TEXTURAS PARTÍCULAS
+    //
+    loadAndResizeImage("p_est1", "assets/HUD/p_texturas/p_est1.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est2", "assets/HUD/p_texturas/p_est2.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est3", "assets/HUD/p_texturas/p_est3.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est4", "assets/HUD/p_texturas/p_est4.png", nodes["PartTextures"]);
 
     // GIFS
     //
@@ -749,6 +757,11 @@ double ENGI::GameEngine::getTime()
     return static_cast<double>(microseconds.count()) / 1e6;
 }
 
+Node* ENGI::GameEngine::createNode3D(const char* name)
+{
+    return dmeg.CreateNode(name, nodes["3D"]);
+}
+
 Node* ENGI::GameEngine::createNode(const char* name, Node* parentNode)
 {
     if (!nodes[name])
@@ -996,12 +1009,7 @@ Node* ENGI::GameEngine::drawCube(vec3d position, vec3d size, DarkMoon::Color col
 
 Node* ENGI::GameEngine::createLine3D(vec3d startPos, vec3d endPos, float lSize, Color color, const char* nodeName, Node* parentNode)
 {
-    if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreateLine3D(startPos.toGlm(), endPos.toGlm(), lSize, color, nodeName, parentNode);
-    else
-        nodes[nodeName]->setVisibleOne(true);
-
-    return nodes[nodeName];
+    return dmeg.CreateLine3D(startPos.toGlm(), endPos.toGlm(), lSize, color, nodeName, parentNode);
 }
 
 Node* ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, float lSize, Color color)

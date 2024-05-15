@@ -8,17 +8,22 @@
 
 struct Octree
 {
-    using OctMap = std::map<Entity*, ColliderComponent*>;
+    using OctMap = std::vector<std::pair<Entity*, ColliderComponent*>>;
+    using OctType = std::array<std::unique_ptr<Octree>, 8>;
 
     Octree(uint8_t depth, const BBox& bounds, const Octree* parent = nullptr, std::size_t max = MAX_ENTITIES)
         : bounds_(bounds), depth_(depth), parent_(const_cast<Octree*>(parent)), max_ent_(max)
     {
-        // octEntities_.reserve(max_ent_);
+        octEntities_.reserve(max_ent_);
     };
 
+    std::size_t hash(const vec3d& point) const;
     void insert(Entity& entity, ColliderComponent& collider);
-    void subdivide(Entity& entity, ColliderComponent& collider);
+    void subdivide();
+    bool isBalanced();
+    void rebalance();
     void clear();
+    void setBounds(const BBox& bounds) { bounds_ = bounds; }
     std::size_t countEntities() const;
 
     // Funciones en desuso
@@ -46,7 +51,7 @@ struct Octree
     [[nodiscard]] BBox const& getBounds() const noexcept { return bounds_; }
 
     // Función que nos devuelve los hijos del nodo
-    [[nodiscard]] std::array<std::unique_ptr<Octree>, 8> const& getOctants() const noexcept { return octants_; }
+    [[nodiscard]] OctType const& getOctants() const noexcept { return octants_; }
 
     // Función que nos devuelve la profundidad del nodo
     [[nodiscard]] uint8_t getDepth() const noexcept { return depth_; }
@@ -57,9 +62,8 @@ struct Octree
     // Función que nos devuelve el número máximo de entidades en el nodo
     [[nodiscard]] std::size_t getMaxEntities() const noexcept { return max_ent_; }
 
-    static const std::size_t MAX_ENTITIES = 15;
-    static const std::size_t MAX_DEPTH = 10;
-    static constexpr std::array<vec3d, 8> offsets =
+    inline static const std::size_t MAX_ENTITIES = 40;
+    inline static constexpr std::array<vec3d, 8> offsets =
     {
         vec3d(-0.5, -0.5, -0.5),
         vec3d(0.5, -0.5, -0.5),
@@ -72,12 +76,11 @@ struct Octree
     };
 
 private:
-    OctMap octEntities_;
-    std::array<std::unique_ptr<Octree>, 8> octants_{};
+    OctMap octEntities_{};
+    OctType octants_{};
     BBox bounds_{};
     uint8_t depth_{};
-    bool divided_ = false;
-    Octree* parent_;
+    bool divided_{ false };
+    Octree* parent_{ nullptr };
     std::size_t max_ent_{ MAX_ENTITIES };
-    std::unordered_set<Octree*> neighbors;
 };

@@ -22,16 +22,14 @@
 #include "../components/boat_component.hpp"
 #include "../components/particle_component.hpp"
 #include "../components/spawn_component.hpp"
-#include "../components/relay_component.hpp"
 #include "../components/pointlight_component.hpp"
-//ia
+#include "../components/grass_component.hpp"
 #include "../components/ai_component.hpp"
 #include "../components/navmesh_component.hpp"
 #include "../components/npc_component.hpp"
 #include "../components/projectile_component.hpp"
 #include "../components/object_component.hpp"
 #include "../components/zone_component.hpp"
-#include "../components/shield_component.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
 #include "../utils/Item.hpp"
@@ -128,6 +126,7 @@ struct SnowBallTag {};
 struct MagmaBallTag {};
 struct EnemyDeathTag {};
 struct LockableTag {};
+struct GrassTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -139,10 +138,10 @@ using CL = MP::TypeList <
     RampComponent,
     AIComponent,
     AttackComponent,
+    AttackerComponent,
     ProjectileComponent,
     ObjectComponent,
     ZoneComponent,
-    ShieldComponent,
     TypeComponent,
     ChestComponent,
     ListenerComponent,
@@ -159,8 +158,8 @@ using CL = MP::TypeList <
     BoatComponent,
     ParticleMakerComponent,
     SpawnComponent,
-    RelayComponent,
-    PointLightComponent
+    PointLightComponent, 
+    GrassComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,
@@ -215,7 +214,8 @@ using TL = MP::TypeList <
     SnowBallTag,
     MagmaBallTag,
     EnemyDeathTag,
-    LockableTag
+    LockableTag,
+    GrassTag
 > ;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem, FrustumInfo, CheatsInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

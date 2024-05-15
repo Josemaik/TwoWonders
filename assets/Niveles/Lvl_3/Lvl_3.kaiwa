@@ -353,7 +353,7 @@
 						"scale":[5.883, 5.035, 10.0],
 						"rotation": 90.0,
 						"rotVector":[0.0, 0.0, 0.0],
-							"content": 6,
+							"content": 5,
 							"message": ["¡Encontraste 30 destellos!"]
 					},
 					{
@@ -376,7 +376,7 @@
 						"scale":[5.883, 5.035, 10.0],
 						"rotation": 270.0,
 						"rotVector":[0.0, 0.0, -1.0],
-						"content": 6,
+						"content": 5,
 						"message": ["¡Encontraste 30 destellos!"]
 					},
 					{
@@ -386,7 +386,7 @@
 						"scale":[5.883, 5.035, 10.0],
 						"rotation": 90.0,
 						"rotVector":[0.0, 0.0, 1.0],
-						"content": 6,
+						"content": 5,
 						"message": ["¡Encontraste 30 destellos!"]
 					}
 				]
@@ -931,8 +931,8 @@
 						"scale":[5.883, 5.035, 10.0],
 						"rotation": 180.0,
 						"rotVector":[0.0, 0.0, 1.0],
-							"content": 6,
-							"message": ["¡Encontraste 30 destellos!"]
+						"content": 5,
+						"message": ["¡Encontraste 30 destellos!"]
 					},
 					{
 						"type":12,
@@ -967,8 +967,8 @@
 						"scale":[5.883, 5.035, 10.0],
 						"rotation": 180.0,
 						"rotVector":[0.0, 0.0, 1.0],
-							"content": 6,
-							"message": ["¡Encontraste 30 destellos!"]
+						"content": 5,
+						"message": ["¡Encontraste 30 destellos!"]
 					}
 				]
 			}
@@ -1106,7 +1106,7 @@
 							"scale":[5.423, 5.039, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 1.0],
-							"content": 6,
+							"content": 5,
 							"message": ["¡Encontraste 30 destellos!"]
 						},
 						{
@@ -1844,7 +1844,7 @@
 						"scale":[5.423, 5.039, 10.0],
 						"rotation": 180.0,
 						"rotVector":[0.0, 0.0, 1.0],
-						"content": 6,
+						"content": 5,
 						"message": ["¡Encontraste 30 destellos!"]
 					},
 					{
@@ -1854,7 +1854,7 @@
 						"scale":[5.423, 5.039, 10.0],
 						"rotation": 180.0,
 						"rotVector":[0.0, 0.0, 1.0],
-						"content": 6,
+						"content": 5,
 						"message": ["¡Encontraste 30 destellos!"]
 					},
 					{
@@ -1864,7 +1864,7 @@
 						"scale":[5.423, 5.039, 10.0],
 						"rotation": 180.0,
 						"rotVector":[0.0, 0.0, 1.0],
-						"content": 6,
+						"content": 5,
 						"message": ["¡Encontraste 30 destellos!"]
 					},
 					{
@@ -1882,7 +1882,7 @@
 						"scale":[5.423, 5.039, 10.0],
 						"rotation": 90.0,
 						"rotVector":[0.0, 0.0, 1.0],
-						"content": 6,
+						"content": 5,
 						"message": ["¡Encontraste 30 destellos!"]
 					},
 					{

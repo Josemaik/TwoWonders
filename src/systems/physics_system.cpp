@@ -120,11 +120,13 @@ void PhysicsSystem::update(EntityManager& em)
                 }
             }
         }
-        if (e.hasTag<PlayerTag>()) {
-            //std::cout << pos.x() << "," << pos.y() << "," << pos.z() << "\n";
-            auto& ss = em.getSingleton<SoundSystem>();
+
+        //SONIDOS DE MOVIMIENTO
+        auto& ss = em.getSingleton<SoundSystem>();
+        if (e.hasTag<PlayerTag>()){
+
+          
             if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
-                [[maybe_unused]] auto& li = em.getSingleton<LevelInfo>();
                 ss.play_pasos();
                 playerWalking = true;
 
@@ -136,20 +138,56 @@ void PhysicsSystem::update(EntityManager& em)
             }
         }
         auto& li = em.getSingleton<LevelInfo>();
-        if (e.hasTag<GolemTag>()) {
 
-            [[maybe_unused]] auto& player = *em.getEntityByID(li.playerID);
-            [[maybe_unused]] auto& playerPhy = em.getComponent<PhysicsComponent>(player);
-            [[maybe_unused]] auto& playerPos = playerPhy.position;
-            //phy.position
-            //phy.position.distance(playerPos);
-            [[maybe_unused]] auto& ss = em.getSingleton<SoundSystem>();
-            if (phy.velocity.x() != 0 || phy.velocity.z() != 0) {
-                [[maybe_unused]] auto& li = em.getSingleton<LevelInfo>();
-                //ss.sonido_golem_mov();
-                //playerWalking = true;
-
-            }
+        if (e.hasTag<GolemTag>() ){
+            
+            auto& player = *em.getEntityByID(li.playerID);
+            auto& playerPhy = em.getComponent<PhysicsComponent>(player);
+            auto& playerPos = playerPhy.position;
+            auto& ss = em.getSingleton<SoundSystem>();
+            auto& ia = em.getComponent<AIComponent>(e);
+            if( phy.position.distance(playerPos) < 40.0 )
+            {
+                if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !ia.ismoving)
+                {
+                    ss.sonido_golem_mov();
+                    ia.ismoving = true;
+                
+                } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  ia.ismoving)
+                {
+                    ia.ismoving= false;
+                    ss.stop_golem_mov();
+                }
+            } else
+            {
+                ss.stop_golem_mov();
+                ia.ismoving = false;
+            } 
+        }
+        if ( e.hasTag<SnowmanTag>() ){
+            
+           auto& player = *em.getEntityByID(li.playerID);
+            auto& playerPhy = em.getComponent<PhysicsComponent>(player);
+            auto& playerPos = playerPhy.position;
+            auto& ss = em.getSingleton<SoundSystem>();
+            auto& ia = em.getComponent<AIComponent>(e);
+            if( phy.position.distance(playerPos) < 40.0 )
+            {
+                if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !ia.ismoving)
+                {
+                    ss.sonido_munyeco_mov();
+                    ia.ismoving = true;
+                
+                } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  ia.ismoving)
+                {
+                    ia.ismoving= false;
+                    ss.stop_munyeco_mov();
+                }
+            } else
+            {
+                ss.stop_munyeco_mov();
+                ia.ismoving = false;
+            } 
         }
     });
 }

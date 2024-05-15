@@ -443,14 +443,14 @@ namespace DarkMoon {
                     // Skip the rest of the loop
                     continue;
                 }
-                else if (c == '\b') {
+                // Poner o quitar negrita
+                else if (c == '\b')
                     bold = !bold;
-                    // continue;
-                }
-                else if (c == '\t') {
+
+                // Poner o quitar cursiva
+                else if (c == '\t')
                     italic = !italic;
-                    // continue;
-                }
+
 #ifdef _WIN32
                 else if (checkSpecial)
                 {
@@ -483,24 +483,24 @@ namespace DarkMoon {
                     { posX + w, posY + h, 1.0f, 1.0f }
                 };
 
-                // If italic, apply a shear transformation to the vertices
+                // Transformamos los vértices
                 if (italic) {
-                    float shearAmount = -0.2f; // Adjust as needed
+                    static constexpr float shearAmount = -0.2f;
                     for (int i = 0; i < 6; i++) {
                         float shear = shearAmount * vertices[i][1];
                         vertices[i][0] += shear;
                     }
                 }
 
-                // Normalize the vertices
+                // Normalizamos los vértices
                 for (int i = 0; i < 6; i++) {
                     vertices[i][0] = rm.normalizeX(vertices[i][0]);
                     vertices[i][1] = rm.normalizeY(vertices[i][1]);
                 }
 
-                // If italic, adjust the x position of the characters
+                // Movemos los caracteres a donde queremos que estén
                 if (italic) {
-                    float adjustment = 0.181f; // Adjust as needed
+                    static constexpr float adjustment = 0.181f;
                     for (int i = 0; i < 6; i++) {
                         vertices[i][0] += adjustment;
                     }
@@ -517,12 +517,10 @@ namespace DarkMoon {
 
                 if (bold)
                 {
-                    float offset = 0.001f;
+                    static constexpr float offset = 0.001f;
 
                     for (int l = 0; l < 6; l++)
-                    {
                         vertices[l][0] += offset;
-                    }
 
                     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
                     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -888,6 +886,8 @@ namespace DarkMoon {
         Text name{};
         std::vector<std::string> options{};
         std::size_t currentOption{};
+
+
         WindowsManager& wm = WindowsManager::getInstance();
         InputManager& im = InputManager::getInstance();
 
@@ -1002,7 +1002,7 @@ namespace DarkMoon {
     };
 
     struct FloatSlider : OptionSlider {
-        float currentValue;
+        float currentValue{};
 
         FloatSlider(
             glm::vec2 pos = { 0.0f, 0.0f },

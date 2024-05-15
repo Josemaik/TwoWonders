@@ -54,6 +54,14 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             {
                 em.getSingleton<SoundSystem>().sonido_munyeco_danyo();
             }
+            else if (ent.hasTag<SlimeTag>())
+            {
+                em.getSingleton<SoundSystem>().sonido_slime_danyo();
+            }
+            else if (ent.hasTag<SpiderTag>()) 
+            {
+
+            }
 
             lif.lifeLost = 0;
         }
@@ -81,10 +89,10 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 else
                     lif.decreaseNextFrame = false;
                 if (em.getComponent<AIComponent>(ent).healbeforedie) {
-                    em.getComponent<AttackComponent>(ent).attack(AttackType::HealSpell);
+                    em.getComponent<AttackerComponent>(ent).attack(AttackType::HealSpellSetup);
                 }
                 else {
-                    em.getComponent<AttackComponent>(ent).attack(AttackType::HealSpell);
+                    em.getComponent<AttackerComponent>(ent).attack(AttackType::HealSpellSetup);
                 }
             }
             //si es un golem
@@ -95,8 +103,8 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 }
                 else
                     lif.decreaseNextFrame = false;
-                //  if (ent.hasComponent<AttackComponent>()) {
-                //     em.getComponent<AttackComponent>(ent).attack(AttackType::AreaAttack);
+                //  if (ent.hasComponent<AttackerComponent>()) {
+                //     em.getComponent<AttackerComponent>(ent).attack(AttackType::AreaAttack);
                 //  }
             }
 
@@ -105,6 +113,10 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 if (!lif.decreaseNextFrame)
                     em.getSingleton<SoundSystem>().sonido_munyeco_muere();
             }
+            if (ent.hasTag<SlimeTag>()) {
+                if (!lif.decreaseNextFrame)
+                    em.getSingleton<SoundSystem>().sonido_slime_muere();
+            }
 
             //Si es una bala
             if (ent.hasTag<HitPlayerTag>()) {
@@ -112,12 +124,6 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                     lif.decreaseNextFrame = true;
                 else
                     lif.decreaseNextFrame = false;
-
-                if (ent.hasComponent<ColliderComponent>() && ent.hasComponent<AttackComponent>()) {
-                    if (em.getComponent<ColliderComponent>(ent).attackType == AttackType::Spiderweb) {
-                        em.getComponent<AttackComponent>(ent).attack(AttackType::Spiderweb);
-                    }
-                }
             }
 
             if (ent.hasTag<SubjectTag>()) {
@@ -141,6 +147,8 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             if (ent.hasTag<DestructibleTag>()) {
                 if (li.mapID == 1) {
                     li.door_open = true;
+                    em.getSingleton<SoundSystem>().sonido_abrir_puerta_magica();
+
                 }
             }
 

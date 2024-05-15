@@ -41,7 +41,6 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     double countdown_stop = json["countdown_stop"].GetDouble();
     double countdown_shoot = json["countdown_shoot"].GetDouble();
     double countdown_perception = json["countdown_perception"].GetDouble();
-    double scale_to_respawn_attack = json["scale_to_respawn_attack"].GetDouble();
 
     double rot = orientation * DEGTORAD;
 
@@ -238,7 +237,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     auto& ai = em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = arrival_radius, .detect_radius = detect_radius, .attack_radius = attack_radius, .tx = tx, .tz = tz,.time2arrive = time2arrive, .tactive = tactive, .perceptionTime = static_cast<float>(perceptionTime),
         .path = path,.followpatrol = followpatrol ,.countdown_stop = countdown_stop, .countdown_shoot = countdown_shoot, .countdown_perception = countdown_perception, .initialPos = position, .behaviourTree = &tree });
 
-    em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = static_cast<float>(scale_to_respawn_attack) });
+    em.addComponent<AttackerComponent>(e);
 
     // Revisamos si está en el mapa tutorial para hacer que los enemigos no hagan daño
     auto& li = em.getSingleton<LevelInfo>();
@@ -364,5 +363,5 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
     em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = 0.1, .detect_radius = 18.0, .attack_radius = attack_radius_p, .tx = 0.0, .tz = 0.0,.time2arrive = 1.0, .tactive = true, .perceptionTime = static_cast<float>(0.2),
     .path = vec3d{}, .countdown_stop = countdown_stop_p, .countdown_shoot = countdown_shoot_p, .countdown_perception = 0.2, .behaviourTree = &tree });
 
-    em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = 5.0 });
+    em.addComponent<AttackerComponent>(e);
 }

@@ -35,8 +35,8 @@ struct SoundSystem {
     void sonido_melee();
     void sonido_movimiento_camara();    
     void sonido_muerte_enemigo();
-    void sonido_pasos_pradera();        //arreglar metodo, falla
-    void sonido_pasos_prision();        //arreglar metodo, falla
+    void sonido_pasos_pradera();       
+    void sonido_pasos_prision();        
     void sonido_piedras_golpe();
     void sonido_rebote();             
     void sonido_destello();
@@ -50,8 +50,8 @@ struct SoundSystem {
     void sonido_aum_vida_max();         
 
 
-    //SONIDOS PENDIENTES
-    void sonido_music_mazmorra();   //por realizar mejora
+
+    void sonido_music_mazmorra();   
     //dialogos
     void sonido_DInvestigador();    
     void sonido_DPlayer();          
@@ -65,12 +65,12 @@ struct SoundSystem {
 
    //sonidos de zona volcan
 
-    void sonido_music_volcan();     //por realizar mejora
+    void sonido_music_volcan();     
     void sonido_h_dash();                  
     void sonido_h_bola_fuego();     
-    void sonido_amb_volcan();       //por realizar el cambio de parámetros
-    void sonido_pasos_volcan();     //por integrar
-    void sonido_golem_mov();        //por integrar
+    void sonido_amb_volcan();       
+    void sonido_pasos_volcan();     
+    void sonido_golem_mov();        //por mejorar 
     void sonido_golem_ataque();     
     void sonido_golem_danyo();      
     void sonido_golem_muere();      
@@ -79,7 +79,7 @@ struct SoundSystem {
     void sonido_munyeco_danyo();    
     void sonido_munyeco_muere();    
     void sonido_abrir_puerta_magica();  //por integrar
-    void sonido_recoger_pieza();    //ahora no suena
+    void sonido_recoger_pieza();    
     void sonido_equipar_botas();    //por integrar
     void sonido_equipar_gorro();    //por integrar
 
@@ -100,7 +100,7 @@ struct SoundSystem {
 
    void sonido_amb_pradera();           //por integrar
    void sonido_music_pradera();         //por integrar
-   void sonido_h_escudo();              //por integrar
+   void sonido_h_escudo();              //por comprobar
    void sonido_slime_ataque();          //por integrar
    void sonido_slime_danyo();           //por integrar
    void sonido_slime_mov();             //por integrar
@@ -125,16 +125,18 @@ struct SoundSystem {
     void sonido_amb_biblioteca1();      //por integrar
     void sonido_amb_biblioteca2();      //por integrar
 
-    void sonido_boss_mov();             //por disenyar
-    void sonido_subdito_mov();          //por disenyar  
-    void sonido_boss_resucitar();       //por disenyar
-    void sonido_boss_escudo();          //por disenyar
-    void sonido_boss_danyo();           //por disenyar
-    void sonido_subdito_muere();        //por disenyar
-    void sonido_boss_muere();           //por disenyar
-    void sonido_inicio_batalla();       //por disenyar
-    void sonido_cambio_fase();          //por disenyar
-    void sonido_win();                  //por disenyar
+    void sonido_boss_mov();             //por integrar
+    void sonido_subdito_mov();          //por integrar  
+    void sonido_boss_resucitar();       //por integrar
+    void sonido_boss_escudo();          //por integrar
+    void sonido_boss_danyo();           //por integrar
+    void sonido_boss_subdito_danyo();   //por integrar
+    void sonido_subdito_muere();        //por integrar
+    void sonido_boss_muere();           //por integrar
+    void sonido_inicio_batalla();       //por integrar
+    void sonido_cambio_fase();          //por integrar
+    void sonido_win();                  //por integrar
+    void sonido_jugador_muere();        //por integrar
 
 
     void ambiente_parameter_lava(float lava);
@@ -144,9 +146,17 @@ struct SoundSystem {
     void play();
     void play_pasos();
     void play_music();
+    void play_music_level();
     void music_stop();
+    void music_stop_level();
     void ambient_stop();
     void SFX_pasos_stop();
+    void stop_golem_mov();
+    void stop_munyeco_mov();
+    void stop_pasos();
+
+    void sonido_pause(int zona);
+    void sonido_unpause(int zona);
 
     void update();
     void clear();
@@ -166,6 +176,7 @@ struct SoundSystem {
     bool music_started{ false };
     bool ambient_started{ false};
 
+
 private:
     FMOD_SYSTEM* coreSystem;
     FMOD_STUDIO_SYSTEM* soundSystem;
@@ -184,12 +195,17 @@ private:
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica_pradera;
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica_monte;
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_Musica_boss_final;
-    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_pasos;  
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_pasos;
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_munyeco_mov;   
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_golem_mov; 
     FMOD_STUDIO_EVENTINSTANCE* eventInstance;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente_volcan;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_Musica_Level;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_SFX_pasos;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_mov_golem;
+    FMOD_STUDIO_EVENTINSTANCE* eventInstance_mov_munyeco;
 
     FMOD_STUDIO_BUS* bus;
     FMOD_STUDIO_BUS* sfxBus;
@@ -211,9 +227,15 @@ private:
     float ambientVolume;
     float generalVolume;
 
-    //FMOD_RESULT res;
-    //float* volume;
-    //float* finalvolume;
+
+    //Variables para comprobaciones de pausa
+    FMOD_BOOL ambiente {true};
+    FMOD_BOOL ambiente_volcan {true};
+    FMOD_BOOL ambiente_pradera {true};
+    FMOD_BOOL ambiente_biblioteca {true};
+    FMOD_BOOL musica_suena {true};
+
+
 
 
 };

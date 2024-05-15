@@ -17,7 +17,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                 if (e.hasTag<LevelChangeTag>())
                 {
                     em.getSingleton<SoundSystem>().ambient_stop();
-                    em.getSingleton<SoundSystem>().music_stop();
+                    em.getSingleton<SoundSystem>().music_stop_level();
                     switch (li.mapID)
                     {
                     case 0:

@@ -5,49 +5,46 @@ void Octree::insert(Entity& entity, ColliderComponent& collider)
 {
     if (!divided_)
     {
-        if(octEntities_.size() < max_ent_)
-            octEntities_.insert({ &entity, &collider });
+        if (octEntities_.size() < max_ent_)
+            octEntities_.push_back({ &entity, &collider });
         else
-            subdivide(entity, collider);
+        {
+            // Si el octree no está dividido, lo dividimos
+            subdivide();
+
+            // Insertamos las entidades en los octantes antes de borrarlas de este nodo
+            for (auto& ent : octEntities_)
+                insert(*ent.first, *ent.second);
+            insert(entity, collider);
+
+            // Borramos las entidades de este nodo
+            octEntities_.clear();
+        }
     }
-    else if (depth_ < MAX_DEPTH)
+    else
     {
         for (auto& octant : octants_)
         {
-            if (octant && octant->bounds_.intersects(collider.bbox))
-            {
+            if (octant->bounds_.intersects(collider.bbox))
                 octant->insert(entity, collider);
-            }
         }
     }
 }
 
 // Cuando el octree excede su capacidad de entidades, se divide en 8 octantes
-void Octree::subdivide(Entity& entity, ColliderComponent& collider)
+void Octree::subdivide()
 {
     vec3d size = bounds_.size() / 2.0;
     vec3d center = bounds_.center();
+    vec3d octantCenter{};
 
-    octEntities_.insert({ &entity, &collider });
     for (std::size_t i = 0; i < 8; ++i)
     {
-        vec3d octantCenter = center + offsets[i] * size;
+        octantCenter = center + offsets[i] * size;
         BBox octantBounds(octantCenter, size);
 
-        for (auto& entity : octEntities_)
-        {
-            if (octantBounds.intersects(entity.second->bbox))
-            {
-                if (!octants_[i])
-                    octants_[i] = std::make_unique<Octree>(depth_ + 1, octantBounds, this);
-
-                octants_[i]->insert(*entity.first, *entity.second);
-            }
-        }
+        octants_[i] = std::make_unique<Octree>(depth_ + 1, octantBounds, this);
     }
-
-    // Liberamos el espacio del nodo padre
-    octEntities_.clear();
 
     divided_ = true;
 }
@@ -59,14 +56,81 @@ void Octree::clear()
         for (auto& octant : octants_)
         {
             if (octant)
+            {
                 octant->clear();
+                octant.reset();
+            }
         }
 
         divided_ = false;
     }
-    else 
+    else
         octEntities_.clear();
 }
+
+// bool Octree::isBalanced()
+// {
+//     double base = 8.0;
+//     std::size_t entities = countEntities();
+//     uint8_t expected = static_cast<uint8_t>(std::ceil(std::log(entities / max_ent_) / std::log(base)));
+
+//     if (std::abs(static_cast<int>(depth_) - expected) > 1)
+//         return false;
+
+//     if (divided_)
+//     {
+//         for (const auto& octant : octants_)
+//         {
+//             if (!octant->isBalanced())
+//                 return false;
+//         }
+//     }
+
+//     return true;
+// }
+
+// void Octree::rebalance()
+// {
+//     if (!isBalanced())
+//     {
+//         // Store all entities before clearing the Octree
+//         std::vector<std::pair<Entity*, ColliderComponent*>> entities(octEntities_.begin(), octEntities_.end());
+
+//         clear();
+
+//         // Reinsert all entities
+//         for (auto& ent : entities)
+//             insert(*ent.first, *ent.second);
+
+//         octEntities_.clear();
+//     }
+
+//     if (divided_)
+//     {
+//         for (auto& octant : octants_)
+//         {
+//             // Only rebalance the octant if it's not balanced
+//             if (!octant->isBalanced())
+//                 octant->rebalance();
+//         }
+//     }
+// }
+
+// std::size_t Octree::countEntities() const
+// {
+//     std::size_t count = octEntities_.size();
+
+//     if (divided_)
+//     {
+//         for (const auto& octant : octants_)
+//         {
+//             if (octant)
+//                 count += octant->countEntities();
+//         }
+//     }
+
+//     return count;
+// }
 
 // Funciones en desuso
 //

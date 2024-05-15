@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include "../components/type_component.hpp"
+#include <map>
+#include "../components/attack_component.hpp"
 
 inline static std::size_t itemID{ 0 };
 
@@ -31,51 +32,39 @@ enum struct Spells : uint8_t
     WaterDash,
 };
 
+static std::map<AttackType, double> spellType = {
+    { AttackType::None, 0 },
+    { AttackType::FireBallShot, 20 },
+    { AttackType::MeteoritePlayer, 20 },
+    { AttackType::IceShard, 20 },
+    { AttackType::IceShield, 20 },
+    { AttackType::WaterBombShot, 20 },
+    { AttackType::WaterDashArea, 20 },
+};
+
 struct Spell : public Item
 {
-    Spell(std::string name, std::string description, Spells spell, double cost, uint16_t damage)
-        : Item{ name, description }, spell{ spell }, cost{ cost }, damage{ damage }
+
+    Spell(std::string name, std::string description, AttackType atkType)
+        : Item{ name, description }, atkType{ atkType }
     {
-        switch (spell)
-        {
-        case Spells::FireBall:
-            type = ElementalType::Fire;
-            break;
-        case Spells::FireMeteorites:
-            type = ElementalType::Fire;
-            break;
-        case Spells::IceShards:
-            type = ElementalType::Ice;
-            break;
-        case Spells::IceShield:
-            type = ElementalType::Ice;
-            break;
-        case Spells::WaterBomb:
-            type = ElementalType::Water;
-            break;
-        case Spells::WaterDash:
-            type = ElementalType::Water;
-            break;
-        default:
-            break;
-        }
+        cost = spellType[atkType];
     }
 
     ~Spell() override = default;
 
     bool operator==(const Spell& other) const
     {
-        return spell == other.spell;
+        return atkType == other.atkType;
     }
 
-    bool operator==(const Spells& other) const
+    bool operator==(const AttackType& other) const
     {
-        return spell == other;
+        return atkType == other;
     }
-    Spells spell{};
-    ElementalType type{};
+
+    AttackType atkType{};
     double cost{};
-    uint16_t damage{};
 };
 
 struct Staff : public Item
