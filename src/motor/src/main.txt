@@ -146,7 +146,7 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
     auto camera = engine.GetCamera();
     float velocity = 0.5f;
 
-    if (engine.IsKeyDown(D_KEY_A)) { // +X -Z
+    if (engine.IsKeyDown(D_KEY_A) || engine.IsGamepadButtonDown(0, D_GAMEPAD_BUTTON_DPAD_LEFT)) { // +X -Z
         camera->position.x += velocity;
         camera->target.x += velocity;
 
@@ -155,7 +155,7 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
 
         nodeCharacter->translate({ velocity, 0.0f, -velocity });
     }
-    if (engine.IsKeyDown(D_KEY_D)) { // -X +Z
+    if (engine.IsKeyDown(D_KEY_D) || engine.IsGamepadButtonDown(0, D_GAMEPAD_BUTTON_DPAD_RIGHT)) { // -X +Z
         camera->position.x -= velocity;
         camera->target.x -= velocity;
 
@@ -164,7 +164,7 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
 
         nodeCharacter->translate({ -velocity, 0.0f, velocity });
     }
-    if (engine.IsKeyDown(D_KEY_W)) { // +X +Z
+    if (engine.IsKeyDown(D_KEY_W) || engine.IsGamepadButtonDown(0, D_GAMEPAD_BUTTON_DPAD_UP)) { // +X +Z
         camera->position.x += velocity;
         camera->target.x += velocity;
 
@@ -173,7 +173,7 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
 
         nodeCharacter->translate({ velocity, 0.0f, velocity });
     }
-    if (engine.IsKeyDown(D_KEY_S)) { // -X -Z
+    if (engine.IsKeyDown(D_KEY_S) || engine.IsGamepadButtonDown(0, D_GAMEPAD_BUTTON_DPAD_DOWN)) { // -X -Z
         camera->position.x -= velocity;
         camera->target.x -= velocity;
 
@@ -257,7 +257,7 @@ int main() {
             // float currentframe = glfwGetTime();
             // float deltatime = currentframe - lastframe;
             float deltatime = static_cast<float>(engine.GetFrameTime());
-
+            
             // Logic
 
             inputManager(engine, mainCharacter);
@@ -267,6 +267,7 @@ int main() {
 
             //textBoxEntity->text.text = std::to_string(engine.GetFPS());  
             am.UpdateAnimation(deltatime);
+
             // Draw
 
             engine.BeginDrawing();

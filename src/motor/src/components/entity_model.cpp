@@ -206,6 +206,10 @@ namespace DarkMoon {
         aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_SPECULAR, &specular);
         aiGetMaterialFloat(aiMaterial, AI_MATKEY_SHININESS, &shininess);
 
+        ambient.r = ambient.r == 0 ? 1.0f : ambient.r;
+        ambient.g = ambient.g == 0 ? 1.0f : ambient.g;
+        ambient.b = ambient.b == 0 ? 1.0f : ambient.b;
+
         //std::cout << ambient.r << " | " << ambient.g << " | " << ambient.b << "\n";
 
         // Create and return Material object
