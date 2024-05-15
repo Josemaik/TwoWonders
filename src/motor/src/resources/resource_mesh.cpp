@@ -90,7 +90,7 @@ namespace DarkMoon {
 
         if (hasBones)
         {
-            auto transforms = am.GetFinalBoneMatrices();
+            auto transforms = am.GetFinalBoneMatrices(animID);
             for (std::size_t i = 0; i < transforms.size(); ++i) {
                 std::string boneStr = "finalBonesMatrices[" + std::to_string(i) + "]";
                 int boneLocation = glGetUniformLocation(rm.getShader()->getIDShader(), boneStr.c_str());

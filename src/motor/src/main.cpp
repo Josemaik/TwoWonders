@@ -91,10 +91,20 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     modelDummy2->rotate({ 0.0f, 1.0f, 0.0f }, 180.0f);
 
     // Node: Modelo Dummy 3
-    auto modelDummy3 = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 3", p_node3D);
+    auto modelDummy3 = engine.CreateModel("assets/Cofre/Texturas/Cofre.fbx", D_WHITE, "Modelo: Dummy 3", p_node3D);
     //modelDummy3->scale({0.2f, 0.2f, 0.2f});
     modelDummy3->translate({ 30.0f, 0.0f, 0.0f });
-    modelDummy3->rotate({ 0.0f, 1.0f, 0.0f }, 270.0f);
+    modelDummy3->rotate({ 0.0f, 1.0f, 0.0f }, 90.0f);
+    auto eModel = dynamic_cast<DarkMoon::Model*>(modelDummy3->getEntity());
+    auto& m_meshes = eModel->getMeshes();
+
+    auto& am = AnimationManager::getInstance();
+    auto* animation = am.createAnimation("assets/Cofre/Texturas/Cofre.fbx", eModel->getboneInfoMap());
+
+    auto id = am.PlayAnimation(animation);
+    for (auto& mesh : m_meshes) {
+        mesh->animID = id;
+    }
 
     return p_node3D;
 }
@@ -177,7 +187,7 @@ int main() {
         createScene3D(engine);
         auto mainCharacter = createMainCharacter(engine);
         auto modelcharacter = dynamic_cast<DarkMoon::Model*>(mainCharacter->getEntity());
-        // auto& m_meshes = modelcharacter->getMeshes();
+        auto& m_meshes = modelcharacter->getMeshes();
 
         // for (std::size_t i = 0; i < m_meshes.size(); i++)
         // {
@@ -219,7 +229,10 @@ int main() {
         // std::cout << "│ Tree │" << std::endl;
         // std::cout << "└──────┘" << std::endl;
         // engine.GetRootNode()->drawTree();
-        am.PlayAnimation(&crusheranimation);
+        auto id = am.PlayAnimation(&crusheranimation);
+        for (auto& mesh : m_meshes) {
+            mesh->animID = id;
+        }
 
         while (!engine.WindowShouldClose()) {
 

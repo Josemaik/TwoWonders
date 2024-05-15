@@ -73,6 +73,7 @@ namespace DarkMoon {
         std::vector<Vertex> vertices;
         std::vector<uint16_t> indices;
         bool hasBones;
+        std::size_t animID{ std::numeric_limits<std::size_t>::max() };
         //std::vector<VertexBoneData>num_bones{};
         Material* material;
         AnimationManager& am = AnimationManager::getInstance();
