@@ -51,7 +51,7 @@ void AISystem::update(EntityManager& em)
         //Actualizar posiciones de la IAs o potenciales targets para calcular Flocking
         // Comprobamos si el elemento debe procesarse
         // Más alante hacer que se cumpla si esta a una cierta distancia del player
-        if (e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()) {
+        if (e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>() || e.hasTag<SlimeTag>()) {
             //Si el vector esta vacío, el elemento se inserta
             bool id_found = false;
             // Iterar sobre el vector positions

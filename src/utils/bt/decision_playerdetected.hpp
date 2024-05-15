@@ -8,6 +8,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
     const double verticalFOV = 60.0; // Ángulo vertical de visión en grados
     const double horizontalFOV = 250.0; // Ángulo horizontal de visión en grados
     const double MinRayDistance = 10.0; // Mínima distancia de detección por vista
+    const double MIN_HIGHT_DETECTTION { 7.0 };
 
     BTDecisionPlayerDetected() {}
 
@@ -109,15 +110,16 @@ struct BTDecisionPlayerDetected : BTNode_t {
 
             //########## PERCEPCION SENSORIAL - VISTA ################
 
-            // Si el player se encuentra a una altura mayor o menor que el enemigo
-            // que sea superior a 1 metro no puede ser visto por el enemigo
-            // if(ectx.ent.hasTag<SnowmanTag>() || ectx.ent.hasTag<GolemTag>()){
-            //     if(std::abs(getplayerphy(ectx).position.y() - ectx.phy.position.y()) > 7.0){
-            //                 ectx.ai->playerdetected = false;
-            //                 ectx.ai->alert_state = false;
-            //                 return BTNodeStatus_t::fail;
-            //     }
-            // }
+            // en nivel 3 no pueden detectarte por difrencia de altura en el nivel
+            // ademas los muñecos disparan bolas de nieve sin caída
+            auto& li = ectx.em.getSingleton<LevelInfo>();
+            if(li.mapID == 3 && (ectx.ent.hasTag<GolemTag>() || ectx.ent.hasTag<SlimeTag>() || ectx.ent.hasTag<GolemTag>() )){
+                if(std::abs(getplayerphy(ectx).position.y() - ectx.phy.position.y()) > MIN_HIGHT_DETECTTION){
+                            ectx.ai->playerdetected = false;
+                            ectx.ai->alert_state = false;
+                            return BTNodeStatus_t::fail;
+                }
+            }
 
 
             //Calcula la dirección de visión del enemigo utilizando su orientación
@@ -196,6 +198,25 @@ struct BTDecisionPlayerDetected : BTNode_t {
                         // si eres golem o slime no puedes ser detectaddo al estar en diferentes nieveles de altura
                         ectx.ai->alert_state = false;
                         ectx.ai->playerdetected = true;
+                        //if slime -> notify neareest slimes
+                        // if(ectx.ent.hasTag<SlimeTag>()){
+                        auto& bb = ectx.em.getSingleton<BlackBoard_t>();
+                        //     int tam = bb.slimeData.size();
+                        for (auto it = bb.slimeData.begin(); it != bb.slimeData.end(); ++it) {
+                                    // size_t id = ectx.ent.getID();
+                        //         size_t slimeid = it->first;
+                                auto& slime = *ectx.em.getEntityByID(it->first);
+                                if (it->first != ectx.ent.getID() && slime.hasComponent<AIComponent>()) {
+                                    auto const dis = ectx.phy.position.distance(it->second.position);
+                                    auto& aic = ectx.em.getComponent<AIComponent>(slime);
+                                    if (dis < (5.0 * 5.0) && !aic.playerdetected) {
+                                        //  std::cout << "hola:" << it->first << "\n";
+                                        aic.playerdetected = true;
+                                        // return BTNodeStatus_t::success;
+                                    }
+                                }
+                        }
+                        // std::cout << "finalizo";
                         return BTNodeStatus_t::success;
                     }
                 }
