@@ -40,44 +40,89 @@ namespace DarkMoon {
     void RenderManager::updateLights(){
         pointLights.clear();
         directionalLights.clear();
+        spotLights.clear();
     }
 
     void RenderManager::checkLights(){
         if(activeLights){
             useShader(shaders["lights"]);
 
+            // Directional Lights //
+
+            // std::cout << "-----------------------------\n";
+            // std::cout << "Luces direccionales: " << directionalLights.size() << "\n";
+            // std::cout << "Luces puntuales: " << pointLights.size() << "\n";
+            // std::cout << "Luces focales: " << spotLights.size() << "\n";
+
+            if(!directionalLights.empty()){
+                for(int i=0; i<static_cast<int>(directionalLights.size()); i++){
+                    std::string directionUniformName  = "gDirectionalLight.direction";
+                    std::string colorUniformName      = "gDirectionalLight.base.color";
+                    std::string ambientUniformName    = "gDirectionalLight.base.ambientIntensity"; 
+                    std::string diffuseUniformName    = "gDirectionalLight.base.diffuseIntensity"; 
+
+                    glUniform3fv(glGetUniformLocation(shaders["lights"]->getIDShader(), directionUniformName.c_str()), 1, glm::value_ptr(directionalLights[i]->direction));
+                    glUniform3fv(glGetUniformLocation(shaders["lights"]->getIDShader(), colorUniformName.c_str()), 1, glm::value_ptr(normalizeColor(directionalLights[i]->color)));
+                    glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), ambientUniformName.c_str()), directionalLights[i]->ambientIntensity);
+                    glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), diffuseUniformName.c_str()), directionalLights[i]->diffuseIntensity);
+                }
+
+            }
+            //glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "NumDirectionalLights"), static_cast<int>(directionalLights.size()));
+
             // Point Lights //
 
             if(!pointLights.empty()){
                 for(int i=0; i<static_cast<int>(pointLights.size()); i++){
-                    std::string positionUniformName  = "pointsLights[" + std::to_string(i) + "].position";
-                    std::string colorUniformName     = "pointsLights[" + std::to_string(i) + "].color";
-                    std::string constantUniformName  = "pointsLights[" + std::to_string(i) + "].constant";
-                    std::string linearUniformName    = "pointsLights[" + std::to_string(i) + "].linear";
-                    std::string quadraticUniformName = "pointsLights[" + std::to_string(i) + "].quadratic";
+                    std::string positionUniformName  = "gPointLights[" + std::to_string(i) + "].position";
+                    std::string colorUniformName     = "gPointLights[" + std::to_string(i) + "].base.color";
+                    std::string constantUniformName  = "gPointLights[" + std::to_string(i) + "].attenuation.constant";
+                    std::string linearUniformName    = "gPointLights[" + std::to_string(i) + "].attenuation.linear";
+                    std::string quadraticUniformName = "gPointLights[" + std::to_string(i) + "].attenuation.exp";
+                    std::string ambientUniformName   = "gPointLights[" + std::to_string(i) + "].base.ambientIntensity"; 
+                    std::string diffuseUniformName   = "gPointLights[" + std::to_string(i) + "].base.diffuseIntensity"; 
                 
-                    glUniform4fv(glGetUniformLocation(shaders["lights"]->getIDShader(), positionUniformName.c_str()), 1, glm::value_ptr(pointLights[i]->position));
-                    glUniform4fv(glGetUniformLocation(shaders["lights"]->getIDShader(), colorUniformName.c_str()), 1, glm::value_ptr(normalizeColor(pointLights[i]->color)));
+                    glUniform3fv(glGetUniformLocation(shaders["lights"]->getIDShader(), positionUniformName.c_str()), 1, glm::value_ptr(pointLights[i]->position));
+                    glUniform3fv(glGetUniformLocation(shaders["lights"]->getIDShader(), colorUniformName.c_str()), 1, glm::value_ptr(normalizeColor(pointLights[i]->color)));
                     glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), constantUniformName.c_str()), pointLights[i]->constant);
                     glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), linearUniformName.c_str()), pointLights[i]->linear);
                     glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), quadraticUniformName.c_str()), pointLights[i]->quadratic);
+                    glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), ambientUniformName.c_str()), pointLights[i]->ambientIntensity);
+                    glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), diffuseUniformName.c_str()), pointLights[i]->diffuseIntensity);
                 }
             }
-            glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "NumPointLights"), static_cast<int>(pointLights.size()));
+            glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "gNumPointLights"), static_cast<int>(pointLights.size()));
 
-            // Directional Lights //
+            // Spot Lights //
 
-            if(!directionalLights.empty()){
-                for(int i=0; i<static_cast<int>(directionalLights.size()); i++){
-                    std::string directionUniformName  = "directionalLights[" + std::to_string(i) + "].direction";
-                    std::string colorUniformName     = "directionalLights[" + std::to_string(i) + "].color";
+            if(!spotLights.empty()){
+                for(int i=0; i<static_cast<int>(spotLights.size()); i++){
+                    std::string colorUniformName      = "gSpotLights[" + std::to_string(i) + "].base.base.color";
+                    std::string positionUniformName   = "gSpotLights[" + std::to_string(i) + "].base.position";
+                    std::string directionUniformName  = "gSpotLights[" + std::to_string(i) + "].direction";
+                    std::string cutOffUniformName     = "gSpotLights[" + std::to_string(i) + "].cutOff";
 
-                    glUniform4fv(glGetUniformLocation(shaders["lights"]->getIDShader(), directionUniformName.c_str()), 1, glm::value_ptr(directionalLights[i]->direction));
-                    glUniform4fv(glGetUniformLocation(shaders["lights"]->getIDShader(), colorUniformName.c_str()), 1, glm::value_ptr(normalizeColor(directionalLights[i]->color)));
+                    std::string constantUniformName   = "gSpotLights[" + std::to_string(i) + "].base.attenuation.constant";
+                    std::string linearUniformName     = "gSpotLights[" + std::to_string(i) + "].base.attenuation.linear";
+                    std::string quadraticUniformName  = "gSpotLights[" + std::to_string(i) + "].base.attenuation.exp";
+
+                    std::string ambientUniformName    = "gSpotLights[" + std::to_string(i) + "].base.base.ambientIntensity"; 
+                    std::string diffuseUniformName    = "gSpotLights[" + std::to_string(i) + "].base.base.diffuseIntensity"; 
+                
+                    glUniform3fv(glGetUniformLocation(shaders["lights"]->getIDShader(), positionUniformName.c_str()), 1, glm::value_ptr(spotLights[i]->position));
+                    glUniform3fv(glGetUniformLocation(shaders["lights"]->getIDShader(), directionUniformName.c_str()), 1, glm::value_ptr(spotLights[i]->direction));
+                    glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), cutOffUniformName.c_str()), spotLights[i]->cutOff);
+                    glUniform3fv(glGetUniformLocation(shaders["lights"]->getIDShader(), colorUniformName.c_str()), 1, glm::value_ptr(normalizeColor(spotLights[i]->color)));
+
+                    glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), constantUniformName.c_str()), spotLights[i]->constant);
+                    glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), linearUniformName.c_str()), spotLights[i]->linear);
+                    glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), quadraticUniformName.c_str()), spotLights[i]->quadratic);
+
+                    glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), ambientUniformName.c_str()), spotLights[i]->ambientIntensity);
+                    glUniform1f(glGetUniformLocation(shaders["lights"]->getIDShader(), diffuseUniformName.c_str()), spotLights[i]->diffuseIntensity);
                 }
-
             }
-            glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "NumDirectionalLights"), static_cast<int>(directionalLights.size()));
+            glUniform1i(glGetUniformLocation(shaders["lights"]->getIDShader(), "gNumSpotLights"), static_cast<int>(spotLights.size()));
 
         }
     }
