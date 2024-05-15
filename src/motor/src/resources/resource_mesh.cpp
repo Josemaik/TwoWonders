@@ -1,11 +1,13 @@
 #include "resource_mesh.hpp"
 
 namespace DarkMoon {
-    Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<uint16_t> indices, Material* material) {
+    Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<uint16_t> indices, Material* material, std::string name, bool hasBones) {
         this->m_id = id;
         this->vertices = vertices;
         this->indices = indices;
         this->material = material;
+        this->m_name = name;
+        this->hasBones = hasBones;
     }
 
     bool Mesh::load(const char* filePath) {
@@ -57,13 +59,22 @@ namespace DarkMoon {
         // Enable and specify vertex coords
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, textCoords));
-        // Enable and specify bones ids
-        glEnableVertexAttribArray(BONE_ID_LOCATION);
-        glVertexAttribPointer(BONE_ID_LOCATION,MAX_NUM_BONES_PER_VERTEX,GL_INT, GL_FALSE,sizeof(Vertex) , (void*)offsetof(Vertex, m_BonesIDs));
-        //weights
-        glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
-        glVertexAttribPointer(BONE_WEIGHT_LOCATION,MAX_NUM_BONES_PER_VERTEX,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)offsetof(Vertex,m_Weights));
-        
+        // Enable and specify tangent
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
+        // Enable and specify bitangent
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, BiTangent));
+        if (hasBones)
+        {
+            // Enable and specify bones ids
+            glEnableVertexAttribArray(5);
+            glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, boneIDs));
+            //weights
+            glEnableVertexAttribArray(6);
+            glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, weights));
+        }
+
         // Unbind vertex array
         glBindVertexArray(0);
 
@@ -73,13 +84,23 @@ namespace DarkMoon {
 
     void Mesh::draw(glm::mat4 transMatrix, Color color) {
         RenderManager& rm = RenderManager::getInstance();
-
         rm.beginMode3D();
         glEnable(GL_CULL_FACE);
+        auto& shaders = rm.shaders;
+        rm.useShader(shaders["3D"]);
+
+        if (hasBones)
+        {
+            auto transforms = am.GetFinalBoneMatrices(animID);
+            for (std::size_t i = 0; i < transforms.size(); ++i) {
+                std::string boneStr = "finalBonesMatrices[" + std::to_string(i) + "]";
+                int boneLocation = glGetUniformLocation(rm.getShader()->getIDShader(), boneStr.c_str());
+                glUniformMatrix4fv(boneLocation, 1, GL_FALSE, glm::value_ptr(transforms[i]));
+            }
+        }
 
         // Set the uniform color in the shader
         GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
-        glUseProgram(rm.getShader()->getIDShader());
         glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
         // Transform
@@ -95,7 +116,7 @@ namespace DarkMoon {
         if (!material->texture)
             material->texture = rm.defaultMaterial->texture;
         glBindTexture(GL_TEXTURE_2D, material->texture->getIDTexture());
-        
+
         // Material
         glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Kd"), 1, glm::value_ptr(material->getDiffuseColor()));
         glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ka"), 1, glm::value_ptr(material->getAmbientColor()));

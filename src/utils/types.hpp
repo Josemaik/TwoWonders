@@ -23,6 +23,7 @@
 #include "../components/particle_component.hpp"
 #include "../components/spawn_component.hpp"
 #include "../components/pointlight_component.hpp"
+#include "../components/grass_component.hpp"
 #include "../components/ai_component.hpp"
 #include "../components/navmesh_component.hpp"
 #include "../components/npc_component.hpp"
@@ -126,6 +127,7 @@ struct SnowBallTag {};
 struct MagmaBallTag {};
 struct EnemyDeathTag {};
 struct LockableTag {};
+struct GrassTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -157,7 +159,8 @@ using CL = MP::TypeList <
     BoatComponent,
     ParticleMakerComponent,
     SpawnComponent,
-    PointLightComponent,
+    PointLightComponent, 
+    GrassComponent,
     SoundComponent
 > ;
 using TL = MP::TypeList <
@@ -213,7 +216,8 @@ using TL = MP::TypeList <
     SnowBallTag,
     MagmaBallTag,
     EnemyDeathTag,
-    LockableTag
+    LockableTag,
+    GrassTag
 > ;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem, FrustumInfo, CheatsInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;

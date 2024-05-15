@@ -6,6 +6,7 @@
 #include <vector>
 #include <GL/gl.h>
 #include <glm/glm.hpp>
+
 namespace DarkMoon {
     struct Point3D : Entity {
         glm::vec3 position;
@@ -577,5 +578,117 @@ namespace DarkMoon {
 
             rm.endMode3D();
         };
+    };
+
+    struct Vertex2 {
+        glm::vec3 position;
+        glm::vec3 normal;
+        glm::vec2 textCoords;
+    };
+
+    struct Billboard : Entity {
+    private:
+        GLuint m_VAO {}, m_VBO {}, m_EBO {};
+        std::vector<Vertex2> m_vertices;
+        std::vector<uint16_t> m_indices;
+    public:
+        Texture* texture = { nullptr };
+        glm::vec3 position { 0, 0, 0 };
+        glm::vec2 size { 10, 10 };
+        Color color = { D_WHITE };
+        
+        Billboard(Texture* text, glm::vec3 pos, glm::vec2 siz)
+            : texture(text), position(pos), size(siz) {
+                glGenVertexArrays(1, &m_VAO);
+                glGenBuffers(1, &m_VBO);
+                glGenBuffers(1, &m_EBO);
+
+                setupVerticesAndIndices();
+            };
+
+        ~Billboard() {
+            // Clean up resources
+            glDeleteVertexArrays(1, &m_VAO);
+            glDeleteBuffers(1, &m_VBO);
+            glDeleteBuffers(1, &m_EBO);
+        };
+
+        void setupVerticesAndIndices() {
+            // Define vertices and indices for the billboard
+            glm::vec2 halfSize = size * 0.5f;
+            m_vertices = {
+                {{-halfSize.x, 0.0f, -halfSize.y},   {0.0f, 1.0f, 0.0f},   {0.0f, 1.0f}},
+                {{ halfSize.x, 0.0f, -halfSize.y},   {0.0f, 1.0f, 0.0f},   {1.0f, 1.0f}},
+                {{-halfSize.x, 0.0f,  halfSize.y},   {0.0f, 1.0f, 0.0f},   {0.0f, 0.0f}},
+                {{ halfSize.x, 0.0f,  halfSize.y},   {0.0f, 1.0f, 0.0f},   {1.0f, 0.0f}},
+            };
+            m_indices = {0, 1, 2, 1, 2, 3};
+        }
+
+        void draw(glm::mat4) override {
+            RenderManager& rm = RenderManager::getInstance();
+
+            rm.beginMode3D();
+
+            glm::vec3 camDirection = glm::normalize(rm.m_camera->position - position);
+            glm::vec3 billboardDirection = glm::vec3(0.0f, 0.0f, -1.0f);
+            float angleY = static_cast<float>(glm::degrees(atan2(camDirection.x, camDirection.z) - atan2(billboardDirection.x, billboardDirection.z)));
+            float angleX = static_cast<float>(glm::degrees(atan2(camDirection.y, camDirection.z) - atan2(billboardDirection.y, billboardDirection.z)));
+
+            glm::mat4 billboardRotation = glm::rotate(glm::mat4(1.0f), glm::radians(angleY), glm::vec3(0.0f,1.0f,0.0f));
+            billboardRotation = glm::rotate(billboardRotation, glm::radians(angleX), glm::vec3(1.0f,0.0f,0.0f));
+
+            glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), position) * billboardRotation;
+
+            auto nColor = rm.normalizeColor(color);
+
+            setupVerticesAndIndices();
+
+            glBindVertexArray(m_VAO);
+
+            glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+            glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex2), m_vertices.data(), GL_STATIC_DRAW);
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(uint16_t), m_indices.data(), GL_STATIC_DRAW);
+
+            // position attribute
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex2), (void*)offsetof(Vertex2, position));
+            glEnableVertexAttribArray(0);
+
+            // normal attribute
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex2), (void*)offsetof(Vertex2, normal));
+            glEnableVertexAttribArray(1);
+
+            // texture coordinate attribute
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2), (void*)offsetof(Vertex2, textCoords));
+            glEnableVertexAttribArray(2);
+
+            // Colors
+            GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+            glUniform4fv(colorUniform, 1, glm::value_ptr(nColor));
+
+            // Transform
+            glm::mat4 view = rm.m_camera->getViewMatrix();
+            glm::mat4 projection = rm.m_camera->getProjectionMatrix(rm.getWidth(), rm.getHeight());
+            glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+            glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+            glUniformMatrix4fv(glGetUniformLocation(rm.getShader()->getIDShader(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+            // Bind texture
+            if (!texture)
+                texture = rm.defaultMaterial->texture;
+            glBindTexture(GL_TEXTURE_2D, texture->getIDTexture());
+
+            // Draw the plane
+            glBindVertexArray(m_VAO);
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_SHORT, 0);
+
+            // Unbind texture
+            glBindTexture(GL_TEXTURE_2D, 0);
+            glActiveTexture(GL_TEXTURE0);
+
+            rm.endMode3D();
+        }
     };
 }

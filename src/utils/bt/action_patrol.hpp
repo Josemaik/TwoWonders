@@ -34,7 +34,7 @@ struct BTAction_Patrol : BTNode_t {
         auto& li = ectx.em.getSingleton<LevelInfo>();
         auto& navs = ectx.em.getSingleton<NavmeshInfo>();
         //check distance
-        if (!ectx.ai->check_distance && li.mapID == 2) {
+        if(!ectx.ai->check_distance && (li.mapID == 2 || li.mapID == 3) ){
             vec3d begin = *ectx.ai->path.begin();
             double disaux = ectx.phy.position.distance(begin);
             // double dify = std::abs((ectx.phy.position.y()-2.0)  - begin.y());

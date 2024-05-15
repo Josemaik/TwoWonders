@@ -1,10 +1,11 @@
 #include "resource_shader.hpp"
 
 namespace DarkMoon {
-    Shader::Shader(std::size_t id, const char* vertexPath, const char* fragmentPath) {
+    Shader::Shader(std::size_t id, const char* vertexPath, const char* fragmentPath, const char* geometryPath) {
         this->m_id = id;
         this->m_vertexPath = vertexPath;
         this->m_fragmentPath = fragmentPath;
+        this->m_geometryPath = geometryPath;
     };
 
     bool Shader::load(const char* filePath) {
@@ -32,13 +33,16 @@ namespace DarkMoon {
     void Shader::setup() {
 
         //----- Retrieve the vertex/fragment source code from filePath -----//
-        std::string vertexCode;
-        std::string fragmentCode;
+        std::string vertexCode {};
+        std::string fragmentCode {};
+        std::string geometryCode {};
         std::ifstream vShaderFile;
         std::ifstream fShaderFile;
+        std::ifstream gShaderFile;
         // ensure ifstream objects can throw exceptions:
         vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
         fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+        gShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
         try {
             // open files
@@ -54,6 +58,14 @@ namespace DarkMoon {
             // convert stream into string
             vertexCode = vShaderStream.str();
             fragmentCode = fShaderStream.str();
+
+            if(m_geometryPath != ""){
+                gShaderFile.open(m_geometryPath);
+                std::stringstream gShaderStream;
+                gShaderStream << gShaderFile.rdbuf();
+                gShaderFile.close();
+                geometryCode = gShaderStream.str();
+            }
         }
         catch (const std::ifstream::failure& e) {
             std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ\n"
@@ -63,9 +75,13 @@ namespace DarkMoon {
 
         const char* vShaderCode = vertexCode.c_str();
         const char* fShaderCode = fragmentCode.c_str();
+        const char* gShaderCode = geometryCode.c_str();
 
         //----- Compile shaders -----//
-        GLuint vertex, fragment;
+        GLuint vertex, fragment, geometry;
+
+        int success;
+        char infoLog[512];
 
         // Vertex Shader
         //--------------
@@ -73,8 +89,6 @@ namespace DarkMoon {
         glShaderSource(vertex, 1, &vShaderCode, NULL);
         glCompileShader(vertex);
         // check for shader compile errors
-        int success;
-        char infoLog[512];
         glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(vertex, 512, NULL, infoLog);
@@ -91,6 +105,21 @@ namespace DarkMoon {
         if (!success) {
             glGetShaderInfoLog(fragment, 512, NULL, infoLog);
             std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+        }
+
+        // Geometry Shader
+        //----------------
+
+        if(!geometryCode.empty()){
+            geometry = glCreateShader(GL_GEOMETRY_SHADER);
+            glShaderSource(geometry, 1, & gShaderCode, NULL);
+            glCompileShader(geometry);
+            // check for shader compile errors
+            glGetShaderiv(geometry, GL_COMPILE_STATUS, &success);
+            if(!success){
+                glGetShaderInfoLog(geometry, 512, NULL, infoLog);
+                std::cerr << "ERROR::SHADER::GEOMETRY::COMPILATION_FAILED\n" << infoLog << std::endl;
+            }
         }
 
         // Link Shaders

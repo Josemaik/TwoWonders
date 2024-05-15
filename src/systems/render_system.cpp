@@ -445,12 +445,13 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
 {
     auto& inpi = em.getSingleton<InputInfo>();
 
-    ss.sonido_pause(li.mapID);
-
-
     // Nodo de los botones
     if (inpi.pause)
+    {
         getNode(engine, "2D")->setVisible(false);
+        ss.sonido_pause(li.mapID);
+        ss.stop_pasos();
+    }
 
     auto* menuNode = getNode(engine, "MenuPrincipal");
 
@@ -494,21 +495,20 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
     engine.clearBackground(D_WHITE);
     std::map<std::string, std::tuple<Node*, std::string, std::function<void()>>> buttonData = {
         { "1_jugar", { nullptr, inpi.pause ? "Reanudar" : "Jugar" , [&]() {
+
             if (!inpi.pause)
             {
                 li.currentScreen = GameScreen::STORY;
                 li.anyButtonPressed = false;
-                
-                
             }
             else
+            {
                 inpi.pause = false;
-
-            li.elapsedPause = 0.f;
+                ss.sonido_unpause(li.mapID);
+            }
 
             ss.seleccion_menu();
-            ss.sonido_unpause(li.mapID);
-
+            li.elapsedPause = 0.f;
         } } },
         { "2_opciones", { nullptr, "Opciones", [&]() {
             li.previousScreen = li.currentScreen;
@@ -1008,9 +1008,45 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 }
             }
         }
+        else if (e.hasTag<GroundTag>() && e.hasComponent<GrassComponent>())
+        {
+            drawGrass(engine, r, em.getComponent<GrassComponent>(e));
+        }
     });
 
     // engine.activateLights();
+}
+
+void RenderSystem::drawGrass(GameEngine& engine, RenderComponent& ren, GrassComponent& grc)
+{
+    // TODO implementar textura con billboards
+    vec3d surfaceMax = ren.position + ren.scale / 2;
+    if (!grc.created)
+    {
+        // Conseguimos 20 posiciones random que estén entre la x y la z de la superficie
+        vec3d surfaceMin = ren.position - ren.scale / 2;
+
+        for (auto& grass : grc.grass)
+        {
+            double x = engine.getRandomValue(surfaceMin.x(), surfaceMax.x());
+            double z = engine.getRandomValue(surfaceMin.z(), surfaceMax.z());
+            double wiggleX = engine.getRandomValue(-0.5, 0.5);
+            double wiggleZ = engine.getRandomValue(-0.5, 0.5);
+            double y = engine.getRandomValue(1.0, 3.0);
+
+            grass.startPos = { x, surfaceMax.y(), z };
+            grass.endPos = { x + wiggleX, surfaceMax.y() + y, z + wiggleZ };
+        }
+
+        grc.created = true;
+    }
+    else
+    {
+        for (auto& grass : grc.grass)
+        {
+            engine.drawLine3D(grass.startPos, grass.endPos, 1.1f, D_GREEN_DARK);
+        }
+    }
 }
 
 void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r)
@@ -1609,10 +1645,10 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         //Creamos Grafo
         Graph graph{};
         graph.createGraph(navs.conexiones, navs.nodes);
-        std::vector<vec3d> path = graph.PathFindAStar(debug, startnode, 819);
+        std::vector<vec3d> path = graph.PathFindAStar(debug, startnode, 423);
 
-        std::size_t lengthpath = path.size();
-        std::cout << lengthpath;
+        // std::size_t lengthpath = path.size();
+        // std::cout << lengthpath;
         //calcular camnino desde el centro hasta un punto
 
     //     std::vector<vec3d> nodes;

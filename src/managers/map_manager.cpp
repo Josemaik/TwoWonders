@@ -160,8 +160,8 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             }
             case LoadState::LOAD_NAVMESHES:
             {
-                if (li.mapID == 2)
-                    generateNavmeshes(em);
+                // if (li.mapID == 2)
+                generateNavmeshes(em,li.mapID);
                 generateCheats(em);
                 break;
             }
@@ -230,31 +230,37 @@ void MapManager::generateGround(EntityManager& em, const valueType& groundArray,
         Color color{ D_WHITE };
 
         // Sacamos los máximos y los mínimos
+        vec3d groundMax = groundPosition + groundScale / 2;
+        vec3d groundMin = groundPosition - groundScale / 2;
         if (i == 0)
         {
-            min.x = groundPosition.x() - groundScale.x() / 2;
-            min.y = groundPosition.z() - groundScale.z() / 2;
+            min.x = groundMin.x();
+            min.y = groundMin.z();
 
-            max.x = groundPosition.x() + groundScale.x() / 2;
-            max.y = groundPosition.z() + groundScale.z() / 2;
+            max.x = groundMax.x();
+            max.y = groundMax.z();
 
             minHeigth = groundPosition.y();
         }
         else
         {
-            if (min.x > groundPosition.x() - groundScale.x() / 2)
-                min.x = groundPosition.x() - groundScale.x() / 2;
-            if (min.y > groundPosition.z() - groundScale.z() / 2)
-                min.y = groundPosition.z() - groundScale.z() / 2;
+            if (min.x > groundMin.x())
+                min.x = groundMin.x();
+            if (min.y > groundMin.z())
+                min.y = groundMin.z();
 
-            if (max.x < groundPosition.x() + groundScale.x() / 2)
-                max.x = groundPosition.x() + groundScale.x() / 2;
-            if (max.y < groundPosition.z() + groundScale.z() / 2)
-                max.y = groundPosition.z() + groundScale.z() / 2;
+            if (max.x < groundMax.x())
+                max.x = groundMax.x();
+            if (max.y < groundMax.z())
+                max.y = groundMax.z();
 
             if (minHeigth > groundPosition.y())
                 minHeigth = groundPosition.y();
         }
+
+        auto& li = em.getSingleton<LevelInfo>();
+        if (li.mapID == 0)
+            em.addComponent<GrassComponent>(groundEntity);
 
         // Creamos los componentes del suelo
         auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .visible = false, .orientation = rot, .rotationVec = rotationVec });
@@ -765,10 +771,16 @@ vec3d getNodeVec3d(uint16_t nodeId, const std::map<uint16_t, vec3d>& nodes) {
     // Si no se encuentra el nodo, se devuelve un vec3d con valores predeterminados o se maneja el error de alguna otra manera
     return { 0.0f, 0.0f, 0.0f };
 }
-void MapManager::generateNavmeshes(EntityManager& em)
+void MapManager::generateNavmeshes(EntityManager& em,uint8_t map)
 {
+    
     auto& navs = em.getSingleton<NavmeshInfo>();
-    mapType navmeshkaiwa = loadMap("assets/Niveles/Lvl_2/Lvl_2-navmeshes.kaiwa");
+    mapType navmeshkaiwa{};
+    if(map == 2){
+        navmeshkaiwa = loadMap("assets/Niveles/Lvl_2/Lvl_2-navmeshes.kaiwa");
+    }else{
+        navmeshkaiwa = loadMap("assets/Niveles/Lvl_4/Lvl_4-navmeshes.kaiwa");
+    }
     const valueType& navmeshes = navmeshkaiwa["NavMesh"];
     for (mapSizeType i = 0; i < navmeshes.Size(); i++) {
         std::array<vec3d, 9> vecnodes{};
@@ -826,12 +838,13 @@ void MapManager::generateNavmeshes(EntityManager& em)
         // if(xd==NULL){
         //     hasramp = true;
         // }        
-
-        const rapidjson::Value::ConstMemberIterator& xd = navmesh.FindMember("ramp");
-        if (xd != navmesh.MemberEnd()) {
-            if (xd->value.GetBool())
-                hasramp = true;
-        }
+        // if(map == 2){
+            const rapidjson::Value::ConstMemberIterator& xd = navmesh.FindMember("ramp");
+            if (xd != navmesh.MemberEnd()) {
+                if (xd->value.GetBool())
+                    hasramp = true;
+            }
+        // }
         // bool hasramp = navmesh["ramp"].GetBool();
 
         //Creamos NavMesh BBox
@@ -1013,72 +1026,80 @@ void MapManager::generateNavmeshes(EntityManager& em)
     //Conexiones a mano de las rampas del nivel 2
     //rampa muñeco izquierda
     std::vector<Conection> auxconex;
-    auxconex.push_back(Conection{ 1,2,18 });
-    auxconex.push_back(Conection{ 1,5,18 });
-    auxconex.push_back(Conection{ 1,26,18 });
-    auxconex.push_back(Conection{ 1,18,53 });
-    auxconex.push_back(Conection{ 1,53,50 });
-    auxconex.push_back(Conection{ 1,44,0 });
-    auxconex.push_back(Conection{ 1,14,2 });
-    auxconex.push_back(Conection{ 1,27,14 });
-    auxconex.push_back(Conection{ 1,21,18 });
-    // rampa derecha muñeco
-    auxconex.push_back(Conection{ 1,63,59 });
-    auxconex.push_back(Conection{ 1,98,63 });
-    auxconex.push_back(Conection{ 1,64,63 });
-    auxconex.push_back(Conection{ 1,65,63 });
-    // rampa mas abajo
-    auxconex.push_back(Conection{ 1,124,116 });
-    auxconex.push_back(Conection{ 1,121,116 });
-    auxconex.push_back(Conection{ 1,119,116 });
-    //
-    auxconex.push_back(Conection{ 1,576,572 });
-    auxconex.push_back(Conection{ 1,572,567 });
-    auxconex.push_back(Conection{ 1,567,536 });
-    auxconex.push_back(Conection{ 1,620,572 });
-    auxconex.push_back(Conection{ 1,583,572 });
-    auxconex.push_back(Conection{ 1,470,576 });
-    auxconex.push_back(Conection{ 1,473,576 });
-    auxconex.push_back(Conection{ 1,484,473 });
-    //
-    auxconex.push_back(Conection{ 1,333,346 });
-    auxconex.push_back(Conection{ 1,303,333 });
-    //
-    auxconex.push_back(Conection{ 1,643,843 });
-    auxconex.push_back(Conection{ 1,646,843 });
-    auxconex.push_back(Conection{ 1,652,843 });
-    auxconex.push_back(Conection{ 1,843,837 });
-    auxconex.push_back(Conection{ 1,647,648 });
-    auxconex.push_back(Conection{ 1,630,639 });
-    //
-    auxconex.push_back(Conection{ 1,801,808 });
-    auxconex.push_back(Conection{ 1,808,819 });
-    auxconex.push_back(Conection{ 1,742,801 });
-    auxconex.push_back(Conection{ 1,799,801 });
-    auxconex.push_back(Conection{ 1,731,801 });
-    auxconex.push_back(Conection{ 1,736,801 });
-    auxconex.push_back(Conection{ 1,745,801 });
-    auxconex.push_back(Conection{ 1,792,742 });
-    auxconex.push_back(Conection{ 1,800,742 });
-    auxconex.push_back(Conection{ 1,644,808 });
-    auxconex.push_back(Conection{ 1,632,639 });
+    if(map == 2){
+        auxconex.push_back(Conection{ 1,2,18 });
+        auxconex.push_back(Conection{ 1,5,18 });
+        auxconex.push_back(Conection{ 1,26,18 });
+        auxconex.push_back(Conection{ 1,18,53 });
+        auxconex.push_back(Conection{ 1,53,50 });
+        auxconex.push_back(Conection{ 1,44,0 });
+        auxconex.push_back(Conection{ 1,14,2 });
+        auxconex.push_back(Conection{ 1,27,14 });
+        auxconex.push_back(Conection{ 1,21,18 });
+        // rampa derecha muñeco
+        auxconex.push_back(Conection{ 1,63,59 });
+        auxconex.push_back(Conection{ 1,98,63 });
+        auxconex.push_back(Conection{ 1,64,63 });
+        auxconex.push_back(Conection{ 1,65,63 });
+        // rampa mas abajo
+        auxconex.push_back(Conection{ 1,124,116 });
+        auxconex.push_back(Conection{ 1,121,116 });
+        auxconex.push_back(Conection{ 1,119,116 });
+        //
+        auxconex.push_back(Conection{ 1,576,572 });
+        auxconex.push_back(Conection{ 1,572,567 });
+        auxconex.push_back(Conection{ 1,567,536 });
+        auxconex.push_back(Conection{ 1,620,572 });
+        auxconex.push_back(Conection{ 1,583,572 });
+        auxconex.push_back(Conection{ 1,470,576 });
+        auxconex.push_back(Conection{ 1,473,576 });
+        auxconex.push_back(Conection{ 1,484,473 });
+        //
+        auxconex.push_back(Conection{ 1,333,346 });
+        auxconex.push_back(Conection{ 1,303,333 });
+        //
+        auxconex.push_back(Conection{ 1,643,843 });
+        auxconex.push_back(Conection{ 1,646,843 });
+        auxconex.push_back(Conection{ 1,652,843 });
+        auxconex.push_back(Conection{ 1,843,837 });
+        auxconex.push_back(Conection{ 1,647,648 });
+        auxconex.push_back(Conection{ 1,630,639 });
+        //
+        auxconex.push_back(Conection{ 1,801,808 });
+        auxconex.push_back(Conection{ 1,808,819 });
+        auxconex.push_back(Conection{ 1,742,801 });
+        auxconex.push_back(Conection{ 1,799,801 });
+        auxconex.push_back(Conection{ 1,731,801 });
+        auxconex.push_back(Conection{ 1,736,801 });
+        auxconex.push_back(Conection{ 1,745,801 });
+        auxconex.push_back(Conection{ 1,792,742 });
+        auxconex.push_back(Conection{ 1,800,742 });
+        auxconex.push_back(Conection{ 1,644,808 });
+        auxconex.push_back(Conection{ 1,632,639 });
+    }else{
+        auxconex.push_back(Conection{1,457,448});
+        auxconex.push_back(Conection{1,448,419});
+        auxconex.push_back(Conection{1,419,421});
+    }
 
-    for (auto& c : auxconex) {
-        navs.conexiones.push_back(c);
-        //debug
-        auto pair = std::make_pair(getNodeVec3d(c.fromNode, navs.nodes), getNodeVec3d(c.toNode, navs.nodes));
-        navs.conexpos.insert(pair);
-        //nodes
-        for (auto& [n, vec] : navs.nodes) {
-            // if(n == 583){
-            vec = vec3d{ vec.x(),vec.y(),vec.z() + 10.0 };
+    if(auxconex.size() != 0){
+        for (auto& c : auxconex) {
+            navs.conexiones.push_back(c);
+            //debug
+            auto pair = std::make_pair(getNodeVec3d(c.fromNode, navs.nodes), getNodeVec3d(c.toNode, navs.nodes));
+            navs.conexpos.insert(pair);
+            //nodes
+            // for (auto& [n, vec] : navs.nodes) {
+            //     // if(n == 583){
+            //     vec = vec3d{ vec.x(),vec.y(),vec.z() + 10.0 };
+            //     // }
+            //     if (n == c.toNode) {
+            //         navs.selectednodes.insert(std::make_pair(n, vec));
+            //     }
+            //     if (n == c.fromNode) {
+            //         navs.selectednodes.insert(std::make_pair(n, vec));
+            //     }
             // }
-            if (n == c.toNode) {
-                navs.selectednodes.insert(std::make_pair(n, vec));
-            }
-            if (n == c.fromNode) {
-                navs.selectednodes.insert(std::make_pair(n, vec));
-            }
         }
     }
     //Crear conexiones entre los centros
