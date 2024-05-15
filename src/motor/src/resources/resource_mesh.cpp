@@ -85,7 +85,7 @@ namespace DarkMoon {
     void Mesh::draw(glm::mat4 transMatrix, Color color) {
         RenderManager& rm = RenderManager::getInstance();
         rm.beginMode3D();
-        glEnable(GL_CULL_FACE);
+        //glEnable(GL_CULL_FACE);
         auto& shaders = rm.shaders;
         rm.useShader(shaders["3D"]);
 
@@ -118,6 +118,11 @@ namespace DarkMoon {
         glBindTexture(GL_TEXTURE_2D, material->texture->getIDTexture());
 
         // Material
+        //std::cout << "--------------------------\n";
+        //std::cout << material->getDiffuseColor().x << " | " << material->getDiffuseColor().y << " | " << material->getDiffuseColor().z << "\n";
+        //std::cout << material->getAmbientColor().x << " | " << material->getAmbientColor().y << " | " << material->getAmbientColor().z << "\n";
+        //std::cout << material->getSpecularColor().x << " | " << material->getSpecularColor().y << " | " << material->getSpecularColor().z << "\n";
+
         glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Kd"), 1, glm::value_ptr(material->getDiffuseColor()));
         glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ka"), 1, glm::value_ptr(material->getAmbientColor()));
         glUniform3fv(glGetUniformLocation(rm.getShader()->getIDShader(), "Ks"), 1, glm::value_ptr(material->getSpecularColor()));
@@ -133,7 +138,7 @@ namespace DarkMoon {
         glActiveTexture(GL_TEXTURE0);
 
         rm.endMode3D();
-        glDisable(GL_CULL_FACE);
+        //glDisable(GL_CULL_FACE);
     }
 
     void Mesh::drawLines(glm::mat4 transMatrix, Color color) {
