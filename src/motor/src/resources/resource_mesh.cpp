@@ -1,11 +1,12 @@
 #include "resource_mesh.hpp"
 
 namespace DarkMoon {
-    Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<uint16_t> indices, Material* material) {
+    Mesh::Mesh(std::size_t id, std::vector<Vertex> vertices, std::vector<uint16_t> indices, Material* material, std::string name) {
         this->m_id = id;
         this->vertices = vertices;
         this->indices = indices;
         this->material = material;
+        this->m_name = name;
     }
 
     bool Mesh::load(const char* filePath) {
@@ -59,10 +60,10 @@ namespace DarkMoon {
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, textCoords));
         // Enable and specify bones ids
         glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, MAX_NUM_BONES_PER_VERTEX, GL_INT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_BonesIDs));
+        glVertexAttribPointer(3, MAX_NUM_BONES_PER_VERTEX, GL_INT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, boneIDs));
         //weights
         glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, MAX_NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_Weights));
+        glVertexAttribPointer(4, MAX_NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, weights));
         // Enable and specify tangent
         glEnableVertexAttribArray(5);
         glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
@@ -83,9 +84,11 @@ namespace DarkMoon {
         // }
         RenderManager& rm = RenderManager::getInstance();
         rm.beginMode3D();
+        auto& shaders = rm.shaders;
 
         // Set the uniform color in the shader
-        GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+        GLint colorUniform = glGetUniformLocation(shaders["3D"]->getIDShader(), "customColor");
+        glUseProgram(shaders["3D"]->getIDShader());
         glUseProgram(rm.getShader()->getIDShader());
         glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
@@ -109,11 +112,11 @@ namespace DarkMoon {
             std::cout << "\n";
         }
 
-        auto& shaders = rm.shaders;
 
         for (std::size_t i = 0; i < transforms.size(); ++i) {
-            std::string uniformName = "finalBonesMatrices[" + std::to_string(i) + "]";
-            glUniformMatrix4fv(glGetUniformLocation(shaders["3D"]->getIDShader(), uniformName.c_str()), 1, GL_FALSE, glm::value_ptr(transforms[i]));
+            std::string boneStr = "boneTransforms[" + std::to_string(i) + "]";
+            int boneLocation = glGetUniformLocation(shaders["3D"]->getIDShader(), boneStr.c_str());
+            glUniformMatrix4fv(boneLocation, 1, GL_FALSE, glm::value_ptr(transforms[i]));
         }
 
         // Texture

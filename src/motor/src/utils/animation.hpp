@@ -1,8 +1,17 @@
 #pragma once
 
+#include <assimp/postprocess.h>
 #include "bone.hpp"
 #include <glm/gtc/type_ptr.hpp>
-#include "../utils/BoneIndo.hpp"
+#include "../utils/BoneInfo.hpp"
+
+#include <glm/glm.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+
+#include <string>
+#include <vector>
+#include <map>
 
 struct AssimpNodeData
 {
@@ -12,127 +21,100 @@ struct AssimpNodeData
     std::vector<AssimpNodeData> children{};
 };
 
-struct animation
+static glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4* from);
+
+struct Animation
 {
 public:
-    animation() = default;
-
-    animation(const std::string& animationPath, std::map<std::string, BoneInfo>& BoneInfo, int& boneCount)
+    Animation(const std::string& animationPath, std::vector<BoneInfo>& modelBones)
     {
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
         assert(scene && scene->mRootNode);
-        auto animation = scene->mAnimations[0];
-        m_Duration = static_cast<float>(animation->mDuration);
-        m_TicksPerSecond = static_cast<float>(animation->mTicksPerSecond);
-        ReadHeirarchyData(m_RootNode, scene->mRootNode);
-        // FillBones(animation);
-        ReadMissingBones(animation, BoneInfo, boneCount);
+        if (scene->mNumAnimations == 0)
+            return;
+        aiAnimation* animation = scene->mAnimations[0];
+        duration = (float)animation->mDuration;
+        tps = (float)animation->mTicksPerSecond;
+        generateBoneTree(&rootNode, scene->mRootNode);
+        // Reset all root transformations
+        rootNode.transformation = glm::mat4(1.0f);
+        loadIntermediateBones(animation, modelBones);
     }
 
-    ~animation()
+    Bone* findBone(const std::string& name)
     {
-    }
-
-    bone* FindBone(const std::string& name)
-    {
-        auto iter = std::find_if(m_Bones.begin(), m_Bones.end(),
-            [&](const bone& Bone)
-        {
-            return Bone.GetBoneName() == name;
-        }
-        );
-        if (iter == m_Bones.end()) return nullptr;
-        else return &(*iter);
-    }
-
-
-    inline float GetTicksPerSecond() { return m_TicksPerSecond; }
-
-    inline float GetDuration() { return m_Duration; }
-
-    inline const AssimpNodeData& GetRootNode() { return m_RootNode; }
-
-    // inline const std::map<std::string, typename ModelType::BoneInfo>& GetBoneIDMap()
-    // {
-    //     return m_BoneInfoMap;
-    // }
-
-    inline const std::vector<bone> GetBonesVector() { return m_Bones; }
-    //set id
-    // void setID(int id,int index){
-    //     m_Bones[index].SetBoneID(id);
-    // }
-
-    inline std::map<std::string, BoneInfo>& GetBoneIDMap()
-    {
-        return m_BoneInfoMap;
-    }
-private:
-    // void FillBones(const aiAnimation* animation){
-    //     int size = animation->mNumChannels;
-    //     for (int i = 0; i < size; i++)
-    //     {
-    //         auto channel = animation->mChannels[i];
-    //         std::string boneName = channel->mNodeName.data;
-    //         m_Bones.push_back(bone(channel->mNodeName.data,
-    //             1, channel));
-    //     }
-    // }
-    // template<typename ModelType>
-    void ReadMissingBones(const aiAnimation* animation, std::map<std::string, BoneInfo>& boneInfoMap, int&) {
-        int size = animation->mNumChannels;
-
-
-        //reading channels(bones engaged in an animation and their keyframes)
-        // for (int i = 0; i < size; i++)
-        // {
-        //     auto channel = animation->mChannels[i];
-        //     std::string boneName = channel->mNodeName.data;
-
-        //     if (boneInfoMap.find(boneName) == boneInfoMap.end())
-        //     {
-        //         boneInfoMap[boneName].id = boneCount;
-        //         boneCount++;
-        //     }
-        //     m_Bones.push_back(bone(channel->mNodeName.data,
-        //         boneInfoMap[channel->mNodeName.data].id, channel));
-        // }
-
-        // m_BoneInfoMap = boneInfoMap;
-        for (int i = 0; i < size; i++) {
-            auto channel = animation->mChannels[i];
-            std::string boneName = channel->mNodeName.data;
-            if (boneInfoMap.find(boneName) != boneInfoMap.end()) {
-                m_Bones.push_back(bone(channel->mNodeName.data,
-                    boneInfoMap[channel->mNodeName.data].id, channel));
+        for (unsigned int i = 0; i < bones.size(); i++) {
+            if (bones[i].getBoneName() == name) {
+                return &bones[i];
             }
         }
-
-        // for(auto& bone : boneInfoMap){
-        //  m_Bones.push_back(bone(channel->mNodeName.data,
-        //         boneInfoMap[channel->mNodeName.data].id, channel));
-        // }
+        return nullptr;
     }
 
-    void ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src) {
+
+    inline float getTicksPerSecond() { return tps; }
+
+    inline float getDuration() { return duration; }
+
+    inline const AssimpNodeData* getRootNode() { return &rootNode; }
+
+    inline const std::vector<BoneInfo>& getBoneProps()
+    {
+        return boneProps;
+    }
+
+private:
+    float duration = 0.0f;
+    float tps = 0.0f;
+    std::vector<Bone> bones;
+    AssimpNodeData rootNode;
+    std::vector<BoneInfo> boneProps;
+
+    void loadIntermediateBones(const aiAnimation* animation, std::vector<BoneInfo>& modelBones)
+    {
+        auto& boneProps = modelBones;
+
+        for (std::size_t i = 0; i < animation->mNumChannels; i++)
+        {
+            auto channel = animation->mChannels[i];
+            std::string boneName = channel->mNodeName.data;
+            int boneId = -1;
+
+            for (unsigned int i = 0; i < boneProps.size(); i++) {
+                if (boneProps[i].name == boneName) {
+                    boneId = i;
+                    break;
+                }
+            }
+
+            if (boneProps.size() < 100) {
+                if (boneId == -1) {
+                    BoneInfo boneProp;
+                    boneProp.name = boneName;
+                    boneProps.push_back(boneProp);
+                    boneId = static_cast<int>(boneProps.size() - 1);
+                }
+            }
+            bones.push_back(Bone(channel->mNodeName.data, boneId, channel));
+        }
+
+        this->boneProps = boneProps;
+    }
+
+    void generateBoneTree(AssimpNodeData* parent, const aiNode* src)
+    {
         assert(src);
 
-        dest.name = src->mName.data;
-        dest.transformation = glm::make_mat4(&src->mTransformation.a1);
-        dest.childrenCount = src->mNumChildren;
+        parent->name = src->mName.data;
+        parent->transformation = aiMatrix4x4ToGlm(&src->mTransformation);
+        parent->childrenCount = src->mNumChildren;
 
-        for (uint i = 0; i < src->mNumChildren; i++)
+        for (unsigned int i = 0; i < src->mNumChildren; i++)
         {
             AssimpNodeData newData;
-            ReadHeirarchyData(newData, src->mChildren[i]);
-            dest.children.push_back(newData);
+            generateBoneTree(&newData, src->mChildren[i]);
+            parent->children.push_back(newData);
         }
     }
-
-    float m_Duration{};
-    float m_TicksPerSecond{};
-    std::vector<bone> m_Bones{};
-    AssimpNodeData m_RootNode{};
-    std::map<std::string, BoneInfo> m_BoneInfoMap{};
 };

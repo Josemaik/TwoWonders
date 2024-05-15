@@ -50,21 +50,21 @@ namespace DarkMoon {
         //bitangent
         glm::vec3 BiTangent;
         //bone indexes which will influence this vertex
-        int m_BonesIDs[MAX_NUM_BONES_PER_VERTEX];
+        glm::ivec4 boneIDs;
         //weights from each bone
-        float m_Weights[MAX_NUM_BONES_PER_VERTEX];
+        glm::vec4 weights;
 
-        void AddBoneata(uint BondeID, float weight) {
-            for (uint i = 0; i < MAX_NUM_BONES_PER_VERTEX; i++) {
-                if (m_Weights[i] == 0.0) {
-                    m_BonesIDs[i] = BondeID;
-                    m_Weights[i] = weight;
-                    return;
-                }
-            }
-            //si salta, aumentar ,max_nume_bones_per_vertex
-            assert(0);
-        }
+        // void AddBoneata(uint BondeID, float weight) {
+        //     for (uint i = 0; i < MAX_NUM_BONES_PER_VERTEX; i++) {
+        //         if (m_Weights[i] == 0.0) {
+        //             m_BonesIDs[i] = BondeID;
+        //             m_Weights[i] = weight;
+        //             return;
+        //         }
+        //     }
+        //     //si salta, aumentar ,max_nume_bones_per_vertex
+        //     assert(0);
+        // }
     };
 
     struct Mesh : public Resource {
@@ -76,7 +76,7 @@ namespace DarkMoon {
         Material* material;
         AnimationManager& am = AnimationManager::getInstance();
 
-        Mesh(std::size_t, std::vector<Vertex>, std::vector<uint16_t>, Material*);
+        Mesh(std::size_t, std::vector<Vertex>, std::vector<uint16_t>, Material*, std::string name = "");
         ~Mesh() { unload(); };
 
         bool load(const char*) override;
@@ -91,6 +91,7 @@ namespace DarkMoon {
         GLuint m_VBO; // Vertex Buffer Object
         GLuint m_EBO; // Element Buffer Object
         GLuint m_BAO; // Bones Array Object
+        std::string m_name;
 
         void setupMesh();
     };

@@ -79,21 +79,21 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     engine.CreateCubeWires({ 20.0f, 0.0f, -30.0f }, { 10.0f, 10.0f, 10.0f }, D_BLACK, "Wireframe", p_node3D);
 
     // Node: Modelo Dummy 1
-    auto modelDummy = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 1", p_node3D);
-    //modelDummy->scale({0.2f, 0.2f, 0.2f});
-    modelDummy->translate({ 0.0f, 0.0f, -30.0f });
+    // auto modelDummy = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 1", p_node3D);
+    // //modelDummy->scale({0.2f, 0.2f, 0.2f});
+    // modelDummy->translate({ 0.0f, 0.0f, -30.0f });
 
-    // Node: Modelo Dummy 2
-    auto modelDummy2 = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 2", p_node3D);
-    //modelDummy2->scale({0.2f, 0.2f, 0.2f});
-    modelDummy2->translate({ 0.0f, 0.0f, 30.0f });
-    modelDummy2->rotate({ 0.0f, 1.0f, 0.0f }, 180.0f);
+    // // Node: Modelo Dummy 2
+    // auto modelDummy2 = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 2", p_node3D);
+    // //modelDummy2->scale({0.2f, 0.2f, 0.2f});
+    // modelDummy2->translate({ 0.0f, 0.0f, 30.0f });
+    // modelDummy2->rotate({ 0.0f, 1.0f, 0.0f }, 180.0f);
 
-    // Node: Modelo Dummy 3
-    auto modelDummy3 = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 3", p_node3D);
-    //modelDummy3->scale({0.2f, 0.2f, 0.2f});
-    modelDummy3->translate({ 30.0f, 0.0f, 0.0f });
-    modelDummy3->rotate({ 0.0f, 1.0f, 0.0f }, 270.0f);
+    // // Node: Modelo Dummy 3
+    // auto modelDummy3 = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 3", p_node3D);
+    // //modelDummy3->scale({0.2f, 0.2f, 0.2f});
+    // modelDummy3->translate({ 30.0f, 0.0f, 0.0f });
+    // modelDummy3->rotate({ 0.0f, 1.0f, 0.0f }, 270.0f);
 
     return p_node3D;
 }
@@ -177,9 +177,9 @@ int main() {
         auto mainCharacter = createMainCharacter(engine);
         auto modelcharacter = dynamic_cast<DarkMoon::Model*>(mainCharacter->getEntity());
         auto& boneInfoMap = modelcharacter->getboneInfoMap();
-        auto& boneCount = modelcharacter->getBoneCount();
+        // auto& boneCount = modelcharacter->getBoneCount();
         // int count = modelcharacter->getBoneCount();
-        animation crusheranimation("assets/Apisonadora/Apisonadora.fbx", boneInfoMap, boneCount);
+        Animation crusheranimation("assets/Apisonadora/Apisonadora.fbx", boneInfoMap);
         // auto m_bones = crusheranimation.GetBonesVector();
         // for(auto& bone : m_bones){
         //     std::string boneName = bone.GetBoneName();
@@ -192,7 +192,6 @@ int main() {
         // crusheranimation.m_Bones.push_back(bone(channel->mNodeName.data,
         //         boneInfoMap[channel->mNodeName.data].id, channel));
         auto& am = AnimationManager::getInstance();
-        am.setCurrentAnimation(&crusheranimation);
         //         auto textBox = createHUD(engine);
 
                 //auto textBoxEntity = dynamic_cast<DarkMoon::TextBox*>(textBox->getEntity());
@@ -227,7 +226,8 @@ int main() {
 
             inputManager(engine, mainCharacter);
 
-            //textBoxEntity->text.text = std::to_string(engine.GetFPS());            
+            //textBoxEntity->text.text = std::to_string(engine.GetFPS());  
+            am.PlayAnimation(&crusheranimation);
             am.UpdateAnimation(deltatime);
             // Draw
 

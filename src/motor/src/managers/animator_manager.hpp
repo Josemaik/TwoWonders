@@ -5,97 +5,140 @@
 
 struct AnimationManager
 {
-    AnimationManager() = default;
-
-    void setCurrentAnimation(animation* currentAnimation)
+    AnimationManager()
     {
-        m_CurrentTime = 0.0;
-        m_CurrentAnimation = currentAnimation;
+        m_CurrentTime = 0.0f;
+        interpolating = false;
+        haltTime = 0.0;
+        interTime = 0.0;
 
-        // for (int i = 0; i < 100; i++)
-        //     m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
+        m_FinalBoneMatrices.reserve(100);
+
+        for (int i = 0; i < 100; i++)
+            m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
     }
 
     void UpdateAnimation(float dt)
     {
-        m_DeltaTime = dt;
-        if (m_CurrentAnimation)
-        {
-            m_CurrentTime += m_CurrentAnimation->GetTicksPerSecond() * dt;
-            m_CurrentTime = static_cast<float>(fmod(m_CurrentTime, m_CurrentAnimation->GetDuration()));
-            // std::cout << "CurrentTime: " << m_CurrentTime << "\n";
-            CalculateBoneTransform(&m_CurrentAnimation->GetRootNode(), glm::mat4(1.0f));
+        if (m_CurrentAnimation) {
+            m_CurrentTime = myFmod(m_CurrentTime + m_CurrentAnimation->getTicksPerSecond() * dt, m_CurrentAnimation->getDuration());
+
+            float transitionTime = m_CurrentAnimation->getTicksPerSecond() * 0.2f;
+            if (interpolating && interTime <= transitionTime) {
+                interTime += m_CurrentAnimation->getTicksPerSecond() * dt;
+                calculateBoneTransition(m_CurrentAnimation->getRootNode(), glm::mat4(1.0f), m_CurrentAnimation, m_NextAnimation, haltTime, interTime, transitionTime);
+                return;
+            }
+            else if (interpolating) {
+                if (m_QueueAnimation) {
+                    m_CurrentAnimation = m_NextAnimation;
+                    haltTime = 0.0f;
+                    m_NextAnimation = m_QueueAnimation;
+                    m_QueueAnimation = nullptr;
+                    m_CurrentTime = 0.0f;
+                    interTime = 0.0;
+                    return;
+                }
+
+                interpolating = false;
+                m_CurrentAnimation = m_NextAnimation;
+                m_CurrentTime = 0.0;
+                interTime = 0.0;
+            }
+
+            calculateBoneTransform(m_CurrentAnimation->getRootNode(), glm::mat4(1.0f), m_CurrentAnimation, m_CurrentTime);
         }
     }
 
-    void PlayAnimation(animation* pAnimation)
+    void PlayAnimation(Animation* pAnimation)
     {
         m_CurrentAnimation = pAnimation;
         m_CurrentTime = 0.0f;
     }
 
-    void CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform)
+    void calculateBoneTransition(const AssimpNodeData* curNode, glm::mat4 parentTransform, Animation* prevAnimation, Animation* nextAnimation, float haltTime, float currentTime, float transitionTime)
     {
-        std::string nodeName = node->name;
-        glm::mat4 nodeTransform = node->transformation;
-        // std::cout << "name: " << nodeName << "\n";
-        // for(int i = 0; i < 4; i++){
-        //     for(int j = 0; j < 4; j++){
-        //         std::cout << nodeTransform[i][j] << " ";
-        //     }
-        //     std::cout << "\n";
-        // }
+        std::string nodeName = curNode->name;
+        glm::mat4 transform = curNode->transformation;
 
-        bone* Bone = m_CurrentAnimation->FindBone(nodeName);
+        Bone* prevBone = prevAnimation->findBone(nodeName);
+        Bone* nextBone = nextAnimation->findBone(nodeName);
 
-        if (Bone)
+        if (prevBone && nextBone)
         {
-            std::cout << "name: " << Bone->GetBoneName() << "\n";
-            Bone->Update(m_CurrentTime);
-            nodeTransform = Bone->GetLocalTransform();
-            // for (int i = 0; i < 4; i++) {
-            //     for (int j = 0; j < 4; j++) {
-            //         std::cout << nodeTransform[i][j] << " ";
-            //     }
-            //     std::cout << "\n";
-            // }
+            KeyPosition prevPos = prevBone->getPositions(haltTime);
+            KeyRotation prevRot = prevBone->getRotations(haltTime);
+            KeyScale prevScl = prevBone->getScalings(haltTime);
+
+            KeyPosition nextPos = nextBone->getPositions(0.0f);
+            KeyRotation nextRot = nextBone->getRotations(0.0f);
+            KeyScale nextScl = nextBone->getScalings(0.0f);
+
+            prevPos.timeStamp = 0.0f;
+            prevRot.timeStamp = 0.0f;
+            prevScl.timeStamp = 0.0f;
+
+            nextPos.timeStamp = transitionTime;
+            nextRot.timeStamp = transitionTime;
+            nextScl.timeStamp = transitionTime;
+
+            glm::mat4 p = Bone::interpolatePosition(currentTime, prevPos, nextPos);
+            glm::mat4 r = Bone::interpolateRotation(currentTime, prevRot, nextRot);
+            glm::mat4 s = Bone::interpolateScaling(currentTime, prevScl, nextScl);
+
+            transform = p * r * s;
         }
 
-        glm::mat4 globalTransformation = parentTransform * nodeTransform;
+        glm::mat4 globalTransformation = parentTransform * transform;
 
-        auto boneInfoVector = m_CurrentAnimation->GetBonesVector();
-        for (auto& boneInfo : boneInfoVector) {
-            if (boneInfo.GetBoneName() == nodeName) {
-                // std::cout << "NameBone: " << nodeName << "\n";
-                int index = boneInfo.GetBoneID();
-                glm::mat4 offset = boneInfo.Getoffset();
-                //  for(int i = 0; i < 4; i++){
-                //     for(int j = 0; j < 4; j++){
-                //         std::cout << offset[i][j] << " ";
-                //     }
-                //     std::cout << "\n";
-                // }
-
-                m_FinalBoneMatrices[index] = globalTransformation * offset;
-                //  for(int i = 0; i < 4; i++){
-                //     for(int j = 0; j < 4; j++){
-                //         std::cout <<  m_FinalBoneMatrices[index][i][j] << " ";
-                //     }
-                //     std::cout << "\n";
-                // }
-                break; // Salir del bucle una vez que se ha encontrado el hueso
+        auto boneProps = nextAnimation->getBoneProps();
+        for (unsigned int i = 0; i < boneProps.size(); i++) {
+            if (boneProps[i].name == nodeName) {
+                glm::mat4 offset = boneProps[i].offset;
+                m_FinalBoneMatrices[i] = globalTransformation * offset;
+                break;
             }
         }
-        for (int i = 0; i < node->childrenCount; i++)
-            CalculateBoneTransform(&node->children[i], globalTransformation);
+
+        for (int i = 0; i < curNode->childrenCount; i++)
+            calculateBoneTransition(&curNode->children[i], globalTransformation, prevAnimation, nextAnimation, haltTime, currentTime, transitionTime);
     }
 
-    std::map<std::size_t, glm::mat4> GetFinalBoneMatrices()
+    void calculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform, Animation* animation, float currentTime)
+    {
+        std::string nodeName = node->name;
+        glm::mat4 boneTransform = node->transformation;
+
+        Bone* bone = animation->findBone(nodeName);
+
+        if (bone)
+        {
+            bone->update(currentTime);
+            boneTransform = bone->getTransform();
+        }
+
+        glm::mat4 globalTransformation = parentTransform * boneTransform;
+
+        auto boneProps = animation->getBoneProps();
+
+        for (unsigned int i = 0; i < boneProps.size(); i++) {
+            if (boneProps[i].name == nodeName) {
+                glm::mat4 offset = boneProps[i].offset;
+                m_FinalBoneMatrices[i] = globalTransformation * offset;
+                break;
+            }
+        }
+
+        for (int i = 0; i < node->childrenCount; i++)
+            calculateBoneTransform(&node->children[i], globalTransformation, animation, currentTime);
+    }
+
+    std::vector<glm::mat4> GetFinalBoneMatrices()
     {
         return m_FinalBoneMatrices;
     }
 
-    void AddAnimation(animation* newAnimation)
+    void AddAnimation(Animation* newAnimation)
     {
         m_Animations.push_back(newAnimation);
     }
@@ -105,11 +148,23 @@ struct AnimationManager
         return instance;
     }
 
+    float myFmod(float a, float b) {
+        float result = a - (b * static_cast<int>(a / b));
+        if (result < 0) {
+            result += b;
+        }
+        return result;
+    }
+
 private:
 
-    std::map<std::size_t, glm::mat4> m_FinalBoneMatrices{};
-    std::vector<animation*> m_Animations;
-    animation* m_CurrentAnimation;
+    std::vector<glm::mat4> m_FinalBoneMatrices{};
+    std::vector<Animation*> m_Animations;
+    Animation* m_CurrentAnimation{ nullptr };
+    Animation* m_QueueAnimation{ nullptr };
+    Animation* m_NextAnimation{ nullptr };
     float m_CurrentTime;
-    float m_DeltaTime;
+    bool interpolating;
+    float haltTime;
+    float interTime;
 };

@@ -6,7 +6,7 @@
 #include "../resources/resource_material.hpp"
 #include "../managers/resource_manager.hpp"
 #include "../managers/render_manager.hpp"
-#include "../utils/BoneIndo.hpp"
+#include "../utils/BoneInfo.hpp"
 
 #include <vector>
 #include <map>
@@ -33,23 +33,23 @@ namespace DarkMoon {
         // // //num of vertex
         // std::vector<int> mesh_base_vertex{};
         // Name and id of each bone
-        void SetVertexBoneDataToDefault(Vertex& vertex) {
-            for (int i = 0; i < MAX_NUM_BONES_PER_VERTEX;i++) {
-                vertex.m_BonesIDs[i] = -1;
-                vertex.m_Weights[i] = 0.0f;
-            }
-        }
+        // void SetVertexBoneDataToDefault(Vertex& vertex) {
+        //     for (int i = 0; i < MAX_NUM_BONES_PER_VERTEX;i++) {
+        //         vertex.m_BonesIDs[i] = -1;
+        //         vertex.m_Weights[i] = 0.0f;
+        //     }
+        // }
 
-        void SetVertexBoneData(Vertex& vertex, int bondeID, float weight) {
-            for (int i = 0; i < MAX_NUM_BONES_PER_VERTEX;i++) {
-                if (vertex.m_BonesIDs[i] < 0) {
-                    vertex.m_Weights[i] = weight;
-                    vertex.m_BonesIDs[i] = bondeID;
-                    break;
-                }
-            }
-        }
-        void processBone(const aiBone* pbone, std::vector<Vertex>& vertices);
+        // void SetVertexBoneData(Vertex& vertex, int bondeID, float weight) {
+        //     for (int i = 0; i < MAX_NUM_BONES_PER_VERTEX;i++) {
+        //         if (vertex.m_BonesIDs[i] < 0) {
+        //             vertex.m_Weights[i] = weight;
+        //             vertex.m_BonesIDs[i] = bondeID;
+        //             break;
+        //         }
+        //     }
+        // }
+        void processBone(std::vector<glm::ivec4>& boneIDs_all, std::vector<glm::vec4>& weights_all, aiMesh* mesh, const aiScene* scene);
         // int getBoneID(const aiBone* pBone);
         //##############################################################
 
@@ -63,10 +63,10 @@ namespace DarkMoon {
 
     public:
 
-        std::map<std::string, BoneInfo> m_BoneInfomap{};
+        std::vector<BoneInfo> boneVector{};
         int m_BoneCounter{ 0 };
 
-        auto& getboneInfoMap() { return m_BoneInfomap; };
+        auto& getboneInfoMap() { return boneVector; };
         int& getBoneCount() { return m_BoneCounter; };
         void ReadMissingBones(const aiAnimation* animation);
 
