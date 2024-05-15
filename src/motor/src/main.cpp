@@ -170,6 +170,13 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
         nodeCharacter->scale({ 1.1,1.1,1.1 });
     }
 
+    if (engine.IsKeyDown(D_KEY_DOWN)){
+        camera->position.y -= velocity;
+    }
+    if (engine.IsKeyDown(D_KEY_UP)){
+        camera->position.y += velocity;
+    }
+
     if (engine.IsKeyPressed(D_KEY_SPACE))
         engine.ToggleLights();
 }
