@@ -202,6 +202,7 @@ void Game::run()
                 inpi.interact = false;
             }
             render_system.drawStory(engine);
+            sound_system.music_stop();
 
             if (li.replay)
                 gami.update();

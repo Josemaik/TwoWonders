@@ -450,7 +450,6 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
     {
         getNode(engine, "2D")->setVisible(false);
         ss.sonido_pause(li.mapID);
-        ss.stop_pasos();
     }
 
     auto* menuNode = getNode(engine, "MenuPrincipal");
@@ -768,6 +767,7 @@ void RenderSystem::drawEnding(GameEngine&) {
 void RenderSystem::drawStory(GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(D_WHITE);
+    
 
     restartScene(engine);
 
