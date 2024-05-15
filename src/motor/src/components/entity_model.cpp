@@ -166,7 +166,8 @@ namespace DarkMoon {
         }
 
         //Process bones
-        if (mesh->HasBones())
+        bool hasBones = mesh->HasBones();
+        if (hasBones)
         {
             processBone(boneIDs, weights, mesh, scene);
         }
@@ -184,7 +185,7 @@ namespace DarkMoon {
         processTextures(aiMaterial, material, rm);
 
         std::string meshName = mesh->mName.C_Str();
-        auto currentMesh = rm.loadResource<Mesh>(mesh->mName.C_Str(), vertices, indices, material, meshName);
+        auto currentMesh = rm.loadResource<Mesh>(mesh->mName.C_Str(), vertices, indices, material, meshName, hasBones);
 
         m_meshes.push_back(currentMesh);
     }

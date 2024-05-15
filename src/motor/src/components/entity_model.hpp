@@ -66,6 +66,7 @@ namespace DarkMoon {
         std::vector<BoneInfo> boneVector{};
         int m_BoneCounter{ 0 };
 
+        auto& getMeshes() { return m_meshes; };
         auto& getboneInfoMap() { return boneVector; };
         int& getBoneCount() { return m_BoneCounter; };
         void ReadMissingBones(const aiAnimation* animation);

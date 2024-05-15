@@ -72,11 +72,12 @@ namespace DarkMoon {
         // Mesh data
         std::vector<Vertex> vertices;
         std::vector<uint16_t> indices;
+        bool hasBones;
         //std::vector<VertexBoneData>num_bones{};
         Material* material;
         AnimationManager& am = AnimationManager::getInstance();
 
-        Mesh(std::size_t, std::vector<Vertex>, std::vector<uint16_t>, Material*, std::string name = "");
+        Mesh(std::size_t, std::vector<Vertex>, std::vector<uint16_t>, Material*, std::string name = "", bool hasBones = false);
         ~Mesh() { unload(); };
 
         bool load(const char*) override;
