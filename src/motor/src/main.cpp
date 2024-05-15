@@ -126,7 +126,7 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
 
 DarkMoon::Node* createMainCharacter(DarkMoon::DarkMoonEngine& engine) {
     //Node: Modelo
-    auto model = engine.CreateModel("assets/Apisonadora/Apisonadora.fbx", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
+    auto model = engine.CreateModel("assets/MainCharacter/Main_character.fbx", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
    // model->scale({0.02f, 0.02f, 0.02f});
     model->translate({0.0f, 0.0f, 0.0f});
     model->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
@@ -214,7 +214,7 @@ int main() {
         auto& boneInfoMap = modelcharacter->getboneInfoMap();
         // auto& boneCount = modelcharacter->getBoneCount();
         // int count = modelcharacter->getBoneCount();
-        Animation crusheranimation("assets/Apisonadora/Apisonadora.fbx", boneInfoMap);
+        Animation crusheranimation("assets/MainCharacter/Main_character.fbx", boneInfoMap);
         //auto m_bones = crusheranimation.GetBonesVector();
         // for(auto& bone : m_bones){
         //     std::string boneName = bone.GetBoneName();
@@ -260,6 +260,22 @@ int main() {
             inputManager(engine, mainCharacter);
             if(engine.IsKeyDown(D_KEY_X)){
                 am.StopAnimation(id);
+                for (auto& mesh : m_meshes) {
+                    mesh->animID = -1;
+                    // for(auto& ver : mesh->vertices){
+                    //     for (int i = 0; i < 4; i++)
+                    //     {
+                    //         ver.boneIDs[i] = -1;
+                    //         ver.weights[i] = 0.0f;
+                    //     }
+                    // }
+                }
+            }
+            if(engine.IsKeyDown(D_KEY_C)){
+                auto idxd = am.PlayAnimation(&crusheranimation);
+                for (auto& mesh : m_meshes) {
+                    mesh->animID = idxd;
+                }
             }
 
             // textBoxEntity->text.text = std::to_string(engine.GetFPS());  

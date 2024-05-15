@@ -2,6 +2,7 @@
 
 #include "../utils/animation.hpp"
 
+
 struct Anim
 {
     Anim()
@@ -34,6 +35,7 @@ struct AnimationManager
     }
 
     void StopAnimation(std::size_t idanim) {
+        //sacamos la animacion del vector
         if (idanim < m_Animations.size()) {
             m_Animations.erase(m_Animations.begin() + idanim);
         }
