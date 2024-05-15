@@ -33,6 +33,12 @@ struct AnimationManager
         return m_Animations.size() - 1;
     }
 
+    void StopAnimation(std::size_t idanim) {
+        if (idanim < m_Animations.size()) {
+            m_Animations.erase(m_Animations.begin() + idanim);
+        }
+    }
+
     void UpdateAnimation(float dt)
     {
         for (std::size_t id = 0; id < m_Animations.size(); id++)

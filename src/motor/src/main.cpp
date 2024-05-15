@@ -57,12 +57,13 @@
 
 //     return textBox;
 // }
+static size_t idanim{};
 
 DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
-    // Node Scene 3D
+    //Node Scene 3D
     auto p_node3D = engine.CreateNode("Scene 3D", engine.GetRootNode());
 
-    // Node: Rejilla
+    //Node: Rejilla
     engine.CreateGrid(10, 10.0f, D_GRAY, "Rejilla principal", p_node3D);
 
     //Node: Linea diagonal
@@ -70,16 +71,16 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     engine.CreateLine3D({ -1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, -1.0f }, 2.0f, D_YELLOW_DARK, "Linea amarilla", p_node3D);
     engine.CreatePoint3D({ 1.0f, 1.0f, -1.0f }, 5.0f, D_BLACK, "Punto fin linea", p_node3D);
 
-    // Node: Plano
+    //Node: Plano
     engine.CreatePlane({ 0.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, D_PINK, "Plano rosita", p_node3D);
 
-    // Node: Cubo
+    //Node: Cubo
     engine.CreateCube({ -30.0f, 0.0f, 0.0f }, { 10.0f, 10.0f, 10.0f }, D_AQUA_DARK, "Cubo azulito", p_node3D);
     engine.CreateCubeWires({ -30.0f, 0.0f, 0.0f }, { 10.0f, 10.0f, 10.0f }, D_BLACK, "Wireframe", p_node3D);
-    // Node: Wireframe
+    //Node: Wireframe
     engine.CreateCubeWires({ 20.0f, 0.0f, -30.0f }, { 10.0f, 10.0f, 10.0f }, D_BLACK, "Wireframe", p_node3D);
 
-    // Node: Modelo Dummy 1
+    //Node: Modelo Dummy 1
     // auto modelDummy = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 1", p_node3D);
     // //modelDummy->scale({0.2f, 0.2f, 0.2f});
     // modelDummy->translate({ 0.0f, 0.0f, -30.0f });
@@ -90,9 +91,9 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     // modelDummy2->translate({ 0.0f, 0.0f, 30.0f });
     // modelDummy2->rotate({ 0.0f, 1.0f, 0.0f }, 180.0f);
 
-    // Node: Modelo Dummy 3
+    //Node: Modelo Dummy 3
     auto modelDummy3 = engine.CreateModel("assets/Cofre/Texturas/Cofre.fbx", D_WHITE, "Modelo: Dummy 3", p_node3D);
-    //modelDummy3->scale({0.2f, 0.2f, 0.2f});
+   // modelDummy3->scale({0.2f, 0.2f, 0.2f});
     modelDummy3->translate({ 30.0f, 0.0f, 0.0f });
     modelDummy3->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
     auto eModel = dynamic_cast<DarkMoon::Model*>(modelDummy3->getEntity());
@@ -124,10 +125,10 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
 }
 
 DarkMoon::Node* createMainCharacter(DarkMoon::DarkMoonEngine& engine) {
-    // Node: Modelo
+    //Node: Modelo
     auto model = engine.CreateModel("assets/Apisonadora/Apisonadora.fbx", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
-    //model->scale({0.02f, 0.02f, 0.02f});
-    //model->translate({0.0f, 0.0f, 0.0f});
+   // model->scale({0.02f, 0.02f, 0.02f});
+    model->translate({0.0f, 0.0f, 0.0f});
     model->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
 
     auto eModel = dynamic_cast<DarkMoon::Model*>(model->getEntity());
@@ -194,9 +195,9 @@ int main() {
 
     if (engine.InitWindow(800, 600, "DarkMoon Engine")) {
 
-        // std::cout << "┌────────────────┐" << std::endl;
-        // std::cout << "│ Load Resources │" << std::endl;
-        // std::cout << "└────────────────┘" << std::endl;
+        std::cout << "┌────────────────┐" << std::endl;
+        std::cout << "│ Load Resources │" << std::endl;
+        std::cout << "└────────────────┘" << std::endl;
 
         createScene3D(engine);
         auto mainCharacter = createMainCharacter(engine);
@@ -214,17 +215,17 @@ int main() {
         // auto& boneCount = modelcharacter->getBoneCount();
         // int count = modelcharacter->getBoneCount();
         Animation crusheranimation("assets/Apisonadora/Apisonadora.fbx", boneInfoMap);
-        // auto m_bones = crusheranimation.GetBonesVector();
+        //auto m_bones = crusheranimation.GetBonesVector();
         // for(auto& bone : m_bones){
         //     std::string boneName = bone.GetBoneName();
         //     if (boneInfoMap.find(boneName) == boneInfoMap.end()){
         //         bone.SetBoneID(boneInfoMap[boneName].id);
         //     }
         // }
-        // copiar mapbones en mbones
-        // crusheranimation.m_Bones
+        //copiar mapbones en mbones
+        //crusheranimation.m_Bones
         // crusheranimation.m_Bones.push_back(bone(channel->mNodeName.data,
-        //         boneInfoMap[channel->mNodeName.data].id, channel));
+               // boneInfoMap[channel->mNodeName.data].id, channel));
         auto& am = AnimationManager::getInstance();
         //         auto textBox = createHUD(engine);
 
@@ -237,12 +238,12 @@ int main() {
         engine.SetExitKey(D_KEY_F8);
         engine.SetTargetFPS(60);
 
-        //scene3D->getParent()->removeChild(scene3D);
+       // scene3D->getParent()->removeChild(scene3D);
 
-        // std::cout << "┌──────┐" << std::endl;
-        // std::cout << "│ Tree │" << std::endl;
-        // std::cout << "└──────┘" << std::endl;
-        // engine.GetRootNode()->drawTree();
+        std::cout << "┌──────┐" << std::endl;
+        std::cout << "│ Tree │" << std::endl;
+        std::cout << "└──────┘" << std::endl;
+        engine.GetRootNode()->drawTree();
         auto id = am.PlayAnimation(&crusheranimation);
         for (auto& mesh : m_meshes) {
             mesh->animID = id;
@@ -254,13 +255,15 @@ int main() {
             // float deltatime = currentframe - lastframe;
             float deltatime = static_cast<float>(engine.GetFrameTime());
 
-            // Logic
+           // Logic
 
             inputManager(engine, mainCharacter);
+            if(engine.IsKeyDown(D_KEY_X)){
+                am.StopAnimation(id);
+            }
 
-            //textBoxEntity->text.text = std::to_string(engine.GetFPS());  
+            // textBoxEntity->text.text = std::to_string(engine.GetFPS());  
             am.UpdateAnimation(deltatime);
-            // Draw
 
             engine.BeginDrawing();
 
@@ -276,5 +279,5 @@ int main() {
     return 0;
 }
 /*
-    // Patron Dirty //
+    Patron Dirty //
 */
