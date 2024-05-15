@@ -52,6 +52,7 @@ void SoundSystem::initBuses(){
     ERRCHECK(FMOD_Studio_System_GetBus(soundSystem, "bus:/SFX", &sfxBus));
     ERRCHECK(FMOD_Studio_System_GetBus(soundSystem, "bus:/Ambience", &AmbientBus));
     ERRCHECK(FMOD_Studio_System_GetBus(soundSystem, "bus:/Music", &MusicBus));
+    ERRCHECK(FMOD_Studio_System_GetBus(soundSystem, "bus:/SFX/Mov_enemigos", &MovBus));
   
 }
 
@@ -382,7 +383,6 @@ void SoundSystem::sonido_golem_mov( FMOD_STUDIO_EVENTINSTANCE*& sonido) {
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_golem_mov, &sonido));
     FMOD_Studio_EventInstance_Start(sonido);
     update();
-    std::cout<<"Play"<<std::endl;
 }
 
 
@@ -856,7 +856,6 @@ void SoundSystem::SFX_pasos_stop() {
     //parar movimiento de enemigos
 void SoundSystem::stop_golem_mov( FMOD_STUDIO_EVENTINSTANCE* sonido){
     FMOD_Studio_EventInstance_Stop(sonido, FMOD_STUDIO_STOP_ALLOWFADEOUT);
-    std::cout<<"Paro"<<std::endl;
     update();
 
 }
@@ -865,18 +864,16 @@ void SoundSystem::stop_munyeco_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido){
     FMOD_Studio_EventInstance_Stop(sonido, FMOD_STUDIO_STOP_ALLOWFADEOUT);
     update();
 }
-void SoundSystem::stop_pasos(){
-    //stop_munyeco_mov();
-    //stop_golem_mov();
-    update();
-}
+
 
 
 //FUNCIONES PARA LLAMAR PARA MANEJAR LOS EVENTOS DURANTE EL MENU DE PAUSA
 void SoundSystem::sonido_pause(int zona){
     FMOD_BOOL pausa {true};
-    stop_pasos();
+
     SFX_pasos_stop();
+    getVolumeMov();
+    setVolumeMov(0);
     switch (zona)
     {
         case 0:
@@ -906,8 +903,7 @@ void SoundSystem::sonido_pause(int zona){
 }
 void SoundSystem::sonido_unpause(int zona){
     FMOD_BOOL despausa {false};
-    stop_pasos();
-
+    setVolumeMov(movVolume);
     switch (zona)
     {
         case 0:
@@ -974,16 +970,31 @@ void SoundSystem::setVolumeMaster(float volumen) {
 }
 
 void SoundSystem::setVolumeSFX(float volumen){
-    ERRCHECK( FMOD_Studio_Bus_SetVolume(sfxBus,volumen ));
+    ERRCHECK( FMOD_Studio_Bus_SetVolume( sfxBus,volumen ));
 }
 
 void SoundSystem::setVolumeMusic(float volumen){
-    ERRCHECK( FMOD_Studio_Bus_SetVolume(MusicBus,volumen ));
+    ERRCHECK( FMOD_Studio_Bus_SetVolume( MusicBus,volumen ));
 }
 
 void SoundSystem::setVolumeAmbient(float volumen){
-    ERRCHECK( FMOD_Studio_Bus_SetVolume(AmbientBus,volumen ));
+    ERRCHECK( FMOD_Studio_Bus_SetVolume( AmbientBus,volumen ));
 }
+
+
+void SoundSystem::getVolumeMov(){
+        float currentVolume, finalvolume;
+    ERRCHECK(FMOD_Studio_Bus_GetVolume( sfxBus, &currentVolume, &finalvolume ));
+    movVolume = currentVolume;
+}
+void SoundSystem::setVolumeMov(float volumen){
+    //float cambiar_sonido = 0;
+    //if(volumen != 0)
+    //    cambiar_sonido = movVolume;
+    ERRCHECK( FMOD_Studio_Bus_SetVolume( MovBus,volumen ));
+}
+
+
 
 void SoundSystem::muteMaster(){
     generalVolume = getVolumeMaster();

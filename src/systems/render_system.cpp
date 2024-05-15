@@ -446,7 +446,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
     auto& inpi = em.getSingleton<InputInfo>();
 
     ss.sonido_pause(li.mapID);
-    ss.stop_pasos();
+
 
     // Nodo de los botones
     if (inpi.pause)

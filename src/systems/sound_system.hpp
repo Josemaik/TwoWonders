@@ -156,10 +156,11 @@ struct SoundSystem {
     void SFX_pasos_stop();
     void stop_golem_mov(FMOD_STUDIO_EVENTINSTANCE* sonido);
     void stop_munyeco_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido);
-    void stop_pasos();
+
 
     void sonido_pause(int zona);
     void sonido_unpause(int zona);
+
 
     void update();
     void clear();
@@ -171,6 +172,8 @@ struct SoundSystem {
     void setVolumeSFX(float volumen);
     void setVolumeMusic(float volumen);
     void setVolumeAmbient(float volumen);
+    void getVolumeMov();
+    void setVolumeMov(float volumen);
     void muteMaster();
     void muteAmbient();
     void muteSFX();
@@ -214,7 +217,7 @@ private:
     FMOD_STUDIO_BUS* sfxBus;
     FMOD_STUDIO_BUS* AmbientBus;
     FMOD_STUDIO_BUS* MusicBus;
-
+    FMOD_STUDIO_BUS* MovBus;
     
     FMOD_CHANNELGROUP *masterGroup {};
     FMOD_CHANNELGROUP *ambientGroup {};
@@ -229,6 +232,10 @@ private:
     float sfxVolume;
     float ambientVolume;
     float generalVolume;
+
+    //Variable para guardar el volumen de los SFX de los pasos del movimiento de los enemigos
+    //Se utilizará para cuando se abra el menú de pausa almacenar el volumen anterior
+    float movVolume {0};
 
 
     //Variables para comprobaciones de pausa
