@@ -340,14 +340,14 @@ namespace DarkMoon {
     }
 
     // Create billboard in node
-    Node* DarkMoonEngine::CreateBillboard(const char* filePath, glm::vec3 position, const char* nodeName, Node* parentNode){
+    Node* DarkMoonEngine::CreateBillboard(const char* filePath, glm::vec3 position, glm::vec2 size, const char* nodeName, Node* parentNode){
         auto p_nodeBillboard = CreateNode(nodeName, parentNode);
 
         // Load Texture
         auto texture = LoadTexture2D(filePath);
 
         // Load Billboard
-        auto billboard = std::make_unique<Billboard>(texture, position);
+        auto billboard = std::make_unique<Billboard>(texture, position, size);
         p_nodeBillboard->setEntity(std::move(billboard));
 
         return p_nodeBillboard;

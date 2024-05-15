@@ -85,7 +85,7 @@ namespace DarkMoon {
         // Create model in node
         Node* CreateModel(const char* filePath, Color tint, const char* nodeName, Node* parentNode);
         // Create billboard in node
-        Node* CreateBillboard(const char* filePath, glm::vec3 position, const char* nodeName, Node* parentNode);
+        Node* CreateBillboard(const char* filePath, glm::vec3 position, glm::vec2 size, const char* nodeName, Node* parentNode);
 
         // EXTRA
 

@@ -83,8 +83,6 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     engine.CreatePointLight({ 0.0f, 10.0f,  30.0f }, D_BLUE, "Luz azul", p_node3D);
     engine.CreatePointLight({ 30.0f, 10.0f,  0.0f }, D_MAGENTA, "Luz magenta", p_node3D);
 
-    engine.CreateBillboard("assets/koromaru.png", {}, "Billboard Koromaru", p_node3D);
-
     // Node: Modelo Dummy 1
     auto modelDummy = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 1", p_node3D);
     //modelDummy->scale({0.2f, 0.2f, 0.2f});
@@ -192,6 +190,7 @@ int main() {
 
         createScene3D(engine);
         auto mainCharacter = createMainCharacter(engine);
+        engine.CreateBillboard("assets/mago_happy.png", { 0, 20, 0 }, { 20, 10 }, "Billboard Mago", engine.GetRootNode());
         createHUD(engine);
 
         auto camera = engine.GetCamera();
