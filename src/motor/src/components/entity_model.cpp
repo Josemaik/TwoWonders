@@ -15,15 +15,6 @@ namespace DarkMoon {
 
         std::cout << " - Load a model -> " << m_name << std::endl;
 
-        // if(scene->HasAnimations()){
-        //     std::cout << "\n┌────────────┐\n";
-        //     std::cout << "│ ANIMATIONS │ : " << m_name << "\n";
-        //     std::cout << "└────────────┘\n";
-        //     for(int i = 0; i < scene->mNumAnimations; i++)
-        //         std::cout << "└── " << scene->mAnimations[i]->mName.C_Str() << "\n";
-        //     std::cout << "\n";
-        // }
-
         processNode(scene->mRootNode, scene, rm);
         // if(scene->HasAnimations()){
         //     for(uint i = 0; i < scene->mNumAnimations;i++){
@@ -90,7 +81,7 @@ namespace DarkMoon {
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
             aiMaterial* aiMaterial = scene->mMaterials[mesh->mMaterialIndex];
             //std::cout << "Material: " << aiMaterial->GetName().C_Str() << std::endl;
-            // mesh_base_vertex[i] = 0;
+           // mesh_base_vertex[i] = 0;
             processMesh(mesh, aiMaterial, scene, rm);
         }
 
@@ -196,9 +187,8 @@ namespace DarkMoon {
         auto material = processMaterial(aiMaterial, rm);
         processTextures(aiMaterial, material, rm);
 
-        std::string name = std::string(m_name) + mesh->mName.C_Str();
-
-        auto currentMesh = rm.loadResource<Mesh>(name.c_str(), vertices, indices, material,mesh->mName.C_Str(),hasBones);
+        std::string meshName = mesh->mName.C_Str();
+        auto currentMesh = rm.loadResource<Mesh>(mesh->mName.C_Str(), vertices, indices, material, meshName, hasBones);
 
         m_meshes.push_back(currentMesh);
     }
