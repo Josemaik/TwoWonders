@@ -127,12 +127,18 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 if (!lif.decreaseNextFrame)
                 {
                     em.getSingleton<SoundSystem>().sonido_slime_muere();
-                    em.getSingleton<SoundSystem>().sonido_munyeco_muere();
                     if(ent.hasComponent<SoundComponent>())
                     {
                         auto& sc = em.getComponent<SoundComponent>(ent);
                         em.getSingleton<SoundSystem>().stop_enemigo_mov(sc.sound_mov);
                     }
+
+                }
+            }
+            if (ent.hasTag<PlayerTag>()) {
+                if (!lif.decreaseNextFrame)
+                {
+                    em.getSingleton<SoundSystem>().sonido_jugador_muere();
 
                 }
             }
