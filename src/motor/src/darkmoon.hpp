@@ -12,6 +12,7 @@
 #include "managers/windows_manager.hpp"
 #include "managers/render_manager.hpp"
 #include "managers/input_manager.hpp"
+#include "managers/animator_manager.hpp"
 #include "resources/resource_shader.hpp"
 
 #include "utils/keys.hpp"
@@ -293,5 +294,6 @@ namespace DarkMoon {
         RenderManager& m_renderManager = RenderManager::getInstance();
         WindowsManager& m_windowsManager = WindowsManager::getInstance();
         ResourceManager& m_resourceManager = ResourceManager::getInstance();
+        AnimationManager& m_animationManager = AnimationManager::getInstance();
     };
 }
