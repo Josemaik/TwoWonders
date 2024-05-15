@@ -103,7 +103,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                     em.getSingleton<SoundSystem>().sonido_golem_muere();
                     if(ent.hasComponent<SoundComponent>()){
                         auto& sc = em.getComponent<SoundComponent>(ent);
-                        em.getSingleton<SoundSystem>().stop_golem_mov(sc.sound_mov);
+                        em.getSingleton<SoundSystem>().stop_enemigo_mov(sc.sound_mov);
                     }
                     
                 }
@@ -119,13 +119,22 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                        if(ent.hasComponent<SoundComponent>())
                        {
                         auto& sc = em.getComponent<SoundComponent>(ent);
-                        em.getSingleton<SoundSystem>().stop_munyeco_mov(sc.sound_mov);
+                        em.getSingleton<SoundSystem>().stop_enemigo_mov(sc.sound_mov);
                        }
                 }
             }
             if (ent.hasTag<SlimeTag>()) {
                 if (!lif.decreaseNextFrame)
+                {
                     em.getSingleton<SoundSystem>().sonido_slime_muere();
+                    em.getSingleton<SoundSystem>().sonido_munyeco_muere();
+                    if(ent.hasComponent<SoundComponent>())
+                    {
+                        auto& sc = em.getComponent<SoundComponent>(ent);
+                        em.getSingleton<SoundSystem>().stop_enemigo_mov(sc.sound_mov);
+                    }
+
+                }
             }
 
             //Si es una bala

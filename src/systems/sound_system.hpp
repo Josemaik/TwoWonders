@@ -73,18 +73,18 @@ struct SoundSystem {
     void sonido_h_bola_fuego();     
     void sonido_amb_volcan();       
     void sonido_pasos_volcan();     
-    void sonido_golem_mov( FMOD_STUDIO_EVENTINSTANCE*& sonido);        //por mejorar 
+    void sonido_golem_mov( FMOD_STUDIO_EVENTINSTANCE*& sonido);         
     void sonido_golem_ataque();     
     void sonido_golem_danyo();      
     void sonido_golem_muere();      
-    void sonido_munyeco_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido);      //por integrar
+    void sonido_munyeco_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido);      //por cambiar segun el tipo de munyeco
     void sonido_munyeco_ataque();   
     void sonido_munyeco_danyo();    
     void sonido_munyeco_muere();    
-    void sonido_abrir_puerta_magica();  //por integrar
+    void sonido_abrir_puerta_magica();  
     void sonido_recoger_pieza();    
-    void sonido_equipar_botas();    //por integrar
-    void sonido_equipar_gorro();    //por integrar
+    void sonido_equipar_botas();    
+    void sonido_equipar_gorro();    
 
 
 
@@ -101,13 +101,13 @@ struct SoundSystem {
 
    //sonidos de zona pradera
 
-   void sonido_amb_pradera();           //por integrar
+   void sonido_amb_pradera();           
    void sonido_music_pradera();         //por integrar
    void sonido_h_escudo();              //por comprobar
    void sonido_slime_ataque();          //por integrar
-   void sonido_slime_danyo();           //por integrar
-   void sonido_slime_mov();             //por integrar
-   void sonido_slime_muere();           //por integrar
+   void sonido_slime_danyo();           
+   void sonido_slime_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido);             
+   void sonido_slime_muere();           //por cambiar dpendiendo del tipo se dlime
    void sonido_slime_curar();           //por integrar    
    void sonido_crear_pociones();        //por integrar    
    void sonido_campamento_derrotado1(); //por integrar          
@@ -154,8 +154,7 @@ struct SoundSystem {
     void music_stop_level();
     void ambient_stop();
     void SFX_pasos_stop();
-    void stop_golem_mov(FMOD_STUDIO_EVENTINSTANCE* sonido);
-    void stop_munyeco_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido);
+    void stop_enemigo_mov(FMOD_STUDIO_EVENTINSTANCE* sonido);
 
 
     void sonido_pause(int zona);
@@ -204,6 +203,7 @@ private:
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_pasos;
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_munyeco_mov;   
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_golem_mov; 
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_slime_mov; 
     FMOD_STUDIO_EVENTINSTANCE* eventInstance;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente_volcan;

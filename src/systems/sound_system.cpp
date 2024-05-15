@@ -82,6 +82,8 @@ void SoundSystem::initEvents(){
 
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Golem/Golem_mov", &eventDescription_golem_mov));
 
+    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Slime/Slime_mov", &eventDescription_slime_mov));
+
 
 }
 
@@ -533,10 +535,9 @@ void SoundSystem::sonido_slime_muere() {
     update();
 }
 
-void SoundSystem::sonido_slime_mov() {
-    ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Slime/Slime_mov", &eventDescription));
-    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
-    play();
+void SoundSystem::sonido_slime_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido) {
+    ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_slime_mov, &sonido));
+    FMOD_Studio_EventInstance_Start(sonido);
     update();
 }
 
@@ -854,17 +855,11 @@ void SoundSystem::SFX_pasos_stop() {
 }
 
     //parar movimiento de enemigos
-void SoundSystem::stop_golem_mov( FMOD_STUDIO_EVENTINSTANCE* sonido){
+void SoundSystem::stop_enemigo_mov( FMOD_STUDIO_EVENTINSTANCE* sonido){
     FMOD_Studio_EventInstance_Stop(sonido, FMOD_STUDIO_STOP_ALLOWFADEOUT);
     update();
 
 }
-
-void SoundSystem::stop_munyeco_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido){
-    FMOD_Studio_EventInstance_Stop(sonido, FMOD_STUDIO_STOP_ALLOWFADEOUT);
-    update();
-}
-
 
 
 //FUNCIONES PARA LLAMAR PARA MANEJAR LOS EVENTOS DURANTE EL MENU DE PAUSA
