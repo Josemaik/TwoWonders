@@ -577,8 +577,130 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
     }
 }
 
-void RenderSystem::drawInventory(GameEngine&, EntityManager&)
+void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
 {
+    auto& plfi = em.getSingleton<PlayerInfo>();
+    auto* menuNode = getNode(engine, "MenuInventory");
+
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+
+    // Logo del videojuego
+    auto* fondoTwoWonders = getNode(engine, "fondo_inventario");
+
+    auto* fondoText = dynamic_cast<Texture2D*>(fondoTwoWonders->getEntity())->texture;
+
+    auto fondoWidth = fondoText->getWidth();
+    auto fondoHeight = fondoText->getHeight();
+
+    int middleX = engine.getScreenWidth() / 2;
+    int middleY = engine.getScreenHeight() / 2;
+
+    int posBackX = static_cast<int>(static_cast<float>(middleX) - static_cast<float>(fondoWidth) * wRate / 2);
+    int posBackY = static_cast<int>(static_cast<float>(middleY) - static_cast<float>(fondoHeight) * hRate / 2);
+
+    engine.drawNode(fondoTwoWonders, { posBackX, posBackY });
+    engine.createText({ middleX, middleY / 3 }, "Inventario", D_LAVENDER_LIGHT, "Titulo inventario", menuNode, 60, Aligned::CENTER);
+
+    std::map<std::string, std::pair<Node*, std::function<void()>>> buttonData = {
+        { "01_spell1", { nullptr, [&]() {std::cout << "aaaaaaaaaaaaaaaa";}}},
+        { "02_spell2", { nullptr, [&]() {}}},
+        { "03_spell3", { nullptr, [&]() {}}},
+        { "04_spell4", { nullptr, [&]() {}}},
+        { "05_spell5", { nullptr, [&]() {}}},
+        { "06_spell6", { nullptr, [&]() {}}},
+        { "07_obj1", { nullptr, [&]() {}}},
+        { "08_obj2", { nullptr, [&]() {}}},
+        { "09_obj3", { nullptr, [&]() {}}},
+        { "10_obj4", { nullptr, [&]() {}}},
+        { "11_obj5", { nullptr, [&]() {}}},
+        { "12_obj6", { nullptr, [&]() {}}},
+    };
+
+    std::map<std::string, std::pair<Node*, std::function<void()>>> spellButtData = {
+        { "1_spell1", { nullptr, [&]() {}}},
+        { "2_spell2", { nullptr, [&]() {}}},
+        { "3_spell3", { nullptr, [&]() {}}},
+        { "4_spell4", { nullptr, [&]() {}}},
+        { "5_spell5", { nullptr, [&]() {}}},
+        { "6_spell6", { nullptr, [&]() {}}},
+    };
+
+    std::map<std::string, std::pair<Node*, std::function<void()>>> objButtData = {
+        { "1_obj1", { nullptr, [&]() {}}},
+        { "2_obj2", { nullptr, [&]() {}}},
+        { "3_obj3", { nullptr, [&]() {}}},
+        { "4_obj4", { nullptr, [&]() {}}},
+        { "5_obj5", { nullptr, [&]() {}}},
+        { "6_obj6", { nullptr, [&]() {}}},
+    };
+
+    std::map<AttackType, Node*> spellButtNodes = {
+        { AttackType::WaterBombShot, getNode(engine, "pompasInv") },
+        { AttackType::WaterDashArea, getNode(engine, "dashInv") },
+        { AttackType::FireBallShot, getNode(engine, "bola_fuegoInv") },
+        { AttackType::IceShield, getNode(engine, "escudo_hieloInv") },
+        { AttackType::IceShard, getNode(engine, "estacasInv") },
+        { AttackType::MeteoritePlayer, getNode(engine, "meteoritosInv") },
+    };
+
+    // Creamos los botones
+    auto& inpi = em.getSingleton<InputInfo>();
+    auto& currentButton = inpi.currentButton;
+    int initButtonX = static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 12.9f);
+    int initButtonY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 3.18f);
+    int buttonWidth = static_cast<int>(270.f * wRate);
+    int buttonHeight = static_cast<int>(270.f * hRate);
+    int downRate = static_cast<int>(226.f * hRate);
+    int rightRate = static_cast<int>(274.5f * hRate);
+    int hoverRate = static_cast<int>(30.f * hRate);
+    int spellRate = static_cast<int>(20.f * hRate);
+
+    int i{ 0 }, k{ 0 }, j{ 0 };
+    for (auto& [name, data] : buttonData)
+    {
+        auto& [button, action] = data;
+
+        // Asignamos el botón
+        button = engine.createButton({ initButtonX + k * rightRate, initButtonY + i * downRate }, { buttonWidth, buttonHeight },
+            " ",
+            engine.getFontDefault(), 50, D_BLACK,
+            Aligned::CENTER, Aligned::RIGHT,
+            { 0,0,0,120 }, { 0,0,0,120 }, { 0,0,0,120 },
+            name.c_str(), menuNode);
+
+        // Sacamos la información del botón
+        auto& but = *button->getEntity<Button>();
+        but.textBox.drawBox = false;
+
+        // // Comprobar estado del boton
+        if (but.state == ButtonState::CLICK || (but.isCurrent && inpi.interact)) {
+            action();
+            inpi.interact = false;
+            but.state = ButtonState::NORMAL;
+        }
+
+        if (but.state == ButtonState::HOVER)
+        {
+            engine.drawNode(getNode(engine, "hover_inventario"), { initButtonX + k * rightRate - hoverRate, initButtonY + i * downRate - hoverRate });
+            currentButton = static_cast<std::size_t>(j);
+        }
+
+        if (j < plfi.spells.size() && !plfi.spells.empty() && plfi.spells[j] != plfi.noSpell)
+            engine.drawNode(spellButtNodes[plfi.spells[j].atkType], { initButtonX + k * rightRate + spellRate, initButtonY + i * downRate + spellRate }, { 1.4, 1.4 });
+
+
+
+        i += 1;
+        j += 1;
+        if (i == 3)
+        {
+            k += 1;
+            i = 0;
+        }
+    }
+
+    // static std::map<std::string
     // float windowWidth = 450.0f;
     // float windowHeight = 450.0f;
     // float buttonWidth = 200.0f;
@@ -1551,8 +1673,8 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
         drawPauseMenu(engine, em, li, ss);
     }
 
-    // else if (inpi.inventory)
-        // drawInventory(engine, em);
+    else if (inpi.inventory)
+        drawInventory(engine, em);
 
     // Si se pulsa F2 se activa editor  de parámetros In-game
     else if (inpi.debugAI1)

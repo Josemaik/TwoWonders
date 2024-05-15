@@ -700,7 +700,7 @@ namespace DarkMoon {
                     state = ButtonState::HOVER;
                 }
             }
-            else  if (isCurrent)
+            else if (isCurrent)
             {
                 if (!textBox.drawBox)
                     textBox.text.color = hoverColor;

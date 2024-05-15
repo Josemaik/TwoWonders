@@ -40,6 +40,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["MenuPrincipal"] = dmeg.CreateNode("MenuPrincipal", nodes["Menu"]);
     nodes["MenuOpciones"] = dmeg.CreateNode("MenuOpciones", nodes["Menu"]);
     nodes["MenuCheats"] = dmeg.CreateNode("MenuCheats", nodes["Menu"]);
+    nodes["MenuInventory"] = dmeg.CreateNode("MenuInventory", nodes["Menu"]);
 
     ENGI::GameEngine::setExitKey(D_KEY_F8);
 
@@ -52,8 +53,14 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // Logo TwoWonders
     loadAndResizeImage("logo_twowonders", "assets/logo_two_wonders.png", nodes["MenuPrincipal"]);
 
+    // Fondo Inventario
+    loadAndResizeImage("fondo_inventario", "assets/Inventario-fondo.png", nodes["MenuInventory"]);
+
     // Logo Kaiwa
     loadAndResizeImage("logo_kaiwa", "assets/logo_kaiwa_games.png", nodes["2D"]);
+
+    // Hover Inventario
+    loadAndResizeImage("hover_inventario", "assets/Inventario/Inv-select.png", nodes["MenuInventory"]);
 
     // Corazón HUD
     loadAndResizeImage("heart", "assets/HUD/corazon.png", nodes["Hearts"]);
@@ -130,21 +137,27 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Icono para las pompas de agua HUD
     loadAndResizeImage("pompas", "assets/HUD/pompas.png", nodes["AnimTextures"]);
+    loadAndResizeImage("pompasInv", "assets/HUD/pompas.png", nodes["MenuInventory"]);
 
     // Icono para el dash de agua HUD
     loadAndResizeImage("dash", "assets/HUD/dash.png", nodes["AnimTextures"]);
+    loadAndResizeImage("dashInv", "assets/HUD/dash.png", nodes["MenuInventory"]);
 
     // Icono para la bola de fuego HUD
     loadAndResizeImage("bola_fuego", "assets/HUD/bolafuego.png", nodes["AnimTextures"]);
+    loadAndResizeImage("bola_fuegoInv", "assets/HUD/bolafuego.png", nodes["MenuInventory"]);
 
     // Icono para meteoritos HUD
     loadAndResizeImage("meteoritos", "assets/HUD/meteoritos.png", nodes["AnimTextures"]);
+    loadAndResizeImage("meteoritosInv", "assets/HUD/meteoritos.png", nodes["MenuInventory"]);
 
     // Icono para escudo de hielo HUD
     loadAndResizeImage("escudo_hielo", "assets/HUD/escudo.png", nodes["AnimTextures"]);
+    loadAndResizeImage("escudo_hieloInv", "assets/HUD/escudo.png", nodes["MenuInventory"]);
 
     // Icono para las estacas de hielo HUD
     loadAndResizeImage("estacas", "assets/HUD/estacas.png", nodes["AnimTextures"]);
+    loadAndResizeImage("estacasInv", "assets/HUD/estacas.png", nodes["MenuInventory"]);
 
     // Libro para enseñar hechizos HUD
     loadAndResizeImage("libro", "assets/HUD/Libro.png", nodes["Book"]);
@@ -845,10 +858,10 @@ Node* ENGI::GameEngine::createText(vec2i position, std::string text, Font* font,
     return nodes[nodeName];
 }
 
-Node* ENGI::GameEngine::createText(vec2i position, std::string text, Color c, const char* nodeName, Node* parentNode, int fontSize)
+Node* ENGI::GameEngine::createText(vec2i position, std::string text, Color c, const char* nodeName, Node* parentNode, int fontSize, Aligned align)
 {
     if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreateText(position.toGlm(), text, getDefaultFont(), fontSize, c, Aligned::LEFT, false, nodeName, parentNode);
+        nodes[nodeName] = dmeg.CreateText(position.toGlm(), text, getDefaultFont(), fontSize, c, align, false, nodeName, parentNode);
     else
     {
         nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {1.f, 1.f} };

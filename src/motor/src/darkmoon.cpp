@@ -402,15 +402,15 @@ namespace DarkMoon {
     // AuxUpdateLights
     void DarkMoonEngine::AuxUpdateLights(Node* parentNode) {
         for (auto& child : parentNode->getChildren()) {
-            if (auto pLight = child->getEntity<PointLight>()){
+            if (auto pLight = child->getEntity<PointLight>()) {
                 if (pLight->enabled)
                     m_renderManager.pointLights.push_back(pLight);
             }
-            else if (auto dLight = child->getEntity<DirectionalLight>()){
+            else if (auto dLight = child->getEntity<DirectionalLight>()) {
                 if (dLight->enabled)
                     m_renderManager.directionalLights.push_back(dLight);
             }
-            
+
             AuxUpdateLights(child);
         }
     }
@@ -447,8 +447,8 @@ namespace DarkMoon {
             m_renderManager.shaders["3D"] = LoadShader("shader3D", "assets/shaders/3D.vs", "assets/shaders/3D.fs");
             m_renderManager.shaders["text"] = LoadShader("shaderText", "assets/shaders/text.vs", "assets/shaders/text.fs");
             m_renderManager.shaders["lights"] = LoadShader("shaderLights", "assets/shaders/lights.vs", "assets/shaders/lights.fs");
-            m_renderManager.shaders["depth"] = LoadShader("shaderDepth", "assets/shaders/depth.vs", "assets/shaders/depth.fs");
-            m_renderManager.shaders["default"] = LoadShader("shaderDefault", "assets/shaders/default.vs", "assets/shaders/default.fs");
+            // m_renderManager.shaders["depth"] = LoadShader("shaderDepth", "assets/shaders/depth.vs", "assets/shaders/depth.fs");
+            // m_renderManager.shaders["default"] = LoadShader("shaderDefault", "assets/shaders/default.vs", "assets/shaders/default.fs");
 
             //----- Font -----//
             m_renderManager.defaultFont = LoadFont("assets/fonts/Capriola-Regular.ttf");
