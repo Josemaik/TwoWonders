@@ -377,7 +377,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         if (otherEnt.hasComponent<LifeComponent>() && otherEnt.hasTag<SlimeTag>()) {
             em.getComponent<LifeComponent>(otherEnt).increaseLife();
         }
-        em.getSingleton<SoundSystem>().sonido_slime_curar();
+        //em.getSingleton<SoundSystem>().sonido_slime_curar();
         return;
     }
 

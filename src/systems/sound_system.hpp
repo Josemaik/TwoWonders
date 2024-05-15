@@ -24,6 +24,9 @@ struct SoundSystem {
     void recoger_mana();
     void sonido_mov();
     void sonido_salir();
+
+    FMOD_STUDIO_EVENTINSTANCE* createNewEventInstance();
+
    
     void sonido_abrir_cofre();
     void sonido_abrir_puerta();
@@ -70,18 +73,18 @@ struct SoundSystem {
     void sonido_h_bola_fuego();     
     void sonido_amb_volcan();       
     void sonido_pasos_volcan();     
-    void sonido_golem_mov();        //por mejorar 
+    void sonido_golem_mov( FMOD_STUDIO_EVENTINSTANCE*& sonido);         
     void sonido_golem_ataque();     
     void sonido_golem_danyo();      
     void sonido_golem_muere();      
-    void sonido_munyeco_mov();      //por integrar
+    void sonido_munyeco_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido);      //por cambiar segun el tipo de munyeco
     void sonido_munyeco_ataque();   
     void sonido_munyeco_danyo();    
     void sonido_munyeco_muere();    
-    void sonido_abrir_puerta_magica();  //por integrar
+    void sonido_abrir_puerta_magica();  
     void sonido_recoger_pieza();    
-    void sonido_equipar_botas();    //por integrar
-    void sonido_equipar_gorro();    //por integrar
+    void sonido_equipar_botas();    
+    void sonido_equipar_gorro();    
 
 
 
@@ -98,13 +101,13 @@ struct SoundSystem {
 
    //sonidos de zona pradera
 
-   void sonido_amb_pradera();           //por integrar
+   void sonido_amb_pradera();           
    void sonido_music_pradera();         //por integrar
    void sonido_h_escudo();              //por comprobar
    void sonido_slime_ataque();          //por integrar
-   void sonido_slime_danyo();           //por integrar
-   void sonido_slime_mov();             //por integrar
-   void sonido_slime_muere();           //por integrar
+   void sonido_slime_danyo();           
+   void sonido_slime_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido);             
+   void sonido_slime_muere();           //por cambiar dpendiendo del tipo se dlime
    void sonido_slime_curar();           //por integrar    
    void sonido_crear_pociones();        //por integrar    
    void sonido_campamento_derrotado1(); //por integrar          
@@ -151,12 +154,12 @@ struct SoundSystem {
     void music_stop_level();
     void ambient_stop();
     void SFX_pasos_stop();
-    void stop_golem_mov();
-    void stop_munyeco_mov();
-    void stop_pasos();
+    void stop_enemigo_mov(FMOD_STUDIO_EVENTINSTANCE* sonido);
+
 
     void sonido_pause(int zona);
     void sonido_unpause(int zona);
+
 
     void update();
     void clear();
@@ -168,6 +171,8 @@ struct SoundSystem {
     void setVolumeSFX(float volumen);
     void setVolumeMusic(float volumen);
     void setVolumeAmbient(float volumen);
+    void getVolumeMov();
+    void setVolumeMov(float volumen);
     void muteMaster();
     void muteAmbient();
     void muteSFX();
@@ -198,6 +203,7 @@ private:
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_pasos;
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_munyeco_mov;   
     FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_golem_mov; 
+    FMOD_STUDIO_EVENTDESCRIPTION* eventDescription_slime_mov; 
     FMOD_STUDIO_EVENTINSTANCE* eventInstance;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente;
     FMOD_STUDIO_EVENTINSTANCE* eventInstance_Ambiente_volcan;
@@ -211,7 +217,7 @@ private:
     FMOD_STUDIO_BUS* sfxBus;
     FMOD_STUDIO_BUS* AmbientBus;
     FMOD_STUDIO_BUS* MusicBus;
-
+    FMOD_STUDIO_BUS* MovBus;
     
     FMOD_CHANNELGROUP *masterGroup {};
     FMOD_CHANNELGROUP *ambientGroup {};
@@ -226,6 +232,10 @@ private:
     float sfxVolume;
     float ambientVolume;
     float generalVolume;
+
+    //Variable para guardar el volumen de los SFX de los pasos del movimiento de los enemigos
+    //Se utilizará para cuando se abra el menú de pausa almacenar el volumen anterior
+    float movVolume {0};
 
 
     //Variables para comprobaciones de pausa
