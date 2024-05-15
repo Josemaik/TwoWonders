@@ -1647,7 +1647,7 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         graph.createGraph(navs.conexiones, navs.nodes);
         std::vector<vec3d> path = graph.PathFindAStar(debug, startnode, 423);
 
-        std::size_t lengthpath = path.size();
+        // std::size_t lengthpath = path.size();
         // std::cout << lengthpath;
         //calcular camnino desde el centro hasta un punto
 

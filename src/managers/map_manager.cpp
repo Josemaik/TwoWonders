@@ -148,7 +148,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
                     return;
                 const valueType& underworld = chunk[1]["underworld"];
                 const valueType& enemyArray = underworld["Enemies"];
-                //generateEnemies(em, enemyArray, iam);
+                generateEnemies(em, enemyArray, iam);
                 break;
             }
             case LoadState::LOAD_NPCS:

@@ -189,7 +189,7 @@ namespace DarkMoon {
 
         std::string name = std::string(m_name) + mesh->mName.C_Str();
 
-        auto currentMesh = rm.loadResource<Mesh>(name.c_str(), vertices, indices, material,meshName, hasBones);
+        auto currentMesh = rm.loadResource<Mesh>(name.c_str(), vertices, indices, material,mesh->mName.C_Str(),hasBones);
 
         m_meshes.push_back(currentMesh);
     }
