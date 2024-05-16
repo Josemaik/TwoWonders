@@ -240,10 +240,10 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // TEXTURAS PARTÍCULAS
     //
-    loadAndResizeBillboard("p_est1", "assets/HUD/p_texturas/p_est1.png", nodes["PartTextures"]);
-    loadAndResizeBillboard("p_est2", "assets/HUD/p_texturas/p_est2.png", nodes["PartTextures"]);
-    loadAndResizeBillboard("p_est3", "assets/HUD/p_texturas/p_est3.png", nodes["PartTextures"]);
-    loadAndResizeBillboard("p_est4", "assets/HUD/p_texturas/p_est4.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est1", "assets/HUD/p_texturas/p_est1.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est2", "assets/HUD/p_texturas/p_est2.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est3", "assets/HUD/p_texturas/p_est3.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est4", "assets/HUD/p_texturas/p_est4.png", nodes["PartTextures"]);
 
     // GIFS
     //

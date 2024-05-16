@@ -1687,10 +1687,12 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
                     else if constexpr (std::is_same_v<T, std::string>)
                     {
                         std::string& textura = std::get<std::string>(p.color);
-                        std::string path = "assets/HUD/p_texturas/" + textura + ".png";
-                        engine.drawBillboard(path, p.position.toDouble(), { 1.0f, 1.0f });
-                        // auto* p_texture = engine.createNode(getNode(engine, textura.c_str()), getNode(engine, "TextCopy"));
-                        // p_texture->setTranslation(p.position.toGlm());
+                        auto* p_texture = engine.createNode(getNode(engine, textura.c_str()), getNode(engine, "TextCopy"));
+                        auto& textureInfo = *p_texture->getEntity<Texture2D>()->texture;
+                        int posX = static_cast<int>(engine.getWorldToScreenX(p.position.toDouble()) - static_cast<float>(textureInfo.getWidth()) * wRate / 2);
+                        int posY = static_cast<int>(engine.getWorldToScreenY(p.position.toDouble()) - static_cast<float>(textureInfo.getHeight()) * hRate / 2);
+
+                        engine.drawNode(p_texture, { posX, posY });
                     }
                 }, variant);
             }
