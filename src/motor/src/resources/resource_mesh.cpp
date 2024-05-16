@@ -59,14 +59,14 @@ namespace DarkMoon {
         // Enable and specify vertex coords
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, textCoords));
-        // Enable and specify tangent
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
-        // Enable and specify bitangent
-        glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, BiTangent));
         if (hasBones)
         {
+            // Enable and specify tangent
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
+            // Enable and specify bitangent
+            glEnableVertexAttribArray(4);
+            glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, BiTangent));
             // Enable and specify bones ids
             glEnableVertexAttribArray(5);
             glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, boneIDs));
@@ -93,9 +93,12 @@ namespace DarkMoon {
         {
             auto transforms = am.GetFinalBoneMatrices(animID);
             for (std::size_t i = 0; i < transforms.size(); ++i) {
+                // Rotar la matriz en 90 grados alrededor del eje Z
+                glm::mat4 rotatedTransform = glm::rotate(transforms[i], glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
                 std::string boneStr = "finalBonesMatrices[" + std::to_string(i) + "]";
                 int boneLocation = glGetUniformLocation(rm.getShader()->getIDShader(), boneStr.c_str());
-                glUniformMatrix4fv(boneLocation, 1, GL_FALSE, glm::value_ptr(transforms[i]));
+                glUniformMatrix4fv(boneLocation, 1, GL_FALSE, glm::value_ptr(rotatedTransform));
             }
         }
 

@@ -1108,16 +1108,16 @@ void ENGI::GameEngine::nodeClear(Node* node)
 }
 
 //Animaciones
-std::size_t ENGI::GameEngine::PlayAnimation(Animation* panimation){
+std::size_t ENGI::GameEngine::playAnimation(Animation* panimation) {
     return dmeg.PlayAnimation(panimation);
 }
 
-void ENGI::GameEngine::StopAnimation(std::size_t idanim){
+void ENGI::GameEngine::stopAnimation(std::size_t idanim) {
     dmeg.StopAnimation(idanim);
 }
-Animation* ENGI::GameEngine::CreateAnimation(std::string path,std::vector<BoneInfo> vecbones){
-    return dmeg.CreateAnimation(path,vecbones);
+Animation* ENGI::GameEngine::createAnimation(std::string path, std::vector<BoneInfo> vecbones) {
+    return dmeg.CreateAnimation(path, vecbones);
 }
- void ENGI::GameEngine::UpdateAnimations(){
+void ENGI::GameEngine::updateAnimations() {
     dmeg.UpdateAnimations();
- }
+}

@@ -7,7 +7,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -33.0, 13.0, -0.5 };
+        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
 
     // 33.0, 4.0, -25.9 - Posición Incial lvl0
     // 32.0, 4.0, 43.0 - Primer cofre lvl0
@@ -41,7 +41,7 @@ void Game::createEntities()
     // Player
     auto& e{ em.newEntity() };
     em.addTag<PlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 6.0, 2.0 }, .color = D_WHITE,.rotationVec={0.0,0.0,0.0} });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = plfi.spawnPoint, .scale = { 2.0, 6.0, 2.0 }, .color = D_WHITE });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = r.position, .scale = r.scale });
     // p.gravity = 0;
 
@@ -55,6 +55,11 @@ void Game::createEntities()
     auto& lis = em.addComponent<ListenerComponent>(e);
     for (auto i = 0; i < EventCodes::MAX; i++)
         lis.addCode(static_cast<EventCodes>(i));
+
+    auto modelCharacter = engine.dmeg.CreateModel("assets/Personajes/Principal/Main_character.fbx", D_WHITE, "personaje", engine.dmeg.GetRootNode());
+    modelCharacter->translate({ 23.0, 4.0, -25.9 });
+    modelCharacter->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
+    modelCharacter->rotate({ 0.0f, 1.0f, 0.0f }, 90.0f);
 
     // Código de añadir un hechizo al jugador
     // Spell spell{ "Fireball", "Shoots a fireball", Spells::WaterDash, 20.0, 2 };
@@ -286,7 +291,17 @@ void Game::run()
                 alpha = elapsed / timeStepDouble;
                 sound_system.update();
                 lock_system.update(em);
-                anim_system.update(em,engine);
+                using std::chrono::high_resolution_clock;
+                using std::chrono::duration_cast;
+                using std::chrono::duration;
+                using std::chrono::microseconds;
+
+                auto t1 = high_resolution_clock::now();
+                anim_system.update(em, engine);
+
+                auto t2 = high_resolution_clock::now();
+                auto dur = duration_cast<microseconds>(t2 - t1);
+                std::cout << "Anim System: " << dur.count() << "us" << std::endl;
                 render_system.update(em, engine, alpha);
             }
             else if (!resets && debugs) {

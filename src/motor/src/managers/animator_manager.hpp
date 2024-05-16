@@ -77,6 +77,42 @@ struct AnimationManager
         }
     }
 
+    void calculateBoneTransform(AssimpNodeData* node, glm::mat4 parentTransform, Animation* animation, float currentTime, std::size_t id)
+    {
+        std::string nodeName = node->name;
+        glm::mat4 boneTransform = node->transformation;
+
+        if (!node->bone)
+            node->bone = animation->findBone(nodeName);
+
+        auto* bone = node->bone;
+        if (bone)
+        {
+            bone->update(currentTime);
+            boneTransform = bone->getTransform();
+        }
+
+        glm::mat4 globalTransformation = parentTransform * boneTransform;
+
+        auto boneProps = animation->getBoneProps();
+
+        for (unsigned int i = 0; i < boneProps.size(); i++) {
+            if (boneProps[i].name == nodeName) {
+                glm::mat4 offset = boneProps[i].offset;
+                m_Animations[id].m_FinalBoneMatrices[i] = globalTransformation * offset;
+                break;
+            }
+        }
+
+        for (int i = 0; i < node->childrenCount; i++)
+            calculateBoneTransform(&node->children[i], globalTransformation, animation, currentTime, id);
+    }
+
+    std::vector<glm::mat4>& GetFinalBoneMatrices(std::size_t id)
+    {
+        return m_Animations[id].m_FinalBoneMatrices;
+    }
+
     void calculateBoneTransition(const AssimpNodeData* curNode, glm::mat4 parentTransform, Animation* prevAnimation, Animation* nextAnimation, float haltTime, float currentTime, float transitionTime, std::size_t id)
     {
         std::string nodeName = curNode->name;
@@ -123,40 +159,6 @@ struct AnimationManager
 
         for (int i = 0; i < curNode->childrenCount; i++)
             calculateBoneTransition(&curNode->children[i], globalTransformation, prevAnimation, nextAnimation, haltTime, currentTime, transitionTime, id);
-    }
-
-    void calculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform, Animation* animation, float currentTime, std::size_t id)
-    {
-        std::string nodeName = node->name;
-        glm::mat4 boneTransform = node->transformation;
-
-        Bone* bone = animation->findBone(nodeName);
-
-        if (bone)
-        {
-            bone->update(currentTime);
-            boneTransform = bone->getTransform();
-        }
-
-        glm::mat4 globalTransformation = parentTransform * boneTransform;
-
-        auto boneProps = animation->getBoneProps();
-
-        for (unsigned int i = 0; i < boneProps.size(); i++) {
-            if (boneProps[i].name == nodeName) {
-                glm::mat4 offset = boneProps[i].offset;
-                m_Animations[id].m_FinalBoneMatrices[i] = globalTransformation * offset;
-                break;
-            }
-        }
-
-        for (int i = 0; i < node->childrenCount; i++)
-            calculateBoneTransform(&node->children[i], globalTransformation, animation, currentTime, id);
-    }
-
-    std::vector<glm::mat4> GetFinalBoneMatrices(std::size_t id)
-    {
-        return m_Animations[id].m_FinalBoneMatrices;
     }
 
     static AnimationManager& getInstance() {

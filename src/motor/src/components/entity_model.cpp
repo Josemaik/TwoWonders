@@ -100,7 +100,6 @@ namespace DarkMoon {
         std::vector<glm::vec4> weights(mesh->mNumVertices);
         //m_Bones.resize(mesh->mNumVertices);
 
-
         // Loop all vertices in loaded mesh
         for (unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
@@ -167,14 +166,11 @@ namespace DarkMoon {
 
         //Process bones
         bool hasBones = mesh->HasBones();
-        if (hasBones)
-        {
-            processBone(boneIDs, weights, mesh, scene);
-        }
-        //check cofre
-        // if(mesh->mNumBones == 1){
-        //     hasBones = false;
+        // if (hasBones)
+        // {
+        processBone(boneIDs, weights, mesh, scene);
         // }
+
         for (std::size_t i = 0; i < vertices.size(); i++) {
             vertices[i].boneIDs = boneIDs[i];
             vertices[i].weights = weights[i];
@@ -258,7 +254,9 @@ namespace DarkMoon {
             int boneID = -1;
             std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
             if (boneIndex >= boneVector.size()) {
-                boneVector.push_back({ boneName, aiMatrix4x4ToGlm(&mesh->mBones[boneIndex]->mOffsetMatrix) });
+                glm::mat4 offset = aiMatrix4x4ToGlm(&mesh->mBones[boneIndex]->mOffsetMatrix);
+                std::cout << "\n";
+                boneVector.push_back({ boneName, offset });
                 boneID = boneIndex;
                 m_BoneCounter++;
             }

@@ -19,6 +19,7 @@ struct AssimpNodeData
     std::string name{};
     int childrenCount{};
     std::vector<AssimpNodeData> children{};
+    Bone* bone = nullptr;
 };
 
 static glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4* from);
@@ -27,7 +28,7 @@ struct Animation
 {
 public:
     Animation() = default;
-   
+
     Animation(const std::string& animationPath, std::vector<BoneInfo>& modelBones)
     {
         Assimp::Importer importer;
@@ -59,7 +60,7 @@ public:
 
     inline float getDuration() { return duration; }
 
-    inline const AssimpNodeData* getRootNode() { return &rootNode; }
+    inline AssimpNodeData* getRootNode() { return &rootNode; }
 
     inline const std::vector<BoneInfo>& getBoneProps()
     {

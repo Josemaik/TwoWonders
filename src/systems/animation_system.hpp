@@ -7,10 +7,9 @@
 struct AnimationSystem
 {
     // Se van a buscar las entidad que tengan estos componentes y tags
-    using SYSCMPs = MP::TypeList<AnimationComponent,RenderComponent>;
+    using SYSCMPs = MP::TypeList<RenderComponent, AnimationComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em,GameEngine& engine);
-
+    void update(EntityManager& em, GameEngine& engine);
 };
 

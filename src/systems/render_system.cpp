@@ -894,7 +894,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 if (e.hasTag<PlayerTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
-                    pos.setY(pos.y() - 2.4);
+                    pos.setY(pos.y());
                 }
                 else if (e.hasTag<SlimeTag>())
                 {
@@ -974,12 +974,14 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 if (r.node) {
                     r.node->setTranslation({ pos.x(), pos.y(), pos.z() });
                     r.node->setScale({ scl.x(), scl.y(), scl.z() });
-                    if(e.hasComponent<AnimationComponent>()){
-                        r.node->setRotation({1.0, 0.0, 0.0 }, -90.0);
-                        r.node->rotate({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees - 90);
-                    }else{
-                        r.node->setRotation({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees);
+                    if (e.hasComponent<AnimationComponent>())
+                    {
+                        r.node->setRotation({ 1.0, 0.0, 0.0 }, 270.0);
+                        r.node->rotate({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees);
                     }
+                    else
+                        r.node->setRotation({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees);
+
                     r.node->setVisibleOne(true);
 
                     // Luces cofre
@@ -1058,10 +1060,10 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
 {
     auto& li = em.getSingleton<LevelInfo>();
 
-    if (e.hasTag<PlayerTag>()){
+    if (e.hasTag<PlayerTag>()) {
         std::string path = "assets/Personajes/Principal/Main_character.fbx";
         r.node = engine.loadModel(path.c_str());
-        LoadAnimations(engine,em,r,path,e);
+        loadAnimations(engine, em, e, r, path);
     }
     else if (e.hasTag<SlimeTag>())
         r.node = engine.loadModel("assets/models/Slime.obj");
@@ -1269,7 +1271,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         // r.model = engine.loadModelRaylib("assets/models/Apisonadora.obj");
         std::string path = "assets/Personajes/Enemigos/Apisonadora/Apisonadora.fbx";
         r.node = engine.loadModel(path.c_str());
-        LoadAnimations(engine,em,r,path,e);
+        loadAnimations(engine, em, e, r, path);
         // loadShaders(r.model);
     }
     else if (e.hasTag<DummyTag>())
@@ -1436,14 +1438,13 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     r.meshLoaded = true;
 }
 
-
-void RenderSystem::LoadAnimations(GameEngine& engine, EntityManager& em, RenderComponent& rc,std::string path,Entity& ent){
+void RenderSystem::loadAnimations(GameEngine& engine, EntityManager& em, Entity& ent, RenderComponent& rc, std::string path) {
     auto& vecBones = rc.node->getEntity<DarkMoon::Model>()->getboneInfoMap();
-    auto* animation = engine.CreateAnimation(path,vecBones);
+    auto* animation = engine.createAnimation(path, vecBones);
     auto& animcomp = em.addComponent<AnimationComponent>(ent);
-    animcomp.animations[animcomp.animations.size()] = animation;
-}   
+    animcomp.animationList[animcomp.animationList.size()] = animation;
 
+}
 
 void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, Entity& e, Node& n, vec3d pos, Color c)
 {
