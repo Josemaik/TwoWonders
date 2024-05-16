@@ -504,18 +504,14 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Si cualquiera de los impactos es con una bala, se baja la vida del otro
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
-        if (staticEntPtr->hasTag<DestructibleTag>() && staticEntPtr->hasComponent<LifeComponent>() && otherEntPtr->hasComponent<TypeComponent>())
+        if (staticEntPtr->hasTag<DestructibleTag>() && staticEntPtr->hasComponent<LifeComponent>() && otherEntPtr->hasComponent<AttackComponent>())
         {
-            auto& bulletType = em.getComponent<TypeComponent>(*otherEntPtr);
-            if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(bulletType.type)) {
+            auto& attack = em.getComponent<AttackComponent>(*otherEntPtr);
+            if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(attack.type)) {
                 em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
+                attack.doEffect = true;
             }
         }
-
-        // Esto es para efectos secundarios de los ataques
-        if (!otherEntPtr->hasComponent<ObjectComponent>())
-            li.insertDeath(otherEntPtr->getID());
-
         return;
     }
 
