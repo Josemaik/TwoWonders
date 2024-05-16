@@ -7,7 +7,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { -65.0, 13.0, 104.0 };
+        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
 
     // 33.0, 4.0, -25.9 - Posición Incial lvl0
     // 32.0, 4.0, 43.0 - Primer cofre lvl0
@@ -106,6 +106,7 @@ void Game::run()
 
     // Incializamos FPSs
     engine.setTargetFPS(30);
+    engine.toggleLights();
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
@@ -209,7 +210,7 @@ void Game::run()
 
             // TODO - Cuando se implemente el sistema de guardado, cargar el nivel en el que se quedó
             if (!map.isComplete())
-                map.createMap(em, 3, iam);
+                map.createMap(em, 0, iam);
 
             break;
         }
@@ -305,9 +306,13 @@ void Game::run()
         // CODIGO DE LA PANTALLA FINAL
         case GameScreen::ENDING:
         {
-            if (input_system.pressEnter(engine))
+            if (inpi.interact)
+            {
                 li.currentScreen = GameScreen::TITLE;
+                inpi.interact = false;
+            }
 
+            input_system.update(em, engine);
             render_system.drawEnding(engine);
             resetGame();
             break;

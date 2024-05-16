@@ -101,6 +101,9 @@ namespace ENGI {
         Node* drawPointLight(vec3d position, Color color);
         Node* createPointLight(vec3d position, Color color, const char* nodeName, Node* parentNode);
 
+        // Billboard
+        Node* drawBillboard(std::string path, vec3d position, vec2f size);
+
         // Window
         void initWindow(int width, int height, const char* title);
         void closeWindow();
@@ -143,6 +146,7 @@ namespace ENGI {
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();
         void loadAndResizeImage(const char* name, const char* path, Node* parentNode);
+        void loadAndResizeBillboard(const char* name, const char* path, Node* parentNode);
         void loadAndResizeImageGif(const char* name, const char* filePath);
         void unloadGifsAndTextures();
         void setReplayMode(bool replay, GameData& gd);

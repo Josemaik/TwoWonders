@@ -928,39 +928,55 @@ void RenderSystem::drawLogoKaiwa(GameEngine& engine) {
     engine.endDrawing();
 }
 
-void RenderSystem::drawEnding(GameEngine&) {
-    // engine.beginDrawing();
-    // engine.clearBackground(D_WHITE);
+void RenderSystem::drawEnding(GameEngine& engine) {
+    engine.beginDrawing();
+    engine.clearBackground(D_WHITE);
 
-    // // Valores de la caja de texto
-    // float boxWidth = 600.f;
-    // float boxHeight = 100.f;
-    // float posX = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth / 2.f);
-    // float posY = static_cast<float>(engine.getScreenHeight() / 2) - (boxHeight / 2.f);
+    restartScene(engine);
 
-    // std::string text = "[ENTER] PARA VOLVER AL TÍTULO";
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+    int boxWidth = 1050;
+    int boxHeight = 600;
+    int posX = static_cast<int>(engine.getScreenWidth() / 2 - static_cast<int>(static_cast<float>(boxWidth) * wRate / 2.f));
+    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 3.f - static_cast<float>(boxHeight) * hRate / 2.f);
+    int downRate = static_cast<int>(75.f * hRate);
 
-    // if (engine.isGamepadAvailable(0))
-    //     text = "[X] PARA VOLVER AL TÍTULO";
+    std::string text = "[ENTER] PARA VOLVER AL TÍTULO";
 
-    // GuiSetStyle(DEFAULT, TEXT_SIZE, 40);
-    // GuiSetStyle(LABEL, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+    if (engine.isGamepadAvailable(0))
+        text = "[X] PARA VOLVER AL TÍTULO";
 
-    // GuiLabelButton(Rectangle{ posX, posY, boxWidth, boxHeight },
-    //     "¡Gracias por jugar a nuestra demo!");
+    if (!nodeExists(engine, "ending")) {
+        auto* hist = engine.createNode("ending", getNode(engine, "Dialog"));
 
-    // GuiLabelButton(Rectangle{ posX, posY + 50, boxWidth + 100, boxHeight },
-    //     text.c_str());
+        engine.createTextBox({ posX, posY }, { boxWidth, boxHeight }, D_WHITE,
+            "¡Fin de la demo!", engine.getDefaultFont(), 40,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
+            "Texto1_ending", hist);
+        engine.createTextBox({ posX, posY + downRate }, { boxWidth, boxHeight }, D_WHITE,
+            "¡Gracias por jugar!", engine.getDefaultFont(), 40,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
+            "Texto2_ending", hist);
+        engine.createTextBox({ posX, posY + downRate * 3 }, { boxWidth, boxHeight }, D_WHITE,
+            text.c_str(), engine.getDefaultFont(), 40,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
+            "Texto 3", hist);
 
-    // GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
+        for (auto& txtEl : hist->getChildren())
+            dynamic_cast<TextBox*>(txtEl->getEntity())->drawBox = false;
+    }
 
-    // engine.endDrawing();
+    auto* hist = getNode(engine, "ending");
+    hist->setVisible(true);
+
+    engine.traverseRoot();
+    engine.endDrawing();
 }
 
 void RenderSystem::drawStory(GameEngine& engine) {
     engine.beginDrawing();
     engine.clearBackground(D_WHITE);
-    
 
     restartScene(engine);
 
@@ -1201,10 +1217,10 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 }
             }
         }
-        else if (e.hasTag<GroundTag>() && e.hasComponent<GrassComponent>())
-        {
-            drawGrass(engine, r, em.getComponent<GrassComponent>(e));
-        }
+        // else if (e.hasTag<GroundTag>() && e.hasComponent<GrassComponent>())
+        // {
+        //     drawGrass(engine, r, em.getComponent<GrassComponent>(e));
+        // }
     });
 
     // engine.activateLights();
@@ -1647,8 +1663,8 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
     using partCMPs = MP::TypeList<ParticleMakerComponent>;
     using noTAGs = MP::TypeList<>;
 
-    auto wRate = engine.getWidthRate();
-    auto hRate = engine.getHeightRate();
+    [[maybe_unused]] auto wRate = engine.getWidthRate();
+    [[maybe_unused]] auto hRate = engine.getHeightRate();
 
     auto& frti = em.getSingleton<FrustumInfo>();
     em.forEach<partCMPs, noTAGs>([&](Entity& e, ParticleMakerComponent& pmc)
@@ -1671,12 +1687,10 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
                     else if constexpr (std::is_same_v<T, std::string>)
                     {
                         std::string& textura = std::get<std::string>(p.color);
-                        auto* p_texture = engine.createNode(getNode(engine, textura.c_str()), getNode(engine, "TextCopy"));
-                        auto& textureInfo = *p_texture->getEntity<Texture2D>()->texture;
-                        int posX = static_cast<int>(engine.getWorldToScreenX(p.position.toDouble()) - static_cast<float>(textureInfo.getWidth()) * wRate / 2);
-                        int posY = static_cast<int>(engine.getWorldToScreenY(p.position.toDouble()) - static_cast<float>(textureInfo.getHeight()) * hRate / 2);
-
-                        engine.drawNode(p_texture, { posX, posY });
+                        std::string path = "assets/HUD/p_texturas/" + textura + ".png";
+                        engine.drawBillboard(path, p.position.toDouble(), { 1.0f, 1.0f });
+                        // auto* p_texture = engine.createNode(getNode(engine, textura.c_str()), getNode(engine, "TextCopy"));
+                        // p_texture->setTranslation(p.position.toGlm());
                     }
                 }, variant);
             }
@@ -1766,6 +1780,7 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
 
     getNode(engine, "TextCopy")->setVisibleOne(true);
 
+    inpi.interact = false;
     engine.traverseRoot();
     engine.endDrawing();
 }
@@ -2320,8 +2335,9 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
             auto hRate = engine.getHeightRate();
             int barWidth = static_cast<int>(60.f * wRate);
             int barHeight = static_cast<int>(6.f * hRate);
+            auto point = r.position.y() + r.scale.y() / 2 + 120 * hRate;
             int barX = static_cast<int>(engine.getWorldToScreenX(r.position)) - static_cast<int>(static_cast<float>(barWidth) / 2);
-            int barY = static_cast<int>(engine.getWorldToScreenY(r.position)) - static_cast<int>(r.scale.y() * 13 * hRate);
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position)) - static_cast<int>(point);
 
             engine.drawRectangle({ barX, barY }, { barWidth, barHeight }, { D_GRAY });
 
@@ -2400,17 +2416,20 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
             auto& inter{ em.getComponent<InteractiveComponent>(e) };
             vec3d pos{};
             double point{};
+            int pointSum = 150;
+            if (e.hasTag<ChestTag>())
+                pointSum = 60;
             if (e.hasTag<SeparateModelTag>())
             {
                 auto phy = em.getComponent<PhysicsComponent>(e);
                 pos = phy.position;
-                point = phy.position.y() + phy.scale.y() / 2 + 150;
+                point = phy.position.y() + phy.scale.y() / 2 + pointSum;
             }
             else
             {
                 auto& ren = em.getComponent<RenderComponent>(e);
                 pos = ren.position;
-                point = ren.position.y() + ren.scale.y() / 2 + 150;
+                point = ren.position.y() + ren.scale.y() / 2 + pointSum;
             }
 
             if (inter.showButton)
@@ -2541,7 +2560,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
         // Dibujamos el número de monedas en pantalla
         drawCoinBar(engine, em);
 
-        drawFPSCounter(engine);
+        // drawFPSCounter(engine);
         // engine.node_sceneTextures->clearChildren();
 
         // Dibujar el bastón
@@ -2567,8 +2586,6 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                     auto& phy{ em.getComponent<PhysicsComponent>(ene) };
                     if (ren.visible && (ene.hasTag<DummyTag>() || ene.hasTag<DestructibleTag>()))
                     {
-                        double multiplier = 28.0;
-
                         std::string gifName = "cuadrado";
                         if (li.lockedEnemy == li.max)
                         {
@@ -2603,19 +2620,14 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
 
                         auto* gif = getNode(engine, gifName.c_str());
 
-                        multiplier = 20.0;
-
-                        if (ene.hasTag<DestructibleTag>())
-                            multiplier = 8.0;
-                        else if (li.mapID == 1)
-                            multiplier = 25.0;
-
                         auto& textEntity = *dynamic_cast<Gif*>(gif->getEntity());
                         auto& frames = textEntity.frames;
                         auto& currentFrame = textEntity.currentFrame;
                         auto wRate = engine.getWidthRate() * 0.75f;
+                        auto hRate = engine.getHeightRate();
+                        auto point = phy.position.y() + phy.scale.y() / 2 + 200 * hRate;
                         int posX = static_cast<int>(engine.getWorldToScreenX(phy.position) - static_cast<float>(frames[currentFrame]->getWidth()) * wRate / 2);
-                        int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * multiplier);
+                        int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - point);
 
                         engine.drawNode(gif, { posX, posY }, { 0.75f, 0.75f });
                     }
@@ -2926,31 +2938,26 @@ void RenderSystem::drawLockInfo(GameEngine& ge, EntityManager& em)
     }
 }
 
-// void RenderSystem::drawDeath(GameEngine& engine)
-// {
-//     engine.drawRectangle(0, 0, engine.getScreenWidth(), engine.getScreenHeight(), Fade(BLACK, 0.5f));
+void RenderSystem::drawDeath(GameEngine& engine)
+{
+    engine.drawRectangle({ 0, 0 }, { engine.getScreenWidth(), engine.getScreenHeight() }, { 0, 0, 0, 200 });
 
-//     // Valores de la caja de texto
-//     float boxWidth = 300.f;
-//     float boxWidth2 = 500.f;
-//     float boxHeight = 100.f;
-//     float posX = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth / 2.f);
-//     float posX2 = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth2 / 2.f);
-//     float posY = static_cast<float>(engine.getScreenHeight() / 2) - (boxHeight / 2.f);
+    // Valores de la caja de texto
+    float boxWidth = 300.f;
+    float boxWidth2 = 500.f;
+    float boxHeight = 100.f;
+    auto hRate = engine.getHeightRate();
+    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth / 2.f);
+    float posX2 = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth2 / 2.f);
+    float posY = static_cast<float>(engine.getScreenHeight() / 2) - (boxHeight / 2.f);
 
-//     // Tamaño de la fuente
-//     GuiSetStyle(DEFAULT, TEXT_SIZE, 40);
+    engine.drawText("Has Muerto", posX, posY, 40, D_RED);
 
-//     // Color de la fuente de texto
-//     GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, 0xFF0000ff);
-
-//     GuiLabelButton(Rectangle{ posX, posY, boxWidth, boxHeight }, "HAS MUERTO");
-
-//     std::string text = "[ENTER] para volver a jugar";
-//     if (engine.isGamepadAvailable(0))
-//         text = "Pulsa [X] para volver a jugar";
-//     GuiLabelButton(Rectangle{ posX2, posY + 50, boxWidth2, boxHeight }, text.c_str());
-// }
+    std::string text = "[ENTER] para volver a jugar";
+    if (engine.isGamepadAvailable(0))
+        text = "Pulsa [X] para volver a jugar";
+    engine.drawText(text.c_str(), posX2, posY + static_cast<int>(75.f * hRate), 20, D_RED);
+}
 
 void RenderSystem::unloadModels(EntityManager& em, GameEngine&)
 {

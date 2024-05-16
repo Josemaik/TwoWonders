@@ -240,10 +240,10 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // TEXTURAS PARTÍCULAS
     //
-    loadAndResizeImage("p_est1", "assets/HUD/p_texturas/p_est1.png", nodes["PartTextures"]);
-    loadAndResizeImage("p_est2", "assets/HUD/p_texturas/p_est2.png", nodes["PartTextures"]);
-    loadAndResizeImage("p_est3", "assets/HUD/p_texturas/p_est3.png", nodes["PartTextures"]);
-    loadAndResizeImage("p_est4", "assets/HUD/p_texturas/p_est4.png", nodes["PartTextures"]);
+    loadAndResizeBillboard("p_est1", "assets/HUD/p_texturas/p_est1.png", nodes["PartTextures"]);
+    loadAndResizeBillboard("p_est2", "assets/HUD/p_texturas/p_est2.png", nodes["PartTextures"]);
+    loadAndResizeBillboard("p_est3", "assets/HUD/p_texturas/p_est3.png", nodes["PartTextures"]);
+    loadAndResizeBillboard("p_est4", "assets/HUD/p_texturas/p_est4.png", nodes["PartTextures"]);
 
     // GIFS
     //
@@ -768,6 +768,11 @@ void ENGI::GameEngine::loadAndResizeImage(const char* name, const char* path, No
         nodes[name] = dmeg.CreateTexture2D({ 0, 0 }, path, D_WHITE, name, parentNode);
 }
 
+void ENGI::GameEngine::loadAndResizeBillboard(const char* name, const char* path, Node* parentNode) {
+    if (!nodes[name])
+        nodes[name] = dmeg.CreateBillboard(path, { 0, 0, 0 }, { 1, 1 }, name, parentNode);
+}
+
 void ENGI::GameEngine::loadAndResizeImageGif(const char* name, const char* filePath) {
 
     auto textures = loadTextures2DAnim(filePath);
@@ -1089,6 +1094,13 @@ Node* ENGI::GameEngine::drawPointLight(vec3d position, Color color)
 Node* ENGI::GameEngine::createPointLight(vec3d position, Color color, const char* nodeName, Node* parentNode)
 {
     return dmeg.CreatePointLight(position.toGlm(), color, nodeName, parentNode);
+}
+
+///// Billboard /////
+
+Node* ENGI::GameEngine::drawBillboard(std::string path, vec3d position, vec2f size)
+{
+    return dmeg.CreateBillboard(path.c_str(), position.toGlm(), size.toGlm(), "billboard", nodes["TextCopy"]);
 }
 
 Font* ENGI::GameEngine::getDefaultFont()

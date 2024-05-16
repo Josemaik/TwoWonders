@@ -588,23 +588,23 @@ namespace DarkMoon {
 
     struct Billboard : Entity {
     private:
-        GLuint m_VAO {}, m_VBO {}, m_EBO {};
+        GLuint m_VAO{}, m_VBO{}, m_EBO{};
         std::vector<Vertex2> m_vertices;
         std::vector<uint16_t> m_indices;
     public:
         Texture* texture = { nullptr };
-        glm::vec3 position { 0, 0, 0 };
-        glm::vec2 size { 10, 10 };
+        glm::vec3 position{ 0, 0, 0 };
+        glm::vec2 size{ 10, 10 };
         Color color = { D_WHITE };
-        
+
         Billboard(Texture* text, glm::vec3 pos, glm::vec2 siz)
             : texture(text), position(pos), size(siz) {
-                glGenVertexArrays(1, &m_VAO);
-                glGenBuffers(1, &m_VBO);
-                glGenBuffers(1, &m_EBO);
+            glGenVertexArrays(1, &m_VAO);
+            glGenBuffers(1, &m_VBO);
+            glGenBuffers(1, &m_EBO);
 
-                setupVerticesAndIndices();
-            };
+            setupVerticesAndIndices();
+        };
 
         ~Billboard() {
             // Clean up resources
@@ -622,7 +622,7 @@ namespace DarkMoon {
                 {{-halfSize.x, 0.0f,  halfSize.y},   {0.0f, 1.0f, 0.0f},   {0.0f, 0.0f}},
                 {{ halfSize.x, 0.0f,  halfSize.y},   {0.0f, 1.0f, 0.0f},   {1.0f, 0.0f}},
             };
-            m_indices = {0, 1, 2, 1, 2, 3};
+            m_indices = { 0, 1, 2, 1, 2, 3 };
         }
 
         void draw(glm::mat4) override {
@@ -635,8 +635,8 @@ namespace DarkMoon {
             float angleY = static_cast<float>(glm::degrees(atan2(camDirection.x, camDirection.z) - atan2(billboardDirection.x, billboardDirection.z)));
             float angleX = static_cast<float>(glm::degrees(atan2(camDirection.y, camDirection.z) - atan2(billboardDirection.y, billboardDirection.z)));
 
-            glm::mat4 billboardRotation = glm::rotate(glm::mat4(1.0f), glm::radians(angleY), glm::vec3(0.0f,1.0f,0.0f));
-            billboardRotation = glm::rotate(billboardRotation, glm::radians(angleX), glm::vec3(1.0f,0.0f,0.0f));
+            glm::mat4 billboardRotation = glm::rotate(glm::mat4(1.0f), glm::radians(angleY), glm::vec3(0.0f, 1.0f, 0.0f));
+            billboardRotation = glm::rotate(billboardRotation, glm::radians(angleX), glm::vec3(1.0f, 0.0f, 0.0f));
 
             glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), position) * billboardRotation;
 

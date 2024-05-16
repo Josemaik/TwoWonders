@@ -159,7 +159,7 @@ using CL = MP::TypeList <
     BoatComponent,
     ParticleMakerComponent,
     SpawnComponent,
-    PointLightComponent, 
+    PointLightComponent,
     GrassComponent,
     SoundComponent
 > ;
@@ -237,6 +237,7 @@ using Aligned = DarkMoon::Aligned;
 using Node = DarkMoon::Node;
 using Texture = DarkMoon::Texture;
 using Texture2D = DarkMoon::Texture2D;
+using Billboard = DarkMoon::Billboard;
 using Gif = DarkMoon::AnimatedTexture2D;
 using Circle = DarkMoon::Circle;
 using Rectangle = DarkMoon::Rectangle;
