@@ -440,7 +440,7 @@ namespace DarkMoon {
                 if (sLight->enabled)
                     m_renderManager.spotLights.push_back(sLight);
             }
-            
+
             AuxUpdateLights(child);
         }
     }
