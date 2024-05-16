@@ -85,6 +85,8 @@ namespace DarkMoon {
         Node* CreateCubeWires(glm::vec3 position, glm::vec3 size, Color color, const char* nodeName, Node* parentNode);
         // Create model in node
         Node* CreateModel(const char* filePath, Color tint, const char* nodeName, Node* parentNode);
+        // Create billboard in node
+        Node* CreateBillboard(const char* filePath, glm::vec3 position, glm::vec2 size, const char* nodeName, Node* parentNode);
 
         // EXTRA
 
@@ -105,6 +107,8 @@ namespace DarkMoon {
         Node* CreatePointLight(glm::vec3 position, Color color, const char* nodeName, Node* parentNode);
         // Create directional light in node
         Node* CreateDirectionalLight(glm::vec3 direction, Color color, const char* nodeName, Node* parentNode);
+        // Create spot light in node
+        Node* CreateSpotLight(glm::vec3 position, glm::vec3 direction, float cutOff, Color color, const char* nodeName, Node* parentNode);
         // Toggle lights
         void ToggleLights() { m_renderManager.activeLights = !m_renderManager.activeLights; };
         // Activate lights
@@ -252,7 +256,7 @@ namespace DarkMoon {
         void UnloadFont(Font* font);
 
         // Load shader from file into GPU memory
-        Shader* LoadShader(const char* idShader, const char* vsFilePath, const char* fsFilePath);
+        Shader* LoadShader(const char* idShader, const char* vsFilePath = "", const char* fsFilePath = "", const char* gsFilePath = "");
         // Unload shader from CPU and GPU
         void UnloadShader(Shader* shader);
 

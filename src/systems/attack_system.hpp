@@ -335,6 +335,7 @@ private:
             {
                 auto& life = em.getComponent<LifeComponent>(target);
                 life.increaseLife(att.damage);
+                em.getSingleton<SoundSystem>().sonido_slime_curar();
             }
         }
         att.targets.clear();
