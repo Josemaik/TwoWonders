@@ -934,7 +934,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 }
                 else if (e.hasTag<CrusherTag>())
                 {
-                    // scl = { 0.33, 0.33, 0.33 };
+                    scl = { 0.8, 0.8, 0.8 };
                     pos.setY(pos.y() - 8.6);
                 }
                 else if (e.hasTag<AngryBushTag>())
@@ -1053,8 +1053,11 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
 {
     auto& li = em.getSingleton<LevelInfo>();
 
-    if (e.hasTag<PlayerTag>())
-        r.node = engine.loadModel("assets/models/main_character.obj");
+    if (e.hasTag<PlayerTag>()){
+        std::string path = "assets/Personajes/Principal/Main_character.fbx";
+        r.node = engine.loadModel(path.c_str());
+        LoadAnimations(engine,em,r,path,e);
+    }
     else if (e.hasTag<SlimeTag>())
         r.node = engine.loadModel("assets/models/Slime.obj");
     else if (e.hasTag<SnowmanTag>())
@@ -1259,8 +1262,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<CrusherTag>())
     {
         // r.model = engine.loadModelRaylib("assets/models/Apisonadora.obj");
-        r.node = engine.loadModel("assets/models/Apisonadora.obj");
-
+        std::string path = "assets/Personajes/Enemigos/Apisonadora/Apisonadora.fbx";
+        r.node = engine.loadModel(path.c_str());
+        LoadAnimations(engine,em,r,path,e);
         // loadShaders(r.model);
     }
     else if (e.hasTag<DummyTag>())
@@ -1426,6 +1430,15 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     r.meshLoaded = true;
 }
+
+
+void RenderSystem::LoadAnimations(GameEngine& engine, EntityManager& em, RenderComponent& rc,std::string path,Entity& ent){
+    auto& vecBones = rc.node->getEntity<DarkMoon::Model>()->getboneInfoMap();
+    auto* animation = engine.CreateAnimation(path,vecBones);
+    auto& animcomp = em.addComponent<AnimationComponent>(ent);
+    animcomp.animations[animcomp.animations.size()] = animation;
+}   
+
 
 void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, Entity& e, Node& n, vec3d pos, Color c)
 {

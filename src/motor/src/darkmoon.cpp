@@ -339,6 +339,23 @@ namespace DarkMoon {
         return p_nodeModel;
     }
 
+    //Animations
+    std::size_t DarkMoonEngine::PlayAnimation(Animation* panimation){
+        return m_animationManager.PlayAnimation(panimation);
+    }
+
+    void DarkMoonEngine::StopAnimation(std::size_t idanim){
+        m_animationManager.StopAnimation(idanim);
+    }
+
+    Animation* DarkMoonEngine::CreateAnimation(std::string path,std::vector<BoneInfo> vecbones){
+        return m_animationManager.createAnimation(path,vecbones);
+    }
+
+    void DarkMoonEngine::UpdateAnimations(){
+        m_animationManager.UpdateAnimation(GetFrameTime());
+    }
+
     // Create billboard in node
     Node* DarkMoonEngine::CreateBillboard(const char* filePath, glm::vec3 position, glm::vec2 size, const char* nodeName, Node* parentNode){
         auto p_nodeBillboard = CreateNode(nodeName, parentNode);

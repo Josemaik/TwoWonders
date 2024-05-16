@@ -184,6 +184,11 @@ namespace DarkMoon {
         void UnloadModel(Model* model);
         // Unload mesh data from CPU and GPU
         void UnloadMesh(Mesh* mesh);
+        // Animaciones
+        std::size_t PlayAnimation(Animation* panimation);
+        void StopAnimation(std::size_t idanim);
+        Animation* CreateAnimation(std::string path,std::vector<BoneInfo> vecbones);
+        void UpdateAnimations();
 
         // --------------------------------- //
         // Input-related functions: keyboard //
@@ -288,6 +293,7 @@ namespace DarkMoon {
         double GetTime();
         // Get current FPS
         int GetFPS();
+        
 
     private:
         // Root node 

@@ -30,6 +30,7 @@
 #include "../components/projectile_component.hpp"
 #include "../components/object_component.hpp"
 #include "../components/zone_component.hpp"
+#include "../components/animation_component.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
 #include "../utils/Item.hpp"
@@ -159,7 +160,8 @@ using CL = MP::TypeList <
     ParticleMakerComponent,
     SpawnComponent,
     PointLightComponent, 
-    GrassComponent
+    GrassComponent,
+    AnimationComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,
