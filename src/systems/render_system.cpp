@@ -580,6 +580,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
 void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
+    auto& ss = em.getSingleton<SoundSystem>();
     auto* menuNode = getNode(engine, "MenuInventory");
 
     auto wRate = engine.getWidthRate();
@@ -602,13 +603,38 @@ void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
     engine.drawNode(fondoTwoWonders, { posBackX, posBackY });
     engine.createText({ middleX, middleY / 3 }, "Inventario", D_LAVENDER_LIGHT, "Titulo inventario", menuNode, 60, Aligned::CENTER);
 
+    // Variables para los botones
     std::map<std::string, std::pair<Node*, std::function<void()>>> buttonData = {
-        { "01_spell1", { nullptr, [&]() {std::cout << "aaaaaaaaaaaaaaaa";}}},
-        { "02_spell2", { nullptr, [&]() {}}},
-        { "03_spell3", { nullptr, [&]() {}}},
-        { "04_spell4", { nullptr, [&]() {}}},
-        { "05_spell5", { nullptr, [&]() {}}},
-        { "06_spell6", { nullptr, [&]() {}}},
+        { "01_spell1", { nullptr, [&]()
+        {
+            if (!plfi.spells.empty() && plfi.spells[0] != plfi.noSpell)
+                spellSelected = &plfi.spells[0];
+        }}},
+        { "02_spell2", { nullptr, [&]()
+        {
+            if (!plfi.spells.empty() && plfi.spells[1] != plfi.noSpell)
+                spellSelected = &plfi.spells[1];
+        }}},
+        { "03_spell3", { nullptr, [&]()
+        {
+            if (!plfi.spells.empty() && plfi.spells[2] != plfi.noSpell)
+                spellSelected = &plfi.spells[2];
+        }}},
+        { "04_spell4", { nullptr, [&]()
+        {
+            if (!plfi.spells.empty() && plfi.spells[3] != plfi.noSpell)
+                spellSelected = &plfi.spells[3];
+        }}},
+        { "05_spell5", { nullptr, [&]()
+        {
+            if (!plfi.spells.empty() && plfi.spells[4] != plfi.noSpell)
+                spellSelected = &plfi.spells[4];
+        }}},
+        { "06_spell6", { nullptr, [&]()
+        {
+            if (!plfi.spells.empty() && plfi.spells[5] != plfi.noSpell)
+                spellSelected = &plfi.spells[5];
+        }}},
         { "07_obj1", { nullptr, [&]() {}}},
         { "08_obj2", { nullptr, [&]() {}}},
         { "09_obj3", { nullptr, [&]() {}}},
@@ -618,35 +644,72 @@ void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
     };
 
     std::map<std::string, std::pair<Node*, std::function<void()>>> spellButtData = {
-        { "1_spell1", { nullptr, [&]() {}}},
-        { "2_spell2", { nullptr, [&]() {}}},
-        { "3_spell3", { nullptr, [&]() {}}},
-        { "4_spell4", { nullptr, [&]() {}}},
-        { "5_spell5", { nullptr, [&]() {}}},
-        { "6_spell6", { nullptr, [&]() {}}},
+        { "1_spell1", { nullptr, [&]()
+        {
+            plfi.spellSlots[0] = *spellSelected;
+
+            if (plfi.spellSlots[1] == *spellSelected)
+            {
+                plfi.spellSlots[1] = plfi.noSpell;
+            }
+            else if (plfi.spellSlots[2] == *spellSelected)
+            {
+                plfi.spellSlots[2] = plfi.noSpell;
+            }
+            spellSelected = nullptr;
+        }}},
+        { "2_spell2", { nullptr, [&]()
+        {
+            plfi.spellSlots[1] = *spellSelected;
+
+            if (plfi.spellSlots[0] == *spellSelected)
+            {
+                plfi.spellSlots[0] = plfi.noSpell;
+            }
+            else if (plfi.spellSlots[2] == *spellSelected)
+            {
+                plfi.spellSlots[2] = plfi.noSpell;
+            }
+            spellSelected = nullptr;
+        }}},
+        { "3_spell3", { nullptr, [&]()
+        {
+            plfi.spellSlots[2] = *spellSelected;
+
+            if (plfi.spellSlots[0] == *spellSelected)
+            {
+                plfi.spellSlots[0] = plfi.noSpell;
+            }
+            else if (plfi.spellSlots[1] == *spellSelected)
+            {
+                plfi.spellSlots[1] = plfi.noSpell;
+            }
+            spellSelected = nullptr;
+        }}}
     };
 
-    std::map<std::string, std::pair<Node*, std::function<void()>>> objButtData = {
-        { "1_obj1", { nullptr, [&]() {}}},
-        { "2_obj2", { nullptr, [&]() {}}},
-        { "3_obj3", { nullptr, [&]() {}}},
-        { "4_obj4", { nullptr, [&]() {}}},
-        { "5_obj5", { nullptr, [&]() {}}},
-        { "6_obj6", { nullptr, [&]() {}}},
-    };
+    // std::map<std::string, std::pair<Node*, std::function<void()>>> objButtData = {
+    //     { "1_obj1", { nullptr, [&]() {}}},
+    //     { "2_obj2", { nullptr, [&]() {}}},
+    //     { "3_obj3", { nullptr, [&]() {}}},
+    //     { "4_obj4", { nullptr, [&]() {}}},
+    //     { "5_obj5", { nullptr, [&]() {}}},
+    //     { "6_obj6", { nullptr, [&]() {}}},
+    // };
 
-    std::map<AttackType, Node*> spellButtNodes = {
-        { AttackType::WaterBombShot, getNode(engine, "pompasInv") },
-        { AttackType::WaterDashArea, getNode(engine, "dashInv") },
-        { AttackType::FireBallShot, getNode(engine, "bola_fuegoInv") },
-        { AttackType::IceShield, getNode(engine, "escudo_hieloInv") },
-        { AttackType::IceShard, getNode(engine, "estacasInv") },
-        { AttackType::MeteoritePlayer, getNode(engine, "meteoritosInv") },
+    std::map<AttackType, std::pair<Node*, Node*>> spellButtNodes = {
+        { AttackType::WaterBombShot, { getNode(engine, "pompasInv"), getNode(engine, "pompasInv2")} },
+        { AttackType::WaterDashArea, { getNode(engine, "dashInv"), getNode(engine, "dashInv2")} },
+        { AttackType::FireBallShot, { getNode(engine, "bola_fuegoInv"), getNode(engine, "bola_fuegoInv2")} },
+        { AttackType::IceShield, { getNode(engine, "escudo_hieloInv"), getNode(engine, "escudo_hieloInv2")} },
+        { AttackType::IceShard, { getNode(engine, "estacasInv"), getNode(engine, "estacasInv2")} },
+        { AttackType::MeteoritePlayer, { getNode(engine, "meteoritosInv"), getNode(engine, "meteoritosInv2")} },
     };
 
     // Creamos los botones
     auto& inpi = em.getSingleton<InputInfo>();
     auto& currentButton = inpi.currentButton;
+    std::string itemName = " ";
     int initButtonX = static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 12.9f);
     int initButtonY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 3.18f);
     int buttonWidth = static_cast<int>(270.f * wRate);
@@ -654,9 +717,10 @@ void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
     int downRate = static_cast<int>(226.f * hRate);
     int rightRate = static_cast<int>(274.5f * hRate);
     int hoverRate = static_cast<int>(30.f * hRate);
-    int spellRate = static_cast<int>(20.f * hRate);
+    int spellRate = static_cast<int>(15.f * hRate);
 
-    int i{ 0 }, k{ 0 }, j{ 0 };
+    int i{ 0 }, k{ 0 };
+    std::size_t j{ 0 };
     for (auto& [name, data] : buttonData)
     {
         auto& [button, action] = data;
@@ -673,23 +737,30 @@ void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
         auto& but = *button->getEntity<Button>();
         but.textBox.drawBox = false;
 
-        // // Comprobar estado del boton
-        if (but.state == ButtonState::CLICK || (but.isCurrent && inpi.interact)) {
-            action();
-            inpi.interact = false;
-            but.state = ButtonState::NORMAL;
-        }
-
-        if (but.state == ButtonState::HOVER)
+        if (!spellSelected)
         {
-            engine.drawNode(getNode(engine, "hover_inventario"), { initButtonX + k * rightRate - hoverRate, initButtonY + i * downRate - hoverRate });
-            currentButton = static_cast<std::size_t>(j);
+            if (but.state == ButtonState::HOVER || currentButton == j)
+            {
+                engine.drawNode(getNode(engine, "hover_inventario"), { initButtonX + k * rightRate - hoverRate, initButtonY + i * downRate - hoverRate });
+
+                if (j < plfi.spells.size() && !plfi.spells.empty() && plfi.spells[j] != plfi.noSpell)
+                    itemName = plfi.spells[j].name;
+
+                if (but.state == ButtonState::HOVER)
+                    currentButton = static_cast<std::size_t>(j);
+            }
+
+            // Comprobar estado del boton
+            if ((but.state == ButtonState::CLICK || (currentButton == j && inpi.interact))) {
+                action();
+                inpi.interact = false;
+                but.state = ButtonState::NORMAL;
+                currentButton = 0;
+            }
         }
 
         if (j < plfi.spells.size() && !plfi.spells.empty() && plfi.spells[j] != plfi.noSpell)
-            engine.drawNode(spellButtNodes[plfi.spells[j].atkType], { initButtonX + k * rightRate + spellRate, initButtonY + i * downRate + spellRate }, { 1.4, 1.4 });
-
-
+            engine.drawNode(spellButtNodes[plfi.spells[j].atkType].first, { initButtonX + k * rightRate + spellRate, initButtonY + i * downRate + spellRate }, { 1.4f, 1.4f });
 
         i += 1;
         j += 1;
@@ -700,134 +771,134 @@ void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
         }
     }
 
-    // static std::map<std::string
-    // float windowWidth = 450.0f;
-    // float windowHeight = 450.0f;
-    // float buttonWidth = 200.0f;
-    // float buttonHeight = 50.0f;
-    // float posButtonX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2);
-    // float posButtonY = static_cast<float>(engine.getScreenHeight() / 3) - (buttonHeight / 2);
-    // float posX = static_cast<float>(engine.getScreenWidth() / 2) - (windowWidth / 2);
-    // float posY = static_cast<float>(engine.getScreenHeight() / 2) - (windowHeight / 2);
-    // float augment = 55.f;
+    // Texto con el nombre del objeto hovereado
+    engine.createText({ initButtonX, initButtonY - static_cast<int>(80.f * hRate) },
+        itemName, engine.getFontDefault(), 30, D_WHITE, "Texto Nombre inventario", menuNode);
 
-    // Rectangle windowRect = {
-    //     posX,
-    //     posY,
-    //     windowWidth,
-    //     windowHeight
-    // };
-    // engine.drawRectangleLinesEx(windowRect, 2, D_BLACK);
-    // engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
-    // engine.drawTextEx(engine.getFontDefault(), "INVENTARIO", vec2d{ windowRect.x + 110, windowRect.y + 20 }, 40, 1, D_BLACK);
+    // Map de los hechizos seleccionados
+    static std::map<std::size_t, std::pair<Node*, Node*>> spellButtNodesMap = {
+        { 0, { getNode(engine, "placeholderInv1"), getNode(engine, engine.isGamepadAvailable(0) ? "boton_cuadradoInv" : "tecla_jInv")} },
+        { 1, { getNode(engine, "placeholderInv2"), getNode(engine, engine.isGamepadAvailable(0) ? "boton_circuloInv" : "tecla_kInv")} },
+        { 2, { getNode(engine, "placeholderInv3"), getNode(engine, engine.isGamepadAvailable(0) ? "boton_trianguloInv" : "tecla_lInv")} },
+    };
 
-    // auto& plfi = em.getSingleton<PlayerInfo>();
-    // // auto& inpi = em.getSingleton<InputInfo>();
+    // Dibujamos los hechizos seleccionados
+    initButtonX = static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 1.55f);
+    initButtonY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2.35f);
+    downRate = static_cast<int>(120.f * hRate);
+    rightRate = static_cast<int>(180.f * hRate);
+    int leftRate = static_cast<int>(2.f * hRate);
+    spellRate = static_cast<int>(25.f * hRate);
 
-    // // auto& currentButton = inpi.currentButton;
+    int posX{ 0 };
+    bool alreadySelected{ false };
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+        posX = initButtonX + static_cast<int>(i) * rightRate;
 
-    // // Definimos los botones
-    // auto size = plfi.inventory.size() + 1;
-    // std::vector<ButtonRect> buttons(size);
-    // for (std::size_t i = 0; i < plfi.inventory.size(); i++) {
-    //     buttons[i] = { { posButtonX, posButtonY + 55 * static_cast<float>(i), buttonWidth, buttonHeight }, plfi.inventory[i]->name.c_str(), static_cast<int>(i) };
-    // }
-    // buttons[plfi.inventory.size()] = { { posButtonX, posButtonY + 55 * static_cast<float>(plfi.inventory.size()), buttonWidth, buttonHeight }, "VOLVER", static_cast<int>(plfi.inventory.size()) };
+        std::string name = "placeholderInv" + std::to_string(i);
+        engine.drawNode(spellButtNodesMap[i].first, { posX, initButtonY }, { 1.3f, 1.3f });
 
-    // if (plfi.selectedItem == plfi.max)
-    // {
-    //     // Control de botones de mando para cambiar el botón seleccionado
-    //     if (inpi.up || inpi.left) {
-    //         currentButton = (currentButton > 0) ? currentButton - 1 : plfi.inventory.size();
-    //     }
-    //     else if (inpi.down || inpi.right) {
-    //         currentButton = (currentButton < plfi.inventory.size()) ? currentButton + 1 : 0;
-    //     }
+        engine.drawNode(spellButtNodesMap[i].second, { posX + downRate, initButtonY + downRate }, { 1.1f, 1.1f });
 
-    //     for (std::size_t i = 0; i < buttons.size(); i++) {
-    //         ButtonRect& button = buttons[i];
-    //         bool isCurrent = (currentButton == i);
-    //         if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
-    //             (isCurrent && inpi.interact)) {
-    //             currentButton = i;
-    //             // Aquí puedes manejar la acción del botón
-    //             if (i < plfi.inventory.size()) {
-    //                 // Select an item from the inventory
-    //                 plfi.selectedItem = plfi.inventory[i]->getID();
-    //                 currentButton = 0;
-    //                 return;
-    //             }
-    //             else {
-    //                 // "VOLVER" button
-    //                 auto& inpi = em.getSingleton<InputInfo>();
-    //                 inpi.inventory = false;
-    //             }
+        if (plfi.spellSlots[i] != plfi.noSpell)
+        {
+            if (!alreadySelected && spellSelected)
+            {
+                if (plfi.spellSlots[i] == *spellSelected)
+                {
+                    engine.drawNode(getNode(engine, "placeholderSelected"), { posX - leftRate, initButtonY - leftRate }, { 1.04f, 1.04f });
+                    alreadySelected = true;
+                }
+                else
+                    engine.drawNode(getNode(engine, "placeholderSelected"), { initButtonX - leftRate, initButtonY - leftRate }, { 1.04f, 1.04f });
+            }
+            engine.drawNode(spellButtNodes[plfi.spellSlots[i].atkType].second, { posX + spellRate, initButtonY + spellRate }, { 1.1f, 1.1f });
+        }
 
-    //             inpi.interact = false;
-    //         }
-    //     }
-    // }
-    // else
-    // {
-    //     // Dibujamos la descripción del objeto seleccionado
-    //     auto& item = *plfi.getItem(plfi.selectedItem);
-    //     auto text = const_cast<char*>(item.description.c_str());
+        if (spellSelected)
+        {
+            auto name = std::to_string(i + 1) + "_spell" + std::to_string(i + 1);
+            auto& [button, action] = spellButtData[name];
 
-    //     GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_LEFT);
+            // Asignamos el botón
+            button = engine.createButton({ posX, initButtonY }, { buttonWidth, buttonHeight },
+                " ",
+                engine.getFontDefault(), 50, D_BLACK,
+                Aligned::CENTER, Aligned::RIGHT,
+                { 0,0,0,120 }, { 0,0,0,120 }, { 0,0,0,120 },
+                name.c_str(), menuNode);
 
-    //     float descWidth = 300.f, descHeight = 150.f;
-    //     float posDescX = static_cast<float>(engine.getScreenWidth() / 2) - (descWidth / 2.0f);
-    //     float posDescY = static_cast<float>(engine.getScreenHeight() / 2) - (descHeight / 1.25f);
-    //     GuiTextBox({ posDescX, posDescY, descWidth, descHeight }, text, static_cast<int>(item.description.size()), false);
+            // Sacamos la información del botón
+            auto& but = *button->getEntity<Button>();
+            but.textBox.drawBox = false;
 
-    //     if (inpi.interact) {
-    //         // Press the currently selected button
-    //         switch (currentButton) {
-    //         case 0: // "USAR"
-    //             if (dynamic_cast<Potion*>(&item) != nullptr) {
-    //                 auto& potion = static_cast<Potion&>(item);
-    //                 plfi.usePotion(potion);
-    //                 plfi.selectedItem = plfi.max;
-    //                 auto& inpi = em.getSingleton<InputInfo>();
-    //                 inpi.inventory = false;
-    //                 GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
-    //                 return;
-    //             }
-    //             break;
-    //         case 1: // "VOLVER"
-    //             plfi.selectedItem = plfi.max;
-    //             GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
-    //             break;
-    //         }
-    //     }
-    //     else if (inpi.up || inpi.left) {
-    //         // Move the selection up
-    //         currentButton = (currentButton > 0) ? currentButton - 1 : 1;
-    //     }
-    //     else if (inpi.down || inpi.right) {
-    //         // Move the selection down
-    //         currentButton = (currentButton < 1) ? currentButton + 1 : 0;
-    //     }
+            if (but.state == ButtonState::HOVER || currentButton == i)
+            {
+                engine.drawNode(getNode(engine, "placeholderSelected"), { posX - leftRate, initButtonY - leftRate }, { 1.04f, 1.04f });
+                alreadySelected = true;
 
-    //     if (dynamic_cast<Potion*>(&item) != nullptr) {
-    //         Rectangle btn1Rec = { posButtonX, posButtonY + 100, buttonWidth, buttonHeight };
-    //         if (GuiButton(btn1Rec, (currentButton == 0) ? "[USAR]" : "USAR")) {
-    //             auto& potion = static_cast<Potion&>(item);
-    //             plfi.usePotion(potion);
-    //             plfi.selectedItem = plfi.max;
-    //             auto& inpi = em.getSingleton<InputInfo>();
-    //             inpi.inventory = false;
-    //             GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
-    //         }
-    //     }
+                if (but.state == ButtonState::HOVER)
+                    currentButton = i;
+            }
 
-    //     // Boton de volver al inventario
-    //     Rectangle btn2Rec = { posButtonX, posButtonY + 170, buttonWidth, buttonHeight };
-    //     if (GuiButton(btn2Rec, (currentButton == 1) ? "[VOLVER]" : "VOLVER")) {
-    //         plfi.selectedItem = plfi.max;
-    //         GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
-    //     }
-    // }
+            // Comprobar estado del boton
+            if (but.state == ButtonState::CLICK || (currentButton == i && inpi.interact)) {
+                action();
+                inpi.interact = false;
+                but.state = ButtonState::NORMAL;
+                currentButton = 0;
+            }
+        }
+    }
+
+    int initObjY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.5f);
+    engine.drawNode(getNode(engine, "objSelection"), { initButtonX, initObjY });
+
+    auto& lfc = em.getComponent<LifeComponent>(*em.getEntityByID(em.getSingleton<LevelInfo>().playerID));
+
+    const char* face = "";
+    if (lfc.life > lfc.maxLife / 2)
+        face = "mago_happyInv";
+    // Mago Meh
+    else if (lfc.life > 2)
+        face = "mago_mehInv";
+    // Mago sos
+    else
+        face = "mago_sosInv";
+
+    engine.drawNode(getNode(engine, face), { static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 1.4f), engine.getScreenHeight() / 6 }, { 1.8f, 1.8f });
+
+    if (!spellSelected)
+    {
+        if (inpi.right) {
+            currentButton = (currentButton < buttonData.size() - 3) ? currentButton + 3 : currentButton - 9;
+            ss.sonido_mov();
+        }
+        if (inpi.left) {
+            currentButton = (currentButton > 2) ? currentButton - 3 : currentButton + 9;
+            ss.sonido_mov();
+        }
+        if (inpi.up) {
+            currentButton = (currentButton != 0 && currentButton % 3 != 0) ? currentButton - 1 : currentButton + 2;
+            ss.sonido_mov();
+        }
+        if (inpi.down) {
+            currentButton = (currentButton != 9 && currentButton % 3 != 2) ? currentButton + 1 : currentButton - 2;
+            ss.sonido_mov();
+        }
+    }
+    else
+    {
+        if (inpi.up || inpi.left) {
+            currentButton = (currentButton > 0) ? currentButton - 1 : 2;
+            ss.sonido_mov();
+        }
+        if (inpi.down || inpi.right) {
+            currentButton = (currentButton < 2) ? currentButton + 1 : 0;
+            ss.sonido_mov();
+        }
+    }
 }
 
 void RenderSystem::drawLogoKaiwa(GameEngine& engine) {
@@ -3162,6 +3233,7 @@ void RenderSystem::handleAnimatedTexture(const std::string& name, const std::str
     {
         animatedTextures[name].targetPosX = x;
         animatedTextures[name].targetPosY = y;
+        animatedTextures[name].textureName = textureName;
     }
 }
 

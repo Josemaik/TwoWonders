@@ -82,12 +82,15 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Mago Happy HUD
     loadAndResizeImage("mago_happy", "assets/HUD/caras/mago_happy.png", nodes["Faces"]);
+    loadAndResizeImage("mago_happyInv", "assets/HUD/caras/mago_happy.png", nodes["MenuInventory"]);
 
     // Mago Meh HUD
     loadAndResizeImage("mago_meh", "assets/HUD/caras/mago_meh.png", nodes["Faces"]);
+    loadAndResizeImage("mago_mehInv", "assets/HUD/caras/mago_meh.png", nodes["MenuInventory"]);
 
     // Mago SOS HUD
     loadAndResizeImage("mago_sos", "assets/HUD/caras/mago_sos.png", nodes["Faces"]);
+    loadAndResizeImage("mago_sosInv", "assets/HUD/caras/mago_sos.png", nodes["MenuInventory"]);
 
     // Nómada HUD
     loadAndResizeImage("nomada", "assets/HUD/caras/calabaza3.png", nodes["Faces"]);
@@ -131,6 +134,11 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Espacio para hechizos de agua HUD
     loadAndResizeImage("placeholder", "assets/HUD/item_agua.png", nodes["AnimTextures"]);
+    loadAndResizeImage("placeholderInv1", "assets/HUD/item_agua.png", nodes["MenuInventory"]);
+    loadAndResizeImage("placeholderInv2", "assets/HUD/item_agua.png", nodes["MenuInventory"]);
+    loadAndResizeImage("placeholderInv3", "assets/HUD/item_agua.png", nodes["MenuInventory"]);
+    loadAndResizeImage("placeholderSelected", "assets/Inventario/inv-select-atq.png", nodes["MenuInventory"]);
+    loadAndResizeImage("objSelection", "assets/Inventario/inv-cont-obj.png", nodes["MenuInventory"]);
 
     // Icono de palo HUD
     loadAndResizeImage("palo", "assets/HUD/palo.png", nodes["AnimTextures"]);
@@ -138,26 +146,32 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     // Icono para las pompas de agua HUD
     loadAndResizeImage("pompas", "assets/HUD/pompas.png", nodes["AnimTextures"]);
     loadAndResizeImage("pompasInv", "assets/HUD/pompas.png", nodes["MenuInventory"]);
+    loadAndResizeImage("pompasInv2", "assets/HUD/pompas.png", nodes["MenuInventory"]);
 
     // Icono para el dash de agua HUD
     loadAndResizeImage("dash", "assets/HUD/dash.png", nodes["AnimTextures"]);
     loadAndResizeImage("dashInv", "assets/HUD/dash.png", nodes["MenuInventory"]);
+    loadAndResizeImage("dashInv2", "assets/HUD/dash.png", nodes["MenuInventory"]);
 
     // Icono para la bola de fuego HUD
     loadAndResizeImage("bola_fuego", "assets/HUD/bolafuego.png", nodes["AnimTextures"]);
     loadAndResizeImage("bola_fuegoInv", "assets/HUD/bolafuego.png", nodes["MenuInventory"]);
+    loadAndResizeImage("bola_fuegoInv2", "assets/HUD/bolafuego.png", nodes["MenuInventory"]);
 
     // Icono para meteoritos HUD
     loadAndResizeImage("meteoritos", "assets/HUD/meteoritos.png", nodes["AnimTextures"]);
     loadAndResizeImage("meteoritosInv", "assets/HUD/meteoritos.png", nodes["MenuInventory"]);
+    loadAndResizeImage("meteoritosInv2", "assets/HUD/meteoritos.png", nodes["MenuInventory"]);
 
     // Icono para escudo de hielo HUD
     loadAndResizeImage("escudo_hielo", "assets/HUD/escudo.png", nodes["AnimTextures"]);
     loadAndResizeImage("escudo_hieloInv", "assets/HUD/escudo.png", nodes["MenuInventory"]);
+    loadAndResizeImage("escudo_hieloInv2", "assets/HUD/escudo.png", nodes["MenuInventory"]);
 
     // Icono para las estacas de hielo HUD
     loadAndResizeImage("estacas", "assets/HUD/estacas.png", nodes["AnimTextures"]);
     loadAndResizeImage("estacasInv", "assets/HUD/estacas.png", nodes["MenuInventory"]);
+    loadAndResizeImage("estacasInv2", "assets/HUD/estacas.png", nodes["MenuInventory"]);
 
     // Libro para enseñar hechizos HUD
     loadAndResizeImage("libro", "assets/HUD/Libro.png", nodes["Book"]);
@@ -174,24 +188,30 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Botón círculo HUD 
     loadAndResizeImage("boton_circulo", "assets/HUD/botones/cont_circulo.png", nodes["AnimTextures"]);
+    loadAndResizeImage("boton_circuloInv", "assets/HUD/botones/cont_circulo.png", nodes["MenuInventory"]);
 
     // Botón cuadrado HUD
     loadAndResizeImage("boton_cuadrado", "assets/HUD/botones/cont_cuadrado.png", nodes["AnimTextures"]);
+    loadAndResizeImage("boton_cuadradoInv", "assets/HUD/botones/cont_cuadrado.png", nodes["MenuInventory"]);
 
     // Botón triángulo HUD
     loadAndResizeImage("boton_triangulo", "assets/HUD/botones/cont_triangulo.png", nodes["AnimTextures"]);
+    loadAndResizeImage("boton_trianguloInv", "assets/HUD/botones/cont_triangulo.png", nodes["MenuInventory"]);
 
     // Botón R2 HUD
     loadAndResizeImage("boton_r2", "assets/HUD/botones/cont_R2.png", nodes["AnimTextures"]);
 
     // Tecla J HUD
     loadAndResizeImage("tecla_j", "assets/HUD/teclas/cont_J.png", nodes["AnimTextures"]);
+    loadAndResizeImage("tecla_jInv", "assets/HUD/teclas/cont_J.png", nodes["MenuInventory"]);
 
     // Tecla K HUD
     loadAndResizeImage("tecla_k", "assets/HUD/teclas/cont_K.png", nodes["AnimTextures"]);
+    loadAndResizeImage("tecla_kInv", "assets/HUD/teclas/cont_K.png", nodes["MenuInventory"]);
 
     // Tecla L HUD
     loadAndResizeImage("tecla_l", "assets/HUD/teclas/cont_L.png", nodes["AnimTextures"]);
+    loadAndResizeImage("tecla_lInv", "assets/HUD/teclas/cont_L.png", nodes["MenuInventory"]);
 
     // Tecla Espacio HUD
     loadAndResizeImage("tecla_espacio", "assets/HUD/teclas/cont_space.png", nodes["AnimTextures"]);

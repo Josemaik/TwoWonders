@@ -116,6 +116,7 @@ private:
     float elapsed_book{ 0.0f };
 
     int coinBarX{}, coinNumberX{};
+    Spell* spellSelected{ nullptr };
 };
 
 #endif // !RENDER_SYSTEM
