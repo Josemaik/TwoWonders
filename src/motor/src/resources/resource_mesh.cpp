@@ -89,7 +89,7 @@ namespace DarkMoon {
         auto& shaders = rm.shaders;
         rm.useShader(shaders["3D"]);
 
-        if (hasBones && animID != -1)
+        if (hasBones && animID != std::numeric_limits<std::size_t>::max())
         {
             auto transforms = am.GetFinalBoneMatrices(animID);
             for (std::size_t i = 0; i < transforms.size(); ++i) {
