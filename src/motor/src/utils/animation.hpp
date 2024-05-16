@@ -26,6 +26,8 @@ static glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4* from);
 struct Animation
 {
 public:
+    Animation() = default;
+   
     Animation(const std::string& animationPath, std::vector<BoneInfo>& modelBones)
     {
         Assimp::Importer importer;

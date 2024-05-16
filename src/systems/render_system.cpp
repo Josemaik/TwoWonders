@@ -974,7 +974,12 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 if (r.node) {
                     r.node->setTranslation({ pos.x(), pos.y(), pos.z() });
                     r.node->setScale({ scl.x(), scl.y(), scl.z() });
-                    r.node->setRotation({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees);
+                    if(e.hasComponent<AnimationComponent>()){
+                        r.node->setRotation({1.0, 0.0, 0.0 }, -90.0);
+                        r.node->rotate({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees - 90);
+                    }else{
+                        r.node->setRotation({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees);
+                    }
                     r.node->setVisibleOne(true);
 
                     // Luces cofre
