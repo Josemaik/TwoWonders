@@ -159,7 +159,7 @@ using CL = MP::TypeList <
     BoatComponent,
     ParticleMakerComponent,
     SpawnComponent,
-    PointLightComponent, 
+    PointLightComponent,
     GrassComponent,
     AnimationComponent
 > ;
@@ -228,7 +228,7 @@ using mapType = rapidjson::Document;
 using valueType = rapidjson::Value;
 using mapSizeType = rapidjson::SizeType;
 using ShaderType = DarkMoon::Shader;
-using ModelType = DarkMoon::Model;
+using Model = DarkMoon::Model;
 using Effects = ParticleMakerComponent::ParticleEffect;
 using FrustOut = MP::TypeList<GroundTag, NPCTag, ChunkTag, HitPlayerTag>;
 using Color = DarkMoon::Color;

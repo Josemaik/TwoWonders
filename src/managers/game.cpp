@@ -7,7 +7,7 @@ void Game::createEntities()
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
     if (plfi.spawnPoint == vec3d::zero())
-        plfi.spawnPoint = { 33.0, 4.0, -25.9 };
+        plfi.spawnPoint = { -116.0, 4.0, 111.9 };
 
     // 33.0, 4.0, -25.9 - Posición Incial lvl0
     // 32.0, 4.0, 43.0 - Primer cofre lvl0
@@ -55,11 +55,6 @@ void Game::createEntities()
     auto& lis = em.addComponent<ListenerComponent>(e);
     for (auto i = 0; i < EventCodes::MAX; i++)
         lis.addCode(static_cast<EventCodes>(i));
-
-    auto modelCharacter = engine.dmeg.CreateModel("assets/Personajes/Principal/Main_character.fbx", D_WHITE, "personaje", engine.dmeg.GetRootNode());
-    modelCharacter->translate({ 23.0, 4.0, -25.9 });
-    modelCharacter->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
-    modelCharacter->rotate({ 0.0f, 1.0f, 0.0f }, 90.0f);
 
     // Código de añadir un hechizo al jugador
     // Spell spell{ "Fireball", "Shoots a fireball", Spells::WaterDash, 20.0, 2 };
@@ -141,8 +136,8 @@ void Game::run()
     while (!li.gameShouldEnd)
     {
         frameTime = engine.getFrameTimeDouble();
-        if (frameTime > timeStepDouble)
-            frameTime = timeStepDouble;
+        if (frameTime > timeStepDouble120)
+            frameTime = timeStepDouble120;
         elapsed += frameTime;
         gami.updateFrame();
 
@@ -265,9 +260,15 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
             {
-                while (elapsed >= timeStepDouble)
+                while (elapsed >= timeStepDouble120)
                 {
-                    elapsed -= timeStepDouble;
+                    using std::chrono::high_resolution_clock;
+                    using std::chrono::duration_cast;
+                    using std::chrono::duration;
+                    using std::chrono::microseconds;
+                    auto t1 = high_resolution_clock::now();
+
+                    elapsed -= timeStepDouble120;
                     ai_system.update(em);
                     npc_system.update(em);
                     physics_system.update(em);
@@ -276,32 +277,26 @@ void Game::run()
                     object_system.update(em);
                     attack_system.update(em, am);
                     life_system.update(em, object_system);
-                    // if (elapsed < timeStepDouble45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
+                    // if (elapsed < timeStepDouble12045) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     // if(elapsed < target)
                     camera_system.update(em, engine, evm);
                     event_system.update(em, evm, iam, map, object_system, sound_system);
                     if (li.showParticles)
                         particle_system.update(em);
+
+                    auto t2 = high_resolution_clock::now();
+                    auto dur = duration_cast<microseconds>(t2 - t1);
+                    std::cout << "Physics System: " << dur.count() << "us" << std::endl;
                 }
 
                 // Borramos las entidades muertas
                 emptyDeathList(li);
 
                 // Sistemas que no hacen cálculos con las físicas
-                alpha = elapsed / timeStepDouble;
+                alpha = elapsed / timeStepDouble120;
                 sound_system.update();
                 lock_system.update(em);
-                using std::chrono::high_resolution_clock;
-                using std::chrono::duration_cast;
-                using std::chrono::duration;
-                using std::chrono::microseconds;
-
-                auto t1 = high_resolution_clock::now();
                 anim_system.update(em, engine);
-
-                auto t2 = high_resolution_clock::now();
-                auto dur = duration_cast<microseconds>(t2 - t1);
-                std::cout << "Anim System: " << dur.count() << "us" << std::endl;
                 render_system.update(em, engine, alpha);
             }
             else if (!resets && debugs) {

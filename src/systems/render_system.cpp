@@ -3,6 +3,13 @@
 #include <iomanip>
 #include <variant>
 
+// using std::chrono::high_resolution_clock;
+// using std::chrono::duration_cast;
+// using std::chrono::duration;
+// using std::chrono::microseconds;
+
+// auto t1 = high_resolution_clock::now();
+
 float ENGI::GameEngine::widthRate = 1.0;
 float ENGI::GameEngine::heightRate = 1.0f;
 
@@ -25,6 +32,7 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine, double alpha)
         // ren.updateBBox();
     });
 
+    // t1 = high_resolution_clock::now();
     // Empezamos el frame
     beginFrame(engine, em);
 
@@ -894,7 +902,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 if (e.hasTag<PlayerTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
-                    pos.setY(pos.y());
+                    pos.setY(pos.y() - 2.4);
                 }
                 else if (e.hasTag<SlimeTag>())
                 {
@@ -976,8 +984,8 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     r.node->setScale({ scl.x(), scl.y(), scl.z() });
                     if (e.hasComponent<AnimationComponent>())
                     {
-                        r.node->setRotation({ 1.0, 0.0, 0.0 }, 270.0);
-                        r.node->rotate({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees);
+                        r.node->setRotation({ 1.0, 0.0, 0.0 }, -90.0);
+                        r.node->rotate({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees - 90);
                     }
                     else
                         r.node->setRotation({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees);
@@ -1015,10 +1023,10 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 }
             }
         }
-        else if (e.hasTag<GroundTag>() && e.hasComponent<GrassComponent>())
-        {
-            drawGrass(engine, r, em.getComponent<GrassComponent>(e));
-        }
+        // else if (e.hasTag<GroundTag>() && e.hasComponent<GrassComponent>())
+        // {
+        //     drawGrass(engine, r, em.getComponent<GrassComponent>(e));
+        // }
     });
 
     // engine.activateLights();
@@ -1268,8 +1276,8 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     else if (e.hasTag<CrusherTag>())
     {
-        // r.model = engine.loadModelRaylib("assets/models/Apisonadora.obj");
         std::string path = "assets/Personajes/Enemigos/Apisonadora/Apisonadora.fbx";
+        r.node = engine.loadModel(path.c_str());
         r.node = engine.loadModel(path.c_str());
         loadAnimations(engine, em, e, r, path);
         // loadShaders(r.model);
@@ -1438,12 +1446,12 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     r.meshLoaded = true;
 }
 
-void RenderSystem::loadAnimations(GameEngine& engine, EntityManager& em, Entity& ent, RenderComponent& rc, std::string path) {
-    auto& vecBones = rc.node->getEntity<DarkMoon::Model>()->getboneInfoMap();
+void RenderSystem::loadAnimations(GameEngine& engine, EntityManager& em, Entity& ent, RenderComponent& rc, std::string path)
+{
+    auto& vecBones = rc.node->getEntity<Model>()->getboneInfoMap();
     auto* animation = engine.createAnimation(path, vecBones);
     auto& animcomp = em.addComponent<AnimationComponent>(ent);
     animcomp.animationList[animcomp.animationList.size()] = animation;
-
 }
 
 void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, Entity& e, Node& n, vec3d pos, Color c)
@@ -1591,6 +1599,10 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
         li.elapsedPause = 0;
 
     getNode(engine, "TextCopy")->setVisibleOne(true);
+
+    // auto t2 = std::chrono::high_resolution_clock::now();
+    // auto dur = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    // std::cout << "Tiempo de renderizado: " << dur << " mc" << std::endl;
 
     engine.traverseRoot();
     engine.endDrawing();
@@ -2113,9 +2125,10 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
     if (inpi.debugPhy)
         pointedEntity = std::numeric_limits<std::size_t>::max();
 
+    auto& frti = em.getSingleton<FrustumInfo>();
     for (auto const& e : em.getEntities())
     {
-        if (e.hasTag<PlayerTag>())
+        if (!frti.inFrustum(e.getID()) || e.hasTag<PlayerTag>())
             continue;
 
         if (e.hasTag<CrusherTag>() && !e.hasTag<EnemyDeathTag>()) {

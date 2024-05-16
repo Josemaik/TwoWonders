@@ -53,7 +53,7 @@ struct AnimationManager
                 if (anim.interpolating && anim.interTime <= transitionTime) {
                     anim.interTime += anim.m_CurrentAnimation->getTicksPerSecond() * dt;
                     calculateBoneTransition(anim.m_CurrentAnimation->getRootNode(), glm::mat4(1.0f), anim.m_CurrentAnimation, anim.m_NextAnimation, anim.haltTime, anim.interTime, transitionTime, id);
-                    return;
+                    continue;
                 }
                 else if (anim.interpolating) {
                     if (anim.m_QueueAnimation) {
@@ -63,7 +63,7 @@ struct AnimationManager
                         anim.m_QueueAnimation = nullptr;
                         anim.m_CurrentTime = 0.0f;
                         anim.interTime = 0.0;
-                        return;
+                        continue;
                     }
 
                     anim.interpolating = false;

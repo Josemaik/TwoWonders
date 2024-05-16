@@ -166,10 +166,8 @@ namespace DarkMoon {
 
         //Process bones
         bool hasBones = mesh->HasBones();
-        // if (hasBones)
-        // {
-        processBone(boneIDs, weights, mesh, scene);
-        // }
+        if (hasBones)
+            processBone(boneIDs, weights, mesh, scene);
 
         for (std::size_t i = 0; i < vertices.size(); i++) {
             vertices[i].boneIDs = boneIDs[i];
