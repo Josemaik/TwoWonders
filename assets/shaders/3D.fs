@@ -85,18 +85,18 @@ vec4 CalcLightInternal(BaseLight light, vec3 lightDirection, vec3 normal)
                        diffuseFactor;
     }
 
-    vec3 viewDir = normalize(-FragPos);
-    vec3 reflectDir = reflect(-lightDirection, normal);
-    float specularFactor = dot(viewDir, reflectDir);
+    //vec3 viewDir = normalize(-FragPos);
+    //vec3 reflectDir = reflect(-lightDirection, normal);
+    //float specularFactor = dot(viewDir, reflectDir);
 
-    if(specularFactor > 0)
-    {
-        specularFactor = pow(specularFactor, Shininess);
-        specularColor = vec4(light.color, 1.0f) *
-                        Shininess *
-                        vec4(Ks, 1.0f) *
-                        specularFactor;
-    }
+    //if(specularFactor > 0)
+    //{
+    //    specularFactor = pow(specularFactor, Shininess);
+    //    specularColor = vec4(light.color, 1.0f) *
+    //                    Shininess *
+    //                    vec4(Ks, 1.0f) *
+    //                    specularFactor;
+    //}
 
     return (ambientColor + diffuseColor + specularColor);
 }
