@@ -1417,6 +1417,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         // r.model = engine.loadModelRaylib("assets/models/Cofre.obj");
         r.node = engine.loadModel("assets/models/Cofre.obj");
         setPointLight(engine, em, e, *r.node, r.position + vec3d{ 0, 5, 0 });
+        //engine.dmeg.CreateSpotLight(r.position.toGlm() + vec3f(0,10,0).toGlm(), {0, -1, 0}, 30.0f, D_YELLOW, "SpotLight amarilla", r.node);
         // loadShaders(r.model);
     }
     else if (e.hasTag<DestructibleTag>())
@@ -1499,7 +1500,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         {
             auto& [ren, _, plc] = comps;
             ren->node = r.node;
-            setPointLight(engine, *plc, *r.node, ren->position, D_YELLOW);
+            setPointLight(engine, *plc, *r.node, ren->position, 0.5, D_ORANGE_DARK);
         }
     }
     else if (e.hasTag<LevelChangeTag>())
@@ -1534,7 +1535,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<LavaTag>())
     {
         r.node = engine.loadModel("assets/Assets/Charco_lava/Charco_lava.obj");
-        setPointLight(engine, em, e, *r.node, r.position + vec3d{ 0, 3, 0 }, D_RED);
+        setPointLight(engine, em, e, *r.node, r.position, 1.0f, D_RED);
     }
     else if (e.hasTag<SignTag>())
     {
@@ -1637,7 +1638,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     r.meshLoaded = true;
 }
 
-void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, Entity& e, Node& n, vec3d pos, Color c)
+void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, Entity& e, Node& n, vec3d pos, float intensity, Color c)
 {
     PointLightComponent* plc{ nullptr };
     if (e.hasComponent<PointLightComponent>())
@@ -1645,10 +1646,10 @@ void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, Entity& 
     else
         plc = &em.addComponent<PointLightComponent>(e);
 
-    setPointLight(engine, *plc, n, pos, c);
+    setPointLight(engine, *plc, n, pos, intensity, c);
 }
 
-void RenderSystem::setPointLight(GameEngine& engine, PointLightComponent& plc, Node& n, vec3d pos, Color c)
+void RenderSystem::setPointLight(GameEngine& engine, PointLightComponent& plc, Node& n, vec3d pos, float intensity, Color c)
 {
     if (!plc.light)
     {
@@ -1657,6 +1658,8 @@ void RenderSystem::setPointLight(GameEngine& engine, PointLightComponent& plc, N
     }
     else
         plc.light->position = pos.toGlm();
+
+    plc.light->setIntensity(intensity);
 }
 
 void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)

@@ -126,7 +126,7 @@ namespace DarkMoon {
             RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
-            rm.useShader(rm.shaders["3Dv2"]);
+            //rm.useShader(rm.shaders["3Dv2"]);
 
             auto nColor = rm.normalizeColor(color);
 
@@ -632,7 +632,7 @@ namespace DarkMoon {
             RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
-            rm.useShader(rm.shaders["3Dv2"]);
+            //rm.useShader(rm.shaders["3Dv2"]);
 
             glm::vec3 camDirection = glm::normalize(rm.m_camera->position - position);
             glm::vec3 billboardDirection = glm::vec3(0.0f, 0.0f, -1.0f);

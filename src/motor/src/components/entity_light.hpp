@@ -31,6 +31,16 @@ namespace DarkMoon {
 
         PointLight(glm::vec3 pos, Color c)
             : Light(c), position(pos) {};
+
+        // void draw(glm::mat4 transMatrix) override{
+        //     position = glm::vec3(transMatrix[3][0], transMatrix[3][1], transMatrix[3][2]);
+        // }
+
+        void setIntensity(float intensity){
+            constant  /= intensity; 
+            linear    /= intensity; 
+            quadratic /= intensity; 
+        }
     };
 
     struct SpotLight : Light {
@@ -43,5 +53,11 @@ namespace DarkMoon {
 
         SpotLight(glm::vec3 pos, glm::vec3 dir, float cut, Color c)
             : Light(c), position(pos), direction(dir), cutOff(cut) {};
+
+        void setIntensity(float intensity){
+            constant  /= intensity; 
+            linear    /= intensity; 
+            quadratic /= intensity; 
+        }
     };
 }

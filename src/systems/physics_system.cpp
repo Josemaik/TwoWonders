@@ -20,7 +20,10 @@ void PhysicsSystem::update(EntityManager& em)
             if (phy.velocity != vec3d::zero() && phy.target != vec3d::zero())
             {
                 if (phy.position.distance(phy.target) < 8.0)
+                {
+                    phy.prevPosition = phy.position;
                     phy.velocity = vec3d::zero();
+                }
                 else
                 {
                     phy.prevPosition = phy.position;
