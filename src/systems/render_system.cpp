@@ -1496,9 +1496,8 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     {
         r.node = engine.loadModel("assets/Assets/Checkpoint/Checkpoint.obj");
         auto& spc = em.getComponent<SpawnComponent>(e);
-        for (auto& [name, comps] : spc.parts)
+        for (auto& [ren, _, plc] : spc.parts)
         {
-            auto& [ren, _, plc] = comps;
             ren->node = r.node;
             setPointLight(engine, *plc, *r.node, ren->position, 0.5, D_ORANGE_DARK);
         }
@@ -2791,6 +2790,14 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em)
                 static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 5),
                 20,
                 D_RED);
+        }
+
+        if (e.hasComponent<PointLightComponent>())
+        {
+            auto& plc = em.getComponent<PointLightComponent>(e);
+            auto& lightPos = plc.light->position;
+
+            engine.drawCubeWires({ lightPos.x, lightPos.y, lightPos.z }, { 5,5,5 }, D_RED);
         }
 
         if (e.hasComponent<RampComponent>() && e.hasComponent<PhysicsComponent>())

@@ -19,7 +19,7 @@ uniform float Shininess;
 
 uniform bool activeLights;
 
-const int MAX_POINT_LIGHTS = 30;
+const int MAX_POINT_LIGHTS = 40;
 const int MAX_SPOT_LIGHTS  = 10;
 
 struct BaseLight

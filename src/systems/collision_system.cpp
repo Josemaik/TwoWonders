@@ -492,13 +492,6 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
             return;
     }
 
-    // Colisiones con el suelo
-    if (staticEntPtr->hasTag<GroundTag>() && !otherEntPtr->hasTag<HitPlayerTag>())
-    {
-        groundCollision(*otherPhy, *staticPhy, minOverlap);
-        return;
-    }
-
     // Si cualquiera de los impactos es con una bala, se baja la vida del otro
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
@@ -510,6 +503,13 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
                 attack.doEffect = true;
             }
         }
+        return;
+    }
+
+    // Colisiones con el suelo
+    if (staticEntPtr->hasTag<GroundTag>() && !otherEntPtr->hasTag<HitPlayerTag>())
+    {
+        groundCollision(*otherPhy, *staticPhy, minOverlap);
         return;
     }
 

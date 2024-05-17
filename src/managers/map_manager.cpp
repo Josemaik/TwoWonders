@@ -45,7 +45,7 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
             map = loadMap("assets/Niveles/Lvl_3/Lvl_3.kaiwa");
             em.getSingleton<SoundSystem>().sonido_amb_pradera();
             em.getSingleton<SoundSystem>().sonido_music_pradera();
-            em.getSingleton<SoundSystem>().sonido_pasos_pradera();  
+            em.getSingleton<SoundSystem>().sonido_pasos_pradera();
             break;
         }
         default:
@@ -161,7 +161,7 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             case LoadState::LOAD_NAVMESHES:
             {
                 // if (li.mapID == 2)
-                generateNavmeshes(em,li.mapID);
+                generateNavmeshes(em, li.mapID);
                 generateCheats(em);
                 break;
             }
@@ -584,7 +584,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 {
                     auto& plc = em.addComponent<PointLightComponent>(wall);
                     auto& p = em.addComponent<ParticleMakerComponent>(wall, ParticleMakerComponent{ .active = true, .effect = std::get<0>(particleParts[j]), .maxParticles = std::get<1>(particleParts[j]), .spawnRate = std::get<2>(particleParts[j]), .lifeTime = std::get<3>(particleParts[j]) });
-                    spc.parts[static_cast<SpawnComponent::SpawnParts>(j)] = { &rWall, &p, &plc };
+                    spc.parts.push_back({ &rWall, &p, &plc });
                 }
             }
 
@@ -771,14 +771,15 @@ vec3d getNodeVec3d(uint16_t nodeId, const std::map<uint16_t, vec3d>& nodes) {
     // Si no se encuentra el nodo, se devuelve un vec3d con valores predeterminados o se maneja el error de alguna otra manera
     return { 0.0f, 0.0f, 0.0f };
 }
-void MapManager::generateNavmeshes(EntityManager& em,uint8_t map)
+void MapManager::generateNavmeshes(EntityManager& em, uint8_t map)
 {
-    
+
     auto& navs = em.getSingleton<NavmeshInfo>();
     mapType navmeshkaiwa{};
-    if(map == 2){
+    if (map == 2) {
         navmeshkaiwa = loadMap("assets/Niveles/Lvl_2/Lvl_2-navmeshes.kaiwa");
-    }else{
+    }
+    else {
         navmeshkaiwa = loadMap("assets/Niveles/Lvl_4/Lvl_4-navmeshes.kaiwa");
     }
     const valueType& navmeshes = navmeshkaiwa["NavMesh"];
@@ -839,11 +840,11 @@ void MapManager::generateNavmeshes(EntityManager& em,uint8_t map)
         //     hasramp = true;
         // }        
         // if(map == 2){
-            const rapidjson::Value::ConstMemberIterator& xd = navmesh.FindMember("ramp");
-            if (xd != navmesh.MemberEnd()) {
-                if (xd->value.GetBool())
-                    hasramp = true;
-            }
+        const rapidjson::Value::ConstMemberIterator& xd = navmesh.FindMember("ramp");
+        if (xd != navmesh.MemberEnd()) {
+            if (xd->value.GetBool())
+                hasramp = true;
+        }
         // }
         // bool hasramp = navmesh["ramp"].GetBool();
 
@@ -1026,7 +1027,7 @@ void MapManager::generateNavmeshes(EntityManager& em,uint8_t map)
     //Conexiones a mano de las rampas del nivel 2
     //rampa muñeco izquierda
     std::vector<Conection> auxconex;
-    if(map == 2){
+    if (map == 2) {
         auxconex.push_back(Conection{ 1,2,18 });
         auxconex.push_back(Conection{ 1,5,18 });
         auxconex.push_back(Conection{ 1,26,18 });
@@ -1076,13 +1077,14 @@ void MapManager::generateNavmeshes(EntityManager& em,uint8_t map)
         auxconex.push_back(Conection{ 1,800,742 });
         auxconex.push_back(Conection{ 1,644,808 });
         auxconex.push_back(Conection{ 1,632,639 });
-    }else{
-        auxconex.push_back(Conection{1,457,448});
-        auxconex.push_back(Conection{1,448,419});
-        auxconex.push_back(Conection{1,419,421});
+    }
+    else {
+        auxconex.push_back(Conection{ 1,457,448 });
+        auxconex.push_back(Conection{ 1,448,419 });
+        auxconex.push_back(Conection{ 1,419,421 });
     }
 
-    if(auxconex.size() != 0){
+    if (auxconex.size() != 0) {
         for (auto& c : auxconex) {
             navs.conexiones.push_back(c);
             //debug

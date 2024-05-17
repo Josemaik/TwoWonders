@@ -587,21 +587,17 @@ void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
 
         if (distance < ic.range && !sc.active)
         {
-            for (auto& [_, parts] : sc.parts)
-            {
-                auto& [rc, pmc, plc] = parts;
+            for (auto& [rc, pmc, plc] : sc.parts)
                 pmc->multiply = true;
-            }
+
             sc.active = true;
             ic.showButton = true;
         }
         else if (distance > ic.range && sc.active)
         {
-            for (auto& [_, parts] : sc.parts)
-            {
-                auto& [rc, pmc, plc] = parts;
+            for (auto& [rc, pmc, plc] : sc.parts)
                 pmc->multiply = false;
-            }
+
             sc.active = false;
             ic.showButton = false;
             return;
