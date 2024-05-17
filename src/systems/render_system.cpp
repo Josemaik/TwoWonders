@@ -2945,13 +2945,13 @@ void RenderSystem::drawDeath(GameEngine& engine)
     engine.drawRectangle({ 0, 0 }, { engine.getScreenWidth(), engine.getScreenHeight() }, { 0, 0, 0, 200 });
 
     // Valores de la caja de texto
-    float boxWidth = 300.f;
-    float boxWidth2 = 500.f;
-    float boxHeight = 100.f;
+    int boxWidth = 300.f;
+    int boxWidth2 = 500.f;
+    int boxHeight = 100.f;
     auto hRate = engine.getHeightRate();
-    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth / 2.f);
-    float posX2 = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth2 / 2.f);
-    float posY = static_cast<float>(engine.getScreenHeight() / 2) - (boxHeight / 2.f);
+    int posX = engine.getScreenWidth() / 2 - boxWidth / 2;
+    int posX2 = engine.getScreenWidth() / 2 - boxWidth2 / 2;
+    int posY = engine.getScreenHeight() / 2 - boxHeight / 2;
 
     engine.drawText("Has Muerto", posX, posY, 40, D_RED);
 

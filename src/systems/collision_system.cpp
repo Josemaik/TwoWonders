@@ -444,8 +444,6 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
 
 void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
 {
-    auto& li = em.getSingleton<LevelInfo>();
-
     // Sacamos punteros de las físicas y de las entidades para poder hacer swaps
     auto* staticPhy = &statPhy;
     auto* otherPhy = &othrPhy;
