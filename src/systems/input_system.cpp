@@ -43,7 +43,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     }
 
     // INVENTORY
-    if ((ge.isKeyReleased(D_KEY_I) /* || ge.isGamepadButtonReleased(0, GLFW_GAMEPAD_BUTTON_BACK)*/) && li.currentScreen == GameScreen::GAMEPLAY && !inpi.pause)
+    if ((ge.isKeyReleased(D_KEY_I) || ge.isGamepadButtonReleased(0, GLFW_GAMEPAD_BUTTON_BACK)) && li.currentScreen == GameScreen::GAMEPLAY && !inpi.pause)
     {
         inpi.inventory = !inpi.inventory;
         inpi.debugAI1 = false;

@@ -914,11 +914,11 @@ void RenderSystem::drawLogoKaiwa(GameEngine& engine) {
     auto width = logoText->getWidth();
     auto height = logoText->getHeight();
 
-    auto wRate = 0.11f / engine.getWidthRate();
-    auto hRate = 0.11f / engine.getHeightRate();
+    auto wRate = 0.81f / engine.getWidthRate();
+    auto hRate = 0.81f / engine.getHeightRate();
 
-    int posX = engine.getScreenWidth() / 2 - static_cast<int>(static_cast<float>(width) * 0.11f / 2);
-    int posY = engine.getScreenHeight() / 2 - static_cast<int>(static_cast<float>(height) * 0.11f / 2);
+    int posX = engine.getScreenWidth() / 2 - static_cast<int>(static_cast<float>(width) * 0.81f / 2);
+    int posY = engine.getScreenHeight() / 2 - static_cast<int>(static_cast<float>(height) * 0.81f / 2);
 
     engine.drawNode(logoKaiwa, { posX, posY }, { wRate, hRate });
 

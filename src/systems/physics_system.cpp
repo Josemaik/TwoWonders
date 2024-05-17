@@ -6,8 +6,14 @@ void PhysicsSystem::update(EntityManager& em)
     auto& frti = em.getSingleton<FrustumInfo>();
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy)
     {
-        if (!frti.inFrustum(e.getID()) || e.hasTag<EnemyDeathTag>())
+        if (!frti.inFrustum(e.getID()))
             return;
+
+        if (e.hasTag<EnemyDeathTag>())
+        {
+            phy.position = vec3d::zero();
+            phy.velocity = phy.position;
+        }
 
         if (phy.notMove)
         {

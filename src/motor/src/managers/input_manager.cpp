@@ -38,6 +38,12 @@ namespace DarkMoon {
                 return true;
         }
 
+        for (int i = 0; i < GLFW_JOYSTICK_LAST; i++)
+        {
+            if (m_gamepadPressedStates.buttons[i])
+                return true;
+        }
+
         return false;
     }
 
@@ -70,19 +76,19 @@ namespace DarkMoon {
         return name ? name : "Uknown";
     }
 
-    bool InputManager::isGamepadButtonPressed(int , int button) {
+    bool InputManager::isGamepadButtonPressed(int, int button) {
         return m_gamepadPressedStates.buttons[button];
     }
 
-    bool InputManager::isGamepadButtonDown(int , int button) {
+    bool InputManager::isGamepadButtonDown(int, int button) {
         return m_gamepadStates.buttons[button];
     }
 
-    bool InputManager::isGamepadButtonReleased(int , int button) {
+    bool InputManager::isGamepadButtonReleased(int, int button) {
         return m_gamepadReleasedStates.buttons[button];
     }
 
-    bool InputManager::isGamepadButtonUp(int , int button) {
+    bool InputManager::isGamepadButtonUp(int, int button) {
         return !m_gamepadStates.buttons[button];
     }
 
@@ -92,7 +98,7 @@ namespace DarkMoon {
         return axes;
     }
 
-    float InputManager::getGamepadAxisMovement(int , int axis) {
+    float InputManager::getGamepadAxisMovement(int, int axis) {
         return m_gamepadStates.axes[axis];
     }
 
@@ -114,12 +120,12 @@ namespace DarkMoon {
         for (auto& sta : m_gamepadPressedStates.buttons) sta = false;
 
         int jid = 0;
-        if(glfwGetGamepadState(jid, &m_gamepadStates)){
-            for (int i = 0; i < GLFW_JOYSTICK_LAST; i++){
-                if(m_gamepadStates.buttons[i] && !m_gamepadStatesprev.buttons[i]){
+        if (glfwGetGamepadState(jid, &m_gamepadStates)) {
+            for (int i = 0; i < GLFW_JOYSTICK_LAST; i++) {
+                if (m_gamepadStates.buttons[i] && !m_gamepadStatesprev.buttons[i]) {
                     m_gamepadPressedStates.buttons[i] = true;
                 }
-                if(!m_gamepadStates.buttons[i] && m_gamepadStatesprev.buttons[i]){
+                if (!m_gamepadStates.buttons[i] && m_gamepadStatesprev.buttons[i]) {
                     m_gamepadReleasedStates.buttons[i] = true;
                 }
             }
