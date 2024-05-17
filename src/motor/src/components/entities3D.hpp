@@ -26,8 +26,8 @@ namespace DarkMoon {
 
             // Create and configure VAO, VBO
             rm.beginMode3D();
-            auto& shaders = rm.shaders;
-            rm.useShader(rm.activeLights ? shaders["lights"] : shaders["3D"]);
+            //rm.useShader(rm.activeLights ? shaders["lights"] : shaders["3D"]);
+            rm.useShader(rm.shaders["3D"]);
             glGenVertexArrays(1, &VAO);
             glGenBuffers(1, &VBO);
 
@@ -69,6 +69,7 @@ namespace DarkMoon {
         void draw(glm::mat4 transMatrix) override {
 
             rm.beginMode3D();
+            rm.useShader(rm.shaders["3D"]);
 
             auto nColor = rm.normalizeColor(color);
 
@@ -125,6 +126,7 @@ namespace DarkMoon {
             RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
+            rm.useShader(rm.shaders["3Dv2"]);
 
             auto nColor = rm.normalizeColor(color);
 
@@ -383,6 +385,7 @@ namespace DarkMoon {
             RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
+            rm.useShader(rm.shaders["3D"]);
 
             auto nColor = rm.normalizeColor(color);
 
@@ -629,6 +632,7 @@ namespace DarkMoon {
             RenderManager& rm = RenderManager::getInstance();
 
             rm.beginMode3D();
+            rm.useShader(rm.shaders["3Dv2"]);
 
             glm::vec3 camDirection = glm::normalize(rm.m_camera->position - position);
             glm::vec3 billboardDirection = glm::vec3(0.0f, 0.0f, -1.0f);

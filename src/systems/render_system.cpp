@@ -1185,6 +1185,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     r.node->setScale({ scl.x(), scl.y(), scl.z() });
                     r.node->setRotation({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees);
                     r.node->setVisibleOne(true);
+                    r.node->setVisible(true);
 
                     // Luces cofre
                     // if (e.hasTag<ChestTag>()) {

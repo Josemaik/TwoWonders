@@ -26,6 +26,7 @@ namespace DarkMoon {
         //checkLights();
         glEnable(GL_DEPTH_TEST);
         //glEnable(GL_CULL_FACE);
+        useShader(shaders["3D"]);
     }
 
     void RenderManager::endMode3D() {

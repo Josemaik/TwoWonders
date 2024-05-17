@@ -480,6 +480,7 @@ namespace DarkMoon {
             m_renderManager.shaders["depth"] = LoadShader("shaderDepth", "assets/shaders/depth.vs", "assets/shaders/depth.fs");
             m_renderManager.shaders["default"] = LoadShader("shaderDefault", "assets/shaders/default.vs", "assets/shaders/default.fs");
             m_renderManager.shaders["billboard"] = LoadShader("shaderBillboard", "assets/shaders/billboard.vs", "assets/shaders/billboard.fs", "assets/shaders/billboard.gs");
+            m_renderManager.shaders["3Dv2"] = LoadShader("shader3Dv2", "assets/shaders/3Dv2.vs", "assets/shaders/3Dv2.fs");
 
             //----- Font -----//
             m_renderManager.defaultFont = LoadFont("assets/fonts/Capriola-Regular.ttf");

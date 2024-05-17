@@ -1030,12 +1030,7 @@ Node* ENGI::GameEngine::drawCheckBox(vec2i position, float size, bool checked, C
 
 Node* ENGI::GameEngine::createCube(vec3d position, vec3d size, DarkMoon::Color color, const char* nodeName, DarkMoon::Node* parentNode)
 {
-    if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreateCube(position.toGlm(), size.toGlm(), color, nodeName, parentNode);
-    else
-        nodes[nodeName]->setVisibleOne(true);
-
-    return nodes[nodeName];
+    return dmeg.CreateCube(position.toGlm(), size.toGlm(), color, nodeName, parentNode);
 }
 
 Node* ENGI::GameEngine::drawCube(vec3d position, vec3d size, DarkMoon::Color color)
