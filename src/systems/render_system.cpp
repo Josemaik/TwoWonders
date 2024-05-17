@@ -466,7 +466,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
     int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 3.8f) - static_cast<int>(static_cast<float>(buttonHeight) * hRate / 2.f);
 
     // Fondo de los botones
-    int initX = -static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 2.5f);
+    int initX = -static_cast<int>(static_cast<float>(engine.getScreenWidth()) * wRate / 3.3f);
     int initButtonX = posX + initX;
     int finalX = 0;
     float multiplier = 750.f;
@@ -486,7 +486,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
     initButtonX += movement;
 
     engine.createRectangle({ initX, 0 },
-        { static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 2.5f), static_cast<int>(static_cast<float>(engine.getScreenHeight()) / hRate) },
+        { static_cast<int>(static_cast<float>(engine.getScreenWidth()) * wRate / 3.3f), static_cast<int>(static_cast<float>(engine.getScreenHeight()) / hRate) },
         { 0, 0, 0, 120 }, "Fondo_botones", menuNode);
 
     // Botones
