@@ -26,7 +26,7 @@ void PhysicsSystem::update(EntityManager& em)
         // Cuando el jugador se para por un tiempo determinado
         if (phy.elapsed_afterStop < phy.countdown_afterStop)
         {
-            phy.plusDeltatime(timeStep30, phy.elapsed_afterStop);
+            phy.plusDeltatime(timeStep, phy.elapsed_afterStop);
             if (phy.stopped)
                 phy.stopped = false;
         }
@@ -41,7 +41,7 @@ void PhysicsSystem::update(EntityManager& em)
                 return;
             }
             else
-                phy.plusDeltatime(timeStep30, phy.elapsed_stopped);
+                phy.plusDeltatime(timeStep, phy.elapsed_stopped);
         }
 
         // Sacamos referencias a la posición y velocidad
@@ -123,9 +123,9 @@ void PhysicsSystem::update(EntityManager& em)
 
         //SONIDOS DE MOVIMIENTO
         auto& ss = em.getSingleton<SoundSystem>();
-        if (e.hasTag<PlayerTag>()){
+        if (e.hasTag<PlayerTag>()) {
 
-          
+
             if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
                 ss.play_pasos();
                 playerWalking = true;
@@ -139,100 +139,106 @@ void PhysicsSystem::update(EntityManager& em)
         }
         auto& li = em.getSingleton<LevelInfo>();
 
-        if (e.hasTag<GolemTag>() ){
-            
+        if (e.hasTag<GolemTag>()) {
+
             auto& player = *em.getEntityByID(li.playerID);
             auto& playerPhy = em.getComponent<PhysicsComponent>(player);
             auto& playerPos = playerPhy.position;
             auto& ss = em.getSingleton<SoundSystem>();
-            auto& ia = em.getComponent<AIComponent>(e);                    
+            auto& ia = em.getComponent<AIComponent>(e);
 
-            if(e.hasComponent<SoundComponent>()){
+            if (e.hasComponent<SoundComponent>()) {
                 auto& sc = em.getComponent<SoundComponent>(e);
-                if( phy.position.distance(playerPos) < 40.0 )
+                if (phy.position.distance(playerPos) < 40.0)
                 {
-                    if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !ia.ismoving)
+                    if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !ia.ismoving)
                     {
                         ss.sonido_golem_mov(sc.sound_mov);
                         ia.ismoving = true;
-                    
-                    } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  ia.ismoving)
+
+                    }
+                    else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) && ia.ismoving)
                     {
-                        ia.ismoving= false;
+                        ia.ismoving = false;
                         ss.stop_enemigo_mov(sc.sound_mov);
 
                     }
-                } else  if ( ia.ismoving)
+                }
+                else  if (ia.ismoving)
                 {
                     ss.stop_enemigo_mov(sc.sound_mov);
                     ia.ismoving = false;
 
-                } 
+                }
             }
         }
-        if ( e.hasTag<SnowmanTag>() ){
-             auto& player = *em.getEntityByID(li.playerID);
-            auto& playerPhy = em.getComponent<PhysicsComponent>(player);
-            auto& playerPos = playerPhy.position;
-            auto& ss = em.getSingleton<SoundSystem>();
-            auto& ia = em.getComponent<AIComponent>(e);                    
-
-            if(e.hasComponent<SoundComponent>()){
-                auto& sc = em.getComponent<SoundComponent>(e);
-                if( phy.position.distance(playerPos) < 40.0 )
-                {
-                    if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !ia.ismoving)
-                    {
-                        ss.sonido_munyeco_mov(sc.sound_mov);
-                        ia.ismoving = true;
-                    
-                    } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  ia.ismoving)
-                    {
-                        ia.ismoving= false;
-                        ss.stop_enemigo_mov(sc.sound_mov);
-
-                    }
-                } else  if ( ia.ismoving)
-                {
-                    ss.stop_enemigo_mov(sc.sound_mov);
-                    ia.ismoving = false;
-
-                } 
-            }
-            
-           
-        }
-         if ( e.hasTag<SlimeTag>() ){
+        if (e.hasTag<SnowmanTag>()) {
             auto& player = *em.getEntityByID(li.playerID);
             auto& playerPhy = em.getComponent<PhysicsComponent>(player);
             auto& playerPos = playerPhy.position;
             auto& ss = em.getSingleton<SoundSystem>();
-            auto& ia = em.getComponent<AIComponent>(e);                    
+            auto& ia = em.getComponent<AIComponent>(e);
 
-            if(e.hasComponent<SoundComponent>()){
+            if (e.hasComponent<SoundComponent>()) {
                 auto& sc = em.getComponent<SoundComponent>(e);
-                if( phy.position.distance(playerPos) < 40.0 )
+                if (phy.position.distance(playerPos) < 40.0)
                 {
-                    if (( phy.velocity.x() != 0 || phy.velocity.z() != 0 ) && !ia.ismoving)
+                    if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !ia.ismoving)
                     {
-                        ss.sonido_slime_mov(sc.sound_mov);
+                        ss.sonido_munyeco_mov(sc.sound_mov);
                         ia.ismoving = true;
-                    
-                    } else if (( phy.velocity.x() == 0 && phy.velocity.z() == 0 ) &&  ia.ismoving)
+
+                    }
+                    else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) && ia.ismoving)
                     {
-                        ia.ismoving= false;
+                        ia.ismoving = false;
                         ss.stop_enemigo_mov(sc.sound_mov);
 
                     }
-                } else  if ( ia.ismoving)
+                }
+                else  if (ia.ismoving)
                 {
                     ss.stop_enemigo_mov(sc.sound_mov);
                     ia.ismoving = false;
 
-                } 
+                }
             }
-            
-           
+
+
+        }
+        if (e.hasTag<SlimeTag>()) {
+            auto& player = *em.getEntityByID(li.playerID);
+            auto& playerPhy = em.getComponent<PhysicsComponent>(player);
+            auto& playerPos = playerPhy.position;
+            auto& ss = em.getSingleton<SoundSystem>();
+            auto& ia = em.getComponent<AIComponent>(e);
+
+            if (e.hasComponent<SoundComponent>()) {
+                auto& sc = em.getComponent<SoundComponent>(e);
+                if (phy.position.distance(playerPos) < 40.0)
+                {
+                    if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !ia.ismoving)
+                    {
+                        ss.sonido_slime_mov(sc.sound_mov);
+                        ia.ismoving = true;
+
+                    }
+                    else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) && ia.ismoving)
+                    {
+                        ia.ismoving = false;
+                        ss.stop_enemigo_mov(sc.sound_mov);
+
+                    }
+                }
+                else  if (ia.ismoving)
+                {
+                    ss.stop_enemigo_mov(sc.sound_mov);
+                    ia.ismoving = false;
+
+                }
+            }
+
+
         }
     });
 }
