@@ -100,7 +100,6 @@ namespace DarkMoon {
         std::vector<glm::vec4> weights(mesh->mNumVertices);
         //m_Bones.resize(mesh->mNumVertices);
 
-
         // Loop all vertices in loaded mesh
         for (unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
@@ -168,13 +167,8 @@ namespace DarkMoon {
         //Process bones
         bool hasBones = mesh->HasBones();
         if (hasBones)
-        {
             processBone(boneIDs, weights, mesh, scene);
-        }
-        //check cofre
-        // if(mesh->mNumBones == 1){
-        //     hasBones = false;
-        // }
+
         for (std::size_t i = 0; i < vertices.size(); i++) {
             vertices[i].boneIDs = boneIDs[i];
             vertices[i].weights = weights[i];
@@ -244,17 +238,15 @@ namespace DarkMoon {
         else
             material->texture = nullptr;
     }
-    // int Model::getBoneID(const aiBone* pBone){
-    //     int bone_id = 0;
-    //     std::string bone_name{pBone->mName.C_Str()};
-    //     if(m_BoneNameToIndexMap.find(bone_name) == m_BoneNameToIndexMap.end()){
-    //         bone_id = static_cast<int>(m_BoneNameToIndexMap.size());
-    //         m_BoneNameToIndexMap[bone_name] = bone_id;
-    //     }else{
-    //         bone_id = m_BoneNameToIndexMap[bone_name];
-    //     }
-    //     return bone_id;
-    // }
+
+    glm::mat4 Model::getBoneTransform(const std::string& name) {
+        for (auto& bone : boneVector) {
+            if (bone.name == name)
+                return bone.offset;
+        }
+        return glm::mat4(1.0f);
+    }
+
     void Model::processBone(std::vector<glm::ivec4>& boneIDs_all, std::vector<glm::vec4>& weights_all, aiMesh* mesh, const aiScene*)
     {
         // Set the max bones to 100
@@ -265,7 +257,9 @@ namespace DarkMoon {
             int boneID = -1;
             std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
             if (boneIndex >= boneVector.size()) {
-                boneVector.push_back({ boneName, aiMatrix4x4ToGlm(&mesh->mBones[boneIndex]->mOffsetMatrix) });
+                glm::mat4 offset = aiMatrix4x4ToGlm(&mesh->mBones[boneIndex]->mOffsetMatrix);
+                std::cout << "\n";
+                boneVector.push_back({ boneName, offset });
                 boneID = boneIndex;
                 m_BoneCounter++;
             }

@@ -68,6 +68,7 @@ private:
                 auto& target = *em.getEntityByID(targetID);
                 if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
                 {
+                    em.getComponent<AnimationComponent>(target).animToPlay = 3;
                     auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                     auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
                     auto& bb = em.getSingleton<BlackBoard_t>();
@@ -243,6 +244,7 @@ private:
                 auto& target = *em.getEntityByID(targetID);
                 if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
                 {
+                    em.getComponent<AnimationComponent>(target).animToPlay = 3;
                     auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                     auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
 
@@ -271,6 +273,7 @@ private:
                 auto& target = *em.getEntityByID(targetID);
                 if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
                 {
+                    em.getComponent<AnimationComponent>(target).animToPlay = 3;
                     auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                     auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
 
@@ -298,6 +301,7 @@ private:
                 auto& target = *em.getEntityByID(targetID);
                 if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
                 {
+                    em.getComponent<AnimationComponent>(target).animToPlay = 3;
                     auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                     auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
 
@@ -324,6 +328,7 @@ private:
             auto& target = *em.getEntityByID(targetID);
             if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
             {
+                em.getComponent<AnimationComponent>(target).animToPlay = 3;
                 auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                 auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
 
@@ -351,6 +356,7 @@ private:
                 auto& target = *em.getEntityByID(targetID);
                 if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
                 {
+                    em.getComponent<AnimationComponent>(target).animToPlay = 3;
                     auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                     auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
 
@@ -374,6 +380,7 @@ private:
                 auto& target = *em.getEntityByID(targetID);
                 if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
                 {
+                    em.getComponent<AnimationComponent>(target).animToPlay = 3;
                     auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                     auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
 

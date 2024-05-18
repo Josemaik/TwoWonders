@@ -339,8 +339,33 @@ namespace DarkMoon {
         return p_nodeModel;
     }
 
+    //Animations
+    std::size_t DarkMoonEngine::PlayAnimation(Animation* panimation) {
+        return m_animationManager.PlayAnimation(panimation);
+    }
+
+    void DarkMoonEngine::StopAnimation(std::size_t idanim) {
+        m_animationManager.StopAnimation(idanim);
+    }
+
+    Animation* DarkMoonEngine::CreateAnimation(const std::string& path, std::vector<BoneInfo>& vecbones) {
+        return m_animationManager.createAnimation(path, vecbones);
+    }
+
+    std::vector<Animation*> DarkMoonEngine::CreateAnimations(const std::string& path, std::vector<BoneInfo>& vecbones) {
+        return m_animationManager.createAnimations(path, vecbones);
+    }
+
+    void DarkMoonEngine::UpdateAnimations() {
+        m_animationManager.UpdateAnimation(static_cast<float>(GetFrameTime() * 2));
+    }
+
+    void DarkMoonEngine::UpdateAnimations(float mult, std::size_t id) {
+        m_animationManager.UpdateAnimation(static_cast<float>(GetFrameTime()) * mult, id);
+    }
+
     // Create billboard in node
-    Node* DarkMoonEngine::CreateBillboard(const char* filePath, glm::vec3 position, glm::vec2 size, const char* nodeName, Node* parentNode){
+    Node* DarkMoonEngine::CreateBillboard(const char* filePath, glm::vec3 position, glm::vec2 size, const char* nodeName, Node* parentNode) {
         auto p_nodeBillboard = CreateNode(nodeName, parentNode);
 
         // Load Texture
@@ -404,14 +429,14 @@ namespace DarkMoon {
     }
 
     // Create spot light in node
-    Node* DarkMoonEngine::CreateSpotLight(glm::vec3 position, glm::vec3 direction, float cutOff, Color color, const char* nodeName, Node* parentNode){
+    Node* DarkMoonEngine::CreateSpotLight(glm::vec3 position, glm::vec3 direction, float cutOff, Color color, const char* nodeName, Node* parentNode) {
         auto p_nodeLight = CreateNode(nodeName, parentNode);
         auto light = std::make_unique<SpotLight>(position, direction, cutOff, color);
         p_nodeLight->setEntity(std::move(light));
         p_nodeLight->translate({ position.x, position.y, position.z });
 
         return p_nodeLight;
-    }    
+    }
 
     // Update lights
     void DarkMoonEngine::UpdateLights(Node* parentNode) {
@@ -426,17 +451,17 @@ namespace DarkMoon {
     void DarkMoonEngine::AuxUpdateLights(Node* parentNode) {
         for (auto& child : parentNode->getChildren()) {
             // Point Light
-            if (auto pLight = child->getEntity<PointLight>()){
+            if (auto pLight = child->getEntity<PointLight>()) {
                 if (pLight->enabled)
                     m_renderManager.pointLights.push_back(pLight);
             }
             // Directional Light
-            else if (auto dLight = child->getEntity<DirectionalLight>()){
+            else if (auto dLight = child->getEntity<DirectionalLight>()) {
                 if (dLight->enabled)
                     m_renderManager.directionalLights.push_back(dLight);
             }
             // Spot Light
-            else if (auto sLight = child->getEntity<SpotLight>()){
+            else if (auto sLight = child->getEntity<SpotLight>()) {
                 if (sLight->enabled)
                     m_renderManager.spotLights.push_back(sLight);
             }

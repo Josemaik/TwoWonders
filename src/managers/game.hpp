@@ -19,6 +19,7 @@
 #include "../systems/lock_system.hpp"
 #include "../systems/npc_system.hpp"
 #include "../systems/particle_system.hpp"
+#include "../systems/animation_system.hpp"
 #include "game_engine.hpp"
 #include "ia_manager.hpp"
 #include "map_manager.hpp"
@@ -62,6 +63,7 @@ private:
     CameraSystem camera_system{};
     LockSystem lock_system{};
     NPCSystem npc_system{};
+    AnimationSystem anim_system{};
 };
 
 

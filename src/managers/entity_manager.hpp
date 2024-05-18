@@ -9,7 +9,6 @@
 #include <vector>
 #include <algorithm>
 #include <typeinfo>
-#include <set>
 #include <functional>
 #include "../utils/slotmap.hpp"
 #include "../utils/meta_program.hpp"

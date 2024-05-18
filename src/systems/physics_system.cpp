@@ -133,17 +133,30 @@ void PhysicsSystem::update(EntityManager& em)
         //SONIDOS DE MOVIMIENTO
         auto& ss = em.getSingleton<SoundSystem>();
         if (e.hasTag<PlayerTag>()) {
-
-
             if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
                 ss.play_pasos();
                 playerWalking = true;
 
+                if (e.hasComponent<AnimationComponent>())
+                {
+                    auto& plfi = em.getSingleton<PlayerInfo>();
+                    auto& anc = em.getComponent<AnimationComponent>(e);
+                    if (plfi.hasStaff)
+                        anc.animToPlay = 0;
+                    else
+                        anc.animToPlay = 9;
+                }
             }
             else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) && playerWalking)
             {
                 playerWalking = false;
                 ss.SFX_pasos_stop();
+
+                if (e.hasComponent<AnimationComponent>())
+                {
+                    auto& anc = em.getComponent<AnimationComponent>(e);
+                    anc.animToPlay = 10;
+                }
             }
         }
         auto& li = em.getSingleton<LevelInfo>();
@@ -246,8 +259,6 @@ void PhysicsSystem::update(EntityManager& em)
 
                 }
             }
-
-
         }
     });
 }

@@ -7,8 +7,8 @@ void CollisionSystem::update(EntityManager& em)
     // using std::chrono::duration_cast;
     // using std::chrono::duration;
     // using std::chrono::microseconds;
-
     // auto t1 = high_resolution_clock::now();
+
     auto& li = em.getSingleton<LevelInfo>();
     auto& frti = em.getSingleton<FrustumInfo>();
 

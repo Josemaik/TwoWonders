@@ -19,6 +19,7 @@ struct AssimpNodeData
     std::string name{};
     int childrenCount{};
     std::vector<AssimpNodeData> children{};
+    Bone* bone = nullptr;
 };
 
 static glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4* from);
@@ -26,14 +27,27 @@ static glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4* from);
 struct Animation
 {
 public:
+    Animation() = default;
+
     Animation(const std::string& animationPath, std::vector<BoneInfo>& modelBones)
     {
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
+        const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
         assert(scene && scene->mRootNode);
         if (scene->mNumAnimations == 0)
             return;
         aiAnimation* animation = scene->mAnimations[0];
+        duration = (float)animation->mDuration;
+        tps = (float)animation->mTicksPerSecond;
+        generateBoneTree(&rootNode, scene->mRootNode);
+        // Reset all root transformations
+        rootNode.transformation = glm::mat4(1.0f);
+        loadIntermediateBones(animation, modelBones);
+    }
+
+    Animation(const aiScene* scene, std::vector<BoneInfo>& modelBones, std::size_t animID)
+    {
+        aiAnimation* animation = scene->mAnimations[animID];
         duration = (float)animation->mDuration;
         tps = (float)animation->mTicksPerSecond;
         generateBoneTree(&rootNode, scene->mRootNode);
@@ -57,7 +71,7 @@ public:
 
     inline float getDuration() { return duration; }
 
-    inline const AssimpNodeData* getRootNode() { return &rootNode; }
+    inline AssimpNodeData* getRootNode() { return &rootNode; }
 
     inline const std::vector<BoneInfo>& getBoneProps()
     {

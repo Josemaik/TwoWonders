@@ -1,71 +1,15 @@
 #include "darkmoon.hpp"
 
-// DarkMoon::Node* createHUD(DarkMoon::DarkMoonEngine& engine) {
-//     // Node HUD
-//     auto p_nodeHUD = engine.CreateNode("HUD", engine.GetRootNode());
-
-//     // PRUEBAS RENDIMIENTO //
-
-//     // // Node: Pixel prueba
-//     // engine.CreatePixel({ 5, 5 }, D_BLACK, "Pixel prueba", p_nodeHUD);
-//     // // Node: Linea prueba
-//     // engine.CreateLine({ 0, 0 }, { 100, 100 }, D_RED, "Linea prueba", p_nodeHUD);
-//     // // Node: Triangulo prueba
-//     // engine.CreateTriangle({ 0, 0 }, {100, 100}, {0, 100}, D_YELLOW_DARK, "Triangulo prueba", p_nodeHUD);
-//     // Node: Circulo prueba
-//     engine.CreateCircle({ 500, 500 }, 30, 20, D_AQUA_DARK, "Circulo prueba", p_nodeHUD);
-
-//     // Node: Rectangulo rosa Oscuro
-//     engine.CreateRectangle({ 12.0f, 12.0f }, { 375.0f, 40.0f }, D_PINK_DARK, "Rectangulo rosa oscuro", p_nodeHUD);
-//     // Node: Rectangulo rosa
-//     engine.CreateRectangle({ 10.0f, 10.0f }, { 375.0f, 40.0f }, D_PINK, "Rectangulo rosa", p_nodeHUD);
-
-//     // Node: Texto
-//     //engine.CreateText({10.0f, 10.0f}, "Ya era hora pato", engine.GetDefaultFont(), 24, D_GRAY,1,"Texto ya era hora", p_nodeHUD);
-
-//     // Node: Texture2D
-//     engine.CreateTexture2D({ 10.0f, 400.0f }, "assets/mago_happy.png", D_WHITE, "Textura Koromaru", p_nodeHUD);
-
-//     // Node: Rectangulo negro
-//     engine.CreateRectangle({ 10.0f, 100.0f }, { 150.0f, 150.0f }, D_BLACK, "Rectangulo negro", p_nodeHUD);
-
-//     // Node: AnimatedTexture2D
-//     std::vector<DarkMoon::Texture*> texturesGif;
-//     texturesGif.push_back(engine.LoadTexture2D("assets/joystickL-0.png"));
-//     texturesGif.push_back(engine.LoadTexture2D("assets/joystickL-1.png"));
-//     texturesGif.push_back(engine.LoadTexture2D("assets/joystickL-2.png"));
-//     texturesGif.push_back(engine.LoadTexture2D("assets/joystickL-3.png"));
-//     engine.CreateAnimatedTexture2D({ 10.0f, 100.0f }, texturesGif, D_WHITE, 1.0f, 0, "Textura Joystick Izquierdo", p_nodeHUD);
-
-//     // Node: TextBox
-//     // auto textBox = engine.CreateTextBox({ 660, 20 }, { 120, 60 }, D_AQUA_LIGHT, "Texto", engine.GetDefaultFont(), 24, D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER, "Caja de texto de prueba", p_nodeHUD);
-
-//     // Node: Button
-//     engine.CreateButton({ 660, 100 }, { 120, 60 }, "Boton", engine.GetDefaultFont(), 24, D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER, D_ORANGE_DARK, D_ORANGE, D_ORANGE_LIGHT, "Boton de prueba naranja", p_nodeHUD);
-
-//     // Node: Slider
-//     //engine.CreateSlider({660, 180}, {120, 30}, D_GRAY, D_AQUA_LIGHT, "Slider de prueba", p_nodeHUD);
-
-//     // // Node: Pixel Negro
-//     // engine.CreatePixel({400.0f, 300.0f}, BLACK, "Pixel negro", p_nodeHUD);
-//     // // Node: Linea Roja
-//     // engine.CreateLine({0.0f, 0.0f}, {700.0f, 600.0f}, RED, "Linea roja", p_nodeHUD);
-//     // // Node: Triangulo Verde
-//     // engine.CreateTriangle({10.0f, 54.0f}, {10.0f, 590.0f}, {210.0f, 590.0f}, KAIWA, "Triangulo verde", p_nodeHUD);
-//     // // Node: Circulo 
-//     // engine.CreateCircle({250.0f, 50.0f}, 30.0f, 20, LAVENDER, "Circulo lavanda", p_nodeHUD);
-
-//     return textBox;
-// }
 
 DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     // Node Scene 3D
     auto p_node3D = engine.CreateNode("Scene 3D", engine.GetRootNode());
 
-    // Node: Rejilla
-    //engine.CreateGrid(10, 10.0f, D_GRAY, "Rejilla principal", p_node3D);
+    //Node: Rejilla
+    engine.CreateGrid(10, 10.0f, D_GRAY, "Rejilla principal", p_node3D);
 
-    //Node: Linea diagonal
+
+    // Node: Linea diagonal
     engine.CreatePoint3D({ -1.0f, 0.0f, 1.0f }, 5.0f, D_BLACK, "Punto principio linea", p_node3D);
     engine.CreateLine3D({ -1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, -1.0f }, 2.0f, D_YELLOW_DARK, "Linea amarilla", p_node3D);
     engine.CreatePoint3D({ 1.0f, 1.0f, -1.0f }, 5.0f, D_BLACK, "Punto fin linea", p_node3D);
@@ -73,56 +17,40 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     // Node: Plano
     //engine.CreatePlane({ 0.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, D_PINK, "Plano rosita", p_node3D);
 
-    // Node: Cubo
+    //Node: Cubo
     engine.CreateCube({ -30.0f, 0.0f, 0.0f }, { 10.0f, 10.0f, 10.0f }, D_AQUA_DARK, "Cubo azulito", p_node3D);
     engine.CreateCubeWires({ -30.0f, 0.0f, 0.0f }, { 10.0f, 10.0f, 10.0f }, D_BLACK, "Wireframe", p_node3D);
-    // Node: Wireframe
+    //Node: Wireframe
     engine.CreateCubeWires({ 20.0f, 0.0f, -30.0f }, { 10.0f, 10.0f, 10.0f }, D_BLACK, "Wireframe", p_node3D);
 
-    // Node: Modelo Dummy 1
-    auto modelDummy = engine.CreateModel("assets/Cofre/Cofre.obj", D_WHITE, "Modelo: Dummy 1", p_node3D);
-    //modelDummy->scale({0.2f, 0.2f, 0.2f});
-    modelDummy->translate({ 0.0f, 0.0f, -30.0f });
-
-    // // Node: Modelo Dummy 2
-    // auto modelDummy2 = engine.CreateModel("assets/Dummy.obj", D_WHITE, "Modelo: Dummy 2", p_node3D);
-    // //modelDummy2->scale({0.2f, 0.2f, 0.2f});
-    // modelDummy2->translate({ 0.0f, 0.0f, 30.0f });
-    // modelDummy2->rotate({ 0.0f, 1.0f, 0.0f }, 180.0f);
-
     // Node: Modelo Dummy 3
-    auto modelDummy3 = engine.CreateModel("assets/Cofre/Texturas/Cofre.fbx", D_WHITE, "Modelo: Dummy 3", p_node3D);
-    //modelDummy3->scale({0.2f, 0.2f, 0.2f});
-    modelDummy3->translate({ 30.0f, 0.0f, 0.0f });
-    modelDummy3->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
-    auto eModel = dynamic_cast<DarkMoon::Model*>(modelDummy3->getEntity());
-    auto& m_meshes = eModel->getMeshes();
+     // auto modelDummy3 = engine.CreateModel("assets/Cofre/Texturas/Cofre.fbx", D_WHITE, "Modelo: Dummy 3", p_node3D);
+     // modelDummy3->translate({ 30.0f, 0.0f, 0.0f });
+     // modelDummy3->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
+     // auto eModel = dynamic_cast<DarkMoon::Model*>(modelDummy3->getEntity());
+     // auto& m_meshes = eModel->getMeshes();
 
-    engine.CreatePointLight({ 0.0f, 10.0f, -30.0f }, D_RED, "Luz roja", p_node3D);
-    engine.CreatePointLight({ 0.0f, 10.0f,  30.0f }, D_BLUE, "Luz azul", p_node3D);
-    engine.CreatePointLight({ 30.0f, 10.0f,  0.0f }, D_MAGENTA, "Luz magenta", p_node3D);
+    // auto& am = AnimationManager::getInstance();
+    // auto* animation = am.createAnimation("assets/Cofre/Texturas/Cofre.fbx", eModel->getboneInfoMap());
 
-    auto& am = AnimationManager::getInstance();
-    auto* animation = am.createAnimation("assets/Cofre/Texturas/Cofre.fbx", eModel->getboneInfoMap());
+    // auto id = am.PlayAnimation(animation);
+    // for (auto& mesh : m_meshes) {
+    //     mesh->animID = id;
+    // }
 
-    auto id = am.PlayAnimation(animation);
-    for (auto& mesh : m_meshes) {
-        mesh->animID = id;
-    }
+    // auto modelCharacter = engine.CreateModel("assets/MainCharacter/Main_character.fbx", D_WHITE, "Modelo MAin character", p_node3D);
+    // modelCharacter->translate({ 0.0f, 0.0f, 30.0f });
+    // modelCharacter->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
+    // // modelCharacter->rotate({ 0.0f, 1.0f, 0.0f }, 90.0f);
+    // auto eModel1 = dynamic_cast<DarkMoon::Model*>(modelCharacter->getEntity());
+    // auto& m_meshes1 = eModel1->getMeshes();
 
-    auto modelCharacter = engine.CreateModel("assets/MainCharacter/Main_character.fbx",D_WHITE,"Modelo MAin character",p_node3D);
-    modelCharacter->translate({ 0.0f, 0.0f, 30.0f });
-    modelCharacter->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
-    modelCharacter->rotate({ 0.0f, 1.0f, 0.0f }, 90.0f);
-    auto eModel1 = dynamic_cast<DarkMoon::Model*>(modelCharacter->getEntity());
-    auto& m_meshes1 = eModel1->getMeshes();
+    // auto* animation1 = am.createAnimation("assets/MainCharacter/Main_character.fbx", eModel1->getboneInfoMap());
 
-    auto* animation1 = am.createAnimation("assets/MainCharacter/Main_character.fbx", eModel1->getboneInfoMap());
-
-    auto id1 = am.PlayAnimation(animation1);
-    for (auto& mesh : m_meshes1) {
-        mesh->animID = id1;
-    }
+    // auto id1 = am.PlayAnimation(animation1);
+    // for (auto& mesh : m_meshes1) {
+    //     mesh->animID = id1;
+    // }
 
     //engine.CreateBillboard("assets/mago_happy.png", {0,10,0}, {20,20}, "Billboard", p_node3D);
 
@@ -130,16 +58,14 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
 }
 
 DarkMoon::Node* createMainCharacter(DarkMoon::DarkMoonEngine& engine) {
-    // Node: Modelo
-    auto model = engine.CreateModel("assets/Apisonadora/Apisonadora.fbx", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
-    //model->scale({0.02f, 0.02f, 0.02f});
-    //model->translate({0.0f, 0.0f, 0.0f});
-    model->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
-    model->rotate({ 0.0f, 1.0f, 0.0f }, 180.0f);
+    //Node: Modelo
+    auto model = engine.CreateModel("assets/MainCharacter/Main_character.fbx", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
+    model->translate({ 0.0f, 0.0f, 0.0f });
+    model->setScale({ 3.f, 3.f, 3.f });
+    model->setRotation({ 1.0f, 0.0f, 0.0f }, -90.0f);
 
     auto eModel = dynamic_cast<DarkMoon::Model*>(model->getEntity());
     eModel->drawModel = true;
-    eModel->drawWires = false;
 
     return model;
 }
@@ -156,6 +82,9 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
         camera->target.z -= velocity;
 
         nodeCharacter->translate({ velocity, 0.0f, -velocity });
+        nodeCharacter->setRotation({ 1.0f, 0.0f, 0.0f }, -90.0f);
+        nodeCharacter->rotate({ 0.0f, 1.0f, 0.0f }, 0.0f);
+        // nodeCharacter->setRotation({ 1.0f, 0.0f, 0.0f }, 45.0f);
     }
     if (engine.IsKeyDown(D_KEY_D) || engine.IsGamepadButtonDown(0, D_GAMEPAD_BUTTON_DPAD_RIGHT)) { // -X +Z
         camera->position.x -= velocity;
@@ -165,6 +94,9 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
         camera->target.z += velocity;
 
         nodeCharacter->translate({ -velocity, 0.0f, velocity });
+        nodeCharacter->setRotation({ 1.0f, 0.0f, 0.0f }, -90.0f);
+        nodeCharacter->rotate({ 0.0f, 1.0f, 0.0f }, 180.0f);
+
     }
     if (engine.IsKeyDown(D_KEY_W) || engine.IsGamepadButtonDown(0, D_GAMEPAD_BUTTON_DPAD_UP)) { // +X +Z
         camera->position.x += velocity;
@@ -174,6 +106,9 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
         camera->target.z += velocity;
 
         nodeCharacter->translate({ velocity, 0.0f, velocity });
+        nodeCharacter->setRotation({ 1.0f, 0.0f, 0.0f }, -90.0f);
+        nodeCharacter->rotate({ 0.0f, 1.0f, 0.0f }, 270.0f);
+
     }
     if (engine.IsKeyDown(D_KEY_S) || engine.IsGamepadButtonDown(0, D_GAMEPAD_BUTTON_DPAD_DOWN)) { // -X -Z
         camera->position.x -= velocity;
@@ -183,6 +118,9 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
         camera->target.z -= velocity;
 
         nodeCharacter->translate({ -velocity, 0.0f, -velocity });
+        nodeCharacter->setRotation({ 1.0f, 0.0f, 0.0f }, -90.0f);
+        nodeCharacter->rotate({ 0.0f, 1.0f, 0.0f }, 90.0f);
+
     }
     if (engine.IsKeyDown(D_KEY_G)) {
         nodeCharacter->scale({ 0.9,0.9,0.9 });
@@ -190,9 +128,10 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
     if (engine.IsKeyDown(D_KEY_J)) {
         nodeCharacter->scale({ 1.1,1.1,1.1 });
     }
+    if (engine.IsKeyPressed(D_KEY_F7))
+        engine.GetRootNode()->drawTree();
 
-    if (engine.IsKeyReleased(D_KEY_SPACE))
-        engine.ToggleLights();
+    nodeCharacter->translate({ 0.0f, 0.0f, 0.0f });
 }
 
 int main() {
@@ -200,77 +139,151 @@ int main() {
 
     if (engine.InitWindow(800, 600, "DarkMoon Engine")) {
 
-        // std::cout << "┌────────────────┐" << std::endl;
-        // std::cout << "│ Load Resources │" << std::endl;
-        // std::cout << "└────────────────┘" << std::endl;
+        std::cout << "┌────────────────┐" << std::endl;
+        std::cout << "│ Load Resources │" << std::endl;
+        std::cout << "└────────────────┘" << std::endl;
 
         createScene3D(engine);
         auto mainCharacter = createMainCharacter(engine);
         auto modelcharacter = dynamic_cast<DarkMoon::Model*>(mainCharacter->getEntity());
         auto& m_meshes = modelcharacter->getMeshes();
 
-        // for (std::size_t i = 0; i < m_meshes.size(); i++)
-        // {
-        //     unsigned int charVAO = VAOUtils::generateBuffer(*m_meshes[i]);
-        //     mainCharacter->vertexArrayObjectIDs.push_back(charVAO);
-        //     mainCharacter->VAOIndexCounts.push_back(static_cast<unsigned int>(m_meshes[i]->indices.size()));
-        // }
 
         auto& boneInfoMap = modelcharacter->getboneInfoMap();
+        auto& am = AnimationManager::getInstance();
         // auto& boneCount = modelcharacter->getBoneCount();
         // int count = modelcharacter->getBoneCount();
-        Animation crusheranimation("assets/Apisonadora/Apisonadora.fbx", boneInfoMap);
-        // auto m_bones = crusheranimation.GetBonesVector();
-        // for(auto& bone : m_bones){
-        //     std::string boneName = bone.GetBoneName();
-        //     if (boneInfoMap.find(boneName) == boneInfoMap.end()){
-        //         bone.SetBoneID(boneInfoMap[boneName].id);
-        //     }
-        // }
-        // copiar mapbones en mbones
-        // crusheranimation.m_Bones
-        // crusheranimation.m_Bones.push_back(bone(channel->mNodeName.data,
-        //         boneInfoMap[channel->mNodeName.data].id, channel));
-        auto& am = AnimationManager::getInstance();
-        //         auto textBox = createHUD(engine);
+        std::vector<Animation*> anims = am.createAnimations("assets/MainCharacter/Main_character.fbx", boneInfoMap);
 
-                //auto textBoxEntity = dynamic_cast<DarkMoon::TextBox*>(textBox->getEntity());
+        auto varitaModel = engine.CreateModel("assets/MainCharacter/Varita.obj", D_WHITE, "Modelo: Varita", engine.GetRootNode());
+        varitaModel->setTranslation({ 0.0f, 05.0f, 05.0f });
+        auto eVaritaModel = dynamic_cast<DarkMoon::Model*>(varitaModel->getEntity());
+        eVaritaModel->drawModel = true;
+
+        // auto& characterMeshes = modelcharacter->getAdjuntMeshes();
+        // for (auto& mesh : eVaritaModel->getMeshes())
+        // {
+        //     characterMeshes.push_back(mesh);
+        // }
 
         auto camera = engine.GetCamera();
-        camera->position = { -60.0f, 60.0f, -60.0f };
+        camera->position = { -0.0f, 40.0f, -60.0f };
         camera->fovy = 60.0f;
 
         engine.SetExitKey(D_KEY_F8);
         engine.SetTargetFPS(60);
 
-        //scene3D->getParent()->removeChild(scene3D);
-
         // std::cout << "┌──────┐" << std::endl;
         // std::cout << "│ Tree │" << std::endl;
         // std::cout << "└──────┘" << std::endl;
-        // engine.GetRootNode()->drawTree();
-        auto id = am.PlayAnimation(&crusheranimation);
+
+        auto id = am.PlayAnimation(anims[0]);
         for (auto& mesh : m_meshes) {
-            mesh->animID = id;
+            if (mesh->hasBones)
+                mesh->animID = id;
         }
 
+        glm::vec3 position = { 3.59f, 3.3f, 1.f };
+        glm::vec3 rot = { 0.0f, 0.0f, 1.0f };
+        float angle = 198.f;
         while (!engine.WindowShouldClose()) {
 
-            // float currentframe = glfwGetTime();
-            // float deltatime = currentframe - lastframe;
             float deltatime = static_cast<float>(engine.GetFrameTime());
             
             // Logic
 
             inputManager(engine, mainCharacter);
+            if (engine.IsKeyDown(D_KEY_X)) {
+                am.StopAnimation(id);
+                for (auto& mesh : m_meshes) {
+                    mesh->animID = std::numeric_limits<std::size_t>::max();
+                    for (auto& ver : mesh->vertices) {
+                        for (int i = 0; i < 4; i++)
+                        {
+                            ver.boneIDs[i] = -1;
+                            ver.weights[i] = 0.0f;
+                        }
+                    }
+                }
+            }
+            if (engine.IsKeyDown(D_KEY_C)) {
+                auto idxd = am.PlayAnimation(anims[10]);
+                for (auto& mesh : m_meshes) {
+                    mesh->animID = idxd;
+                }
+            }
 
-            // std::cout << "FPS: " << engine.GetFPS() << "\n";
-            // std::cout << "Deltatime: " << deltatime << "\n";
+            if (engine.IsKeyDown(D_KEY_4)) {
+                position = { position.x + 0.1f, position.y, position.z };
+            }
+            else if (engine.IsKeyDown(D_KEY_R))
+            {
+                position = { position.x - 0.1f, position.y, position.z };
+            }
+            else if (engine.IsKeyDown(D_KEY_5))
+            {
+                position = { position.x, position.y + 0.1f, position.z };
+            }
+            else if (engine.IsKeyDown(D_KEY_T))
+            {
+                position = { position.x, position.y - 0.1f, position.z };
+            }
+            else if (engine.IsKeyDown(D_KEY_6))
+            {
+                position = { position.x, position.y, position.z + 0.1f };
+            }
+            else if (engine.IsKeyDown(D_KEY_Y))
+            {
+                position = { position.x, position.y, position.z - 0.1f };
+            }
+            else if (engine.IsKeyDown(D_KEY_7))
+            {
+                angle += 1.0f;
+            }
+            else if (engine.IsKeyDown(D_KEY_U))
+            {
+                angle -= 1.0f;
+            }
+            else if (engine.IsKeyDown(D_KEY_8))
+            {
+                rot = { 1.0f, 0.0f, 0.0f };
+            }
+            else if (engine.IsKeyDown(D_KEY_I))
+            {
+                rot = { 0.0f, 1.0f, 0.0f };
+            }
+            else if (engine.IsKeyDown(D_KEY_9))
+            {
+                rot = { 0.0f, 0.0f, 1.0f };
+            }
 
-            //textBoxEntity->text.text = std::to_string(engine.GetFPS());  
             am.UpdateAnimation(deltatime);
 
-            // Draw
+            // Obtiene la matriz de transformación del hueso
+            glm::mat4 boneTransform = am.getBoneTransform("R.Antebrazo", anims[10]);
+
+            // Obtiene la matriz de transformación del personaje principal
+            glm::mat4 characterTransform = mainCharacter->getTransformationMatrix();
+
+            // Crea una matriz de transformación para el reposicionamiento y la rotación
+            glm::mat4 offsetTransform = glm::translate(glm::mat4(1.0f), position); // Mueve el modelo hijo 1 unidad hacia arriba
+            offsetTransform = glm::rotate(offsetTransform, glm::radians(angle), rot); // Rota el modelo hijo 45 grados alrededor del eje Y
+            // offsetTransform = glm::rotate(offsetTransform, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, .0f)); // Rota el modelo hijo 45 grados alrededor del eje Y
+
+            // Combina las matrices de transformación
+            glm::mat4 combinedTransform = characterTransform * boneTransform;
+
+            // Aplica la transformación combinada al modelo de la varita
+            varitaModel->setTransformationMatrix(combinedTransform);
+            // for (int i = 0; i < 4; i++)
+            // {
+            //     for (int j = 0; j < 4; j++)
+            //     {
+            //         std::cout << transMatrix[i][j] << " ";
+            //     }
+            //     std::cout << std::endl;
+            // }
+            // std::cout << std::endl;
 
             engine.BeginDrawing();
 
@@ -286,5 +299,5 @@ int main() {
     return 0;
 }
 /*
-    // Patron Dirty //
+    Patron Dirty //
 */

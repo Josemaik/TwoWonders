@@ -49,6 +49,7 @@ void Game::createEntities()
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     // em.addComponent<AttackerComponent>(e);
+    em.addComponent<AnimationComponent>(e);
     em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = false, .effect = Effects::PLAYER, .maxParticles = 4, .spawnRate = 0.05f, .lifeTime = 0.3f });
 
     // Listeners de eventos para el jugador
@@ -138,8 +139,8 @@ void Game::run()
     while (!li.gameShouldEnd)
     {
         frameTime = engine.getFrameTimeDouble();
-        if (frameTime > timeStepDouble)
-            frameTime = timeStepDouble;
+        if (frameTime > timeStepDouble120)
+            frameTime = timeStepDouble120;
         elapsed += frameTime;
         gami.updateFrame();
 
@@ -266,9 +267,15 @@ void Game::run()
             // seleccionar modo de debug ( physics o AI)
             if (!resets && !debugs)
             {
-                while (elapsed >= timeStepDouble)
+                while (elapsed >= timeStepDouble120)
                 {
-                    elapsed -= timeStepDouble;
+                    using std::chrono::high_resolution_clock;
+                    using std::chrono::duration_cast;
+                    using std::chrono::duration;
+                    using std::chrono::microseconds;
+                    auto t1 = high_resolution_clock::now();
+
+                    elapsed -= timeStepDouble120;
                     ai_system.update(em);
                     npc_system.update(em);
                     physics_system.update(em);
@@ -277,21 +284,26 @@ void Game::run()
                     object_system.update(em);
                     attack_system.update(em, am);
                     life_system.update(em, object_system);
-                    // if (elapsed < timeStepDouble45) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
+                    // if (elapsed < timeStepDouble12045) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render
                     // if(elapsed < target)
                     camera_system.update(em, engine, evm);
                     event_system.update(em, evm, iam, map, object_system, sound_system);
                     if (li.showParticles)
                         particle_system.update(em);
+
+                    auto t2 = high_resolution_clock::now();
+                    auto dur = duration_cast<microseconds>(t2 - t1);
+                    std::cout << "Physics System: " << dur.count() << "us" << std::endl;
                 }
 
                 // Borramos las entidades muertas
                 emptyDeathList(li);
 
                 // Sistemas que no hacen cálculos con las físicas
-                alpha = elapsed / timeStepDouble;
+                alpha = elapsed / timeStepDouble120;
                 sound_system.update();
                 lock_system.update(em);
+                anim_system.update(em, engine);
                 render_system.update(em, engine, alpha);
             }
             else if (!resets && debugs) {

@@ -3,6 +3,7 @@
 #define IA_MAN
 
 #include "../utils/types.hpp"
+#include "../managers/game_engine.hpp"
 #include <cstdint>
 #include <cmath>
 

@@ -30,6 +30,7 @@
 #include "../components/projectile_component.hpp"
 #include "../components/object_component.hpp"
 #include "../components/zone_component.hpp"
+#include "../components/animation_component.hpp"
 #include "../components/sound_component.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
@@ -161,6 +162,7 @@ using CL = MP::TypeList <
     SpawnComponent,
     PointLightComponent,
     GrassComponent,
+    AnimationComponent
     SoundComponent
 > ;
 using TL = MP::TypeList <
@@ -228,7 +230,7 @@ using mapType = rapidjson::Document;
 using valueType = rapidjson::Value;
 using mapSizeType = rapidjson::SizeType;
 using ShaderType = DarkMoon::Shader;
-using ModelType = DarkMoon::Model;
+using Model = DarkMoon::Model;
 using Effects = ParticleMakerComponent::ParticleEffect;
 using FrustOut = MP::TypeList<GroundTag, NPCTag, ChunkTag, HitPlayerTag>;
 using Color = DarkMoon::Color;

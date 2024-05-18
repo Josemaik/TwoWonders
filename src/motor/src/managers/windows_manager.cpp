@@ -182,17 +182,17 @@ namespace DarkMoon {
     }
 
     void WindowsManager::controlFrameRate() {
-        double currentFrameTime = glfwGetTime();
-        m_deltaTime =  currentFrameTime - m_lastFrameTime;
+        double currentFrameTime = tim.getElapsedTime();
+        m_deltaTime = currentFrameTime - m_lastFrameTime;
         m_lastFrameTime = currentFrameTime;
 
         double sleepTime = m_targetFrameTime - m_deltaTime;
         if (sleepTime > 0.0) {
             double endTime = currentFrameTime + sleepTime;
-            while (glfwGetTime() < endTime) {
+            while (tim.getElapsedTime() < endTime) {
                 // Bucle activo
             }
-            currentFrameTime = glfwGetTime();
+            currentFrameTime = tim.getElapsedTime();
             m_deltaTime = currentFrameTime - m_lastFrameTime;
             m_lastFrameTime = currentFrameTime;
         }

@@ -3,6 +3,13 @@
 #include <iomanip>
 #include <variant>
 
+// using std::chrono::high_resolution_clock;
+// using std::chrono::duration_cast;
+// using std::chrono::duration;
+// using std::chrono::microseconds;
+
+// auto t1 = high_resolution_clock::now();
+
 float ENGI::GameEngine::widthRate = 1.0;
 float ENGI::GameEngine::heightRate = 1.0f;
 
@@ -25,6 +32,7 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine, double alpha)
         // ren.updateBBox();
     });
 
+    // t1 = high_resolution_clock::now();
     // Empezamos el frame
     beginFrame(engine, em);
 
@@ -1046,37 +1054,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
             return;
 
         if (r.visible) {
-            Color colorEntidad = r.color;
-
-            // Comprobar el tipo y si es enemigo cambiarle el color
-            if (!e.hasTag<PlayerTag>() && e.hasComponent<TypeComponent>()) {
-                auto& t{ em.getComponent<TypeComponent>(e) };
-
-                switch (t.type)
-                {
-                case ElementalType::Neutral:
-                    colorEntidad = D_GRAY;
-                    break;
-
-                case ElementalType::Water:
-                    colorEntidad = D_BLUE;
-                    break;
-
-                case ElementalType::Fire:
-                    colorEntidad = D_RED;
-                    break;
-
-                case ElementalType::Ice:
-                    colorEntidad = D_BLUE_LIGHT;
-                    break;
-
-                default:
-                    break;
-                }
-            }
-
-            if (e.hasTag<SubjectTag>() && e.hasComponent<SubjectComponent>() && em.getComponent<SubjectComponent>(e).activeShield)
-                colorEntidad = D_GREEN;
+            Color colorEntidad = D_WHITE;
 
             if (e.hasComponent<LifeComponent>()) {
                 auto& l{ em.getComponent<LifeComponent>(e) };
@@ -1143,7 +1121,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 }
                 else if (e.hasTag<CrusherTag>())
                 {
-                    // scl = { 0.33, 0.33, 0.33 };
+                    scl = { 0.8, 0.8, 0.8 };
                     pos.setY(pos.y() - 8.6);
                 }
                 else if (e.hasTag<AngryBushTag>())
@@ -1183,10 +1161,19 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 if (r.node) {
                     r.node->setTranslation({ pos.x(), pos.y(), pos.z() });
                     r.node->setScale({ scl.x(), scl.y(), scl.z() });
-                    r.node->setRotation({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees);
+                    if (e.hasComponent<AnimationComponent>())
+                    {
+                        r.node->setRotation({ 1.0, 0.0, 0.0 }, -90.0);
+                        r.node->rotate({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees - 90);
+                    }
+                    else
+                        r.node->setRotation({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees);
+
                     r.node->setVisibleOne(true);
                     r.node->setVisible(true);
-
+                  
+                    if (auto model = r.node->getEntity<Model>())
+                        model->color = colorEntidad;
                     // Luces cofre
                     // if (e.hasTag<ChestTag>()) {
                     //     auto& chest = em.getComponent<ChestComponent>(e);
@@ -1263,8 +1250,11 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
 {
     auto& li = em.getSingleton<LevelInfo>();
 
-    if (e.hasTag<PlayerTag>())
-        r.node = engine.loadModel("assets/models/main_character.obj");
+    if (e.hasTag<PlayerTag>()) {
+        std::string path = "assets/Personajes/Principal/Main_character.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 2.0);
+    }
     else if (e.hasTag<SlimeTag>())
         r.node = engine.loadModel("assets/models/Slime.obj");
     else if (e.hasTag<SnowmanTag>())
@@ -1469,9 +1459,10 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     else if (e.hasTag<CrusherTag>())
     {
-        // r.model = engine.loadModelRaylib("assets/models/Apisonadora.obj");
-        r.node = engine.loadModel("assets/models/Apisonadora.obj");
-
+        std::string path = "assets/Personajes/Enemigos/Apisonadora/Apisonadora.fbx";
+        r.node = engine.loadModel(path.c_str());
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 1.95f);
         // loadShaders(r.model);
     }
     else if (e.hasTag<DummyTag>())
@@ -1637,6 +1628,17 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     r.meshLoaded = true;
 }
 
+void RenderSystem::loadAnimations(GameEngine& engine, EntityManager& em, Entity& ent, RenderComponent& rc, const std::string& path, float mult)
+{
+    auto& vecBones = rc.node->getEntity<Model>()->getboneInfoMap();
+    auto& ac = em.addComponent<AnimationComponent>(ent);
+    ac.animationList = engine.createAnimations(path, vecBones);
+    ac.multiplier = mult;
+
+    if (ac.animationList.size() == 1)
+        ac.animToPlay = 0;
+}
+
 void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, Entity& e, Node& n, vec3d pos, float intensity, Color c)
 {
     PointLightComponent* plc{ nullptr };
@@ -1784,6 +1786,10 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
         li.elapsedPause = 0;
 
     getNode(engine, "TextCopy")->setVisibleOne(true);
+
+    // auto t2 = std::chrono::high_resolution_clock::now();
+    // auto dur = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    // std::cout << "Tiempo de renderizado: " << dur << " mc" << std::endl;
 
     inpi.interact = false;
     engine.traverseRoot();
@@ -2307,9 +2313,10 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
     if (inpi.debugPhy)
         pointedEntity = std::numeric_limits<std::size_t>::max();
 
+    auto& frti = em.getSingleton<FrustumInfo>();
     for (auto const& e : em.getEntities())
     {
-        if (e.hasTag<PlayerTag>())
+        if (!frti.inFrustum(e.getID()) || e.hasTag<PlayerTag>())
             continue;
 
         if (e.hasTag<CrusherTag>() && !e.hasTag<EnemyDeathTag>()) {

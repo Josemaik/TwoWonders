@@ -142,6 +142,12 @@ namespace ENGI {
         float getGamepadAxisMovement(int gamepad, int axis);
 
         Node* loadModel(const char* filename);
+        std::size_t playAnimation(Animation* panimation);
+        void stopAnimation(std::size_t idanim);
+        Animation* createAnimation(const std::string& path, std::vector<BoneInfo>& vecbones);
+        std::vector<Animation*> createAnimations(const std::string& path, std::vector<BoneInfo>& vecbones);
+        void updateAnimations();
+        void updateAnimations(float mult, std::size_t id);
         float getWorldToScreenX(vec3d pos);
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();

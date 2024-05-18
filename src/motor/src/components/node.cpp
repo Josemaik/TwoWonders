@@ -58,7 +58,7 @@ namespace DarkMoon {
                 * glm::translate(glm::mat4(1.0f), m_translation)
                 * glm::mat4_cast(m_rotation)
                 * glm::scale(glm::mat4(1.0f), m_scale);
-        }
+        }   
 
         // Draw Entity
         if (m_entity && m_visible && m_parent->m_visible)
