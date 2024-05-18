@@ -323,7 +323,7 @@ public:
 
                         std::array<std::pair<SpeakerType, std::string>, 2> msgs =
                         {
-                            std::make_pair(SpeakerType::NONE, "¡Haz recibido un pergamino con la formulación \npara crear una pompa de agua!"),
+                            std::make_pair(SpeakerType::NONE, "¡Has recibido un pergamino con la formulación \npara crear una pompa de agua!"),
                             std::make_pair(SpeakerType::NOMAD, "Nómada: \nCon esto podremos salir de aquí por si disparas a esa puerta. \nLos muñecos de por medio te servirán de práctica.")
                         };
 
@@ -368,7 +368,7 @@ public:
 
                         std::array<std::pair<SpeakerType, std::string>, 2> msgs =
                         {
-                            std::make_pair(SpeakerType::NONE, "¡Haz recibido un pergamino con la formulación \npara hacer una esquiva de agua!"),
+                            std::make_pair(SpeakerType::NONE, "¡Has recibido un pergamino con la formulación \npara hacer una esquiva de agua!"),
                             std::make_pair(SpeakerType::NOMAD, "Nómada: \nCon esto podrás cruzar los charcos de lava. \n¡Buena suerte, yo solo necesito mis buenas patas para cruzar!")
                         };
 
@@ -445,7 +445,7 @@ public:
 
                         std::array<std::pair<SpeakerType, std::string>, 2> msgs =
                         {
-                            std::make_pair(SpeakerType::NONE, "¡Haz recibido un pergamino con la formulación \npara hacer una bola de fuego!"),
+                            std::make_pair(SpeakerType::NONE, "¡Has recibido un pergamino con la formulación \npara hacer una bola de fuego!"),
                             std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nCon esto y un bizcocho, nos largamos de aquí.")
                         };
 
