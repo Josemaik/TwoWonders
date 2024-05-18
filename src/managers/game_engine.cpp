@@ -1115,9 +1115,19 @@ std::size_t ENGI::GameEngine::playAnimation(Animation* panimation) {
 void ENGI::GameEngine::stopAnimation(std::size_t idanim) {
     dmeg.StopAnimation(idanim);
 }
-Animation* ENGI::GameEngine::createAnimation(std::string path, std::vector<BoneInfo> vecbones) {
+
+Animation* ENGI::GameEngine::createAnimation(const std::string& path, std::vector<BoneInfo>& vecbones) {
     return dmeg.CreateAnimation(path, vecbones);
 }
+
+std::vector<Animation*> ENGI::GameEngine::createAnimations(const std::string& path, std::vector<BoneInfo>& vecbones) {
+    return dmeg.CreateAnimations(path, vecbones);
+}
+
 void ENGI::GameEngine::updateAnimations() {
     dmeg.UpdateAnimations();
+}
+
+void ENGI::GameEngine::updateAnimations(float mult, std::size_t id) {
+    dmeg.UpdateAnimations(mult, id);
 }

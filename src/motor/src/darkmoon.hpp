@@ -187,8 +187,10 @@ namespace DarkMoon {
         // Animaciones
         std::size_t PlayAnimation(Animation* panimation);
         void StopAnimation(std::size_t idanim);
-        Animation* CreateAnimation(std::string path,std::vector<BoneInfo> vecbones);
+        Animation* CreateAnimation(const std::string& path, std::vector<BoneInfo>& vecbones);
+        std::vector<Animation*> CreateAnimations(const std::string& path, std::vector<BoneInfo>& vecbones);
         void UpdateAnimations();
+        void UpdateAnimations(float mult, std::size_t id);
 
         // --------------------------------- //
         // Input-related functions: keyboard //
@@ -293,7 +295,7 @@ namespace DarkMoon {
         double GetTime();
         // Get current FPS
         int GetFPS();
-        
+
 
     private:
         // Root node 

@@ -348,12 +348,20 @@ namespace DarkMoon {
         m_animationManager.StopAnimation(idanim);
     }
 
-    Animation* DarkMoonEngine::CreateAnimation(std::string path, std::vector<BoneInfo> vecbones) {
+    Animation* DarkMoonEngine::CreateAnimation(const std::string& path, std::vector<BoneInfo>& vecbones) {
         return m_animationManager.createAnimation(path, vecbones);
     }
 
+    std::vector<Animation*> DarkMoonEngine::CreateAnimations(const std::string& path, std::vector<BoneInfo>& vecbones) {
+        return m_animationManager.createAnimations(path, vecbones);
+    }
+
     void DarkMoonEngine::UpdateAnimations() {
-        m_animationManager.UpdateAnimation(static_cast<float>(GetFrameTime()));
+        m_animationManager.UpdateAnimation(static_cast<float>(GetFrameTime() * 2));
+    }
+
+    void DarkMoonEngine::UpdateAnimations(float mult, std::size_t id) {
+        m_animationManager.UpdateAnimation(static_cast<float>(GetFrameTime()) * mult, id);
     }
 
     // Create billboard in node

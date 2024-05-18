@@ -845,37 +845,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
             return;
 
         if (r.visible) {
-            Color colorEntidad = r.color;
-
-            // Comprobar el tipo y si es enemigo cambiarle el color
-            if (!e.hasTag<PlayerTag>() && e.hasComponent<TypeComponent>()) {
-                auto& t{ em.getComponent<TypeComponent>(e) };
-
-                switch (t.type)
-                {
-                case ElementalType::Neutral:
-                    colorEntidad = D_GRAY;
-                    break;
-
-                case ElementalType::Water:
-                    colorEntidad = D_BLUE;
-                    break;
-
-                case ElementalType::Fire:
-                    colorEntidad = D_RED;
-                    break;
-
-                case ElementalType::Ice:
-                    colorEntidad = D_BLUE_LIGHT;
-                    break;
-
-                default:
-                    break;
-                }
-            }
-
-            if (e.hasTag<SubjectTag>() && e.hasComponent<SubjectComponent>() && em.getComponent<SubjectComponent>(e).activeShield)
-                colorEntidad = D_GREEN;
+            Color colorEntidad = D_WHITE;
 
             if (e.hasComponent<LifeComponent>()) {
                 auto& l{ em.getComponent<LifeComponent>(e) };
@@ -991,7 +961,8 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                         r.node->setRotation({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees);
 
                     r.node->setVisibleOne(true);
-
+                    if (auto model = r.node->getEntity<Model>())
+                        model->color = colorEntidad;
                     // Luces cofre
                     // if (e.hasTag<ChestTag>()) {
                     //     auto& chest = em.getComponent<ChestComponent>(e);
@@ -1071,7 +1042,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     if (e.hasTag<PlayerTag>()) {
         std::string path = "assets/Personajes/Principal/Main_character.fbx";
         r.node = engine.loadModel(path.c_str());
-        loadAnimations(engine, em, e, r, path);
+        loadAnimations(engine, em, e, r, path, 2.0);
     }
     else if (e.hasTag<SlimeTag>())
         r.node = engine.loadModel("assets/models/Slime.obj");
@@ -1279,7 +1250,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         std::string path = "assets/Personajes/Enemigos/Apisonadora/Apisonadora.fbx";
         r.node = engine.loadModel(path.c_str());
         r.node = engine.loadModel(path.c_str());
-        loadAnimations(engine, em, e, r, path);
+        loadAnimations(engine, em, e, r, path, 1.95f);
         // loadShaders(r.model);
     }
     else if (e.hasTag<DummyTag>())
@@ -1446,12 +1417,15 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     r.meshLoaded = true;
 }
 
-void RenderSystem::loadAnimations(GameEngine& engine, EntityManager& em, Entity& ent, RenderComponent& rc, std::string path)
+void RenderSystem::loadAnimations(GameEngine& engine, EntityManager& em, Entity& ent, RenderComponent& rc, const std::string& path, float mult)
 {
     auto& vecBones = rc.node->getEntity<Model>()->getboneInfoMap();
-    auto* animation = engine.createAnimation(path, vecBones);
-    auto& animcomp = em.addComponent<AnimationComponent>(ent);
-    animcomp.animationList[animcomp.animationList.size()] = animation;
+    auto& ac = em.addComponent<AnimationComponent>(ent);
+    ac.animationList = engine.createAnimations(path, vecBones);
+    ac.multiplier = mult;
+
+    if (ac.animationList.size() == 1)
+        ac.animToPlay = 0;
 }
 
 void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, Entity& e, Node& n, vec3d pos, Color c)

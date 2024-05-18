@@ -76,7 +76,7 @@ private:
     void drawAlerts_IA(EntityManager& em, GameEngine& engine);
     void drawFPSCounter(GameEngine& engine);
     void loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r);
-    void loadAnimations(GameEngine& engine, EntityManager& em, Entity& ent, RenderComponent& rc, std::string path);
+    void loadAnimations(GameEngine& engine, EntityManager& em, Entity& ent, RenderComponent& rc, const std::string& path, float mult = 1.0f);
     // void loadShaders(Model& model);
     void drawTextBox(GameEngine& engine, EntityManager& em);
     double shakeDouble(double value);

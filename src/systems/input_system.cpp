@@ -29,12 +29,12 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         {
             inpi.pause = !inpi.pause;
             em.getSingleton<SoundSystem>().seleccion_menu();
-            if(em.getSingleton<SoundSystem>().music_started)
+            if (em.getSingleton<SoundSystem>().music_started)
             {
                 em.getSingleton<SoundSystem>().sonido_unpause(li.mapID);
             }
         }
-           
+
         inpi.debugAI1 = false;
         inpi.debugAI2 = false;
         inpi.debugPhy = false;
@@ -275,10 +275,12 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     // Codigo para el ataque
     if (player.hasComponent<AttackerComponent>())
     {
+        auto& anc = em.getComponent<AnimationComponent>(player);
         if ((ge.isKeyDown(in.space) || ge.getGamepadAxisMovement(0, in.m_space) > 0.1))
         {
             plfi.currentSpell = plfi.noSpell;
             em.getComponent<AttackerComponent>(player).attack(AttackType::MeleePlayer);
+            anc.animToPlay = 1;
         }
 
         auto& atc = em.getComponent<AttackerComponent>(player);
@@ -316,6 +318,8 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             // Restamos el maná
             if (playerSpelled)
             {
+                anc.animToPlay = 2;
+                phy.stopped = true;
                 plfi.mana -= plfi.currentSpell.cost;
 
                 if (plfi.mana < 0.0)

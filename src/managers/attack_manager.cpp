@@ -388,7 +388,7 @@ void AttackManager::createAttackRangedOrMelee(EntityManager& em, vec3d pos, vec3
 {
     auto& e{ em.newEntity() };
     em.addTag<HitPlayerTag>(e);
-    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = vel == vec3d::zero() ? vec3d{ 6.0, 3.0, 6.0 } : vec3d{ 1.5, 1.5, 1.5 }, .color = D_BLACK });
+    auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = pos, .scale = vel == vec3d::zero() ? vec3d{ 6.0, 1.0, 6.0 } : vec3d{ 1.5, 1.5, 1.5 }, .color = D_BLACK });
     auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .velocity = vel, .scale = r.scale, .gravity = 0, .orientation = ori });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, behavior });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = type });

@@ -22,7 +22,13 @@ enum struct PlayerAnimations
 
 struct AnimationComponent
 {
+    static constexpr std::size_t max = std::numeric_limits<std::size_t>::max();
     // std::vector<std::string>{};
-    std::map<std::size_t, Animation*> animationList{};
-    std::size_t currentAnimation{ std::numeric_limits<std::size_t>::max() };
+    std::vector<Animation*> animationList{};
+    std::size_t currentAnimation{ max };
+    std::size_t animToPlay{ max };
+    std::size_t idCurrent{ max };
+    float multiplier{ 1.0 };
+    float timer{ 0.0f };
+    bool stopAnim{ false };
 };
