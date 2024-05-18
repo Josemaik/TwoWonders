@@ -174,12 +174,40 @@ struct AnimationManager
         return result;
     }
 
+    glm::mat4 getBoneTransform(const std::string& name, Animation* animation)
+    {
+        auto* bone = animation->findBone(name);
+        if (bone)
+            return bone->getTransform();
+
+        return glm::mat4(1.0f);
+    }
+
     Animation* createAnimation(const std::string& animationPath, std::vector<BoneInfo>& modelBones)
     {
         auto animation = std::make_unique<Animation>(animationPath, modelBones);
         auto rawPtr = animation.get();
         m_AnimationList.push_back(std::move(animation));
         return rawPtr;
+    }
+
+    std::vector<Animation*> createAnimations(const std::string& animationPath, std::vector<BoneInfo>& modelBones)
+    {
+        std::vector<Animation*> animations;
+        Assimp::Importer importer;
+        const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+        assert(scene && scene->mRootNode);
+
+        for (std::size_t i = 0; i < scene->mNumAnimations; i++)
+        {
+            auto animation = std::make_unique<Animation>(scene, modelBones, i);
+            auto rawPtr = animation.get();
+            m_AnimationList.push_back(std::move(animation));
+            animations.push_back(rawPtr);
+            std::cout << "Animation: " << scene->mAnimations[i]->mName.C_Str() << std::endl;
+        }
+
+        return animations;
     }
 
 private:

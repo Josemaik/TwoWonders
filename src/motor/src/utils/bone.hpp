@@ -90,7 +90,6 @@ public:
         return scales[sclIndex];
     }
 
-
     void update(float animationTime)
     {
         size_t posIndex = getPositionIndex(animationTime);

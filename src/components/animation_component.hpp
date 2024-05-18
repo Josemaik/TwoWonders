@@ -5,6 +5,21 @@
 
 // enum animationtypes
 
+enum struct PlayerAnimations
+{
+    NORMAL_WALK,
+    MELEE_ATTACK,
+    RANGED_ATTACK,
+    GOT_HIT,
+    DEATH,
+    SPEAKING,
+    MAKING_POTION,
+    USING_POTION,
+    OPEN_INVENTORY,
+    STAFF_WALK,
+    IDLE
+};
+
 struct AnimationComponent
 {
     // std::vector<std::string>{};

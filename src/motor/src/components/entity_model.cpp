@@ -231,17 +231,15 @@ namespace DarkMoon {
         else
             material->texture = nullptr;
     }
-    // int Model::getBoneID(const aiBone* pBone){
-    //     int bone_id = 0;
-    //     std::string bone_name{pBone->mName.C_Str()};
-    //     if(m_BoneNameToIndexMap.find(bone_name) == m_BoneNameToIndexMap.end()){
-    //         bone_id = static_cast<int>(m_BoneNameToIndexMap.size());
-    //         m_BoneNameToIndexMap[bone_name] = bone_id;
-    //     }else{
-    //         bone_id = m_BoneNameToIndexMap[bone_name];
-    //     }
-    //     return bone_id;
-    // }
+
+    glm::mat4 Model::getBoneTransform(const std::string& name) {
+        for (auto& bone : boneVector) {
+            if (bone.name == name)
+                return bone.offset;
+        }
+        return glm::mat4(1.0f);
+    }
+
     void Model::processBone(std::vector<glm::ivec4>& boneIDs_all, std::vector<glm::vec4>& weights_all, aiMesh* mesh, const aiScene*)
     {
         // Set the max bones to 100

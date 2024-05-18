@@ -32,11 +32,22 @@ public:
     Animation(const std::string& animationPath, std::vector<BoneInfo>& modelBones)
     {
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
+        const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
         assert(scene && scene->mRootNode);
         if (scene->mNumAnimations == 0)
             return;
         aiAnimation* animation = scene->mAnimations[0];
+        duration = (float)animation->mDuration;
+        tps = (float)animation->mTicksPerSecond;
+        generateBoneTree(&rootNode, scene->mRootNode);
+        // Reset all root transformations
+        rootNode.transformation = glm::mat4(1.0f);
+        loadIntermediateBones(animation, modelBones);
+    }
+
+    Animation(const aiScene* scene, std::vector<BoneInfo>& modelBones, std::size_t animID)
+    {
+        aiAnimation* animation = scene->mAnimations[animID];
         duration = (float)animation->mDuration;
         tps = (float)animation->mTicksPerSecond;
         generateBoneTree(&rootNode, scene->mRootNode);
