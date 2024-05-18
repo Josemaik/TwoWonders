@@ -126,7 +126,7 @@ void Game::run()
 
     gami.setRandomSeed(seed);
     engine.setReplayMode(li.replay, gami);
-    sound_system.setVolumeMaster(0.5f);
+    sound_system.setVolumeMaster(1.0f);
     engine.setWindowFullScreen();
 
     // Inicializa una variable donde tener el tiempo entre frames
