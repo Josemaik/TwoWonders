@@ -13,6 +13,7 @@ out vec3 FragPos;
 out vec2 TextCoord;
 out vec3 tangents;
 out vec3 bitangents;
+out vec3 Normal;
 
 // Uniform variables
 uniform mat4 model;
@@ -45,4 +46,6 @@ void main()
    TextCoord = aTextCoord;
    tangents = aTangents;
    bitangents = aBitangents;
+
+   Normal = normalize(transpose(inverse(mat3(model))) * aNormal);
 }

@@ -181,8 +181,9 @@ namespace DarkMoon {
         auto material = processMaterial(aiMaterial, rm);
         processTextures(aiMaterial, material, rm);
 
+        std::string name = std::string(m_name) + mesh->mName.C_Str();
         std::string meshName = mesh->mName.C_Str();
-        auto currentMesh = rm.loadResource<Mesh>(mesh->mName.C_Str(), vertices, indices, material, meshName, hasBones);
+        auto currentMesh = rm.loadResource<Mesh>(name.c_str(), vertices, indices, material, meshName, hasBones);
 
         m_meshes.push_back(currentMesh);
     }
@@ -198,6 +199,12 @@ namespace DarkMoon {
         aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
         aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_SPECULAR, &specular);
         aiGetMaterialFloat(aiMaterial, AI_MATKEY_SHININESS, &shininess);
+
+        ambient.r = ambient.r == 0 ? 1.0f : ambient.r;
+        ambient.g = ambient.g == 0 ? 1.0f : ambient.g;
+        ambient.b = ambient.b == 0 ? 1.0f : ambient.b;
+
+        //std::cout << ambient.r << " | " << ambient.g << " | " << ambient.b << "\n";
 
         // Create and return Material object
         //auto material = rm.loadResource<Material>(aiMaterial->GetName().C_Str());

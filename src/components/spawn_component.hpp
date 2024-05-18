@@ -7,8 +7,6 @@
 
 struct SpawnComponent
 {
-    enum struct SpawnParts { BONFIRE, TORCH, CAULDRON };
-
     bool active{ false };
-    std::map<SpawnParts, std::tuple<RenderComponent*, ParticleMakerComponent*, PointLightComponent*>> parts{};
+    std::vector<std::tuple<RenderComponent*, ParticleMakerComponent*, PointLightComponent*>> parts{};
 };

@@ -91,8 +91,8 @@ private:
     void checkSliderSound(SoundSystem& ss, OptionSlider& slider);
     void drawSnowEffect(GameEngine& engine, bool generate, vec2f aux);
     void generateSnow(GameEngine& engine, std::size_t num);
-    void setPointLight(GameEngine& engine, EntityManager& em, Entity& e, Node& n, vec3d pos, Color c = { 255, 215, 0, 255 });
-    void setPointLight(GameEngine& engine, PointLightComponent& plc, Node& n, vec3d pos, Color c = { 255, 215, 0, 255 });
+    void setPointLight(GameEngine& engine, EntityManager& em, Entity& e, Node& n, vec3d pos, float intensity = 1.0f, Color c = { 255, 215, 0, 255 });
+    void setPointLight(GameEngine& engine, PointLightComponent& plc, Node& n, vec3d pos, float intensity = 1.0f, Color c = { 255, 215, 0, 255 });
     void drawGrass(GameEngine& engine, RenderComponent& ren, GrassComponent& grass);
 
     bool isSelected{ false };
@@ -117,6 +117,7 @@ private:
     float elapsed_book{ 0.0f };
 
     int coinBarX{}, coinNumberX{};
+    Spell* spellSelected{ nullptr };
 };
 
 #endif // !RENDER_SYSTEM

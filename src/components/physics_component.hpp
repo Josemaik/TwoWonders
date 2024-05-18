@@ -50,7 +50,7 @@ struct PhysicsComponent
 
     bool stopped{ false }, notMove{ false };
     float countdown_stopped{ 0.35f }, elapsed_stopped{ 0.0f };
-    float countdown_afterStop{ 0.5f }, elapsed_afterStop{ countdown_afterStop };
+    float countdown_afterStop{ 0.05f }, elapsed_afterStop{ countdown_afterStop };
     vec3d target{};
 
     vec3d prevPosition{};

@@ -80,7 +80,7 @@ namespace ENGI {
         // Text
         Node* drawText(const char* text, int posX, int posY, int fontSize, Color color, Aligned aligned = Aligned::LEFT);
         Node* createText(vec2i position, std::string text, Font* font, int fontSize, Color textColor, const char* nodeName, Node* parentNode, Aligned align = Aligned::LEFT, bool charByChar = false);
-        Node* createText(vec2i position, std::string text, Color c, const char* nodeName, Node* parentNode, int fontSize = 20);
+        Node* createText(vec2i position, std::string text, Color c, const char* nodeName, Node* parentNode, int fontSize = 20, Aligned align = Aligned::LEFT);
         Node* createTextBox(vec2i position, vec2i size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode, bool charByChar = false);
         Font* getFontDefault();
 
@@ -100,6 +100,9 @@ namespace ENGI {
         // Point Light
         Node* drawPointLight(vec3d position, Color color);
         Node* createPointLight(vec3d position, Color color, const char* nodeName, Node* parentNode);
+
+        // Billboard
+        Node* drawBillboard(std::string path, vec3d position, vec2f size);
 
         // Window
         void initWindow(int width, int height, const char* title);
@@ -149,6 +152,7 @@ namespace ENGI {
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();
         void loadAndResizeImage(const char* name, const char* path, Node* parentNode);
+        void loadAndResizeBillboard(const char* name, const char* path, Node* parentNode);
         void loadAndResizeImageGif(const char* name, const char* filePath);
         void unloadGifsAndTextures();
         void setReplayMode(bool replay, GameData& gd);

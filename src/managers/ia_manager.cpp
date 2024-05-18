@@ -54,6 +54,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     em.addComponent<ColliderComponent>(e, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
     auto& wl = em.addComponent<LifeComponent>(e, LifeComponent{ .life = life });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = element });
+    em.addComponent<SoundComponent>(e);
 
     // if (json.HasMember("orientation"))
     // {

@@ -24,13 +24,15 @@ private:
         for (auto& targetID : att.targets)
         {
             auto& target = *em.getEntityByID(targetID);
-            if (target.hasComponent<LifeComponent>() && target.hasComponent<TypeComponent>())
+            if (target.hasComponent<LifeComponent>())
             {
-                auto& tpc = em.getComponent<TypeComponent>(target);
+                if (target.hasComponent<TypeComponent>())
+                {
+                    auto& tpc = em.getComponent<TypeComponent>(target);
+                    baseDamage *= att.resolveType(tpc.type);
+                }
+
                 auto& life = em.getComponent<LifeComponent>(target);
-
-                baseDamage *= att.resolveType(tpc.type);
-
                 life.decreaseLife(static_cast<int>(baseDamage));
             }
         }
@@ -97,8 +99,8 @@ private:
             {
                 if (target.hasComponent<TypeComponent>())
                 {
-                auto& tpc = em.getComponent<TypeComponent>(target);
-                baseDamage *= att.resolveType(tpc.type);
+                    auto& tpc = em.getComponent<TypeComponent>(target);
+                    baseDamage *= att.resolveType(tpc.type);
                 }
 
                 auto& life = em.getComponent<LifeComponent>(target);
@@ -340,6 +342,7 @@ private:
             {
                 auto& life = em.getComponent<LifeComponent>(target);
                 life.increaseLife(att.damage);
+                em.getSingleton<SoundSystem>().sonido_slime_curar();
             }
         }
         att.targets.clear();

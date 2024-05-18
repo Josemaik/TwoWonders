@@ -107,6 +107,7 @@ void Game::run()
 
     // Incializamos FPSs
     engine.setTargetFPS(30);
+    engine.toggleLights();
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
@@ -125,7 +126,8 @@ void Game::run()
 
     gami.setRandomSeed(seed);
     engine.setReplayMode(li.replay, gami);
-    sound_system.setVolumeMaster(0.3f);
+    sound_system.setVolumeMaster(0.5f);
+    engine.setWindowFullScreen();
 
     // Inicializa una variable donde tener el tiempo entre frames
     float currentTime{};
@@ -203,13 +205,17 @@ void Game::run()
                 inpi.interact = false;
             }
             render_system.drawStory(engine);
+            sound_system.music_stop();
 
             if (li.replay)
                 gami.update();
 
             // TODO - Cuando se implemente el sistema de guardado, cargar el nivel en el que se quedó
             if (!map.isComplete())
+            {
                 map.createMap(em, 0, iam);
+                collision_system.updateOctreeSize(li.mapID);
+            }
 
             break;
         }
@@ -316,9 +322,13 @@ void Game::run()
         // CODIGO DE LA PANTALLA FINAL
         case GameScreen::ENDING:
         {
-            if (input_system.pressEnter(engine))
+            if (inpi.interact)
+            {
                 li.currentScreen = GameScreen::TITLE;
+                inpi.interact = false;
+            }
 
+            input_system.update(em, engine);
             render_system.drawEnding(engine);
             resetGame();
             break;

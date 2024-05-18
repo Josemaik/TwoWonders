@@ -4,8 +4,16 @@ void RenderComponent::destroyMesh()
 {
     //UnloadModel(model);
     meshLoaded = false;
-    if (node)
-        node->setVisible(false);
+    if (node){
+        for (auto& child : node->getChildren()) {
+            if(auto pLight = child->getEntity<DarkMoon::PointLight>())
+                pLight->enabled = false;
+            //if(auto sLight = child->getEntity<DarkMoon::SpotLight>())
+            //    sLight->enabled = false;
+        }
+        //node->destroy();
+        node = nullptr;
+    }
 }
 
 void RenderComponent::setAll(vec3d p, vec3d s, Color c)

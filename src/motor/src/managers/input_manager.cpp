@@ -38,6 +38,12 @@ namespace DarkMoon {
                 return true;
         }
 
+        for (int i = 0; i < GLFW_JOYSTICK_LAST; i++)
+        {
+            if (m_gamepadPressedStates.buttons[i])
+                return true;
+        }
+
         return false;
     }
 
@@ -70,32 +76,20 @@ namespace DarkMoon {
         return name ? name : "Uknown";
     }
 
-    bool InputManager::isGamepadButtonPressed(int gamepad, int button) {
-        if (gamepad < 0 || gamepad >= GLFW_JOYSTICK_LAST || button < 0 || button >= GLFW_GAMEPAD_BUTTON_LAST)
-            return false;
-
-        return m_gamepadStates[gamepad].buttons[button] == GLFW_PRESS;
+    bool InputManager::isGamepadButtonPressed(int, int button) {
+        return m_gamepadPressedStates.buttons[button];
     }
 
-    bool InputManager::isGamepadButtonDown(int gamepad, int button) {
-        if (gamepad < 0 || gamepad >= GLFW_JOYSTICK_LAST || button < 0 || button >= GLFW_GAMEPAD_BUTTON_LAST)
-            return false;
-
-        return m_gamepadStates[gamepad].buttons[button] == GLFW_PRESS;
+    bool InputManager::isGamepadButtonDown(int, int button) {
+        return m_gamepadStates.buttons[button];
     }
 
-    bool InputManager::isGamepadButtonReleased(int gamepad, int button) {
-        if (gamepad < 0 || gamepad >= GLFW_JOYSTICK_LAST || button < 0 || button >= GLFW_GAMEPAD_BUTTON_LAST)
-            return false;
-
-        return m_gamepadReleaseStates[gamepad].buttons[button] == GLFW_PRESS;
+    bool InputManager::isGamepadButtonReleased(int, int button) {
+        return m_gamepadReleasedStates.buttons[button];
     }
 
-    bool InputManager::isGamepadButtonUp(int gamepad, int button) {
-        if (gamepad < 0 || gamepad >= GLFW_JOYSTICK_LAST || button < 0 || button >= GLFW_GAMEPAD_BUTTON_LAST)
-            return false;
-
-        return m_gamepadStates[gamepad].buttons[button] == GLFW_RELEASE;
+    bool InputManager::isGamepadButtonUp(int, int button) {
+        return !m_gamepadStates.buttons[button];
     }
 
     int InputManager::getGamepadAxisCount(int gamepad) {
@@ -104,28 +98,13 @@ namespace DarkMoon {
         return axes;
     }
 
-    float InputManager::getGamepadAxisMovement(int gamepad, int axis) {
-        return m_gamepadStates[gamepad].axes[axis];
+    float InputManager::getGamepadAxisMovement(int, int axis) {
+        return m_gamepadStates.axes[axis];
     }
 
     // Update
 
-    void InputManager::updateBeginFrame() {
-        // Update gamepad state
-        int jid = 0;
-        GLFWgamepadstate gamepadState;
-        if (glfwGetGamepadState(jid, &gamepadState)) {
-            m_gamepadStates[jid] = gamepadState;
-            // m_gamepadReleaseStates[jid] = gamepadState;
-
-            for (int i = 0; i < GLFW_JOYSTICK_LAST + 1; i++) {
-                if (m_gamepadStates[jid].buttons[i] == GLFW_RELEASE)
-                    m_gamepadReleaseStates[jid].buttons[i] = 1;
-                else
-                    m_gamepadReleaseStates[jid].buttons[i] = 0;
-            }
-        }
-    }
+    void InputManager::updateBeginFrame() {};
 
     void InputManager::updateEndFrame() {
         // Update mouse state
@@ -135,6 +114,24 @@ namespace DarkMoon {
         // Update key state
         for (auto& sta : m_keyReleaseStates) sta = false;
         for (auto& sta : m_keyPressedStates) sta = false;
+
+        // Update gamepad state
+        for (auto& sta : m_gamepadReleasedStates.buttons) sta = false;
+        for (auto& sta : m_gamepadPressedStates.buttons) sta = false;
+
+        int jid = 0;
+        if (glfwGetGamepadState(jid, &m_gamepadStates)) {
+            for (int i = 0; i < GLFW_JOYSTICK_LAST; i++) {
+                if (m_gamepadStates.buttons[i] && !m_gamepadStatesprev.buttons[i]) {
+                    m_gamepadPressedStates.buttons[i] = true;
+                }
+                if (!m_gamepadStates.buttons[i] && m_gamepadStatesprev.buttons[i]) {
+                    m_gamepadReleasedStates.buttons[i] = true;
+                }
+            }
+
+            m_gamepadStatesprev = m_gamepadStates;
+        }
     }
 
     // Input-related functions: mouse

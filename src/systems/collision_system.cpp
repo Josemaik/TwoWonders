@@ -377,7 +377,7 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         if (otherEnt.hasComponent<LifeComponent>() && otherEnt.hasTag<SlimeTag>()) {
             em.getComponent<LifeComponent>(otherEnt).increaseLife();
         }
-        em.getSingleton<SoundSystem>().sonido_slime_curar();
+        //em.getSingleton<SoundSystem>().sonido_slime_curar();
         return;
     }
 
@@ -444,8 +444,6 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
 
 void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt, Entity& otherEnt, PhysicsComponent& statPhy, PhysicsComponent& othrPhy, vec3d& minOverlap, BehaviorType behaviorType1, BehaviorType behaviorType2)
 {
-    auto& li = em.getSingleton<LevelInfo>();
-
     // Sacamos punteros de las físicas y de las entidades para poder hacer swaps
     auto* staticPhy = &statPhy;
     auto* otherPhy = &othrPhy;
@@ -494,28 +492,24 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
             return;
     }
 
+    // Si cualquiera de los impactos es con una bala, se baja la vida del otro
+    if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
+    {
+        if (staticEntPtr->hasTag<DestructibleTag>() && staticEntPtr->hasComponent<LifeComponent>() && otherEntPtr->hasComponent<AttackComponent>())
+        {
+            auto& attack = em.getComponent<AttackComponent>(*otherEntPtr);
+            if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(attack.type)) {
+                em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
+                attack.doEffect = true;
+            }
+        }
+        return;
+    }
+
     // Colisiones con el suelo
     if (staticEntPtr->hasTag<GroundTag>() && !otherEntPtr->hasTag<HitPlayerTag>())
     {
         groundCollision(*otherPhy, *staticPhy, minOverlap);
-        return;
-    }
-
-    // Si cualquiera de los impactos es con una bala, se baja la vida del otro
-    if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
-    {
-        if (staticEntPtr->hasTag<DestructibleTag>() && staticEntPtr->hasComponent<LifeComponent>() && otherEntPtr->hasComponent<TypeComponent>())
-        {
-            auto& bulletType = em.getComponent<TypeComponent>(*otherEntPtr);
-            if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(bulletType.type)) {
-                em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
-            }
-        }
-
-        // Esto es para efectos secundarios de los ataques
-        if (!otherEntPtr->hasComponent<ObjectComponent>())
-            li.insertDeath(otherEntPtr->getID());
-
         return;
     }
 

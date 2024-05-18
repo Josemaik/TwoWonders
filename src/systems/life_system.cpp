@@ -58,7 +58,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             {
                 em.getSingleton<SoundSystem>().sonido_slime_danyo();
             }
-            else if (ent.hasTag<SpiderTag>()) 
+            else if (ent.hasTag<SpiderTag>())
             {
 
             }
@@ -98,24 +98,49 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             //si es un golem
             if (ent.hasTag<GolemTag>()) {
                 if (!lif.decreaseNextFrame) {
+                    // auto& ia = em.getComponent<AIComponent>(ent);
                     lif.decreaseNextFrame = true;
                     em.getSingleton<SoundSystem>().sonido_golem_muere();
+                    if (ent.hasComponent<SoundComponent>()) {
+                        auto& sc = em.getComponent<SoundComponent>(ent);
+                        em.getSingleton<SoundSystem>().stop_enemigo_mov(sc.sound_mov);
+                    }
+
                 }
                 else
                     lif.decreaseNextFrame = false;
-                //  if (ent.hasComponent<AttackerComponent>()) {
-                //     em.getComponent<AttackerComponent>(ent).attack(AttackType::AreaAttack);
-                //  }
             }
 
             //si es un snowman
             if (ent.hasTag<SnowmanTag>()) {
                 if (!lif.decreaseNextFrame)
+                {
                     em.getSingleton<SoundSystem>().sonido_munyeco_muere();
+                    if (ent.hasComponent<SoundComponent>())
+                    {
+                        auto& sc = em.getComponent<SoundComponent>(ent);
+                        em.getSingleton<SoundSystem>().stop_enemigo_mov(sc.sound_mov);
+                    }
+                }
             }
             if (ent.hasTag<SlimeTag>()) {
                 if (!lif.decreaseNextFrame)
+                {
                     em.getSingleton<SoundSystem>().sonido_slime_muere();
+                    if (ent.hasComponent<SoundComponent>())
+                    {
+                        auto& sc = em.getComponent<SoundComponent>(ent);
+                        em.getSingleton<SoundSystem>().stop_enemigo_mov(sc.sound_mov);
+                    }
+
+                }
+            }
+            if (ent.hasTag<PlayerTag>()) {
+                if (!lif.decreaseNextFrame)
+                {
+                    em.getSingleton<SoundSystem>().sonido_jugador_muere();
+
+                }
             }
 
             //Si es una bala

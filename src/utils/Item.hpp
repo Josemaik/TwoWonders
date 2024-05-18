@@ -63,8 +63,8 @@ struct Spell : public Item
         return atkType == other;
     }
 
-    AttackType atkType{};
-    double cost{};
+    AttackType atkType{ AttackType::None };
+    double cost{ 0.0 };
 };
 
 struct Staff : public Item

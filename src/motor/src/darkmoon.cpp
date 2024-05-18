@@ -7,7 +7,7 @@ namespace DarkMoon {
         m_rootNode = std::make_unique<Node>();
         m_rootNode->name = "Scene";
 
-        // Create Default Light
+        // Create Default Light // -0.7 | -1 | 0
         auto light = CreateDirectionalLight({ 0.0f, -1.0f, 0.0f }, D_WHITE, "Default directional light", GetRootNode());
         auto eLight = light->getEntity<DirectionalLight>();
         eLight->ambientIntensity = 1.0f;
@@ -505,6 +505,7 @@ namespace DarkMoon {
             m_renderManager.shaders["depth"] = LoadShader("shaderDepth", "assets/shaders/depth.vs", "assets/shaders/depth.fs");
             m_renderManager.shaders["default"] = LoadShader("shaderDefault", "assets/shaders/default.vs", "assets/shaders/default.fs");
             m_renderManager.shaders["billboard"] = LoadShader("shaderBillboard", "assets/shaders/billboard.vs", "assets/shaders/billboard.fs", "assets/shaders/billboard.gs");
+            //m_renderManager.shaders["3Dv2"] = LoadShader("shader3Dv2", "assets/shaders/3Dv2.vs", "assets/shaders/3Dv2.fs");
 
             //----- Font -----//
             m_renderManager.defaultFont = LoadFont("assets/fonts/Capriola-Regular.ttf");
