@@ -269,11 +269,11 @@ void Game::run()
             {
                 while (elapsed >= timeStepDouble120)
                 {
-                    using std::chrono::high_resolution_clock;
-                    using std::chrono::duration_cast;
-                    using std::chrono::duration;
-                    using std::chrono::microseconds;
-                    auto t1 = high_resolution_clock::now();
+                    //using std::chrono::high_resolution_clock;
+                    //using std::chrono::duration_cast;
+                    //using std::chrono::duration;
+                    //using std::chrono::microseconds;
+                    //auto t1 = high_resolution_clock::now();
 
                     elapsed -= timeStepDouble120;
                     ai_system.update(em);
@@ -291,9 +291,9 @@ void Game::run()
                     if (li.showParticles)
                         particle_system.update(em);
 
-                    auto t2 = high_resolution_clock::now();
-                    auto dur = duration_cast<microseconds>(t2 - t1);
-                    std::cout << "Physics System: " << dur.count() << "us" << std::endl;
+                    //auto t2 = high_resolution_clock::now();
+                    //auto dur = duration_cast<microseconds>(t2 - t1);
+                    //std::cout << "Physics System: " << dur.count() << "us" << std::endl;
                 }
 
                 // Borramos las entidades muertas

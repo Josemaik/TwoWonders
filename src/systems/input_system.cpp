@@ -113,6 +113,28 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         //ge.toggleLights();
     }
 
+    // Pruebas Shader Cartoon
+    /*
+    if(ge.dmeg.IsKeyDown(D_KEY_1))
+        ge.dmeg.SetDepthThresholdValue(ge.dmeg.GetDepthThresholdValue() + 0.01f);
+    if(ge.dmeg.IsKeyDown(D_KEY_2))
+        ge.dmeg.SetDepthThresholdValue(ge.dmeg.GetDepthThresholdValue() - 0.01f < 0 ? 0 : ge.dmeg.GetDepthThresholdValue() - 0.01f);
+
+    if(ge.dmeg.IsKeyDown(D_KEY_3))
+        ge.dmeg.SetNormalThresholdValue(ge.dmeg.GetNormalThresholdValue() + 0.01f);
+    if(ge.dmeg.IsKeyDown(D_KEY_4))
+        ge.dmeg.SetNormalThresholdValue(ge.dmeg.GetNormalThresholdValue() - 0.01f < 0 ? 0 : ge.dmeg.GetNormalThresholdValue() - 0.01f);
+
+    if(ge.dmeg.IsKeyDown(D_KEY_5))
+        ge.dmeg.SetOutlineColor(ge.dmeg.GetOutlineColor() + glm::vec4({0.0f, 0.0f, 0.0f, 0.01f}));
+    if(ge.dmeg.IsKeyDown(D_KEY_6))
+        ge.dmeg.SetOutlineColor(ge.dmeg.GetOutlineColor() - glm::vec4({0.0f, 0.0f, 0.0f, 0.01f}));
+
+    std::cout << "-------------------------\n";
+    std::cout << "DepthThreshold: " << ge.dmeg.GetDepthThresholdValue() << "\n";
+    std::cout << "NormalThreshold: " << ge.dmeg.GetNormalThresholdValue() << "\n";
+    */
+
     // Sacamos las físicas y el input del jugador
     auto& phy = em.getComponent<PhysicsComponent>(player);
     if (phy.stopped && phy.elapsed_afterStop >= phy.countdown_afterStop)

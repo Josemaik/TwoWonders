@@ -134,10 +134,13 @@ namespace DarkMoon {
         void SetDepthThresholdValue(float depthThreshold) { 
             m_renderManager.depthThreshold = depthThreshold;
         };
-
         float GetNormalThresholdValue() { return m_renderManager.normalThreshold; };
         void SetNormalThresholdValue(float normalThreshold) { 
             m_renderManager.normalThreshold = normalThreshold;
+        };
+        glm::vec4 GetOutlineColor() { return m_renderManager.outlineColor; };
+        void SetOutlineColor(glm::vec4 outlineColor) {
+            m_renderManager.outlineColor = outlineColor;
         };
 
         // ------------------------ //
