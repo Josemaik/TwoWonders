@@ -162,7 +162,7 @@ using CL = MP::TypeList <
     SpawnComponent,
     PointLightComponent,
     GrassComponent,
-    AnimationComponent
+    AnimationComponent,
     SoundComponent
 > ;
 using TL = MP::TypeList <
