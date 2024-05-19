@@ -281,6 +281,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             plfi.currentSpell = plfi.noSpell;
             em.getComponent<AttackerComponent>(player).attack(AttackType::MeleePlayer);
             anc.animToPlay = 1;
+            phy.stopped = true;
         }
 
         auto& atc = em.getComponent<AttackerComponent>(player);

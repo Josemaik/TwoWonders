@@ -41,42 +41,6 @@ struct AnimationManager
         }
     }
 
-    void UpdateAnimation(float dt)
-    {
-        for (std::size_t id = 0; id < m_Animations.size(); id++)
-        {
-            auto& anim = m_Animations[id];
-            if (anim.m_CurrentAnimation) {
-                anim.m_CurrentTime = myFmod(anim.m_CurrentTime + anim.m_CurrentAnimation->getTicksPerSecond() * dt, anim.m_CurrentAnimation->getDuration());
-
-                float transitionTime = anim.m_CurrentAnimation->getTicksPerSecond() * 0.2f;
-                if (anim.interpolating && anim.interTime <= transitionTime) {
-                    anim.interTime += anim.m_CurrentAnimation->getTicksPerSecond() * dt;
-                    calculateBoneTransition(anim.m_CurrentAnimation->getRootNode(), glm::mat4(1.0f), anim.m_CurrentAnimation, anim.m_NextAnimation, anim.haltTime, anim.interTime, transitionTime, id);
-                    continue;
-                }
-                else if (anim.interpolating) {
-                    if (anim.m_QueueAnimation) {
-                        anim.m_CurrentAnimation = anim.m_NextAnimation;
-                        anim.haltTime = 0.0f;
-                        anim.m_NextAnimation = anim.m_QueueAnimation;
-                        anim.m_QueueAnimation = nullptr;
-                        anim.m_CurrentTime = 0.0f;
-                        anim.interTime = 0.0;
-                        continue;
-                    }
-
-                    anim.interpolating = false;
-                    anim.m_CurrentAnimation = anim.m_NextAnimation;
-                    anim.m_CurrentTime = 0.0;
-                    anim.interTime = 0.0;
-                }
-
-                calculateBoneTransform(anim.m_CurrentAnimation->getRootNode(), glm::mat4(1.0f), anim.m_CurrentAnimation, anim.m_CurrentTime, id);
-            }
-        }
-    }
-
     void UpdateAnimation(float dt, std::size_t id)
     {
         auto& anim = m_Animations[id];
@@ -207,6 +171,11 @@ struct AnimationManager
         return result;
     }
 
+    float getCurrentInSecs(std::size_t id)
+    {
+        return m_Animations[id].m_CurrentTime / m_Animations[id].m_CurrentAnimation->getTicksPerSecond();
+    }
+
     glm::mat4 getBoneTransform(const std::string& name, Animation* animation)
     {
         auto* bone = animation->findBone(name);
@@ -214,14 +183,6 @@ struct AnimationManager
             return bone->getTransform();
 
         return glm::mat4(1.0f);
-    }
-
-    Animation* createAnimation(const std::string& animationPath, std::vector<BoneInfo>& modelBones)
-    {
-        auto animation = std::make_unique<Animation>(animationPath, modelBones);
-        auto rawPtr = animation.get();
-        m_AnimationList.push_back(std::move(animation));
-        return rawPtr;
     }
 
     std::vector<Animation*> createAnimations(const std::string& animationPath, std::vector<BoneInfo>& modelBones)
