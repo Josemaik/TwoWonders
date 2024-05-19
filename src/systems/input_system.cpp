@@ -108,8 +108,10 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     if (ge.isKeyReleased(D_KEY_F11))
         ge.setWindowFullScreen();
 
-    if (ge.isKeyReleased(D_KEY_F12))
-        ge.toggleLights();
+    if (ge.isKeyReleased(D_KEY_F12)){
+        ge.dmeg.ToggleShaderCartoon();
+        //ge.toggleLights();
+    }
 
     // Sacamos las físicas y el input del jugador
     auto& phy = em.getComponent<PhysicsComponent>(player);

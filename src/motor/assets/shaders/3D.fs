@@ -85,18 +85,18 @@ vec4 CalcLightInternal(BaseLight light, vec3 lightDirection, vec3 normal)
                        diffuseFactor;
     }
 
-    vec3 viewDir = normalize(-FragPos);
-    vec3 reflectDir = reflect(-lightDirection, normal);
-    float specularFactor = dot(viewDir, reflectDir);
+    // vec3 viewDir = normalize(-FragPos);
+    // vec3 reflectDir = reflect(-lightDirection, normal);
+    // float specularFactor = dot(viewDir, reflectDir);
 
-    if(specularFactor > 0)
-    {
-        specularFactor = pow(specularFactor, Shininess);
-        specularColor = vec4(light.color, 1.0f) *
-                        Shininess *
-                        vec4(Ks, 1.0f) *
-                        specularFactor;
-    }
+    // if(specularFactor > 0)
+    // {
+    //     specularFactor = pow(specularFactor, Shininess);
+    //     specularColor = vec4(light.color, 1.0f) *
+    //                     Shininess *
+    //                     vec4(Ks, 1.0f) *
+    //                     specularFactor;
+    // }
 
     return (ambientColor + diffuseColor + specularColor);
 }
@@ -147,9 +147,95 @@ vec4 Phong()
 	return totalLight;
 }
 
+// SHADER CARTOON //
+
+uniform bool activeShaderCartoon;
+
+uniform float depthThreshold;
+uniform float normalThreshold;
+uniform vec4 _outlineColor;
+
+mat3 sobelX = mat3(
+    -1.0, 0.0, 1.0,
+    -2.0, 0.0, 2.0,
+    -1.0, 0.0, 1.0
+);
+
+mat3 sobelY = mat3(
+    -1.0, -2.0, -1.0,
+     0.0,  0.0,  0.0,
+     1.0,  2.0,  1.0
+);
+
+float CalcDepthGradient()
+{
+    float center = texture(texture0, TextCoord).a;
+    float gx = 0.0;
+    float gy = 0.0;
+    vec2 tex_offset = 1.0 / textureSize(texture0, 0);
+
+    for(int i = 0; i < 3; i++)
+    {
+        for(int j = 0; j < 3; j++)
+        {
+            vec2 offset = vec2(i-1, j-1) * tex_offset;
+            float sample = texture(texture0, TextCoord + offset).a;
+            gx += (sample - center) * sobelX[i][j];
+            gy += (sample - center) * sobelY[i][j];
+        }
+    }
+
+    float gradient = sqrt(gx * gx + gy * gy);
+
+    return min(pow(gradient / depthThreshold, 2), 1.0);
+}
+
+float CalcNormalGradient()
+{
+    vec3 center =  texture(texture0, TextCoord).rgb;
+    float gx = 0.0;
+    float gy = 0.0;
+    vec2 tex_offset = 1.0 / textureSize(texture0, 0);
+
+    for(int i = 0; i < 3; i++)
+    {
+        for(int j = 0; j < 3; j++)
+        {
+            vec2 offset = vec2(i-1, j-1) * tex_offset;
+            vec3 sample = texture(texture0, TextCoord + offset).rgb;
+            gx += length(sample - center) * sobelX[i][j];
+            gy += length(sample - center) * sobelY[i][j];
+        }
+    }
+
+    float gradient = sqrt(gx * gx + gy * gy);
+
+    return min(pow(gradient / normalThreshold, 2), 1.0);
+}
+
+vec4 ShaderCartoon()
+{
+    vec3 sceneColor = texture(texture0, TextCoord).rgb;
+
+    float sobelDepth = CalcDepthGradient();
+    float soberNormal = CalcNormalGradient();
+
+    float sobelOutline = clamp(max(sobelDepth, soberNormal), 0.0, 1.0);
+    vec3 outlineColor = mix(sceneColor, _outlineColor.rgb, sobelOutline);
+    
+    vec3 color = mix(sceneColor, outlineColor, sobelOutline);
+
+    return vec4(color, 1.0);
+}
+
 void main(){
-	if(activeLights)
-		FragColor = texture(texture0, TextCoord) * customColor * Phong();
+
+    vec4 textureShader = texture(texture0, TextCoord);
+    if(activeShaderCartoon)
+        textureShader = ShaderCartoon();
+
+    if(activeLights)
+		FragColor = textureShader * customColor * Phong();
 	else
-   		FragColor = texture(texture0, TextCoord) * customColor;
+   		FragColor = textureShader * customColor;
 }
