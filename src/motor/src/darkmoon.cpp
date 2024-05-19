@@ -339,29 +339,29 @@ namespace DarkMoon {
         return p_nodeModel;
     }
 
-    //Animations
+    // Play animation
     std::size_t DarkMoonEngine::PlayAnimation(Animation* panimation) {
         return m_animationManager.PlayAnimation(panimation);
     }
 
+    // Stop animation
     void DarkMoonEngine::StopAnimation(std::size_t idanim) {
         m_animationManager.StopAnimation(idanim);
     }
 
-    Animation* DarkMoonEngine::CreateAnimation(const std::string& path, std::vector<BoneInfo>& vecbones) {
-        return m_animationManager.createAnimation(path, vecbones);
-    }
-
+    // Create animations
     std::vector<Animation*> DarkMoonEngine::CreateAnimations(const std::string& path, std::vector<BoneInfo>& vecbones) {
         return m_animationManager.createAnimations(path, vecbones);
     }
 
-    void DarkMoonEngine::UpdateAnimations() {
-        m_animationManager.UpdateAnimation(static_cast<float>(GetFrameTime() * 2));
+    // Update animation
+    void DarkMoonEngine::UpdateAnimation(float mult, std::size_t id) {
+        m_animationManager.UpdateAnimation(static_cast<float>(GetFrameTime()) * mult, id);
     }
 
-    void DarkMoonEngine::UpdateAnimations(float mult, std::size_t id) {
-        m_animationManager.UpdateAnimation(static_cast<float>(GetFrameTime()) * mult, id);
+    // Get animation time
+    float DarkMoonEngine::GetAnimationTime(std::size_t id) {
+        return m_animationManager.getCurrentInSecs(id);
     }
 
     // Create billboard in node

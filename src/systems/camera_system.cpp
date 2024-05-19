@@ -146,7 +146,7 @@ void CameraSystem::updateFrustum(EntityManager& em, GameEngine& ge, vec3d& camer
     float halfWidth = aspectRatio * halfHeight;
 
     constexpr static float nearPlane = 0.1f;
-    constexpr static float farPlane = 1000.0f;
+    constexpr static float farPlane = 100.0f;
 
     frustum.setFrustum(-halfWidth, halfWidth, -halfHeight, halfHeight, nearPlane, farPlane, cameraPos.to_other<float>(), cameraTar.to_other<float>(), cameraUp);
 

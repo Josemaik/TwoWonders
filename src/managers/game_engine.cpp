@@ -1147,7 +1147,8 @@ void ENGI::GameEngine::nodeClear(Node* node)
     }
 }
 
-//Animaciones
+///// Animations /////
+
 std::size_t ENGI::GameEngine::playAnimation(Animation* panimation) {
     return dmeg.PlayAnimation(panimation);
 }
@@ -1156,18 +1157,14 @@ void ENGI::GameEngine::stopAnimation(std::size_t idanim) {
     dmeg.StopAnimation(idanim);
 }
 
-Animation* ENGI::GameEngine::createAnimation(const std::string& path, std::vector<BoneInfo>& vecbones) {
-    return dmeg.CreateAnimation(path, vecbones);
-}
-
 std::vector<Animation*> ENGI::GameEngine::createAnimations(const std::string& path, std::vector<BoneInfo>& vecbones) {
     return dmeg.CreateAnimations(path, vecbones);
 }
 
-void ENGI::GameEngine::updateAnimations() {
-    dmeg.UpdateAnimations();
+void ENGI::GameEngine::updateAnimation(float mult, std::size_t id) {
+    dmeg.UpdateAnimation(mult, id);
 }
 
-void ENGI::GameEngine::updateAnimations(float mult, std::size_t id) {
-    dmeg.UpdateAnimations(mult, id);
+float ENGI::GameEngine::getAnimationTime(std::size_t id) {
+    return dmeg.GetAnimationTime(id);
 }

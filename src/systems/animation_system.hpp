@@ -11,5 +11,11 @@ struct AnimationSystem
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em, GameEngine& engine);
+
+private:
+std::map<std::size_t, float> playerAnimMap = {
+    {1, 2.0f},
+    {2, 1.0f}
+};
 };
 

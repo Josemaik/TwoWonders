@@ -29,6 +29,6 @@ struct AnimationComponent
     std::size_t animToPlay{ max };
     std::size_t idCurrent{ max };
     float multiplier{ 1.0 };
-    float timer{ 0.0f };
-    bool stopAnim{ false };
+    float timer{ 0.0f }, currentTime{ 0.0f };
+    bool stopAnim{ false }, animEnded{ false }, aboutToEnd{ false };
 };

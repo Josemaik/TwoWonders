@@ -13,9 +13,8 @@ void AnimationSystem::update(EntityManager& em, GameEngine& engine)
             ac.idCurrent = engine.playAnimation(ac.animationList[ac.animToPlay]);
             auto& meshes = rc.node->getEntity<Model>()->getMeshes();
 
-            for (auto& mesh : meshes) {
+            for (auto& mesh : meshes)
                 mesh->animID = ac.idCurrent;
-            }
 
             if (e.hasTag<PlayerTag>())
             {
@@ -48,7 +47,17 @@ void AnimationSystem::update(EntityManager& em, GameEngine& engine)
         // }
 
         if (ac.currentAnimation != ac.max)
-            engine.updateAnimations(ac.multiplier, ac.idCurrent);
+        {
+            engine.updateAnimation(ac.multiplier, ac.idCurrent);
+            float currentTime = engine.getAnimationTime(ac.idCurrent);
+            if (currentTime < ac.currentTime)
+                ac.animEnded = true;
+
+            ac.currentTime = currentTime;
+
+            if (ac.currentTime > ac.animationList[ac.currentAnimation]->getSekDuration() - 0.5f)
+                ac.aboutToEnd = true;
+        }
 
         if (ac.timer > 0.1f)
         {

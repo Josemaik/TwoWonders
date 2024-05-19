@@ -1,6 +1,7 @@
 #include "windows_manager.hpp"
 
 #include <iostream>
+#include "../libs/stb_image.h"
 
 // Windows manager
 namespace DarkMoon {
@@ -32,6 +33,13 @@ namespace DarkMoon {
             glfwTerminate();
             return false;
         }
+
+        // Set the window icon
+        GLFWimage images[1];
+        images[0].pixels = stbi_load("assets/mago_icon.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
+        glfwSetWindowIcon(m_window, 1, images);
+        stbi_image_free(images[0].pixels);
+
         glfwMakeContextCurrent(m_window);
         //glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback());
 

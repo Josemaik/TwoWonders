@@ -26,7 +26,6 @@ static glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4* from);
 
 struct Animation
 {
-public:
     Animation() = default;
 
     Animation(const std::string& animationPath, std::vector<BoneInfo>& modelBones)
@@ -71,12 +70,11 @@ public:
 
     inline float getDuration() { return duration; }
 
+    inline float getSekDuration() { return duration / tps; }
+
     inline AssimpNodeData* getRootNode() { return &rootNode; }
 
-    inline const std::vector<BoneInfo>& getBoneProps()
-    {
-        return boneProps;
-    }
+    inline const std::vector<BoneInfo>& getBoneProps() { return boneProps; }
 
 private:
     float duration = 0.0f;
