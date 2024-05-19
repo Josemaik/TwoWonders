@@ -23,9 +23,10 @@ struct PlayerInfo
     bool onLadder{ false };
     bool showBook{ false };
     bool attackUpgrade{ false };
+    bool invincible{ false };
     std::vector<std::unique_ptr<Item>> inventory{};
     std::vector<Spell> spells{};
-    Spell noSpell{ "None", "No spell", Spells::None, 0.0, 0 };
+    const Spell noSpell{ "None", "No spell", AttackType::None };
     Spell currentSpell{ noSpell };
     std::array<Spell, 3> spellSlots{ noSpell, noSpell, noSpell };
     std::size_t selectedItem{ max };
@@ -152,7 +153,7 @@ struct PlayerInfo
 
     void reset()
     {
-        currentSpell = { "None", "No spell", Spells::None, 0.0, 0 };
+        currentSpell = noSpell;
         selectedItem = max;
         inventory.clear();
         spells.clear();

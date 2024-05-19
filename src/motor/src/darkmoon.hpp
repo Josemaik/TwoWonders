@@ -12,6 +12,7 @@
 #include "managers/windows_manager.hpp"
 #include "managers/render_manager.hpp"
 #include "managers/input_manager.hpp"
+#include "managers/animator_manager.hpp"
 #include "resources/resource_shader.hpp"
 
 #include "utils/keys.hpp"
@@ -52,9 +53,9 @@ namespace DarkMoon {
         // GUI
 
         // Create text in node
-        Node* CreateText(glm::vec2 position, std::string text, Font* font, int fontSize, Color color, Aligned align, const char* nodeName, Node* parentNode);
+        Node* CreateText(glm::vec2 position, std::string text, Font* font, int fontSize, Color color, Aligned align, bool charByChar, const char* nodeName, Node* parentNode);
         // Create a text box in node
-        Node* CreateTextBox(glm::vec2 position, glm::vec2 size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode);
+        Node* CreateTextBox(glm::vec2 position, glm::vec2 size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, bool charByChar, const char* nodeName, Node* parentNode);
         // Create a button in node
         Node* CreateButton(glm::vec2 position, glm::vec2 size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor, const char* nodeName, Node* parentNode);
         // Create a slider in node
@@ -63,6 +64,10 @@ namespace DarkMoon {
         Node* CreateOptionSlider(glm::vec2 pos, glm::vec2 sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, std::vector<std::string> opts, std::string firstOption, const char* nodeName, Node* parentNode);
         // Create float slider in node
         Node* CreateFloatSlider(glm::vec2 pos, glm::vec2 sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, float initialValue, const char* nodeName, Node* parentNode);
+        // Create checkbox in node
+        Node* CreateCheckbox(glm::vec2 pos, float size, bool checked, Color bCol, Color nCol, Color hCol, const char* nodeName, Node* parentNode);
+        // CReate checkbox with pointer in node
+        Node* CreateCheckboxPtr(glm::vec2 pos, float size, bool* checked, Color bCol, Color nCol, Color hCol, const char* nodeName, Node* parentNode);
 
         // 3D
 
@@ -80,6 +85,8 @@ namespace DarkMoon {
         Node* CreateCubeWires(glm::vec3 position, glm::vec3 size, Color color, const char* nodeName, Node* parentNode);
         // Create model in node
         Node* CreateModel(const char* filePath, Color tint, const char* nodeName, Node* parentNode);
+        // Create billboard in node
+        Node* CreateBillboard(const char* filePath, glm::vec3 position, glm::vec2 size, const char* nodeName, Node* parentNode);
 
         // EXTRA
 
@@ -91,6 +98,8 @@ namespace DarkMoon {
         Font* GetDefaultFont() { return m_renderManager.defaultFont; };
         // Get mouse ray cast
         Ray GetMouseRay();
+        // Get view matrix
+        glm::mat4 GetViewMatrix();
 
         // LIGHTS
 
@@ -98,10 +107,18 @@ namespace DarkMoon {
         Node* CreatePointLight(glm::vec3 position, Color color, const char* nodeName, Node* parentNode);
         // Create directional light in node
         Node* CreateDirectionalLight(glm::vec3 direction, Color color, const char* nodeName, Node* parentNode);
-        // Active lights
+        // Create spot light in node
+        Node* CreateSpotLight(glm::vec3 position, glm::vec3 direction, float cutOff, Color color, const char* nodeName, Node* parentNode);
+        // Toggle lights
         void ToggleLights() { m_renderManager.activeLights = !m_renderManager.activeLights; };
+        // Activate lights
+        void ActivateLights() { m_renderManager.activeLights = true; };
+        // Deactivate lights
+        void DeactivateLights() { m_renderManager.activeLights = false; };
         // Update lights
         void UpdateLights(Node* parentNode);
+        // AuxUpdateLights
+        void AuxUpdateLights(Node* parentNode);
 
         // ------------------------ //
         // Window-related functions //
@@ -167,6 +184,17 @@ namespace DarkMoon {
         void UnloadModel(Model* model);
         // Unload mesh data from CPU and GPU
         void UnloadMesh(Mesh* mesh);
+
+        // Play animation
+        std::size_t PlayAnimation(Animation* panimation);
+        // Stop animation
+        void StopAnimation(std::size_t idanim);
+        // Create animations
+        std::vector<Animation*> CreateAnimations(const std::string& path, std::vector<BoneInfo>& vecbones);
+        // Update animation
+        void UpdateAnimation(float mult, std::size_t id);
+        // Get animation time
+        float GetAnimationTime(std::size_t id);
 
         // --------------------------------- //
         // Input-related functions: keyboard //
@@ -239,7 +267,7 @@ namespace DarkMoon {
         void UnloadFont(Font* font);
 
         // Load shader from file into GPU memory
-        Shader* LoadShader(const char* idShader, const char* vsFilePath, const char* fsFilePath);
+        Shader* LoadShader(const char* idShader, const char* vsFilePath = "", const char* fsFilePath = "", const char* gsFilePath = "");
         // Unload shader from CPU and GPU
         void UnloadShader(Shader* shader);
 
@@ -263,12 +291,15 @@ namespace DarkMoon {
 
         // Set target FPS (max)
         void SetTargetFPS(int fps);
+        // Get target FPS
+        double GetTargetFPS();
         // Get time in seconds for last frame drawn
         double GetFrameTime();
         // Get elapsed time in seconds
         double GetTime();
         // Get current FPS
         int GetFPS();
+
 
     private:
         // Root node 
@@ -279,5 +310,6 @@ namespace DarkMoon {
         RenderManager& m_renderManager = RenderManager::getInstance();
         WindowsManager& m_windowsManager = WindowsManager::getInstance();
         ResourceManager& m_resourceManager = ResourceManager::getInstance();
+        AnimationManager& m_animationManager = AnimationManager::getInstance();
     };
 }

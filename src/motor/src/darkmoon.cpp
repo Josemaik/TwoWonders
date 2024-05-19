@@ -7,8 +7,11 @@ namespace DarkMoon {
         m_rootNode = std::make_unique<Node>();
         m_rootNode->name = "Scene";
 
-        // Create Default Light
-        CreateDirectionalLight({ 0.0f, tan(-45.0f), -1.0f }, D_WHITE, "Default directional light", GetRootNode());
+        // Create Default Light // -0.7 | -1 | 0
+        auto light = CreateDirectionalLight({ 0.0f, -1.0f, 0.0f }, D_WHITE, "Default directional light", GetRootNode());
+        auto eLight = light->getEntity<DirectionalLight>();
+        eLight->ambientIntensity = 1.0f;
+        eLight->diffuseIntensity = 0.1f;
 
         // Create Default Camera
         auto eCamera = CreateCamera("Default Camera", GetRootNode());
@@ -152,11 +155,11 @@ namespace DarkMoon {
     // GUI
 
     // Create text in node
-    Node* DarkMoonEngine::CreateText(glm::vec2 position, std::string text, Font* font, int fontSize, Color color, Aligned align, const char* nodeName, Node* parentNode) {
+    Node* DarkMoonEngine::CreateText(glm::vec2 position, std::string text, Font* font, int fontSize, Color color, Aligned align, bool charByChar, const char* nodeName, Node* parentNode) {
         auto p_nodeText = CreateNode(nodeName, parentNode);
 
         // Create text
-        auto textE = std::make_unique<Text>(position, text, font, fontSize, color, align);
+        auto textE = std::make_unique<Text>(position, text, font, fontSize, color, align, charByChar);
 
         p_nodeText->translate({ position.x, position.y, 0.0f });
         p_nodeText->setEntity(std::move(textE));
@@ -165,11 +168,11 @@ namespace DarkMoon {
     }
 
     // Create a text box in node
-    Node* DarkMoonEngine::CreateTextBox(glm::vec2 position, glm::vec2 size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode) {
+    Node* DarkMoonEngine::CreateTextBox(glm::vec2 position, glm::vec2 size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, bool charByChar, const char* nodeName, Node* parentNode) {
         auto p_nodeTextBox = CreateNode(nodeName, parentNode);
 
         // Create text box
-        auto textBoxE = std::make_unique<TextBox>(position, size, boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned);
+        auto textBoxE = std::make_unique<TextBox>(position, size, boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned, charByChar);
 
         p_nodeTextBox->translate({ position.x, position.y, 0.0f });
         p_nodeTextBox->setEntity(std::move(textBoxE));
@@ -227,6 +230,30 @@ namespace DarkMoon {
         p_nodeFloatSlider->setEntity(std::move(floatSliderE));
 
         return p_nodeFloatSlider;
+    }
+
+    Node* DarkMoonEngine::CreateCheckbox(glm::vec2 pos, float size, bool checked, Color bCol, Color nCol, Color hCol, const char* nodeName, Node* parentNode) {
+        auto p_nodeCheckbox = CreateNode(nodeName, parentNode);
+
+        // Create checkbox
+        auto checkboxE = std::make_unique<CheckBox>(pos, size, checked, bCol, nCol, hCol);
+
+        p_nodeCheckbox->translate({ pos.x, pos.y, 0.0f });
+        p_nodeCheckbox->setEntity(std::move(checkboxE));
+
+        return p_nodeCheckbox;
+    }
+
+    Node* DarkMoonEngine::CreateCheckboxPtr(glm::vec2 pos, float size, bool* checked, Color bCol, Color nCol, Color hCol, const char* nodeName, Node* parentNode) {
+        auto p_nodeCheckbox = CreateNode(nodeName, parentNode);
+
+        // Create checkbox
+        auto checkboxE = std::make_unique<CheckBoxPtr>(pos, size, checked, bCol, nCol, hCol);
+
+        p_nodeCheckbox->translate({ pos.x, pos.y, 0.0f });
+        p_nodeCheckbox->setEntity(std::move(checkboxE));
+
+        return p_nodeCheckbox;
     }
 
     // 3D
@@ -312,6 +339,45 @@ namespace DarkMoon {
         return p_nodeModel;
     }
 
+    // Play animation
+    std::size_t DarkMoonEngine::PlayAnimation(Animation* panimation) {
+        return m_animationManager.PlayAnimation(panimation);
+    }
+
+    // Stop animation
+    void DarkMoonEngine::StopAnimation(std::size_t idanim) {
+        m_animationManager.StopAnimation(idanim);
+    }
+
+    // Create animations
+    std::vector<Animation*> DarkMoonEngine::CreateAnimations(const std::string& path, std::vector<BoneInfo>& vecbones) {
+        return m_animationManager.createAnimations(path, vecbones);
+    }
+
+    // Update animation
+    void DarkMoonEngine::UpdateAnimation(float mult, std::size_t id) {
+        m_animationManager.UpdateAnimation(static_cast<float>(GetFrameTime()) * mult, id);
+    }
+
+    // Get animation time
+    float DarkMoonEngine::GetAnimationTime(std::size_t id) {
+        return m_animationManager.getCurrentInSecs(id);
+    }
+
+    // Create billboard in node
+    Node* DarkMoonEngine::CreateBillboard(const char* filePath, glm::vec3 position, glm::vec2 size, const char* nodeName, Node* parentNode) {
+        auto p_nodeBillboard = CreateNode(nodeName, parentNode);
+
+        // Load Texture
+        auto texture = LoadTexture2D(filePath);
+
+        // Load Billboard
+        auto billboard = std::make_unique<Billboard>(texture, position, size);
+        p_nodeBillboard->setEntity(std::move(billboard));
+
+        return p_nodeBillboard;
+    }
+
     // EXTRA
 
     // Create camera in node
@@ -336,6 +402,11 @@ namespace DarkMoon {
         return m_renderManager.m_camera->getMouseRay(GetMouseX(), GetMouseY(), m_windowsManager.getScreenWidth(), m_windowsManager.getScreenHeight());
     }
 
+    // Get view matrix
+    glm::mat4 DarkMoonEngine::GetViewMatrix() {
+        return m_renderManager.m_camera->getViewMatrix();
+    }
+
     // LIGHTS
 
     // Create point light in node
@@ -344,8 +415,6 @@ namespace DarkMoon {
         auto light = std::make_unique<PointLight>(position, color);
         p_nodeLight->setEntity(std::move(light));
         p_nodeLight->translate({ position.x, position.y, position.z });
-
-        // m_renderManager.lights.push_back(dynamic_cast<Light*>(p_nodeLight->getEntity()));
 
         return p_nodeLight;
     }
@@ -356,7 +425,15 @@ namespace DarkMoon {
         auto light = std::make_unique<DirectionalLight>(direction, color);
         p_nodeLight->setEntity(std::move(light));
 
-        // m_renderManager.lights.push_back(dynamic_cast<Light*>(p_nodeLight->getEntity()));
+        return p_nodeLight;
+    }
+
+    // Create spot light in node
+    Node* DarkMoonEngine::CreateSpotLight(glm::vec3 position, glm::vec3 direction, float cutOff, Color color, const char* nodeName, Node* parentNode) {
+        auto p_nodeLight = CreateNode(nodeName, parentNode);
+        auto light = std::make_unique<SpotLight>(position, direction, cutOff, color);
+        p_nodeLight->setEntity(std::move(light));
+        p_nodeLight->translate({ position.x, position.y, position.z });
 
         return p_nodeLight;
     }
@@ -365,16 +442,32 @@ namespace DarkMoon {
     void DarkMoonEngine::UpdateLights(Node* parentNode) {
         m_renderManager.updateLights();
 
-        for (auto& child : parentNode->getChildren()) {
-            if (child->getVisible()) {
-                if (auto pLight = child->getEntity<PointLight>())
-                    m_renderManager.pointLights.push_back(pLight);
-                else if (auto dLight = child->getEntity<DirectionalLight>())
-                    m_renderManager.directionalLights.push_back(dLight);
-            }
-        }
+        AuxUpdateLights(parentNode);
 
         m_renderManager.checkLights();
+    }
+
+    // AuxUpdateLights
+    void DarkMoonEngine::AuxUpdateLights(Node* parentNode) {
+        for (auto& child : parentNode->getChildren()) {
+            // Point Light
+            if (auto pLight = child->getEntity<PointLight>()) {
+                if (pLight->enabled)
+                    m_renderManager.pointLights.push_back(pLight);
+            }
+            // Directional Light
+            else if (auto dLight = child->getEntity<DirectionalLight>()) {
+                if (dLight->enabled)
+                    m_renderManager.directionalLights.push_back(dLight);
+            }
+            // Spot Light
+            else if (auto sLight = child->getEntity<SpotLight>()) {
+                if (sLight->enabled)
+                    m_renderManager.spotLights.push_back(sLight);
+            }
+
+            AuxUpdateLights(child);
+        }
     }
 
     // ------------------------ //
@@ -409,6 +502,10 @@ namespace DarkMoon {
             m_renderManager.shaders["3D"] = LoadShader("shader3D", "assets/shaders/3D.vs", "assets/shaders/3D.fs");
             m_renderManager.shaders["text"] = LoadShader("shaderText", "assets/shaders/text.vs", "assets/shaders/text.fs");
             m_renderManager.shaders["lights"] = LoadShader("shaderLights", "assets/shaders/lights.vs", "assets/shaders/lights.fs");
+            m_renderManager.shaders["depth"] = LoadShader("shaderDepth", "assets/shaders/depth.vs", "assets/shaders/depth.fs");
+            m_renderManager.shaders["default"] = LoadShader("shaderDefault", "assets/shaders/default.vs", "assets/shaders/default.fs");
+            m_renderManager.shaders["billboard"] = LoadShader("shaderBillboard", "assets/shaders/billboard.vs", "assets/shaders/billboard.fs", "assets/shaders/billboard.gs");
+            //m_renderManager.shaders["3Dv2"] = LoadShader("shader3Dv2", "assets/shaders/3Dv2.vs", "assets/shaders/3Dv2.fs");
 
             //----- Font -----//
             m_renderManager.defaultFont = LoadFont("assets/fonts/Capriola-Regular.ttf");
@@ -688,8 +785,8 @@ namespace DarkMoon {
     }
 
     // Load shader from file into GPU memory
-    Shader* DarkMoonEngine::LoadShader(const char* idShader, const char* vsFilePath, const char* fsFilePath) {
-        return m_resourceManager.loadResource<Shader>(idShader, vsFilePath, fsFilePath);
+    Shader* DarkMoonEngine::LoadShader(const char* idShader, const char* vsFilePath, const char* fsFilePath, const char* gsFilePath) {
+        return m_resourceManager.loadResource<Shader>(idShader, vsFilePath, fsFilePath, gsFilePath);
     }
 
     // Unload shader from CPU and GPU
@@ -714,6 +811,11 @@ namespace DarkMoon {
     // Set target FPS (max)
     void DarkMoonEngine::SetTargetFPS(int fps) {
         m_windowsManager.setTargetFPS(fps);
+    }
+
+    // Get target FPS
+    double DarkMoonEngine::GetTargetFPS() {
+        return m_windowsManager.getTargetFPS();
     }
 
     // Get time in seconds for last frame drawn

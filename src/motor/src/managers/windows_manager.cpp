@@ -1,6 +1,7 @@
 #include "windows_manager.hpp"
 
 #include <iostream>
+#include "../libs/stb_image.h"
 
 // Windows manager
 namespace DarkMoon {
@@ -32,6 +33,13 @@ namespace DarkMoon {
             glfwTerminate();
             return false;
         }
+
+        // Set the window icon
+        GLFWimage images[1];
+        images[0].pixels = stbi_load("assets/mago_icon.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
+        glfwSetWindowIcon(m_window, 1, images);
+        stbi_image_free(images[0].pixels);
+
         glfwMakeContextCurrent(m_window);
         //glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback());
 
@@ -165,6 +173,10 @@ namespace DarkMoon {
         m_targetFrameTime = 1.0 / targetFPS;
     }
 
+    double WindowsManager::getTargetFPS() {
+        return 1.0 / m_targetFrameTime;
+    }
+
     double WindowsManager::getFrameTime() {
         return m_deltaTime;
     }
@@ -178,15 +190,17 @@ namespace DarkMoon {
     }
 
     void WindowsManager::controlFrameRate() {
-        double currentFrameTime = glfwGetTime();
-        m_deltaTime =  currentFrameTime - m_lastFrameTime;
+        double currentFrameTime = tim.getElapsedTime();
+        m_deltaTime = currentFrameTime - m_lastFrameTime;
         m_lastFrameTime = currentFrameTime;
 
         double sleepTime = m_targetFrameTime - m_deltaTime;
         if (sleepTime > 0.0) {
-            std::chrono::milliseconds sleepDuration(static_cast<long long>(sleepTime * 1000));
-            std::this_thread::sleep_for(sleepDuration);
-            currentFrameTime = glfwGetTime();
+            double endTime = currentFrameTime + sleepTime;
+            while (tim.getElapsedTime() < endTime) {
+                // Bucle activo
+            }
+            currentFrameTime = tim.getElapsedTime();
             m_deltaTime = currentFrameTime - m_lastFrameTime;
             m_lastFrameTime = currentFrameTime;
         }

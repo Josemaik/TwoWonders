@@ -1,5 +1,4 @@
 #include "game_engine.hpp"
-#include <chrono>
 
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
@@ -20,6 +19,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["Menu"] = dmeg.CreateNode("Menu", rootNode);
     nodes["HUD"] = dmeg.CreateNode("HUD", nodes["2D"]);
     nodes["Book"] = dmeg.CreateNode("Book", nodes["HUD"]);
+    nodes["SnowStarfield"] = dmeg.CreateNode("SnowStarfield", nodes["HUD"]);
     nodes["Dialog"] = dmeg.CreateNode("Dialog", nodes["HUD"]);
     nodes["Gifs"] = dmeg.CreateNode("Gifs", nodes["2D"]);
     nodes["Nums"] = dmeg.CreateNode("Nums", nodes["HUD"]);
@@ -30,6 +30,7 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["Copy"] = dmeg.CreateNode("Copy", nodes["HUD"]);
     nodes["Boat"] = dmeg.CreateNode("Boat", nodes["HUD"]);
     nodes["AnimTextures"] = dmeg.CreateNode("AnimTextures", nodes["HUD"]);
+    nodes["PartTextures"] = dmeg.CreateNode("PartTextures", nodes["HUD"]);
     nodes["Debug"] = dmeg.CreateNode("Debug", nodes["HUD"]);
     nodes["DebugPhy"] = dmeg.CreateNode("DebugPhy", nodes["Debug"]);
     nodes["DebugAI1"] = dmeg.CreateNode("DebugAI1", nodes["Debug"]);
@@ -38,17 +39,28 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     nodes["DebugAI4"] = dmeg.CreateNode("DebugAI4", nodes["Debug"]);
     nodes["MenuPrincipal"] = dmeg.CreateNode("MenuPrincipal", nodes["Menu"]);
     nodes["MenuOpciones"] = dmeg.CreateNode("MenuOpciones", nodes["Menu"]);
+    nodes["MenuCheats"] = dmeg.CreateNode("MenuCheats", nodes["Menu"]);
+    nodes["MenuInventory"] = dmeg.CreateNode("MenuInventory", nodes["Menu"]);
 
     ENGI::GameEngine::setExitKey(D_KEY_F8);
 
     // Fondo Inicio
-    loadAndResizeImage("fondo_inicio", "assets/Inicio_fondo.png", nodes["MenuPrincipal"]);
+    loadAndResizeImage("fondo_inicio", "assets/Principal_fondo.png", nodes["MenuPrincipal"]);
+
+    // Fondo Opciones
+    loadAndResizeImage("fondo_opciones", "assets/Opciones_fondo.png", nodes["MenuOpciones"]);
 
     // Logo TwoWonders
     loadAndResizeImage("logo_twowonders", "assets/logo_two_wonders.png", nodes["MenuPrincipal"]);
 
+    // Fondo Inventario
+    loadAndResizeImage("fondo_inventario", "assets/Inventario-fondo.png", nodes["MenuInventory"]);
+
     // Logo Kaiwa
     loadAndResizeImage("logo_kaiwa", "assets/logo_kaiwa_games.png", nodes["2D"]);
+
+    // Hover Inventario
+    loadAndResizeImage("hover_inventario", "assets/Inventario/Inv-select.png", nodes["MenuInventory"]);
 
     // Corazón HUD
     loadAndResizeImage("heart", "assets/HUD/corazon.png", nodes["Hearts"]);
@@ -70,12 +82,15 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Mago Happy HUD
     loadAndResizeImage("mago_happy", "assets/HUD/caras/mago_happy.png", nodes["Faces"]);
+    loadAndResizeImage("mago_happyInv", "assets/HUD/caras/mago_happy.png", nodes["MenuInventory"]);
 
     // Mago Meh HUD
     loadAndResizeImage("mago_meh", "assets/HUD/caras/mago_meh.png", nodes["Faces"]);
+    loadAndResizeImage("mago_mehInv", "assets/HUD/caras/mago_meh.png", nodes["MenuInventory"]);
 
     // Mago SOS HUD
     loadAndResizeImage("mago_sos", "assets/HUD/caras/mago_sos.png", nodes["Faces"]);
+    loadAndResizeImage("mago_sosInv", "assets/HUD/caras/mago_sos.png", nodes["MenuInventory"]);
 
     // Nómada HUD
     loadAndResizeImage("nomada", "assets/HUD/caras/calabaza3.png", nodes["Faces"]);
@@ -112,34 +127,51 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Cuadro de diálogo
     createTextBox({ 0, 0 }, { 900, 180 }, D_WHITE, "", dmeg.GetDefaultFont(),
-        20, D_BLACK, Aligned::CENTER, Aligned::CENTER, "cuadroDialogo", nodes["Dialog"]);
+        20, D_BLACK, Aligned::CENTER, Aligned::CENTER, "cuadroDialogo", nodes["Dialog"], true);
 
     // Diálogo Siguiente HUD
     loadAndResizeImage("sig", "assets/HUD/dialog_siguiente.png", nodes["Dialog"]);
 
     // Espacio para hechizos de agua HUD
     loadAndResizeImage("placeholder", "assets/HUD/item_agua.png", nodes["AnimTextures"]);
+    loadAndResizeImage("placeholderInv1", "assets/HUD/item_agua.png", nodes["MenuInventory"]);
+    loadAndResizeImage("placeholderInv2", "assets/HUD/item_agua.png", nodes["MenuInventory"]);
+    loadAndResizeImage("placeholderInv3", "assets/HUD/item_agua.png", nodes["MenuInventory"]);
+    loadAndResizeImage("placeholderSelected", "assets/Inventario/inv-select-atq.png", nodes["MenuInventory"]);
+    loadAndResizeImage("objSelection", "assets/Inventario/inv-cont-obj.png", nodes["MenuInventory"]);
 
     // Icono de palo HUD
     loadAndResizeImage("palo", "assets/HUD/palo.png", nodes["AnimTextures"]);
 
     // Icono para las pompas de agua HUD
     loadAndResizeImage("pompas", "assets/HUD/pompas.png", nodes["AnimTextures"]);
+    loadAndResizeImage("pompasInv", "assets/HUD/pompas.png", nodes["MenuInventory"]);
+    loadAndResizeImage("pompasInv2", "assets/HUD/pompas.png", nodes["MenuInventory"]);
 
     // Icono para el dash de agua HUD
     loadAndResizeImage("dash", "assets/HUD/dash.png", nodes["AnimTextures"]);
+    loadAndResizeImage("dashInv", "assets/HUD/dash.png", nodes["MenuInventory"]);
+    loadAndResizeImage("dashInv2", "assets/HUD/dash.png", nodes["MenuInventory"]);
 
     // Icono para la bola de fuego HUD
     loadAndResizeImage("bola_fuego", "assets/HUD/bolafuego.png", nodes["AnimTextures"]);
+    loadAndResizeImage("bola_fuegoInv", "assets/HUD/bolafuego.png", nodes["MenuInventory"]);
+    loadAndResizeImage("bola_fuegoInv2", "assets/HUD/bolafuego.png", nodes["MenuInventory"]);
 
     // Icono para meteoritos HUD
     loadAndResizeImage("meteoritos", "assets/HUD/meteoritos.png", nodes["AnimTextures"]);
+    loadAndResizeImage("meteoritosInv", "assets/HUD/meteoritos.png", nodes["MenuInventory"]);
+    loadAndResizeImage("meteoritosInv2", "assets/HUD/meteoritos.png", nodes["MenuInventory"]);
 
     // Icono para escudo de hielo HUD
     loadAndResizeImage("escudo_hielo", "assets/HUD/escudo.png", nodes["AnimTextures"]);
+    loadAndResizeImage("escudo_hieloInv", "assets/HUD/escudo.png", nodes["MenuInventory"]);
+    loadAndResizeImage("escudo_hieloInv2", "assets/HUD/escudo.png", nodes["MenuInventory"]);
 
     // Icono para las estacas de hielo HUD
     loadAndResizeImage("estacas", "assets/HUD/estacas.png", nodes["AnimTextures"]);
+    loadAndResizeImage("estacasInv", "assets/HUD/estacas.png", nodes["MenuInventory"]);
+    loadAndResizeImage("estacasInv2", "assets/HUD/estacas.png", nodes["MenuInventory"]);
 
     // Libro para enseñar hechizos HUD
     loadAndResizeImage("libro", "assets/HUD/Libro.png", nodes["Book"]);
@@ -156,24 +188,30 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
 
     // Botón círculo HUD 
     loadAndResizeImage("boton_circulo", "assets/HUD/botones/cont_circulo.png", nodes["AnimTextures"]);
+    loadAndResizeImage("boton_circuloInv", "assets/HUD/botones/cont_circulo.png", nodes["MenuInventory"]);
 
     // Botón cuadrado HUD
     loadAndResizeImage("boton_cuadrado", "assets/HUD/botones/cont_cuadrado.png", nodes["AnimTextures"]);
+    loadAndResizeImage("boton_cuadradoInv", "assets/HUD/botones/cont_cuadrado.png", nodes["MenuInventory"]);
 
     // Botón triángulo HUD
     loadAndResizeImage("boton_triangulo", "assets/HUD/botones/cont_triangulo.png", nodes["AnimTextures"]);
+    loadAndResizeImage("boton_trianguloInv", "assets/HUD/botones/cont_triangulo.png", nodes["MenuInventory"]);
 
     // Botón R2 HUD
     loadAndResizeImage("boton_r2", "assets/HUD/botones/cont_R2.png", nodes["AnimTextures"]);
 
     // Tecla J HUD
     loadAndResizeImage("tecla_j", "assets/HUD/teclas/cont_J.png", nodes["AnimTextures"]);
+    loadAndResizeImage("tecla_jInv", "assets/HUD/teclas/cont_J.png", nodes["MenuInventory"]);
 
     // Tecla K HUD
     loadAndResizeImage("tecla_k", "assets/HUD/teclas/cont_K.png", nodes["AnimTextures"]);
+    loadAndResizeImage("tecla_kInv", "assets/HUD/teclas/cont_K.png", nodes["MenuInventory"]);
 
     // Tecla L HUD
     loadAndResizeImage("tecla_l", "assets/HUD/teclas/cont_L.png", nodes["AnimTextures"]);
+    loadAndResizeImage("tecla_lInv", "assets/HUD/teclas/cont_L.png", nodes["MenuInventory"]);
 
     // Tecla Espacio HUD
     loadAndResizeImage("tecla_espacio", "assets/HUD/teclas/cont_space.png", nodes["AnimTextures"]);
@@ -199,6 +237,13 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImage("+", "assets/HUD/numeros/mas.png", nodes["Nums"]);
     loadAndResizeImage("-", "assets/HUD/numeros/-.png", nodes["Nums"]);
     loadAndResizeImage("barra", "assets/HUD/barra.png", nodes["Nums"]);
+
+    // TEXTURAS PARTÍCULAS
+    //
+    loadAndResizeImage("p_est1", "assets/HUD/p_texturas/p_est1.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est2", "assets/HUD/p_texturas/p_est2.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est3", "assets/HUD/p_texturas/p_est3.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est4", "assets/HUD/p_texturas/p_est4.png", nodes["PartTextures"]);
 
     // GIFS
     //
@@ -295,8 +340,16 @@ void ENGI::GameEngine::setTargetFPS(int fps) {
     dmeg.SetTargetFPS(fps);
 }
 
+double ENGI::GameEngine::getTargetFPS() {
+    return dmeg.GetTargetFPS();
+}
+
 float ENGI::GameEngine::getFrameTime() {
     return static_cast<float>(dmeg.GetFrameTime());
+}
+
+double ENGI::GameEngine::getFrameTimeDouble() {
+    return dmeg.GetFrameTime();
 }
 
 ////// DRAWING //////
@@ -343,10 +396,6 @@ void ENGI::GameEngine::drawNode(Node* node, vec2i pos, vec2f scale) {
     node->setTranslation({ pos.x, pos.y, 0.0f });
     node->setScale({ scale.x, scale.y, 1.0f });
     node->setVisibleOne(true);
-}
-
-void ENGI::GameEngine::drawCircle(int, int, float, Color) {
-    //DrawCircle(posX, posY, radius, color);
 }
 
 void ENGI::GameEngine::drawCircleSector(vec2d, float, float, float, int, Color) {
@@ -459,6 +508,11 @@ vec3d ENGI::GameEngine::getUpCamera()
 float ENGI::GameEngine::getFovyCamera()
 {
     return camera->fovy;
+}
+
+glm::mat4 ENGI::GameEngine::getViewMatrix()
+{
+    return camera->getViewMatrix();
 }
 
 ////// INPUT HANDLING //////
@@ -714,6 +768,11 @@ void ENGI::GameEngine::loadAndResizeImage(const char* name, const char* path, No
         nodes[name] = dmeg.CreateTexture2D({ 0, 0 }, path, D_WHITE, name, parentNode);
 }
 
+void ENGI::GameEngine::loadAndResizeBillboard(const char* name, const char* path, Node* parentNode) {
+    if (!nodes[name])
+        nodes[name] = dmeg.CreateBillboard(path, { 0, 0, 0 }, { 1, 1 }, name, parentNode);
+}
+
 void ENGI::GameEngine::loadAndResizeImageGif(const char* name, const char* filePath) {
 
     auto textures = loadTextures2DAnim(filePath);
@@ -736,6 +795,11 @@ double ENGI::GameEngine::getTime()
     return static_cast<double>(microseconds.count()) / 1e6;
 }
 
+Node* ENGI::GameEngine::createNode3D(const char* name)
+{
+    return dmeg.CreateNode(name, nodes["3D"]);
+}
+
 Node* ENGI::GameEngine::createNode(const char* name, Node* parentNode)
 {
     if (!nodes[name])
@@ -747,6 +811,23 @@ Node* ENGI::GameEngine::createNode(const char* name, Node* parentNode)
 Node* ENGI::GameEngine::createNode(Node* copyNode, Node* parentNode)
 {
     return dmeg.CreateNodeCopy(copyNode, parentNode);
+}
+
+///// Circle /////
+
+Node* ENGI::GameEngine::createCircle(vec2i position, float radius, int segments, Color color, const char* nodeName, Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateCircle({ position.x, position.y }, radius, segments, color, nodeName, parentNode);
+    else
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {radius * 2, radius * 2} };
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::drawCircle(vec2i position, float radius, int segments, Color color)
+{
+    return dmeg.CreateCircle({ position.x, position.y }, radius, segments, color, "circle", nodes["TextCopy"]);
 }
 
 ///// Rectangle /////
@@ -774,10 +855,10 @@ Node* ENGI::GameEngine::drawRectangle(vec2i pos, vec2i size, Color color, Node* 
 
 ///// TextBox /////
 
-Node* ENGI::GameEngine::createTextBox(vec2i position, vec2i size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode)
+Node* ENGI::GameEngine::createTextBox(vec2i position, vec2i size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode, bool cbc)
 {
     if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreateTextBox(position.toGlm(), size.toGlm(), boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned, nodeName, parentNode);
+        nodes[nodeName] = dmeg.CreateTextBox(position.toGlm(), size.toGlm(), boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned, cbc, nodeName, parentNode);
     else
     {
         nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), size.to_other<float>() };
@@ -789,10 +870,10 @@ Node* ENGI::GameEngine::createTextBox(vec2i position, vec2i size, Color boxColor
 
 ///// Text /////
 
-Node* ENGI::GameEngine::createText(vec2i position, std::string text, Font* font, int fontSize, Color color, const char* nodeName, Node* parentNode, Aligned align)
+Node* ENGI::GameEngine::createText(vec2i position, std::string text, Font* font, int fontSize, Color color, const char* nodeName, Node* parentNode, Aligned align, bool cbc)
 {
     if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreateText(position.toGlm(), text, font, fontSize, color, align, nodeName, parentNode);
+        nodes[nodeName] = dmeg.CreateText(position.toGlm(), text, font, fontSize, color, align, cbc, nodeName, parentNode);
     else
     {
         nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {1.f, 1.f} };
@@ -802,10 +883,10 @@ Node* ENGI::GameEngine::createText(vec2i position, std::string text, Font* font,
     return nodes[nodeName];
 }
 
-Node* ENGI::GameEngine::createText(vec2i position, std::string text, Color c, const char* nodeName, Node* parentNode, int fontSize)
+Node* ENGI::GameEngine::createText(vec2i position, std::string text, Color c, const char* nodeName, Node* parentNode, int fontSize, Aligned align)
 {
     if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreateText(position.toGlm(), text, getDefaultFont(), fontSize, c, Aligned::LEFT, nodeName, parentNode);
+        nodes[nodeName] = dmeg.CreateText(position.toGlm(), text, getDefaultFont(), fontSize, c, align, false, nodeName, parentNode);
     else
     {
         nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {1.f, 1.f} };
@@ -816,7 +897,7 @@ Node* ENGI::GameEngine::createText(vec2i position, std::string text, Color c, co
 }
 
 Node* ENGI::GameEngine::drawText(const char* text, int x, int y, int fontSize, Color c, Aligned align) {
-    return dmeg.CreateText({ x, y }, text, getDefaultFont(), fontSize, c, align, "text", nodes["TextCopy"]);
+    return dmeg.CreateText({ x, y }, text, getDefaultFont(), fontSize, c, align, false, "text", nodes["TextCopy"]);
 }
 
 Font* ENGI::GameEngine::getFontDefault() {
@@ -914,16 +995,42 @@ Node* ENGI::GameEngine::drawButton(vec2i position, vec2i size, std::string text,
     return dmeg.CreateButton(position.toGlm(), size.toGlm(), text, font, fontSize, textColor, verticalAligned, horizontalAligned, normalColor, hoverColor, clickColor, "button", nodes["TextCopy"]);
 }
 
+///// CheckBox /////
+
+Node* ENGI::GameEngine::createCheckBox(vec2i position, float size, bool checked, Color backgroundColor, DarkMoon::Color normalColor, DarkMoon::Color hoverColor, const char* nodeName, DarkMoon::Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateCheckbox(position.toGlm(), size, checked, backgroundColor, normalColor, hoverColor, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {size, size} };
+    }
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::createCheckBoxPtr(vec2i position, float size, bool* checked, Color backgroundColor, DarkMoon::Color normalColor, DarkMoon::Color hoverColor, const char* nodeName, DarkMoon::Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateCheckboxPtr(position.toGlm(), size, checked, backgroundColor, normalColor, hoverColor, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {size, size} };
+    }
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::drawCheckBox(vec2i position, float size, bool checked, Color backgroundColor, DarkMoon::Color normalColor, DarkMoon::Color hoverColor)
+{
+    return dmeg.CreateCheckbox(position.toGlm(), size, checked, backgroundColor, normalColor, hoverColor, "checkbox", nodes["TextCopy"]);
+}
+
 ///// Cube /////
 
 Node* ENGI::GameEngine::createCube(vec3d position, vec3d size, DarkMoon::Color color, const char* nodeName, DarkMoon::Node* parentNode)
 {
-    if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreateCube(position.toGlm(), size.toGlm(), color, nodeName, parentNode);
-    else
-        nodes[nodeName]->setVisibleOne(true);
-
-    return nodes[nodeName];
+    return dmeg.CreateCube(position.toGlm(), size.toGlm(), color, nodeName, parentNode);
 }
 
 Node* ENGI::GameEngine::drawCube(vec3d position, vec3d size, DarkMoon::Color color)
@@ -935,12 +1042,7 @@ Node* ENGI::GameEngine::drawCube(vec3d position, vec3d size, DarkMoon::Color col
 
 Node* ENGI::GameEngine::createLine3D(vec3d startPos, vec3d endPos, float lSize, Color color, const char* nodeName, Node* parentNode)
 {
-    if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreateLine3D(startPos.toGlm(), endPos.toGlm(), lSize, color, nodeName, parentNode);
-    else
-        nodes[nodeName]->setVisibleOne(true);
-
-    return nodes[nodeName];
+    return dmeg.CreateLine3D(startPos.toGlm(), endPos.toGlm(), lSize, color, nodeName, parentNode);
 }
 
 Node* ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, float lSize, Color color)
@@ -952,17 +1054,48 @@ Node* ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, float lSize, Co
 
 Node* ENGI::GameEngine::createPoint3D(vec3d position, float pointSize, Color color, const char* nodeName, Node* parentNode)
 {
-    if (!nodes[nodeName])
-        nodes[nodeName] = dmeg.CreatePoint3D(position.toGlm(), pointSize, color, nodeName, parentNode);
-    else
-        nodes[nodeName]->setVisibleOne(true);
-
-    return nodes[nodeName];
+    return dmeg.CreatePoint3D(position.toGlm(), pointSize, color, nodeName, parentNode);
 }
 
 Node* ENGI::GameEngine::drawPoint3D(vec3d position, float pointSize, Color color)
 {
-    return dmeg.CreatePoint3D(position.toGlm(), pointSize, color, "point", nodes["Copy"]);
+    return dmeg.CreatePoint3D(position.toGlm(), pointSize, color, "point", nodes["TextCopy"]);
+}
+
+///// Lights /////
+
+void ENGI::GameEngine::toggleLights()
+{
+    dmeg.ToggleLights();
+}
+
+void ENGI::GameEngine::activateLights()
+{
+    dmeg.ActivateLights();
+}
+
+void ENGI::GameEngine::deactivateLights()
+{
+    dmeg.DeactivateLights();
+}
+
+///// Point Light /////
+
+Node* ENGI::GameEngine::drawPointLight(vec3d position, Color color)
+{
+    return dmeg.CreatePointLight(position.toGlm(), color, "pointLight", nodes["TextCopy"]);
+}
+
+Node* ENGI::GameEngine::createPointLight(vec3d position, Color color, const char* nodeName, Node* parentNode)
+{
+    return dmeg.CreatePointLight(position.toGlm(), color, nodeName, parentNode);
+}
+
+///// Billboard /////
+
+Node* ENGI::GameEngine::drawBillboard(std::string path, vec3d position, vec2f size)
+{
+    return dmeg.CreateBillboard(path.c_str(), position.toGlm(), size.toGlm(), "billboard", nodes["TextCopy"]);
 }
 
 Font* ENGI::GameEngine::getDefaultFont()
@@ -1012,4 +1145,26 @@ void ENGI::GameEngine::nodeClear(Node* node)
         if (nodesToDraw.find(child) != nodesToDraw.end())
             nodesToDraw.erase(child);
     }
+}
+
+///// Animations /////
+
+std::size_t ENGI::GameEngine::playAnimation(Animation* panimation) {
+    return dmeg.PlayAnimation(panimation);
+}
+
+void ENGI::GameEngine::stopAnimation(std::size_t idanim) {
+    dmeg.StopAnimation(idanim);
+}
+
+std::vector<Animation*> ENGI::GameEngine::createAnimations(const std::string& path, std::vector<BoneInfo>& vecbones) {
+    return dmeg.CreateAnimations(path, vecbones);
+}
+
+void ENGI::GameEngine::updateAnimation(float mult, std::size_t id) {
+    dmeg.UpdateAnimation(mult, id);
+}
+
+float ENGI::GameEngine::getAnimationTime(std::size_t id) {
+    return dmeg.GetAnimationTime(id);
 }

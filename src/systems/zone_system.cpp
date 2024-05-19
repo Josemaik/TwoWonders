@@ -17,7 +17,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                 if (e.hasTag<LevelChangeTag>())
                 {
                     em.getSingleton<SoundSystem>().ambient_stop();
-                    em.getSingleton<SoundSystem>().music_stop();
+                    em.getSingleton<SoundSystem>().music_stop_level();
                     switch (li.mapID)
                     {
                     case 0:
@@ -238,6 +238,10 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
                 li.dontLoad.insert(pair);
                 em.getSingleton<SoundSystem>().sonido_interaccion_e();
                 inpi.interact = false;
+
+                // Apagamos la luz del cofre
+                auto& plc = em.getComponent<PointLightComponent>(e);
+                plc.light->enabled = false;
             }
         }
     });
@@ -387,13 +391,16 @@ void ZoneSystem::checkVolcanoLava(EntityManager& em)
     auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
     auto& playerPos = playerPhy.position;
     using noCMP = MP::TypeList<>;
-    using enemyTag = MP::TypeList<LavaTag>;
+    using lavaTag = MP::TypeList<LavaTag>;
     li.volcanoLava.clear();
 
-    em.forEachAny<noCMP, enemyTag>([&](Entity& e)
+    double minDistance = std::numeric_limits<double>::max();
+    em.forEachAny<noCMP, lavaTag>([&](Entity& e)
     {
         auto& phy = em.getComponent<PhysicsComponent>(e);
         double distance = playerPos.distance(phy.position);
+        if (distance < minDistance)
+            minDistance = distance;
 
         double range = 15.0;
 
@@ -402,6 +409,15 @@ void ZoneSystem::checkVolcanoLava(EntityManager& em)
             li.volcanoLava.push_back(e.getID());
         }
     });
+
+    auto& ss = em.getSingleton<SoundSystem>();
+    if (minDistance > 80.0) {
+        ss.ambiente_parameter_lava(2);
+    }
+    else if (minDistance > 45) {
+        ss.ambiente_parameter_lava(1);
+    }
+    else ss.ambiente_parameter_lava(0);
 }
 
 void ZoneSystem::checkLadders(EntityManager& em)
@@ -434,8 +450,7 @@ void ZoneSystem::checkLadders(EntityManager& em)
         {
             playerPos = { phy.position.x(), playerPos.y() + 0.5, phy.position.z() };
             playerPhy.gravity = 0;
-            playerPhy.orientation = ldc.orientation;
-
+            playerPhy.orientation = -(ldc.orientation * phy.rotationVec.y());
             plfi.onLadder = true;
             inpi.interact = false;
             ic.showButton = false;
@@ -558,13 +573,13 @@ void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
     auto& playerEnt = *em.getEntityByID(li.playerID);
     auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
     auto& playerPos = playerPhy.position;
-    using CMPs = MP::TypeList<PhysicsComponent, ColliderComponent, InteractiveComponent, SpawnComponent>;
+    using CMPs = MP::TypeList<PhysicsComponent, InteractiveComponent, SpawnComponent>;
     using spawnTag = MP::TypeList<SpawnTag>;
 
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<CMPs, spawnTag>([&](Entity&, PhysicsComponent& phy, ColliderComponent& col, InteractiveComponent& ic, SpawnComponent& sc)
+    em.forEach<CMPs, spawnTag>([&](Entity& e, PhysicsComponent& phy, InteractiveComponent& ic, SpawnComponent& sc)
     {
-        if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+        if (!frti.inFrustum(e.getID()))
             return;
 
         // Calculamos la distancia entre el jugador y el spawn
@@ -572,19 +587,17 @@ void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
 
         if (distance < ic.range && !sc.active)
         {
-            for (auto& [_, part] : sc.parts)
-            {
-                part->multiply = true;
-            }
+            for (auto& [rc, pmc, plc] : sc.parts)
+                pmc->multiply = true;
+
             sc.active = true;
             ic.showButton = true;
         }
         else if (distance > ic.range && sc.active)
         {
-            for (auto& [_, part] : sc.parts)
-            {
-                part->multiply = false;
-            }
+            for (auto& [rc, pmc, plc] : sc.parts)
+                pmc->multiply = false;
+
             sc.active = false;
             ic.showButton = false;
             return;

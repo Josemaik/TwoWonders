@@ -81,11 +81,16 @@ namespace DarkMoon {
     struct Circle : Entity2D {
     private:
         void changeVAO(glm::mat4& transMatrix) override;
+        void changeVAO(glm::mat4& transMatrix, bool forceUpdate = false);
     public:
         glm::vec2 position = {};
         float radius = { 10.0f };
+        float oldRadius = { 10.0f };
         int segments = { 20 };
+        int oldSegments = { 20 };
+        std::vector<float> vertices{};
         Color color = { D_BLACK };
+        RenderManager& rm = RenderManager::getInstance();
 
         Circle(glm::vec2 p, float rad, int seg, Color c);
         ~Circle();
@@ -109,12 +114,12 @@ namespace DarkMoon {
     };
 
     struct AnimatedTexture2D : Entity {
-        glm::vec2 position;
-        std::vector<Texture*> frames;
-        Color color;
-        float frameDuration;
-        float elapsedTime{ 0.0f };
-        int currentFrame;
+        glm::vec2 position {};
+        std::vector<Texture*> frames {};
+        Color color {};
+        float frameDuration { 1.0f };
+        float elapsedTime { 0.0f };
+        int currentFrame { 0 };
 
         AnimatedTexture2D(glm::vec2 pos = { 0.0f, 0.0f }, Color col = D_WHITE, float framD = 1.0f, int currF = 0)
             : position(pos), color(col), frameDuration(framD), currentFrame(currF) {};
@@ -226,10 +231,14 @@ namespace DarkMoon {
         Font* font{};
         int fontSize{};
         Color color{};
+        static constexpr float charSpeed{ 0.035f };
 
         float scale{};
         float maxWidth{};
         float maxHeight{};
+        float timeElapsed{};
+        size_t charIndex{};
+        bool charIndexChanged{ false };
         std::vector<float> widths{};
         Aligned alignment{};
 
@@ -239,9 +248,12 @@ namespace DarkMoon {
         WindowsManager& wm = WindowsManager::getInstance();
         float ratio{};
         int numLines{ 1 };
+        bool charByChar{ false };
+        bool bold{ false };
+        bool italic{ false };
 
-        Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK, Aligned al = Aligned::LEFT)
-            : position(pos), font(f), fontSize(fS), color(col), alignment(al)
+        Text(glm::vec2 pos = { 0.0f, 0.0f }, std::string txt = "", Font* f = nullptr, int fS = 10, Color col = D_BLACK, Aligned al = Aligned::LEFT, bool cbc = false)
+            : position(pos), font(f), fontSize(fS), color(col), alignment(al), charByChar(cbc)
         {
             // Get ratio
             ratio = wm.getHeightRatio();
@@ -264,12 +276,15 @@ namespace DarkMoon {
 #ifdef _WIN32
             bool checkSpecial = false;
 #endif
-            if (font && !text.empty() && this->text != textW) {
+            if (font && !text.empty() && textW != this->text) {
                 // Reset values
                 widths.clear();
                 maxWidth = 0.0f;
                 maxHeight = 0.0f;
                 numLines = 1;
+                charIndex = 0;
+                bold = false;
+                italic = false;
                 float lineWidth = position.x;
 
                 // Seteamos la escala con el ratio
@@ -297,7 +312,6 @@ namespace DarkMoon {
                         continue;
                     }
 #endif
-
                     // Max Height
                     Character ch = font->characters[c];
                     auto chY = static_cast<float>(ch.size.y);
@@ -388,25 +402,55 @@ namespace DarkMoon {
                 aux_y -= maxHeight * static_cast<float>(numLines) * 0.6f;
             }
 
-            int i{ 1 };
+            float deltaTime = static_cast<float>(wm.getFrameTime());
+
+            if (charByChar)
+            {
+                timeElapsed += deltaTime;
+                if (timeElapsed >= charSpeed) {
+                    timeElapsed -= charSpeed;
+                    if (charIndex < text.size()) {
+                        bold = false;
+                        italic = false;
+                        ++charIndex;
+
+                        if (charIndex % static_cast<std::size_t>(8) == 0)
+                            charIndexChanged = true;
+                    }
+                }
+                else
+                    charIndexChanged = false;
+            }
+            else
+                charIndex = text.size();
 #ifdef _WIN32
             bool checkSpecial = false;
 #endif
-            for (wchar_t& c : text) {
+            int k{ 1 }; // Pa la anchura de las líneas
+            for (size_t i = 0; i < charIndex; ++i) {
+                wchar_t c = text[i];
                 if (c == '\n') {
                     // Reset the x position to the start of the line
                     aux_x = position.x;
 
                     if (alignment == Aligned::CENTER)
-                        aux_x -= widths[i] / 2;
+                        aux_x -= widths[k] / 2;
                     else
-                        aux_x -= widths[i];
+                        aux_x -= widths[k];
 
-                    i += 1;
+                    k += 1;
                     aux_y += maxHeight * 1.2f;
                     // Skip the rest of the loop
                     continue;
                 }
+                // Poner o quitar negrita
+                else if (c == '\b')
+                    bold = !bold;
+
+                // Poner o quitar cursiva
+                else if (c == '\t')
+                    italic = !italic;
+
 #ifdef _WIN32
                 else if (checkSpecial)
                 {
@@ -430,14 +474,37 @@ namespace DarkMoon {
 
                 // Update VBO for each character
                 float vertices[6][4] = {
-                    { rm.normalizeX(posX)    , rm.normalizeY(posY + h), 0.0f, 1.0f },
-                    { rm.normalizeX(posX)    , rm.normalizeY(posY)    , 0.0f, 0.0f },
-                    { rm.normalizeX(posX + w), rm.normalizeY(posY)    , 1.0f, 0.0f },
+                    { posX    , posY + h, 0.0f, 1.0f },
+                    { posX    , posY    , 0.0f, 0.0f },
+                    { posX + w, posY    , 1.0f, 0.0f },
 
-                    { rm.normalizeX(posX)    , rm.normalizeY(posY + h), 0.0f, 1.0f },
-                    { rm.normalizeX(posX + w), rm.normalizeY(posY)    , 1.0f, 0.0f },
-                    { rm.normalizeX(posX + w), rm.normalizeY(posY + h), 1.0f, 1.0f }
+                    { posX    , posY + h, 0.0f, 1.0f },
+                    { posX + w, posY    , 1.0f, 0.0f },
+                    { posX + w, posY + h, 1.0f, 1.0f }
                 };
+
+                // Transformamos los vértices
+                if (italic) {
+                    static constexpr float shearAmount = -0.2f;
+                    for (int i = 0; i < 6; i++) {
+                        float shear = shearAmount * vertices[i][1];
+                        vertices[i][0] += shear;
+                    }
+                }
+
+                // Normalizamos los vértices
+                for (int i = 0; i < 6; i++) {
+                    vertices[i][0] = rm.normalizeX(vertices[i][0]);
+                    vertices[i][1] = rm.normalizeY(vertices[i][1]);
+                }
+
+                // Movemos los caracteres a donde queremos que estén
+                if (italic) {
+                    static constexpr float adjustment = 0.181f;
+                    for (int i = 0; i < 6; i++) {
+                        vertices[i][0] += adjustment;
+                    }
+                }
 
                 // Configure VAO/VBO for texture quads
                 glBindVertexArray(VAO);
@@ -447,6 +514,17 @@ namespace DarkMoon {
 
                 glBindTexture(GL_TEXTURE_2D, ch.textureID);
                 glDrawArrays(GL_TRIANGLES, 0, 6);
+
+                if (bold)
+                {
+                    static constexpr float offset = 0.001f;
+
+                    for (int l = 0; l < 6; l++)
+                        vertices[l][0] += offset;
+
+                    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+                    glDrawArrays(GL_TRIANGLES, 0, 6);
+                }
 
                 // Advance cursors for next glyph
                 aux_x += static_cast<float>(ch.advance >> 6) * scale;
@@ -462,6 +540,18 @@ namespace DarkMoon {
 
         std::wstring getText() {
             return text;
+        }
+
+        void skipText() {
+            charIndex = text.size();
+        }
+
+        bool isTextFinished() {
+            return charIndex == text.size();
+        }
+
+        bool charChanged() {
+            return charIndexChanged;
         }
 
         std::wstring text{};
@@ -486,8 +576,9 @@ namespace DarkMoon {
             int fS = 10,
             Color tCol = D_BLACK,
             Aligned verAl = Aligned::CENTER,
-            Aligned horAl = Aligned::CENTER) :
-            box(pos, sz, bCol), boxBackground({ pos.x - 1, pos.y - 1 }, { sz.x + 2, sz.y + 2 }, D_GRAY), text(pos, txt, f, fS, tCol, horAl), verAligned(verAl), horAligned(horAl) {};
+            Aligned horAl = Aligned::CENTER,
+            bool cbc = false) :
+            box(pos, sz, bCol), boxBackground({ pos.x - 1, pos.y - 1 }, { sz.x + 2, sz.y + 2 }, D_GRAY), text(pos, txt, f, fS, tCol, horAl, cbc), verAligned(verAl), horAligned(horAl) {};
 
         void draw(glm::mat4 transMatrix) override {
             if (drawBox) {
@@ -554,6 +645,7 @@ namespace DarkMoon {
         Color hoverColor;
         Color clickColor;
         ButtonState state{ ButtonState::NORMAL };
+        ButtonState prevState{ ButtonState::NORMAL };
         WindowsManager& wm = WindowsManager::getInstance();
         InputManager& im = InputManager::getInstance();
         bool isCurrent{ false };
@@ -577,9 +669,7 @@ namespace DarkMoon {
         };
 
         void draw(glm::mat4 transMatrix) override {
-            // Color
             checkMouse();
-            // Text box
             textBox.draw(transMatrix);
         };
 
@@ -596,6 +686,7 @@ namespace DarkMoon {
                         textBox.text.color = clickColor;
                     else
                         textBox.box.color = clickColor;
+                    prevState = state;
                     state = ButtonState::CLICK;
                 }
                 else {
@@ -603,15 +694,17 @@ namespace DarkMoon {
                         textBox.text.color = hoverColor;
                     else
                         textBox.box.color = hoverColor;
+                    prevState = state;
                     state = ButtonState::HOVER;
                 }
             }
-            else  if (isCurrent)
+            else if (isCurrent)
             {
                 if (!textBox.drawBox)
                     textBox.text.color = hoverColor;
                 else
                     textBox.box.color = hoverColor;
+                prevState = state;
                 state = ButtonState::HOVER;
 
                 isCurrent = false;
@@ -621,7 +714,114 @@ namespace DarkMoon {
                     textBox.text.color = normalColor;
                 else
                     textBox.box.color = normalColor;
+                prevState = state;
                 state = ButtonState::NORMAL;
+            }
+        }
+    };
+
+    struct CheckBoxBase : Entity {
+        TextBox textBox;
+        Color normalColor;
+        Color hoverColor;
+        ButtonState state{ ButtonState::NORMAL };
+        WindowsManager& wm = WindowsManager::getInstance();
+        InputManager& im = InputManager::getInstance();
+
+        CheckBoxBase(glm::vec2 pos = { 0.0f, 0.0f },
+            float size = 50.0f,
+            Color bCol = D_WHITE,
+            Color nColor = D_WHITE,
+            Color hColor = D_GRAY) :
+            textBox(pos, { size, size }, bCol, "", nullptr, 18, D_BLACK, Aligned::CENTER, Aligned::CENTER),
+            normalColor(nColor), hoverColor(hColor)
+        {
+            textBox.box.position = pos;
+            checkMouse();
+        };
+
+        void draw(glm::mat4 transMatrix) override {
+            checkMouse();
+            if (checkChecked()) {
+                textBox.text.setText("X");
+            }
+            else {
+                textBox.text.setText(" ");
+            }
+            textBox.draw(transMatrix);
+        };
+
+        void checkMouse()
+        {
+            glm::vec2 mPos = { im.getMouseX(wm.getWindow()), im.getMouseY(wm.getWindow()) };
+            glm::vec2 topLeft = textBox.box.position;
+            glm::vec2 bottomRight = { topLeft.x + textBox.box.size.x, topLeft.y + textBox.box.size.y };
+
+            if (mPos.x >= topLeft.x && mPos.x <= bottomRight.x &&
+                mPos.y >= topLeft.y && mPos.y <= bottomRight.y) {
+                if (im.isMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT)) {
+                    state = ButtonState::CLICK;
+                    toggleChecked();
+                }
+                else {
+                    textBox.box.color = hoverColor;
+                    state = ButtonState::HOVER;
+                }
+            }
+            else {
+                textBox.box.color = normalColor;
+                state = ButtonState::NORMAL;
+            }
+        }
+
+        bool isClicked() {
+            return state == ButtonState::CLICK;
+        }
+
+        virtual bool checkChecked() = 0;
+        virtual void toggleChecked() = 0;
+    };
+
+    struct CheckBox : CheckBoxBase {
+        bool checked{ false };
+
+        CheckBox(glm::vec2 pos = { 0.0f, 0.0f },
+            float size = 50.0f,
+            bool checked = false,
+            Color bCol = D_WHITE,
+            Color nColor = D_WHITE,
+            Color hColor = D_GRAY) :
+            CheckBoxBase(pos, size, bCol, nColor, hColor), checked(checked)
+        {};
+
+        bool checkChecked() override {
+            return checked;
+        }
+
+        void toggleChecked() override {
+            checked = !checked;
+        }
+    };
+
+    struct CheckBoxPtr : CheckBoxBase {
+        bool* checked{ nullptr };
+
+        CheckBoxPtr(glm::vec2 pos = { 0.0f, 0.0f },
+            float size = 50.0f,
+            bool* checked = nullptr,
+            Color bCol = D_WHITE,
+            Color nColor = D_WHITE,
+            Color hColor = D_GRAY) :
+            CheckBoxBase(pos, size, bCol, nColor, hColor), checked(checked)
+        {};
+
+        bool checkChecked() override {
+            return *checked;
+        }
+
+        void toggleChecked() override {
+            if (checked) {
+                *checked = !*checked;
             }
         }
     };
@@ -630,9 +830,9 @@ namespace DarkMoon {
         Rectangle background;
         Rectangle boxBackground;
         Rectangle slider;
+        float valor{}; // 0 -> 1
         WindowsManager& wm = WindowsManager::getInstance();
         InputManager& im = InputManager::getInstance();
-        float valor{}; // 0 -> 1
 
         Slider(glm::vec2 pos = { 0.0f, 0.0f },
             glm::vec2 sz = { 100.0f, 50.0f },
@@ -684,6 +884,8 @@ namespace DarkMoon {
         Text name{};
         std::vector<std::string> options{};
         std::size_t currentOption{};
+
+
         WindowsManager& wm = WindowsManager::getInstance();
         InputManager& im = InputManager::getInstance();
 
@@ -754,10 +956,16 @@ namespace DarkMoon {
 
         void checkMouse()
         {
-            if (prevButton.state == ButtonState::CLICK)
+            if (nextButton.state == ButtonState::CLICK)
                 nextOption();
-            else if (nextButton.state == ButtonState::CLICK)
+            else if (prevButton.state == ButtonState::CLICK)
                 prevOption();
+        }
+
+        void setOptions(std::vector<std::string> opts)
+        {
+            options = opts;
+            textBox.text.setText(options[currentOption]);
         }
 
         void setCurrentOption(std::size_t option)
@@ -792,7 +1000,7 @@ namespace DarkMoon {
     };
 
     struct FloatSlider : OptionSlider {
-        float currentValue;
+        float currentValue{};
 
         FloatSlider(
             glm::vec2 pos = { 0.0f, 0.0f },
@@ -834,11 +1042,5 @@ namespace DarkMoon {
             currentValue = std::max(currentValue - 0.01f, 0.0f);
             textBox.text.setText(std::to_string(static_cast<int>(currentValue * 100)));
         }
-    };
-
-    // TODO
-
-    struct CheckBox : Entity {
-
     };
 }

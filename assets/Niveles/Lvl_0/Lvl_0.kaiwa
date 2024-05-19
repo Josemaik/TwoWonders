@@ -120,7 +120,7 @@
 							"scale": [6.494, 7.101, 10.0],
 							"rotation": 270.0,
 							"rotVector": [0.0, 0.0, -1.0],
-							"content": 19,
+							"content": 13,
 							"visible": false,
 							"message": [
 								"¡Encontraste un bastón mágico!", 
@@ -161,8 +161,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [-0.0, 4.0, 21.0],
@@ -190,8 +189,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [15.0, 4.0, 6.0],
@@ -219,8 +217,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [37.0, 4.0, 17.0],
@@ -248,8 +245,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						}
 					],
 					"NPCs": [],
@@ -386,7 +382,7 @@
 							"scale": [6.494, 7.101, 10.0],
 							"rotation": 270.0,
 							"rotVector": [0.0, 0.0, -1.0],
-							"content": 6,
+							"content": 5,
 							"message": ["¡Encontraste 30 destellos!"]
 						},
 						{
@@ -431,8 +427,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [-26.85, 4.0, 73.32],
@@ -460,8 +455,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [-2.7, 4.0, 96.8],
@@ -489,8 +483,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [33, 4.0, 117.0],
@@ -518,8 +511,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [20, 4.0, 117.0],
@@ -547,8 +539,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [-20, 4.0, 132.0],
@@ -576,8 +567,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [-26, 4.0, 143.0],
@@ -605,8 +595,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						}
 					],
 					"Objects": [],
@@ -743,7 +732,7 @@
 							"scale":[7.101, 6.494, 10.0],
 							"rotation": 180.0,
 							"rotVector":[0.0, 0.0, 1.0],
-							"content": 10,
+							"content": 8,
 							"message": ["¡Encontraste una llave!", "Parece que es de un solo uso..."],
 							"events": [6, 7]
 						},
@@ -804,8 +793,7 @@
 							],
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [-82.0, 4.0, 134.0],
@@ -833,14 +821,13 @@
 							],
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [-98.0, 10.0, 73.0],
 							"rotVector": [0.0, 0.0, 1.0],
-							"rotation": 0.0,
-							"scale": [10.0, 17.0, 17.0],
+							"rotation": -90.0,
+							"scale": [16.0, 17.0, 16.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.4,
 							"life": 10,
@@ -862,8 +849,7 @@
 							],
 							"countdown_stop": 0.0,
 							"countdown_shoot": 1.0,
-							"countdown_perception": 0.2,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.2
 						}
 					],
 					"Objects": [],

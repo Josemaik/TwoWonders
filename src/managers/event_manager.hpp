@@ -323,12 +323,12 @@ public:
 
                         std::array<std::pair<SpeakerType, std::string>, 2> msgs =
                         {
-                            std::make_pair(SpeakerType::NONE, "¡Haz recibido un pergamino con la formulación \npara crear una pompa de agua!"),
+                            std::make_pair(SpeakerType::NONE, "¡Has recibido un pergamino con la formulación \npara crear una pompa de agua!"),
                             std::make_pair(SpeakerType::NOMAD, "Nómada: \nCon esto podremos salir de aquí por si disparas a esa puerta. \nLos muñecos de por medio te servirán de práctica.")
                         };
 
                         // Le damos el hechizo
-                        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", Spells::WaterBomb, 20.0, 3 };
+                        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", AttackType::WaterBombShot };
                         plfi.addSpell(spell);
                         plfi.showBook = true;
 
@@ -368,12 +368,12 @@ public:
 
                         std::array<std::pair<SpeakerType, std::string>, 2> msgs =
                         {
-                            std::make_pair(SpeakerType::NONE, "¡Haz recibido un pergamino con la formulación \npara hacer una esquiva de agua!"),
+                            std::make_pair(SpeakerType::NONE, "¡Has recibido un pergamino con la formulación \npara hacer una esquiva de agua!"),
                             std::make_pair(SpeakerType::NOMAD, "Nómada: \nCon esto podrás cruzar los charcos de lava. \n¡Buena suerte, yo solo necesito mis buenas patas para cruzar!")
                         };
 
                         // Le damos el hechizo
-                        Spell spell{ "Dash de agua", "Esquivas a la velocidad de la marea", Spells::WaterDash, 20.0, 1 };
+                        Spell spell{ "Dash de agua", "Esquivas a la velocidad de la marea", AttackType::WaterDashArea };
                         plfi.addSpell(spell);
                         plfi.showBook = true;
 
@@ -445,12 +445,12 @@ public:
 
                         std::array<std::pair<SpeakerType, std::string>, 2> msgs =
                         {
-                            std::make_pair(SpeakerType::NONE, "¡Haz recibido un pergamino con la formulación \npara hacer una bola de fuego!"),
+                            std::make_pair(SpeakerType::NONE, "¡Has recibido un pergamino con la formulación \npara hacer una bola de fuego!"),
                             std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nCon esto y un bizcocho, nos largamos de aquí.")
                         };
 
                         // Le damos el hechizo
-                        Spell spell{ "Bola de fuego", "Tiras una poderosa bola de destrucción", Spells::FireBall, 20.0, 4 };
+                        Spell spell{ "Bola de fuego", "Tiras una poderosa bola de destrucción", AttackType::FireBallShot };
                         plfi.addSpell(spell);
                         plfi.showBook = true;
 

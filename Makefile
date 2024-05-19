@@ -80,7 +80,7 @@ $(ASSETS):
 
 game: $(APP)
 ifeq ($(OS),Windows_NT)
-	./libs/$(APP)
+	./$(LIBS_DIR)/$(APP)
 else
 	./$(APP)
 endif
@@ -93,4 +93,8 @@ dir:
 	$(info $(ALLCPPOBJ))
 
 clean:
+ifeq ($(OS),Windows_NT)
+	rm -r ./$(OBJ)/ ./$(LIBS_DIR)/$(APP) ./$(RELEASE)/ ./$(ZIP_NAME) 
+else
 	rm -r ./$(OBJ)/ ./$(APP) ./$(RELEASE)/ ./$(ZIP_NAME)
+endif

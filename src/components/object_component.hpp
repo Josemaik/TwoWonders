@@ -7,25 +7,19 @@ enum struct ObjectType
     Sword,
     Bomb,
     Coin,
-    BombExplode,
     Coin30,
-    ShopItem_Bomb,
     ShopItem_ExtraLife,
     ShopItem_Life,
     Key,
-    Heal_Spell,
     Mana_Potion,
     AreaAttack,
-    Spiderweb,
-    Meteorit,
-    Fire_Spell,
     Ice_Spell,
     Water_Spell,
     Basic_Staff,
-    CrusherAttack,
     GoodBoots,
     RegularHat,
-    AttackUpgrade
+    AttackUpgrade,
+    WarningZone
 };
 
 struct ObjectComponent

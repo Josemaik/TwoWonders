@@ -12,16 +12,16 @@ void AISystem::perception(BlackBoard_t& bb, AIComponent& ai) {
     // Al pulsar la G , la ia con seek va a la posición del player
     if (ai.elapsed_perception >= ai.countdown_perception) {
         ai.elapsed_perception = 0;
-        if (bb.tactive) {
+        // if (bb.tactive) {
             ai.tx = bb.tx;
             ai.tz = bb.tz;
             ai.tactive = true;
             ai.teid = bb.teid;
             // ai.behaviour = bb.behaviour;
-            bb.tactive = false;
+           // bb.tactive = false;
             // ai.pathIt = bb.path.begin();
             //  id {static_cast<int>(e.getID()) };
-        }
+        // }
     }
     else {
         ai.plusDeltatime(timeStep, ai.elapsed_perception);
@@ -44,14 +44,14 @@ void AISystem::update(EntityManager& em)
         AIComponent* aiptr = &ai;
         LifeComponent* lcptr = &lc;
         //percibir el entorno
-        if (e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()) {
+        if (e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>() || e.hasTag<SlimeTag>()) {
             perception(bb, ai);
         }
 
         //Actualizar posiciones de la IAs o potenciales targets para calcular Flocking
         // Comprobamos si el elemento debe procesarse
         // Más alante hacer que se cumpla si esta a una cierta distancia del player
-        if (e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()) {
+        if (e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>() || e.hasTag<SlimeTag>()) {
             //Si el vector esta vacío, el elemento se inserta
             bool id_found = false;
             // Iterar sobre el vector positions

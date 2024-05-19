@@ -20,6 +20,8 @@ struct InfoSub
 struct InfoSlime {
     vec3d position{};
     int life{};
+    void setPosition(vec3d pos) { position = pos; }
+    void setLife(int li) { life = li; }
 };
 
 struct BlackBoard_t {
@@ -43,12 +45,27 @@ struct BlackBoard_t {
 
     void
         updateInfoSlime(std::size_t id, vec3d position, int life) {
-        // si el tipo es 0 es slime, si es 1 es subdito
-        // if (type == 0) {
-        InfoSlime EntInfo(position, life);
-        slimeData[id] = EntInfo;
+            // Comprobar si la clave ya existe en slimeData
+        auto it = slimeData.find(id);
+        if (it != slimeData.end()) {
+            // Si la clave existe, actualizar sus valores
+            it->second.setPosition(position);
+            it->second.setLife(life);
+        } else {
+            // Si la clave no existe, añadir un nuevo elemento
+            InfoSlime EntInfo(position, life);
+            slimeData[id] = EntInfo;
+        }
+        // // si el tipo es 0 es slime, si es 1 es subdito
+        // // if (type == 0) {
+        // InfoSlime EntInfo(position, life);
+        // slimeData[id] = EntInfo;
+        // // si el tipo es 0 es slime, si es 1 es subdito
+        // // if (type == 0) {
+        // InfoSlime EntInfo(position, life);
+        // slimeData[id] = EntInfo;
 
-    }
+        }
     void
 
         updateInfoSub(std::size_t id, vec3d position, int life, bool acshield) {

@@ -13,21 +13,34 @@
 #include <thread>
 #include <chrono>
 
+struct Timer {
+    Timer() : start(std::chrono::high_resolution_clock::now()) {}
+
+    double getElapsedTime() {
+        auto end = std::chrono::high_resolution_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        return static_cast<double>(elapsed.count()) / 1000000.0;
+    }
+
+private:
+    std::chrono::time_point<std::chrono::high_resolution_clock> start;
+};
+
 namespace DarkMoon {
     struct WindowsManager {
     private:
-        GLFWwindow* m_window {};
-        int m_width {};
-        int m_height {};
-        int m_oldWidth {};
-        int m_oldHeight {};
+        GLFWwindow* m_window{};
+        int m_width{};
+        int m_height{};
+        int m_oldWidth{};
+        int m_oldHeight{};
 
-        int m_FPS {};
-        int m_frames {};
-        double m_lastFrameTime {};
-        double m_targetFrameTime {};
-        double m_lastFPSTime {};
-        double m_deltaTime {};
+        int m_FPS{};
+        int m_frames{};
+        double m_lastFrameTime{};
+        double m_targetFrameTime{};
+        double m_lastFPSTime{};
+        double m_deltaTime{};
 
         void controlFrameRate();
         void framebuffer_size_callback();
@@ -53,9 +66,11 @@ namespace DarkMoon {
 
         // Timing-related functions
         void setTargetFPS(int fps);
+        double getTargetFPS();
         double getFrameTime();
         double getTime();
         int getFPS();
+        Timer tim{};
 
         static WindowsManager& getInstance() {
             static WindowsManager instance;

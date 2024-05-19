@@ -14,6 +14,7 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
             li.mapID = 0;
             map = loadMap("assets/Niveles/Lvl_0/Lvl_0.kaiwa");
             em.getSingleton<SoundSystem>().sonido_amb_bosque();
+            em.getSingleton<SoundSystem>().sonido_pasos_pradera();
             break;
         }
         case 1:
@@ -21,18 +22,32 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
             li.mapID = 1;
             map = loadMap("assets/Niveles/Lvl_1/Lvl_1.kaiwa");
 
+            em.getSingleton<SoundSystem>().SFX_pasos_stop();
             em.getSingleton<SoundSystem>().sonido_mazmorra();
             em.getSingleton<SoundSystem>().sonido_music_mazmorra();
+            em.getSingleton<SoundSystem>().sonido_pasos_prision();
             break;
         }
         case 2:
+        {
             li.mapID = 2;
             map = loadMap("assets/Niveles/Lvl_2/Lvl_2.kaiwa");
+            em.getSingleton<SoundSystem>().SFX_pasos_stop();
             em.getSingleton<SoundSystem>().sonido_amb_volcan();
             em.getSingleton<SoundSystem>().sonido_music_volcan();
+            em.getSingleton<SoundSystem>().sonido_pasos_volcan();
 
             break;
-
+        }
+        case 3:
+        {
+            li.mapID = 3;
+            map = loadMap("assets/Niveles/Lvl_3/Lvl_3.kaiwa");
+            em.getSingleton<SoundSystem>().sonido_amb_pradera();
+            em.getSingleton<SoundSystem>().sonido_music_pradera();
+            em.getSingleton<SoundSystem>().sonido_pasos_pradera();
+            break;
+        }
         default:
             break;
         }
@@ -145,8 +160,9 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             }
             case LoadState::LOAD_NAVMESHES:
             {
-                if (li.mapID == 2)
-                    generateNavmeshes(em);
+                // if (li.mapID == 2)
+                generateNavmeshes(em, li.mapID);
+                generateCheats(em);
                 break;
             }
             default:
@@ -191,6 +207,7 @@ void MapManager::generateChunkModel(EntityManager& em, mapSizeType& i)
         em.addTag<Chunk6Tag>(modelEntity);
         break;
     }
+    em.addTag<ChunkTag>(modelEntity);
     em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = vec3d::zero(), .scale = vec3d::zero(), .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, -1.0, 0.0 } });
 }
 
@@ -213,31 +230,37 @@ void MapManager::generateGround(EntityManager& em, const valueType& groundArray,
         Color color{ D_WHITE };
 
         // Sacamos los máximos y los mínimos
+        vec3d groundMax = groundPosition + groundScale / 2;
+        vec3d groundMin = groundPosition - groundScale / 2;
         if (i == 0)
         {
-            min.x = groundPosition.x() - groundScale.x() / 2;
-            min.y = groundPosition.z() - groundScale.z() / 2;
+            min.x = groundMin.x();
+            min.y = groundMin.z();
 
-            max.x = groundPosition.x() + groundScale.x() / 2;
-            max.y = groundPosition.z() + groundScale.z() / 2;
+            max.x = groundMax.x();
+            max.y = groundMax.z();
 
             minHeigth = groundPosition.y();
         }
         else
         {
-            if (min.x > groundPosition.x() - groundScale.x() / 2)
-                min.x = groundPosition.x() - groundScale.x() / 2;
-            if (min.y > groundPosition.z() - groundScale.z() / 2)
-                min.y = groundPosition.z() - groundScale.z() / 2;
+            if (min.x > groundMin.x())
+                min.x = groundMin.x();
+            if (min.y > groundMin.z())
+                min.y = groundMin.z();
 
-            if (max.x < groundPosition.x() + groundScale.x() / 2)
-                max.x = groundPosition.x() + groundScale.x() / 2;
-            if (max.y < groundPosition.z() + groundScale.z() / 2)
-                max.y = groundPosition.z() + groundScale.z() / 2;
+            if (max.x < groundMax.x())
+                max.x = groundMax.x();
+            if (max.y < groundMax.z())
+                max.y = groundMax.z();
 
             if (minHeigth > groundPosition.y())
                 minHeigth = groundPosition.y();
         }
+
+        auto& li = em.getSingleton<LevelInfo>();
+        if (li.mapID == 0)
+            em.addComponent<GrassComponent>(groundEntity);
 
         // Creamos los componentes del suelo
         auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .visible = false, .orientation = rot, .rotationVec = rotationVec });
@@ -250,14 +273,15 @@ void MapManager::generateGround(EntityManager& em, const valueType& groundArray,
     vec3d center = { (min.x + max.x) / 2, minHeigth, (min.y + max.y) / 2 };
 
     auto& li = em.getSingleton<LevelInfo>();
-    double zoneHeight = 20.0;
-    if (li.mapID == 1)
-        zoneHeight = 30.0;
-    else if (li.mapID == 2)
-        zoneHeight = 65.0;
+
+    static std::map<uint8_t, double> zoneHeights = {
+        {1, 30.0},
+        {2, 65.0},
+        {3, 100.0}
+    };
 
     // Creamos 4 zonas para el chunk
-    vec3d zoneScale = { (max.x - min.x) / 2, zoneHeight, (max.y - min.y) / 2 };
+    vec3d zoneScale = { (max.x - min.x) / 2, zoneHeights[li.mapID], (max.y - min.y) / 2 };
     int k = 0;
     int limit = j + 4;
     for (; j < limit; j++)
@@ -408,8 +432,9 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             addMessageCmp(em, entity, interactable);
 
             ic.range = 7.5;
+            em.addComponent<PointLightComponent>(entity);
             em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
-            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
+            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 10, .spawnRate = 0.1f });
             [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .content = content });
 
             if (interactable.HasMember("offsetZ"))
@@ -431,6 +456,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             auto& li = em.getSingleton<LevelInfo>();
             em.addTag<DestructibleTag>(entity);
             em.addTag<WallTag>(entity);
+            em.addTag<LockableTag>(entity);
 
             int life{ interactable["life"].GetInt() };
             em.addComponent<LifeComponent>(entity, LifeComponent{ .life = life });
@@ -518,7 +544,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
 
             auto& pos = p.position;
             auto posY = pos.y() - 2.0;
-            auto rotCopy = rot;
+            double rotCopy = rot;
 
             if (rotationVec[1] > 0.0)
                 rotCopy *= -1;
@@ -550,14 +576,15 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             {
                 auto& wall{ em.newEntity() };
                 em.addTag<WallTag>(wall);
-                em.addComponent<RenderComponent>(wall, RenderComponent{ .position = wallPoints[j].first, .scale = wallPoints[j].second, .color = color, .visible = false, .orientation = 0.0, .rotationVec = rotationVec });
+                auto& rWall = em.addComponent<RenderComponent>(wall, RenderComponent{ .position = wallPoints[j].first, .scale = wallPoints[j].second, .color = color, .visible = false, .orientation = 0.0, .rotationVec = rotationVec });
                 em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = wallPoints[j].first, .velocity = vec3d::zero(), .scale = wallPoints[j].second, .gravity = 0, .orientation = 0.0, .rotationVec = rotationVec });
                 em.addComponent<ColliderComponent>(wall, ColliderComponent{ position, scale, BehaviorType::STATIC });
 
                 if (j > 5)
                 {
+                    auto& plc = em.addComponent<PointLightComponent>(wall);
                     auto& p = em.addComponent<ParticleMakerComponent>(wall, ParticleMakerComponent{ .active = true, .effect = std::get<0>(particleParts[j]), .maxParticles = std::get<1>(particleParts[j]), .spawnRate = std::get<2>(particleParts[j]), .lifeTime = std::get<3>(particleParts[j]) });
-                    spc.parts[static_cast<SpawnComponent::SpawnParts>(j)] = &p;
+                    spc.parts.push_back({ &rWall, &p, &plc });
                 }
             }
 
@@ -589,7 +616,6 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         }
         case InteractableType::Roca:
         {
-            //em.addTag<WallTag>(entity);
             em.addTag<ObstacleTag>(entity);
             r.visible = false;
             break;
@@ -604,8 +630,8 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
 
             auto yMin = c.bbox.min.y();
             auto yMax = c.bbox.max.y();
-            auto rot2 = (orientation - 90.0) * DEGTORAD;
-            em.addComponent<LadderComponent>(entity, LadderComponent{ .orientation = rot2, .yMin = yMin, .yMax = yMax });
+            // auto rot2 = (orientation - 90.0) * DEGTORAD;
+            em.addComponent<LadderComponent>(entity, LadderComponent{ .orientation = rot, .yMin = yMin, .yMax = yMax });
             break;
         }
         case InteractableType::Sign:
@@ -633,11 +659,11 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         case InteractableType::MissionOBJ:
         {
             auto& li = em.getSingleton<LevelInfo>();
+            em.addTag<MissionObjTag>(entity);
             switch (li.mapID)
             {
             case 2:
             {
-                em.addTag<MissionObjTag>(entity);
                 em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
                 auto& bc = em.addComponent<BoatComponent>(entity);
                 bc.setPart(boatParts);
@@ -648,6 +674,15 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 {
                     r.offset = interactable["offsetZ"][0].GetDouble();
                 }
+                break;
+            }
+            case 3:
+            {
+                em.addTag<LockableTag>(entity);
+                c.behaviorType = BehaviorType::RELAY;
+                auto relayType = static_cast<ElementalType>(interactable["relay"].GetUint());
+                em.addComponent<TypeComponent>(entity, TypeComponent({ .type = relayType }));
+                em.addComponent<LifeComponent>(entity, LifeComponent({ .life = 20 }));
                 break;
             }
             default:
@@ -736,10 +771,17 @@ vec3d getNodeVec3d(uint16_t nodeId, const std::map<uint16_t, vec3d>& nodes) {
     // Si no se encuentra el nodo, se devuelve un vec3d con valores predeterminados o se maneja el error de alguna otra manera
     return { 0.0f, 0.0f, 0.0f };
 }
-void MapManager::generateNavmeshes(EntityManager& em)
+void MapManager::generateNavmeshes(EntityManager& em, uint8_t map)
 {
+
     auto& navs = em.getSingleton<NavmeshInfo>();
-    mapType navmeshkaiwa = loadMap("assets/Niveles/Lvl_2/Lvl_2-navmeshes.kaiwa");
+    mapType navmeshkaiwa{};
+    if (map == 2) {
+        navmeshkaiwa = loadMap("assets/Niveles/Lvl_2/Lvl_2-navmeshes.kaiwa");
+    }
+    else {
+        navmeshkaiwa = loadMap("assets/Niveles/Lvl_4/Lvl_4-navmeshes.kaiwa");
+    }
     const valueType& navmeshes = navmeshkaiwa["NavMesh"];
     for (mapSizeType i = 0; i < navmeshes.Size(); i++) {
         std::array<vec3d, 9> vecnodes{};
@@ -797,12 +839,13 @@ void MapManager::generateNavmeshes(EntityManager& em)
         // if(xd==NULL){
         //     hasramp = true;
         // }        
-        
+        // if(map == 2){
         const rapidjson::Value::ConstMemberIterator& xd = navmesh.FindMember("ramp");
-        if(xd != navmesh.MemberEnd()){
-            if(xd->value.GetBool())
+        if (xd != navmesh.MemberEnd()) {
+            if (xd->value.GetBool())
                 hasramp = true;
         }
+        // }
         // bool hasramp = navmesh["ramp"].GetBool();
 
         //Creamos NavMesh BBox
@@ -984,73 +1027,82 @@ void MapManager::generateNavmeshes(EntityManager& em)
     //Conexiones a mano de las rampas del nivel 2
     //rampa muñeco izquierda
     std::vector<Conection> auxconex;
-    auxconex.push_back(Conection{ 1,2,18 });
-    auxconex.push_back(Conection{ 1,5,18 });
-    auxconex.push_back(Conection{ 1,26,18 });
-    auxconex.push_back(Conection{ 1,18,53 });
-    auxconex.push_back(Conection{ 1,53,50 });
-    auxconex.push_back(Conection{ 1,44,0 });
-    auxconex.push_back(Conection{ 1,14,2 });
-    auxconex.push_back(Conection{ 1,27,14 });
-    auxconex.push_back(Conection{ 1,21,18 });
-    // rampa derecha muñeco
-    auxconex.push_back(Conection{ 1,63,59 });
-    auxconex.push_back(Conection{ 1,98,63 });
-    auxconex.push_back(Conection{ 1,64,63 });
-    auxconex.push_back(Conection{ 1,65,63 });
-    // rampa mas abajo
-    auxconex.push_back(Conection{ 1,124,116 });
-    auxconex.push_back(Conection{ 1,121,116 });
-    auxconex.push_back(Conection{ 1,119,116 });
-    //
-    auxconex.push_back(Conection{ 1,576,572 });
-    auxconex.push_back(Conection{ 1,572,567 });
-    auxconex.push_back(Conection{ 1,567,536 });
-    auxconex.push_back(Conection{ 1,620,572 });
-    auxconex.push_back(Conection{ 1,583,572 });
-    auxconex.push_back(Conection{ 1,470,576 });
-    auxconex.push_back(Conection{ 1,473,576 });
-    auxconex.push_back(Conection{ 1,484,473 });
-    //
-    auxconex.push_back(Conection{ 1,333,346 });
-    auxconex.push_back(Conection{ 1,303,333 });
-    //
-    auxconex.push_back(Conection{ 1,643,843 });
-    auxconex.push_back(Conection{ 1,646,843 });
-    auxconex.push_back(Conection{ 1,652,843 });
-    auxconex.push_back(Conection{ 1,843,837 });
-    auxconex.push_back(Conection{ 1,647,648 });
-    auxconex.push_back(Conection{ 1,630,639 });
-    //
-    auxconex.push_back(Conection{ 1,801,808});
-    auxconex.push_back(Conection{ 1,808,819});
-    auxconex.push_back(Conection{ 1,742,801});
-    auxconex.push_back(Conection{ 1,799,801});
-    auxconex.push_back(Conection{ 1,731,801});
-    auxconex.push_back(Conection{ 1,736,801});
-    auxconex.push_back(Conection{ 1,745,801});
-    auxconex.push_back(Conection{ 1,792,742});
-    auxconex.push_back(Conection{ 1,800,742});
-    auxconex.push_back(Conection{ 1,644,808});
-    auxconex.push_back(Conection{ 1,632,639});
+    if (map == 2) {
+        auxconex.push_back(Conection{ 1,2,18 });
+        auxconex.push_back(Conection{ 1,5,18 });
+        auxconex.push_back(Conection{ 1,26,18 });
+        auxconex.push_back(Conection{ 1,18,53 });
+        auxconex.push_back(Conection{ 1,53,50 });
+        auxconex.push_back(Conection{ 1,44,0 });
+        auxconex.push_back(Conection{ 1,14,2 });
+        auxconex.push_back(Conection{ 1,27,14 });
+        auxconex.push_back(Conection{ 1,21,18 });
+        // rampa derecha muñeco
+        auxconex.push_back(Conection{ 1,63,59 });
+        auxconex.push_back(Conection{ 1,98,63 });
+        auxconex.push_back(Conection{ 1,64,63 });
+        auxconex.push_back(Conection{ 1,65,63 });
+        // rampa mas abajo
+        auxconex.push_back(Conection{ 1,124,116 });
+        auxconex.push_back(Conection{ 1,121,116 });
+        auxconex.push_back(Conection{ 1,119,116 });
+        //
+        auxconex.push_back(Conection{ 1,576,572 });
+        auxconex.push_back(Conection{ 1,572,567 });
+        auxconex.push_back(Conection{ 1,567,536 });
+        auxconex.push_back(Conection{ 1,620,572 });
+        auxconex.push_back(Conection{ 1,583,572 });
+        auxconex.push_back(Conection{ 1,470,576 });
+        auxconex.push_back(Conection{ 1,473,576 });
+        auxconex.push_back(Conection{ 1,484,473 });
+        //
+        auxconex.push_back(Conection{ 1,333,346 });
+        auxconex.push_back(Conection{ 1,303,333 });
+        //
+        auxconex.push_back(Conection{ 1,643,843 });
+        auxconex.push_back(Conection{ 1,646,843 });
+        auxconex.push_back(Conection{ 1,652,843 });
+        auxconex.push_back(Conection{ 1,843,837 });
+        auxconex.push_back(Conection{ 1,647,648 });
+        auxconex.push_back(Conection{ 1,630,639 });
+        //
+        auxconex.push_back(Conection{ 1,801,808 });
+        auxconex.push_back(Conection{ 1,808,819 });
+        auxconex.push_back(Conection{ 1,742,801 });
+        auxconex.push_back(Conection{ 1,799,801 });
+        auxconex.push_back(Conection{ 1,731,801 });
+        auxconex.push_back(Conection{ 1,736,801 });
+        auxconex.push_back(Conection{ 1,745,801 });
+        auxconex.push_back(Conection{ 1,792,742 });
+        auxconex.push_back(Conection{ 1,800,742 });
+        auxconex.push_back(Conection{ 1,644,808 });
+        auxconex.push_back(Conection{ 1,632,639 });
+    }
+    else {
+        auxconex.push_back(Conection{ 1,457,448 });
+        auxconex.push_back(Conection{ 1,448,419 });
+        auxconex.push_back(Conection{ 1,419,421 });
+    }
 
-    for (auto& c : auxconex) {
-        navs.conexiones.push_back(c);
-        //debug
-        auto pair = std::make_pair(getNodeVec3d(c.fromNode, navs.nodes), getNodeVec3d(c.toNode, navs.nodes));
-        navs.conexpos.insert(pair);
-        //nodes
-        // for (auto& [n, vec] : navs.nodes) {
-        //     // if(n == 583){
-        //     //     vec = vec3d{vec.x(),vec.y(),vec.z()+10.0};
-        //     // }
-        //     if (n == c.toNode) {
-        //         navs.selectednodes.insert(std::make_pair(n, vec));
-        //     }
-        //     if (n == c.fromNode) {
-        //         navs.selectednodes.insert(std::make_pair(n, vec));
-        //     }
-        // }
+    if (auxconex.size() != 0) {
+        for (auto& c : auxconex) {
+            navs.conexiones.push_back(c);
+            //debug
+            auto pair = std::make_pair(getNodeVec3d(c.fromNode, navs.nodes), getNodeVec3d(c.toNode, navs.nodes));
+            navs.conexpos.insert(pair);
+            //nodes
+            // for (auto& [n, vec] : navs.nodes) {
+            //     // if(n == 583){
+            //     vec = vec3d{ vec.x(),vec.y(),vec.z() + 10.0 };
+            //     // }
+            //     if (n == c.toNode) {
+            //         navs.selectednodes.insert(std::make_pair(n, vec));
+            //     }
+            //     if (n == c.fromNode) {
+            //         navs.selectednodes.insert(std::make_pair(n, vec));
+            //     }
+            // }
+        }
     }
     //Crear conexiones entre los centros
     // Crear conexiones entre los centros
@@ -1279,6 +1331,28 @@ void MapManager::checkDispatcher(EntityManager& em, Entity& e, const valueType& 
         for (mapSizeType j = 0; j < value["events"].Size(); j++)
         {
             dc.eventCodes.push_back(value["events"][j].GetInt());
+        }
+    }
+}
+
+void MapManager::generateCheats(EntityManager& em)
+{
+    auto& cheatPositions = em.getSingleton<CheatsInfo>().cheatPositions;
+    if (!cheatPositions.empty())
+        return;
+
+    mapType cheatsKaiwa = loadMap("assets/cheats.kaiwa");
+    const valueType& levels = cheatsKaiwa["Niveles"];
+    for (mapSizeType i = 0; i < levels.Size(); i++)
+    {
+        uint8_t levelNum = static_cast<uint8_t>(levels[i]["Nombre"].GetUint());
+        auto& positions = levels[i]["Puntos"];
+        for (mapSizeType j = 0; j < positions.Size(); j++)
+        {
+            std::string positionName = positions[j]["Nombre"].GetString();
+            auto& positionLabel = positions[j]["Posición"];
+            vec3d position = { positionLabel[0].GetDouble(), positionLabel[1].GetDouble(), positionLabel[2].GetDouble() };
+            cheatPositions[cheatPositions.size()] = std::make_tuple(levelNum, positionName, position);
         }
     }
 }

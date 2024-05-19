@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
+#include <random>
 #include "../utils/types.hpp"
 #include "../utils/vec3D.hpp"
 #include "../motor/src/darkmoon.hpp"
@@ -21,7 +22,9 @@ namespace ENGI {
 
         // Timing Related Functions
         void setTargetFPS(int fps);
+        double getTargetFPS();
         float getFrameTime();
+        double getFrameTimeDouble();
 
         // Drawing
         void beginDrawing();
@@ -36,9 +39,12 @@ namespace ENGI {
         void drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color);
 
         void drawNode(Node* node, vec2i pos = { -1, -1 }, vec2f scale = { 1.0f, 1.0f });
-        void drawCircle(int posX, int posY, float radius, Color color);
         void drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color);
         void drawTriangle(vec2d v1, vec2d v2, vec2d v3, Color color);
+
+        // Circle
+        Node* drawCircle(vec2i position, float radius, int segments, Color color);
+        Node* createCircle(vec2i position, float radius, int segments, Color color, const char* nodeName, Node* parentNode);
 
         // Rectangle
         Node* drawRectangle(vec2i pos, vec2i size, Color color);
@@ -62,15 +68,20 @@ namespace ENGI {
         Node* createButton(vec2i position, vec2i size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor, const char* nodeName, Node* parentNode);
         Node* createButton(vec2i position, vec2i size, std::string text, const char* nodeName, Node* parentNode);
 
+        // CheckBox
+        Node* drawCheckBox(vec2i position, float size, bool checked, Color backgroundColor, Color normalColor, Color hoverColor);
+        Node* createCheckBox(vec2i position, float size, bool checked, Color backgroundColor, Color normalColor, Color hoverColor, const char* nodeName, Node* parentNode);
+        Node* createCheckBoxPtr(vec2i position, float size, bool* checked, Color backgroundColor, Color normalColor, Color hoverColor, const char* nodeName, Node* parentNode);
+
         // Cube
         Node* drawCube(vec3d position, vec3d size, DarkMoon::Color color);
         Node* createCube(vec3d position, vec3d size, DarkMoon::Color color, const char* nodeName, Node* parentNode);
 
         // Text
         Node* drawText(const char* text, int posX, int posY, int fontSize, Color color, Aligned aligned = Aligned::LEFT);
-        Node* createText(vec2i position, std::string text, Font* font, int fontSize, Color textColor, const char* nodeName, Node* parentNode, Aligned align = Aligned::LEFT);
-        Node* createText(vec2i position, std::string text, Color c, const char* nodeName, Node* parentNode, int fontSize = 20);
-        Node* createTextBox(vec2i position, vec2i size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode);
+        Node* createText(vec2i position, std::string text, Font* font, int fontSize, Color textColor, const char* nodeName, Node* parentNode, Aligned align = Aligned::LEFT, bool charByChar = false);
+        Node* createText(vec2i position, std::string text, Color c, const char* nodeName, Node* parentNode, int fontSize = 20, Aligned align = Aligned::LEFT);
+        Node* createTextBox(vec2i position, vec2i size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode, bool charByChar = false);
         Font* getFontDefault();
 
         // Line 3D
@@ -80,6 +91,18 @@ namespace ENGI {
         // Point 3D
         Node* drawPoint3D(vec3d position, float pointSize, Color color);
         Node* createPoint3D(vec3d position, float pointSize, Color color, const char* nodeName, Node* parentNode);
+
+        // Lights
+        void toggleLights();
+        void activateLights();
+        void deactivateLights();
+
+        // Point Light
+        Node* drawPointLight(vec3d position, Color color);
+        Node* createPointLight(vec3d position, Color color, const char* nodeName, Node* parentNode);
+
+        // Billboard
+        Node* drawBillboard(std::string path, vec3d position, vec2f size);
 
         // Window
         void initWindow(int width, int height, const char* title);
@@ -101,6 +124,7 @@ namespace ENGI {
         vec3d getTargetCamera();
         vec3d getUpCamera();
         float getFovyCamera();
+        glm::mat4 getViewMatrix();
 
         // Input Handling
         bool isKeyPressed(int key);
@@ -117,11 +141,19 @@ namespace ENGI {
         bool isGamepadButtonReleased(int gamepad, int button);
         float getGamepadAxisMovement(int gamepad, int axis);
 
+        // Animations
+        std::size_t playAnimation(Animation* panimation);
+        void stopAnimation(std::size_t idanim);
+        std::vector<Animation*> createAnimations(const std::string& path, std::vector<BoneInfo>& vecbones);
+        void updateAnimation(float mult, std::size_t id);
+        float getAnimationTime(std::size_t id);
+
         Node* loadModel(const char* filename);
         float getWorldToScreenX(vec3d pos);
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();
         void loadAndResizeImage(const char* name, const char* path, Node* parentNode);
+        void loadAndResizeBillboard(const char* name, const char* path, Node* parentNode);
         void loadAndResizeImageGif(const char* name, const char* filePath);
         void unloadGifsAndTextures();
         void setReplayMode(bool replay, GameData& gd);
@@ -134,6 +166,21 @@ namespace ENGI {
         Font* getDefaultFont();
         void traverseRoot();
         void nodeClear(Node* node);
+        template<typename T>
+        T getRandomValue(T min, T max)
+        {
+            static std::random_device rd; // obtiene una semilla aleatoria para el generador
+            static std::mt19937 generator(rd()); // usa Mersenne twister para generar números aleatorios
+
+            if constexpr (std::is_integral<T>::value) {
+                std::uniform_int_distribution<T> distribution(min, max); // distribución uniforme entre min y max para enteros
+                return distribution(generator);
+            }
+            else if constexpr (std::is_floating_point<T>::value) {
+                std::uniform_real_distribution<T> distribution(min, max); // distribución uniforme entre min y max para flotantes
+                return distribution(generator);
+            }
+        }
 
         // DarkMoon Engine //
 
@@ -142,6 +189,7 @@ namespace ENGI {
         std::map<std::string, Node*> nodes;
         std::map<Node*, std::pair<vec2i, vec2f>> nodesToDraw{};
 
+        Node* createNode3D(const char* name);
         Node* createNode(const char* name, Node* parentNode);
         Node* createNode(Node* copyNode, Node* parentNode);
 

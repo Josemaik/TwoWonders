@@ -1,110 +1,148 @@
 #version 330 core
-out vec4 FragColor;
+
+const int MAX_POINT_LIGHTS = 30;
+const int MAX_SPOT_LIGHTS  = 10;
 
 in vec3 FragPos;
 in vec3 Normal;
 in vec2 TextCoord;
 
-// --------------- //
-// --- Texture --- //
-// --------------- //
+out vec4 FragColor;
+
+// TEXTURE //
 
 uniform sampler2D texture0;
 uniform vec4 customColor;
 
-// ---------------- //
-// --- Material --- //
-// ---------------- //
+// MATERIAL //
 
 uniform vec3 Kd;
 uniform vec3 Ka;
 uniform vec3 Ks;
 uniform float Shininess;
 
-const float MIN_SHININESS = 0.1;
+// LIGHTS //
 
-// -------------- //
-// --- Lights --- //
-// -------------- //
+struct BaseLight
+{
+    vec3 color;
+    float ambientIntensity;
+    float diffuseIntensity;
+};
 
-const int MAX_POINT_LIGHTS = 10;
+struct DirectionalLight
+{
+    BaseLight base;
+    vec3 direction;
+};
 
-struct PointLight {
-    vec4 position;
-    vec4 color;
+struct Attenuation
+{
     float constant;
     float linear;
-    float quadratic;
+    float exp;
 };
 
-uniform PointLight pointsLights[MAX_POINT_LIGHTS];
-uniform int NumPointLights;
+struct PointLight
+{
+    BaseLight base;
+    vec3 position;
+    Attenuation attenuation;
+};
 
-const int MAX_DIRECTIONAL_LIGHTS = 2;
-
-struct DirectionalLight {
+struct SpotLight
+{
+    PointLight base;
     vec3 direction;
-    vec4 color;
+    float cutOff;
 };
 
-uniform DirectionalLight directionalLights[MAX_DIRECTIONAL_LIGHTS];
-uniform int NumDirectionalLights;
+uniform DirectionalLight gDirectionalLight;
 
-// ------------- //
-// --- Phong --- //
-// ------------- //
+uniform int gNumPointLights;
+uniform PointLight gPointLights[MAX_POINT_LIGHTS];
 
-vec3 Phong(){
+uniform int gNumSpotLights;
+uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
 
-    vec3 totalLight = vec3(0.0);
+// FUNCTIONS //
 
-    // pointsLights
+vec4 CalcLightInternal(BaseLight light, vec3 lightDirection, vec3 normal)
+{
+    vec4 ambientColor = vec4(light.color, 1.0f) * 
+                        light.ambientIntensity * 
+                        vec4(Ka, 1.0f);
 
-    vec3 n = normalize(Normal);
-    vec3 v = normalize(vec3(-FragPos));
+    vec4 diffuseColor = vec4(0.0);
+    vec4 specularColor = vec4(0.0);
 
-    float ShininessAux = max(Shininess, MIN_SHININESS);
+    float diffuseFactor = dot(normal, -lightDirection);
 
-    int pLightCount = min(NumPointLights, MAX_POINT_LIGHTS);
-    for(int i = 0; i < pLightCount; i++){
-        vec3 l = normalize(vec3(pointsLights[i].position) - FragPos);
-        vec3 r = reflect(-l, n);
-
-        float distance = length(pointsLights[i].position - vec4(FragPos, 1.0));
-        float attenuation = 1.0 / (pointsLights[i].constant + pointsLights[i].linear * distance + pointsLights[i].quadratic * (distance * distance));
-
-        vec3 ambientTerm = Ka * pointsLights[i].color.rgb;
-        vec3 diffuseTerm = Kd * max(dot(l,n), 0.0) * pointsLights[i].color.rgb;
-        vec3 specularTerm = Ks * pow(max(dot(r,v), 0.0), ShininessAux) * pointsLights[i].color.rgb;
-
-        totalLight += attenuation * (ambientTerm + diffuseTerm + specularTerm);
+    if(diffuseFactor > 0)
+    {
+        diffuseColor = vec4(light.color, 1.0f) * 
+                       light.diffuseIntensity * 
+                       vec4(Kd, 1.0f) *
+                       diffuseFactor;
     }
 
-    // directionalLights
+    vec3 viewDir = normalize(-FragPos);
+    vec3 reflectDir = reflect(-lightDirection, normal);
+    float specularFactor = dot(viewDir, reflectDir);
 
-    int dLightCount = min(NumDirectionalLights, MAX_DIRECTIONAL_LIGHTS);
-    for(int i = 0; i < dLightCount; i++){
-        vec3 lightDir = normalize(-directionalLights[i].direction);
-
-        float diff = max(dot(n, lightDir), 0.0);
-
-        vec3 reflectDir = reflect(-lightDir, n);
-        float spec = pow(max(dot(reflectDir, v), 0.0), ShininessAux);
-
-        vec3 ambientTerm = Ka * directionalLights[i].color.rgb;
-        vec3 diffuseTerm = Kd * diff * directionalLights[i].color.rgb;
-        vec3 specularTerm = Ks * spec * directionalLights[i].color.rgb;
-
-        totalLight += (ambientTerm + diffuseTerm + specularTerm);
+    if(specularFactor > 0)
+    {
+        specularFactor = pow(specularFactor, Shininess);
+        specularColor = vec4(light.color, 1.0f) *
+                        Shininess *
+                        vec4(Ks, 1.0f) *
+                        specularFactor;
     }
 
-    return totalLight;
-}   
+    return (ambientColor + diffuseColor + specularColor);
+}
 
-// ------------ //
-// --- Main --- //
-// ------------ //
+vec4 CalcDirectionalLight(vec3 normal)
+{
+    return CalcLightInternal(gDirectionalLight.base, gDirectionalLight.direction, normal);
+}
+
+vec4 CalcPointLight(PointLight l, vec3 normal)
+{
+    vec3 lightDirection = FragPos - l.position;
+    float distance = length(lightDirection);
+    lightDirection = normalize(lightDirection);
+
+    vec4 color = CalcLightInternal(l.base, lightDirection, normal);
+    float attenuation = l.attenuation.constant +
+                        l.attenuation.linear * distance +
+                        l.attenuation.exp * distance * distance;
+
+    return color / attenuation;
+}
+
+vec4 CalcSpotLight(SpotLight l, vec3 normal)
+{
+    float auxCutOff = cos(radians(l.cutOff));
+
+    vec3 lightToPixel = normalize(FragPos - l.base.position);
+    float spotFactor = dot(lightToPixel, l.direction);
+
+    if(spotFactor > auxCutOff)
+        return CalcPointLight(l.base, normal) * (1.0 - (1.0 - spotFactor) * 1.0 / (1.0 - auxCutOff));
+    else 
+        return vec4(0.0);
+}
 
 void main(){
-   FragColor = texture(texture0, TextCoord) * customColor * vec4(Phong(), 1.0);
+    vec3 normal = normalize(Normal);
+    vec4 totalLight = CalcDirectionalLight(normal);
+
+    for(int i = 0; i < gNumPointLights; i++)
+        totalLight += CalcPointLight(gPointLights[i], normal);
+
+    for(int i = 0; i < gNumSpotLights; i++)
+        totalLight += CalcSpotLight(gSpotLights[i], normal);
+
+    FragColor = texture(texture0, TextCoord) * customColor * totalLight;
 }

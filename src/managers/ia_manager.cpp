@@ -41,19 +41,20 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     double countdown_stop = json["countdown_stop"].GetDouble();
     double countdown_shoot = json["countdown_shoot"].GetDouble();
     double countdown_perception = json["countdown_perception"].GetDouble();
-    double scale_to_respawn_attack = json["scale_to_respawn_attack"].GetDouble();
 
     double rot = orientation * DEGTORAD;
 
     // Creamos el enemigo
     auto& e{ em.newEntity() };
     em.addTag<EnemyTag>(e);
+    em.addTag<LockableTag>(e);
 
     auto& wr = em.addComponent<RenderComponent>(e, RenderComponent{ .position = position, .scale = scale, .color = color,.orientation = rot,.rotationVec = rotationVec });
     auto& wp = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.orientationonrespawn = rot,.rotationVec = rotationVec, .max_speed = max_speed });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ wp.position, wr.scale, BehaviorType::ENEMY });
     auto& wl = em.addComponent<LifeComponent>(e, LifeComponent{ .life = life });
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = element });
+    em.addComponent<SoundComponent>(e);
 
     // if (json.HasMember("orientation"))
     // {
@@ -92,10 +93,11 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     {
         em.addTag<SnowmanTag>(e);
 
+        auto* a_e_1 = &tree.createNode<BTAction_Evade>();
         auto* d_a_6 = &tree.createNode<BTDecisionReadyforAttack>();
         auto* a_a_6 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer, vec3d{}); // fail si disparo succes si no disparo
         auto* d_r_6 = &tree.createNode<BTDecisionOnAttackRadius>();
-        auto* sequence6_1 = &tree.createNode<BTNodeSequence_t>(d_a_6, a_a_6, d_r_6);
+        auto* sequence6_1 = &tree.createNode<BTNodeSequence_t>(a_e_1, d_a_6, a_a_6, d_r_6);
 
         auto* d_1_2 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* a_s_2 = &tree.createNode<BTAction_Seek>();
@@ -129,9 +131,9 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
 
         auto* d_a_3 = &tree.createNode<BTDecisionReadyforAttack>();
         auto* a_j_3 = &tree.createNode<BTAction_JumptoPlayer>();
-        //auto* a_a_3 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee); // fail si disparo succes si no disparo
+        auto* a_a_3 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee,vec3d{}); // fail si disparo succes si no disparo
         auto* d_r_3 = &tree.createNode<BTDecisionOnAttackRadius>();
-        auto* sequence3_2 = &tree.createNode<BTNodeSequence_t>(d_a_3, a_j_3, d_r_3);
+        auto* sequence3_2 = &tree.createNode<BTNodeSequence_t>(d_a_3, a_j_3, a_a_3,d_r_3);
 
         auto* d_1_3 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* a_s_3 = &tree.createNode<BTAction_Seek>();
@@ -204,6 +206,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     break;
     case 5: {
         em.addTag<AngryBushTag>(e);
+        em.destroyTag<LockableTag>(e);
         auto& abc = em.addComponent<AngryBushComponent>(e);
         abc.max_speed = wp.max_speed;
         wl.invulnerable = true;
@@ -213,7 +216,10 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     case 6:
         em.addTag<DummyTag>(e);
         break;
-    case 7: em.addTag<AngryBushTag2>(e); tree.createNode<BTAction_Patrol>();
+    case 7:
+        em.addTag<AngryBushTag2>(e);
+        em.destroyTag<LockableTag>(e);
+        tree.createNode<BTAction_Patrol>();
         break;
     case 8: {
         em.addTag<CrusherTag>(e);
@@ -232,7 +238,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     auto& ai = em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = arrival_radius, .detect_radius = detect_radius, .attack_radius = attack_radius, .tx = tx, .tz = tz,.time2arrive = time2arrive, .tactive = tactive, .perceptionTime = static_cast<float>(perceptionTime),
         .path = path,.followpatrol = followpatrol ,.countdown_stop = countdown_stop, .countdown_shoot = countdown_shoot, .countdown_perception = countdown_perception, .initialPos = position, .behaviourTree = &tree });
 
-    em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = static_cast<float>(scale_to_respawn_attack) });
+    em.addComponent<AttackerComponent>(e);
 
     // Revisamos si está en el mapa tutorial para hacer que los enemigos no hagan daño
     auto& li = em.getSingleton<LevelInfo>();
@@ -358,5 +364,5 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
     em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = 0.1, .detect_radius = 18.0, .attack_radius = attack_radius_p, .tx = 0.0, .tz = 0.0,.time2arrive = 1.0, .tactive = true, .perceptionTime = static_cast<float>(0.2),
     .path = vec3d{}, .countdown_stop = countdown_stop_p, .countdown_shoot = countdown_shoot_p, .countdown_perception = 0.2, .behaviourTree = &tree });
 
-    em.addComponent<AttackComponent>(e, AttackComponent{ .scale_to_respawn_attack = 5.0 });
+    em.addComponent<AttackerComponent>(e);
 }

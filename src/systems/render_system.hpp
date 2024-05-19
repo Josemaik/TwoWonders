@@ -18,15 +18,22 @@ struct RenderSystem
         float scaleFactorX{};
         float scaleFactorY{};
         float lerpFactor{};
-        float lerpSpeed{ 0.01f };
+        float lerpSpeed{ 0.03f };
         float elapsed{};
+    };
+
+    struct Snow
+    {
+        vec2f position{ -1, -1 };
+        vec2f speed{};
+        float size{};
     };
 
     // Se van a buscar las entidad que tengan estos componentes y tags
     using SYSCMPs = MP::TypeList<PhysicsComponent, RenderComponent>;
     using SYSTAGs = MP::TypeList<>;
 
-    void update(EntityManager& em, GameEngine& engine);
+    void update(EntityManager& em, GameEngine& engine, double alpha);
     void drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss);
     void drawLogoKaiwa(GameEngine& engine);
     void drawOptions(GameEngine& engine, EntityManager& em, SoundSystem& ss);
@@ -69,9 +76,11 @@ private:
     void drawAlerts_IA(EntityManager& em, GameEngine& engine);
     void drawFPSCounter(GameEngine& engine);
     void loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r);
+    void loadAnimations(GameEngine& engine, EntityManager& em, Entity& ent, RenderComponent& rc, const std::string& path, float mult = 1.0f);
     // void loadShaders(Model& model);
     void drawTextBox(GameEngine& engine, EntityManager& em);
     double shakeDouble(double value);
+    void drawCheats(EntityManager& em, GameEngine& engine);
 
     void updateHealthBar(GameEngine& engine, EntityManager& em, const Entity& e);
     void updateManaBar(GameEngine& engine, EntityManager& em);
@@ -79,12 +88,19 @@ private:
     bool nodeExists(GameEngine& engine, const char* name);
     double SelectValue(GameEngine& engine, double value, int posx, int posy, int height, int width, const char* name, Node* parentNode);
     uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::map<uint16_t, vec3d>& nodes);
+    void checkSliderSound(SoundSystem& ss, OptionSlider& slider);
+    void drawSnowEffect(GameEngine& engine, bool generate, vec2f aux);
+    void generateSnow(GameEngine& engine, std::size_t num);
+    void setPointLight(GameEngine& engine, EntityManager& em, Entity& e, Node& n, vec3d pos, float intensity = 1.0f, Color c = { 255, 215, 0, 255 });
+    void setPointLight(GameEngine& engine, PointLightComponent& plc, Node& n, vec3d pos, float intensity = 1.0f, Color c = { 255, 215, 0, 255 });
+    void drawGrass(GameEngine& engine, RenderComponent& ren, GrassComponent& grass);
 
     bool isSelected{ false };
     bool isSelectedfordebug{ false };
     std::size_t pointedEntity{ std::numeric_limits<std::size_t>::max() };
     double pointedDistance{ std::numeric_limits<double>::max() };
     std::map<std::string, AnimatedTexture> animatedTextures{};
+    std::map<std::size_t, Snow> snowList{};
     // bool chunk0Charged{ false };
     // bool chunk1Charged{ false };
     // ShaderType* shaderPtr{ nullptr };
@@ -101,6 +117,7 @@ private:
     float elapsed_book{ 0.0f };
 
     int coinBarX{}, coinNumberX{};
+    Spell* spellSelected{ nullptr };
 };
 
 #endif // !RENDER_SYSTEM

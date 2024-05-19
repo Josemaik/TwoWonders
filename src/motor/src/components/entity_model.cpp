@@ -4,7 +4,7 @@ namespace DarkMoon {
     void Model::load(const char* filePath, ResourceManager& rm) {
         // Read file
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(filePath,aiProcess_Triangulate | aiProcess_FlipUVs);
+        const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
         if (!scene || !scene->mRootNode) {
             std::cerr << "[ERROR ASSIMP] : " << importer.GetErrorString() << std::endl;
             return;
@@ -16,7 +16,31 @@ namespace DarkMoon {
         std::cout << " - Load a model -> " << m_name << std::endl;
 
         processNode(scene->mRootNode, scene, rm);
+        // if(scene->HasAnimations()){
+        //     for(uint i = 0; i < scene->mNumAnimations;i++){
+        //         ReadMissingBones(scene->mAnimations[i]);
+        //     }
+        // }
     };
+
+    // void Model::ReadMissingBones(const aiAnimation* animation){
+    //     int size = animation->mNumChannels;
+
+    //     auto& boneInfoMap = getboneInfoMap();
+    //     int& boneCount = getBoneCount();
+
+    //     for (int i = 0; i < size; i++)
+    //     {
+    //         auto channel = animation->mChannels[i];
+    //         std::string boneName = channel->mNodeName.data;
+
+    //         if (boneInfoMap.find(boneName) == boneInfoMap.end())
+    //         {
+    //             boneInfoMap[boneName].id = boneCount;
+    //             boneCount++;
+    //         }
+    //     }
+    // }
 
     void Model::unload() {
         //ResourceManager rm = ResourceManager::getInstance();
@@ -29,7 +53,7 @@ namespace DarkMoon {
 
         // Draw meshes
         if (drawModel)
-            for (const auto& mesh : m_meshes){
+            for (const auto& mesh : m_meshes) {
                 //std::cout << mesh->getID() << "\n";
                 mesh->draw(transMatrix, color);
             }
@@ -69,44 +93,65 @@ namespace DarkMoon {
         }
     }
 
-    void Model::processMesh(aiMesh* mesh, aiMaterial* aiMaterial, const aiScene*, ResourceManager& rm) {
+    void Model::processMesh(aiMesh* mesh, aiMaterial* aiMaterial, const aiScene* scene, ResourceManager& rm) {
         // Process the vertices
         std::vector<Vertex> vertices(mesh->mNumVertices);
-
+        std::vector<glm::ivec4> boneIDs(mesh->mNumVertices);
+        std::vector<glm::vec4> weights(mesh->mNumVertices);
         //m_Bones.resize(mesh->mNumVertices);
-        
 
-        for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
-            Vertex vertex;
+        // Loop all vertices in loaded mesh
+        for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+        {
+            glm::ivec4 boneID;
+            glm::vec4 weight;
 
-            if(mesh->HasBones()){
-                std::cout << mesh->mNumBones << "\n";
-                SetVertexBoneDataToDefault(vertex);
-            }
-            
-            // Position
-            if (mesh->HasPositions()) {
-                vertex.position.x = mesh->mVertices[i].x;
-                vertex.position.y = mesh->mVertices[i].y;
-                vertex.position.z = mesh->mVertices[i].z;
+            // Set default values
+            for (int i = 0; i < 4; i++)
+            {
+                boneID[i] = -1;
+                weight[i] = 0.0f;
             }
 
-            // Normal
-            if (mesh->HasNormals()) {
-                vertex.normal.x = mesh->mNormals[i].x;
-                vertex.normal.y = mesh->mNormals[i].y;
-                vertex.normal.z = mesh->mNormals[i].z;
+            boneIDs[i] = boneID;
+            weights[i] = weight;
+
+            glm::vec3 vector;
+            // Set positions
+            vector.x = mesh->mVertices[i].x;
+            vector.y = mesh->mVertices[i].y;
+            vector.z = mesh->mVertices[i].z;
+            vertices[i].position = vector;
+
+            if (mesh->HasNormals())
+            {
+                // Set normals
+                vector.x = mesh->mNormals[i].x;
+                vector.y = mesh->mNormals[i].y;
+                vector.z = mesh->mNormals[i].z;
+                vertices[i].normal = vector;
             }
 
-            // Text Coords
-            if (mesh->HasTextureCoords(0)) {
-                vertex.textCoords.x = mesh->mTextureCoords[0][i].x;
-                vertex.textCoords.y = mesh->mTextureCoords[0][i].y;
+            if (mesh->mTextureCoords[0])
+            {
+                // Set texture coords
+                glm::vec2 vec;
+                vec.x = mesh->mTextureCoords[0][i].x;
+                vec.y = mesh->mTextureCoords[0][i].y;
+                vertices[i].textCoords = vec;
+                if (mesh->HasTangentsAndBitangents()) {
+                    // Set tangent
+                    vector.x = mesh->mTangents[i].x;
+                    vector.y = mesh->mTangents[i].y;
+                    vector.z = mesh->mTangents[i].z;
+                    vertices[i].Tangent = vector;
+                    // Set bitangent
+                    vector.x = mesh->mBitangents[i].x;
+                    vector.y = mesh->mBitangents[i].y;
+                    vector.z = mesh->mBitangents[i].z;
+                    vertices[i].BiTangent = vector;
+                }
             }
-            else // Default Texture Coords
-                vertex.textCoords = glm::vec2(0.0f, 0.0f);
-
-            vertices[i] = vertex;
         }
 
         // Process the indices
@@ -120,10 +165,13 @@ namespace DarkMoon {
         }
 
         //Process bones
-        if(mesh->HasBones()){
-            for(unsigned int i = 0;i < mesh->mNumBones;++i){
-                processBone(mesh->mBones[i],vertices);
-            }        
+        bool hasBones = mesh->HasBones();
+        if (hasBones)
+            processBone(boneIDs, weights, mesh, scene);
+
+        for (std::size_t i = 0; i < vertices.size(); i++) {
+            vertices[i].boneIDs = boneIDs[i];
+            vertices[i].weights = weights[i];
         }
 
         //std::cout << aiMaterial->GetName().C_Str() << "\n";
@@ -133,7 +181,9 @@ namespace DarkMoon {
         auto material = processMaterial(aiMaterial, rm);
         processTextures(aiMaterial, material, rm);
 
-        auto currentMesh = rm.loadResource<Mesh>(mesh->mName.C_Str(), vertices, indices, material);
+        std::string name = std::string(m_name) + mesh->mName.C_Str();
+        std::string meshName = mesh->mName.C_Str();
+        auto currentMesh = rm.loadResource<Mesh>(name.c_str(), vertices, indices, material, meshName, hasBones);
 
         m_meshes.push_back(currentMesh);
     }
@@ -150,13 +200,19 @@ namespace DarkMoon {
         aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_SPECULAR, &specular);
         aiGetMaterialFloat(aiMaterial, AI_MATKEY_SHININESS, &shininess);
 
+        ambient.r = ambient.r == 0 ? 1.0f : ambient.r;
+        ambient.g = ambient.g == 0 ? 1.0f : ambient.g;
+        ambient.b = ambient.b == 0 ? 1.0f : ambient.b;
+
+        //std::cout << ambient.r << " | " << ambient.g << " | " << ambient.b << "\n";
+
         // Create and return Material object
         //auto material = rm.loadResource<Material>(aiMaterial->GetName().C_Str());
         auto material = rm.loadResource<Material>(aiMaterial->GetName().C_Str(),
-                                                  glm::vec3(ambient.r, ambient.g, ambient.b),
-                                                  glm::vec3(diffuse.r, diffuse.g, diffuse.b),
-                                                  glm::vec3(specular.r, specular.g, specular.b),
-                                                  shininess);
+            glm::vec3(ambient.r, ambient.g, ambient.b),
+            glm::vec3(diffuse.r, diffuse.g, diffuse.b),
+            glm::vec3(specular.r, specular.g, specular.b),
+            shininess);
 
         return material;
     }
@@ -182,46 +238,63 @@ namespace DarkMoon {
         else
             material->texture = nullptr;
     }
-    // int Model::getBoneID(const aiBone* pBone){
-    //     int bone_id = 0;
-    //     std::string bone_name{pBone->mName.C_Str()};
-    //     if(m_BoneNameToIndexMap.find(bone_name) == m_BoneNameToIndexMap.end()){
-    //         bone_id = static_cast<int>(m_BoneNameToIndexMap.size());
-    //         m_BoneNameToIndexMap[bone_name] = bone_id;
-    //     }else{
-    //         bone_id = m_BoneNameToIndexMap[bone_name];
-    //     }
-    //     return bone_id;
-    // }
-    void Model::processBone(const aiBone* pbone,std::vector<Vertex>& vertices){
-        int boneID = -1;
-        //obtenemos el nombre del hueso
-        std::string boneName = pbone->mName.C_Str();
-        // comprobamos si existe en el map
-        if(m_BoneInfomap.find(boneName) == m_BoneInfomap.end()){
-            // si no existe se crea uno nuevo
-            BoneInfo newBoneInfo{};
-            newBoneInfo.id = m_BoneCounter;
-            newBoneInfo.offset = glm::make_mat4(&pbone->mOffsetMatrix.a1);
-            m_BoneInfomap[boneName] = newBoneInfo;
-            boneID = m_BoneCounter;
-            m_BoneCounter++;
+
+    glm::mat4 Model::getBoneTransform(const std::string& name) {
+        for (auto& bone : boneVector) {
+            if (bone.name == name)
+                return bone.offset;
         }
-        else{
-            // si existe se asigna el id
-            boneID = m_BoneInfomap[boneName].id;
-        }
-        assert(boneID != -1);
-        //obtenemos la influencia de pesos de este hueso
-        auto weights = pbone->mWeights;
-        int numWeights = pbone->mNumWeights;
-        //recorremos el número de vértices afectados por este hueso
-        for(int i = 0; i < numWeights; i++){
-            int vertexID = weights[i].mVertexId;
-            float weight = weights[i].mWeight;
-            assert(vertexID <= static_cast<int>(vertices.size()));
-            //se setean los datos a los vértices
-            SetVertexBoneData(vertices[vertexID],boneID,weight);
+        return glm::mat4(1.0f);
+    }
+
+    void Model::processBone(std::vector<glm::ivec4>& boneIDs_all, std::vector<glm::vec4>& weights_all, aiMesh* mesh, const aiScene*)
+    {
+        // Set the max bones to 100
+        unsigned int numBones = mesh->mNumBones > 100 ? 100 : mesh->mNumBones;
+        // For each bone
+        for (unsigned int boneIndex = 0; boneIndex < numBones; ++boneIndex)
+        {
+            int boneID = -1;
+            std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+            if (boneIndex >= boneVector.size()) {
+                glm::mat4 offset = aiMatrix4x4ToGlm(&mesh->mBones[boneIndex]->mOffsetMatrix);
+                std::cout << "\n";
+                boneVector.push_back({ boneName, offset });
+                boneID = boneIndex;
+                m_BoneCounter++;
+            }
+            else {
+                for (unsigned int i = 0; i < boneVector.size(); i++) {
+                    if (boneVector[i].name == boneName) {
+                        boneID = i;
+                        break;
+                    }
+                }
+            }
+            assert(boneID != -1);
+
+            // Get all vertex weights for current bone
+            aiVertexWeight* weights = mesh->mBones[boneIndex]->mWeights;
+            unsigned int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+
+            // For each weight at vertex x for current bone
+            for (unsigned int weightIndex = 0; weightIndex < numWeights; ++weightIndex)
+            {
+                unsigned int vertexId = weights[weightIndex].mVertexId;
+                float weight = weights[weightIndex].mWeight;
+                assert(vertexId <= boneIDs_all.size());
+
+                // Update four most influential bones
+                for (int i = 0; i < 4; ++i)
+                {
+                    if (boneIDs_all[vertexId][i] < 0)
+                    {
+                        weights_all[vertexId][i] = weight;
+                        boneIDs_all[vertexId][i] = boneID;
+                        break;
+                    }
+                }
+            }
         }
     }
 }
