@@ -47,7 +47,8 @@ namespace DarkMoon {
     void RenderManager::checkLights(){
         useShader(shaders["3D"]);
         glUniform1i(glGetUniformLocation(shaders["3D"]->getIDShader(), "activeLights"), activeLights ? 1 : 0);
-        
+        glUniform1i(glGetUniformLocation(shaders["3D"]->getIDShader(), "activeShaderCartoon"), activeShaderCartoon ? 1 : 0);
+
         if(activeLights){
 
             //std::cout << "-----------------------------\n";
@@ -127,6 +128,12 @@ namespace DarkMoon {
             }
             glUniform1i(glGetUniformLocation(shaders["3D"]->getIDShader(), "gNumSpotLights"), static_cast<int>(spotLights.size()));
 
+        }
+    
+        if(activeShaderCartoon){
+            glUniform1f(glGetUniformLocation(shaders["3D"]->getIDShader(), "depthThreshold"), depthThreshold);
+            glUniform1f(glGetUniformLocation(shaders["3D"]->getIDShader(), "normalThreshold"), normalThreshold);
+            glUniform4f(glGetUniformLocation(shaders["3D"]->getIDShader(), "_outlineColor"), outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a);
         }
     }
 
