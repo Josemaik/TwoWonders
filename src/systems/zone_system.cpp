@@ -18,6 +18,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
                 {
                     em.getSingleton<SoundSystem>().ambient_stop();
                     em.getSingleton<SoundSystem>().music_stop_level();
+
                     switch (li.mapID)
                     {
                     case 0:
@@ -54,6 +55,8 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
                         }
                         li.currentScreen = GameScreen::ENDING;
                         elapsedEnding = 0.0f;
+                        em.getSingleton<SoundSystem>().sonido_win();
+
                         // map.changeMap(em, 2, iam);
                         // li.transition = true;
                         // // em.getSingleton<SoundSystem>().ambient_stop();
