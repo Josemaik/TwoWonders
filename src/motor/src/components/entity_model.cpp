@@ -243,7 +243,7 @@ namespace DarkMoon {
             std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
             if (boneIndex >= boneVector.size()) {
                 glm::mat4 offset = aiMatrix4x4ToGlm(&mesh->mBones[boneIndex]->mOffsetMatrix);
-                std::cout << "\n";
+                //std::cout << "\n";
                 boneVector.push_back({ boneName, offset });
                 boneID = boneIndex;
                 m_BoneCounter++;

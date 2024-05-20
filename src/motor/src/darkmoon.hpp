@@ -120,6 +120,29 @@ namespace DarkMoon {
         // AuxUpdateLights
         void AuxUpdateLights(Node* parentNode);
 
+        // SHADER CARTOON
+
+        // Toggle shader cartoon
+        void ToggleShaderCartoon() { m_renderManager.activeShaderCartoon = !m_renderManager.activeShaderCartoon; };
+        // Activate shader cartoon
+        void ActivateShaderCartoon() { m_renderManager.activeShaderCartoon = true; };
+        // Deactivate shader cartoon
+        void DeactivateShaderCartoon() { m_renderManager.activeShaderCartoon = false; };
+
+        // Set valors shader cartoon
+        float GetDepthThresholdValue() { return m_renderManager.depthThreshold; };
+        void SetDepthThresholdValue(float depthThreshold) { 
+            m_renderManager.depthThreshold = depthThreshold;
+        };
+        float GetNormalThresholdValue() { return m_renderManager.normalThreshold; };
+        void SetNormalThresholdValue(float normalThreshold) { 
+            m_renderManager.normalThreshold = normalThreshold;
+        };
+        glm::vec4 GetOutlineColor() { return m_renderManager.outlineColor; };
+        void SetOutlineColor(glm::vec4 outlineColor) {
+            m_renderManager.outlineColor = outlineColor;
+        };
+
         // ------------------------ //
         // Window-related functions //
         // ------------------------ //

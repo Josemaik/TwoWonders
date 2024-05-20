@@ -283,10 +283,16 @@ void Game::run()
                     // if(elapsed < target)
                     camera_system.update(em, engine, evm);
                     event_system.update(em, evm, iam, map, object_system, sound_system);
-                }
+                  
+                    if (li.showParticles)
+                        particle_system.update(em);
 
-                if (li.showParticles)
-                    particle_system.update(em);
+                    //auto t2 = high_resolution_clock::now();
+                    //auto dur = duration_cast<microseconds>(t2 - t1);
+                    //std::cout << "Physics System: " << dur.count() << "us" << std::endl;
+
+                }
+              
                 // Borramos las entidades muertas
                 emptyDeathList(li);
 

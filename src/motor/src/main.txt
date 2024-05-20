@@ -1,6 +1,5 @@
 #include "darkmoon.hpp"
 
-
 DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     // Node Scene 3D
     auto p_node3D = engine.CreateNode("Scene 3D", engine.GetRootNode());
@@ -8,6 +7,10 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     //Node: Rejilla
     engine.CreateGrid(10, 10.0f, D_GRAY, "Rejilla principal", p_node3D);
 
+    auto mapa = engine.CreateModel("assets/lvl_0-cnk_0.obj", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
+    mapa->translate({ 0.0f, 0.0f, 0.0f });
+    mapa->setScale({ 1.f, 1.f, 1.f });
+    mapa->setRotation({ 0.0f, 1.0f, 0.0f }, 225.0f);
 
     // Node: Linea diagonal
     engine.CreatePoint3D({ -1.0f, 0.0f, 1.0f }, 5.0f, D_BLACK, "Punto principio linea", p_node3D);
@@ -15,20 +18,27 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     engine.CreatePoint3D({ 1.0f, 1.0f, -1.0f }, 5.0f, D_BLACK, "Punto fin linea", p_node3D);
 
     // Node: Plano
-    //engine.CreatePlane({ 0.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, D_PINK, "Plano rosita", p_node3D);
+    engine.CreatePlane({ 0.0f, 0.0f, 0.0f }, { 15.0f, 15.0f }, D_PINK, "Plano rosita", p_node3D);
 
     //Node: Cubo
     engine.CreateCube({ -30.0f, 0.0f, 0.0f }, { 10.0f, 10.0f, 10.0f }, D_AQUA_DARK, "Cubo azulito", p_node3D);
-    engine.CreateCubeWires({ -30.0f, 0.0f, 0.0f }, { 10.0f, 10.0f, 10.0f }, D_BLACK, "Wireframe", p_node3D);
+    //engine.CreateCubeWires({ -30.0f, 0.0f, 0.0f }, { 10.0f, 10.0f, 10.0f }, D_BLACK, "Wireframe", p_node3D);
     //Node: Wireframe
     engine.CreateCubeWires({ 20.0f, 0.0f, -30.0f }, { 10.0f, 10.0f, 10.0f }, D_BLACK, "Wireframe", p_node3D);
 
+    engine.CreatePointLight({30.0f, 10.0f, 30.0f}, D_YELLOW, "Luz prueba", p_node3D);
+    engine.CreatePointLight({30.0f, 10.0f,  0.0f},    D_RED, "Luz prueba", p_node3D);
+    engine.CreatePointLight({ 0.0f, 10.0f, 30.0f}, D_ORANGE, "Luz prueba", p_node3D);
+    engine.CreatePointLight({ 0.0f, 10.0f,  0.0f},   D_BLUE, "Luz prueba", p_node3D);
+
+    engine.CreatePointLight({}, D_YELLOW_LIGHT, "Luz prueba", p_node3D);
+
     // Node: Modelo Dummy 3
-     // auto modelDummy3 = engine.CreateModel("assets/Cofre/Texturas/Cofre.fbx", D_WHITE, "Modelo: Dummy 3", p_node3D);
-     // modelDummy3->translate({ 30.0f, 0.0f, 0.0f });
-     // modelDummy3->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
-     // auto eModel = dynamic_cast<DarkMoon::Model*>(modelDummy3->getEntity());
-     // auto& m_meshes = eModel->getMeshes();
+    // auto modelDummy3 = engine.CreateModel("assets/Cofre/Texturas/Cofre.fbx", D_WHITE, "Modelo: Dummy 3", p_node3D);
+    // modelDummy3->translate({ 30.0f, 0.0f, 0.0f });
+    // modelDummy3->rotate({ 1.0f, 0.0f, 0.0f }, -90.0f);
+    // auto eModel = dynamic_cast<DarkMoon::Model*>(modelDummy3->getEntity());
+    // auto& m_meshes = eModel->getMeshes();
 
     // auto& am = AnimationManager::getInstance();
     // auto* animation = am.createAnimation("assets/Cofre/Texturas/Cofre.fbx", eModel->getboneInfoMap());
@@ -57,20 +67,22 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
     return p_node3D;
 }
 
-DarkMoon::Node* createMainCharacter(DarkMoon::DarkMoonEngine& engine) {
-    //Node: Modelo
-    auto model = engine.CreateModel("assets/MainCharacter/Main_character.fbx", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
+DarkMoon::Node* model = nullptr;
+
+void createMainCharacter(DarkMoon::DarkMoonEngine& engine) {
+    // Model
+    model = engine.CreateModel("assets/Nomada.obj", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
     model->translate({ 0.0f, 0.0f, 0.0f });
-    model->setScale({ 3.f, 3.f, 3.f });
-    model->setRotation({ 1.0f, 0.0f, 0.0f }, -90.0f);
+    model->setScale({ 2.f, 2.f, 2.f });
+    model->setRotation({ 0.0f, 1.0f, 0.0f }, 225.0f);
 
-    auto eModel = dynamic_cast<DarkMoon::Model*>(model->getEntity());
-    eModel->drawModel = true;
-
-    return model;
+    // Camera
+    auto camera = engine.GetCamera();
+    camera->position = { -60.f, 60.f, -60.f };
+    camera->fovy = 60.0f;
 }
 
-void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacter) {
+void inputManager(DarkMoon::DarkMoonEngine& engine) {
     auto camera = engine.GetCamera();
     float velocity = 0.5f;
 
@@ -81,10 +93,9 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
         camera->position.z -= velocity;
         camera->target.z -= velocity;
 
-        nodeCharacter->translate({ velocity, 0.0f, -velocity });
-        nodeCharacter->setRotation({ 1.0f, 0.0f, 0.0f }, -90.0f);
-        nodeCharacter->rotate({ 0.0f, 1.0f, 0.0f }, 0.0f);
-        // nodeCharacter->setRotation({ 1.0f, 0.0f, 0.0f }, 45.0f);
+        model->translate({ velocity, 0.0f, -velocity });
+        model->setRotation({ 0.0f, 1.0f, 0.0f }, 135.0f);
+        // model->setRotation({ 1.0f, 0.0f, 0.0f }, 45.0f);
     }
     if (engine.IsKeyDown(D_KEY_D) || engine.IsGamepadButtonDown(0, D_GAMEPAD_BUTTON_DPAD_RIGHT)) { // -X +Z
         camera->position.x -= velocity;
@@ -93,9 +104,8 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
         camera->position.z += velocity;
         camera->target.z += velocity;
 
-        nodeCharacter->translate({ -velocity, 0.0f, velocity });
-        nodeCharacter->setRotation({ 1.0f, 0.0f, 0.0f }, -90.0f);
-        nodeCharacter->rotate({ 0.0f, 1.0f, 0.0f }, 180.0f);
+        model->translate({ -velocity, 0.0f, velocity });
+        model->setRotation({ 0.0f, 1.0f, 0.0f }, -45.0f);
 
     }
     if (engine.IsKeyDown(D_KEY_W) || engine.IsGamepadButtonDown(0, D_GAMEPAD_BUTTON_DPAD_UP)) { // +X +Z
@@ -105,9 +115,8 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
         camera->position.z += velocity;
         camera->target.z += velocity;
 
-        nodeCharacter->translate({ velocity, 0.0f, velocity });
-        nodeCharacter->setRotation({ 1.0f, 0.0f, 0.0f }, -90.0f);
-        nodeCharacter->rotate({ 0.0f, 1.0f, 0.0f }, 270.0f);
+        model->translate({ velocity, 0.0f, velocity });
+        model->setRotation({ 0.0f, 1.0f, 0.0f }, 45.0f);
 
     }
     if (engine.IsKeyDown(D_KEY_S) || engine.IsGamepadButtonDown(0, D_GAMEPAD_BUTTON_DPAD_DOWN)) { // -X -Z
@@ -117,21 +126,45 @@ void inputManager(DarkMoon::DarkMoonEngine& engine, DarkMoon::Node* nodeCharacte
         camera->position.z -= velocity;
         camera->target.z -= velocity;
 
-        nodeCharacter->translate({ -velocity, 0.0f, -velocity });
-        nodeCharacter->setRotation({ 1.0f, 0.0f, 0.0f }, -90.0f);
-        nodeCharacter->rotate({ 0.0f, 1.0f, 0.0f }, 90.0f);
+        model->translate({ -velocity, 0.0f, -velocity });
+        model->setRotation({ 0.0f, 1.0f, 0.0f }, 225.0f);
 
     }
-    if (engine.IsKeyDown(D_KEY_G)) {
-        nodeCharacter->scale({ 0.9,0.9,0.9 });
-    }
-    if (engine.IsKeyDown(D_KEY_J)) {
-        nodeCharacter->scale({ 1.1,1.1,1.1 });
-    }
+    
+    if (engine.IsKeyDown(D_KEY_G))
+        model->scale({ 0.9,0.9,0.9 });
+    if (engine.IsKeyDown(D_KEY_J))
+        model->scale({ 1.1,1.1,1.1 });
+
     if (engine.IsKeyPressed(D_KEY_F7))
         engine.GetRootNode()->drawTree();
 
-    nodeCharacter->translate({ 0.0f, 0.0f, 0.0f });
+    if (engine.IsKeyPressed(D_KEY_F10))
+        engine.ToggleLights();
+    if (engine.IsKeyPressed(D_KEY_F11))
+        engine.ToggleShaderCartoon();
+
+    model->translate({ 0.0f, 0.0f, 0.0f });
+}
+
+void managerShaderCartoon(DarkMoon::DarkMoonEngine& engine, bool comments) {
+
+    if(engine.IsKeyDown(D_KEY_1))
+        engine.SetDepthThresholdValue(engine.GetDepthThresholdValue() + 0.01f);
+    if(engine.IsKeyDown(D_KEY_2))
+        engine.SetDepthThresholdValue(engine.GetDepthThresholdValue() - 0.01f < 0 ? 0 : engine.GetDepthThresholdValue() - 0.01f);
+
+
+    if(engine.IsKeyDown(D_KEY_3))
+        engine.SetNormalThresholdValue(engine.GetNormalThresholdValue() + 0.01f);
+    if(engine.IsKeyDown(D_KEY_4))
+        engine.SetNormalThresholdValue(engine.GetNormalThresholdValue() - 0.01f < 0 ? 0 : engine.GetNormalThresholdValue() - 0.01f);
+
+    if(comments){
+        std::cout << "---------------------------------\n";
+        std::cout << "DepthThreshold: " << engine.GetDepthThresholdValue() << "\n";
+        std::cout << "NormalThreshold: " << engine.GetNormalThresholdValue() << "\n";
+    }
 }
 
 int main() {
@@ -139,152 +172,29 @@ int main() {
 
     if (engine.InitWindow(800, 600, "DarkMoon Engine")) {
 
-        std::cout << "┌────────────────┐" << std::endl;
-        std::cout << "│ Load Resources │" << std::endl;
-        std::cout << "└────────────────┘" << std::endl;
+        std::cout << "┌────────────────┐\n";
+        std::cout << "│ Load Resources │\n";
+        std::cout << "└────────────────┘\n";
 
         createScene3D(engine);
-        auto mainCharacter = createMainCharacter(engine);
-        auto modelcharacter = dynamic_cast<DarkMoon::Model*>(mainCharacter->getEntity());
-        auto& m_meshes = modelcharacter->getMeshes();
-
-
-        auto& boneInfoMap = modelcharacter->getboneInfoMap();
-        auto& am = AnimationManager::getInstance();
-        // auto& boneCount = modelcharacter->getBoneCount();
-        // int count = modelcharacter->getBoneCount();
-        std::vector<Animation*> anims = am.createAnimations("assets/MainCharacter/Main_character.fbx", boneInfoMap);
-
-        auto varitaModel = engine.CreateModel("assets/MainCharacter/Varita.obj", D_WHITE, "Modelo: Varita", engine.GetRootNode());
-        varitaModel->setTranslation({ 0.0f, 05.0f, 05.0f });
-        auto eVaritaModel = dynamic_cast<DarkMoon::Model*>(varitaModel->getEntity());
-        eVaritaModel->drawModel = true;
-
-        // auto& characterMeshes = modelcharacter->getAdjuntMeshes();
-        // for (auto& mesh : eVaritaModel->getMeshes())
-        // {
-        //     characterMeshes.push_back(mesh);
-        // }
-
-        auto camera = engine.GetCamera();
-        camera->position = { -0.0f, 40.0f, -60.0f };
-        camera->fovy = 60.0f;
+        createMainCharacter(engine);
 
         engine.SetExitKey(D_KEY_F8);
         engine.SetTargetFPS(60);
 
-        // std::cout << "┌──────┐" << std::endl;
-        // std::cout << "│ Tree │" << std::endl;
-        // std::cout << "└──────┘" << std::endl;
+        engine.ActivateLights();
+        engine.ActivateShaderCartoon();
 
-        auto id = am.PlayAnimation(anims[0]);
-        for (auto& mesh : m_meshes) {
-            if (mesh->hasBones)
-                mesh->animID = id;
-        }
-
-        glm::vec3 position = { 3.59f, 3.3f, 1.f };
-        glm::vec3 rot = { 0.0f, 0.0f, 1.0f };
-        float angle = 198.f;
         while (!engine.WindowShouldClose()) {
-
-            float deltatime = static_cast<float>(engine.GetFrameTime());
             
             // Logic
 
-            inputManager(engine, mainCharacter);
-            if (engine.IsKeyDown(D_KEY_X)) {
-                am.StopAnimation(id);
-                for (auto& mesh : m_meshes) {
-                    mesh->animID = std::numeric_limits<std::size_t>::max();
-                    for (auto& ver : mesh->vertices) {
-                        for (int i = 0; i < 4; i++)
-                        {
-                            ver.boneIDs[i] = -1;
-                            ver.weights[i] = 0.0f;
-                        }
-                    }
-                }
-            }
-            if (engine.IsKeyDown(D_KEY_C)) {
-                auto idxd = am.PlayAnimation(anims[10]);
-                for (auto& mesh : m_meshes) {
-                    mesh->animID = idxd;
-                }
-            }
+            inputManager(engine);
 
-            if (engine.IsKeyDown(D_KEY_4)) {
-                position = { position.x + 0.1f, position.y, position.z };
-            }
-            else if (engine.IsKeyDown(D_KEY_R))
-            {
-                position = { position.x - 0.1f, position.y, position.z };
-            }
-            else if (engine.IsKeyDown(D_KEY_5))
-            {
-                position = { position.x, position.y + 0.1f, position.z };
-            }
-            else if (engine.IsKeyDown(D_KEY_T))
-            {
-                position = { position.x, position.y - 0.1f, position.z };
-            }
-            else if (engine.IsKeyDown(D_KEY_6))
-            {
-                position = { position.x, position.y, position.z + 0.1f };
-            }
-            else if (engine.IsKeyDown(D_KEY_Y))
-            {
-                position = { position.x, position.y, position.z - 0.1f };
-            }
-            else if (engine.IsKeyDown(D_KEY_7))
-            {
-                angle += 1.0f;
-            }
-            else if (engine.IsKeyDown(D_KEY_U))
-            {
-                angle -= 1.0f;
-            }
-            else if (engine.IsKeyDown(D_KEY_8))
-            {
-                rot = { 1.0f, 0.0f, 0.0f };
-            }
-            else if (engine.IsKeyDown(D_KEY_I))
-            {
-                rot = { 0.0f, 1.0f, 0.0f };
-            }
-            else if (engine.IsKeyDown(D_KEY_9))
-            {
-                rot = { 0.0f, 0.0f, 1.0f };
-            }
+            managerShaderCartoon(engine, false);
 
-            am.UpdateAnimation(deltatime);
-
-            // Obtiene la matriz de transformación del hueso
-            glm::mat4 boneTransform = am.getBoneTransform("R.Antebrazo", anims[10]);
-
-            // Obtiene la matriz de transformación del personaje principal
-            glm::mat4 characterTransform = mainCharacter->getTransformationMatrix();
-
-            // Crea una matriz de transformación para el reposicionamiento y la rotación
-            glm::mat4 offsetTransform = glm::translate(glm::mat4(1.0f), position); // Mueve el modelo hijo 1 unidad hacia arriba
-            offsetTransform = glm::rotate(offsetTransform, glm::radians(angle), rot); // Rota el modelo hijo 45 grados alrededor del eje Y
-            // offsetTransform = glm::rotate(offsetTransform, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, .0f)); // Rota el modelo hijo 45 grados alrededor del eje Y
-
-            // Combina las matrices de transformación
-            glm::mat4 combinedTransform = characterTransform * boneTransform;
-
-            // Aplica la transformación combinada al modelo de la varita
-            varitaModel->setTransformationMatrix(combinedTransform);
-            // for (int i = 0; i < 4; i++)
-            // {
-            //     for (int j = 0; j < 4; j++)
-            //     {
-            //         std::cout << transMatrix[i][j] << " ";
-            //     }
-            //     std::cout << std::endl;
-            // }
-            // std::cout << std::endl;
-
+            // Draw
+    
             engine.BeginDrawing();
 
             engine.ClearBackground(D_WHITE);

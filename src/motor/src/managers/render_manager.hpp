@@ -42,9 +42,15 @@ namespace DarkMoon {
         // Shaders
         std::map<std::string, Shader*> shaders;
 
-        bool activeLights{ false };
+        bool activeLights { false };
         void updateLights();
         void checkLights();
+
+        // Shader cartoon
+        bool activeShaderCartoon { false };
+        float depthThreshold = { 0.4f };
+        float normalThreshold = { 0.8f };
+        glm::vec4 outlineColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f); 
 
         // Screen width and height
         void setWindowSize(int width, int height) { m_width = width; m_height = height; };
