@@ -96,7 +96,11 @@ namespace DarkMoon {
             auto transforms = am.GetFinalBoneMatrices(animID);
             glUniform1i(isBoneAnimationEnabledLocation, GL_TRUE);
 
+#ifdef _WIN32
+            float degrees = 0.f;
+#else
             float degrees = 90.f;
+#endif
             if (!rotateBones)
                 degrees = 0.f;
 

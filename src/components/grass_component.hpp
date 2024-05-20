@@ -12,6 +12,6 @@ struct Grass
 
 struct GrassComponent
 {
-    std::array<Grass, 200> grass{};
+    std::vector<Grass> grass{};
     bool created{ false };
 };
