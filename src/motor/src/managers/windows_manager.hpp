@@ -53,6 +53,8 @@ namespace DarkMoon {
 
         void createFramebuffer();
         void configureFramebufferVAO();
+        void applySobelFilter();
+
         void cleanup();
 
     public:

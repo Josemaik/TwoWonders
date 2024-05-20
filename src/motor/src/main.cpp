@@ -191,7 +191,7 @@ int main() {
 
             inputManager(engine);
 
-            managerShaderCartoon(engine, false);
+            managerShaderCartoon(engine, true);
 
             // Draw
     

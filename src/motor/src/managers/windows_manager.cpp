@@ -206,6 +206,33 @@ namespace DarkMoon {
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
     }
 
+    void WindowsManager::applySobelFilter(){
+        configureFramebufferVAO();
+
+        // Sobel Filter
+
+        glDisable(GL_DEPTH_TEST);
+
+        RenderManager& rm = RenderManager::getInstance();
+        rm.useShader(rm.shaders["sobel"]);
+
+        glUniform1f(glGetUniformLocation(rm.shaders["sobel"]->getIDShader(), "depthThreshold"), rm.depthThreshold);
+        glUniform1f(glGetUniformLocation(rm.shaders["sobel"]->getIDShader(), "normalThreshold"), rm.normalThreshold);    
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_texColorBuffer);
+        
+        glBindVertexArray(m_screenVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
+
+        glEnable(GL_DEPTH_TEST);
+
+        // Clean up resources
+
+        cleanup();
+    }
+
     void WindowsManager::cleanup(){
         glDeleteFramebuffers(1, &m_framebuffer);
         glDeleteTextures(1, &m_texColorBuffer);
@@ -237,14 +264,7 @@ namespace DarkMoon {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            configureFramebufferVAO();
-
-            rm.useShader(rm.shaders["sobel"]);
-            glBindVertexArray(m_screenVAO);
-            glBindTexture(GL_TEXTURE_2D, m_texColorBuffer);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-
-            cleanup();
+            applySobelFilter();
         }
 
         glfwSwapBuffers(m_window);
