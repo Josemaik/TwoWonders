@@ -314,7 +314,10 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             if ((ge.isKeyDown(in.spell1) || ge.isGamepadButtonPressed(0, in.m_spell1)) && plfi.spellSlots[0] != plfi.noSpell)
             {
                 if (plfi.spellSlots[0].cost > plfi.mana)
+                {
+                    em.getSingleton<SoundSystem>().sonido_no_mana();
                     return;
+                }
                 pmc.active = true;
                 playerSpelled = true;
                 plfi.currentSpell = plfi.spellSlots[0];
@@ -323,7 +326,10 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             else if ((ge.isKeyDown(in.spell2) || ge.isGamepadButtonPressed(0, in.m_spell2)) && plfi.spellSlots[1] != plfi.noSpell)
             {
                 if (plfi.spellSlots[1].cost > plfi.mana)
+                {
+                    em.getSingleton<SoundSystem>().sonido_no_mana();
                     return;
+                }
                 pmc.active = true;
                 playerSpelled = true;
                 plfi.currentSpell = plfi.spellSlots[1];
@@ -332,7 +338,10 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             else if ((ge.isKeyDown(in.spell3) || ge.isGamepadButtonPressed(0, in.m_spell3)) && plfi.spellSlots[2] != plfi.noSpell)
             {
                 if (plfi.spellSlots[2].cost > plfi.mana)
+                {
+                    em.getSingleton<SoundSystem>().sonido_no_mana();
                     return;
+                }
                 pmc.active = true;
                 playerSpelled = true;
                 plfi.currentSpell = plfi.spellSlots[2];

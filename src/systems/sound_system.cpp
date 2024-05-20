@@ -691,10 +691,12 @@ ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Arany
 
     }          
     void SoundSystem::sonido_win(){
+        setVolumeMov(0);
         ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Feedback/Ganar", &eventDescription));
         ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
         play();
         update();
+
 
     }                  
     void SoundSystem::sonido_jugador_muere(){
@@ -704,6 +706,13 @@ ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Arany
         update();
 
     }
+    void SoundSystem::sonido_no_mana() {
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Feedback/No_mana", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+    }
+  
 
 
     //PASOS
@@ -732,7 +741,7 @@ ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Arany
         ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance_SFX_pasos));
     }               
 
-  
+
     
     
 
@@ -957,7 +966,6 @@ float SoundSystem::getVolumeAmbient(){
 }
 
 void SoundSystem::setVolumeMaster(float volumen) {
-    //REVISAR, ESTO SE DECLARA CREAR EL SYSTEM
     FMOD_System_GetMasterChannelGroup(coreSystem, &masterGroup);
 
 
