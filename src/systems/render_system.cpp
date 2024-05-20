@@ -1555,6 +1555,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<InvestigatorTag>())
     {
         r.node = engine.loadModel("assets/Personajes/NPCs/Investigador/Investigador.obj");
+        setPointLight(engine, em, e, *r.node, r.position, 1.f, D_YELLOW);
         // loadShaders(r.model);
     }
     else if (e.hasTag<LavaTag>())
