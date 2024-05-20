@@ -127,13 +127,13 @@ public:
                     }
                     case EventCodes::OpenDoor:
                     {
-                        auto& li = em.getSingleton<LevelInfo>();
+                        // auto& li = em.getSingleton<LevelInfo>();
                         auto& plfi = em.getSingleton<PlayerInfo>();
 
                         ss.sonido_abrir_puerta();
 
                         plfi.hasKey = false;
-                        li.insertDeath(li.doorToOpen);
+                        // li.insertDeath(li.doorToOpen);
                         break;
                     }
                     case EventCodes::SpawnWallLevel0:
@@ -277,15 +277,14 @@ public:
                         auto& npc = *em.getEntityByID(li.npcToTalk);
                         auto& dc = em.getComponent<DispatcherComponent>(npc);
 
-                        if (dc.eventCodes.size() > 1)
+                        if (dc.eventCodes.size() > 0)
                         {
-                            auto& lc = em.getComponent<ListenerComponent>(e);
-                            for (std::size_t i = 1; i < dc.eventCodes.size(); i++)
-                            {
+                            for (std::size_t i = 0; i < dc.eventCodes.size(); i++)
                                 scheduleEvent(Event{ static_cast<EventCodes>(dc.eventCodes[i]) });
-                                lc.addCode(static_cast<EventCodes>(dc.eventCodes[i]));
-                            }
                         }
+
+                        auto& anc = em.getComponent<AnimationComponent>(e);
+                        anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::SPEAKING);
 
                         li.npcToTalk = li.max;
                         break;

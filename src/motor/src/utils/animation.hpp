@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <unordered_map>
 
 struct AssimpNodeData
 {
@@ -33,6 +34,7 @@ struct Animation
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
         assert(scene && scene->mRootNode);
+        scene->mRootNode->mTransformation = aiMatrix4x4();
         if (scene->mNumAnimations == 0)
             return;
         aiAnimation* animation = scene->mAnimations[0];
@@ -46,6 +48,7 @@ struct Animation
 
     Animation(const aiScene* scene, std::vector<BoneInfo>& modelBones, std::size_t animID)
     {
+        scene->mRootNode->mTransformation = aiMatrix4x4();
         aiAnimation* animation = scene->mAnimations[animID];
         duration = (float)animation->mDuration;
         tps = (float)animation->mTicksPerSecond;
@@ -57,11 +60,9 @@ struct Animation
 
     Bone* findBone(const std::string& name)
     {
-        for (unsigned int i = 0; i < bones.size(); i++) {
-            if (bones[i].getBoneName() == name) {
-                return &bones[i];
-            }
-        }
+        auto search = bones.find(name);
+        if (search != bones.end())
+            return &search->second;
         return nullptr;
     }
 
@@ -79,7 +80,8 @@ struct Animation
 private:
     float duration = 0.0f;
     float tps = 0.0f;
-    std::vector<Bone> bones;
+    std::unordered_map<std::string, Bone> bones{};
+    std::unordered_map<std::string, std::vector<glm::mat4>> preCalculateTransforms{};
     AssimpNodeData rootNode;
     std::vector<BoneInfo> boneProps;
 
@@ -108,7 +110,7 @@ private:
                     boneId = static_cast<int>(boneProps.size() - 1);
                 }
             }
-            bones.push_back(Bone(channel->mNodeName.data, boneId, channel));
+            bones.insert({ boneName, Bone(channel->mNodeName.data, boneId, channel) });
         }
 
         this->boneProps = boneProps;

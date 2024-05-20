@@ -49,26 +49,35 @@ struct BTActionShoot : BTNode_t {
                 att.vel = (getPlayerDistance(ectx)).normalized() * ectx.ai->SPEED_AI;
 
                 if (ectx.ent.hasTag<SnowmanTag>()) {
-                    att.attack(AttackType::SnowmanBall);
-                    //Se ajuste la velocidad y altura del atque segun a que distancia se encuentre
-                    auto& plphy = getplayerphy(ectx);
-                    auto distance = ectx.phy.position.distance(plphy.position);
+                    auto& anc = ectx.em.getComponent<AnimationComponent>(ectx.ent);
 
-                    if (plphy.velocity.x() != 0.0 && plphy.velocity.z() != 0.0) {
-                        Steer_t steering = STBH::Pursue(plphy, ectx.phy, 50.0);
-                        if (distance >= 11.0 && distance <= 14.1) {
-                            att.vel = vec3d{ steering.v_x,att.vel.y() + 0.2, steering.v_z };
+                    if (anc.animEnded)
+                        anc.animToPlay = static_cast<std::size_t>(SnowmanAnimations::ATTACK);
+                    if (anc.aboutToEnd && anc.currentAnimation == static_cast<std::size_t>(SnowmanAnimations::ATTACK))
+                    {
+                        att.attack(AttackType::SnowmanBall);
+
+                        anc.aboutToEnd = false;
+                        //Se ajuste la velocidad y altura del atque segun a que distancia se encuentre
+                        auto& plphy = getplayerphy(ectx);
+                        auto distance = ectx.phy.position.distance(plphy.position);
+
+                        if (plphy.velocity.x() != 0.0 && plphy.velocity.z() != 0.0) {
+                            Steer_t steering = STBH::Pursue(plphy, ectx.phy, 50.0);
+                            if (distance >= 11.0 && distance <= 14.1) {
+                                att.vel = vec3d{ steering.v_x,att.vel.y() + 0.2, steering.v_z };
+                            }
+                            else {
+                                att.vel = vec3d{ steering.v_x,att.vel.y() + 0.3, steering.v_z };
+                            }
                         }
                         else {
-                            att.vel = vec3d{ steering.v_x,att.vel.y() + 0.3, steering.v_z };
-                        }
-                    }
-                    else {
-                        if (distance >= 11.0 && distance <= 14.1) {
-                            att.vel = { att.vel.x() * 1.0, att.vel.y() + 0.6, att.vel.z() * 1.0 };
-                        }
-                        else {
-                            att.vel = { att.vel.x() * 1.4, att.vel.y() + 0.7, att.vel.z() * 1.4 };
+                            if (distance >= 11.0 && distance <= 14.1) {
+                                att.vel = { att.vel.x() * 1.0, att.vel.y() + 0.6, att.vel.z() * 1.0 };
+                            }
+                            else {
+                                att.vel = { att.vel.x() * 1.4, att.vel.y() + 0.7, att.vel.z() * 1.4 };
+                            }
                         }
                     }
 

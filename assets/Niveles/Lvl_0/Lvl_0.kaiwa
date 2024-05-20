@@ -116,10 +116,10 @@
 						{
 							"type":1,
 							"offsetZ": [3.544463634490967],
-							"position": [48.26, 32.868, 7.0],
+							"position": [60.26, 38.868, 7.0],
 							"scale": [6.494, 7.101, 10.0],
-							"rotation": 270.0,
-							"rotVector": [0.0, 0.0, -1.0],
+							"rotation": 135.0,
+							"rotVector": [0.0, 0.0, 1.0],
 							"content": 13,
 							"visible": false,
 							"message": [

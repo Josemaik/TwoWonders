@@ -1,12 +1,17 @@
 #include "Octree.hpp"
 
+std::unordered_set<Octree*> Octree::octreePool_{};
+
 // Función para insertar una entidad en el octree o en sus hijos
 void Octree::insert(Entity& entity, ColliderComponent& collider)
 {
     if (!divided_)
     {
         if (octEntities_.size() < max_ent_)
+        {
             octEntities_.push_back({ &entity, &collider });
+            octreePool_.insert(this);
+        }
         else
         {
             // Si el octree no está dividido, lo dividimos
@@ -46,6 +51,7 @@ void Octree::subdivide()
         octants_[i] = std::make_unique<Octree>(depth_ + 1, octantBounds, this);
     }
 
+    octreePool_.erase(this);
     divided_ = true;
 }
 

@@ -145,7 +145,7 @@ namespace ENGI {
         std::size_t playAnimation(Animation* panimation);
         void stopAnimation(std::size_t idanim);
         std::vector<Animation*> createAnimations(const std::string& path, std::vector<BoneInfo>& vecbones);
-        void updateAnimation(float mult, std::size_t id);
+        void updateAnimation(float dt, float mult, std::size_t id);
         float getAnimationTime(std::size_t id);
 
         Node* loadModel(const char* filename);

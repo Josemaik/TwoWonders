@@ -54,7 +54,7 @@ private:
     void generateEnemies(EntityManager& em, const valueType& enemyArray, Ia_man& iam);
     void generateNPCs(EntityManager& em, const valueType& npcArray);
     void generateInteractables(EntityManager& em, const valueType& interactableArray);
-    void generateNavmeshes(EntityManager& em,uint8_t map);
+    void generateNavmeshes(EntityManager& em, uint8_t map);
     void generateCheats(EntityManager& em);
     void addToZone(EntityManager& em, Entity& e, InteractableType type);
     void checkDispatcher(EntityManager& em, Entity& e, const valueType& value);
@@ -75,7 +75,7 @@ private:
     inline void resetTag(EntityManager&) {}
     template <typename Tag>
     inline void resetTag(EntityManager& em, Ia_man& iam) {}
-
+    int doorCount = 0;
     std::vector<std::unique_ptr<BehaviourTree_t>> vec_t{};
 };
 

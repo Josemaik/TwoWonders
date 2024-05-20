@@ -114,12 +114,12 @@ namespace DarkMoon {
     };
 
     struct AnimatedTexture2D : Entity {
-        glm::vec2 position {};
-        std::vector<Texture*> frames {};
-        Color color {};
-        float frameDuration { 1.0f };
-        float elapsedTime { 0.0f };
-        int currentFrame { 0 };
+        glm::vec2 position{};
+        std::vector<Texture*> frames{};
+        Color color{};
+        float frameDuration{ .6f };
+        float elapsedTime{ 0.0f };
+        int currentFrame{ 0 };
 
         AnimatedTexture2D(glm::vec2 pos = { 0.0f, 0.0f }, Color col = D_WHITE, float framD = 1.0f, int currF = 0)
             : position(pos), color(col), frameDuration(framD), currentFrame(currF) {};

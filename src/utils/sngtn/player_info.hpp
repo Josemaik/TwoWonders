@@ -169,7 +169,7 @@ struct PlayerInfo
         hasStaff = false;
         hasBoots = false;
         hasHat = false;
-        hasKey = false;
+        hasKey = true;
         onSpawn = false;
         showBook = false;
         attackUpgrade = false;

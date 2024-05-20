@@ -17,7 +17,8 @@ void ParticleSystem::update(EntityManager& em)
     { Effects::WATERSPLASH, { { 2.0f, 0.1f, 2.0f }, std::vector<Color>{ {0, 121, 241, 255}, { 102, 191, 255, 255 } } } },
     { Effects::FIRESPLASH, { { 2.0f, 0.1f, 2.0f }, std::vector<Color>{  {255, 215, 0, 255} } } },
     { Effects::PRISONDOOR, { { .2f, 0.1f, .2f }, std::vector<Color>{  {255, 215, 0, 255} } } },
-    { Effects::PLAYER, { { 3.0f, 0.1f, 3.0f }, std::vector<std::string>{ "p_est1", "p_est2", "p_est3", "p_est4"} } }
+    { Effects::PLAYER, { { 3.0f, 0.1f, 3.0f }, std::vector<std::string>{ "p_est1", "p_est2", "p_est3", "p_est4"} } },
+    { Effects::MISSIONOBJ, { { 10.0f, 0.1f, 5.0f },  std::vector<Color>{ { {255, 215, 0, 255} } } } }
     };
 
     // La parte del motor gráfico será poder colocar puntos de luz desde donde se generen las partículas sjsjsj
@@ -66,7 +67,7 @@ void ParticleSystem::update(EntityManager& em)
                     }
                     else
                     {
-                        auto offSetY = e.hasTag<DestructibleTag>() ? 5.5f : 4.0f;
+                        auto offSetY = e.hasTag<DestructibleTag>() ? 5.5f : 8.0f;
                         float xOffset = 0.0f, zOffset = 0.0f;
 
                         if (std::abs(std::sin(phy.orientation)) == 1)

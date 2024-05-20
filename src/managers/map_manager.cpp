@@ -489,12 +489,15 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             {
             case 0:
             {
-                em.addTag<SeparateModelTag>(entity);
-                r.position = vec3d::zero();
+                // em.addTag<SeparateModelTag>(entity);
+                // r.position = vec3d::zero();
                 break;
             }
             case 1:
             {
+                em.addTag<SeparateModelTag>(entity);
+                r.orientation += 90.0 * DEGTORAD;
+                r.position.setY(r.position.y() + 4.0);
                 em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = Effects::PRISONDOOR, .maxParticles = 16, .spawnRate = 0.1f, .lifeTime = 0.3f });
                 break;
             }
@@ -605,7 +608,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         case InteractableType::DamageObj:
         {
             em.addTag<LavaTag>(entity);
-            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::LAVA, .maxParticles = 20, .spawnRate = 0.1f });
+            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::LAVA, .maxParticles = 10, .spawnRate = 0.1f });
             c.behaviorType = BehaviorType::LAVA;
 
             if (interactable.HasMember("offsetZ"))
@@ -664,7 +667,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             {
             case 2:
             {
-                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
+                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::MISSIONOBJ, .maxParticles = 10, .spawnRate = 0.1f });
                 auto& bc = em.addComponent<BoatComponent>(entity);
                 bc.setPart(boatParts);
                 ic.range = 7.0;
@@ -726,10 +729,15 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
         auto& entity{ em.newEntity() };
         em.addTag<NPCTag>(entity);
 
+        auto& wr = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color,.orientation = rot,.rotationVec = rotationVec });
+        auto& wp = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.rotationVec = rotationVec, .max_speed = max_speed });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ wp.position, wp.scale, BehaviorType::STATIC });
+
         double range = 0.0;
         switch (npcType)
         {
         case NPCType::NOMAD:
+        {
             em.addTag<NomadTag>(entity);
             switch (li.mapID)
             {
@@ -741,6 +749,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
                 break;
             }
             break;
+        }
         case NPCType::INVESTIGATOR:
             em.addTag<InvestigatorTag>(entity);
             range = 21.0;
@@ -749,9 +758,6 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
             break;
         }
 
-        auto& wr = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color,.orientation = rot,.rotationVec = rotationVec });
-        auto& wp = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.rotationVec = rotationVec, .max_speed = max_speed });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ wp.position, wp.scale, BehaviorType::STATIC });
         em.addComponent<InteractiveComponent>(entity, InteractiveComponent{ .range = range });
         em.addComponent<NPCComponent>(entity, NPCComponent{ .path = path, .type = npcType, .behaviourTree = &tree,.arrival_radius = arrival_radius });
 
