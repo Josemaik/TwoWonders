@@ -48,7 +48,7 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    em.addComponent<AttackerComponent>(e);
+    // em.addComponent<AttackerComponent>(e);
     em.addComponent<AnimationComponent>(e);
     em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = false, .effect = Effects::PLAYER, .maxParticles = 4, .spawnRate = 0.05f, .lifeTime = 0.3f });
 
@@ -109,6 +109,7 @@ void Game::run()
     // Incializamos FPSs
     engine.setTargetFPS(30);
     engine.toggleLights();
+    engine.dmeg.ToggleShaderCartoon();
 
     // Nos aseguramos que los numeros aleatorios sean diferentes cada vez
     unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
@@ -283,7 +284,7 @@ void Game::run()
                     // if(elapsed < target)
                     camera_system.update(em, engine, evm);
                     event_system.update(em, evm, iam, map, object_system, sound_system);
-                  
+
                     if (li.showParticles)
                         particle_system.update(em);
 
@@ -292,7 +293,7 @@ void Game::run()
                     //std::cout << "Physics System: " << dur.count() << "us" << std::endl;
 
                 }
-              
+
                 // Borramos las entidades muertas
                 emptyDeathList(li);
 

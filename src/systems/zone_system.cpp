@@ -336,8 +336,13 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
             li.doorToOpen = e.getID();
             evm.scheduleEvent(Event{ EventCodes::OpenDoor });
             em.getSingleton<SoundSystem>().sonido_interaccion_e();
-            em.getComponent<AnimationComponent>(e).animToPlay = static_cast<std::size_t>(DoorAnimations::OPEN);
+            if (e.hasComponent<AnimationComponent>())
+                em.getComponent<AnimationComponent>(e).animToPlay = static_cast<std::size_t>(DoorAnimations::OPEN);
+            else
+                li.insertDeath(e.getID());
 
+            em.getSingleton<SoundSystem>().sonido_abrir_puerta();
+            plfi.hasKey = false;
             inpi.interact = false;
         }
     });
@@ -357,7 +362,10 @@ void ZoneSystem::openDoorsZone(EntityManager& em, EventManager& evm, vec3d& leve
         {
             li.doorToOpen = e.getID();
             evm.scheduleEvent(Event{ EventCodes::OpenDoor });
-            em.getComponent<AnimationComponent>(e).animToPlay = static_cast<std::size_t>(DoorAnimations::OPEN);
+            if (e.hasComponent<AnimationComponent>())
+                em.getComponent<AnimationComponent>(e).animToPlay = static_cast<std::size_t>(DoorAnimations::OPEN);
+            else
+                li.insertDeath(e.getID());
         }
     });
 }

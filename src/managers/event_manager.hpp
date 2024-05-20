@@ -128,11 +128,9 @@ public:
                     case EventCodes::OpenDoor:
                     {
                         // auto& li = em.getSingleton<LevelInfo>();
-                        auto& plfi = em.getSingleton<PlayerInfo>();
 
-                        ss.sonido_abrir_puerta();
 
-                        plfi.hasKey = false;
+
                         // li.insertDeath(li.doorToOpen);
                         break;
                     }

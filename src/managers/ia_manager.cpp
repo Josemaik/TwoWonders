@@ -92,7 +92,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     case 1:
     {
         em.addTag<SnowmanTag>(e);
-
+        em.addComponent<AnimationComponent>(e);
         auto* a_e_1 = &tree.createNode<BTAction_Evade>();
         auto* d_a_6 = &tree.createNode<BTDecisionReadyforAttack>();
         auto* a_a_6 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::OneShoottoPlayer, vec3d{}); // fail si disparo succes si no disparo
@@ -131,9 +131,9 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
 
         auto* d_a_3 = &tree.createNode<BTDecisionReadyforAttack>();
         auto* a_j_3 = &tree.createNode<BTAction_JumptoPlayer>();
-        auto* a_a_3 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee,vec3d{}); // fail si disparo succes si no disparo
+        auto* a_a_3 = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::Melee, vec3d{}); // fail si disparo succes si no disparo
         auto* d_r_3 = &tree.createNode<BTDecisionOnAttackRadius>();
-        auto* sequence3_2 = &tree.createNode<BTNodeSequence_t>(d_a_3, a_j_3, a_a_3,d_r_3);
+        auto* sequence3_2 = &tree.createNode<BTNodeSequence_t>(d_a_3, a_j_3, a_a_3, d_r_3);
 
         auto* d_1_3 = &tree.createNode<BTDecisionPlayerDetected>();
         auto* a_s_3 = &tree.createNode<BTAction_Seek>();
@@ -208,6 +208,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
         em.addTag<AngryBushTag>(e);
         em.destroyTag<LockableTag>(e);
         auto& abc = em.addComponent<AngryBushComponent>(e);
+        em.addComponent<AnimationComponent>(e);
         abc.max_speed = wp.max_speed;
         wl.invulnerable = true;
         tree.createNode<BTAction_Pendulum>();
@@ -219,10 +220,12 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     case 7:
         em.addTag<AngryBushTag2>(e);
         em.destroyTag<LockableTag>(e);
+        em.addComponent<AnimationComponent>(e);
         tree.createNode<BTAction_Patrol>();
         break;
     case 8: {
         em.addTag<CrusherTag>(e);
+        em.addComponent<AnimationComponent>(e);
         auto* pdc = &tree.createNode<BTDecisionPlayerDetected>();
         auto* rfca = &tree.createNode<BTDecisionReadyforCrusherAttk>();
         auto* ash = &tree.createNode<BTActionShoot>(AIComponent::TypeShoot::CrusherAttack, wp.position);

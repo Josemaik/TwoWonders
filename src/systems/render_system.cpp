@@ -1442,10 +1442,9 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         {
         case 0:
         {
-            std::string path = "assets/Assets/Barricada_cueva/Barricada.fbx";
+            std::string path = "assets/Assets/Barricada_cueva/Barricada_cueva.obj";
             r.node = engine.loadModel(path.c_str());
-            loadAnimations(engine, em, e, r, path, 1.0f);
-
+            // loadAnimations(engine, em, e, r, path, 1.0f);
             break;
         }
         case 1:

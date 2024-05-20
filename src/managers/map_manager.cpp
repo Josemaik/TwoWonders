@@ -489,8 +489,8 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             {
             case 0:
             {
-                // em.addTag<SeparateModelTag>(entity);
-                // r.position = vec3d::zero();
+                em.addTag<SeparateModelTag>(entity);
+                r.position = vec3d::zero();
                 break;
             }
             case 1:
