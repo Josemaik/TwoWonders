@@ -246,7 +246,7 @@ namespace DarkMoon {
     void WindowsManager::beginDrawing() {
         // Shader Cartoon
         RenderManager& rm = RenderManager::getInstance();
-        if(!rm.activeShaderCartoon){
+        if(rm.activeShaderCartoon){
             createFramebuffer();
             glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -260,7 +260,7 @@ namespace DarkMoon {
     void WindowsManager::endDrawing() {
         // Shader Cartoon
         RenderManager& rm = RenderManager::getInstance();
-        if(!rm.activeShaderCartoon){
+        if(rm.activeShaderCartoon){
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
