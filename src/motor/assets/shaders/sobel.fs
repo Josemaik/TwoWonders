@@ -21,7 +21,19 @@ mat3 sobelY = mat3(
      1.0,  2.0,  1.0
 );
 
-void main(){
+mat3 scharrX = mat3(
+    -3.0, 0.0, 3.0,
+    -10.0, 0.0, 10.0,
+    -3.0, 0.0, 3.0
+);
+
+mat3 scharrY = mat3(
+    -3.0, -10.0, -3.0,
+     0.0,  0.0,  0.0,
+     3.0,  10.0,  3.0
+);
+
+vec4 shaderCartoonOutline(mat3 matX, mat3 matY){
     vec2 tex_offset = 1.0 / textureSize(screenTexture, 0);
 
     float gx_depth = 0.0;
@@ -36,24 +48,29 @@ void main(){
             float depth = sample.a;
             vec3 normal = sample.rgb;
 
-            gx_depth += depth * sobelX[i][j];
-            gy_depth += depth * sobelY[i][j];
+            gx_depth += depth * matX[i][j];
+            gy_depth += depth * matY[i][j];
 
-            gx_normal += length(normal) * sobelX[i][j];
-            gy_normal += length(normal) * sobelY[i][j];
+            gx_normal += length(normal) * matX[i][j];
+            gy_normal += length(normal) * matY[i][j];
         }
     }  
 
     float gradient_depth = sqrt(gx_depth * gx_depth + gy_depth * gy_depth);
     float gradient_normal = sqrt(gx_normal * gx_normal + gy_normal * gy_normal);
 
-    float sobelEdgeDepth = min(pow(gradient_depth / depthThreshold, 2), 1.0);
-    float sobelEdgeNormal = min(pow(gradient_normal / normalThreshold, 2), 1.0);
+    float edgeDepth = min(pow(gradient_depth / depthThreshold, 2), 1.0);
+    float edgeNormal = min(pow(gradient_normal / normalThreshold, 2), 1.0);
 
-    float sobelEdge = max(sobelEdgeDepth, sobelEdgeNormal);
+    float edge = max(edgeDepth, edgeNormal);
 
-    if(sobelEdge > 0.1)
-        FragColor = vec4(vec3(0.0), 1.0);
-    else
-        FragColor = texture(screenTexture, TexCoords);
+    vec3 sceneColor = texture(screenTexture, TexCoords).rgb;
+    vec3 finalColor = mix(sceneColor, vec3(0.0), edge * 0.95);
+
+    return vec4(finalColor, 1.0);
+}
+
+void main()
+{
+    FragColor = shaderCartoonOutline(scharrX, scharrY);
 }

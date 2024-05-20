@@ -154,7 +154,6 @@ void managerShaderCartoon(DarkMoon::DarkMoonEngine& engine, bool comments) {
     if(engine.IsKeyDown(D_KEY_2))
         engine.SetDepthThresholdValue(engine.GetDepthThresholdValue() - 0.01f < 0 ? 0 : engine.GetDepthThresholdValue() - 0.01f);
 
-
     if(engine.IsKeyDown(D_KEY_3))
         engine.SetNormalThresholdValue(engine.GetNormalThresholdValue() + 0.01f);
     if(engine.IsKeyDown(D_KEY_4))
@@ -192,6 +191,17 @@ int main() {
             inputManager(engine);
 
             managerShaderCartoon(engine, true);
+
+            if(engine.IsKeyPressed(D_KEY_9)){
+                engine.ActivateShaderCartoon();
+                engine.SetDepthThresholdValue(0.5f);
+                engine.SetNormalThresholdValue(1.5f);
+            }
+            else if(engine.IsKeyPressed(D_KEY_0)){
+                engine.DeactivateShaderCartoon();
+                engine.SetDepthThresholdValue(0.5f);
+                engine.SetNormalThresholdValue(4.0f);
+            }
 
             // Draw
     
