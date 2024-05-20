@@ -120,6 +120,7 @@ struct AnimationManager
         for (unsigned int i = 0; i < boneProps.size(); i++) {
             if (boneProps[i].name == nodeName) {
                 glm::mat4 offset = boneProps[i].offset;
+                assert(id < m_Animations.size());
                 m_Animations[id].m_FinalBoneMatrices[i] = globalTransformation * offset;
                 break;
             }
@@ -239,6 +240,6 @@ struct AnimationManager
 
 private:
     static inline std::size_t nextID = 0;
-    std::array<Anim, 20> m_Animations{};
+    std::array<Anim, 40> m_Animations{};
     std::vector<std::unique_ptr<Animation>> m_AnimationList{};
 };
