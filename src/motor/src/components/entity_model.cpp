@@ -15,32 +15,9 @@ namespace DarkMoon {
 
         std::cout << " - Load a model -> " << m_name << std::endl;
 
+        scene->mRootNode->mTransformation = aiMatrix4x4();
         processNode(scene->mRootNode, scene, rm);
-        // if(scene->HasAnimations()){
-        //     for(uint i = 0; i < scene->mNumAnimations;i++){
-        //         ReadMissingBones(scene->mAnimations[i]);
-        //     }
-        // }
     };
-
-    // void Model::ReadMissingBones(const aiAnimation* animation){
-    //     int size = animation->mNumChannels;
-
-    //     auto& boneInfoMap = getboneInfoMap();
-    //     int& boneCount = getBoneCount();
-
-    //     for (int i = 0; i < size; i++)
-    //     {
-    //         auto channel = animation->mChannels[i];
-    //         std::string boneName = channel->mNodeName.data;
-
-    //         if (boneInfoMap.find(boneName) == boneInfoMap.end())
-    //         {
-    //             boneInfoMap[boneName].id = boneCount;
-    //             boneCount++;
-    //         }
-    //     }
-    // }
 
     void Model::unload() {
         //ResourceManager rm = ResourceManager::getInstance();
@@ -54,8 +31,13 @@ namespace DarkMoon {
         // Draw meshes
         if (drawModel)
             for (const auto& mesh : m_meshes) {
-                //std::cout << mesh->getID() << "\n";
+                if (hasBones && animID != maxID)
+                    mesh->animID = animID;
+
                 mesh->draw(transMatrix, color);
+
+                if (hasBones && animID != maxID)
+                    mesh->animID = maxID;
             }
 
         // Draw wires
@@ -165,9 +147,12 @@ namespace DarkMoon {
         }
 
         //Process bones
-        bool hasBones = mesh->HasBones();
-        if (hasBones)
+        bool meshHasBones = mesh->HasBones();
+        if (meshHasBones)
+        {
             processBone(boneIDs, weights, mesh, scene);
+            hasBones = true;
+        }
 
         for (std::size_t i = 0; i < vertices.size(); i++) {
             vertices[i].boneIDs = boneIDs[i];
@@ -183,7 +168,7 @@ namespace DarkMoon {
 
         std::string name = std::string(m_name) + mesh->mName.C_Str();
         std::string meshName = mesh->mName.C_Str();
-        auto currentMesh = rm.loadResource<Mesh>(name.c_str(), vertices, indices, material, meshName, hasBones);
+        auto currentMesh = rm.loadResource<Mesh>(name.c_str(), vertices, indices, material, meshName, meshHasBones);
 
         m_meshes.push_back(currentMesh);
     }

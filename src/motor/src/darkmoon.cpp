@@ -355,13 +355,33 @@ namespace DarkMoon {
     }
 
     // Update animation
-    void DarkMoonEngine::UpdateAnimation(float mult, std::size_t id) {
-        m_animationManager.UpdateAnimation(static_cast<float>(GetFrameTime()) * mult, id);
+    void DarkMoonEngine::UpdateAnimation(float dt, float mult, std::size_t id) {
+        m_animationManager.UpdateAnimation(dt * mult, id);
     }
 
     // Get animation time
     float DarkMoonEngine::GetAnimationTime(std::size_t id) {
         return m_animationManager.getCurrentInSecs(id);
+    }
+
+    // Interpolate Animation
+    void DarkMoonEngine::InterpolateAnimation(std::size_t id, Animation* anim) {
+        m_animationManager.interpolateAnimation(id, anim);
+    }
+
+    // Is interpolating
+    bool DarkMoonEngine::IsInterpolating(std::size_t id) {
+        return m_animationManager.isInterpolating(id);
+    }
+
+    // Change Animation
+    void DarkMoonEngine::ChangeAnimation(std::size_t id, Animation* anim) {
+        m_animationManager.ChangeAnimation(id, anim);
+    }
+
+    // Has animation ended
+    bool DarkMoonEngine::HasAnimationEnded(std::size_t id) {
+        return m_animationManager.isAnimationEnded(id);
     }
 
     // Create billboard in node

@@ -153,6 +153,7 @@ void ObjectSystem::createObjects(EntityManager& em)
         {
         case ObjectType::Life:
         {
+            em.addTag<LifeDropTag>(e);
             color = D_RED;
             break;
         }
@@ -169,6 +170,7 @@ void ObjectSystem::createObjects(EntityManager& em)
         }
         case ObjectType::Mana_Potion:
         {
+            em.addTag<ManaDropTag>(e);
             color = D_BLUE_LIGHT;
             break;
         }
@@ -231,7 +233,7 @@ void ObjectSystem::createObjects(EntityManager& em)
             auto& plfi = em.getSingleton<PlayerInfo>();
             plfi.hasHat = true;
 
-             em.getSingleton<SoundSystem>().sonido_equipar_gorro();
+            em.getSingleton<SoundSystem>().sonido_equipar_gorro();
 
             Item boots = { "Sombrero de Mago", "Te ayuda a canalizar mejor tu uso de magia" };
             break;

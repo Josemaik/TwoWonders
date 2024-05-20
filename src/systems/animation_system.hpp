@@ -13,9 +13,11 @@ struct AnimationSystem
     void update(EntityManager& em, GameEngine& engine);
 
 private:
-std::map<std::size_t, float> playerAnimMap = {
-    {1, 2.0f},
-    {2, 1.0f}
-};
-};
+    static inline constexpr std::array<float, 11> playerSpeeds = {
+        2.0, 4.0, 2.0, 4.0, 2.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0
+    };
 
+    static inline constexpr std::array<float, 4> snowmanSpeeds = {
+        5.0, 2.0, 2.0, 2.0
+    };
+};

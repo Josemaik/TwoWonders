@@ -29,7 +29,7 @@ void Game::createEntities()
     // 37.0, 13.0, -104.0 - Desp segunda lava lvl2
     // -95.0, 22.0, -135.0 - Spawn lvl2
     // -30.24, 49.0, -26.59 - Spawn crater lvl2
-    // -58.26,31.0,16.54 - spawn ramp muñeco
+    // -58.26, 31.0, 16.54 - spawn ramp muñeco
     // 40.0, 50.0, -3.0 - Nomada lvl2
     // 4.6, 7.0, -32.9 - Posición Incial lvl3
     // -33.0, 13.0, -0.5 - Hacia detrás casa lvl3
@@ -48,7 +48,7 @@ void Game::createEntities()
     em.addComponent<InputComponent>(e);
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
-    // em.addComponent<AttackerComponent>(e);
+    em.addComponent<AttackerComponent>(e);
     em.addComponent<AnimationComponent>(e);
     em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = false, .effect = Effects::PLAYER, .maxParticles = 4, .spawnRate = 0.05f, .lifeTime = 0.3f });
 
@@ -83,6 +83,7 @@ void Game::run()
     // using std::chrono::duration_cast;
     // using std::chrono::duration;
     // using std::chrono::microseconds;
+    // auto t1 = high_resolution_clock::now();
 
     // Codigo para medir el tiempo de ejecucion
     //
@@ -269,12 +270,6 @@ void Game::run()
             {
                 while (elapsed >= timeStepDouble120)
                 {
-                    //using std::chrono::high_resolution_clock;
-                    //using std::chrono::duration_cast;
-                    //using std::chrono::duration;
-                    //using std::chrono::microseconds;
-                    //auto t1 = high_resolution_clock::now();
-
                     elapsed -= timeStepDouble120;
                     ai_system.update(em);
                     npc_system.update(em);
@@ -288,14 +283,16 @@ void Game::run()
                     // if(elapsed < target)
                     camera_system.update(em, engine, evm);
                     event_system.update(em, evm, iam, map, object_system, sound_system);
+                  
                     if (li.showParticles)
                         particle_system.update(em);
 
                     //auto t2 = high_resolution_clock::now();
                     //auto dur = duration_cast<microseconds>(t2 - t1);
                     //std::cout << "Physics System: " << dur.count() << "us" << std::endl;
-                }
 
+                }
+              
                 // Borramos las entidades muertas
                 emptyDeathList(li);
 
@@ -309,6 +306,7 @@ void Game::run()
             else if (!resets && debugs) {
                 emptyDeathList(li);
                 sound_system.update();
+                anim_system.update(em, engine);
                 render_system.update(em, engine, 1.f);
             }
 

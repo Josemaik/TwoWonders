@@ -62,7 +62,8 @@ struct Octree
     // Función que nos devuelve el número máximo de entidades en el nodo
     [[nodiscard]] std::size_t getMaxEntities() const noexcept { return max_ent_; }
 
-    inline static const std::size_t MAX_ENTITIES = 40;
+    inline static constexpr std::size_t MAX_ENTITIES = 40;
+    inline static const uint8_t MAX_DEPTH = 8;
     inline static constexpr std::array<vec3d, 8> offsets =
     {
         vec3d(-0.5, -0.5, -0.5),
@@ -75,6 +76,7 @@ struct Octree
         vec3d(0.5, 0.5, 0.5)
     };
 
+    static std::unordered_set<Octree*> octreePool_;
 private:
     OctMap octEntities_{};
     OctType octants_{};

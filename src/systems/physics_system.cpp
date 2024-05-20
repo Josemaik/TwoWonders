@@ -141,10 +141,10 @@ void PhysicsSystem::update(EntityManager& em)
                 {
                     auto& plfi = em.getSingleton<PlayerInfo>();
                     auto& anc = em.getComponent<AnimationComponent>(e);
-                    if (plfi.hasStaff)
-                        anc.animToPlay = 0;
-                    else
-                        anc.animToPlay = 9;
+                    if (!plfi.hasStaff && anc.currentAnimation != 1 && anc.currentAnimation != 2)
+                        anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::NORMAL_WALK);
+                    else if (plfi.hasStaff && anc.currentAnimation != 1 && anc.currentAnimation != 2)
+                        anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::STAFF_WALK);
                 }
             }
             else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) && playerWalking)
@@ -155,7 +155,9 @@ void PhysicsSystem::update(EntityManager& em)
                 if (e.hasComponent<AnimationComponent>())
                 {
                     auto& anc = em.getComponent<AnimationComponent>(e);
-                    anc.animToPlay = 10;
+
+                    if (anc.currentAnimation != 1 && anc.currentAnimation != 2)
+                        anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::IDLE);
                 }
             }
         }

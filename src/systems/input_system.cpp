@@ -303,8 +303,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         if ((ge.isKeyDown(in.space) || ge.getGamepadAxisMovement(0, in.m_space) > 0.1))
         {
             plfi.currentSpell = plfi.noSpell;
-            em.getComponent<AttackerComponent>(player).attack(AttackType::MeleePlayer);
-            anc.animToPlay = 1;
+            anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::MELEE_ATTACK);
             phy.stopped = true;
         }
 
@@ -343,7 +342,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             // Restamos el maná
             if (playerSpelled)
             {
-                anc.animToPlay = 2;
+                anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::RANGED_ATTACK);
                 phy.stopped = true;
                 plfi.mana -= plfi.currentSpell.cost;
 
