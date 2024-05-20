@@ -127,11 +127,6 @@ public:
                     }
                     case EventCodes::OpenDoor:
                     {
-                        // auto& li = em.getSingleton<LevelInfo>();
-
-
-
-                        // li.insertDeath(li.doorToOpen);
                         break;
                     }
                     case EventCodes::SpawnWallLevel0:
@@ -280,6 +275,7 @@ public:
                             for (std::size_t i = 0; i < dc.eventCodes.size(); i++)
                                 scheduleEvent(Event{ static_cast<EventCodes>(dc.eventCodes[i]) });
                         }
+                        dc.eventCodes.clear();
 
                         auto& anc = em.getComponent<AnimationComponent>(e);
                         anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::SPEAKING);

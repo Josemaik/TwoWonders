@@ -384,6 +384,11 @@ namespace DarkMoon {
         return m_animationManager.isAnimationEnded(id);
     }
 
+    // Reset Animations
+    void DarkMoonEngine::ResetAnimations() {
+        m_animationManager.resetAnims();
+    }
+
     // Create billboard in node
     Node* DarkMoonEngine::CreateBillboard(const char* filePath, glm::vec3 position, glm::vec2 size, const char* nodeName, Node* parentNode) {
         auto p_nodeBillboard = CreateNode(nodeName, parentNode);

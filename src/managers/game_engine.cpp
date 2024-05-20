@@ -1168,3 +1168,7 @@ void ENGI::GameEngine::updateAnimation(float dt, float mult, std::size_t id) {
 float ENGI::GameEngine::getAnimationTime(std::size_t id) {
     return dmeg.GetAnimationTime(id);
 }
+
+void ENGI::GameEngine::resetAnimations() {
+    dmeg.ResetAnimations();
+}

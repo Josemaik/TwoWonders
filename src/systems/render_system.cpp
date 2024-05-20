@@ -3,12 +3,12 @@
 #include <iomanip>
 #include <variant>
 
-using std::chrono::high_resolution_clock;
-using std::chrono::duration_cast;
-using std::chrono::duration;
-using std::chrono::microseconds;
+// using std::chrono::high_resolution_clock;
+// using std::chrono::duration_cast;
+// using std::chrono::duration;
+// using std::chrono::microseconds;
 
-auto t1 = high_resolution_clock::now();
+// auto t1 = high_resolution_clock::now();
 
 float ENGI::GameEngine::widthRate = 1.0;
 float ENGI::GameEngine::heightRate = 1.0f;
@@ -1262,6 +1262,11 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         std::string path = "assets/Personajes/Enemigos/Snowman/Snowman.fbx";
         r.node = engine.loadModel(path.c_str());
         loadAnimations(engine, em, e, r, path, 2.0);
+
+        if (li.mapID == 2)
+            for (auto& mesh : r.node->getEntity<Model>()->getMeshes())
+                mesh->material->texture = engine.loadTexture2D("assets/Personajes/Enemigos/Snowman/snowman_fuego_texture.png");
+
         // r.model = engine.loadModel("assets/Personajes/Enemigos/Snowman/Snowman.obj");
 
         // Texture t{};
@@ -1717,7 +1722,7 @@ void RenderSystem::setPointLight(GameEngine& engine, PointLightComponent& plc, N
 
 void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
 {
-    t1 = std::chrono::high_resolution_clock::now();
+    // t1 = std::chrono::high_resolution_clock::now();
     using partCMPs = MP::TypeList<ParticleMakerComponent>;
     using noTAGs = MP::TypeList<>;
 
@@ -1757,9 +1762,9 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
         }
     });
 
-    auto t2 = std::chrono::high_resolution_clock::now();
-    auto dur = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    std::cout << "Tiempo de renderizado de partículas: " << dur << " mc" << std::endl;
+    // auto t2 = std::chrono::high_resolution_clock::now();
+    // auto dur = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    // std::cout << "Tiempo de renderizado de partículas: " << dur << " mc" << std::endl;
 }
 
 // Empieza el dibujado y se limpia la pantalla

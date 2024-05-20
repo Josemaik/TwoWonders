@@ -231,7 +231,7 @@ namespace DarkMoon {
         Font* font{};
         int fontSize{};
         Color color{};
-        static constexpr float charSpeed{ 0.035f };
+        static constexpr float charSpeed{ 0.045f };
 
         float scale{};
         float maxWidth{};
@@ -439,7 +439,8 @@ namespace DarkMoon {
                         aux_x -= widths[k];
 
                     k += 1;
-                    aux_y += maxHeight * 1.2f;
+                    auto hRate = wm.getHeightRatio();
+                    aux_y += maxHeight * 1.8f * hRate;
                     // Skip the rest of the loop
                     continue;
                 }

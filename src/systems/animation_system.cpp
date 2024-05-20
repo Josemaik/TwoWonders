@@ -54,6 +54,21 @@ void AnimationSystem::update(EntityManager& em, GameEngine& engine)
 
         if (ac.animToPlay != ac.max)
         {
+            if (e.hasTag<PlayerTag>())
+            {
+                if (ac.currentAnimation == static_cast<std::size_t>(PlayerAnimations::MELEE_ATTACK) && !ac.aboutToEnd)
+                {
+                    ac.animToPlay = ac.max;
+                    return;
+                }
+
+                ac.multiplier = playerSpeeds[ac.animToPlay];
+            }
+
+            else if (e.hasTag<SnowmanTag>())
+                ac.multiplier = snowmanSpeeds[ac.animToPlay];
+
+            // Seteamos la animación o la interpolamos con la anterior por fluidez
             if (ac.idCurrent != ac.max)
                 engine.dmeg.InterpolateAnimation(ac.idCurrent, ac.animationList[ac.animToPlay]);
             else
@@ -62,12 +77,7 @@ void AnimationSystem::update(EntityManager& em, GameEngine& engine)
                 rc.node->getEntity<Model>()->animID = ac.idCurrent;
             }
 
-            if (e.hasTag<PlayerTag>())
-                ac.multiplier = playerSpeeds[ac.animToPlay];
-
-            else if (e.hasTag<SnowmanTag>())
-                ac.multiplier = snowmanSpeeds[ac.animToPlay];
-
+            // Reseteamos valores
             ac.currentAnimation = ac.animToPlay;
             ac.animToPlay = ac.max;
             ac.currentTime = 0.0f;
@@ -108,7 +118,5 @@ void AnimationSystem::update(EntityManager& em, GameEngine& engine)
                 engine.stopAnimation(ac.idCurrent);
             }
         }
-
-
     });
 }

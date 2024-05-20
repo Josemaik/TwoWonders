@@ -147,6 +147,7 @@ namespace ENGI {
         std::vector<Animation*> createAnimations(const std::string& path, std::vector<BoneInfo>& vecbones);
         void updateAnimation(float dt, float mult, std::size_t id);
         float getAnimationTime(std::size_t id);
+        void resetAnimations();
 
         Node* loadModel(const char* filename);
         float getWorldToScreenX(vec3d pos);

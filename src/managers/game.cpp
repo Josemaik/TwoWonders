@@ -49,7 +49,7 @@ void Game::createEntities()
     em.addComponent<LifeComponent>(e, LifeComponent{ .life = 6 });
     em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, BehaviorType::PLAYER });
     // em.addComponent<AttackerComponent>(e);
-    em.addComponent<AnimationComponent>(e);
+    em.addComponent<AnimationComponent>(e, AnimationComponent{ .animToPlay = static_cast<std::size_t>(PlayerAnimations::IDLE) });
     em.addComponent<ParticleMakerComponent>(e, ParticleMakerComponent{ .active = false, .effect = Effects::PLAYER, .maxParticles = 4, .spawnRate = 0.05f, .lifeTime = 0.3f });
 
     // Listeners de eventos para el jugador
@@ -61,7 +61,7 @@ void Game::createEntities()
     // Spell spell{ "Fireball", "Shoots a fireball", Spells::WaterDash, 20.0, 2 };
     // plfi.addSpell(spell);
 
-    // Código de añadir un objeto poción al inventario
+    // Código de añadir un objeto poción al inventario33.0, 4.0, -25.9
     // Potion pot{ "Potion", "Heals 2 life points", PotionType::Health, 2.0 };
     // plfi.addItem(std::make_unique<Potion>(pot));
 
@@ -239,6 +239,7 @@ void Game::run()
                 map.changeMap(em, li.mapID, iam);
                 collision_system.updateOctreeSize(li.mapID);
                 li.mapToLoad = li.u8max;
+                engine.resetAnimations();
             }
 
             if (!map.isComplete())

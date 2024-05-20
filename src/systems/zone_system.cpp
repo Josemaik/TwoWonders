@@ -1,6 +1,6 @@
 #include "zone_system.hpp"
 
-void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, EventManager& evm, MapManager& map) {
+void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam, EventManager& evm, MapManager& map) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, ZoneComponent& zon)
@@ -30,6 +30,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         plfi.spawnPoint = spawnPoint;
                         p.position = spawnPoint;
                         em.getSingleton<SoundSystem>().update();
+                        engine.resetAnimations();
                         break;
                     }
                     case 1:
@@ -42,6 +43,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         plfi.spawnPoint = spawnPoint;
                         p.position = spawnPoint;
                         em.getSingleton<SoundSystem>().update();
+                        engine.resetAnimations();
                         break;
                     }
                     case 2:
