@@ -712,7 +712,12 @@ ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Arany
         play();
         update();
     }
-  
+   void SoundSystem::sonido_puerta_prision() {
+        ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Puerta/Puerta_cae", &eventDescription));
+        ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription, &eventInstance));
+        play();
+        update();
+    }
 
 
     //PASOS
