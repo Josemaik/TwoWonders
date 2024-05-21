@@ -69,6 +69,62 @@ DarkMoon::Node* createScene3D(DarkMoon::DarkMoonEngine& engine) {
 
 DarkMoon::Node* model = nullptr;
 
+void createHUD(DarkMoon::DarkMoonEngine& engine){
+    // Node HUD
+    auto p_nodeHUD = engine.CreateNode("HUD", engine.GetRootNode());
+
+    // PRUEBAS RENDIMIENTO //
+
+    // // Node: Pixel prueba
+    // engine.CreatePixel({ 5, 5 }, D_BLACK, "Pixel prueba", p_nodeHUD);
+    // // Node: Linea prueba
+    // engine.CreateLine({ 0, 0 }, { 100, 100 }, D_RED, "Linea prueba", p_nodeHUD);
+    // // Node: Triangulo prueba
+    // engine.CreateTriangle({ 0, 0 }, {100, 100}, {0, 100}, D_YELLOW_DARK, "Triangulo prueba", p_nodeHUD);
+    // Node: Circulo prueba
+    engine.CreateCircle({ 500, 500 }, 30, 20, D_AQUA_DARK, "Circulo prueba", p_nodeHUD);
+
+    // Node: Rectangulo rosa Oscuro
+    engine.CreateRectangle({ 12.0f, 12.0f }, { 375.0f, 40.0f }, D_PINK_DARK, "Rectangulo rosa oscuro", p_nodeHUD);
+    // Node: Rectangulo rosa
+    engine.CreateRectangle({ 10.0f, 10.0f }, { 375.0f, 40.0f }, D_PINK, "Rectangulo rosa", p_nodeHUD);
+
+    // Node: Texto
+    //engine.CreateText({10.0f, 10.0f}, "Ya era hora pato", engine.GetDefaultFont(), 24, D_GRAY,1,"Texto ya era hora", p_nodeHUD);
+
+    // Node: Texture2D
+    engine.CreateTexture2D({ 10.0f, 400.0f }, "assets/mago_happy.png", D_WHITE, "Textura Koromaru", p_nodeHUD);
+
+    // Node: Rectangulo negro
+    engine.CreateRectangle({ 10.0f, 100.0f }, { 150.0f, 150.0f }, D_BLACK, "Rectangulo negro", p_nodeHUD);
+
+    // Node: AnimatedTexture2D
+    std::vector<DarkMoon::Texture*> texturesGif;
+    texturesGif.push_back(engine.LoadTexture2D("assets/joystickL-0.png"));
+    texturesGif.push_back(engine.LoadTexture2D("assets/joystickL-1.png"));
+    texturesGif.push_back(engine.LoadTexture2D("assets/joystickL-2.png"));
+    texturesGif.push_back(engine.LoadTexture2D("assets/joystickL-3.png"));
+    engine.CreateAnimatedTexture2D({ 10.0f, 100.0f }, texturesGif, D_WHITE, 1.0f, 0, "Textura Joystick Izquierdo", p_nodeHUD);
+
+    // Node: TextBox
+    //auto textBox = engine.CreateTextBox({ 660, 20 }, { 120, 60 }, D_AQUA_LIGHT, "Texto", engine.GetDefaultFont(), 24, D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER, "Caja de texto de prueba", p_nodeHUD);
+
+    // Node: Button
+    engine.CreateButton({ 660, 100 }, { 120, 60 }, "Boton", engine.GetDefaultFont(), 24, D_BLACK, DarkMoon::Aligned::CENTER, DarkMoon::Aligned::CENTER, D_ORANGE_DARK, D_ORANGE, D_ORANGE_LIGHT, "Boton de prueba naranja", p_nodeHUD);
+
+    // Node: Slider
+    //engine.CreateSlider({660, 180}, {120, 30}, D_GRAY, D_AQUA_LIGHT, "Slider de prueba", p_nodeHUD);
+
+    // // Node: Pixel Negro
+    // engine.CreatePixel({400.0f, 300.0f}, BLACK, "Pixel negro", p_nodeHUD);
+    // // Node: Linea Roja
+    // engine.CreateLine({0.0f, 0.0f}, {700.0f, 600.0f}, RED, "Linea roja", p_nodeHUD);
+    // // Node: Triangulo Verde
+    // engine.CreateTriangle({10.0f, 54.0f}, {10.0f, 590.0f}, {210.0f, 590.0f}, KAIWA, "Triangulo verde", p_nodeHUD);
+    // // Node: Circulo 
+    // engine.CreateCircle({250.0f, 50.0f}, 30.0f, 20, LAVENDER, "Circulo lavanda", p_nodeHUD);
+}
+
 void createMainCharacter(DarkMoon::DarkMoonEngine& engine) {
     // Model
     model = engine.CreateModel("assets/Nomada.obj", D_WHITE, "Modelo: Main Character", engine.GetRootNode());
@@ -154,7 +210,6 @@ void managerShaderCartoon(DarkMoon::DarkMoonEngine& engine, bool comments) {
     if(engine.IsKeyDown(D_KEY_2))
         engine.SetDepthThresholdValue(engine.GetDepthThresholdValue() - 0.01f < 0 ? 0 : engine.GetDepthThresholdValue() - 0.01f);
 
-
     if(engine.IsKeyDown(D_KEY_3))
         engine.SetNormalThresholdValue(engine.GetNormalThresholdValue() + 0.01f);
     if(engine.IsKeyDown(D_KEY_4))
@@ -178,12 +233,13 @@ int main() {
 
         createScene3D(engine);
         createMainCharacter(engine);
+        createHUD(engine);
 
         engine.SetExitKey(D_KEY_F8);
         engine.SetTargetFPS(60);
 
         engine.ActivateLights();
-        engine.ActivateShaderCartoon();
+        //engine.ActivateShaderCartoon();
 
         while (!engine.WindowShouldClose()) {
             
@@ -192,6 +248,9 @@ int main() {
             inputManager(engine);
 
             managerShaderCartoon(engine, false);
+
+            if(engine.IsKeyPressed(D_KEY_0))
+                engine.ToggleShaderCartoon();
 
             // Draw
     

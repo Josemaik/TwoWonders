@@ -45,6 +45,18 @@ namespace DarkMoon {
         void controlFrameRate();
         void framebuffer_size_callback();
 
+        // Framebuffer
+        GLuint m_framebuffer {};
+        GLuint m_texColorBuffer {};
+        GLuint m_RBO {};
+        GLuint m_screenVAO {}, m_screenVBO {};
+
+        void createFramebuffer();
+        void configureFramebufferVAO();
+        void applySobelFilter();
+
+        void cleanup();
+
     public:
         // Window-related functions
         bool initWindow(int width, int height, const char* title);
