@@ -130,11 +130,11 @@ namespace DarkMoon {
 
         }
     
-        // if(activeShaderCartoon){
-        //     glUniform1f(glGetUniformLocation(shaders["3D"]->getIDShader(), "depthThreshold"), depthThreshold);
-        //     glUniform1f(glGetUniformLocation(shaders["3D"]->getIDShader(), "normalThreshold"), normalThreshold);
-        //     glUniform4f(glGetUniformLocation(shaders["3D"]->getIDShader(), "_outlineColor"), outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a);
-        // }
+        if(activeShaderCartoon){
+            glUniform1f(glGetUniformLocation(shaders["3D"]->getIDShader(), "depthThreshold"), depthThreshold);
+            glUniform1f(glGetUniformLocation(shaders["3D"]->getIDShader(), "normalThreshold"), normalThreshold);
+            glUniform4f(glGetUniformLocation(shaders["3D"]->getIDShader(), "_outlineColor"), outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a);
+        }
     }
 
     // Basic drawing functions

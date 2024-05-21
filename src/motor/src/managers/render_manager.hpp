@@ -49,7 +49,7 @@ namespace DarkMoon {
         // Shader cartoon
         bool activeShaderCartoon { false };
         float depthThreshold = { 0.5f };
-        float normalThreshold = { 4.0f };
+        float normalThreshold = { 0.76f };
         glm::vec4 outlineColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f); 
 
         // Screen width and height

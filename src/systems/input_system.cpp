@@ -109,7 +109,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         ge.setWindowFullScreen();
 
     if (ge.isKeyReleased(D_KEY_F12)){
-        //ge.dmeg.ToggleShaderCartoon();
+        ge.dmeg.ToggleShaderCartoon();
         ge.toggleLights();
     }
 

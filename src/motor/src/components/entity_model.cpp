@@ -192,8 +192,9 @@ namespace DarkMoon {
         //std::cout << ambient.r << " | " << ambient.g << " | " << ambient.b << "\n";
 
         // Create and return Material object
+        std::string name = std::string(m_name) + aiMaterial->GetName().C_Str();
         //auto material = rm.loadResource<Material>(aiMaterial->GetName().C_Str());
-        auto material = rm.loadResource<Material>(aiMaterial->GetName().C_Str(),
+        auto material = rm.loadResource<Material>(name.c_str(),
             glm::vec3(ambient.r, ambient.g, ambient.b),
             glm::vec3(diffuse.r, diffuse.g, diffuse.b),
             glm::vec3(specular.r, specular.g, specular.b),
