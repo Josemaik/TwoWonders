@@ -206,34 +206,22 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 auto& doorAnim = em.getComponent<AnimationComponent>(ent);
                 doorAnim.animToPlay = static_cast<std::size_t>(DoorAnimations::OPEN);
 
+                lif.life = 20;
                 li.door_open = true;
                 em.getSingleton<SoundSystem>().sonido_abrir_puerta_magica();
 
-                lif.life = 20;
-                return;
-                if (li.npcToTalk != li.max)
-                {
-                    auto& npc = *em.getEntityByID(li.npcToTalk);
-                    auto& npcC = em.getComponent<NPCComponent>(npc);
-                    switch (npcC.type)
-                    {
-                    case NPCType::NOMAD:
-                    {
-                        auto& npcAnim = em.getComponent<AnimationComponent>(npc);
-                        npcAnim.animToPlay = static_cast<std::size_t>(NPCAnimations::WALK);
-                        break;
-                    }
-                    default:
-                        break;
-                    }
-                }
+                // Iniciamos la animación de caminar del nómada
+                using AnimCMP = MP::TypeList<AnimationComponent>;
+                using NomadTAG = MP::TypeList<NomadTag>;
 
+                em.forEach<AnimCMP, NomadTAG>([](Entity&, AnimationComponent& anc)
+                {
+                    anc.animToPlay = static_cast<std::size_t>(NomadAnimations::WALK);
+                });
             }
 
             if (li.lockedEnemy == ent.getID())
                 li.lockedEnemy = li.max;
-
-            lif.markedForDeletion = true;
         }
 
         // Para cuando se recoge una poción de vida

@@ -24,4 +24,8 @@ private:
     static inline constexpr std::array<float, 4> nomadSpeeds = {
         3.0, 2.0, 2.0, 3.0
     };
+
+    static inline constexpr std::array<float, 4> catSpeeds = {
+        2.0, 4.0, 2.0, 3.0
+    };
 };

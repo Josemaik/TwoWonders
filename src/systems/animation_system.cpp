@@ -51,10 +51,10 @@ void AnimationSystem::update(EntityManager& em, GameEngine& engine)
             }
             else if (e.hasTag<NomadTag>())
             {
-                if (ac.currentAnimation == static_cast<std::size_t>(NPCAnimations::GIVE_ITEM))
+                if (ac.currentAnimation == static_cast<std::size_t>(NomadAnimations::GIVE_ITEM))
                 {
                     ac.reset();
-                    ac.animToPlay = static_cast<std::size_t>(NPCAnimations::SPEAKING);
+                    ac.animToPlay = static_cast<std::size_t>(NomadAnimations::SPEAKING);
                 }
             }
         }
@@ -77,6 +77,8 @@ void AnimationSystem::update(EntityManager& em, GameEngine& engine)
                 ac.multiplier = snowmanSpeeds[ac.currentAnimation];
             else if (e.hasTag<NomadTag>())
                 ac.multiplier = nomadSpeeds[ac.currentAnimation];
+            else if (e.hasTag<InvestigatorTag>())
+                ac.multiplier = catSpeeds[ac.currentAnimation];
         }
 
         // Cuando se va a ejecutar una nueva animación
@@ -98,6 +100,9 @@ void AnimationSystem::update(EntityManager& em, GameEngine& engine)
 
             else if (e.hasTag<NomadTag>())
                 ac.multiplier = nomadSpeeds[ac.animToPlay];
+
+            else if (e.hasTag<InvestigatorTag>())
+                ac.multiplier = catSpeeds[ac.animToPlay];
 
             // Seteamos la animación o la interpolamos con la anterior por fluidez
             if (ac.idCurrent != ac.max)

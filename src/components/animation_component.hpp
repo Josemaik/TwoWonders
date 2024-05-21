@@ -35,11 +35,19 @@ enum struct DoorAnimations : uint8_t
     OPEN
 };
 
-enum struct NPCAnimations : uint8_t
+enum struct NomadAnimations : uint8_t
 {
     WALK,
     IDLE,
     SPEAKING,
+    GIVE_ITEM
+};
+
+enum struct InvestAnimations : uint8_t
+{
+    SPEAKING,
+    WALK,
+    IDLE,
     GIVE_ITEM
 };
 

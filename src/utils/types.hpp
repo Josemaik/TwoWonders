@@ -73,6 +73,36 @@ static constexpr double timeStepDouble240 = 1.0 / 240.0;  // Actualiza el juego 
 // Forward Declarations
 namespace ENGI { struct GameEngine; }
 
+// Eventos del juego
+enum EventCodes : uint16_t
+{
+    NoEvent,
+    SpawnKey,
+    SpawnDungeonKey,
+    OpenChest,
+    SetSpawn,
+    OpenDoor,
+    SpawnWallLevel0,
+    ViewPointCave,
+    NPCDialog,
+    DialogPrisonNomad1,
+    DialogPrisonNomad2,
+    DialogFirstSpawn,
+    ViewPointDoor,
+    BoatPartFound,
+    BoatDialog,
+    DialogNomadVolcano1,
+    DialogNomadVolcano2,
+    DialogCatVolcano1,
+    InitBoatParts,
+    DialogCatVolcano2,
+    DialogCatVolcano3,
+    DialogNomadVolcano3,
+    TPBoat,
+    ViewPointNomadDoor,
+    MAX
+};
+
 // Tags - Colocar en TL
 struct PlayerTag {};
 struct EnemyTag {};

@@ -162,15 +162,16 @@ void PhysicsSystem::update(EntityManager& em)
                 {
                     playerWalking = false;
                     ss.SFX_pasos_stop();
+
+                    if (e.hasComponent<AnimationComponent>())
+                    {
+                        auto& anc = em.getComponent<AnimationComponent>(e);
+
+                        if (anc.animToPlay == anc.max && anc.currentAnimation != 1 && anc.currentAnimation != 2 && anc.currentAnimation != 4)
+                            anc.animToPlay = (static_cast<std::size_t>(PlayerAnimations::IDLE));
+                    }
                 }
 
-                if (e.hasComponent<AnimationComponent>())
-                {
-                    auto& anc = em.getComponent<AnimationComponent>(e);
-
-                    if (anc.animToPlay == anc.max && anc.currentAnimation != 1 && anc.currentAnimation != 2 && anc.currentAnimation != 4)
-                        anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::IDLE);
-                }
             }
         }
         auto& li = em.getSingleton<LevelInfo>();

@@ -43,7 +43,11 @@ struct BTAction_PatrolNPC : BTNode_t {
                         li.insertDeath(ectx.ent.getID());
 
                     if (li.mapID == 2)
-                        addDialogEvent(ectx, 21);
+                    {
+                        addDialogEvent(ectx, static_cast<int>(EventCodes::DialogNomadVolcano3));
+                        auto& anc = ectx.em.getComponent<AnimationComponent>(ectx.ent);
+                        anc.animToPlay = static_cast<std::size_t>(NomadAnimations::IDLE);
+                    }
                 }
             }
         }
@@ -53,7 +57,11 @@ struct BTAction_PatrolNPC : BTNode_t {
                     ectx.npc->path_investigador_finalized = true;
 
                     if (li.mapID == 2)
-                        addDialogEvent(ectx, 19);
+                    {
+                        addDialogEvent(ectx, static_cast<int>(EventCodes::DialogCatVolcano2));
+                        auto& anc = ectx.em.getComponent<AnimationComponent>(ectx.ent);
+                        anc.animToPlay = static_cast<std::size_t>(InvestAnimations::IDLE);
+                    }
                 }
             }
         }

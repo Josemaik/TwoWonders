@@ -1422,8 +1422,6 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         // loadAnimations(engine, em, e, r, "assets/Assets/Cofre/Cofre0.fbx", 1.0f);
         r.node = engine.loadModel("assets/Assets/Cofre/Cofre.obj");
         setPointLight(engine, em, e, *r.node, r.position + vec3d{ 0, 5, 0 });
-        //engine.dmeg.CreateSpotLight(r.position.toGlm() + vec3f(0,10,0).toGlm(), {0, -1, 0}, 30.0f, D_YELLOW, "SpotLight amarilla", r.node);
-        // loadShaders(r.model);
     }
     else if (e.hasTag<DestructibleTag>())
     {
@@ -1561,10 +1559,10 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<InvestigatorTag>())
     {
         // FIXME
-        // std::string path = "assets/Personajes/NPCs/Investigador/Investigador.fbx";
-        // r.node = engine.loadModel(path.c_str());
-        // loadAnimations(engine, em, e, r, path, 1.0f);
-        r.node = engine.loadModel("assets/Personajes/NPCs/Investigador/Investigador.obj");
+        std::string path = "assets/Personajes/NPCs/Investigador/Investigador.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 1.0f);
+        // r.node = engine.loadModel("assets/Personajes/NPCs/Investigador/Investigador.obj");
         setPointLight(engine, em, e, *r.node, r.position, 1.f, D_YELLOW);
     }
     else if (e.hasTag<LavaTag>())
@@ -1693,7 +1691,9 @@ void RenderSystem::loadAnimations(GameEngine& engine, EntityManager& em, Entity&
     // else if (ent.hasTag<DummyTag>())
     //     ac.animToPlay = 0;
     else if (ent.hasTag<NomadTag>())
-        ac.animToPlay = static_cast<std::size_t>(NPCAnimations::IDLE);
+        ac.animToPlay = static_cast<std::size_t>(NomadAnimations::IDLE);
+    else if (ent.hasTag<InvestigatorTag>())
+        ac.animToPlay = static_cast<std::size_t>(InvestAnimations::IDLE);
     else if (ent.hasTag<SnowmanTag>())
         ac.animToPlay = static_cast<std::size_t>(SnowmanAnimations::IDLE);
     else if (ent.hasTag<GolemTag>())
@@ -3610,7 +3610,7 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
         auto* speaker = engine.createNode(getNode(engine, name.c_str()), getNode(engine, "Copy"));
         engine.drawNode(speaker, { posX - offSetX, posY - offSetY });
 
-        if (boxInfo.text.charChanged())
+        if (boxInfo.text.charChanged() || boxInfo.text.charIndex == 0)
             sound();
     }
 
@@ -3630,22 +3630,30 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
                 li.openChest = false;
             }
 
-            if (li.npcToTalk != li.max && !em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).notMove)
+            auto& playerAnim = em.getComponent<AnimationComponent>(*em.getEntityByID(li.playerID));
+            if (playerAnim.currentAnimation == static_cast<std::size_t>(PlayerAnimations::SPEAKING))
             {
-                auto& npc = *em.getEntityByID(li.npcToTalk);
-                auto& npcC = em.getComponent<NPCComponent>(npc);
+                using animCMP = MP::TypeList<NPCComponent, AnimationComponent>;
+                using npcTAG = MP::TypeList<NPCTag>;
 
-                switch (npcC.type)
+                em.forEach<animCMP, npcTAG>([&](Entity&, NPCComponent& npcC, AnimationComponent& anim)
                 {
-                case NPCType::NOMAD:
-                {
-                    auto& animNpc = em.getComponent<AnimationComponent>(npc);
-                    animNpc.animToPlay = static_cast<std::size_t>(NPCAnimations::IDLE);
-                    break;
-                }
-                default:
-                    break;
-                }
+                    switch (npcC.type)
+                    {
+                    case NPCType::INVESTIGATOR:
+                    {
+                        anim.animToPlay = static_cast<std::size_t>(InvestAnimations::IDLE);
+                        break;
+                    }
+                    case NPCType::NOMAD:
+                    {
+                        anim.animToPlay = static_cast<std::size_t>(NomadAnimations::IDLE);
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+                });
             }
         }
         inpi.interact = false;
