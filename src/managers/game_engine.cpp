@@ -1161,10 +1161,14 @@ std::vector<Animation*> ENGI::GameEngine::createAnimations(const std::string& pa
     return dmeg.CreateAnimations(path, vecbones);
 }
 
-void ENGI::GameEngine::updateAnimation(float mult, std::size_t id) {
-    dmeg.UpdateAnimation(mult, id);
+void ENGI::GameEngine::updateAnimation(float dt, float mult, std::size_t id) {
+    dmeg.UpdateAnimation(dt, mult, id);
 }
 
 float ENGI::GameEngine::getAnimationTime(std::size_t id) {
     return dmeg.GetAnimationTime(id);
+}
+
+void ENGI::GameEngine::resetAnimations() {
+    dmeg.ResetAnimations();
 }

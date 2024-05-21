@@ -54,6 +54,7 @@ namespace DarkMoon {
 
         // Check changes
         if (m_updateMatrix) {
+
             m_transformationMatrix = parentMatrix
                 * glm::translate(glm::mat4(1.0f), m_translation)
                 * glm::mat4_cast(m_rotation)
@@ -89,6 +90,24 @@ namespace DarkMoon {
     }
 
     void Node::setTransformationMatrix(glm::mat4 newMatrix) {
+
+        glm::vec3 newTranslate = newMatrix[3];
+        setTranslation(newTranslate);
+
+        glm::vec3 scale;
+        scale.x = glm::length(glm::vec3(newMatrix[0]));
+        scale.y = glm::length(glm::vec3(newMatrix[1]));
+        scale.z = glm::length(glm::vec3(newMatrix[2]));
+        m_scale = scale;
+
+        // glm::mat4 rotation = glm::mat4();
+
+        // rotation[0] = newMatrix[0] / scale.x;
+        // rotation[1] = newMatrix[1] / scale.y;
+        // rotation[2] = newMatrix[2] / scale.z;
+
+        // m_rotation = rotation;
+
         m_transformationMatrix = newMatrix;
     }
 

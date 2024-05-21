@@ -216,6 +216,7 @@ void AttackManager::createAttackType(EntityManager& em, Entity& ent, AttackType 
             eleType = em.getComponent<TypeComponent>(ent).type;
 
         auto& e{ em.newEntity() };
+        em.addTag<HitPlayerTag>(e);
         auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = position, .scale = { 20.0f, 0.1f, 20.0f }, .color = D_GREEN });
         auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.0 });
         em.addComponent<AttackComponent>(e, AttackComponent{ .atkType = AttackType::CrusherAttack, .damage = 2, .type = eleType, .lifeTime = 0.2f });

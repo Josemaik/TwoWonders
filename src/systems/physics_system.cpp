@@ -130,33 +130,48 @@ void PhysicsSystem::update(EntityManager& em)
             }
         }
 
-        //SONIDOS DE MOVIMIENTO
+        // SONIDOS Y ANIMACIONES DE MOVIMIENTO
         auto& ss = em.getSingleton<SoundSystem>();
-        if (e.hasTag<PlayerTag>()) {
-            if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
-                ss.play_pasos();
-                playerWalking = true;
+        if (e.hasTag<PlayerTag>())
+        {
+            if (phy.velocity.x() != 0 || phy.velocity.z() != 0) {
+
+                if (!playerWalking)
+                {
+                    ss.play_pasos();
+                    playerWalking = true;
+
+                }
 
                 if (e.hasComponent<AnimationComponent>())
                 {
                     auto& plfi = em.getSingleton<PlayerInfo>();
                     auto& anc = em.getComponent<AnimationComponent>(e);
-                    if (plfi.hasStaff)
-                        anc.animToPlay = 0;
-                    else
-                        anc.animToPlay = 9;
+                    if (anc.animToPlay == anc.max && anc.currentAnimation == static_cast<std::size_t>(PlayerAnimations::IDLE))
+                    {
+                        if (!plfi.hasStaff)
+                            anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::NORMAL_WALK);
+                        else
+                            anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::STAFF_WALK);
+                    }
                 }
             }
-            else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) && playerWalking)
+            else if (phy.velocity.x() == 0 && phy.velocity.z() == 0)
             {
-                playerWalking = false;
-                ss.SFX_pasos_stop();
-
-                if (e.hasComponent<AnimationComponent>())
+                if (playerWalking)
                 {
-                    auto& anc = em.getComponent<AnimationComponent>(e);
-                    anc.animToPlay = 10;
+                    playerWalking = false;
+                    ss.SFX_pasos_stop();
+
+                    if (e.hasComponent<AnimationComponent>())
+                    {
+                        auto& anc = em.getComponent<AnimationComponent>(e);
+
+                        if (anc.animToPlay == anc.max && anc.currentAnimation != 1 && anc.currentAnimation != 2 && anc.currentAnimation != 4)
+                            anc.animToPlay = (static_cast<std::size_t>(PlayerAnimations::IDLE));
+                    }
                 }
+
             }
         }
         auto& li = em.getSingleton<LevelInfo>();

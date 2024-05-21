@@ -8,36 +8,6 @@
 #include <cstdint>
 #include <vector>
 
-//Eventos
-enum EventCodes : uint16_t
-{
-    NoEvent,
-    SpawnKey,
-    SpawnDungeonKey,
-    OpenChest,
-    SetSpawn,
-    OpenDoor,
-    SpawnWallLevel0,
-    ViewPointCave,
-    NPCDialog,
-    DialogPrisonNomad1,
-    DialogPrisonNomad2,
-    DialogFirstSpawn,
-    ViewPointDoor,
-    BoatPartFound,
-    BoatDialog,
-    DialogNomadVolcano1,
-    DialogNomadVolcano2,
-    DialogCatVolcano1,
-    InitBoatParts,
-    DialogCatVolcano2,
-    DialogCatVolcano3,
-    DialogNomadVolcano3,
-    TPBoat,
-    ViewPointNomadDoor,
-    MAX
-};
-
 struct Event {
     EventCodes code; // Código identificador del evento
 };
@@ -127,13 +97,6 @@ public:
                     }
                     case EventCodes::OpenDoor:
                     {
-                        auto& li = em.getSingleton<LevelInfo>();
-                        auto& plfi = em.getSingleton<PlayerInfo>();
-
-                        ss.sonido_abrir_puerta();
-
-                        plfi.hasKey = false;
-                        li.insertDeath(li.doorToOpen);
                         break;
                     }
                     case EventCodes::SpawnWallLevel0:
@@ -253,17 +216,15 @@ public:
 
                         auto& li = em.getSingleton<LevelInfo>();
                         li.investigatorstartwalk = true;
-                        using CMPs = MP::TypeList<PhysicsComponent, NPCComponent>;
-                        using npcTAG = MP::TypeList<NPCTag>;
+                        using CMPs = MP::TypeList<PhysicsComponent, NPCComponent, AnimationComponent>;
+                        using npcTAG = MP::TypeList<InvestigatorTag>;
 
-                        em.forEach<CMPs, npcTAG>([&](Entity&, PhysicsComponent& phy, NPCComponent& npc)
+                        em.forEach<CMPs, npcTAG>([&](Entity&, PhysicsComponent& phy, NPCComponent& npc, AnimationComponent& anc)
                         {
-                            if (npc.type == NPCType::INVESTIGATOR)
-                            {
-                                npc.pathIt_inestigador = npc.path_investigador.begin();
-                                phy.position = { 27.2022,14,-104.252 };
-                                npc.tp = true;
-                            }
+                            npc.pathIt_inestigador = npc.path_investigador.begin();
+                            phy.position = { 27.2022,14,-104.252 };
+                            npc.tp = true;
+                            anc.animToPlay = static_cast<std::size_t>(InvestAnimations::WALK);
                         });
 
                         break;
@@ -275,19 +236,36 @@ public:
                             break;
 
                         auto& npc = *em.getEntityByID(li.npcToTalk);
+                        auto& npcC = em.getComponent<NPCComponent>(npc);
                         auto& dc = em.getComponent<DispatcherComponent>(npc);
 
-                        if (dc.eventCodes.size() > 1)
+                        if (dc.eventCodes.size() > 0)
                         {
-                            auto& lc = em.getComponent<ListenerComponent>(e);
-                            for (std::size_t i = 1; i < dc.eventCodes.size(); i++)
-                            {
+                            for (std::size_t i = 0; i < dc.eventCodes.size(); i++)
                                 scheduleEvent(Event{ static_cast<EventCodes>(dc.eventCodes[i]) });
-                                lc.addCode(static_cast<EventCodes>(dc.eventCodes[i]));
-                            }
                         }
+                        dc.eventCodes.clear();
 
-                        li.npcToTalk = li.max;
+                        auto& anc = em.getComponent<AnimationComponent>(e);
+                        anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::SPEAKING);
+
+                        auto& animNpc = em.getComponent<AnimationComponent>(npc);
+
+                        switch (npcC.type)
+                        {
+                        case NPCType::NOMAD:
+                        {
+                            animNpc.animToPlay = static_cast<std::size_t>(NomadAnimations::SPEAKING);
+                            break;
+                        }
+                        case NPCType::INVESTIGATOR:
+                        {
+                            animNpc.animToPlay = static_cast<std::size_t>(InvestAnimations::SPEAKING);
+                            break;
+                        }
+                        default:
+                            break;
+                        }
                         break;
                     }
                     case EventCodes::DialogPrisonNomad1:
@@ -340,6 +318,18 @@ public:
 
                         auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
                         playerPhy.notMove = false;
+
+                        // Cosas de animaciones a partir de aquí
+                        auto& playerAnim = em.getComponent<AnimationComponent>(e);
+                        playerAnim.animToPlay = static_cast<std::size_t>(PlayerAnimations::SPEAKING);
+
+                        using NoCMPS = MP::TypeList<AnimationComponent>;
+                        using NomadTAG = MP::TypeList<NomadTag>;
+
+                        em.forEach<NoCMPS, NomadTAG>([&](Entity&, AnimationComponent& anc)
+                        {
+                            anc.animToPlay = static_cast<std::size_t>(NomadAnimations::GIVE_ITEM);
+                        });
                         break;
                     }
                     case EventCodes::DialogNomadVolcano1:
@@ -383,6 +373,18 @@ public:
 
                         auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
                         playerPhy.notMove = false;
+
+                        // Cosas de animaciones
+                        auto& playerAnim = em.getComponent<AnimationComponent>(e);
+                        playerAnim.animToPlay = static_cast<std::size_t>(PlayerAnimations::SPEAKING);
+
+                        using NoCMPS = MP::TypeList<AnimationComponent>;
+                        using NomadTAG = MP::TypeList<NomadTag>;
+
+                        em.forEach<NoCMPS, NomadTAG>([&](Entity&, AnimationComponent& anc)
+                        {
+                            anc.animToPlay = static_cast<std::size_t>(NomadAnimations::GIVE_ITEM);
+                        });
                         break;
                     }
                     case EventCodes::DialogCatVolcano1:
@@ -396,13 +398,13 @@ public:
                             std::make_pair(SpeakerType::PLAYER_DANGER, "Mago: \nLo siento, le pediré a mi maestro que me lo enseñe."),
                             std::make_pair(SpeakerType::CAT, "Gato: \nNo te preocupes niño, si me estaba quedando contigo. \nSoy un investigador"),
                             std::make_pair(SpeakerType::PLAYER, "Mago: \n¡Ah vale! Oye, ¿sabes cómo salir de aquí? \nTengo que encontrar a mi maestro."),
-                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nNo eres el único que quiere salir de aquí."),
-                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nIgual deberías de preocuparte más por el volcán\n a punto de estallar que de tu maestro."),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nNo eres el único que quiere salir de aquí."),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nIgual deberías de preocuparte más por el volcán\n a punto de estallar que de tu maestro."),
                             std::make_pair(SpeakerType::PLAYER_DANGER, "Mago: \n¿¡Quéeeee!? ¡¿Estallar!? ¡¿Cómo?!"),
-                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nAsí es, pero no te alarmes, porque me vas a ayudar a \nreconstruir mi barca para salir de aquí."),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nAsí es, pero no te alarmes, porque me vas a ayudar a \nreconstruir mi barca para salir de aquí."),
                             std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \n¿Una barca?"),
-                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nEfectivamente, los monstruos me desperdigaron \nlas piezas por todo el lugar."),
-                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nAyúdame a recuperarlas\ny saldremos de aquí antes de la explosión."),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nEfectivamente, los monstruos me desperdigaron \nlas piezas por todo el lugar."),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nAyúdame a recuperarlas\ny saldremos de aquí antes de la explosión."),
                             std::make_pair(SpeakerType::PLAYER, "Mago: \n¡Entiendo, déjalo en mis manos!")
                         };
 
@@ -420,21 +422,30 @@ public:
                         auto& txti = em.getSingleton<TextInfo>();
                         std::array<std::pair<SpeakerType, std::string>, 5> msgs =
                         {
-                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \n¡Miau! ¡Miau! ¡Miau!"),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \n¡Miau! ¡Miau! ¡Miau!"),
                             std::make_pair(SpeakerType::PLAYER, "Mago: \nNo me vuelves a pillar con esa"),
-                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nBuen trabajo, ahora vamos a salir de aquí\n He terminado las reparaciones"),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nBuen trabajo, ahora vamos a salir de aquí\n He terminado las reparaciones"),
                             std::make_pair(SpeakerType::PLAYER, "Mago: \n¡Perfecto!"),
-                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nPero antes toma una recompensa por tu trabajo")
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nPero antes toma una recompensa por tu trabajo")
                         };
-
-                        li.npcflee = true;
 
                         // Metemos el texto en el stack de texto
                         for (std::size_t i = 0; i < msgs.size(); i++)
                             txti.addText(msgs[i]);
 
+                        li.npcflee = true;
+
                         scheduleEvent(Event{ EventCodes::DialogCatVolcano3 });
                         out = true;
+
+                        // Cosas de animaciones a partir de aquí
+                        using NoCMPS = MP::TypeList<AnimationComponent>;
+                        using NomadTAG = MP::TypeList<NomadTag>;
+
+                        em.forEach<NoCMPS, NomadTAG>([&](Entity&, AnimationComponent& anc)
+                        {
+                            anc.animToPlay = static_cast<std::size_t>(NomadAnimations::WALK);
+                        });
                         break;
                     }
                     case EventCodes::DialogCatVolcano3:
@@ -446,7 +457,7 @@ public:
                         std::array<std::pair<SpeakerType, std::string>, 2> msgs =
                         {
                             std::make_pair(SpeakerType::NONE, "¡Has recibido un pergamino con la formulación \npara hacer una bola de fuego!"),
-                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \nCon esto y un bizcocho, nos largamos de aquí.")
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nCon esto y un bizcocho, nos largamos de aquí.")
                         };
 
                         // Le damos el hechizo
@@ -460,6 +471,18 @@ public:
 
                         auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
                         playerPhy.notMove = false;
+
+                        // Animación de dar el objeto
+                        auto& playerAnim = em.getComponent<AnimationComponent>(e);
+                        playerAnim.animToPlay = static_cast<std::size_t>(PlayerAnimations::SPEAKING);
+
+                        using NoCMPS = MP::TypeList<AnimationComponent>;
+                        using InvestTAG = MP::TypeList<InvestigatorTag>;
+
+                        em.forEach<NoCMPS, InvestTAG>([&](Entity&, AnimationComponent& anc)
+                        {
+                            anc.animToPlay = static_cast<std::size_t>(InvestAnimations::GIVE_ITEM);
+                        });
                         break;
                     }
                     case EventCodes::DialogNomadVolcano3:
@@ -473,7 +496,7 @@ public:
                             std::make_pair(SpeakerType::NOMAD, "Nómada: \nCasi se me queman las semillas \npasando por la lava, a ver \n si tenéis un poco de respeto."),
                             std::make_pair(SpeakerType::PLAYER_DANGER, "Mago: \nLo siento mucho por tus semillas."),
                             std::make_pair(SpeakerType::NOMAD, "Nómada: \nBueno venga, vámonos de aquí."),
-                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigador: \n¡Miau! ¡Miau! ¡Miau!")
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \n¡Miau! ¡Miau! ¡Miau!")
                         };
 
                         // Metemos el texto en el stack de texto

@@ -260,11 +260,11 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             gami.setVel(vel);
     }
 
-    // if (ge.isKeyReleased(D_KEY_Z))
-    // {
-    //     Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", AttackType::WaterBombShot };
-    //     plfi.addSpell(spell);
-    // }
+    if (ge.isKeyReleased(D_KEY_Z))
+    {
+        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", AttackType::WaterBombShot };
+        plfi.addSpell(spell);
+    }
 
     // if (ge.isKeyReleased(D_KEY_X))
     // {
@@ -297,14 +297,13 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     bb.teid = player.getID();
 
     // Codigo para el ataque
-    if (player.hasComponent<AttackerComponent>())
+    if (player.hasComponent<AttackerComponent>() && !phy.notMove)
     {
         auto& anc = em.getComponent<AnimationComponent>(player);
         if ((ge.isKeyDown(in.space) || ge.getGamepadAxisMovement(0, in.m_space) > 0.1))
         {
             plfi.currentSpell = plfi.noSpell;
-            em.getComponent<AttackerComponent>(player).attack(AttackType::MeleePlayer);
-            anc.animToPlay = 1;
+            anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::MELEE_ATTACK);
             phy.stopped = true;
         }
 
@@ -315,7 +314,10 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             if ((ge.isKeyDown(in.spell1) || ge.isGamepadButtonPressed(0, in.m_spell1)) && plfi.spellSlots[0] != plfi.noSpell)
             {
                 if (plfi.spellSlots[0].cost > plfi.mana)
+                {
+                    em.getSingleton<SoundSystem>().sonido_no_mana();
                     return;
+                }
                 pmc.active = true;
                 playerSpelled = true;
                 plfi.currentSpell = plfi.spellSlots[0];
@@ -324,7 +326,10 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             else if ((ge.isKeyDown(in.spell2) || ge.isGamepadButtonPressed(0, in.m_spell2)) && plfi.spellSlots[1] != plfi.noSpell)
             {
                 if (plfi.spellSlots[1].cost > plfi.mana)
+                {
+                    em.getSingleton<SoundSystem>().sonido_no_mana();
                     return;
+                }
                 pmc.active = true;
                 playerSpelled = true;
                 plfi.currentSpell = plfi.spellSlots[1];
@@ -333,7 +338,10 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             else if ((ge.isKeyDown(in.spell3) || ge.isGamepadButtonPressed(0, in.m_spell3)) && plfi.spellSlots[2] != plfi.noSpell)
             {
                 if (plfi.spellSlots[2].cost > plfi.mana)
+                {
+                    em.getSingleton<SoundSystem>().sonido_no_mana();
                     return;
+                }
                 pmc.active = true;
                 playerSpelled = true;
                 plfi.currentSpell = plfi.spellSlots[2];
@@ -343,7 +351,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             // Restamos el maná
             if (playerSpelled)
             {
-                anc.animToPlay = 2;
+                anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::RANGED_ATTACK);
                 phy.stopped = true;
                 plfi.mana -= plfi.currentSpell.cost;
 

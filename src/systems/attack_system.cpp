@@ -69,7 +69,7 @@ void AttackSystem::update(EntityManager& em, AttackManager& am) {
 }
 
 
-void AttackSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, PhysicsComponent& enemyPhy, bool isEnemy)
+void AttackSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, PhysicsComponent& enemyPhy, bool)
 {
     auto& pos = playerPhy.position;
     auto& otherPos = enemyPhy.position;
@@ -79,35 +79,34 @@ void AttackSystem::resolvePlayerDirection(PhysicsComponent& playerPhy, PhysicsCo
 
     dir.normalize();
 
-    if (isEnemy)
-    {
+    // if (isEnemy)
+    // {
         // Si la dirección del enemigo y la del jugador tienen menos de 20 grados de diferencia, el jugador se le suman 45º en la dirección contraria
-        vec3d dirEnemy = { otherPos.x() - enemyVel.x(), 0, otherPos.z() - enemyVel.z() };
-        dirEnemy.normalize();
+    vec3d dirEnemy = { otherPos.x() - enemyVel.x(), 0, otherPos.z() - enemyVel.z() };
+    dirEnemy.normalize();
 
-        // Calcular el ángulo entre las dos direcciones
-        double dot = dir.x() * dirEnemy.x() + dir.z() * dirEnemy.z(); // producto punto
-        double det = dir.x() * dirEnemy.z() - dir.z() * dirEnemy.x(); // determinante
-        double angle = atan2(det, dot); // atan2(y, x) o atan2(sin, cos)
+    // Calcular el ángulo entre las dos direcciones
+    double dot = dir.x() * dirEnemy.x() + dir.z() * dirEnemy.z(); // producto punto
+    double det = dir.x() * dirEnemy.z() - dir.z() * dirEnemy.x(); // determinante
+    double angle = atan2(det, dot); // atan2(y, x) o atan2(sin, cos)
 
-        // Convertir el ángulo a grados
-        double angleDeg = angle * 180 / K_PI;
+    // Convertir el ángulo a grados
+    double angleDeg = angle * 180 / K_PI;
 
-        // Si el ángulo es menor de 20 grados, ajustar la dirección del jugador
-        if (std::abs(angleDeg) < 20)
-        {
-            // Rotar la dirección del jugador 45 grados en la dirección contraria
-            double angleRad = -135 * K_PI / 180; // Convertir a radianes
-            double cosAngle = cos(angleRad);
-            double sinAngle = sin(angleRad);
-            vec3d newDir = { dir.x() * cosAngle - dir.z() * sinAngle, 0.0, dir.x() * sinAngle + dir.z() * cosAngle };
+    // Si el ángulo es menor de 20 grados, ajustar la dirección del jugador
+    if (std::abs(angleDeg) < 20)
+    {
+        // Rotar la dirección del jugador 45 grados en la dirección contraria
+        double angleRad = -135 * K_PI / 180; // Convertir a radianes
+        double cosAngle = cos(angleRad);
+        double sinAngle = sin(angleRad);
+        vec3d newDir = { dir.x() * cosAngle - dir.z() * sinAngle, 0.0, dir.x() * sinAngle + dir.z() * cosAngle };
 
-            dir = newDir;
-        }
-        multiplier = 7;
+        dir = newDir;
     }
-    else
-        playerPhy.gravity = playerPhy.gravity / 1.5;
+    // }
+    // else
+    //     playerPhy.gravity = playerPhy.gravity / 1.5;
 
     playerPhy.velocity = dir * multiplier;
     playerPhy.stopped = true;

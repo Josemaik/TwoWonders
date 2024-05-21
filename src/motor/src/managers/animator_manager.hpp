@@ -1,7 +1,7 @@
 #pragma once
 
+#include <array>
 #include "../utils/animation.hpp"
-
 
 struct Anim
 {
@@ -11,6 +11,17 @@ struct Anim
 
         for (int i = 0; i < 100; i++)
             m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
+    }
+
+    void reset()
+    {
+        m_CurrentAnimation = nullptr;
+        m_QueueAnimation = nullptr;
+        m_NextAnimation = nullptr;
+        m_CurrentTime = 0.0f;
+        interpolating = false;
+        haltTime = 0.0f;
+        interTime = 0.0f;
     }
 
     Animation* m_CurrentAnimation{ nullptr };
@@ -27,18 +38,31 @@ struct AnimationManager
 {
     std::size_t PlayAnimation(Animation* pAnimation)
     {
-        Anim a = Anim();
-        a.m_CurrentAnimation = pAnimation;
-        m_Animations.push_back(a);
+        m_Animations[nextID++].m_CurrentAnimation = pAnimation;
+        return nextID - 1;
+    }
 
-        return m_Animations.size() - 1;
+    void ChangeAnimation(std::size_t id, Animation* pAnimation) {
+        m_Animations[id].reset();
+        m_Animations[id].m_CurrentAnimation = pAnimation;
     }
 
     void StopAnimation(std::size_t idanim) {
         //sacamos la animacion del vector
         if (idanim < m_Animations.size()) {
-            m_Animations.erase(m_Animations.begin() + idanim);
+            m_Animations[idanim].reset();
         }
+    }
+
+    void interpolateAnimation(std::size_t id, Animation* pAnimation)
+    {
+        m_Animations[id].m_NextAnimation = pAnimation;
+        m_Animations[id].interpolating = true;
+    }
+
+    bool isInterpolating(std::size_t id)
+    {
+        return m_Animations[id].interpolating;
     }
 
     void UpdateAnimation(float dt, std::size_t id)
@@ -103,6 +127,16 @@ struct AnimationManager
 
         for (int i = 0; i < node->childrenCount; i++)
             calculateBoneTransform(&node->children[i], globalTransformation, animation, currentTime, id);
+    }
+
+    bool isAnimationEnded(std::size_t id)
+    {
+        return m_Animations[id].m_CurrentTime >= m_Animations[id].m_CurrentAnimation->getDuration();
+    }
+
+    bool isAnimationsEmpty()
+    {
+        return m_Animations.empty();
     }
 
     std::vector<glm::mat4>& GetFinalBoneMatrices(std::size_t id)
@@ -198,13 +232,21 @@ struct AnimationManager
             auto rawPtr = animation.get();
             m_AnimationList.push_back(std::move(animation));
             animations.push_back(rawPtr);
-            std::cout << "Animation: " << scene->mAnimations[i]->mName.C_Str() << std::endl;
         }
 
         return animations;
     }
 
+    void resetAnims()
+    {
+        for (std::size_t i = 1; i < m_Animations.size(); i++)
+            m_Animations[i].reset();
+
+        nextID = 1;
+    }
+
 private:
-    std::vector<Anim> m_Animations{};
+    static inline std::size_t nextID = 0;
+    std::array<Anim, 40> m_Animations{};
     std::vector<std::unique_ptr<Animation>> m_AnimationList{};
 };

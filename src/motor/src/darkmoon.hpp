@@ -131,11 +131,11 @@ namespace DarkMoon {
 
         // Set valors shader cartoon
         float GetDepthThresholdValue() { return m_renderManager.depthThreshold; };
-        void SetDepthThresholdValue(float depthThreshold) { 
+        void SetDepthThresholdValue(float depthThreshold) {
             m_renderManager.depthThreshold = depthThreshold;
         };
         float GetNormalThresholdValue() { return m_renderManager.normalThreshold; };
-        void SetNormalThresholdValue(float normalThreshold) { 
+        void SetNormalThresholdValue(float normalThreshold) {
             m_renderManager.normalThreshold = normalThreshold;
         };
         glm::vec4 GetOutlineColor() { return m_renderManager.outlineColor; };
@@ -215,9 +215,19 @@ namespace DarkMoon {
         // Create animations
         std::vector<Animation*> CreateAnimations(const std::string& path, std::vector<BoneInfo>& vecbones);
         // Update animation
-        void UpdateAnimation(float mult, std::size_t id);
+        void UpdateAnimation(float dt, float mult, std::size_t id);
         // Get animation time
         float GetAnimationTime(std::size_t id);
+        // Interpolate Animation
+        void InterpolateAnimation(std::size_t id, Animation* panimation);
+        // Is interpolating
+        bool IsInterpolating(std::size_t id);
+        // Change Animation
+        void ChangeAnimation(std::size_t id, Animation* panimation);
+        // Has animation ended
+        bool HasAnimationEnded(std::size_t id);
+        // Reset animations
+        void ResetAnimations();
 
         // --------------------------------- //
         // Input-related functions: keyboard //

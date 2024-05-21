@@ -1,6 +1,6 @@
 #include "zone_system.hpp"
 
-void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, EventManager& evm, MapManager& map) {
+void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam, EventManager& evm, MapManager& map) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, ZoneComponent& zon)
@@ -18,6 +18,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                 {
                     em.getSingleton<SoundSystem>().ambient_stop();
                     em.getSingleton<SoundSystem>().music_stop_level();
+
                     switch (li.mapID)
                     {
                     case 0:
@@ -30,6 +31,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         plfi.spawnPoint = spawnPoint;
                         p.position = spawnPoint;
                         em.getSingleton<SoundSystem>().update();
+                        engine.resetAnimations();
                         break;
                     }
                     case 1:
@@ -42,6 +44,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         plfi.spawnPoint = spawnPoint;
                         p.position = spawnPoint;
                         em.getSingleton<SoundSystem>().update();
+                        engine.resetAnimations();
                         break;
                     }
                     case 2:
@@ -52,6 +55,8 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         }
                         li.currentScreen = GameScreen::ENDING;
                         elapsedEnding = 0.0f;
+                        em.getSingleton<SoundSystem>().sonido_win();
+
                         // map.changeMap(em, 2, iam);
                         // li.transition = true;
                         // // em.getSingleton<SoundSystem>().ambient_stop();
@@ -239,6 +244,11 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
                 em.getSingleton<SoundSystem>().sonido_interaccion_e();
                 inpi.interact = false;
 
+                // FIXME
+                // Animación del cofre
+                // auto& ac = em.getComponent<AnimationComponent>(e);
+                // ac.animToPlay = 0;
+
                 // Apagamos la luz del cofre
                 auto& plc = em.getComponent<PointLightComponent>(e);
                 plc.light->enabled = false;
@@ -331,7 +341,13 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
             li.doorToOpen = e.getID();
             evm.scheduleEvent(Event{ EventCodes::OpenDoor });
             em.getSingleton<SoundSystem>().sonido_interaccion_e();
+            if (e.hasComponent<AnimationComponent>())
+                em.getComponent<AnimationComponent>(e).animToPlay = static_cast<std::size_t>(DoorAnimations::OPEN);
+            else
+                li.insertDeath(e.getID());
 
+            em.getSingleton<SoundSystem>().sonido_abrir_puerta();
+            plfi.hasKey = false;
             inpi.interact = false;
         }
     });
@@ -351,6 +367,10 @@ void ZoneSystem::openDoorsZone(EntityManager& em, EventManager& evm, vec3d& leve
         {
             li.doorToOpen = e.getID();
             evm.scheduleEvent(Event{ EventCodes::OpenDoor });
+            if (e.hasComponent<AnimationComponent>())
+                em.getComponent<AnimationComponent>(e).animToPlay = static_cast<std::size_t>(DoorAnimations::OPEN);
+            else
+                li.insertDeath(e.getID());
         }
     });
 }
@@ -537,7 +557,7 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager&)
     using noCMP = MP::TypeList<PhysicsComponent, InteractiveComponent, OneUseComponent, DispatcherComponent>;
     using npcTag = MP::TypeList<NPCTag>;
 
-    em.forEach<noCMP, npcTag>([&](Entity& e, PhysicsComponent& phy, InteractiveComponent& ic, OneUseComponent& ouc, DispatcherComponent& dc)
+    em.forEach<noCMP, npcTag>([&](Entity& e, PhysicsComponent& phy, InteractiveComponent& ic, OneUseComponent& ouc, DispatcherComponent&)
     {
         // Revisamos si ya se ha hablado con el npc
         std::pair<uint8_t, uint8_t> pair{ li.mapID, ouc.id };
@@ -559,8 +579,8 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager&)
             phy.lookAt(playerPhy.position);
 
             li.viewPoint = phy.position;
-            li.events.insert(dc.eventCodes.begin(), dc.eventCodes.end());
-            dc.eventCodes.clear();
+            li.events.insert(static_cast<uint16_t>(EventCodes::NPCDialog));
+            // dc.eventCodes.clear();
             // if (dc.eventCodes.size() > 0)
             //     evm.scheduleEvent({ static_cast<EventCodes>(dc.eventCodes[0]) });
         }

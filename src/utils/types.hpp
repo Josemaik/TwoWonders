@@ -73,6 +73,36 @@ static constexpr double timeStepDouble240 = 1.0 / 240.0;  // Actualiza el juego 
 // Forward Declarations
 namespace ENGI { struct GameEngine; }
 
+// Eventos del juego
+enum EventCodes : uint16_t
+{
+    NoEvent,
+    SpawnKey,
+    SpawnDungeonKey,
+    OpenChest,
+    SetSpawn,
+    OpenDoor,
+    SpawnWallLevel0,
+    ViewPointCave,
+    NPCDialog,
+    DialogPrisonNomad1,
+    DialogPrisonNomad2,
+    DialogFirstSpawn,
+    ViewPointDoor,
+    BoatPartFound,
+    BoatDialog,
+    DialogNomadVolcano1,
+    DialogNomadVolcano2,
+    DialogCatVolcano1,
+    InitBoatParts,
+    DialogCatVolcano2,
+    DialogCatVolcano3,
+    DialogNomadVolcano3,
+    TPBoat,
+    ViewPointNomadDoor,
+    MAX
+};
+
 // Tags - Colocar en TL
 struct PlayerTag {};
 struct EnemyTag {};
@@ -129,6 +159,8 @@ struct MagmaBallTag {};
 struct EnemyDeathTag {};
 struct LockableTag {};
 struct GrassTag {};
+struct ManaDropTag {};
+struct LifeDropTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -219,7 +251,9 @@ using TL = MP::TypeList <
     MagmaBallTag,
     EnemyDeathTag,
     LockableTag,
-    GrassTag
+    GrassTag,
+    ManaDropTag,
+    LifeDropTag
 > ;
 using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem, FrustumInfo, CheatsInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
@@ -232,7 +266,7 @@ using mapSizeType = rapidjson::SizeType;
 using ShaderType = DarkMoon::Shader;
 using Model = DarkMoon::Model;
 using Effects = ParticleMakerComponent::ParticleEffect;
-using FrustOut = MP::TypeList<GroundTag, NPCTag, ChunkTag, HitPlayerTag>;
+using FrustOut = MP::TypeList<PlayerTag, GroundTag, NPCTag, ChunkTag, HitPlayerTag>;
 using Color = DarkMoon::Color;
 using Font = DarkMoon::Font;
 using Aligned = DarkMoon::Aligned;

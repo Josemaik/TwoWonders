@@ -51,6 +51,10 @@ private:
             auto& target = *em.getEntityByID(targetID);
             if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
             {
+                auto& lc = em.getComponent<LifeComponent>(target);
+                if (lc.onDeathAnim)
+                    return;
+
                 auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                 em.getSingleton<BlackBoard_t>().playerhunted = true;
                 playerPhy.dragActivated = true;
@@ -68,12 +72,15 @@ private:
                 auto& target = *em.getEntityByID(targetID);
                 if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
                 {
-                    em.getComponent<AnimationComponent>(target).animToPlay = 3;
+                    auto& lc = em.getComponent<LifeComponent>(target);
+                    if (lc.onDeathAnim)
+                        return;
+
                     auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                     auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
                     auto& bb = em.getSingleton<BlackBoard_t>();
                     if (bb.playerdamagebycrusher == false) {
-                        em.getComponent<LifeComponent>(target).decreaseLife(att.damage);
+                        lc.decreaseLife(att.damage);
                         bb.playerdamagebycrusher = true;
 
                         // El jugador se mueve hacia atrás de la posición del crusher
@@ -244,11 +251,14 @@ private:
                 auto& target = *em.getEntityByID(targetID);
                 if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
                 {
-                    em.getComponent<AnimationComponent>(target).animToPlay = 3;
+                    auto& lc = em.getComponent<LifeComponent>(target);
+                    if (lc.onDeathAnim)
+                        return;
+
                     auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                     auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
 
-                    em.getComponent<LifeComponent>(target).decreaseLife(att.damage);
+                    lc.decreaseLife(att.damage);
 
                     // El jugador se mueve hacia atrás de la posición del crusher
                     resolvePlayerDirection(playerPhy, atkPhy, false);
@@ -273,11 +283,14 @@ private:
                 auto& target = *em.getEntityByID(targetID);
                 if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
                 {
-                    em.getComponent<AnimationComponent>(target).animToPlay = 3;
+                    auto& lc = em.getComponent<LifeComponent>(target);
+                    if (lc.onDeathAnim)
+                        return;
+
                     auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                     auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
 
-                    em.getComponent<LifeComponent>(target).decreaseLife(att.damage);
+                    lc.decreaseLife(att.damage);
 
                     // El jugador se mueve hacia atrás de la posición del crusher
                     resolvePlayerDirection(playerPhy, atkPhy, false);
@@ -301,11 +314,14 @@ private:
                 auto& target = *em.getEntityByID(targetID);
                 if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
                 {
-                    em.getComponent<AnimationComponent>(target).animToPlay = 3;
+                    auto& lc = em.getComponent<LifeComponent>(target);
+                    if (lc.onDeathAnim)
+                        return;
+
                     auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                     auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
 
-                    em.getComponent<LifeComponent>(target).decreaseLife(att.damage);
+                    lc.decreaseLife(att.damage);
 
                     // El jugador se mueve hacia atrás de la posición del crusher
                     resolvePlayerDirection(playerPhy, atkPhy, false);
@@ -328,11 +344,14 @@ private:
             auto& target = *em.getEntityByID(targetID);
             if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
             {
-                em.getComponent<AnimationComponent>(target).animToPlay = 3;
+                auto& lc = em.getComponent<LifeComponent>(target);
+                if (lc.onDeathAnim)
+                    return;
+
                 auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                 auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
 
-                em.getComponent<LifeComponent>(target).decreaseLife(att.damage);
+                lc.decreaseLife(att.damage);
 
                 // El jugador se mueve hacia atrás de la posición del crusher
                 resolvePlayerDirection(playerPhy, atkPhy, false);
@@ -356,11 +375,14 @@ private:
                 auto& target = *em.getEntityByID(targetID);
                 if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
                 {
-                    em.getComponent<AnimationComponent>(target).animToPlay = 3;
+                    auto& lc = em.getComponent<LifeComponent>(target);
+                    if (lc.onDeathAnim)
+                        return;
+
                     auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                     auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
 
-                    em.getComponent<LifeComponent>(target).decreaseLife(att.damage);
+                    lc.decreaseLife(att.damage);
 
                     // El jugador se mueve hacia atrás de la posición del crusher
                     resolvePlayerDirection(playerPhy, atkPhy, false);
@@ -380,11 +402,14 @@ private:
                 auto& target = *em.getEntityByID(targetID);
                 if (target.hasTag<PlayerTag>() && target.hasComponent<PhysicsComponent>())
                 {
-                    em.getComponent<AnimationComponent>(target).animToPlay = 3;
+                    auto& lc = em.getComponent<LifeComponent>(target);
+                    if (lc.onDeathAnim)
+                        return;
+
                     auto& playerPhy = em.getComponent<PhysicsComponent>(target);
                     auto& atkPhy = em.getComponent<PhysicsComponent>(atkEnt);
 
-                    em.getComponent<LifeComponent>(target).decreaseLife(att.damage);
+                    lc.decreaseLife(att.damage);
 
                     // El jugador se mueve hacia atrás de la posición del crusher
                     resolvePlayerDirection(playerPhy, atkPhy, false);

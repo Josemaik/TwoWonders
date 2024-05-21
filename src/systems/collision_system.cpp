@@ -14,6 +14,7 @@ void CollisionSystem::update(EntityManager& em)
 
     // Liberar el octree
     octree.clear();
+    Octree::octreePool_.clear();
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
     {
         if (!frti.inFrustum(e.getID()) || e.hasTag<EnemyDeathTag>())
@@ -38,7 +39,8 @@ void CollisionSystem::update(EntityManager& em)
     resetCollisionsMatrix();
 
     // Comprobar colisiones
-    checkCollision(em, octree);
+    for (auto& octant : octree.octreePool_)
+        checkCollision(em, *octant);
 
     // Comprobar colisiones con rampas
     handleRampCollision(em);
@@ -52,18 +54,18 @@ void CollisionSystem::update(EntityManager& em)
 void CollisionSystem::checkCollision(EntityManager& em, Octree& octant)
 {
     // Si el octree está dividido, revisar sus hijos
-    if (octant.isDivided())
-    {
-        for (auto& octant : octant.getOctants())
-        {
-            // Si el octante tiene entidades o está dividido, revisar sus colisiones
-            if (octant.get()->getNumEntities() > 0 || octant.get()->isDivided())
-                checkCollision(em, *octant);
-        }
-        return;
-    }
+    // if (octant.isDivided())
+    // {
+    //     for (auto& octant : octant.getOctants())
+    //     {
+    //         // Si el octante tiene entidades o está dividido, revisar sus colisiones
+    //         if (octant.get()->getNumEntities() > 0 || octant.get()->isDivided())
+    //             checkCollision(em, *octant);
+    //     }
+    //     return;
+    // }
 
-    auto octEntities = octant.getOctEntities();
+    auto& octEntities = octant.getOctEntities();
     for (auto it1 = octEntities.begin(); it1 != octEntities.end(); ++it1)
     {
         for (auto it2 = std::next(it1); it2 != octEntities.end(); ++it2)
@@ -495,13 +497,19 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Si cualquiera de los impactos es con una bala, se baja la vida del otro
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
-        if (staticEntPtr->hasTag<DestructibleTag>() && staticEntPtr->hasComponent<LifeComponent>() && otherEntPtr->hasComponent<AttackComponent>())
+        if (otherEntPtr->hasComponent<AttackComponent>())
         {
             auto& attack = em.getComponent<AttackComponent>(*otherEntPtr);
-            if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(attack.type)) {
-                em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
-                attack.doEffect = true;
+            if (staticEntPtr->hasTag<DestructibleTag>() && staticEntPtr->hasComponent<LifeComponent>())
+            {
+                if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(attack.type)) {
+                    em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
+                    attack.doEffect = true;
+                }
             }
+
+            if (attack.atkType & AttackType::SpiderShot)
+                attack.doEffect = true;
         }
         return;
     }
@@ -553,6 +561,7 @@ void CollisionSystem::enemiesWallCollision(EntityManager& em, Entity& ent, Physi
         {
             ab.angrySound = true;
             ab.angrySoundOneTime = false;
+            em.getComponent<AnimationComponent>(ent).animToPlay = static_cast<std::size_t>(RockAnimations::REPOSITION);
         }
     }
 }
@@ -623,6 +632,7 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
         {
             resolvePlayerDirection(*staticPhy, *otherPhy, true);
             em.getSingleton<SoundSystem>().sonido_rebote();
+            em.getComponent<AnimationComponent>(*staticEntPtr).changeAnimation(static_cast<std::size_t>(PlayerAnimations::GOT_HIT));
 
             if (!otherEntPtr->hasTag<AngryBushTag>())
                 return;

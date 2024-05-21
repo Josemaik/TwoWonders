@@ -19,6 +19,7 @@ out vec3 Normal;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform bool isBoneAnimationEnabled;
 
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
@@ -26,18 +27,21 @@ uniform mat4 finalBonesMatrices[MAX_BONES];
 
 void main()
 {
-   vec4 totalpos = vec4(0.0f);
-   for(int i = 0;i < MAX_BONE_INFLUENCE; i++){
-      if(boneIds[i] == -1)
-         continue;
-      if(boneIds[i] >= MAX_BONES){
-         totalpos = vec4(aPos,1.0f);
-         break;
+  vec4 totalpos = vec4(aPos, 1.0f);
+  if (isBoneAnimationEnabled) {
+    totalpos = vec4(0.0f);
+    for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
+      if (boneIds[i] == -1)
+        continue;
+      if (boneIds[i] >= MAX_BONES) {
+        totalpos = vec4(aPos, 1.0f);
+        break;
       }
-      vec4 localpos = finalBonesMatrices[boneIds[i]] * vec4(aPos,1.0f);
+      vec4 localpos = finalBonesMatrices[boneIds[i]] * vec4(aPos, 1.0f);
       totalpos += localpos * weights[i];
       vec3 localNormal = mat3(finalBonesMatrices[boneIds[i]]) * aNormal;
-   }
+    }
+  }
    // Transform vertex position to clip coordinates
    mat4 viewmodel = view * model;
    gl_Position = projection * viewmodel * totalpos;

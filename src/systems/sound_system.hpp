@@ -139,7 +139,11 @@ struct SoundSystem {
     void sonido_inicio_batalla();       //por integrar
     void sonido_cambio_fase();          //por integrar
     void sonido_win();                  //por integrar
-    void sonido_jugador_muere();        //por integrar
+    void sonido_jugador_muere();        
+    void sonido_no_mana();
+
+
+
 
 
     void ambiente_parameter_lava(float lava);

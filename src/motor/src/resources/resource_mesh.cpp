@@ -89,18 +89,32 @@ namespace DarkMoon {
         auto& shaders = rm.shaders;
         rm.useShader(shaders["3D"]);
 
-        if (hasBones && animID != std::numeric_limits<std::size_t>::max())
+        // Asume que 'shaderProgram' es el ID de tu programa de shader
+        GLint isBoneAnimationEnabledLocation = glGetUniformLocation(rm.getShader()->getIDShader(), "isBoneAnimationEnabled");
+        if (hasBones && animID != std::numeric_limits<std::size_t>::max() && !am.isAnimationsEmpty())
         {
             auto transforms = am.GetFinalBoneMatrices(animID);
+            glUniform1i(isBoneAnimationEnabledLocation, GL_TRUE);
+
+#ifdef _WIN32
+            float degrees = 0.f;
+#else
+            float degrees = 90.f;
+#endif
+            if (!rotateBones)
+                degrees = 0.f;
+
             for (std::size_t i = 0; i < transforms.size(); ++i) {
                 // Rotar la matriz en 90 grados alrededor del eje Z
-                glm::mat4 rotatedTransform = glm::rotate(transforms[i], glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+                glm::mat4 rotatedTransform = glm::rotate(transforms[i], glm::radians(degrees), glm::vec3(0.0f, 0.0f, 1.0f));
 
                 std::string boneStr = "finalBonesMatrices[" + std::to_string(i) + "]";
                 int boneLocation = glGetUniformLocation(rm.getShader()->getIDShader(), boneStr.c_str());
                 glUniformMatrix4fv(boneLocation, 1, GL_FALSE, glm::value_ptr(rotatedTransform));
             }
         }
+        else
+            glUniform1i(isBoneAnimationEnabledLocation, GL_FALSE);
 
         // Set the uniform color in the shader
         GLint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");

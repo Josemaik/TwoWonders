@@ -62,9 +62,11 @@ namespace DarkMoon {
 
 
     public:
-
+        static constexpr std::size_t maxID = std::numeric_limits<std::size_t>::max();
         std::vector<BoneInfo> boneVector{};
         int m_BoneCounter{ 0 };
+        std::size_t animID{ std::numeric_limits<std::size_t>::max() };
+        bool hasBones{ false }, rotateBones{ false };
 
         auto& getMeshes() { return m_meshes; };
         auto& getboneInfoMap() { return boneVector; };

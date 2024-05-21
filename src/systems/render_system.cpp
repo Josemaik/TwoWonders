@@ -1063,7 +1063,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     colorEntidad = D_CORAL_PINK;
 
                     if (e.hasTag<DestructibleTag>())
-                        r.position.setZ(shakeDouble(r.position.z()));
+                        r.position.setX(shakeDouble(r.position.x()));
                 }
             }
             if (!e.hasTag<ZoneTag>())
@@ -1171,7 +1171,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
 
                     r.node->setVisibleOne(true);
                     r.node->setVisible(true);
-                  
+
                     if (auto model = r.node->getEntity<Model>())
                         model->color = colorEntidad;
                     // Luces cofre
@@ -1259,7 +1259,14 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         r.node = engine.loadModel("assets/models/Slime.obj");
     else if (e.hasTag<SnowmanTag>())
     {
-        r.node = engine.loadModel("assets/Personajes/Enemigos/Snowman/Snowman.obj");
+        std::string path = "assets/Personajes/Enemigos/Snowman/Snowman.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 2.0);
+
+        if (li.mapID == 2)
+            for (auto& mesh : r.node->getEntity<Model>()->getMeshes())
+                mesh->material->texture = engine.loadTexture2D("assets/Personajes/Enemigos/Snowman/snowman_fuego_texture.png");
+
         // r.model = engine.loadModel("assets/Personajes/Enemigos/Snowman/Snowman.obj");
 
         // Texture t{};
@@ -1274,7 +1281,13 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
     }
     else if (e.hasTag<GolemTag>())
-        r.node = engine.loadModel("assets/Personajes/Enemigos/Golem/Golem.obj");
+    {
+        // FIXME
+        std::string path = "assets/Personajes/Enemigos/Golem/Golem.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 2.0);
+        // r.node = engine.loadModel("assets/Personajes/Enemigos/Golem/Golem.obj");
+    }
     else if (e.hasTag<SpiderTag>())
         r.node = engine.loadModel("assets/models/Spider.obj");
     else if (e.hasTag<BossFinalTag>())
@@ -1404,11 +1417,11 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     else if (e.hasTag<ChestTag>())
     {
-        // r.model = engine.loadModelRaylib("assets/models/Cofre.obj");
-        r.node = engine.loadModel("assets/models/Cofre.obj");
+        // FIXME
+        // r.node = engine.loadModel("assets/Assets/Cofre/Cofre0.fbx");
+        // loadAnimations(engine, em, e, r, "assets/Assets/Cofre/Cofre0.fbx", 1.0f);
+        r.node = engine.loadModel("assets/Assets/Cofre/Cofre.obj");
         setPointLight(engine, em, e, *r.node, r.position + vec3d{ 0, 5, 0 });
-        //engine.dmeg.CreateSpotLight(r.position.toGlm() + vec3f(0,10,0).toGlm(), {0, -1, 0}, 30.0f, D_YELLOW, "SpotLight amarilla", r.node);
-        // loadShaders(r.model);
     }
     else if (e.hasTag<DestructibleTag>())
     {
@@ -1420,9 +1433,16 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            // r.model = engine.loadModelRaylib("assets/models/Puerta_prision_agua.obj");
-            r.node = engine.loadModel("assets/models/Puerta_prision_agua.obj");
+        {
+            std::string path = "assets/Assets/Puerta_prision_agua/Puerta_prision_agua.fbx";
+            r.node = engine.loadModel(path.c_str());
+            loadAnimations(engine, em, e, r, "assets/Assets/Puerta_prision_base/Puerta_prision.fbx", 1.0f);
+            for (auto& mesh : r.node->getEntity<Model>()->getMeshes())
+                mesh->material->texture = engine.loadTexture2D("assets/Assets/Texturas/lvl_1_extras-texture.png");
+
+            setPointLight(engine, em, e, *r.node, r.position, 2.5f, D_BLUE_DARK);
             break;
+        }
         }
         // loadShaders(r.model);
     }
@@ -1431,14 +1451,20 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
         switch (li.mapID)
         {
         case 0:
-            // r.model = engine.loadModelRaylib("assets/levels/Zona_0-Bosque/objs/Barricada_cambio_lvl.obj");
-            r.node = engine.loadModel("assets/levels/Zona_0-Bosque/objs/Barricada_cambio_lvl.obj");
+        {
+            std::string path = "assets/Assets/Barricada_cueva/Barricada_cueva.obj";
+            r.node = engine.loadModel(path.c_str());
+            // loadAnimations(engine, em, e, r, path, 1.0f);
             break;
-
+        }
         case 1:
-            // r.model = engine.loadModelRaylib("assets/models/Puerta_prision_base.obj");
-            r.node = engine.loadModel("assets/models/Puerta_prision_base.obj");
+        {
+            std::string path = "assets/Assets/Puerta_prision_base/Puerta_prision.fbx";
+            r.node = engine.loadModel(path.c_str());
+            loadAnimations(engine, em, e, r, path, 1.0f);
+            setPointLight(engine, em, e, *r.node, r.position, 2.5f, D_LAVENDER_DARK);
             break;
+        }
         }
 
         // loadShaders(r.model);
@@ -1446,38 +1472,41 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<AngryBushTag>())
     {
         // r.model = engine.loadModelRaylib("assets/models/Piedra.obj");
+        std::string path = "";
         if (li.mapID == 0)
-            r.node = engine.loadModel("assets/Personajes/Enemigos/Piedra/Piedra_2.obj");
+            path = "assets/Personajes/Enemigos/Piedra/Piedra_2.fbx";
         else
-            r.node = engine.loadModel("assets/Personajes/Enemigos/Piedra/Piedra_3.obj");
+            path = "assets/Personajes/Enemigos/Piedra/Piedra_3.fbx";
+
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, "assets/Personajes/Enemigos/Piedra/Piedra_3.fbx", 4.5f);
 
         // loadShaders(r.model);
     }
     else if (e.hasTag<AngryBushTag2>())
     {
-        r.node = engine.loadModel("assets/Personajes/Enemigos/Piedra/Piedra_1.obj");
+        std::string path = "assets/Personajes/Enemigos/Piedra/Piedra_1.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, "assets/Personajes/Enemigos/Piedra/Piedra_3.fbx", 1.0f);
     }
     else if (e.hasTag<CrusherTag>())
     {
         std::string path = "assets/Personajes/Enemigos/Apisonadora/Apisonadora.fbx";
-        r.node = engine.loadModel(path.c_str());
         r.node = engine.loadModel(path.c_str());
         loadAnimations(engine, em, e, r, path, 1.95f);
         // loadShaders(r.model);
     }
     else if (e.hasTag<DummyTag>())
     {
-        // r.model = engine.loadModelRaylib("assets/models/Dummy.obj");
-        r.node = engine.loadModel("assets/models/Dummy.obj");
+        // FIXME
+        // std::string path = "assets/Personajes/Enemigos/Dummy/Dummy.fbx";
+        // r.node = engine.loadModel(path.c_str());
+        // loadAnimations(engine, em, e, r, path, 1.0f);
+        r.node = engine.loadModel("assets/Personajes/Enemigos/Dummy/Dummy.obj");
 
-        // if (li.mapID == 2)
-        // {
-        //     for (int j = 0; j < r.model.materialCount; j++)
-        //     {
-        //         for (int k = 0; k < 11; k++)
-        //             r.model.materials[j].maps[k].texture = engine.loadTexture("assets/Personajes/Enemigos/Dummy/Dummy_fire-texture.png");
-        //     }
-        // }
+        if (li.mapID == 2)
+            for (auto& mesh : r.node->getEntity<Model>()->getMeshes())
+                mesh->material->texture = engine.loadTexture2D("assets/Personajes/Enemigos/Dummy/Dummy_fire-texture.png");
     }
     else if (e.hasTag<BarricadeTag>())
     {
@@ -1505,6 +1534,14 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     {
         r.node = engine.loadModel("assets/Assets/Props/Destellos.obj");
     }
+    else if (e.hasTag<ManaDropTag>())
+    {
+        r.node = engine.loadModel("assets/Assets/Props/Dropeable_Mana.obj");
+    }
+    else if (e.hasTag<LifeDropTag>())
+    {
+        r.node = engine.loadModel("assets/Assets/Props/Dropeable_Vida.obj");
+    }
     else if (e.hasTag<WaterBombTag>())
     {
         r.node = engine.loadModel("assets/Assets/Props/Hechizos/Agua_1.obj");
@@ -1515,12 +1552,18 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     else if (e.hasTag<NomadTag>())
     {
-        r.node = engine.loadModel("assets/Personajes/NPCs/Nomada/Nomada.obj");
+        std::string path = "assets/Personajes/NPCs/Nomada/Nomada.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 1.0f);
     }
     else if (e.hasTag<InvestigatorTag>())
     {
-        r.node = engine.loadModel("assets/Personajes/NPCs/Investigador/Investigador.obj");
-        // loadShaders(r.model);
+        // FIXME
+        std::string path = "assets/Personajes/NPCs/Investigador/Investigador.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 1.0f);
+        // r.node = engine.loadModel("assets/Personajes/NPCs/Investigador/Investigador.obj");
+        setPointLight(engine, em, e, *r.node, r.position, 1.f, D_YELLOW);
     }
     else if (e.hasTag<LavaTag>())
     {
@@ -1530,8 +1573,6 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<SignTag>())
     {
         r.node = engine.loadModel("assets/Assets/Cartel/Cartel.obj");
-
-        // loadShaders(r.model);
     }
     else if (e.hasTag<TableTag>())
     {
@@ -1630,13 +1671,33 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
 
 void RenderSystem::loadAnimations(GameEngine& engine, EntityManager& em, Entity& ent, RenderComponent& rc, const std::string& path, float mult)
 {
-    auto& vecBones = rc.node->getEntity<Model>()->getboneInfoMap();
+    auto& model = *rc.node->getEntity<Model>();
+    auto& vecBones = model.getboneInfoMap();
     auto& ac = em.addComponent<AnimationComponent>(ent);
     ac.animationList = engine.createAnimations(path, vecBones);
     ac.multiplier = mult;
 
-    if (ac.animationList.size() == 1)
-        ac.animToPlay = 0;
+    if (ent.hasTag<CrusherTag>())
+        ac.animToPlay = static_cast<std::size_t>(CrusherAnimations::ATTACK);
+    else if (ent.hasTag<PlayerTag>())
+        ac.animToPlay = static_cast<std::size_t>(PlayerAnimations::IDLE);
+    else if (ent.hasTag<DoorTag>() || ent.hasTag<DestructibleTag>())
+    {
+        for (auto& mesh : model.getMeshes())
+            mesh->rotateBones = false;
+    }
+    else if (ent.hasTag<AngryBushTag>() || ent.hasTag<AngryBushTag2>())
+        ac.animToPlay = static_cast<std::size_t>(RockAnimations::ROLL);
+    // else if (ent.hasTag<DummyTag>())
+    //     ac.animToPlay = 0;
+    else if (ent.hasTag<NomadTag>())
+        ac.animToPlay = static_cast<std::size_t>(NomadAnimations::IDLE);
+    else if (ent.hasTag<InvestigatorTag>())
+        ac.animToPlay = static_cast<std::size_t>(InvestAnimations::IDLE);
+    else if (ent.hasTag<SnowmanTag>())
+        ac.animToPlay = static_cast<std::size_t>(SnowmanAnimations::IDLE);
+    else if (ent.hasTag<GolemTag>())
+        ac.animToPlay = static_cast<std::size_t>(GolemAnimations::WALK);
 }
 
 void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, Entity& e, Node& n, vec3d pos, float intensity, Color c)
@@ -1665,6 +1726,7 @@ void RenderSystem::setPointLight(GameEngine& engine, PointLightComponent& plc, N
 
 void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
 {
+    // t1 = std::chrono::high_resolution_clock::now();
     using partCMPs = MP::TypeList<ParticleMakerComponent>;
     using noTAGs = MP::TypeList<>;
 
@@ -1703,6 +1765,10 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
             }
         }
     });
+
+    // auto t2 = std::chrono::high_resolution_clock::now();
+    // auto dur = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    // std::cout << "Tiempo de renderizado de partículas: " << dur << " mc" << std::endl;
 }
 
 // Empieza el dibujado y se limpia la pantalla
@@ -2996,8 +3062,11 @@ void RenderSystem::unloadModels(EntityManager& em, GameEngine&)
 
 void RenderSystem::updateHealthBar(GameEngine& engine, EntityManager& em, const Entity& e)
 {
-    auto const& l{ em.getComponent<LifeComponent>(e) };
+    auto& l{ em.getComponent<LifeComponent>(e) };
     auto& plfi = em.getSingleton<PlayerInfo>();
+
+    if (plfi.invincible)
+        l.life = l.maxLife;
 
     auto wRate = engine.getWidthRate();
     auto hRate = engine.getHeightRate();
@@ -3509,7 +3578,7 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
 
     auto& ss = em.getSingleton<SoundSystem>();
 
-    std::map<SpeakerType, std::pair<std::string, std::function<void()>>> speakerTextures = {
+    static std::map<SpeakerType, std::pair<std::string, std::function<void()>>> speakerTextures = {
         {SpeakerType::PLAYER, {"mago_happy", [&]() {ss.sonido_DPlayer();}}},
         {SpeakerType::PLAYER_SAD, {"mago_meh", [&]() {ss.sonido_DPlayer();}}},
         {SpeakerType::PLAYER_DANGER, {"mago_sos", [&]() {ss.sonido_DPlayer();}}},
@@ -3534,14 +3603,14 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     boxInfo.text.setText(text);
     engine.drawNode(box, { posX, posY });
 
-    int offSetX = 40;
-    int offSetY = 50;
+    int offSetX = static_cast<int>(60.f * wRate);
+    int offSetY = static_cast<int>(75.f * hRate);
     if (speakerTextures.count(str.first) > 0) {
         auto& [name, sound] = speakerTextures[str.first];
         auto* speaker = engine.createNode(getNode(engine, name.c_str()), getNode(engine, "Copy"));
         engine.drawNode(speaker, { posX - offSetX, posY - offSetY });
 
-        if (boxInfo.text.charChanged())
+        if (boxInfo.text.charChanged() || boxInfo.text.charIndex == 0)
             sound();
     }
 
@@ -3559,6 +3628,32 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
             {
                 em.getSingleton<SoundSystem>().sonido_cerrar_cofre();
                 li.openChest = false;
+            }
+
+            auto& playerAnim = em.getComponent<AnimationComponent>(*em.getEntityByID(li.playerID));
+            if (playerAnim.currentAnimation == static_cast<std::size_t>(PlayerAnimations::SPEAKING))
+            {
+                using animCMP = MP::TypeList<NPCComponent, AnimationComponent>;
+                using npcTAG = MP::TypeList<NPCTag>;
+
+                em.forEach<animCMP, npcTAG>([&](Entity&, NPCComponent& npcC, AnimationComponent& anim)
+                {
+                    switch (npcC.type)
+                    {
+                    case NPCType::INVESTIGATOR:
+                    {
+                        anim.animToPlay = static_cast<std::size_t>(InvestAnimations::IDLE);
+                        break;
+                    }
+                    case NPCType::NOMAD:
+                    {
+                        anim.animToPlay = static_cast<std::size_t>(NomadAnimations::IDLE);
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+                });
             }
         }
         inpi.interact = false;
@@ -3805,12 +3900,6 @@ void RenderSystem::drawCheats(EntityManager& em, GameEngine& engine)
 
     engine.createText({ posTextX, posY + i * downRate }, "Invencible", D_BLACK, "invincibleCheckText", cheatsNode);
     engine.createCheckBoxPtr({ posButtonX + 45, posButtonY + i * downRate }, 40.f, &plfi.invincible, D_WHITE, D_LAVENDER, D_LAVENDER_LIGHT, "invincibleCheckBox", cheatsNode);
-
-    if (plfi.invincible)
-    {
-        auto& lc = em.getComponent<LifeComponent>(player);
-        lc.life = lc.maxLife;
-    }
 }
 
 void RenderSystem::drawSnowEffect(GameEngine& engine, bool generate, vec2f)
