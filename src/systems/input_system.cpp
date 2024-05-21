@@ -260,11 +260,11 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             gami.setVel(vel);
     }
 
-    if (ge.isKeyReleased(D_KEY_Z))
-    {
-        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", AttackType::WaterBombShot };
-        plfi.addSpell(spell);
-    }
+    // if (ge.isKeyReleased(D_KEY_Z))
+    // {
+    //     Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", AttackType::WaterBombShot };
+    //     plfi.addSpell(spell);
+    // }
 
     // if (ge.isKeyReleased(D_KEY_X))
     // {
