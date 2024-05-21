@@ -26,6 +26,8 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             {
                 auto& plfi = em.getSingleton<PlayerInfo>();
                 em.getSingleton<SoundSystem>().sonido_recibir_danyo();
+                em.getComponent<AnimationComponent>(ent).changeAnimation(static_cast<std::size_t>(PlayerAnimations::GOT_HIT));
+
                 if (plfi.armor > 0)
                 {
                     lif.life += lif.lifeLost;
@@ -49,10 +51,22 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             else if (ent.hasTag<GolemTag>())
             {
                 em.getSingleton<SoundSystem>().sonido_golem_danyo();
+                if (lif.life > 0)
+                {
+                    auto& anc = em.getComponent<AnimationComponent>(ent);
+                    if (anc.currentAnimation != static_cast<std::size_t>(GolemAnimations::ATTACK))
+                        anc.changeAnimation(static_cast<std::size_t>(GolemAnimations::GOT_HIT));
+                }
             }
             else if (ent.hasTag<SnowmanTag>())
             {
                 em.getSingleton<SoundSystem>().sonido_munyeco_danyo();
+                if (lif.life > 0)
+                {
+                    auto& anc = em.getComponent<AnimationComponent>(ent);
+                    anc.changeAnimation(static_cast<std::size_t>(SnowmanAnimations::GOT_HIT));
+                }
+
             }
             else if (ent.hasTag<SlimeTag>())
             {
@@ -85,7 +99,15 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
             if (ent.hasTag<SlimeTag>())
             {
                 if (!lif.decreaseNextFrame)
+                {
                     lif.decreaseNextFrame = true;
+                    em.getSingleton<SoundSystem>().sonido_slime_muere();
+                    if (ent.hasComponent<SoundComponent>())
+                    {
+                        auto& sc = em.getComponent<SoundComponent>(ent);
+                        em.getSingleton<SoundSystem>().stop_enemigo_mov(sc.sound_mov);
+                    }
+                }
                 else
                     lif.decreaseNextFrame = false;
                 if (em.getComponent<AIComponent>(ent).healbeforedie) {
@@ -96,8 +118,8 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 }
             }
             //si es un golem
-            if (ent.hasTag<GolemTag>()) {
-                if (!lif.decreaseNextFrame) {
+            else if (ent.hasTag<GolemTag>()) {
+                if (!lif.decreaseNextFrame && !lif.onDeathAnim) {
                     // auto& ia = em.getComponent<AIComponent>(ent);
                     lif.decreaseNextFrame = true;
                     em.getSingleton<SoundSystem>().sonido_golem_muere();
@@ -105,53 +127,64 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                         auto& sc = em.getComponent<SoundComponent>(ent);
                         em.getSingleton<SoundSystem>().stop_enemigo_mov(sc.sound_mov);
                     }
-
                 }
-                else
-                    lif.decreaseNextFrame = false;
+                else if (!lif.onDeathAnim)
+                {
+                    auto& anim = em.getComponent<AnimationComponent>(ent);
+                    anim.changeAnimation(static_cast<std::size_t>(GolemAnimations::DEATH));
+                    lif.onDeathAnim = true;
+                    lif.decreaseNextFrame = true;
+
+                    auto& inpi = em.getSingleton<InputInfo>();
+                    li.lockedEnemy = li.max;
+                    inpi.lockOn = false;
+                }
             }
 
             //si es un snowman
-            if (ent.hasTag<SnowmanTag>()) {
-                if (!lif.decreaseNextFrame)
+            else if (ent.hasTag<SnowmanTag>()) {
+                if (!lif.decreaseNextFrame && !lif.onDeathAnim)
                 {
                     em.getSingleton<SoundSystem>().sonido_munyeco_muere();
+                    lif.decreaseNextFrame = true;
                     if (ent.hasComponent<SoundComponent>())
                     {
                         auto& sc = em.getComponent<SoundComponent>(ent);
                         em.getSingleton<SoundSystem>().stop_enemigo_mov(sc.sound_mov);
                     }
                 }
-            }
-            if (ent.hasTag<SlimeTag>()) {
-                if (!lif.decreaseNextFrame)
+                else if (!lif.onDeathAnim)
                 {
-                    em.getSingleton<SoundSystem>().sonido_slime_muere();
-                    if (ent.hasComponent<SoundComponent>())
-                    {
-                        auto& sc = em.getComponent<SoundComponent>(ent);
-                        em.getSingleton<SoundSystem>().stop_enemigo_mov(sc.sound_mov);
-                    }
+                    auto& anim = em.getComponent<AnimationComponent>(ent);
+                    anim.changeAnimation(static_cast<std::size_t>(SnowmanAnimations::DEATH));
+                    lif.onDeathAnim = true;
+                    lif.decreaseNextFrame = true;
 
+                    auto& inpi = em.getSingleton<InputInfo>();
+                    li.lockedEnemy = li.max;
+                    inpi.lockOn = false;
                 }
             }
-            if (ent.hasTag<PlayerTag>()) {
-                if (!lif.decreaseNextFrame)
+
+            else if (ent.hasTag<PlayerTag>()) {
+                if (!lif.decreaseNextFrame && !lif.onDeathAnim)
                 {
                     em.getSingleton<SoundSystem>().sonido_jugador_muere();
-
+                    em.getComponent<AnimationComponent>(ent).changeAnimation(static_cast<std::size_t>(PlayerAnimations::DEATH));
+                    lif.decreaseNextFrame = true;
+                    lif.onDeathAnim = true;
                 }
             }
 
             //Si es una bala
-            if (ent.hasTag<HitPlayerTag>()) {
+            else if (ent.hasTag<HitPlayerTag>()) {
                 if (!lif.decreaseNextFrame)
                     lif.decreaseNextFrame = true;
                 else
                     lif.decreaseNextFrame = false;
             }
 
-            if (ent.hasTag<SubjectTag>()) {
+            else  if (ent.hasTag<SubjectTag>()) {
                 if (!lif.decreaseNextFrame)
                     lif.decreaseNextFrame = true;
                 else
@@ -160,7 +193,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 bb.subditosData.erase(ent.getID());
             }
 
-            if (ent.hasTag<BossFinalTag>()) {
+            else if (ent.hasTag<BossFinalTag>()) {
                 // if (!lif.decreaseNextFrame)
                 //     lif.decreaseNextFrame = true;
                 // else
@@ -169,12 +202,32 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 bb.boss_fase++;
             }
 
-            if (ent.hasTag<DestructibleTag>()) {
-                if (li.mapID == 1) {
-                    li.door_open = true;
-                    em.getSingleton<SoundSystem>().sonido_abrir_puerta_magica();
+            else if (ent.hasTag<DestructibleTag>() && li.mapID == 1) {
+                auto& doorAnim = em.getComponent<AnimationComponent>(ent);
+                doorAnim.animToPlay = static_cast<std::size_t>(DoorAnimations::OPEN);
 
+                li.door_open = true;
+                em.getSingleton<SoundSystem>().sonido_abrir_puerta_magica();
+
+                lif.life = 20;
+                return;
+                if (li.npcToTalk != li.max)
+                {
+                    auto& npc = *em.getEntityByID(li.npcToTalk);
+                    auto& npcC = em.getComponent<NPCComponent>(npc);
+                    switch (npcC.type)
+                    {
+                    case NPCType::NOMAD:
+                    {
+                        auto& npcAnim = em.getComponent<AnimationComponent>(npc);
+                        npcAnim.animToPlay = static_cast<std::size_t>(NPCAnimations::WALK);
+                        break;
+                    }
+                    default:
+                        break;
+                    }
                 }
+
             }
 
             if (li.lockedEnemy == ent.getID())
@@ -199,7 +252,12 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
         if (lif.markedForDeletion && !lif.decreaseNextFrame)
         {
             if (!ent.hasTag<EnemyTag>())
+            {
                 li.insertDeath(ent.getID());
+
+                if (ent.hasTag<PlayerTag>())
+                    lif.onDeathAnim = false;
+            }
             else
             {
                 em.addTag<EnemyDeathTag>(ent);
@@ -210,6 +268,7 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                     ren.node->setVisible(false);
                 }
             }
+
         }
     });
 }

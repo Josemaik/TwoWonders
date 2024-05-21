@@ -1465,7 +1465,7 @@
 								[-133.8,28.0,-16.85],
 								[-133.80,28.0,-4.67]
 							],
-							"countdown_stop": 0.2,
+							"countdown_stop": 0.01,
 							"countdown_shoot": 0.3,
 							"countdown_perception": 0.10
 						},
@@ -1493,7 +1493,7 @@
 								[-80.8,9.0,7.2],
 								[-80.8,9.0,7.2]
 							],
-							"countdown_stop": 0.2,
+							"countdown_stop": 0.01,
 							"countdown_shoot": 0.3,
 							"countdown_perception": 0.02
 						},

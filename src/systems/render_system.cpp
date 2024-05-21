@@ -1063,7 +1063,7 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                     colorEntidad = D_CORAL_PINK;
 
                     if (e.hasTag<DestructibleTag>())
-                        r.position.setZ(shakeDouble(r.position.z()));
+                        r.position.setX(shakeDouble(r.position.x()));
                 }
             }
             if (!e.hasTag<ZoneTag>())
@@ -1283,10 +1283,10 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<GolemTag>())
     {
         // FIXME
-        // std::string path = "assets/Personajes/Enemigos/Golem/Golem.fbx";
-        // r.node = engine.loadModel(path.c_str());
-        // loadAnimations(engine, em, e, r, path, 2.0);
-        r.node = engine.loadModel("assets/Personajes/Enemigos/Golem/Golem.obj");
+        std::string path = "assets/Personajes/Enemigos/Golem/Golem.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 2.0);
+        // r.node = engine.loadModel("assets/Personajes/Enemigos/Golem/Golem.obj");
     }
     else if (e.hasTag<SpiderTag>())
         r.node = engine.loadModel("assets/models/Spider.obj");
@@ -1435,9 +1435,16 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             break;
 
         case 1:
-            // r.model = engine.loadModelRaylib("assets/models/Puerta_prision_agua.obj");
-            r.node = engine.loadModel("assets/models/Puerta_prision_agua.obj");
+        {
+            std::string path = "assets/Assets/Puerta_prision_agua/Puerta_prision_agua.fbx";
+            r.node = engine.loadModel(path.c_str());
+            loadAnimations(engine, em, e, r, "assets/Assets/Puerta_prision_base/Puerta_prision.fbx", 1.0f);
+            for (auto& mesh : r.node->getEntity<Model>()->getMeshes())
+                mesh->material->texture = engine.loadTexture2D("assets/Assets/Texturas/lvl_1_extras-texture.png");
+
+            setPointLight(engine, em, e, *r.node, r.position, 2.5f, D_BLUE_DARK);
             break;
+        }
         }
         // loadShaders(r.model);
     }
@@ -1457,6 +1464,7 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
             std::string path = "assets/Assets/Puerta_prision_base/Puerta_prision.fbx";
             r.node = engine.loadModel(path.c_str());
             loadAnimations(engine, em, e, r, path, 1.0f);
+            setPointLight(engine, em, e, *r.node, r.position, 2.5f, D_LAVENDER_DARK);
             break;
         }
         }
@@ -1546,17 +1554,18 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     }
     else if (e.hasTag<NomadTag>())
     {
-        // FIXME
-        // std::string path = "assets/Personajes/NPCs/Nomada/Nomada.fbx";
-        // r.node = engine.loadModel(path.c_str());
-        // loadAnimations(engine, em, e, r, path, 1.0f);
-        r.node = engine.loadModel("assets/Personajes/NPCs/Nomada/Nomada.obj");
+        std::string path = "assets/Personajes/NPCs/Nomada/Nomada.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 1.0f);
     }
     else if (e.hasTag<InvestigatorTag>())
     {
+        // FIXME
+        // std::string path = "assets/Personajes/NPCs/Investigador/Investigador.fbx";
+        // r.node = engine.loadModel(path.c_str());
+        // loadAnimations(engine, em, e, r, path, 1.0f);
         r.node = engine.loadModel("assets/Personajes/NPCs/Investigador/Investigador.obj");
         setPointLight(engine, em, e, *r.node, r.position, 1.f, D_YELLOW);
-        // loadShaders(r.model);
     }
     else if (e.hasTag<LavaTag>())
     {
@@ -1566,8 +1575,6 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<SignTag>())
     {
         r.node = engine.loadModel("assets/Assets/Cartel/Cartel.obj");
-
-        // loadShaders(r.model);
     }
     else if (e.hasTag<TableTag>())
     {
@@ -1676,7 +1683,7 @@ void RenderSystem::loadAnimations(GameEngine& engine, EntityManager& em, Entity&
         ac.animToPlay = static_cast<std::size_t>(CrusherAnimations::ATTACK);
     else if (ent.hasTag<PlayerTag>())
         ac.animToPlay = static_cast<std::size_t>(PlayerAnimations::IDLE);
-    else if (ent.hasTag<DoorTag>())
+    else if (ent.hasTag<DoorTag>() || ent.hasTag<DestructibleTag>())
     {
         for (auto& mesh : model.getMeshes())
             mesh->rotateBones = false;
@@ -1685,16 +1692,12 @@ void RenderSystem::loadAnimations(GameEngine& engine, EntityManager& em, Entity&
         ac.animToPlay = static_cast<std::size_t>(RockAnimations::ROLL);
     // else if (ent.hasTag<DummyTag>())
     //     ac.animToPlay = 0;
-    // else if (ent.hasTag<NomadTag>())
-    // {
-    //     ac.animToPlay = 0;
-    //     for (auto& mesh : model.getMeshes())
-    //         mesh->rotateBones = false;
-    // }
+    else if (ent.hasTag<NomadTag>())
+        ac.animToPlay = static_cast<std::size_t>(NPCAnimations::IDLE);
     else if (ent.hasTag<SnowmanTag>())
         ac.animToPlay = static_cast<std::size_t>(SnowmanAnimations::IDLE);
-    // else if (ent.hasTag<GolemTag>())
-    //     ac.animToPlay = 0;
+    else if (ent.hasTag<GolemTag>())
+        ac.animToPlay = static_cast<std::size_t>(GolemAnimations::WALK);
 }
 
 void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, Entity& e, Node& n, vec3d pos, float intensity, Color c)
@@ -3575,7 +3578,7 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
 
     auto& ss = em.getSingleton<SoundSystem>();
 
-    std::map<SpeakerType, std::pair<std::string, std::function<void()>>> speakerTextures = {
+    static std::map<SpeakerType, std::pair<std::string, std::function<void()>>> speakerTextures = {
         {SpeakerType::PLAYER, {"mago_happy", [&]() {ss.sonido_DPlayer();}}},
         {SpeakerType::PLAYER_SAD, {"mago_meh", [&]() {ss.sonido_DPlayer();}}},
         {SpeakerType::PLAYER_DANGER, {"mago_sos", [&]() {ss.sonido_DPlayer();}}},
@@ -3600,8 +3603,8 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     boxInfo.text.setText(text);
     engine.drawNode(box, { posX, posY });
 
-    int offSetX = 40;
-    int offSetY = 50;
+    int offSetX = static_cast<int>(60.f * wRate);
+    int offSetY = static_cast<int>(75.f * hRate);
     if (speakerTextures.count(str.first) > 0) {
         auto& [name, sound] = speakerTextures[str.first];
         auto* speaker = engine.createNode(getNode(engine, name.c_str()), getNode(engine, "Copy"));
@@ -3625,6 +3628,24 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
             {
                 em.getSingleton<SoundSystem>().sonido_cerrar_cofre();
                 li.openChest = false;
+            }
+
+            if (li.npcToTalk != li.max && !em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).notMove)
+            {
+                auto& npc = *em.getEntityByID(li.npcToTalk);
+                auto& npcC = em.getComponent<NPCComponent>(npc);
+
+                switch (npcC.type)
+                {
+                case NPCType::NOMAD:
+                {
+                    auto& animNpc = em.getComponent<AnimationComponent>(npc);
+                    animNpc.animToPlay = static_cast<std::size_t>(NPCAnimations::IDLE);
+                    break;
+                }
+                default:
+                    break;
+                }
             }
         }
         inpi.interact = false;

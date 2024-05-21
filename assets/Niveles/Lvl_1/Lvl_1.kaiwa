@@ -1361,7 +1361,7 @@
 							"scale":[13.0, 3.0, 20.0],
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, -1.0],
-							"life": 3,
+							"life": 2,
 							"weaknesses": [2]
 						},
 						{

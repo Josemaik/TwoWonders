@@ -475,7 +475,12 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
 
             if (li.mapID == 1)
             {
+                em.addTag<SeparateModelTag>(entity);
+                r.orientation += 90.0 * DEGTORAD;
+                // r.position.setY(r.position.y() + 4.0);
+
                 em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = Effects::PRISONDOOR, .maxParticles = 16, .spawnRate = 0.1f, .lifeTime = 0.3f });
+                em.addComponent<AnimationComponent>(entity);
             }
 
             em.destroyComponent<InteractiveComponent>(entity);
@@ -1207,6 +1212,7 @@ void MapManager::spawnReset(EntityManager& em, Ia_man&)
             em.destroyTag<EnemyDeathTag>(e);
         lic.life = lic.maxLife;
         lic.markedForDeletion = false;
+        lic.onDeathAnim = false;
         phy.position = aic.initialPos;
     });
 }

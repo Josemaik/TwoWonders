@@ -497,13 +497,19 @@ void CollisionSystem::handleStaticCollision(EntityManager& em, Entity& staticEnt
     // Si cualquiera de los impactos es con una bala, se baja la vida del otro
     if (behaviorType2 & BehaviorType::ATK_PLAYER || behaviorType2 & BehaviorType::ATK_ENEMY)
     {
-        if (staticEntPtr->hasTag<DestructibleTag>() && staticEntPtr->hasComponent<LifeComponent>() && otherEntPtr->hasComponent<AttackComponent>())
+        if (otherEntPtr->hasComponent<AttackComponent>())
         {
             auto& attack = em.getComponent<AttackComponent>(*otherEntPtr);
-            if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(attack.type)) {
-                em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
-                attack.doEffect = true;
+            if (staticEntPtr->hasTag<DestructibleTag>() && staticEntPtr->hasComponent<LifeComponent>())
+            {
+                if (em.getComponent<DestructibleComponent>(*staticEntPtr).checkIfDamaged(attack.type)) {
+                    em.getComponent<LifeComponent>(*staticEntPtr).decreaseLife();
+                    attack.doEffect = true;
+                }
             }
+
+            if (attack.atkType & AttackType::SpiderShot)
+                attack.doEffect = true;
         }
         return;
     }
