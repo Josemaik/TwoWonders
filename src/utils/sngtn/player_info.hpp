@@ -169,11 +169,11 @@ struct PlayerInfo
         hasStaff = false;
         hasBoots = false;
         hasHat = false;
-        hasKey = true;
+        hasKey = false;
         onSpawn = false;
         showBook = false;
         attackUpgrade = false;
         boatParts.clear();
-        // spawnPoint = { 33.0, 4.0, -25.9 };
+        spawnPoint = { 33.0, 4.0, -25.9 };
     }
 };
