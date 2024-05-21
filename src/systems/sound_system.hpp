@@ -141,6 +141,7 @@ struct SoundSystem {
     void sonido_win();                  //por integrar
     void sonido_jugador_muere();        
     void sonido_no_mana();
+    void sonido_puerta_prision();
 
 
 
