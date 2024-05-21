@@ -108,7 +108,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     if (ge.isKeyReleased(D_KEY_F11))
         ge.setWindowFullScreen();
 
-    if (ge.isKeyReleased(D_KEY_F12)){
+    if (ge.isKeyReleased(D_KEY_F12)) {
         ge.dmeg.ToggleShaderCartoon();
         //ge.toggleLights();
     }
@@ -260,11 +260,11 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             gami.setVel(vel);
     }
 
-    // if (ge.isKeyReleased(D_KEY_Z))
-    // {
-    //     Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", AttackType::WaterBombShot };
-    //     plfi.addSpell(spell);
-    // }
+    if (ge.isKeyReleased(D_KEY_Z))
+    {
+        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", AttackType::WaterBombShot };
+        plfi.addSpell(spell);
+    }
 
     // if (ge.isKeyReleased(D_KEY_X))
     // {
@@ -297,7 +297,7 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     bb.teid = player.getID();
 
     // Codigo para el ataque
-    if (player.hasComponent<AttackerComponent>())
+    if (player.hasComponent<AttackerComponent>() && !phy.notMove)
     {
         auto& anc = em.getComponent<AnimationComponent>(player);
         if ((ge.isKeyDown(in.space) || ge.getGamepadAxisMovement(0, in.m_space) > 0.1))

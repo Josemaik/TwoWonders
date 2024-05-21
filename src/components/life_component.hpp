@@ -13,5 +13,5 @@ struct LifeComponent
 
     int life{ 1 }, maxLife{ life }, lifeLost{ 0 }, maxLifeAdd{ 0 };
     float countdown{ 0.5 }, elapsed{ countdown }, life_width{}; // En segundos
-    bool markedForDeletion{ false }, invulnerable{ false };
+    bool markedForDeletion{ false }, invulnerable{ false }, onDeathAnim{ false };
 };

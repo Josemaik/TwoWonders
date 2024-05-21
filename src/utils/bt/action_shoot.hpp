@@ -104,7 +104,19 @@ struct BTActionShoot : BTNode_t {
                 if (!ectx.ent.hasTag<GolemTag>())
                     att.attack(AttackType::MeleeEnemy);
                 else
-                    att.attack(AttackType::GollemAttack);
+                {
+                    auto& anc = ectx.em.getComponent<AnimationComponent>(ectx.ent);
+
+                    if (anc.animEnded && anc.currentAnimation != static_cast<std::size_t>(GolemAnimations::ATTACK))
+                        anc.animToPlay = static_cast<std::size_t>(GolemAnimations::ATTACK);
+
+                    if (anc.aboutToEnd && anc.currentAnimation == static_cast<std::size_t>(GolemAnimations::ATTACK))
+                    {
+                        anc.aboutToEnd = false;
+                        att.attack(AttackType::GollemAttack);
+                    }
+
+                }
                 return BTNodeStatus_t::success;
                 break;
             }

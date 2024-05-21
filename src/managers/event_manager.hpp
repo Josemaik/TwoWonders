@@ -268,6 +268,7 @@ public:
                             break;
 
                         auto& npc = *em.getEntityByID(li.npcToTalk);
+                        auto& npcC = em.getComponent<NPCComponent>(npc);
                         auto& dc = em.getComponent<DispatcherComponent>(npc);
 
                         if (dc.eventCodes.size() > 0)
@@ -280,7 +281,17 @@ public:
                         auto& anc = em.getComponent<AnimationComponent>(e);
                         anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::SPEAKING);
 
-                        li.npcToTalk = li.max;
+                        switch (npcC.type)
+                        {
+                        case NPCType::NOMAD:
+                        {
+                            auto& animNpc = em.getComponent<AnimationComponent>(npc);
+                            animNpc.animToPlay = static_cast<std::size_t>(NPCAnimations::SPEAKING);
+                            break;
+                        }
+                        default:
+                            break;
+                        }
                         break;
                     }
                     case EventCodes::DialogPrisonNomad1:
@@ -306,6 +317,22 @@ public:
 
                         events.push_back(Event{ EventCodes::DialogPrisonNomad2 });
                         out = true;
+
+                        // auto& li = em.getSingleton<LevelInfo>();
+                        // auto& npc = *em.getEntityByID(li.npcToTalk);
+                        // auto& npcC = em.getComponent<NPCComponent>(npc);
+
+                        // switch (npcC.type)
+                        // {
+                        // case NPCType::NOMAD:
+                        // {
+                        //     auto& animNpc = em.getComponent<AnimationComponent>(npc);
+                        //     animNpc.animToPlay = static_cast<std::size_t>(NPCAnimations::GIVE_ITEM);
+                        //     break;
+                        // }
+                        // default:
+                        //     break;
+                        // }
                         break;
                     }
                     case EventCodes::DialogPrisonNomad2:
@@ -333,6 +360,21 @@ public:
 
                         auto& playerPhy = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID));
                         playerPhy.notMove = false;
+
+                        auto& npc = *em.getEntityByID(li.npcToTalk);
+                        auto& npcC = em.getComponent<NPCComponent>(npc);
+
+                        switch (npcC.type)
+                        {
+                        case NPCType::NOMAD:
+                        {
+                            auto& animNpc = em.getComponent<AnimationComponent>(npc);
+                            animNpc.animToPlay = static_cast<std::size_t>(NPCAnimations::GIVE_ITEM);
+                            break;
+                        }
+                        default:
+                            break;
+                        }
                         break;
                     }
                     case EventCodes::DialogNomadVolcano1:

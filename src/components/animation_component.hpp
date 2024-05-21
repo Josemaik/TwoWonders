@@ -35,9 +35,12 @@ enum struct DoorAnimations : uint8_t
     OPEN
 };
 
-enum struct NomadAnimations : uint8_t
+enum struct NPCAnimations : uint8_t
 {
+    WALK,
     IDLE,
+    SPEAKING,
+    GIVE_ITEM
 };
 
 enum struct RockAnimations : uint8_t
@@ -52,6 +55,14 @@ enum struct SnowmanAnimations : uint8_t
     GOT_HIT,
     IDLE,
     DEATH
+};
+
+enum struct GolemAnimations : uint8_t
+{
+    WALK,
+    ATTACK,
+    DEATH,
+    GOT_HIT
 };
 
 struct AnimationComponent
