@@ -98,11 +98,13 @@ namespace DarkMoon {
 
 #ifdef _WIN32
             float degrees = 0.f;
+            if (!rotateBones)
+                degrees = -90.f;
 #else
             float degrees = 90.f;
-#endif
             if (!rotateBones)
                 degrees = 0.f;
+#endif
 
             for (std::size_t i = 0; i < transforms.size(); ++i) {
                 // Rotar la matriz en 90 grados alrededor del eje Z

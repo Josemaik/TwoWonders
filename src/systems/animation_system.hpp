@@ -14,18 +14,18 @@ struct AnimationSystem
 
 private:
     static inline constexpr std::array<float, 11> playerSpeeds = {
-        3.0, 6.0, 3.0, 4.0, 1.0, 1.0, 2.0, 2.0, 2.0, 3.0, 2.0
+        3.0f, 6.0f, 3.0f, 4.0f, 2.5f, 1.0f, 2.0f, 2.0f, 2.0f, 3.0f, 2.0f
     };
 
     static inline constexpr std::array<float, 4> snowmanSpeeds = {
-        5.0, 2.0, 2.0, 1.0
+        5.0f, 2.0f, 2.0f, 1.0f
     };
 
     static inline constexpr std::array<float, 4> nomadSpeeds = {
-        3.0, 2.0, 2.0, 3.0
+        3.0f, 2.0f, 2.0f, 3.0f
     };
 
     static inline constexpr std::array<float, 4> catSpeeds = {
-        2.0, 4.0, 2.0, 3.0
+        2.0f, 4.0f, 2.0f, 3.0f
     };
 };

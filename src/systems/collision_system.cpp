@@ -361,6 +361,8 @@ void CollisionSystem::handleCollision(EntityManager& em, Entity& staticEnt, Enti
         else if (otherEntPtr->hasTag<PlayerTag>() && otherEntPtr->hasComponent<LifeComponent>())
         {
             auto& life = em.getComponent<LifeComponent>(*otherEntPtr);
+            if(life.onDeathAnim)
+                return;
             life.decreaseLife();
 
             resolvePlayerDirection(*otherPhyPtr, *staticPhyPtr, false);
@@ -630,6 +632,10 @@ void CollisionSystem::handlePlayerCollision(EntityManager& em, Entity& staticEnt
 
         if (!otherEntPtr->hasTag<DummyTag>() && !otherEntPtr->hasTag<CrusherTag>())
         {
+            auto& life = em.getComponent<LifeComponent>(*staticEntPtr);
+            if(life.onDeathAnim)
+                return;
+                
             resolvePlayerDirection(*staticPhy, *otherPhy, true);
             em.getSingleton<SoundSystem>().sonido_rebote();
             em.getComponent<AnimationComponent>(*staticEntPtr).changeAnimation(static_cast<std::size_t>(PlayerAnimations::GOT_HIT));
