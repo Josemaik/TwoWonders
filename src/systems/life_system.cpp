@@ -90,7 +90,6 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
                 auto& phy = em.getComponent<PhysicsComponent>(ent);
                 createObject(em, os, phy.position);
                 em.getSingleton<SoundSystem>().sonido_muerte_enemigo();
-
                 if (li.playerDetected)
                     li.enemyToChestPos = phy.position;
             }
@@ -222,6 +221,8 @@ void LifeSystem::update(EntityManager& em, ObjectSystem& os) {
 
             if (li.lockedEnemy == ent.getID())
                 li.lockedEnemy = li.max;
+
+            lif.markedForDeletion = true;
         }
 
         // Para cuando se recoge una poción de vida
