@@ -1869,8 +1869,8 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     auto& li = em.getSingleton<LevelInfo>();
     //Dibujado de titulo y ventana
     auto* debugNode = getNode(engine, "DebugAI4");
-    engine.createRectangle({ engine.getScreenWidth() - 400, 300 }, { 495, 645 }, { 255, 255, 255, 128 }, "pathfinding", debugNode);
-    engine.createText({ engine.getScreenWidth() - 370, 320 }, "PATHFINDING", D_RED, "pathfinding_title", debugNode);
+    engine.createRectangle({ engine.getScreenWidth() - 550, 300 }, { 550, 645 }, { 255, 255, 255, 128 }, "pathfinding", debugNode);
+    engine.createText({ engine.getScreenWidth() - 370, 310 }, "PATHFINDING", D_RED, "pathfinding_title", debugNode);
 
     // Datos de los botones
     int buttonWidth = 225;
@@ -1895,12 +1895,12 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     // engine.drawText(std::to_string(static_cast<int>(debug.goalnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY + 40), 20, D_BLUE);
     // goalnodenew += 1;
 
-    auto& butt1 = *engine.createButton({ posX - 10, posY + 80 }, { buttonWidth, buttonHeight }, "CALCULATE", "pathfinding_butt1", debugNode)->getEntity<Button>();
-    auto& butt2 = *engine.createButton({ posX + 140, posY + 80 }, { buttonWidth, buttonHeight }, "CLEAR", "pathfinding_butt2", debugNode)->getEntity<Button>();
+    auto& butt1 = *engine.createButton({ posX - 100, posY + 150 }, { buttonWidth, buttonHeight }, "CALCULATE", "pathfinding_butt1", debugNode)->getEntity<Button>();
+    auto& butt2 = *engine.createButton({ posX + 140, posY + 150 }, { buttonWidth, buttonHeight }, "CLEAR", "pathfinding_butt2", debugNode)->getEntity<Button>();
     auto& butt3 = *engine.createButton({ posX + 140, posY }, { buttonWidth, buttonHeight }, "CORNERS", "pathfinding_butt3", debugNode)->getEntity<Button>();
-    auto& butt4 = *engine.createButton({ posX - 10, posY }, { buttonWidth, buttonHeight }, "CENTERS", "pathfinding_butt4", debugNode)->getEntity<Button>();
-    auto& butt5 = *engine.createButton({ posX + 140, posY + 40 }, { buttonWidth, buttonHeight }, "MIDPOINTS", "pathfinding_butt5", debugNode)->getEntity<Button>();
-    auto& butt6 = *engine.createButton({ posX - 10, posY + 40 }, { buttonWidth, buttonHeight }, "CONEXIONES", "pathfinding_butt6", debugNode)->getEntity<Button>();
+    auto& butt4 = *engine.createButton({ posX - 100, posY }, { buttonWidth, buttonHeight }, "CENTERS", "pathfinding_butt4", debugNode)->getEntity<Button>();
+    auto& butt5 = *engine.createButton({ posX + 140, posY + 80 }, { buttonWidth, buttonHeight }, "MIDPOINTS", "pathfinding_butt5", debugNode)->getEntity<Button>();
+    auto& butt6 = *engine.createButton({ posX - 100, posY + 80 }, { buttonWidth, buttonHeight }, "CONEXIONES", "pathfinding_butt6", debugNode)->getEntity<Button>();
 
     // Botón
     if (butt1.state == ButtonState::CLICK) {
@@ -2015,7 +2015,7 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         debug.seeconex = !debug.seeconex;
     }
     //resultado
-    engine.createText({ posX, 480 }, "PATH RESULT", D_RED, "path_result", debugNode);
+    engine.createText({ posX, 580 }, "PATH RESULT", D_RED, "path_result", debugNode);
 
     //Dibujar path
     int posyt = 510;
