@@ -1843,7 +1843,7 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
         drawDebuggerInGameIA(engine, em);
 
     else if (inpi.pathfind)
-        drawTestPathfindinf(engine, em);
+        drawTestPathfinding(engine, em);
 
     else if (inpi.cheats)
         drawCheats(em, engine);
@@ -1863,7 +1863,8 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
 }
 
 // Interfaz para probar el pathfinding
-void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
+void RenderSystem::drawTestPathfinding(GameEngine& engine, EntityManager& em) {
+    // Se obtienen los singletons
     auto& debug = em.getSingleton<Debug_t>();
     auto& navs = em.getSingleton<NavmeshInfo>();
     auto& li = em.getSingleton<LevelInfo>();
@@ -1877,24 +1878,7 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     int buttonHeight = 45;
     int posX = engine.getScreenWidth() - 370;
     int posY = 350;
-
-    // Slider para startnode
-    // float startMinValue = 1.0f;
-    // float startMaxValue = 100.0f;
-    // const char* startNodeText = "Start Node";
-    // posX = 600.0f; // Reseteamos la posición X
-    // posY = 355.0f; // Posición Y para el slider de startnode
-    // int startnodenew = GuiSliderBar(Rectangle(posX, posY, buttonWidth, buttonHeight), startNodeText, NULL, &debug.startnode, startMinValue, startMaxValue);
-    // engine.drawText(std::to_string(static_cast<int>(debug.startnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY), 20, D_BLUE);
-    // startnodenew += 1;
-    // // Slider para goalnode
-    // float goalMinValue = 1.0f;
-    // float goalMaxValue = 100.0f;
-    // const char* goalNodeText = "Goal Node";
-    // int goalnodenew = GuiSliderBar(Rectangle(posX, posY + 40, buttonWidth, buttonHeight), goalNodeText, NULL, &debug.goalnode, goalMinValue, goalMaxValue);
-    // engine.drawText(std::to_string(static_cast<int>(debug.goalnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY + 40), 20, D_BLUE);
-    // goalnodenew += 1;
-
+    //botones
     auto& butt1 = *engine.createButton({ posX - 100, posY + 150 }, { buttonWidth, buttonHeight }, "CALCULATE", "pathfinding_butt1", debugNode)->getEntity<Button>();
     auto& butt2 = *engine.createButton({ posX + 140, posY + 150 }, { buttonWidth, buttonHeight }, "CLEAR", "pathfinding_butt2", debugNode)->getEntity<Button>();
     auto& butt3 = *engine.createButton({ posX + 140, posY }, { buttonWidth, buttonHeight }, "CORNERS", "pathfinding_butt3", debugNode)->getEntity<Button>();
@@ -1902,27 +1886,10 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     auto& butt5 = *engine.createButton({ posX + 140, posY + 80 }, { buttonWidth, buttonHeight }, "MIDPOINTS", "pathfinding_butt5", debugNode)->getEntity<Button>();
     auto& butt6 = *engine.createButton({ posX - 100, posY + 80 }, { buttonWidth, buttonHeight }, "CONEXIONES", "pathfinding_butt6", debugNode)->getEntity<Button>();
 
-    // Botón
+    // evento click en botón CALCULAR
     if (butt1.state == ButtonState::CLICK) {
-        //std::size_t idcenter{};
-                // if(em.getEntityByID(li.playerID)->hasComponent<ColliderComponent>()){
-                //     auto& playerbbox = em.getComponent<ColliderComponent>(*em.getEntityByID(li.playerID)).boundingBox;
-                //     for (auto& navmesh : navs.NavMeshes){
-                //         //auto center = it->centerpoint.second;
-                //         auto& currentbbox = navmesh.box;
-                //         if(currentbbox.intersects(playerbbox)){
-                //             vec3d center = {navmesh.centerpoint.second.x(),navmesh.centerpoint.second.y(),navmesh.centerpoint.second.z()};
-                //             idcenter = navmesh.centerpoint.first;
-                //             break;
-                //             // DrawCube(Vector3{static_cast<float>(center.x()),
-                //             // static_cast<float>(center.y()),
-                //             // static_cast<float>(center.z())},500,500,500,RED);
-                //         }
-                //     }
-                // }
-                //Recorre navs.nodes //    std::set<std::pair<uint16_t, vec3d>> nodes;
-                // recorrelos y devuelve
-                // Función para encontrar el nodo más cercano a una posición dada
+        
+        // Función para encontrar el nodo más cercano a una posición dada
         vec3d posplayer = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
         uint16_t startnode = findNearestNode(em, posplayer, navs.nodes);
         // uint16_t targetnode = findNearestNode(em, vec3d{ -12.33, 40.0, 22.41 }, navs.nodes);
@@ -1932,53 +1899,7 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         graph.createGraph(navs.conexiones, navs.nodes);
         std::vector<vec3d> path = graph.PathFindAStar(debug, startnode, 423);
 
-        // std::size_t lengthpath = path.size();
-        // std::cout << lengthpath;
-        //calcular camnino desde el centro hasta un punto
-
-    //     std::vector<vec3d> nodes;
-    //     nodes.push_back({ -106.9, 4.0, 116.0 });
-    //     nodes.push_back({ -119.0, 4.0, 114.0 });
-    //     nodes.push_back({ -131.0, 4.0, 105.1 });
-    //     nodes.push_back({ -105.0, 4.0, 97.3 });
-    //     nodes.push_back({ -118.0, 4.0, 92.0 });
-    //     nodes.push_back({ -132.0, 4.0, 87.0 });
-    //     nodes.push_back({ -117.0, 4.0, 78.0 });
-    //     nodes.push_back({ -127.4, 4.0, 69.6 });
-    //     //Creamos puntos y conexiones
-    //     std::vector<Conection> conexiones;
-    //     Conection cone12(1, 1, 2);
-    //     conexiones.push_back(cone12);
-    //     Conection cone14(1, 1, 4);
-    //     conexiones.push_back(cone14);
-    //     Conection cone15(1, 1, 5);
-    //     conexiones.push_back(cone15);
-    //     Conection cone25(1, 2, 5);
-    //     conexiones.push_back(cone25);
-    //     Conection cone23(1, 2, 3);
-    //     conexiones.push_back(cone23);
-    //     Conection cone36(1, 3, 6);
-    //     conexiones.push_back(cone36);
-    //     Conection cone45(1, 4, 5);
-    //     conexiones.push_back(cone45);
-    //     Conection cone56(1, 5, 6);
-    //     conexiones.push_back(cone56);
-    //     Conection cone57(1, 5, 7);
-    //     conexiones.push_back(cone57);
-    //     Conection cone58(1, 5, 8);
-    //     conexiones.push_back(cone58);
-    //     Conection cone68(1, 6, 8);
-    //     conexiones.push_back(cone68);
-    //     Conection cone78(1, 7, 8);
-    //     conexiones.push_back(cone78);
-    //     Lammamos a creargrafo
-    //     Creamos el grafo
-    //     Graph graph{};
-    //     graph.createGraph(navs.conexiones, navs.nodes);
-    //     graph.createGraph(conexiones,nodes);
-    //     Calcular pathfinding
-    //     std::cout << static_cast<uint16_t>(debug.startnode) << static_cast<uint16_t>(debug.goalnode) << "\n";
-    //     std::vector<vec3d> path = graph.PathFindAStar(static_cast<uint16_t>(debug.startnode), static_cast<uint16_t>(debug.goalnode));
+        
         if (path.size() == 0) {
             std::cout << "CAGUEEEEEEEE \n";
         }
@@ -1987,16 +1908,9 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
             debug.path.resize(path.size());
             //     //Rellenamos
             std::copy(path.begin(), path.end(), debug.path.begin());
-            //     Mostrar el camino copiado
-                //    std::cout << "Camino en debug.path:" << std::endl;
-            // for (const auto& node : debug.path) {
-            //     std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
-            //     debug.nodes.push_back(node);
-            // }
         }
-        //    debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
-        //    std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
     }
+    //Evento click botones
     if (butt2.state == ButtonState::CLICK) {
         debug.path.clear();
         debug.nodes.clear();
@@ -2033,10 +1947,7 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         engine.drawCube(node, { 2, 2, 2 }, D_GREEN);
     }
 
-    // for (auto& node : navs.nodes) {
-    //     engine.drawCube(node.second, 2, 2, 2, RED);
-    // }
-//Dibujar corners
+    //Dibujar corners y conexiones
     if (debug.seecorners) {
         for (auto& node : navs.corners) {
             engine.drawCube(node, { 2, 2, 2 }, D_RED);
@@ -2067,16 +1978,13 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
                 D_VIOLET);
         }
     }
-
+    // dibujar posición de los nodos
     for (auto& node : debug.nodes) {
         std::string text = std::to_string(node.x()) + " " + std::to_string(node.y()) + " " + std::to_string(node.z());
         int posx = static_cast<int>(engine.getWorldToScreenX(node));
         int posy = static_cast<int>(engine.getWorldToScreenY(node));
         engine.createText({ posx, posy }, text, D_RED, "path_numbers2", debugNode, 15);
     }
-
-    // debugNode->setTranslation({ engine.getScreenWidth() / 2, 0.0f, 0.0f });
-    // engine.drawNode(debugNode);
 }
 
 //Debugger visual in-game
@@ -2084,17 +1992,17 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
 {
     auto& debugsnglt = em.getSingleton<Debug_t>();
 
-    int posX = engine.getScreenWidth() - 330;
+    int posX = engine.getScreenWidth() - 530;
     int posText = static_cast<int>(posX + 10);
 
     auto* debugNode = getNode(engine, "DebugAI2");
-    engine.createRectangle({ posX, 80 }, { 330, 230 }, { 255, 255, 255, 128 }, "debugAI2_rect", debugNode);
+    engine.createRectangle({ posX, 80 }, { 330, 500 }, { 255, 255, 255, 128 }, "debugAI2_rect", debugNode);
     engine.createText({ posText, 90 }, "INFO", D_BLACK, "debugAI2_info", debugNode);
 
     using SYSCMPss = MP::TypeList<AIComponent, ColliderComponent, RenderComponent>;
     using SYSTAGss = MP::TypeList<EnemyTag>;
 
-    // AQUI PONDRIA
+    // Reccorremos las entidades
     em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, ColliderComponent& col, RenderComponent& ren)
     {
         RayCast ray = engine.getMouseRay();
@@ -2107,9 +2015,9 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
         if (isSelectedfordebug && e.getID() == debugsnglt.IA_id_debug) {
             auto& bb = em.getSingleton<BlackBoard_t>();
             engine.drawCubeWires(ren.position, { ren.scale.x(), ren.scale.y(), ren.scale.z() }, D_VIOLET_DARK);
-            engine.createText({ posText, 110 }, "ID:", D_BLACK, "debugAI2_id", debugNode);
-            engine.createText({ posText + 90 ,110 }, std::to_string(e.getID()), D_GRAY, "debugAI2_id2", debugNode);
-            engine.createText({ posText, 130 }, "Node active:", D_BLACK, "debugAI2_node", debugNode);
+            engine.createText({ posText, 120 }, "ID:", D_BLACK, "debugAI2_id", debugNode);
+            engine.createText({ posText + 90 ,120 }, std::to_string(e.getID()), D_GRAY, "debugAI2_id2", debugNode);
+            engine.createText({ posText, 140 }, "Node active:", D_BLACK, "debugAI2_node", debugNode);
             // std::cout << debugsnglt.elapsed << "\n";
              // std::cout << debugsnglt.countdown << "\n";
             if (debugsnglt.elapsed >= debugsnglt.countdown) {
@@ -2121,34 +2029,34 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
             }
             if (!debugsnglt.text)
                 debugsnglt.text = "a";
-            engine.createText({ posText + 130, 130 }, debugsnglt.text, D_GRAY, "debugAI2_text", debugNode);
+            engine.createText({ posText + 180, 140 }, debugsnglt.text, D_GRAY, "debugAI2_text", debugNode);
 
-            engine.createText({ posText, 150 }, "TEID:", D_BLACK, "debugAI2_teid", debugNode);
-            engine.createText({ posText + 90, 150 }, std::to_string(aic.teid), D_GRAY, "debugAI2_teid2", debugNode);
+            engine.createText({ posText, 170 }, "TEID:", D_BLACK, "debugAI2_teid", debugNode);
+            engine.createText({ posText + 90, 170 }, std::to_string(aic.teid), D_GRAY, "debugAI2_teid2", debugNode);
 
-            engine.createText({ posText, 170 }, "TX:", D_BLACK, "debugAI2_tx", debugNode);
-            engine.createText({ posText + 80, 170 }, std::to_string(aic.tx), D_GRAY, "debugAI2_tx2", debugNode);
+            engine.createText({ posText, 200 }, "TX:", D_BLACK, "debugAI2_tx", debugNode);
+            engine.createText({ posText + 80, 200 }, std::to_string(aic.tx), D_GRAY, "debugAI2_tx2", debugNode);
 
-            engine.createText({ posText, 190 }, "TZ:", D_BLACK, "debugAI2_tz", debugNode);
-            engine.createText({ posText + 80, 190 }, std::to_string(aic.tz), D_GRAY, "debugAI2_tz2", debugNode);
+            engine.createText({ posText, 230 }, "TZ:", D_BLACK, "debugAI2_tz", debugNode);
+            engine.createText({ posText + 80, 230 }, std::to_string(aic.tz), D_GRAY, "debugAI2_tz2", debugNode);
 
-            engine.createText({ posText, 210 }, "Culldown:", D_BLACK, "debugAI2_culldown", debugNode);
-            engine.createText({ posText + 90, 210 }, std::to_string(aic.elapsed_shoot), D_GRAY, "debugAI2_culldown2", debugNode);
+            engine.createText({ posText, 260 }, "Culldown:", D_BLACK, "debugAI2_culldown", debugNode);
+            engine.createText({ posText + 140, 260 }, std::to_string(aic.elapsed_shoot), D_GRAY, "debugAI2_culldown2", debugNode);
 
-            engine.createText({ posText, 230 }, "Player Detected?:", D_BLACK, "debugAI2_playerdetected", debugNode);
-            engine.createText({ posText + 180, 230 }, (aic.playerdetected == 0) ? "No" : "Sí", D_GRAY, "debugAI2_playerdetected2", debugNode);
+            engine.createText({ posText, 290 }, "Player Detected?:", D_BLACK, "debugAI2_playerdetected", debugNode);
+            engine.createText({ posText + 240, 290 }, (aic.playerdetected == 0) ? "No" : "Sí", D_GRAY, "debugAI2_playerdetected2", debugNode);
 
-            engine.createText({ posText, 250 }, "Player hunted?:", D_BLACK, "debugAI2_playerhunted", debugNode);
-            engine.createText({ posText + 180, 250 }, (bb.playerhunted == 0) ? "No" : "Sí", D_GRAY, "debugAI2_playerhunted2", debugNode);
+            engine.createText({ posText, 320 }, "Player hunted?:", D_BLACK, "debugAI2_playerhunted", debugNode);
+            engine.createText({ posText + 240, 320 }, (bb.playerhunted == 0) ? "No" : "Sí", D_GRAY, "debugAI2_playerhunted2", debugNode);
 
-            engine.createText({ posText, 270 }, "Subditos alive:", D_BLACK, "debugAI2_subditos", debugNode);
-            engine.createText({ posText + 180, 270 }, std::to_string(bb.subditosData.size()), D_GRAY, "debugAI2_subditos2", debugNode);
+            engine.createText({ posText, 360 }, "Subditos alive:", D_BLACK, "debugAI2_subditos", debugNode);
+            engine.createText({ posText + 240, 360 }, std::to_string(bb.subditosData.size()), D_GRAY, "debugAI2_subditos2", debugNode);
 
-            engine.createText({ posText, 290 }, "Subditos id alive:", D_BLACK, "debugAI2_subditosid", debugNode);
-            engine.createText({ posText + 180, 290 }, std::to_string(bb.idsubditos.size()), D_GRAY, "debugAI2_subditosid2", debugNode);
+            engine.createText({ posText, 390 }, "Subditos id alive:", D_BLACK, "debugAI2_subditosid", debugNode);
+            engine.createText({ posText + 240, 390 }, std::to_string(bb.idsubditos.size()), D_GRAY, "debugAI2_subditosid2", debugNode);
 
-            engine.createText({ posText, 310 }, "Alert state:", D_BLACK, "debugAI2_alertstate", debugNode);
-            engine.createText({ posText + 180, 310 }, (aic.alert_state == 0) ? "No" : "Sí", D_GRAY, "debugAI2_alertstate2", debugNode);
+            engine.createText({ posText, 420 }, "Alert state:", D_BLACK, "debugAI2_alertstate", debugNode);
+            engine.createText({ posText + 220, 420 }, (aic.alert_state == 0) ? "No" : "Sí", D_GRAY, "debugAI2_alertstate2", debugNode);
 
             //raycast
             if (bb.launched) {
@@ -2195,10 +2103,11 @@ double RenderSystem::SelectValue(GameEngine& engine, double value, int posx, int
     auto& sliderInfo = *slider->getEntity<Slider>();
 
     floatValue = sliderInfo.valor * 100.f;
-    engine.createText({ posx + width + 80, posy + 5 }, std::to_string(floatValue).c_str(), D_BLUE, (std::string(name) + "_text").c_str(), parent);    // seteamos el nuevo valor
+    engine.createText({ posx + width + 100, posy + 5 }, std::to_string(floatValue).c_str(), D_BLUE, (std::string(name) + "_text").c_str(), parent);    // seteamos el nuevo valor
     return static_cast<double>(floatValue);
 }
 
+//Función para buscar nodo más cercano al player
 uint16_t RenderSystem::findNearestNode(EntityManager& em, const vec3d& position, const std::map<uint16_t, vec3d>& nodes) {
     uint16_t nearestNodeId = 0; // Suponemos que el primer nodo es el más cercano inicialmente
     double minDistance = std::numeric_limits<double>::max(); // Inicializamos la distancia mínima con un valor muy grande
@@ -2222,7 +2131,7 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
     int windowRectX = 0;
     int windowRectY = 100;
 
-    int windowRectWidth = 390;
+    int windowRectWidth = 610;
     int windowRectHeight = 550;
 
     auto* debugAI = getNode(engine, "DebugAI1");
@@ -2255,21 +2164,31 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
             if (isSelected) {
                 // ID DE LA ENTIDAD SELECCIONADA
                 engine.createText({ 15, 170 }, "EID:", D_BLACK, "text_eid", debugAI);
-                engine.createText({ 55, 170 }, std::to_string(debugsglt.IA_id).c_str(), D_GRAY, "text_eid_value", debugAI);
+                engine.createText({ 75, 170 }, std::to_string(debugsglt.IA_id).c_str(), D_GRAY, "text_eid_value", debugAI);
                 //Detect Radius
-                aic.detect_radius = SelectValue(engine, aic.detect_radius, 45.0, 200.0, 120.0, 30.0, "detect_radius", debugAI);
+                engine.createText({ 15, 200 }, "Detect Radius:", D_BLACK, "detect radius", debugAI);
+                aic.detect_radius = SelectValue(engine, aic.detect_radius, 260.0, 200.0, 120.0, 30.0, "detect_radius", debugAI);
                 // Attack Radius
-                aic.attack_radius = SelectValue(engine, aic.attack_radius, 45.0, 240.0, 120.0, 30.0, "attack_radius", debugAI);
+                engine.createText({ 15, 240 }, "Attack Radius:", D_BLACK, "attack radius", debugAI);
+                aic.attack_radius = SelectValue(engine, aic.attack_radius, 260.0, 240.0, 120.0, 30.0, "attack_radius", debugAI);
                 // Arrival Radius
-                aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 45.0, 280.0, 120.0, 30.0, "arriv_rad", debugAI);
+                engine.createText({ 15, 280 }, "Arrival Radius:", D_BLACK, "arrival radius", debugAI);
+                aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 260.0, 280.0, 120.0, 30.0, "arriv_rad", debugAI);
                 // Max Speed
-                phy.max_speed = SelectValue(engine, phy.max_speed, 45.0, 320.0, 120.0, 30.0, "max_speed", debugAI);
+                engine.createText({ 15, 320 }, "Max speed:", D_BLACK, "max speed", debugAI);
+                phy.max_speed = SelectValue(engine, phy.max_speed, 260.0, 320.0, 120.0, 30.0, "max_speed", debugAI);
                 //COuntdown Perception
-                aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 45.0, 360.0, 120.0, 30.0, "countdown_perception", debugAI);
+                engine.createText({ 15, 360 }, "Perception:", D_BLACK, "perception", debugAI);
+                aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 260.0, 360.0, 120.0, 30.0, "countdown_perception", debugAI);
                 //Countdown Shoot
-                aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 45.0, 400.0, 120.0, 30.0, "countdown_shoot", debugAI);
+                engine.createText({ 15, 400 }, "Countdown attack:", D_BLACK, "countdown attack", debugAI);
+                aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 290.0, 400.0, 120.0, 30.0, "countdown_shoot", debugAI);
                 //Countdown stop
-                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 45.0, 440.0, 120.0, 30.0, "countdown_stop", debugAI);
+                engine.createText({ 15, 440 }, "Countdown Stop:", D_BLACK, "countdown stop", debugAI);
+                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 290.0, 440.0, 120.0, 30.0, "countdown_stop", debugAI);
+                
+                engine.createText({ 15, 440 }, "Countdown Stop:", D_BLACK, "countdown stop", debugAI);
+                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 290.0, 440.0, 120.0, 30.0, "countdown_stop", debugAI);
             }
         }
     });
@@ -2294,14 +2213,6 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
             }
 
             if (aic.playerdetected && aic.show_icon) {
-                // vec2d point1 = { barX, barY - 120.0f };
-                // vec2d point2 = { barX - 30.0f, barY - 50.0f };
-                // vec2d point3 = { barX + 30.0f, barY - 50.0f };
-                // //dibujar icono alerta
-                // // Dibuja el triángulo
-                // engine.drawTriangle(point1, point2, point3, D_BLACK);
-                // // Dibuja el signo de exclamación dentro del triángulo
-                // engine.drawText("!", static_cast<int>(barX - 2), static_cast<int>(barY - 100), 50, YELLOW);
                 auto* icon = engine.createNode(getNode(engine, "detectionIcon"), getNode(engine, "Copy"));
                 int offSetX = static_cast<int>(22.5f * wRate);
                 int offSetY = static_cast<int>(202.5f * hRate);
@@ -2319,9 +2230,6 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
 
             //vec2d center = { barX, barY - 120.0f };
             if (aic.alert_state) {
-                // if(e.getID() == 148){
-                //     std::cout << aic.endangle << "\n";
-                // }
                 //Se escuahn pasos
                 if (aic.listen_steps) {
                     aic.endangle -= aic.increase_angle;

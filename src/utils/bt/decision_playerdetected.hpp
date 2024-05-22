@@ -2,7 +2,7 @@
 #include "node.hpp"
 #include <utils/vec3D.hpp>
 
-
+//Comprobar si has detectado al player
 struct BTDecisionPlayerDetected : BTNode_t {
     // Constantes para ángulos de visión
     const double verticalFOV = 60.0; // Ángulo vertical de visión en grados
@@ -166,7 +166,7 @@ struct BTDecisionPlayerDetected : BTNode_t {
                 for (Entity& ent : ectx.em.getEntities()) {
                     // Comprobamos entidades Pared y que tengan colisión component
                     if (ent.hasComponent<ColliderComponent>()) {
-                        if (ent.hasTag<WallTag>() || ent.hasTag<LavaTag>() || ent.hasTag<GroundTag>()) {
+                        if (ent.hasTag<WallTag>() || ent.hasTag<LavaTag>()) {
                             auto& col = ectx.em.getComponent<ColliderComponent>(ent);
                             if (col.bbox.intersectsRay(ray.origin, ray.direction, intersection_wall)) {
                                 //col.boundingBox.intersectsRay(ray.origin, ray.direction,intersection_wall);

@@ -2,7 +2,7 @@
 #include "node.hpp"
 #include <utils/types.hpp>
 
-
+//Atacar al player
 struct BTActionShoot : BTNode_t {
     using type_value = AIComponent::TypeShoot;
     BTActionShoot(type_value t, vec3d p) : shoot{ t }, pos{ p } {}
@@ -28,13 +28,7 @@ struct BTActionShoot : BTNode_t {
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         auto& att = ectx.em.getComponent<AttackerComponent>(ectx.ent);
         ectx.ai->bh = "shooting";
-        // if (ectx.ai->elapsed_shoot >= ectx.ai->countdown_shoot) {
-            // if(ectx.ai->ghost){
-            //     //rend a no visibles
-            //      auto& rend1 = ectx.em.getComponent<RenderComponent>(ectx.ent);
-            //      rend1.visible = false;
-            // }
-            // ectx.ai->elapsed_shoot = 0;
+
         if (ectx.ai->ready_attack) {
             ectx.ai->ready_attack = false;
             switch (shoot)
@@ -80,13 +74,6 @@ struct BTActionShoot : BTNode_t {
                             }
                         }
                     }
-
-                    //pursue en un futuro, arreglar que sea mas preciso
-                    // else{
-                    //     Steer_t steering = STBH::Pursue(plphy,ectx.phy,0.5);
-                    //     att.vel = vec3d{ steering.v_x/2.0,att.vel.y() + 0.5, steering.v_z/2.0};
-                    //     //att.vel = vec3d(std::sin(steering.orientation), 0.0, std::cos(steering.orientation));
-                    // }
                 }
                 else
                     att.attack(AttackType::RangedEnemy);
@@ -133,14 +120,8 @@ struct BTActionShoot : BTNode_t {
                 break;
             }
         }
-        // }
-        // Si no puedo atacar por culldown pero sigo en radio de ataque
-        // if(ectx.ai->on_attack_radius){
-        //     ectx.ai->on_attack_radius = false;
+
         return BTNodeStatus_t::success;
-        // }else{
-        //     return BTNodeStatus_t::fail;
-        // }
 
 
     }

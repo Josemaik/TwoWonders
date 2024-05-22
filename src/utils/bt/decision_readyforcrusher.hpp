@@ -2,7 +2,7 @@
 #include "node.hpp"
 #include <utils/vec3D.hpp>
 
-
+//Comprobar si la apisonadora ataca
 struct BTDecisionReadyforCrusherAttk : BTNode_t {
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         ectx.ai->bh = "crusher attack?";
@@ -18,10 +18,7 @@ struct BTDecisionReadyforCrusherAttk : BTNode_t {
                 return BTNodeStatus_t::success;
             }
         }
-        // if (ectx.ai->elapsed_shoot >= ectx.ai->countdown_shoot) {
 
-        // }
-        // ectx.ai->plusDeltatime(ectx.deltaTime, ectx.ai->elapsed_shoot);
         return BTNodeStatus_t::fail;
     }
 };

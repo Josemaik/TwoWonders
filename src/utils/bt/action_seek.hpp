@@ -30,17 +30,14 @@ struct BTAction_Seek : BTNode_t {
         Steer_t steering = STBH::Seek(ectx.phy, { ectx.ai->tx,0.0,ectx.ai->tz });
         // steering.v_x = steering.v_x * 0.7;
         // steering.v_z = steering.v_z * 0.7;
+        
         //Calcule Flocking
         //Comprobamos si tiene target en un radio cercano
         double suma_cm_x{};
         double suma_cm_z{};
         double numenemigos_cm{};
         vec3d cm{};
-        //int num_forces_aplicated{0};
-        //bool force_aplicated{false};
-        // int num_stopped{0};
-        // double min_distance{100.0};
-        // Steer_t steering_closest{};
+
         auto& bb = ectx.em.getSingleton<BlackBoard_t>();
         //Check closest  targets
         for (auto& pt : bb.potencial_targets) {
@@ -91,7 +88,8 @@ struct BTAction_Seek : BTNode_t {
             steering.v_x += std::clamp(dirToCenterOfMass.x() * centerOfMassWeight, -ectx.phy.max_speed, ectx.phy.max_speed);
             steering.v_z += std::clamp(dirToCenterOfMass.z() * centerOfMassWeight, -ectx.phy.max_speed, ectx.phy.max_speed);
         }
-
+        
+        //Esquivar obstáculos
         using noCMP = MP::TypeList<PhysicsComponent, ColliderComponent>;
         using obstacleTag = MP::TypeList<ObstacleTag>;
 
@@ -129,9 +127,7 @@ struct BTAction_Seek : BTNode_t {
                     //maxevade = 0.5;
                 }
                 vec3d avoidanceForce = perpendicular * maxseparate;
-                // Steer_t steeringEvade = STBH::Evade(ectx.phy,*ptrphy,maxevade);
-                // steering.v_x += steeringEvade.v_x;
-                // steering.v_z += steeringEvade.v_z;
+                
                 steering.v_x += steering.v_x * 0.5;
                 steering.v_z += steering.v_z * 0.5;
                 steering.v_x += avoidanceForce.x();

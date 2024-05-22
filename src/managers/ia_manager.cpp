@@ -3,7 +3,7 @@
 
 void Ia_man::createEnemy(EntityManager& em, jsonType json)
 {
-    // Extraemos los datos del json
+    // Extraemos los datos del .kaiwa
     vec3d position = { json["position"][0].GetDouble(), json["position"][1].GetDouble(), json["position"][2].GetDouble() };
     vec3d rotationVec{ json["rotVector"][1].GetDouble(), json["rotVector"][2].GetDouble(), json["rotVector"][0].GetDouble() };
     double orientation{ json["rotation"].GetDouble() };
@@ -25,12 +25,8 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
                        vec3d{json["path"][1][0].GetDouble(), json["path"][1][1].GetDouble(), json["path"][1][2].GetDouble()},
                        vec3d{json["path"][2][0].GetDouble(), json["path"][2][1].GetDouble(), json["path"][2][2].GetDouble()},
                        vec3d{json["path"][3][0].GetDouble(), json["path"][3][1].GetDouble(), json["path"][3][2].GetDouble()} };
-    // int i = 0;
-    // for (const auto& point : json["path"]) {
-    //     path[i] = vec3d{ point[0], point[1], point[2] };
-    //     i++;
-    // }
-    //check if ai have to follow or no patrol
+
+    //Comprobamos si la IA patrulla o no
     bool followpatrol{ true };
     vec3d firstpathpos = { json["path"][0][0].GetDouble(), json["path"][0][1].GetDouble(), json["path"][0][2].GetDouble() };
     if (firstpathpos.x() == position.x() && firstpathpos.z() == position.z()) {
@@ -56,13 +52,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     em.addComponent<TypeComponent>(e, TypeComponent{ .type = element });
     em.addComponent<SoundComponent>(e);
 
-    // if (json.HasMember("orientation"))
-    // {
-    //     double orientation = json["orientation"].GetDouble();
-    //     wp.orientation = orientation;
-    // }
-
-    // Creamos el arbol de comportamiento
+    // Creamos el arbol de comportamiento para cada tipo de IA
     vec_t.push_back(std::make_unique<BehaviourTree_t>());
     auto& tree = *vec_t.back();
 
@@ -247,7 +237,7 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     auto& li = em.getSingleton<LevelInfo>();
     if (li.mapID == 0)
         em.addTag<NoDamageTag>(e);
-
+    //Si estamos en la fase 2 del boss final especificar countdowns
     auto& bb = em.getSingleton<BlackBoard_t>();
     if (bb.boss_fase == 2) {
         ai.couldown_spawning = 0.35;
@@ -257,11 +247,13 @@ void Ia_man::createEnemy(EntityManager& em, jsonType json)
     }
 }
 
+//Borrar vector de bt
 void Ia_man::resetVec()
 {
     vec_t.clear();
 }
 
+//Crear fase 2 del boss final
 void Ia_man::createBossFinalFase2(EntityManager& em, const mapType& map) {
     const rapidjson::Value& underworld = map["underworld"];
     const rapidjson::Value& bossfase2 = underworld["bossfinalfase2"];

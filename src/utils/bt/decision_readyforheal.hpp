@@ -2,7 +2,7 @@
 #include "node.hpp"
 #include <utils/types.hpp>
 
-
+//Comprobar si estas preparado para curarte
 struct BTDecisionReadyforHeal : BTNode_t {
 
     BTDecisionReadyforHeal() {}
@@ -38,8 +38,6 @@ struct BTDecisionReadyforHeal : BTNode_t {
             }
         }
         return BTNodeStatus_t::fail;
-        // recorrer unorderd map del bb , comprobar si tienen < de 3 vidas y si lo cumple, comprobar si esta en radio de cura. El primero que lo cumpla
-        // sale del bucle
-        // tx y tz la posicion de ese slime
+
     }
 };

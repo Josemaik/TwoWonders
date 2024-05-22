@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <utils/sb/steeringbehaviour.hpp>
 
+//Patruyar NPCs
 struct BTAction_PatrolNPC : BTNode_t {
     template <size_t N>
     bool calculateSteering(EntityContext_t& ectx, typename Path_t<N>::iterator& pathIt, Path_t<N>& path) noexcept {

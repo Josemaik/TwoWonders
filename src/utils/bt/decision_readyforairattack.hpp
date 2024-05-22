@@ -2,7 +2,7 @@
 #include "node.hpp"
 #include <utils/vec3D.hpp>
 
-
+//Comprobar si estas preparado para hacer un ataque aéreo
 struct BTDecisionReadyforAirAttack : BTNode_t {
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         ectx.ai->bh = "air attack?";

@@ -794,6 +794,7 @@ void MapManager::generateNavmeshes(EntityManager& em, uint8_t map)
 
     auto& navs = em.getSingleton<NavmeshInfo>();
     mapType navmeshkaiwa{};
+    //Comprobamos mapa
     if (map == 2) {
         navmeshkaiwa = loadMap("assets/Niveles/Lvl_2/Lvl_2-navmeshes.kaiwa");
     }
@@ -853,18 +854,13 @@ void MapManager::generateNavmeshes(EntityManager& em, uint8_t map)
         //Rampa?
         bool hasramp{ false };
 
-        // const valueType& xd = navmesh["ramp"];
-        // if(xd==NULL){
-        //     hasramp = true;
-        // }        
-        // if(map == 2){
+        //comprobar si tiene rampa
         const rapidjson::Value::ConstMemberIterator& xd = navmesh.FindMember("ramp");
         if (xd != navmesh.MemberEnd()) {
             if (xd->value.GetBool())
                 hasramp = true;
         }
-        // }
-        // bool hasramp = navmesh["ramp"].GetBool();
+
 
         //Creamos NavMesh BBox
         double scalex{}, scalez{};
@@ -891,9 +887,7 @@ void MapManager::generateNavmeshes(EntityManager& em, uint8_t map)
             navs.num_nodes++;
         }
         navs.NavMeshes.push_back(nav);
-        // Conection c6{1, }; auxconex.push_back(c6);
-        // Conection c7{1, }; auxconex.push_back(c7);
-        // Conection c8{1, }; auxconex.push_back(c8);
+
         //Creamos conexiones de el navmesh
         if (nav.ramp == false) {
             for (auto it = nav.nodes.begin(); it != std::prev(nav.nodes.end()); ++it) {
@@ -912,90 +906,6 @@ void MapManager::generateNavmeshes(EntityManager& em, uint8_t map)
             }
         }
     }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////7
-    // Guardamos info 
-    // std::vector<Conection> auxconex;
-    // auxconex.push_back(Conection{ 1,27,7 });
-    // auxconex.push_back(Conection{ 1,7,26 });
-    // auxconex.push_back(Conection{ 1,26,45 });
-    // auxconex.push_back(Conection{ 1,45,50 });
-    // auxconex.push_back(Conection{ 1,10,26 });
-    // auxconex.push_back(Conection{ 1,0,26 });
-    // auxconex.push_back(Conection{ 1,44,0 });
-    // auxconex.push_back(Conection{ 1,54,50 });
-    // auxconex.push_back(Conection{ 1,59,54 });
-    // auxconex.push_back(Conection{ 1,98,59 });
-    // auxconex.push_back(Conection{ 1,116,98 });
-    // auxconex.push_back(Conection{ 1,124,116 });
-    // auxconex.push_back(Conection{ 1,123,124 });
-    // auxconex.push_back(Conection{ 1,134,123 });
-    // auxconex.push_back(Conection{ 1,242,134 });
-    // auxconex.push_back(Conection{ 1,468,473 });
-    // auxconex.push_back(Conection{ 1,583,572 });
-    // auxconex.push_back(Conection{ 1,473,583 });
-    // auxconex.push_back(Conection{ 1,637,816 });
-    // auxconex.push_back(Conection{ 1,637,639 });
-    // auxconex.push_back(Conection{ 1,639,643 });
-    // auxconex.push_back(Conection{ 1,643,837 });
-    // auxconex.push_back(Conection{ 1,837,846 });
-    // auxconex.push_back(Conection{ 1,639,620 });
-    // auxconex.push_back(Conection{ 1,620,639 });
-    // auxconex.push_back(Conection{ 1,846,895 });
-    // auxconex.push_back(Conection{ 1,816,827 });
-    // auxconex.push_back(Conection{ 1,822,827 });
-    // auxconex.push_back(Conection{ 1,288,297 });
-    // auxconex.push_back(Conection{ 1,297,320 });
-    // auxconex.push_back(Conection{ 1,320,333 });
-
-    // for (auto& c : auxconex) {
-    //     navs.conexiones.push_back(c);
-    //     //debug
-    //     auto pair = std::make_pair(getNodeVec3d(c.fromNode, navs.nodes), getNodeVec3d(c.toNode, navs.nodes));
-    //     navs.conexpos.insert(pair);
-    //     //nodes
-    //     for (auto& [n, vec] : navs.nodes) {
-    //         // if(n == 583){
-    //         //     vec = vec3d{vec.x(),vec.y(),vec.z()+10.0};
-    //         // }
-    //         if (n == c.toNode) {
-    //             navs.selectednodes.insert(std::make_pair(n, vec));
-    //         }
-    //         if (n == c.fromNode) {
-    //             navs.selectednodes.insert(std::make_pair(n, vec));
-    //         }
-    //     }
-    // }
-
-    // auto& li = em.getSingleton<LevelInfo>();
-    // li.level_graph.createGraph(navs.conexiones, navs.selectednodes);
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7
-    // Crear conexiones de navmesh con otros con los que colisiona
-    // for (auto it = navs.NavMeshes.begin(); it != navs.NavMeshes.end(); ++it) {
-    //     for (auto nextnavmesh = std::next(it); nextnavmesh != navs.NavMeshes.end(); ++nextnavmesh) {
-    //         if(!it->ramp && !nextnavmesh->ramp){
-    //             auto& currentbbox = it->box;
-    //             auto& nextbbox = nextnavmesh->box;
-
-    //             // Conexiones con navmeshes colisionables
-    //             if (currentbbox.intersects(nextbbox)) {
-    //                 // Obtenemos el centro (primer nodo) del primer navmesh
-    //                 const auto& currentNode = it->nodes.begin();
-
-    //                 // Obtenemos el centro (primer nodo) del segundo navmesh
-    //                 const auto& nextNode = nextnavmesh->nodes.begin();
-
-    //                 // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
-    //                 if (navs.insert_ids(currentNode->first, nextNode->first)) {
-    //                     Conection c{ 1, currentNode->first, nextNode->first };
-    //                     navs.conexiones.push_back(c);
-    //                     // debug
-    //                     auto pair = std::make_pair(currentNode->second, nextNode->second);
-    //                     navs.conexpos.insert(pair);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
 
     //Crear conexiones de navmesh con otros con los que colisiona
     for (auto it = navs.NavMeshes.begin(); it != navs.NavMeshes.end(); ++it) {
@@ -1026,9 +936,6 @@ void MapManager::generateNavmeshes(EntityManager& em, uint8_t map)
                                 && nextNode != nextnavmesh->nodes.begin()) continue;
 
                             // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
-                            //(navs.checkcousinsnodes())
-                            //navs.insert_ids(currentNode->first, nextNode->first
-                            //navs.checkcousins(nextNode->second.x(),nextNode->second.z(),it->nodes)
                             if (navs.insert_ids(currentNode->first, nextNode->first)) {
                                 Conection c{ 1, currentcenter.first, nextNode->first };
                                 navs.conexiones.push_back(c);
@@ -1042,7 +949,7 @@ void MapManager::generateNavmeshes(EntityManager& em, uint8_t map)
             }
         }
     }
-    //Conexiones a mano de las rampas del nivel 2
+    //Conexiones a mano de las rampas 
     //rampa muñeco izquierda
     std::vector<Conection> auxconex;
     if (map == 2) {
@@ -1101,51 +1008,25 @@ void MapManager::generateNavmeshes(EntityManager& em, uint8_t map)
         auxconex.push_back(Conection{ 1,448,419 });
         auxconex.push_back(Conection{ 1,419,421 });
     }
-
+    // guardar conexiones
     if (auxconex.size() != 0) {
         for (auto& c : auxconex) {
             navs.conexiones.push_back(c);
             //debug
             auto pair = std::make_pair(getNodeVec3d(c.fromNode, navs.nodes), getNodeVec3d(c.toNode, navs.nodes));
             navs.conexpos.insert(pair);
-            //nodes
-            // for (auto& [n, vec] : navs.nodes) {
-            //     // if(n == 583){
-            //     vec = vec3d{ vec.x(),vec.y(),vec.z() + 10.0 };
-            //     // }
-            //     if (n == c.toNode) {
-            //         navs.selectednodes.insert(std::make_pair(n, vec));
-            //     }
-            //     if (n == c.fromNode) {
-            //         navs.selectednodes.insert(std::make_pair(n, vec));
-            //     }
+            // //nodes
+            // if (n == c.toNode) {
+            //     navs.selectednodes.insert(std::make_pair(n, vec));
+            // }
+            // if (n == c.fromNode) {
+            //     navs.selectednodes.insert(std::make_pair(n, vec));
             // }
         }
     }
-    //Crear conexiones entre los centros
-    // Crear conexiones entre los centros
-    // for (auto it = navs.centers.begin(); it != navs.centers.end(); ++it) {
-    //     auto currentCenter = it->first;
-    //     auto currentcenterpos = it->second;
-    //     // Recorrer todos los centros nuevamente para encontrar conexiones
-    //     for (auto nextCenter = std::next(it); nextCenter != navs.centers.end(); ++nextCenter) {
-    //         double distance = currentcenterpos.distance(nextCenter->second);
-
-    //         // Establecer la distancia máxima para crear una conexión (ajusta el valor según sea necesario)
-    //         double maxDistance = 60.0; // Por ejemplo, 10 unidades
-
-    //         // Si la distancia entre los centros es menor o igual a la distancia máxima, crear una conexión
-    //         if (distance <= maxDistance) {
-    //             // Crea la conexión si no existe ya
-    //             // if (navs.insert_ids(currentCenter, nextCenter->first)) {
-    //                 Conection c{ 1, currentCenter, nextCenter->first };
-    //                 navs.conexiones.push_back(c);
-    //                 auto pair = std::make_pair(currentcenterpos, nextCenter->second);
-    //                 navs.conexpos.insert(pair);
-    //             // }
-    //        }
-    //     }
-    // }
+    //crear grafo
+    auto& li = em.getSingleton<LevelInfo>();
+    li.level_graph.createGraph(navs.conexiones, navs.selectednodes);
 }
 
 vec3d MapManager::rotateY(const vec3d& v, double angle) {

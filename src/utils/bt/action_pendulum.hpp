@@ -2,6 +2,7 @@
 #include "node.hpp"
 #include <utils/sb/steeringbehaviour.hpp>
 
+//Movimiento de péndulo
 struct BTAction_Pendulum : BTNode_t {
 
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
