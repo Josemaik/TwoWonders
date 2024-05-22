@@ -2203,14 +2203,6 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
             }
 
             if (aic.playerdetected && aic.show_icon) {
-                // vec2d point1 = { barX, barY - 120.0f };
-                // vec2d point2 = { barX - 30.0f, barY - 50.0f };
-                // vec2d point3 = { barX + 30.0f, barY - 50.0f };
-                // //dibujar icono alerta
-                // // Dibuja el triángulo
-                // engine.drawTriangle(point1, point2, point3, D_BLACK);
-                // // Dibuja el signo de exclamación dentro del triángulo
-                // engine.drawText("!", static_cast<int>(barX - 2), static_cast<int>(barY - 100), 50, YELLOW);
                 auto* icon = engine.createNode(getNode(engine, "detectionIcon"), getNode(engine, "Copy"));
                 int offSetX = static_cast<int>(22.5f * wRate);
                 int offSetY = static_cast<int>(202.5f * hRate);
@@ -2228,9 +2220,6 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
 
             //vec2d center = { barX, barY - 120.0f };
             if (aic.alert_state) {
-                // if(e.getID() == 148){
-                //     std::cout << aic.endangle << "\n";
-                // }
                 //Se escuahn pasos
                 if (aic.listen_steps) {
                     aic.endangle -= aic.increase_angle;

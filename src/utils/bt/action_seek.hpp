@@ -13,7 +13,6 @@ static double radius_centro_masas{ 30.0 };
 // Peso para la influencia de la dirección hacia el centro de masas
 static double centerOfMassWeight{ 0.05 };
 
-//Seguir al player
 struct BTAction_Seek : BTNode_t {
     // BTActionPatrol() = default;
 
@@ -26,10 +25,12 @@ struct BTAction_Seek : BTNode_t {
         ectx.ai->bh = "seeking";
         ectx.ai->seeking = true;
         ectx.ai->ispushed = false;
-       
+        // ectx.ai->ia_front_of_you = false;
         //Seek
         Steer_t steering = STBH::Seek(ectx.phy, { ectx.ai->tx,0.0,ectx.ai->tz });
-     
+        // steering.v_x = steering.v_x * 0.7;
+        // steering.v_z = steering.v_z * 0.7;
+        
         //Calcule Flocking
         //Comprobamos si tiene target en un radio cercano
         double suma_cm_x{};
@@ -87,11 +88,11 @@ struct BTAction_Seek : BTNode_t {
             steering.v_x += std::clamp(dirToCenterOfMass.x() * centerOfMassWeight, -ectx.phy.max_speed, ectx.phy.max_speed);
             steering.v_z += std::clamp(dirToCenterOfMass.z() * centerOfMassWeight, -ectx.phy.max_speed, ectx.phy.max_speed);
         }
-
+        
+        //Esquivar obstáculos
         using noCMP = MP::TypeList<PhysicsComponent, ColliderComponent>;
         using obstacleTag = MP::TypeList<ObstacleTag>;
 
-        //Esquivar obstáculos
         auto& pos = ectx.phy.position;
         double mindistance{ 100.0 };
         PhysicsComponent* ptrphy{};
@@ -126,7 +127,9 @@ struct BTAction_Seek : BTNode_t {
                     //maxevade = 0.5;
                 }
                 vec3d avoidanceForce = perpendicular * maxseparate;
-
+                // Steer_t steeringEvade = STBH::Evade(ectx.phy,*ptrphy,maxevade);
+                // steering.v_x += steeringEvade.v_x;
+                // steering.v_z += steeringEvade.v_z;
                 steering.v_x += steering.v_x * 0.5;
                 steering.v_z += steering.v_z * 0.5;
                 steering.v_x += avoidanceForce.x();
