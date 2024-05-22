@@ -735,6 +735,7 @@ ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Enemigos/Arany
     void SoundSystem::sonido_pasos_volcan() {
         ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_volcan", &eventDescription_pasos));
         ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_pasos, &eventInstance_SFX_pasos));
+        ERRCHECK(FMOD_Studio_EventInstance_SetParameterByName(eventInstance_SFX_pasos, "Speed", 5.1f, true));
     }
     void SoundSystem::sonido_pasos_nieve() {
         ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Pasos/Pasos_monte", &eventDescription_pasos));
