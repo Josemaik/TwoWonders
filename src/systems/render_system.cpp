@@ -1992,17 +1992,17 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
 {
     auto& debugsnglt = em.getSingleton<Debug_t>();
 
-    int posX = engine.getScreenWidth() - 330;
+    int posX = engine.getScreenWidth() - 530;
     int posText = static_cast<int>(posX + 10);
 
     auto* debugNode = getNode(engine, "DebugAI2");
-    engine.createRectangle({ posX, 80 }, { 330, 230 }, { 255, 255, 255, 128 }, "debugAI2_rect", debugNode);
+    engine.createRectangle({ posX, 80 }, { 330, 500 }, { 255, 255, 255, 128 }, "debugAI2_rect", debugNode);
     engine.createText({ posText, 90 }, "INFO", D_BLACK, "debugAI2_info", debugNode);
 
     using SYSCMPss = MP::TypeList<AIComponent, ColliderComponent, RenderComponent>;
     using SYSTAGss = MP::TypeList<EnemyTag>;
 
-    // AQUI PONDRIA
+    // Reccorremos las entidades
     em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, ColliderComponent& col, RenderComponent& ren)
     {
         RayCast ray = engine.getMouseRay();
@@ -2015,9 +2015,9 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
         if (isSelectedfordebug && e.getID() == debugsnglt.IA_id_debug) {
             auto& bb = em.getSingleton<BlackBoard_t>();
             engine.drawCubeWires(ren.position, { ren.scale.x(), ren.scale.y(), ren.scale.z() }, D_VIOLET_DARK);
-            engine.createText({ posText, 110 }, "ID:", D_BLACK, "debugAI2_id", debugNode);
-            engine.createText({ posText + 90 ,110 }, std::to_string(e.getID()), D_GRAY, "debugAI2_id2", debugNode);
-            engine.createText({ posText, 130 }, "Node active:", D_BLACK, "debugAI2_node", debugNode);
+            engine.createText({ posText, 120 }, "ID:", D_BLACK, "debugAI2_id", debugNode);
+            engine.createText({ posText + 90 ,120 }, std::to_string(e.getID()), D_GRAY, "debugAI2_id2", debugNode);
+            engine.createText({ posText, 140 }, "Node active:", D_BLACK, "debugAI2_node", debugNode);
             // std::cout << debugsnglt.elapsed << "\n";
              // std::cout << debugsnglt.countdown << "\n";
             if (debugsnglt.elapsed >= debugsnglt.countdown) {
@@ -2029,34 +2029,34 @@ void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
             }
             if (!debugsnglt.text)
                 debugsnglt.text = "a";
-            engine.createText({ posText + 130, 130 }, debugsnglt.text, D_GRAY, "debugAI2_text", debugNode);
+            engine.createText({ posText + 180, 140 }, debugsnglt.text, D_GRAY, "debugAI2_text", debugNode);
 
-            engine.createText({ posText, 150 }, "TEID:", D_BLACK, "debugAI2_teid", debugNode);
-            engine.createText({ posText + 90, 150 }, std::to_string(aic.teid), D_GRAY, "debugAI2_teid2", debugNode);
+            engine.createText({ posText, 170 }, "TEID:", D_BLACK, "debugAI2_teid", debugNode);
+            engine.createText({ posText + 90, 170 }, std::to_string(aic.teid), D_GRAY, "debugAI2_teid2", debugNode);
 
-            engine.createText({ posText, 170 }, "TX:", D_BLACK, "debugAI2_tx", debugNode);
-            engine.createText({ posText + 80, 170 }, std::to_string(aic.tx), D_GRAY, "debugAI2_tx2", debugNode);
+            engine.createText({ posText, 200 }, "TX:", D_BLACK, "debugAI2_tx", debugNode);
+            engine.createText({ posText + 80, 200 }, std::to_string(aic.tx), D_GRAY, "debugAI2_tx2", debugNode);
 
-            engine.createText({ posText, 190 }, "TZ:", D_BLACK, "debugAI2_tz", debugNode);
-            engine.createText({ posText + 80, 190 }, std::to_string(aic.tz), D_GRAY, "debugAI2_tz2", debugNode);
+            engine.createText({ posText, 230 }, "TZ:", D_BLACK, "debugAI2_tz", debugNode);
+            engine.createText({ posText + 80, 230 }, std::to_string(aic.tz), D_GRAY, "debugAI2_tz2", debugNode);
 
-            engine.createText({ posText, 210 }, "Culldown:", D_BLACK, "debugAI2_culldown", debugNode);
-            engine.createText({ posText + 90, 210 }, std::to_string(aic.elapsed_shoot), D_GRAY, "debugAI2_culldown2", debugNode);
+            engine.createText({ posText, 260 }, "Culldown:", D_BLACK, "debugAI2_culldown", debugNode);
+            engine.createText({ posText + 140, 260 }, std::to_string(aic.elapsed_shoot), D_GRAY, "debugAI2_culldown2", debugNode);
 
-            engine.createText({ posText, 230 }, "Player Detected?:", D_BLACK, "debugAI2_playerdetected", debugNode);
-            engine.createText({ posText + 180, 230 }, (aic.playerdetected == 0) ? "No" : "Sí", D_GRAY, "debugAI2_playerdetected2", debugNode);
+            engine.createText({ posText, 290 }, "Player Detected?:", D_BLACK, "debugAI2_playerdetected", debugNode);
+            engine.createText({ posText + 240, 290 }, (aic.playerdetected == 0) ? "No" : "Sí", D_GRAY, "debugAI2_playerdetected2", debugNode);
 
-            engine.createText({ posText, 250 }, "Player hunted?:", D_BLACK, "debugAI2_playerhunted", debugNode);
-            engine.createText({ posText + 180, 250 }, (bb.playerhunted == 0) ? "No" : "Sí", D_GRAY, "debugAI2_playerhunted2", debugNode);
+            engine.createText({ posText, 320 }, "Player hunted?:", D_BLACK, "debugAI2_playerhunted", debugNode);
+            engine.createText({ posText + 240, 320 }, (bb.playerhunted == 0) ? "No" : "Sí", D_GRAY, "debugAI2_playerhunted2", debugNode);
 
-            engine.createText({ posText, 270 }, "Subditos alive:", D_BLACK, "debugAI2_subditos", debugNode);
-            engine.createText({ posText + 180, 270 }, std::to_string(bb.subditosData.size()), D_GRAY, "debugAI2_subditos2", debugNode);
+            engine.createText({ posText, 360 }, "Subditos alive:", D_BLACK, "debugAI2_subditos", debugNode);
+            engine.createText({ posText + 240, 360 }, std::to_string(bb.subditosData.size()), D_GRAY, "debugAI2_subditos2", debugNode);
 
-            engine.createText({ posText, 290 }, "Subditos id alive:", D_BLACK, "debugAI2_subditosid", debugNode);
-            engine.createText({ posText + 180, 290 }, std::to_string(bb.idsubditos.size()), D_GRAY, "debugAI2_subditosid2", debugNode);
+            engine.createText({ posText, 390 }, "Subditos id alive:", D_BLACK, "debugAI2_subditosid", debugNode);
+            engine.createText({ posText + 240, 390 }, std::to_string(bb.idsubditos.size()), D_GRAY, "debugAI2_subditosid2", debugNode);
 
-            engine.createText({ posText, 310 }, "Alert state:", D_BLACK, "debugAI2_alertstate", debugNode);
-            engine.createText({ posText + 180, 310 }, (aic.alert_state == 0) ? "No" : "Sí", D_GRAY, "debugAI2_alertstate2", debugNode);
+            engine.createText({ posText, 420 }, "Alert state:", D_BLACK, "debugAI2_alertstate", debugNode);
+            engine.createText({ posText + 220, 420 }, (aic.alert_state == 0) ? "No" : "Sí", D_GRAY, "debugAI2_alertstate2", debugNode);
 
             //raycast
             if (bb.launched) {
