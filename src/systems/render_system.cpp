@@ -1843,7 +1843,7 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
         drawDebuggerInGameIA(engine, em);
 
     else if (inpi.pathfind)
-        drawTestPathfindinf(engine, em);
+        drawTestPathfinding(engine, em);
 
     else if (inpi.cheats)
         drawCheats(em, engine);
@@ -1863,7 +1863,8 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
 }
 
 // Interfaz para probar el pathfinding
-void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
+void RenderSystem::drawTestPathfinding(GameEngine& engine, EntityManager& em) {
+    // Se obtienen los singletons
     auto& debug = em.getSingleton<Debug_t>();
     auto& navs = em.getSingleton<NavmeshInfo>();
     auto& li = em.getSingleton<LevelInfo>();
@@ -1877,24 +1878,7 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     int buttonHeight = 45;
     int posX = engine.getScreenWidth() - 370;
     int posY = 350;
-
-    // Slider para startnode
-    // float startMinValue = 1.0f;
-    // float startMaxValue = 100.0f;
-    // const char* startNodeText = "Start Node";
-    // posX = 600.0f; // Reseteamos la posición X
-    // posY = 355.0f; // Posición Y para el slider de startnode
-    // int startnodenew = GuiSliderBar(Rectangle(posX, posY, buttonWidth, buttonHeight), startNodeText, NULL, &debug.startnode, startMinValue, startMaxValue);
-    // engine.drawText(std::to_string(static_cast<int>(debug.startnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY), 20, D_BLUE);
-    // startnodenew += 1;
-    // // Slider para goalnode
-    // float goalMinValue = 1.0f;
-    // float goalMaxValue = 100.0f;
-    // const char* goalNodeText = "Goal Node";
-    // int goalnodenew = GuiSliderBar(Rectangle(posX, posY + 40, buttonWidth, buttonHeight), goalNodeText, NULL, &debug.goalnode, goalMinValue, goalMaxValue);
-    // engine.drawText(std::to_string(static_cast<int>(debug.goalnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY + 40), 20, D_BLUE);
-    // goalnodenew += 1;
-
+    //botones
     auto& butt1 = *engine.createButton({ posX - 100, posY + 150 }, { buttonWidth, buttonHeight }, "CALCULATE", "pathfinding_butt1", debugNode)->getEntity<Button>();
     auto& butt2 = *engine.createButton({ posX + 140, posY + 150 }, { buttonWidth, buttonHeight }, "CLEAR", "pathfinding_butt2", debugNode)->getEntity<Button>();
     auto& butt3 = *engine.createButton({ posX + 140, posY }, { buttonWidth, buttonHeight }, "CORNERS", "pathfinding_butt3", debugNode)->getEntity<Button>();
@@ -1902,27 +1886,10 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
     auto& butt5 = *engine.createButton({ posX + 140, posY + 80 }, { buttonWidth, buttonHeight }, "MIDPOINTS", "pathfinding_butt5", debugNode)->getEntity<Button>();
     auto& butt6 = *engine.createButton({ posX - 100, posY + 80 }, { buttonWidth, buttonHeight }, "CONEXIONES", "pathfinding_butt6", debugNode)->getEntity<Button>();
 
-    // Botón
+    // evento click en botón CALCULAR
     if (butt1.state == ButtonState::CLICK) {
-        //std::size_t idcenter{};
-                // if(em.getEntityByID(li.playerID)->hasComponent<ColliderComponent>()){
-                //     auto& playerbbox = em.getComponent<ColliderComponent>(*em.getEntityByID(li.playerID)).boundingBox;
-                //     for (auto& navmesh : navs.NavMeshes){
-                //         //auto center = it->centerpoint.second;
-                //         auto& currentbbox = navmesh.box;
-                //         if(currentbbox.intersects(playerbbox)){
-                //             vec3d center = {navmesh.centerpoint.second.x(),navmesh.centerpoint.second.y(),navmesh.centerpoint.second.z()};
-                //             idcenter = navmesh.centerpoint.first;
-                //             break;
-                //             // DrawCube(Vector3{static_cast<float>(center.x()),
-                //             // static_cast<float>(center.y()),
-                //             // static_cast<float>(center.z())},500,500,500,RED);
-                //         }
-                //     }
-                // }
-                //Recorre navs.nodes //    std::set<std::pair<uint16_t, vec3d>> nodes;
-                // recorrelos y devuelve
-                // Función para encontrar el nodo más cercano a una posición dada
+        
+        // Función para encontrar el nodo más cercano a una posición dada
         vec3d posplayer = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
         uint16_t startnode = findNearestNode(em, posplayer, navs.nodes);
         // uint16_t targetnode = findNearestNode(em, vec3d{ -12.33, 40.0, 22.41 }, navs.nodes);
@@ -1932,53 +1899,7 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         graph.createGraph(navs.conexiones, navs.nodes);
         std::vector<vec3d> path = graph.PathFindAStar(debug, startnode, 423);
 
-        // std::size_t lengthpath = path.size();
-        // std::cout << lengthpath;
-        //calcular camnino desde el centro hasta un punto
-
-    //     std::vector<vec3d> nodes;
-    //     nodes.push_back({ -106.9, 4.0, 116.0 });
-    //     nodes.push_back({ -119.0, 4.0, 114.0 });
-    //     nodes.push_back({ -131.0, 4.0, 105.1 });
-    //     nodes.push_back({ -105.0, 4.0, 97.3 });
-    //     nodes.push_back({ -118.0, 4.0, 92.0 });
-    //     nodes.push_back({ -132.0, 4.0, 87.0 });
-    //     nodes.push_back({ -117.0, 4.0, 78.0 });
-    //     nodes.push_back({ -127.4, 4.0, 69.6 });
-    //     //Creamos puntos y conexiones
-    //     std::vector<Conection> conexiones;
-    //     Conection cone12(1, 1, 2);
-    //     conexiones.push_back(cone12);
-    //     Conection cone14(1, 1, 4);
-    //     conexiones.push_back(cone14);
-    //     Conection cone15(1, 1, 5);
-    //     conexiones.push_back(cone15);
-    //     Conection cone25(1, 2, 5);
-    //     conexiones.push_back(cone25);
-    //     Conection cone23(1, 2, 3);
-    //     conexiones.push_back(cone23);
-    //     Conection cone36(1, 3, 6);
-    //     conexiones.push_back(cone36);
-    //     Conection cone45(1, 4, 5);
-    //     conexiones.push_back(cone45);
-    //     Conection cone56(1, 5, 6);
-    //     conexiones.push_back(cone56);
-    //     Conection cone57(1, 5, 7);
-    //     conexiones.push_back(cone57);
-    //     Conection cone58(1, 5, 8);
-    //     conexiones.push_back(cone58);
-    //     Conection cone68(1, 6, 8);
-    //     conexiones.push_back(cone68);
-    //     Conection cone78(1, 7, 8);
-    //     conexiones.push_back(cone78);
-    //     Lammamos a creargrafo
-    //     Creamos el grafo
-    //     Graph graph{};
-    //     graph.createGraph(navs.conexiones, navs.nodes);
-    //     graph.createGraph(conexiones,nodes);
-    //     Calcular pathfinding
-    //     std::cout << static_cast<uint16_t>(debug.startnode) << static_cast<uint16_t>(debug.goalnode) << "\n";
-    //     std::vector<vec3d> path = graph.PathFindAStar(static_cast<uint16_t>(debug.startnode), static_cast<uint16_t>(debug.goalnode));
+        
         if (path.size() == 0) {
             std::cout << "CAGUEEEEEEEE \n";
         }
@@ -1987,16 +1908,9 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
             debug.path.resize(path.size());
             //     //Rellenamos
             std::copy(path.begin(), path.end(), debug.path.begin());
-            //     Mostrar el camino copiado
-                //    std::cout << "Camino en debug.path:" << std::endl;
-            // for (const auto& node : debug.path) {
-            //     std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
-            //     debug.nodes.push_back(node);
-            // }
         }
-        //    debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
-        //    std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
     }
+    //Evento click botones
     if (butt2.state == ButtonState::CLICK) {
         debug.path.clear();
         debug.nodes.clear();
@@ -2033,10 +1947,7 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
         engine.drawCube(node, { 2, 2, 2 }, D_GREEN);
     }
 
-    // for (auto& node : navs.nodes) {
-    //     engine.drawCube(node.second, 2, 2, 2, RED);
-    // }
-//Dibujar corners
+    //Dibujar corners y conexiones
     if (debug.seecorners) {
         for (auto& node : navs.corners) {
             engine.drawCube(node, { 2, 2, 2 }, D_RED);
@@ -2067,16 +1978,13 @@ void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
                 D_VIOLET);
         }
     }
-
+    // dibujar posición de los nodos
     for (auto& node : debug.nodes) {
         std::string text = std::to_string(node.x()) + " " + std::to_string(node.y()) + " " + std::to_string(node.z());
         int posx = static_cast<int>(engine.getWorldToScreenX(node));
         int posy = static_cast<int>(engine.getWorldToScreenY(node));
         engine.createText({ posx, posy }, text, D_RED, "path_numbers2", debugNode, 15);
     }
-
-    // debugNode->setTranslation({ engine.getScreenWidth() / 2, 0.0f, 0.0f });
-    // engine.drawNode(debugNode);
 }
 
 //Debugger visual in-game
@@ -2199,6 +2107,7 @@ double RenderSystem::SelectValue(GameEngine& engine, double value, int posx, int
     return static_cast<double>(floatValue);
 }
 
+//Función para buscar nodo más cercano al player
 uint16_t RenderSystem::findNearestNode(EntityManager& em, const vec3d& position, const std::map<uint16_t, vec3d>& nodes) {
     uint16_t nearestNodeId = 0; // Suponemos que el primer nodo es el más cercano inicialmente
     double minDistance = std::numeric_limits<double>::max(); // Inicializamos la distancia mínima con un valor muy grande

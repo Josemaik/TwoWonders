@@ -44,7 +44,7 @@ struct RenderSystem
     void unloadModels(EntityManager& em, GameEngine& engine);
     void drawEditorInGameIA(GameEngine& engine, EntityManager& em);
     void drawDebuggerInGameIA(GameEngine& engine, EntityManager& em);
-    void drawTestPathfindinf(ENGI::GameEngine& engine, EntityManager& em);
+    void drawTestPathfinding(ENGI::GameEngine& engine, EntityManager& em);
     void drawRay(vec3d origin, vec3d end);
     void drawVisionCone(vec3d pos_enemy, double orientation, double horizontalFOV);
     void drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInfo& li, SoundSystem& ss);

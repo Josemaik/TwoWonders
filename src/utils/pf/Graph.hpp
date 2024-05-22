@@ -13,20 +13,6 @@ struct Graph
 {
     /* data */
     void createGraph(std::vector<Conection> conexiones, std::map<uint16_t, vec3d> nodes) {
-        //navmesh-----------------
-        //TENDRE QUE PASAR EL JSON CON LOS NAVMESHES
-        // CALCULAR PUNTOS DE CADA NAVMESH Y CALCULAR CONEXIONES
-        // CALCULAR SI UN NAVMESH COLISIONA CON OTRO
-            // EN ESE CASO CALCULAMOS CONEXIONES
-        // ASI EN BUCLE HASTA QUE TERMINEMOS CON TODOS
-        // LOS NAVMESHES
-
-
-        //--------------------------
-
-        //A mano---------------------
-        //paso conexiones
-        // relleno array de conexiones y de puntos
         // Rellenar ArrayConections
         for (const auto& conexion : conexiones) {
             ArrayConections.push_back(conexion);
@@ -36,19 +22,6 @@ struct Graph
         for (const auto& node : nodes) {
             Nodes.insert(node);
         }
-
-        // Recorrer y mostrar los nodos
-        // std::cout << "Nodos:" << std::endl;
-        // for (const auto& node : Nodes) {
-        //     std::cout << "Node " << node.first << ": (" << node.second.x() << ", " << node.second.y() << ", " << node.second.z() << ")" << std::endl;
-        // }
-        // Recorrer ArrayConections e imprimir fromNode y toNode
-        // std::cout << "Conexiones:" << std::endl;
-        // for (const auto& conexion : ArrayConections) {
-        //     std::cout << "From Node: " << conexion.fromNode << " - To Node: " << conexion.toNode << std::endl;
-        // }
-        ///
-        //-------------------------------
     }
     //borramos el grafo
     void cleanGraph(){
