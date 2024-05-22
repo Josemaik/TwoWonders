@@ -2,7 +2,7 @@
 #include "node.hpp"
 #include <utils/vec3D.hpp>
 
-
+//Comprobar si estás en rango para atacar
 struct BTDecisionOnAttackRadius : BTNode_t{
 
     BTDecisionOnAttackRadius()  {}

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <utils/sb/steeringbehaviour.hpp>
 
+//Evitar al player
 struct BTAction_Evade : BTNode_t {
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         if (!ectx.ai->tactive) return BTNodeStatus_t::fail;
@@ -32,8 +33,6 @@ struct BTAction_Evade : BTNode_t {
         else {
             return BTNodeStatus_t::success;
         }
-        // ectx.phy.a_linear = steering.linear;
-        // ectx.phy.v_angular = steering.angular;
 
         return BTNodeStatus_t::running;
     }

@@ -9,6 +9,7 @@
 static double MIN_DISTANCE_ARRIVE_SPAWN { 3.0 };
 static const double dist_to_spawn{ 35.0 };
 
+//Patrullar para una IA
 struct BTAction_Patrol : BTNode_t {
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         if (!ectx.ai->tactive) return BTNodeStatus_t::fail;
@@ -85,20 +86,6 @@ struct BTAction_Patrol : BTNode_t {
                 ++ectx.ai->pathIt;
             }
         }
-        //path_calculated == true && !pathfind_finished
-            // recorrer path como se hace el patrol
-            // pathfind_finished = true
-            // path_calculated = false;
-            // pathfind_active = false
-
-        //pathfind_finished == true && path_calculated == true
-
-        //Do patrol
-        //if pathfind_active == true
-            // if pathfind_finished == true
-                //patrol
-        //else
-            //patrol
 
         ectx.phy.velocity = vec3d{ steering.v_x,0.0,steering.v_z };
         return BTNodeStatus_t::success;

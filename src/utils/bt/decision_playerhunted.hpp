@@ -2,7 +2,7 @@
 #include "node.hpp"
 #include <utils/types.hpp>
 
-
+//Comprobar si has cazado al player
 struct BTDecisionPlayerHunted : BTNode_t {
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         ectx.ai->bh = "Player hunted?";

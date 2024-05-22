@@ -2,7 +2,7 @@
 #include "node.hpp"
 #include <utils/vec3D.hpp>
 
-
+//Comprobar si has detectado al player
 struct BTDecisionPlayerDetected : BTNode_t {
     // Constantes para ángulos de visión
     const double verticalFOV = 60.0; // Ángulo vertical de visión en grados

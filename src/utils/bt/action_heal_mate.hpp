@@ -2,7 +2,7 @@
 #include "node.hpp"
 #include <utils/sb/steeringbehaviour.hpp>
 
-
+//Currar a un compañero
 struct BTAction_HealMate : BTNode_t{
     double calculatedistance(vec3d const& target, vec3d const& origin) {
         auto dx{ target.x() - origin.x() };

@@ -13,6 +13,7 @@ static double radius_centro_masas{ 30.0 };
 // Peso para la influencia de la dirección hacia el centro de masas
 static double centerOfMassWeight{ 0.05 };
 
+//Seguir al player
 struct BTAction_Seek : BTNode_t {
     // BTActionPatrol() = default;
 
@@ -25,22 +26,17 @@ struct BTAction_Seek : BTNode_t {
         ectx.ai->bh = "seeking";
         ectx.ai->seeking = true;
         ectx.ai->ispushed = false;
-        // ectx.ai->ia_front_of_you = false;
+       
         //Seek
         Steer_t steering = STBH::Seek(ectx.phy, { ectx.ai->tx,0.0,ectx.ai->tz });
-        // steering.v_x = steering.v_x * 0.7;
-        // steering.v_z = steering.v_z * 0.7;
+     
         //Calcule Flocking
         //Comprobamos si tiene target en un radio cercano
         double suma_cm_x{};
         double suma_cm_z{};
         double numenemigos_cm{};
         vec3d cm{};
-        //int num_forces_aplicated{0};
-        //bool force_aplicated{false};
-        // int num_stopped{0};
-        // double min_distance{100.0};
-        // Steer_t steering_closest{};
+
         auto& bb = ectx.em.getSingleton<BlackBoard_t>();
         //Check closest  targets
         for (auto& pt : bb.potencial_targets) {
@@ -95,6 +91,7 @@ struct BTAction_Seek : BTNode_t {
         using noCMP = MP::TypeList<PhysicsComponent, ColliderComponent>;
         using obstacleTag = MP::TypeList<ObstacleTag>;
 
+        //Esquivar obstáculos
         auto& pos = ectx.phy.position;
         double mindistance{ 100.0 };
         PhysicsComponent* ptrphy{};
@@ -129,9 +126,7 @@ struct BTAction_Seek : BTNode_t {
                     //maxevade = 0.5;
                 }
                 vec3d avoidanceForce = perpendicular * maxseparate;
-                // Steer_t steeringEvade = STBH::Evade(ectx.phy,*ptrphy,maxevade);
-                // steering.v_x += steeringEvade.v_x;
-                // steering.v_z += steeringEvade.v_z;
+
                 steering.v_x += steering.v_x * 0.5;
                 steering.v_z += steering.v_z * 0.5;
                 steering.v_x += avoidanceForce.x();

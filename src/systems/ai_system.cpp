@@ -4,24 +4,13 @@
 
 // Cada cuanto se percibe al jugador
 void AISystem::perception(BlackBoard_t& bb, AIComponent& ai) {
-    // Accumulate delta time still perception time
-    // ai.accumulated_dt += dt;
-    // if (ai.accumulated_dt <= ai.perceptionTime) return;
-    //Perception time reached
-    // ai.accumulated_dt -= ai.perceptionTime;
-    // Al pulsar la G , la ia con seek va a la posición del player
+
     if (ai.elapsed_perception >= ai.countdown_perception) {
         ai.elapsed_perception = 0;
-        // if (bb.tactive) {
-            ai.tx = bb.tx;
-            ai.tz = bb.tz;
-            ai.tactive = true;
-            ai.teid = bb.teid;
-            // ai.behaviour = bb.behaviour;
-           // bb.tactive = false;
-            // ai.pathIt = bb.path.begin();
-            //  id {static_cast<int>(e.getID()) };
-        // }
+        ai.tx = bb.tx;
+        ai.tz = bb.tz;
+        ai.tactive = true;
+        ai.teid = bb.teid;
     }
     else {
         ai.plusDeltatime(timeStep, ai.elapsed_perception);
@@ -46,12 +35,8 @@ void AISystem::update(EntityManager& em)
         //percibir el entorno
         if (e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>() || e.hasTag<SlimeTag>()) {
             perception(bb, ai);
-        }
-
-        //Actualizar posiciones de la IAs o potenciales targets para calcular Flocking
-        // Comprobamos si el elemento debe procesarse
-        // Más alante hacer que se cumpla si esta a una cierta distancia del player
-        if (e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>() || e.hasTag<SlimeTag>()) {
+            
+            //guardar potencialees targets para calcular el flocking
             //Si el vector esta vacío, el elemento se inserta
             bool id_found = false;
             // Iterar sobre el vector positions
@@ -111,16 +96,19 @@ void AISystem::update(EntityManager& em)
             li.playerDetected = true;
             isDetected = true;
         }
-
+        //Si está detectando al player, guardamos su poisición
         if (ai.playerdetected)
             enemyPositions.push_back(phy.position);
-
+        
+        //Ejecutar behaviour tree
         if (ai.behaviourTree) {
             ai.behaviourTree->run({ em,e,aiptr,nullptr,phy,ren,lcptr, timeStep });
             return;
         }
     });
 
+    // Boss Final
+    //Manejo del borrado de súbditos
     if (!bb.idsubditos.empty())
     {
         std::vector<std::size_t> keysToRemove;
@@ -148,6 +136,6 @@ void AISystem::update(EntityManager& em)
     if (!isDetected && li.playerDetected)
         li.playerDetected = false;
 
-
+    // guardar posiciones de los enemigos detectados
     li.enemyPositions = enemyPositions;
 }
