@@ -219,6 +219,7 @@ void ObjectSystem::createObjects(EntityManager& em)
             auto& plfi = em.getSingleton<PlayerInfo>();
             plfi.hasBoots = true;
             em.getSingleton<SoundSystem>().sonido_equipar_botas();
+            em.getSingleton<SoundSystem>().sonido_boost_pasos();
 
             Item boots = { "Botas de la suerte", "Botas que te hacen correr más rápido" };
             break;

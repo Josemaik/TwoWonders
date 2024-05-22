@@ -143,7 +143,7 @@ struct SoundSystem {
     void sonido_no_mana();
     void sonido_puerta_prision();
 
-
+    void sonido_boost_pasos();
 
 
 
