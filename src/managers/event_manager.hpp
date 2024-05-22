@@ -275,13 +275,13 @@ public:
                         std::array<std::pair<SpeakerType, std::string>, 9> msgs =
                         {
                             std::make_pair(SpeakerType::NOMAD, "Nómada: \nSaludos, no esperaba encontrarme a un \naprendiz de mago por aquí."),
-                            std::make_pair(SpeakerType::PLAYER, "Mago: \nBuenas! Sabes qué son todos estos enemigos?\nNo aparecían en los libros que estudié."),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \n¡Buenas! ¿Sabes qué son todos estos enemigos?\nNo aparecían en los libros que estudié."),
                             std::make_pair(SpeakerType::NOMAD, "Nómada: \nCuanto más se debilita la barrera más enemigos \nentran al mundo, cosa del viejo."),
                             std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \n¿Qué viejo?"),
                             std::make_pair(SpeakerType::NOMAD, "Nómada: \nEl pellejo."),
                             std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \nEspera, ¿¿no será el gran mago??"),
-                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nEse mismo"),
-                            std::make_pair(SpeakerType::PLAYER, "Mago: \nEse es mi maestro! \nMe abandonó y me encomendó que lo encontrara."),
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nEse mismo."),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \n¡Ese es mi maestro! \nMe abandonó y me encomendó que lo encontrara."),
                             std::make_pair(SpeakerType::NOMAD, "Nómada: \nSi eres el aprendiz del viejo sabrás utilizar esto.")
                         };
 
@@ -302,7 +302,7 @@ public:
                         std::array<std::pair<SpeakerType, std::string>, 2> msgs =
                         {
                             std::make_pair(SpeakerType::NONE, "¡Has recibido un pergamino con la formulación \npara crear una pompa de agua!"),
-                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nCon esto podremos salir de aquí por si disparas a esa puerta. \nLos muñecos de por medio te servirán de práctica.")
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \nCon esto podremos salir de aquí, disparando a esa puerta. \nLos muñecos de por medio te servirán de práctica.")
                         };
 
                         // Le damos el hechizo
@@ -339,7 +339,7 @@ public:
                         {
                             std::make_pair(SpeakerType::NOMAD, "Nómada: \nTú de nuevo, gracias por sacarme de esa mazmorra.\n ¿Ves los charcos de lava de alrededor?"),
                             std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \nSí, pero no puedo apagarlos con mi agua. \nY tengo que cruzarlos."),
-                            std::make_pair(SpeakerType::NOMAD, "Nómada: \n¿Qué te enseñó el viejo ese? \n Toma, usa esto te ayudará con la lava.")
+                            std::make_pair(SpeakerType::NOMAD, "Nómada: \n¿Qué te enseñó el viejo ese? \n Toma usa esto, te ayudará con la lava.")
                         };
 
                         // Metemos el texto en el stack de texto
@@ -394,13 +394,13 @@ public:
                         {
                             std::make_pair(SpeakerType::CAT, "Gato: \n¡Miau! ¡Miau! ¡Miau!"),
                             std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \n¿Qué dices? ¿Qué quieres decirme?"),
-                            std::make_pair(SpeakerType::CAT, "Gato: \n¿Acaso no hablas gatuno? Qué falta de respeto"),
+                            std::make_pair(SpeakerType::CAT, "Gato: \n¿Acaso no hablas gatuno? Qué falta de respeto."),
                             std::make_pair(SpeakerType::PLAYER_DANGER, "Mago: \nLo siento, le pediré a mi maestro que me lo enseñe."),
-                            std::make_pair(SpeakerType::CAT, "Gato: \nNo te preocupes niño, si me estaba quedando contigo. \nSoy un investigador"),
+                            std::make_pair(SpeakerType::CAT, "Gato: \nNo te preocupes niño, si me estaba quedando contigo. \nSoy un investigador."),
                             std::make_pair(SpeakerType::PLAYER, "Mago: \n¡Ah vale! Oye, ¿sabes cómo salir de aquí? \nTengo que encontrar a mi maestro."),
                             std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nNo eres el único que quiere salir de aquí."),
                             std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nIgual deberías de preocuparte más por el volcán\n a punto de estallar que de tu maestro."),
-                            std::make_pair(SpeakerType::PLAYER_DANGER, "Mago: \n¿¡Quéeeee!? ¡¿Estallar!? ¡¿Cómo?!"),
+                            std::make_pair(SpeakerType::PLAYER_DANGER, "Mago: \n¿¡Quéeeee!? ¿¡Estallar!? ¿¡Cómo¡?"),
                             std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nAsí es, pero no te alarmes, porque me vas a ayudar a \nreconstruir mi barca para salir de aquí."),
                             std::make_pair(SpeakerType::PLAYER_SAD, "Mago: \n¿Una barca?"),
                             std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nEfectivamente, los monstruos me desperdigaron \nlas piezas por todo el lugar."),
@@ -423,10 +423,10 @@ public:
                         std::array<std::pair<SpeakerType, std::string>, 5> msgs =
                         {
                             std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \n¡Miau! ¡Miau! ¡Miau!"),
-                            std::make_pair(SpeakerType::PLAYER, "Mago: \nNo me vuelves a pillar con esa"),
-                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nBuen trabajo, ahora vamos a salir de aquí\n He terminado las reparaciones"),
+                            std::make_pair(SpeakerType::PLAYER, "Mago: \nNo me vuelves a pillar con esa."),
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nBuen trabajo, ahora vamos a salir de aquí\n He terminado las reparaciones."),
                             std::make_pair(SpeakerType::PLAYER, "Mago: \n¡Perfecto!"),
-                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nPero antes toma una recompensa por tu trabajo")
+                            std::make_pair(SpeakerType::INVESTIGATOR, "Investigato: \nPero antes toma una recompensa por tu trabajo.")
                         };
 
                         // Metemos el texto en el stack de texto
