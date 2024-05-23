@@ -33,7 +33,7 @@ void AISystem::update(EntityManager& em)
         AIComponent* aiptr = &ai;
         LifeComponent* lcptr = &lc;
         //percibir el entorno
-        if (e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>() || e.hasTag<SlimeTag>()) {
+        if (e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>() || e.hasTag<SlimeTag>() || e.hasTag<SpiderTag>()) {
             perception(bb, ai);
             
             //guardar potencialees targets para calcular el flocking

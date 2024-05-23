@@ -2103,7 +2103,7 @@ double RenderSystem::SelectValue(GameEngine& engine, double value, int posx, int
     auto& sliderInfo = *slider->getEntity<Slider>();
 
     floatValue = sliderInfo.valor * 100.f;
-    engine.createText({ posx + width + 80, posy + 5 }, std::to_string(floatValue).c_str(), D_BLUE, (std::string(name) + "_text").c_str(), parent);    // seteamos el nuevo valor
+    engine.createText({ posx + width + 100, posy + 5 }, std::to_string(floatValue).c_str(), D_BLUE, (std::string(name) + "_text").c_str(), parent);    // seteamos el nuevo valor
     return static_cast<double>(floatValue);
 }
 
@@ -2131,7 +2131,7 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
     int windowRectX = 0;
     int windowRectY = 100;
 
-    int windowRectWidth = 390;
+    int windowRectWidth = 610;
     int windowRectHeight = 550;
 
     auto* debugAI = getNode(engine, "DebugAI1");
@@ -2164,21 +2164,31 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
             if (isSelected) {
                 // ID DE LA ENTIDAD SELECCIONADA
                 engine.createText({ 15, 170 }, "EID:", D_BLACK, "text_eid", debugAI);
-                engine.createText({ 55, 170 }, std::to_string(debugsglt.IA_id).c_str(), D_GRAY, "text_eid_value", debugAI);
+                engine.createText({ 75, 170 }, std::to_string(debugsglt.IA_id).c_str(), D_GRAY, "text_eid_value", debugAI);
                 //Detect Radius
-                aic.detect_radius = SelectValue(engine, aic.detect_radius, 45.0, 200.0, 120.0, 30.0, "detect_radius", debugAI);
+                engine.createText({ 15, 200 }, "Detect Radius:", D_BLACK, "detect radius", debugAI);
+                aic.detect_radius = SelectValue(engine, aic.detect_radius, 260.0, 200.0, 120.0, 30.0, "detect_radius", debugAI);
                 // Attack Radius
-                aic.attack_radius = SelectValue(engine, aic.attack_radius, 45.0, 240.0, 120.0, 30.0, "attack_radius", debugAI);
+                engine.createText({ 15, 240 }, "Attack Radius:", D_BLACK, "attack radius", debugAI);
+                aic.attack_radius = SelectValue(engine, aic.attack_radius, 260.0, 240.0, 120.0, 30.0, "attack_radius", debugAI);
                 // Arrival Radius
-                aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 45.0, 280.0, 120.0, 30.0, "arriv_rad", debugAI);
+                engine.createText({ 15, 280 }, "Arrival Radius:", D_BLACK, "arrival radius", debugAI);
+                aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 260.0, 280.0, 120.0, 30.0, "arriv_rad", debugAI);
                 // Max Speed
-                phy.max_speed = SelectValue(engine, phy.max_speed, 45.0, 320.0, 120.0, 30.0, "max_speed", debugAI);
+                engine.createText({ 15, 320 }, "Max speed:", D_BLACK, "max speed", debugAI);
+                phy.max_speed = SelectValue(engine, phy.max_speed, 260.0, 320.0, 120.0, 30.0, "max_speed", debugAI);
                 //COuntdown Perception
-                aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 45.0, 360.0, 120.0, 30.0, "countdown_perception", debugAI);
+                engine.createText({ 15, 360 }, "Perception:", D_BLACK, "perception", debugAI);
+                aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 260.0, 360.0, 120.0, 30.0, "countdown_perception", debugAI);
                 //Countdown Shoot
-                aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 45.0, 400.0, 120.0, 30.0, "countdown_shoot", debugAI);
+                engine.createText({ 15, 400 }, "Countdown attack:", D_BLACK, "countdown attack", debugAI);
+                aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 290.0, 400.0, 120.0, 30.0, "countdown_shoot", debugAI);
                 //Countdown stop
-                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 45.0, 440.0, 120.0, 30.0, "countdown_stop", debugAI);
+                engine.createText({ 15, 440 }, "Countdown Stop:", D_BLACK, "countdown stop", debugAI);
+                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 290.0, 440.0, 120.0, 30.0, "countdown_stop", debugAI);
+                
+                engine.createText({ 15, 440 }, "Countdown Stop:", D_BLACK, "countdown stop", debugAI);
+                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 290.0, 440.0, 120.0, 30.0, "countdown_stop", debugAI);
             }
         }
     });

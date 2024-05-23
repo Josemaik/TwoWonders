@@ -127,9 +127,7 @@ struct BTAction_Seek : BTNode_t {
                     //maxevade = 0.5;
                 }
                 vec3d avoidanceForce = perpendicular * maxseparate;
-                // Steer_t steeringEvade = STBH::Evade(ectx.phy,*ptrphy,maxevade);
-                // steering.v_x += steeringEvade.v_x;
-                // steering.v_z += steeringEvade.v_z;
+                
                 steering.v_x += steering.v_x * 0.5;
                 steering.v_z += steering.v_z * 0.5;
                 steering.v_x += avoidanceForce.x();
