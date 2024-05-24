@@ -31,15 +31,14 @@ void SoundSystem::initBanks(const char* master_bank_location, const char* master
     ERRCHECK(FMOD_Studio_System_LoadBankFile(soundSystem, SFX_bank_location, FMOD_STUDIO_LOAD_BANK_NORMAL, &SFX_bank));
     ERRCHECK(FMOD_Studio_Bank_GetLoadingState(ui_bank, &loadingState));
 
+    //Inicializamos los buses y lo canales para poder modificar el volumen en la configuracion
     initBuses();
 
     initChannels();
 
-    initEvents();
 
- 
-
-    
+    //Inicializamos alguno de los eventos
+    initEvents();    
 }
 
 void SoundSystem::createEventInstance() {
@@ -97,15 +96,11 @@ void SoundSystem::playMusicMenu() {
 void SoundSystem::sonido_music_volcan() {
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_volcan, &eventInstance_Musica_Level));
     play_music_level();
-   
-
 }
 
 void SoundSystem::sonido_music_mazmorra() {
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_mazmorra, &eventInstance_Musica_Level));
     play_music_level();
-
-
 }
 void SoundSystem::sonido_music_monte() {
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_monte, &eventInstance_Musica_Level));
@@ -120,9 +115,7 @@ void SoundSystem::sonido_music_pradera() {
 void SoundSystem::sonido_music_boss_final(){
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Musica_boss_final, &eventInstance_Musica_Level));
     play_music_level();
-
 }  
-
 
 void SoundSystem::seleccion_menu() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Menus/main_select", &eventDescription));
@@ -133,26 +126,20 @@ void SoundSystem::seleccion_menu() {
 
 void SoundSystem::playAmbient() {
     FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
-    //FMOD_Studio_System_Update(soundSystem);
     update();
 }
 
 void SoundSystem::sonido_amb_bosque() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_bosque", &eventDescription_Ambiente));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Ambiente, &eventInstance_Ambiente));
-    //FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
-    // FMOD_Studio_System_Update(soundSystem);
     playAmbient();
-    //update();
 }
 
 void SoundSystem::sonido_mazmorra() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Ambientes/amb_mazmorra", &eventDescription_Ambiente));
     ERRCHECK(FMOD_Studio_EventDescription_CreateInstance(eventDescription_Ambiente, &eventInstance_Ambiente));
-    //FMOD_Studio_EventInstance_Start(eventInstance_Ambiente);
-    //FMOD_Studio_System_Update(soundSystem);
     playAmbient();
-    //update();
+
 }
 
 void SoundSystem::sonido_amb_volcan() {
@@ -200,9 +187,6 @@ void SoundSystem::sonido_amb_biblioteca2(){
     play();
     update();
 }
-
-
-
 
 void SoundSystem::recoger_mana() {
     ERRCHECK(FMOD_Studio_System_GetEvent(soundSystem, "event:/Efectos/Jugador/Interaccion/Recoger_mana", &eventDescription));

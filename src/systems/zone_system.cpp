@@ -53,6 +53,8 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
                         }
                         li.currentScreen = GameScreen::ENDING;
                         elapsedEnding = 0.0f;
+                        em.getSingleton<SoundSystem>().music_stop_level();
+                        em.getSingleton<SoundSystem>().ambient_stop();
                         em.getSingleton<SoundSystem>().sonido_win();
 
                         // map.changeMap(em, 2, iam);

@@ -107,7 +107,7 @@ struct SoundSystem {
    void sonido_slime_ataque();          //por integrar
    void sonido_slime_danyo();           
    void sonido_slime_mov(FMOD_STUDIO_EVENTINSTANCE*& sonido);             
-   void sonido_slime_muere();           //por cambiar dpendiendo del tipo se dlime
+   void sonido_slime_muere();           //por cambiar dpendiendo del tipo se slime
    void sonido_slime_curar();           //por integrar    
    void sonido_crear_pociones();        //por integrar    
    void sonido_campamento_derrotado1(); //por integrar          
@@ -232,7 +232,7 @@ private:
     
     
     
-    //Variables para guardar el volumen, en caso de querer mutear el juego
+    //Variables para guardar el volumen, en caso de querer mutear el juego NO IMPLEMENTADO DE MOMENTO
     float musicVolume;
     float sfxVolume;
     float ambientVolume;
