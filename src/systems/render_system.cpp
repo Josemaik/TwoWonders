@@ -1466,10 +1466,10 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<ChestTag>())
     {
         // FIXME
-        std::string path = "assets/Assets/Cofre/Cofre0.fbx";
-        r.node = engine.loadModel(path.c_str());
-        loadAnimations(engine, em, e, r, path, 1.0f);
-        // r.node = engine.loadModel("assets/Assets/Cofre/Cofre.obj");
+        // std::string path = "assets/Assets/Cofre/Cofre0.fbx";
+        // r.node = engine.loadModel(path.c_str());
+        // loadAnimations(engine, em, e, r, path, 1.0f);
+        r.node = engine.loadModel("assets/Assets/Cofre/Cofre.obj");
         setPointLight(engine, em, e, *r.node, r.position + vec3d{ 0, 5, 0 });
     }
     else if (e.hasTag<DestructibleTag>())
@@ -1775,7 +1775,6 @@ void RenderSystem::setPointLight(GameEngine& engine, PointLightComponent& plc, N
 
 void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
 {
-    // t1 = std::chrono::high_resolution_clock::now();
     using partCMPs = MP::TypeList<ParticleMakerComponent>;
     using noTAGs = MP::TypeList<>;
 
@@ -1792,36 +1791,23 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
         {
             for (auto& [node, p] : pmc.particles)
             {
-                std::variant<Color, std::string>& variant = p.color;
-                std::visit([&](auto&& arg) {
-                    using T = std::decay_t<decltype(arg)>;
-                    if constexpr (std::is_same_v<T, Color>)
-                    {
-                        // Dibujamos la partícula en un punto de 3x3 píxeles
-                        engine.drawPoint3D(p.position.to_other<double>(), 3.f, std::get<Color>(p.color));
-                    }
-                    else if constexpr (std::is_same_v<T, std::string>)
-                    {
-                        if (!node)
-                        {
-                            std::string& textura = std::get<std::string>(p.color);
-                            node = engine.createNode(getNode(engine, textura.c_str()), getNode(engine, "HUD"));
-                        }
+                if (p.type == Particle::ParticleType::Pixel)
+                    // Dibujamos la partícula en un punto de 3x3 píxeles
+                    engine.drawPoint3D(p.position.to_other<double>(), 3.f, p.color);
+                else
+                {
+                    if (!node)
+                        node = engine.createNode(getNode(engine, p.texture.c_str()), getNode(engine, "HUD"));
 
-                        auto& textureInfo = *node->getEntity<Texture2D>()->texture;
-                        int posX = static_cast<int>(engine.getWorldToScreenX(p.position.toDouble()) - static_cast<float>(textureInfo.getWidth()) * wRate / 2);
-                        int posY = static_cast<int>(engine.getWorldToScreenY(p.position.toDouble()) - static_cast<float>(textureInfo.getHeight()) * hRate / 2);
+                    auto& textureInfo = *node->getEntity<Texture2D>()->texture;
+                    int posX = static_cast<int>(engine.getWorldToScreenX(p.position.toDouble()) - static_cast<float>(textureInfo.getWidth()) * wRate / 2);
+                    int posY = static_cast<int>(engine.getWorldToScreenY(p.position.toDouble()) - static_cast<float>(textureInfo.getHeight()) * hRate / 2);
 
-                        engine.drawNode(node, { posX, posY });
-                    }
-                }, variant);
+                    engine.drawNode(node, { posX, posY });
+                }
             }
         }
     });
-
-    // auto t2 = std::chrono::high_resolution_clock::now();
-    // auto dur = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    // std::cout << "Tiempo de renderizado de partículas: " << dur << " mc" << std::endl;
 }
 
 // Empieza el dibujado y se limpia la pantalla

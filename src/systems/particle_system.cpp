@@ -100,7 +100,7 @@ void ParticleSystem::update(EntityManager& em)
                         }
                         else if constexpr (std::is_same_v<T, std::vector<std::string>>) {
                             std::string& colorName = arg[std::rand() % arg.size()];
-                            p.color = colorName;
+                            p.texture = colorName;
                             p.type = Particle::ParticleType::Texture;
                         }
                     }, variant);

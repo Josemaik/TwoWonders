@@ -16,7 +16,8 @@ struct Particle
 
     float lifeTime{ .6f };
     float remainingLife{ lifeTime };
-    std::variant<DarkMoon::Color, std::string> color{};
+    DarkMoon::Color color{};
+    std::string texture{};
     ParticleType type{ ParticleType::Pixel };
 };
 

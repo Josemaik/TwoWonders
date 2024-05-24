@@ -364,7 +364,9 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             if (playerSpelled)
             {
                 anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::RANGED_ATTACK);
-                phy.stopped = true;
+                if (!(plfi.currentSpell.atkType & AttackType::WaterDashArea))
+                    phy.stopped = true;
+
                 plfi.mana -= plfi.currentSpell.cost;
 
                 if (plfi.mana < 0.0)
