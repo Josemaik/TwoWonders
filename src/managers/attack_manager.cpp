@@ -129,8 +129,8 @@ void AttackManager::createAttackType(EntityManager& em, Entity& ent, AttackType 
             em.addTag<HitPlayerTag>(e);
             auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = getPosMeteorito(i, pos), .scale = { 4.0f, 4.0f, 4.0f }, .color = D_ORANGE_DARK });
             auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0.02 });
-            em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.5f });
-            em.addComponent<AttackComponent>(e, AttackComponent{ .atkType = type, .damage = 4, .type = ElementalType::Fire });
+            em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = .5f });
+            em.addComponent<AttackComponent>(e, AttackComponent{ .atkType = type, .damage = 5, .type = ElementalType::Fire, .lifeTime = 2.0f });
             em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, p.scale, BehaviorType::ATK_PLAYER });
         }
         break;
@@ -402,6 +402,9 @@ void AttackManager::createAttackRangedOrMelee(EntityManager& em, vec3d pos, vec3
 
     if (p.velocity != vec3d::zero())
         em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f });
+
+    if (behavior & BehaviorType::ATK_PLAYER && atkType != AttackType::IceShard)
+        r.visible = false;
 }
 
 void AttackManager::setPlayerAtkVel(EntityManager& em, vec3d& pos, vec3d& vel, double ori)

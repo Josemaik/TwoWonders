@@ -163,9 +163,9 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
         inpi.interact = false;
     }
 
-    auto text = "mando_explicacion";
-    if (li.keyboardControls)
-        text = "teclado_explicacion";
+    auto text = "teclado_explicacion";
+    if (engine.isGamepadAvailable(0))
+        text = "mando_explicacion";
 
     engine.beginDrawing();
     engine.clearBackground(D_GRAY);
@@ -472,7 +472,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
     int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 3.8f) - static_cast<int>(static_cast<float>(buttonHeight) * hRate / 2.f);
 
     // Fondo de los botones
-    int initX = -static_cast<int>(static_cast<float>(engine.getScreenWidth()) * wRate / 3.3f);
+    int initX = -static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 3.3f);
     int initButtonX = posX + initX;
     int finalX = 0;
     float multiplier = 750.f;
@@ -482,9 +482,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
     int movement = static_cast<int>(multiplier * li.elapsedPause);
 
     if (initX + movement > finalX)
-    {
         movement = finalX - initX;
-    }
     else
         li.elapsedPause += engine.getFrameTime();
 
@@ -492,7 +490,7 @@ void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInf
     initButtonX += movement;
 
     engine.createRectangle({ initX, 0 },
-        { static_cast<int>(static_cast<float>(engine.getScreenWidth()) * wRate / 3.3f), static_cast<int>(static_cast<float>(engine.getScreenHeight()) / hRate) },
+        { static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 3.3f), static_cast<int>(static_cast<float>(engine.getScreenHeight()) / hRate) },
         { 0, 0, 0, 120 }, "Fondo_botones", menuNode);
 
     // Botones
@@ -3304,7 +3302,7 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
             {AttackType::FireBallShot, {"bola_fuego", "exp_bola_f", 22.5f, 25.5f, 2.55f}},
             {AttackType::MeteoritePlayer, {"meteoritos", "exp_pompa", 22.5f, 25.5f, 2.5f}},
             {AttackType::IceShard, {"estacas", "exp_pompa", 22.5f, 25.5f, 2.5f}},
-            {AttackType::IceShield, {"escudo", "exp_pompa", 22.5f, 25.5f, 2.5f}},
+            {AttackType::IceShield, {"escudo_hielo", "exp_pompa", 22.5f, 25.5f, 2.5f}},
         };
 
         for (std::size_t i = 0; i < plfi.spellSlots.size(); i++)
@@ -3669,7 +3667,7 @@ void RenderSystem::drawFPSCounter(GameEngine& engine)
     std::string fpsStr = "FPS: " + std::to_string(fps);
     if (!nodeExists(engine, "fpstext"))
     {
-        auto* fpsText = engine.createText({ engine.getScreenWidth() - 100, 10 }, fpsStr.c_str(), engine.getDefaultFont(), 20, D_RED, "fpstext", getNode(engine, "HUD"));
+        auto* fpsText = engine.createText({ engine.getScreenWidth() - 150, 10 }, fpsStr.c_str(), engine.getDefaultFont(), 20, D_RED, "fpstext", getNode(engine, "HUD"));
         fpsText->setVisibleOne(true);
     }
     else

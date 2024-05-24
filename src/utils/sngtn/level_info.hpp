@@ -70,7 +70,6 @@ struct LevelInfo
     // Pantalla de carga
     double loadingLimit{ 3.0 }, loadingTime{ loadingLimit };
     bool loading{ false };
-    bool keyboardControls{ false };
 
     // Variables relacionadas con los eventos
     std::size_t chestToOpen{ max };

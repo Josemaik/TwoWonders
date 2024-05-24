@@ -45,7 +45,7 @@ void FrustumInfo::bboxIn(std::size_t id, const BBox& bbox)
 
     // Si el centro no está dentro, comprobar las esquinas
     for (auto& corner : bbox.getCorners())
-    {        
+    {
         if (pointInFrustum(corner))
         {
             frustSet.insert(id);
