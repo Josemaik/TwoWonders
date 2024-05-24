@@ -16,7 +16,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam
 
                 if (e.hasTag<LevelChangeTag>())
                 {
-                   
+
                     switch (li.mapID)
                     {
                     case 0:
@@ -244,8 +244,8 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
 
                 // FIXME
                 // Animación del cofre
-                auto& ac = em.getComponent<AnimationComponent>(e);
-                ac.animToPlay = 0;
+                // auto& ac = em.getComponent<AnimationComponent>(e);
+                // ac.animToPlay = 0;
 
                 // Apagamos la luz del cofre
                 auto& plc = em.getComponent<PointLightComponent>(e);

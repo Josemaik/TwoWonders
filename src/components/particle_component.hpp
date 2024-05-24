@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <cstdint>
-#include <variant>
 #include "../utils/vec3D.hpp"
 #include "../motor/src/darkmoon.hpp"
 
