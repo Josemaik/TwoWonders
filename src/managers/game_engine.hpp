@@ -4,30 +4,15 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
-#include "utils/types.hpp"
-#include "utils/vec3D.hpp"
+#include <random>
+#include "../utils/types.hpp"
+#include "../utils/vec3D.hpp"
+#include "../motor/src/darkmoon.hpp"
 
 namespace ENGI {
 
     struct GameEngine
     {
-        struct Gif
-        {
-            std::string name{};
-            Image image{};
-            Texture2D texture{};
-            int currentFrame{};
-            int frames{};
-            int nextFrameDataOffset{};
-
-            double reScaleX{ 2.0 };
-            double reScaleY{ 2.0 };
-
-            // Variable para el update del frame
-            int frameCounter{ 0 };
-            int frameDelay{ 13 };
-        };
-
         using CL = MP::TypeList<PhysicsComponent, RenderComponent>;
         using TL = MP::TypeList<>;
 
@@ -37,14 +22,9 @@ namespace ENGI {
 
         // Timing Related Functions
         void setTargetFPS(int fps);
+        double getTargetFPS();
         float getFrameTime();
-
-        // Image and Texture
-        Image loadImage(const char* filename);
-        Image loadImagenAnim(const char* filename, int& frames);
-        void imageResize(Image* image, int newWidth, int newHeight);
-        void unloadImage(Image image);
-        Texture2D loadTextureFromImage(Image image);
+        double getFrameTimeDouble();
 
         // Drawing
         void beginDrawing();
@@ -53,29 +33,76 @@ namespace ENGI {
         void endDrawing();
         void beginMode3D();
         void endMode3D();
-        void drawLine3D(vec3d startPos, vec3d endPos, Color color);
-        void drawPoint3D(vec3d pos, Color color);
-        void drawCube(vec3d pos, float width, float height, float lenght, Color color);
-        void drawCubeWires(vec3d pos, float width, float height, float lenght, Color color);
-        void drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
-        void drawModelWires(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
+        void drawCubeWires(vec3d position, vec3d size, Color color);
+        // void drawModel(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
+        // void drawModelWires(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint);
         void drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color);
 
-        // Rectangle
-        void drawRectangle(int posX, int posY, int width, int height, Color color);
-        void drawRectangleLinesEx(Rectangle rec, float lineThick, Color color);
-        void drawRectangleRec(Rectangle rec, Color color);
-        void drawTexture(Texture2D texture, int posX, int posY, Color tint);
-        void drawTexture(Texture2D texture, int posX, int posY, Color tint, float scale);
-        void drawCircle(int posX, int posY, float radius, Color color);
+        void drawNode(Node* node, vec2i pos = { -1, -1 }, vec2f scale = { 1.0f, 1.0f });
         void drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color);
         void drawTriangle(vec2d v1, vec2d v2, vec2d v3, Color color);
 
+        // Circle
+        Node* drawCircle(vec2i position, float radius, int segments, Color color);
+        Node* createCircle(vec2i position, float radius, int segments, Color color, const char* nodeName, Node* parentNode);
+
+        // Rectangle
+        Node* drawRectangle(vec2i pos, vec2i size, Color color);
+        Node* drawRectangle(vec2i pos, vec2i size, Color color, Node* parent);
+        Node* createRectangle(vec2i pos, vec2i size, Color color, const char* name, Node* parentNode);
+
+        // Slider
+        Node* drawSlider(vec2i position, vec2i size, float value, Color backColor, Color sliderColor);
+        Node* createSlider(vec2i position, vec2i size, float value, Color backColor, Color sliderColor, const char* nodeName, Node* parentNode);
+
+        // Option Slider
+        Node* drawOptionSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, std::vector<std::string> opts, std::string firstOption);
+        Node* createOptionSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, std::vector<std::string> opts, std::string firstOption, const char* nodeName, Node* parentNode);
+
+        // Float Slider
+        Node* drawFloatSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, float initialValue);
+        Node* createFloatSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, float initialValue, const char* nodeName, Node* parentNode);
+
+        // Button
+        Node* drawButton(vec2i position, vec2i size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor);
+        Node* createButton(vec2i position, vec2i size, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, Color normalColor, Color hoverColor, Color clickColor, const char* nodeName, Node* parentNode);
+        Node* createButton(vec2i position, vec2i size, std::string text, const char* nodeName, Node* parentNode);
+
+        // CheckBox
+        Node* drawCheckBox(vec2i position, float size, bool checked, Color backgroundColor, Color normalColor, Color hoverColor);
+        Node* createCheckBox(vec2i position, float size, bool checked, Color backgroundColor, Color normalColor, Color hoverColor, const char* nodeName, Node* parentNode);
+        Node* createCheckBoxPtr(vec2i position, float size, bool* checked, Color backgroundColor, Color normalColor, Color hoverColor, const char* nodeName, Node* parentNode);
+
+        // Cube
+        Node* drawCube(vec3d position, vec3d size, DarkMoon::Color color);
+        Node* createCube(vec3d position, vec3d size, DarkMoon::Color color, const char* nodeName, Node* parentNode);
+
         // Text
-        void drawText(const char* text, int posX, int posY, int fontSize, Color color);
-        void drawTextEx(Font font, const char* text, vec2d position, float fontSize, float spacing, Color tint);
-        vec2d measureTextEx(Font font, const char* text, float fontSize, float spacing);
-        Font getFontDefault();
+        Node* drawText(const char* text, int posX, int posY, int fontSize, Color color, Aligned aligned = Aligned::LEFT);
+        Node* createText(vec2i position, std::string text, Font* font, int fontSize, Color textColor, const char* nodeName, Node* parentNode, Aligned align = Aligned::LEFT, bool charByChar = false);
+        Node* createText(vec2i position, std::string text, Color c, const char* nodeName, Node* parentNode, int fontSize = 20, Aligned align = Aligned::LEFT);
+        Node* createTextBox(vec2i position, vec2i size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode, bool charByChar = false);
+        Font* getFontDefault();
+
+        // Line 3D
+        Node* drawLine3D(vec3d startPos, vec3d endPos, float lSize, Color color);
+        Node* createLine3D(vec3d startPos, vec3d endPos, float lSize, Color color, const char* nodeName, Node* parentNode);
+
+        // Point 3D
+        Node* drawPoint3D(vec3d position, float pointSize, Color color);
+        Node* createPoint3D(vec3d position, float pointSize, Color color, const char* nodeName, Node* parentNode);
+
+        // Lights
+        void toggleLights();
+        void activateLights();
+        void deactivateLights();
+
+        // Point Light
+        Node* drawPointLight(vec3d position, Color color);
+        Node* createPointLight(vec3d position, Color color, const char* nodeName, Node* parentNode);
+
+        // Billboard
+        Node* drawBillboard(std::string path, vec3d position, vec2f size);
 
         // Window
         void initWindow(int width, int height, const char* title);
@@ -85,22 +112,27 @@ namespace ENGI {
         int getScreenHeight();
         void setWindowSize(int width, int height);
         void setWindowFullScreen();
+        void setExitKey(int key);
 
         // Camera
         void setPositionCamera(vec3d pos);
         void setTargetCamera(vec3d tar);
         void setUpCamera(vec3d up);
         void setFovyCamera(float fovy);
-        void setProjectionCamera(int proj);
+        void setProjectionCamera(CameraProjection proj);
         vec3d getPositionCamera();
         vec3d getTargetCamera();
         vec3d getUpCamera();
         float getFovyCamera();
+        glm::mat4 getViewMatrix();
 
         // Input Handling
         bool isKeyPressed(int key);
+        bool isAnyKeyPressed();
         bool isKeyDown(int key);
+        bool isAnyKeyDown();
         bool isKeyReleased(int key);
+        bool isAnyKeyReleased();
         bool isMouseButtonPressed(int button);
         bool isMouseButtonDown(int button);
         bool isGamepadAvailable(int gamepad);
@@ -109,45 +141,70 @@ namespace ENGI {
         bool isGamepadButtonReleased(int gamepad, int button);
         float getGamepadAxisMovement(int gamepad, int axis);
 
-        // Mouse collision
-        bool checkCollisionPointRec(Vector2 point, Rectangle rec);
+        // Animations
+        std::size_t playAnimation(Animation* panimation);
+        void stopAnimation(std::size_t idanim);
+        std::vector<Animation*> createAnimations(const std::string& path, std::vector<BoneInfo>& vecbones);
+        void updateAnimation(float dt, float mult, std::size_t id);
+        float getAnimationTime(std::size_t id);
+        void resetAnimations();
 
-        // Shaders
-        Shader loadShader(const char* vsFileName, const char* fsFileName);
-        void unloadShader(Shader s);
-        int getShaderLocation(Shader s, const char* uniformName);
-        void setShaderValue(Shader s, int uniformLoc, const void* value, int uniformType);
-
-        // Aux
-        Mesh genMeshCube(float width, float height, float lenght);
-        Model loadModelFromMesh(Mesh m);
-        Model loadModel(const char* filename);
-        Texture2D loadTexture(const char* filename);
-        void updateTexture(Texture2D texture, const void* data);
-        void unloadMesh(Mesh m);
-        void unloadModel(Model m);
+        Node* loadModel(const char* filename);
         float getWorldToScreenX(vec3d pos);
         float getWorldToScreenY(vec3d pos);
         RayCast getMouseRay();
-        void loadAndResizeImage(const std::string& name, const std::string& path, double reScaleX = 1.3, double reScaleY = 1.3);
-        void loadAndResizeImageGif(const std::string& name, const std::string& path, int frames, int delay = 15, double reScaleX = 2.0, double reScaleY = 2.0);
-        void updateGif(Gif& anim);
+        void loadAndResizeImage(const char* name, const char* path, Node* parentNode);
+        void loadAndResizeBillboard(const char* name, const char* path, Node* parentNode);
+        void loadAndResizeImageGif(const char* name, const char* filePath, float frameTime = 0.5f);
         void unloadGifsAndTextures();
         void setReplayMode(bool replay, GameData& gd);
         double getTime();
+        float getWidthRate();
+        float getHeightRate();
         float getAspectRat();
+        Node* get2D();
+        Node* get3D();
+        Font* getDefaultFont();
+        void traverseRoot();
+        void nodeClear(Node* node);
+        template<typename T>
+        T getRandomValue(T min, T max)
+        {
+            static std::random_device rd; // obtiene una semilla aleatoria para el generador
+            static std::mt19937 generator(rd()); // usa Mersenne twister para generar números aleatorios
 
-        std::map<std::string, Texture2D> textures;
-        std::map<std::string, Gif> gifs;
+            if constexpr (std::is_integral<T>::value) {
+                std::uniform_int_distribution<T> distribution(min, max); // distribución uniforme entre min y max para enteros
+                return distribution(generator);
+            }
+            else if constexpr (std::is_floating_point<T>::value) {
+                std::uniform_real_distribution<T> distribution(min, max); // distribución uniforme entre min y max para flotantes
+                return distribution(generator);
+            }
+        }
 
+        // DarkMoon Engine //
+
+        DarkMoonEngine dmeg;
+
+        std::map<std::string, Node*> nodes;
+        std::map<Node*, std::pair<vec2i, vec2f>> nodesToDraw{};
+
+        Node* createNode3D(const char* name);
+        Node* createNode(const char* name, Node* parentNode);
+        Node* createNode(Node* copyNode, Node* parentNode);
+
+        Texture* loadTexture2D(const char* filePath);
+        std::vector<Texture*> loadTextures2DAnim(const char* filePath);
 
     private:
         u16 const width_{}, height_{};
-        Camera3D camera{};
+        static float widthRate, heightRate;
         bool replayMode{ false };
         GameData* gameData{ nullptr };
+
+        Camera* camera;
     };
 
 #endif // !GAME_ENGINE
-
 }

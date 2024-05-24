@@ -178,8 +178,7 @@
                 ],
                 "countdown_stop": 2.0,
                 "countdown_shoot": 0.0,
-                "countdown_perception": 1.5,
-                "scale_to_respawn_attack": 2.0
+                "countdown_perception": 1.5
             },
             {
                 "position": [75.0, 0.0, -74.0],
@@ -205,8 +204,7 @@
                 ],
                 "countdown_stop": 2.0,
                 "countdown_shoot": 0.0,
-                "countdown_perception": 1.0,
-                "scale_to_respawn_attack": 2.0
+                "countdown_perception": 1.0
             },
             {
                 "position": [61.0, 0.0, -88.0],
@@ -232,8 +230,7 @@
                 ],
                 "countdown_stop": 0.0,
                 "countdown_shoot": 0.5,
-                "countdown_perception": 0.5,
-                "scale_to_respawn_attack": 2.0
+                "countdown_perception": 0.5
             }
         ],
         "bossfinalfase2":[
@@ -261,8 +258,7 @@
                 ],
                 "countdown_stop": 0.0,
                 "countdown_shoot": 0.5,
-                "countdown_perception": 0.5,
-                "scale_to_respawn_attack": 2.0
+                "countdown_perception": 0.5
             }
         ],
         "interactables": [],
@@ -293,8 +289,7 @@
                 ],
                 "countdown_stop": 0.0,
                 "countdown_shoot": 0.5,
-                "countdown_perception": 0.5,
-                "scale_to_respawn_attack": 2.0
+                "countdown_perception": 0.5
             },
             {
                 "position": [61.0, 0.0, -78.0],

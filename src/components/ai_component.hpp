@@ -49,21 +49,24 @@ struct AIComponent
     double slimex{}, slimez{};
     std::size_t slimetarget{};
     //flocking
-    bool ispushed{false};
+    bool ispushed{ false };
     //dejar de ver
-    bool seeking{false};
+    bool seeking{ false };
     //area
     bool attackbeforedie{ false };
     //PATH
     Path_t<4> path{ };
     Path_t<4>::iterator pathIt{ };
     bool path_initialized{ false };
-    bool followpatrol{true};
+    bool followpatrol{ true };
     //pathfinding
-    bool pathfind_active{false},check_distance{false};
+    bool pathfind_active{ false }, check_distance{ false };
     std::vector<vec3d> found_path{};
-    vec3d *it_path{nullptr};
-    
+    vec3d* it_path{ nullptr };
+
+
+    //enemigo moviendose
+    bool ismoving { false };
     // SB behaviour {SB::Arrive};
     double txp{}, tzp{};
     bool target_obtained{ false };
@@ -73,11 +76,13 @@ struct AIComponent
         //    fase 2 // spawn 0.25 heal 1.0 shield 0.4
     bool chargeattack{ false };
     double countdown_change_dir{ 1.5 }, countdown_stop{ 0.8 }, countdown_shoot{ 0.5 }, countdown_change_position{ 3.0 }
-        , countdown_fleeing{ 3.0 }, countdown_perception{ 0.5 }, couldown_spawning{ 0.5 }, countdown_heal{ 1.5 }, countdown_shield{ 0.7 },
-        countdown_air_attack{ 1.0 }, countdown_show_icon{ 7.0 }; // seconds
+        , countdown_fleeing{ 1.0 }, countdown_perception{ 0.5 }, couldown_spawning{ 0.5 }, countdown_heal{ 1.5 }, countdown_shield{ 0.7 },
+        countdown_air_attack{ 1.0 }, countdown_show_icon{ 7.0 }, countdown_evade{1.0}; // seconds
     double elapsed_change_position{ 1.0 }, elapsed_stop{ 1.0 }, elapsed_change_dir{ 1.0 }, elapsed_shoot{ 0.0 },
         elapsed_fleeing{ 1.0 }, elapsed_perception{ 1.0 }, elapsed_spawning{ 1.0 }, elapsed_heal{ 1.0 }, elapsed_shield{ 1.0 },
-        elapsed_air_attack{ 1.0 }, elapsed_show_icon{ 1.0 };
+        elapsed_air_attack{ 1.0 }, elapsed_show_icon{ 1.0 },elapsed_evade{1.0},elapsed_stop_evade{1.0};
+
+    vec3d initialPos{};
 
     void plusDeltatime(float deltaTime, double& elapsed) { elapsed += deltaTime; };
     // Behaviour trees

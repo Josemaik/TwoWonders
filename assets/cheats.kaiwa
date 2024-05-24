@@ -1,0 +1,49 @@
+{
+    "Niveles": [
+        {
+            "Nombre": 0,
+            "Puntos": [
+                {"Nombre": "Posición Incial", "Posición": [33.0, 4.0, -25.9]},
+                {"Nombre": "Primer cofre", "Posición": [32.0, 4.0, 43.0]},
+                {"Nombre": "Segundo cofre", "Posición": [32.0, 4.0, 130.0]},
+                {"Nombre": "Cofre con llave", "Posición": [-72.0, 4.0, 72.9]},
+                {"Nombre": "Apisonadora", "Posición": [-116.0, 4.0, 111.0]}
+            ]
+        },
+        {
+            "Nombre": 1,
+            "Puntos": [
+                {"Nombre": "Posición Incial", "Posición": [7.0, 22.0, -21.0]},
+                {"Nombre": "Primera rampa", "Posición": [-68.0, 4.0, -22.0]},
+                {"Nombre": "Segundo altar", "Posición": [-126.0, 4.0, 152.0]},
+                {"Nombre": "Campamento", "Posición": [-6.0, 4.0, 94.0]},
+                {"Nombre": "Pasillo antes segundo campamento", "Posición": [34.0, 13.0, 99.0]},
+                {"Nombre": "Segundo campamento", "Posición": [30.0, 13.0, 213.0]},
+                {"Nombre": "NPC", "Posición": [-26.0, 4.0, 235.0]},
+                {"Nombre": "Final", "Posición": [-113.0, 13.0, 236.0]},
+                {"Nombre": "pasillo nivel 1", "Posición": [46.0, 13.0, 86.9]}
+            ]
+        },
+        {
+            "Nombre": 2,
+            "Puntos": [
+                {"Nombre": "Posición Incial", "Posición": [-28.0, 49.0, -30.0]},
+                {"Nombre": "Segunda rampa", "Posición": [34.0, 29.0, -60.0]},
+                {"Nombre": "Lugar donde muñeco de nieve", "Posición": [-7.55, 40.0, 16.0]},
+                {"Nombre": "Desp segunda lava", "Posición": [37.0, 13.0, -104.0]},
+                {"Nombre": "Spawn", "Posición": [-95.0, 22.0, -135.0]},
+                {"Nombre": "Spawn crater", "Posición": [-30.24, 49.0, -26.59]},
+                {"Nombre": "spawn ramp muñeco", "Posición": [-58.26,31.0,16.54]},
+                {"Nombre": "Nomada", "Posición": [40.0, 50.0, -3.0]}
+            ]
+        },
+        {
+            "Nombre": 3,
+            "Puntos": [
+                {"Nombre": "Posición Incial", "Posición": [4.6, 7.0, -32.9]},
+                {"Nombre": "Hacia detrás casa", "Posición": [-33.0, 13.0, -0.5]},
+                {"Nombre": "Campamento", "Posición": [-65.0, 13.0, 104.0]}
+            ]
+        }
+    ]
+}

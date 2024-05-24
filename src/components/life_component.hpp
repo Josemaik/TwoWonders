@@ -11,7 +11,7 @@ struct LifeComponent
     bool vidaMax() { return (life == maxLife + maxLifeAdd); };
     bool decreaseNextFrame{ false };
 
-    int life{ 1 }, maxLife{ life }, life_width{}, lifeLost{ 0 }, maxLifeAdd{ 0 };
-    float countdown{ 0.5 }, elapsed{ countdown }; // En segundos
-    bool markedForDeletion{ false }, invulnerable{ false };
+    int life{ 1 }, maxLife{ life }, lifeLost{ 0 }, maxLifeAdd{ 0 };
+    float countdown{ 0.5 }, elapsed{ countdown }, life_width{}; // En segundos
+    bool markedForDeletion{ false }, invulnerable{ false }, onDeathAnim{ false };
 };

@@ -1,464 +1,518 @@
 #include "game_engine.hpp"
-#include <chrono>
 
 ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     : width_{ width }, height_{ height }
 {
     ENGI::GameEngine::initWindow(width_, height_, "Two Wonders");
 
+    camera = dmeg.GetCamera();
+
     ENGI::GameEngine::setUpCamera({ 0.0f, 1.0f, 0.0f });
-    ENGI::GameEngine::setProjectionCamera(CAMERA_ORTHOGRAPHIC);
+    ENGI::GameEngine::setProjectionCamera(CameraProjection::CAMERA_ORTHOGRAPHIC);
 
-    // Logo Two Wonders
-    loadAndResizeImage("logo_twowonders", "assets/logo_two_wonders.png");
+    widthRate = static_cast<float>(width) / 1920.0f;
+    heightRate = static_cast<float>(height) / 1080.0f;
 
-    // Logo Kaiwa Games
-    loadAndResizeImage("logo_kaiwagames", "assets/logo_kaiwa_games.png");
+    auto* rootNode = dmeg.GetRootNode();
+    nodes["3D"] = dmeg.CreateNode("Scene 3D", rootNode);
+    nodes["2D"] = dmeg.CreateNode("Scene 2D", rootNode);
+    nodes["Menu"] = dmeg.CreateNode("Menu", rootNode);
+    nodes["HUD"] = dmeg.CreateNode("HUD", nodes["2D"]);
+    nodes["Book"] = dmeg.CreateNode("Book", nodes["HUD"]);
+    nodes["SnowStarfield"] = dmeg.CreateNode("SnowStarfield", nodes["HUD"]);
+    nodes["Dialog"] = dmeg.CreateNode("Dialog", nodes["HUD"]);
+    nodes["Gifs"] = dmeg.CreateNode("Gifs", nodes["2D"]);
+    nodes["Nums"] = dmeg.CreateNode("Nums", nodes["HUD"]);
+    nodes["Faces"] = dmeg.CreateNode("Faces", nodes["HUD"]);
+    nodes["Hearts"] = dmeg.CreateNode("Hearts", nodes["HUD"]);
+    nodes["ManaBar"] = dmeg.CreateNode("Mana", nodes["HUD"]);
+    nodes["CoinBar"] = dmeg.CreateNode("Coins", nodes["HUD"]);
+    nodes["Copy"] = dmeg.CreateNode("Copy", nodes["HUD"]);
+    nodes["Boat"] = dmeg.CreateNode("Boat", nodes["HUD"]);
+    nodes["AnimTextures"] = dmeg.CreateNode("AnimTextures", nodes["HUD"]);
+    nodes["PartTextures"] = dmeg.CreateNode("PartTextures", nodes["HUD"]);
+    nodes["Debug"] = dmeg.CreateNode("Debug", nodes["HUD"]);
+    nodes["DebugPhy"] = dmeg.CreateNode("DebugPhy", nodes["Debug"]);
+    nodes["DebugAI1"] = dmeg.CreateNode("DebugAI1", nodes["Debug"]);
+    nodes["DebugAI2"] = dmeg.CreateNode("DebugAI2", nodes["Debug"]);
+    nodes["DebugAI3"] = dmeg.CreateNode("DebugAI3", nodes["Debug"]);
+    nodes["DebugAI4"] = dmeg.CreateNode("DebugAI4", nodes["Debug"]);
+    nodes["MenuPrincipal"] = dmeg.CreateNode("MenuPrincipal", nodes["Menu"]);
+    nodes["MenuOpciones"] = dmeg.CreateNode("MenuOpciones", nodes["Menu"]);
+    nodes["MenuCheats"] = dmeg.CreateNode("MenuCheats", nodes["Menu"]);
+    nodes["MenuInventory"] = dmeg.CreateNode("MenuInventory", nodes["Menu"]);
 
-    // Corazones HUD
-    loadAndResizeImage("heart", "assets/HUD/corazon.png");
+    ENGI::GameEngine::setExitKey(D_KEY_F8);
+
+    // Fondo Inicio
+    loadAndResizeImage("fondo_inicio", "assets/Principal_fondo.png", nodes["MenuPrincipal"]);
+
+    // Fondo Opciones
+    loadAndResizeImage("fondo_opciones", "assets/Opciones_fondo.png", nodes["MenuOpciones"]);
+
+    // Logo TwoWonders
+    loadAndResizeImage("logo_twowonders", "assets/logo_two_wonders.png", nodes["MenuPrincipal"]);
+
+    // Fondo Inventario
+    loadAndResizeImage("fondo_inventario", "assets/Inventario-fondo.png", nodes["MenuInventory"]);
+
+    // Logo Kaiwa
+    loadAndResizeImage("logo_kaiwa", "assets/logo_kaiwa_games.png", nodes["2D"]);
+
+    // Hover Inventario
+    loadAndResizeImage("hover_inventario", "assets/Inventario/Inv-select.png", nodes["MenuInventory"]);
+
+    // Corazón HUD
+    loadAndResizeImage("heart", "assets/HUD/corazon.png", nodes["Hearts"]);
 
     // Medio Corazón HUD
-    loadAndResizeImage("half_heart", "assets/HUD/corazon_medio.png");
+    loadAndResizeImage("half_heart", "assets/HUD/corazon_medio.png", nodes["Hearts"]);
 
     // Corazones vacíos HUD
-    loadAndResizeImage("empty_heart", "assets/HUD/corazon_vacio.png");
+    loadAndResizeImage("empty_heart", "assets/HUD/corazon_vacio.png", nodes["Hearts"]);;
 
     // Corazones Hielo HUD
-    loadAndResizeImage("ice_heart", "assets/HUD/corazon_escudo2.png");
+    loadAndResizeImage("ice_heart", "assets/HUD/corazon_escudo2.png", nodes["Hearts"]);;
 
     // Medio Corazón Hielo HUD
-    loadAndResizeImage("half_ice_heart", "assets/HUD/corazon_escudo_medio2.png");
+    loadAndResizeImage("half_ice_heart", "assets/HUD/corazon_escudo_medio2.png", nodes["Hearts"]);
 
     // Corazones vacíos Hielo HUD
-    loadAndResizeImage("empty_ice_heart", "assets/HUD/corazon_escudo_v2.png");
+    loadAndResizeImage("empty_ice_heart", "assets/HUD/corazon_escudo_v2.png", nodes["Hearts"]);
 
     // Mago Happy HUD
-    loadAndResizeImage("mago_happy", "assets/HUD/caras/mago_happy.png");
+    loadAndResizeImage("mago_happy", "assets/HUD/caras/mago_happy.png", nodes["Faces"]);
+    loadAndResizeImage("mago_happyInv", "assets/HUD/caras/mago_happy.png", nodes["MenuInventory"]);
 
     // Mago Meh HUD
-    loadAndResizeImage("mago_meh", "assets/HUD/caras/mago_meh.png");
+    loadAndResizeImage("mago_meh", "assets/HUD/caras/mago_meh.png", nodes["Faces"]);
+    loadAndResizeImage("mago_mehInv", "assets/HUD/caras/mago_meh.png", nodes["MenuInventory"]);
 
     // Mago SOS HUD
-    loadAndResizeImage("mago_sos", "assets/HUD/caras/mago_sos.png");
+    loadAndResizeImage("mago_sos", "assets/HUD/caras/mago_sos.png", nodes["Faces"]);
+    loadAndResizeImage("mago_sosInv", "assets/HUD/caras/mago_sos.png", nodes["MenuInventory"]);
 
     // Nómada HUD
-    loadAndResizeImage("nomada", "assets/HUD/caras/calabaza3.png");
+    loadAndResizeImage("nomada", "assets/HUD/caras/calabaza3.png", nodes["Faces"]);
 
     // Investigador HUD
-    loadAndResizeImage("investigador", "assets/HUD/caras/investigador.png");
-
-    // Barra de maná HUD
-    loadAndResizeImage("mana", "assets/HUD/mana_bar.png");
-
-    // Destellos HUD
-    loadAndResizeImage("destellos", "assets/HUD/destellos.png");
-
-    // Destello fijado HUD
-    loadAndResizeImage("destellin", "assets/HUD/fijado_destellin.png");
+    loadAndResizeImage("investigador", "assets/HUD/caras/investigador.png", nodes["Faces"]);
 
     // Candado abierto HUD
-    loadAndResizeImage("candado_abierto", "assets/HUD/candado_abierto.png");
+    loadAndResizeImage("candado_abierto", "assets/HUD/candado_abierto.png", nodes["HUD"]);
 
     // Candado cerrado HUD
-    loadAndResizeImage("candado_cerrado", "assets/HUD/candado_cerrado.png");
+    loadAndResizeImage("candado_cerrado", "assets/HUD/candado_cerrado.png", nodes["HUD"]);
+
+    // Fijado Destello HUD
+    loadAndResizeImage("destellin", "assets/HUD/fijado_destellin.png", nodes["HUD"]);
+
+    // Barra de destellos HUD
+    loadAndResizeImage("destellos", "assets/HUD/destellos.png", nodes["CoinBar"]);
+
+    // Rectángulo de la barra de maná
+    createRectangle({ 0, 0 }, { 1, 35 }, { 154, 222, 235, 255 }, "mana_rect", nodes["ManaBar"]);
+
+    // Rectángulo fondo de la vida de los enemigos
+    createRectangle({ 0, 0 }, { 40, 4 }, { D_GRAY }, "borde_vida", nodes["HUD"]);
+
+    // Rectángulo de la barra de vida
+    createRectangle({ 0, 0 }, { 1, 4 }, { D_RED }, "vida_rect", nodes["HUD"]);
+
+    // Rectángulo blanco debug físicas
+    createRectangle({ 0, 55 }, { 225, 520 }, D_WHITE, "debugRectPhy", nodes["DebugPhy"]);
+
+    // Borde Barra Maná
+    loadAndResizeImage("borde_mana", "assets/HUD/mana_bar.png", nodes["ManaBar"]);
+
+    // Cuadro de diálogo
+    createTextBox({ 0, 0 }, { 900, 180 }, D_WHITE, "", dmeg.GetDefaultFont(),
+        20, D_BLACK, Aligned::CENTER, Aligned::CENTER, "cuadroDialogo", nodes["Dialog"], true);
 
     // Diálogo Siguiente HUD
-    loadAndResizeImage("sig", "assets/HUD/dialog_siguiente.png");
+    loadAndResizeImage("sig", "assets/HUD/dialog_siguiente.png", nodes["Dialog"]);
 
     // Espacio para hechizos de agua HUD
-    loadAndResizeImage("placeholder", "assets/HUD/item_agua.png");
+    loadAndResizeImage("placeholder", "assets/HUD/item_agua.png", nodes["AnimTextures"]);
+    loadAndResizeImage("placeholderInv1", "assets/HUD/item_agua.png", nodes["MenuInventory"]);
+    loadAndResizeImage("placeholderInv2", "assets/HUD/item_agua.png", nodes["MenuInventory"]);
+    loadAndResizeImage("placeholderInv3", "assets/HUD/item_agua.png", nodes["MenuInventory"]);
+    loadAndResizeImage("placeholderSelected", "assets/Inventario/inv-select-atq.png", nodes["MenuInventory"]);
+    loadAndResizeImage("objSelection", "assets/Inventario/inv-cont-obj.png", nodes["MenuInventory"]);
 
     // Icono de palo HUD
-    loadAndResizeImage("palo", "assets/HUD/palo.png");
+    loadAndResizeImage("palo", "assets/HUD/palo.png", nodes["AnimTextures"]);
 
     // Icono para las pompas de agua HUD
-    loadAndResizeImage("pompas", "assets/HUD/pompas.png", 1.5, 1.5);
+    loadAndResizeImage("pompas", "assets/HUD/pompas.png", nodes["AnimTextures"]);
+    loadAndResizeImage("pompasInv", "assets/HUD/pompas.png", nodes["MenuInventory"]);
+    loadAndResizeImage("pompasInv2", "assets/HUD/pompas.png", nodes["MenuInventory"]);
 
     // Icono para el dash de agua HUD
-    loadAndResizeImage("dash", "assets/HUD/dash.png");
+    loadAndResizeImage("dash", "assets/HUD/dash.png", nodes["AnimTextures"]);
+    loadAndResizeImage("dashInv", "assets/HUD/dash.png", nodes["MenuInventory"]);
+    loadAndResizeImage("dashInv2", "assets/HUD/dash.png", nodes["MenuInventory"]);
 
     // Icono para la bola de fuego HUD
-    loadAndResizeImage("bola_fuego", "assets/HUD/bolafuego.png");
+    loadAndResizeImage("bola_fuego", "assets/HUD/bolafuego.png", nodes["AnimTextures"]);
+    loadAndResizeImage("bola_fuegoInv", "assets/HUD/bolafuego.png", nodes["MenuInventory"]);
+    loadAndResizeImage("bola_fuegoInv2", "assets/HUD/bolafuego.png", nodes["MenuInventory"]);
 
     // Icono para meteoritos HUD
-    loadAndResizeImage("meteoritos", "assets/HUD/meteoritos.png");
+    loadAndResizeImage("meteoritos", "assets/HUD/meteoritos.png", nodes["AnimTextures"]);
+    loadAndResizeImage("meteoritosInv", "assets/HUD/meteoritos.png", nodes["MenuInventory"]);
+    loadAndResizeImage("meteoritosInv2", "assets/HUD/meteoritos.png", nodes["MenuInventory"]);
 
     // Icono para escudo de hielo HUD
-    loadAndResizeImage("escudo_hielo", "assets/HUD/escudo.png");
+    loadAndResizeImage("escudo_hielo", "assets/HUD/escudo.png", nodes["AnimTextures"]);
+    loadAndResizeImage("escudo_hieloInv", "assets/HUD/escudo.png", nodes["MenuInventory"]);
+    loadAndResizeImage("escudo_hieloInv2", "assets/HUD/escudo.png", nodes["MenuInventory"]);
 
     // Icono para las estacas de hielo HUD
-    loadAndResizeImage("estacas", "assets/HUD/estacas.png");
+    loadAndResizeImage("estacas", "assets/HUD/estacas.png", nodes["AnimTextures"]);
+    loadAndResizeImage("estacasInv", "assets/HUD/estacas.png", nodes["MenuInventory"]);
+    loadAndResizeImage("estacasInv2", "assets/HUD/estacas.png", nodes["MenuInventory"]);
 
     // Libro para enseñar hechizos HUD
-    loadAndResizeImage("libro", "assets/HUD/Libro.png");
+    loadAndResizeImage("libro", "assets/HUD/Libro.png", nodes["Book"]);
 
     // Icono de detección HUD
-    loadAndResizeImage("detectionicon", "assets/HUD/detectionicon.png");
+    loadAndResizeImage("detectionIcon", "assets/HUD/detectionicon.png", nodes["HUD"]);
 
     // Barco para el nivel del volcán HUD
-    loadAndResizeImage("barco", "assets/HUD/barco_piezas.png");
+    loadAndResizeImage("barco", "assets/HUD/barco_piezas.png", nodes["Boat"]);
+    nodes["BoatCopy"] = dmeg.CreateNode("BoatCopy", nodes["Boat"]);
 
     // Icono Batalla HUD
-    loadAndResizeImage("batalla", "assets/HUD/batalla.png");
+    loadAndResizeImage("batalla", "assets/HUD/batalla.png", nodes["HUD"]);
 
     // Botón círculo HUD 
-    loadAndResizeImage("boton_circulo", "assets/HUD/botones/cont_circulo.png");
+    loadAndResizeImage("boton_circulo", "assets/HUD/botones/cont_circulo.png", nodes["AnimTextures"]);
+    loadAndResizeImage("boton_circuloInv", "assets/HUD/botones/cont_circulo.png", nodes["MenuInventory"]);
 
     // Botón cuadrado HUD
-    loadAndResizeImage("boton_cuadrado", "assets/HUD/botones/cont_cuadrado.png");
+    loadAndResizeImage("boton_cuadrado", "assets/HUD/botones/cont_cuadrado.png", nodes["AnimTextures"]);
+    loadAndResizeImage("boton_cuadradoInv", "assets/HUD/botones/cont_cuadrado.png", nodes["MenuInventory"]);
 
     // Botón triángulo HUD
-    loadAndResizeImage("boton_triangulo", "assets/HUD/botones/cont_triangulo.png");
+    loadAndResizeImage("boton_triangulo", "assets/HUD/botones/cont_triangulo.png", nodes["AnimTextures"]);
+    loadAndResizeImage("boton_trianguloInv", "assets/HUD/botones/cont_triangulo.png", nodes["MenuInventory"]);
 
     // Botón R2 HUD
-    loadAndResizeImage("boton_r2", "assets/HUD/botones/cont_R2.png");
+    loadAndResizeImage("boton_r2", "assets/HUD/botones/cont_R2.png", nodes["AnimTextures"]);
 
     // Tecla J HUD
-    loadAndResizeImage("tecla_j", "assets/HUD/teclas/cont_J.png");
+    loadAndResizeImage("tecla_j", "assets/HUD/teclas/cont_J.png", nodes["AnimTextures"]);
+    loadAndResizeImage("tecla_jInv", "assets/HUD/teclas/cont_J.png", nodes["MenuInventory"]);
 
     // Tecla K HUD
-    loadAndResizeImage("tecla_k", "assets/HUD/teclas/cont_K.png");
+    loadAndResizeImage("tecla_k", "assets/HUD/teclas/cont_K.png", nodes["AnimTextures"]);
+    loadAndResizeImage("tecla_kInv", "assets/HUD/teclas/cont_K.png", nodes["MenuInventory"]);
 
     // Tecla L HUD
-    loadAndResizeImage("tecla_l", "assets/HUD/teclas/cont_L.png");
+    loadAndResizeImage("tecla_l", "assets/HUD/teclas/cont_L.png", nodes["AnimTextures"]);
+    loadAndResizeImage("tecla_lInv", "assets/HUD/teclas/cont_L.png", nodes["MenuInventory"]);
 
     // Tecla Espacio HUD
-    loadAndResizeImage("tecla_espacio", "assets/HUD/teclas/cont_space.png");
+    loadAndResizeImage("tecla_espacio", "assets/HUD/teclas/cont_space.png", nodes["AnimTextures"]);
 
     // Imagen Mando HUD
-    loadAndResizeImage("mando_explicacion", "assets/HUD/botones/Mando_botones.png");
+    loadAndResizeImage("mando_explicacion", "assets/HUD/botones/Mando_botones.png", nodes["2D"]);
 
     // Imagen Teclado HUD
-    loadAndResizeImage("teclado_explicacion", "assets/HUD/teclas/teclado_ctrl.png");
+    loadAndResizeImage("teclado_explicacion", "assets/HUD/teclas/teclado_ctrl.png", nodes["2D"]);
 
     // NÚMEROS Y SÍMBOLOS NUMÉRICOS
     //
-    loadAndResizeImage("0", "assets/HUD/numeros/0.png");
-    loadAndResizeImage("1", "assets/HUD/numeros/1.png");
-    loadAndResizeImage("2", "assets/HUD/numeros/2.png");
-    loadAndResizeImage("3", "assets/HUD/numeros/3.png");
-    loadAndResizeImage("4", "assets/HUD/numeros/4.png");
-    loadAndResizeImage("5", "assets/HUD/numeros/5.png");
-    loadAndResizeImage("6", "assets/HUD/numeros/6.png");
-    loadAndResizeImage("7", "assets/HUD/numeros/7.png");
-    loadAndResizeImage("8", "assets/HUD/numeros/8.png");
-    loadAndResizeImage("9", "assets/HUD/numeros/9.png");
-    loadAndResizeImage("+", "assets/HUD/numeros/mas.png");
-    loadAndResizeImage("-", "assets/HUD/numeros/-.png");
-    loadAndResizeImage("barra", "assets/HUD/barra.png");
+    loadAndResizeImage("0", "assets/HUD/numeros/0.png", nodes["Nums"]);
+    loadAndResizeImage("1", "assets/HUD/numeros/1.png", nodes["Nums"]);
+    loadAndResizeImage("2", "assets/HUD/numeros/2.png", nodes["Nums"]);
+    loadAndResizeImage("3", "assets/HUD/numeros/3.png", nodes["Nums"]);
+    loadAndResizeImage("4", "assets/HUD/numeros/4.png", nodes["Nums"]);
+    loadAndResizeImage("5", "assets/HUD/numeros/5.png", nodes["Nums"]);
+    loadAndResizeImage("6", "assets/HUD/numeros/6.png", nodes["Nums"]);
+    loadAndResizeImage("7", "assets/HUD/numeros/7.png", nodes["Nums"]);
+    loadAndResizeImage("8", "assets/HUD/numeros/8.png", nodes["Nums"]);
+    loadAndResizeImage("9", "assets/HUD/numeros/9.png", nodes["Nums"]);
+    loadAndResizeImage("+", "assets/HUD/numeros/mas.png", nodes["Nums"]);
+    loadAndResizeImage("-", "assets/HUD/numeros/-.png", nodes["Nums"]);
+    loadAndResizeImage("barra", "assets/HUD/barra.png", nodes["Nums"]);
+
+    // TEXTURAS PARTÍCULAS
+    //
+    loadAndResizeImage("p_est1", "assets/HUD/p_texturas/p_est1.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est2", "assets/HUD/p_texturas/p_est2.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est3", "assets/HUD/p_texturas/p_est3.png", nodes["PartTextures"]);
+    loadAndResizeImage("p_est4", "assets/HUD/p_texturas/p_est4.png", nodes["PartTextures"]);
 
     // GIFS
     //
     // Joystick Izquierdo
-    loadAndResizeImageGif("joystick_izq", "assets/HUD/botones/joystickL.gif", 0, 18);
+    loadAndResizeImageGif("joystick_izq", "assets/HUD/botones/joystickL.gif");
 
     // Fijador de cámara
-    loadAndResizeImageGif("fijado", "assets/HUD/gifs/fijado_trama.gif", 0, 18, 1.2, 1.2);
+    loadAndResizeImageGif("fijado", "assets/HUD/gifs/fijado_trama.gif");
 
     // Botón X
-    loadAndResizeImageGif("x", "assets/HUD/botones/x.gif", 0, 28);
+    loadAndResizeImageGif("x", "assets/HUD/botones/x.gif");
 
     // Botón Círculo
-    loadAndResizeImageGif("circulo", "assets/HUD/botones/circulo.gif", 0, 28);
+    loadAndResizeImageGif("circulo", "assets/HUD/botones/circulo.gif");
 
     // Botón Triángulo
-    loadAndResizeImageGif("triangulo", "assets/HUD/botones/triangulo.gif", 0);
+    loadAndResizeImageGif("triangulo", "assets/HUD/botones/triangulo.gif");
 
     // Botón Cuadrado
-    loadAndResizeImageGif("cuadrado", "assets/HUD/botones/cuadrado.gif", 0, 28);
+    loadAndResizeImageGif("cuadrado", "assets/HUD/botones/cuadrado.gif");
 
     // Botón Menú
-    loadAndResizeImageGif("menu", "assets/HUD/botones/menu.gif", 0);
+    loadAndResizeImageGif("menu", "assets/HUD/botones/menu.gif");
 
     // Tecla E
-    loadAndResizeImageGif("e", "assets/HUD/teclas/e.gif", 0, 28);
+    loadAndResizeImageGif("e", "assets/HUD/teclas/e.gif");
 
     // Tecla F
-    loadAndResizeImageGif("f", "assets/HUD/teclas/f.gif", 0, 28);
+    loadAndResizeImageGif("f", "assets/HUD/teclas/f.gif");
 
     // Tecla Q
-    loadAndResizeImageGif("q", "assets/HUD/teclas/q.gif", 0, 28);
+    loadAndResizeImageGif("q", "assets/HUD/teclas/q.gif");
 
     // Tecla I
-    loadAndResizeImageGif("i", "assets/HUD/teclas/i.gif", 0, 28);
+    loadAndResizeImageGif("i", "assets/HUD/teclas/i.gif");
 
     // Tecla H
-    loadAndResizeImageGif("h", "assets/HUD/teclas/H.gif", 0, 28);
+    loadAndResizeImageGif("h", "assets/HUD/teclas/H.gif");
 
     // Tecla L
-    loadAndResizeImageGif("l", "assets/HUD/teclas/L.gif", 0, 28);
+    loadAndResizeImageGif("l", "assets/HUD/teclas/L.gif");
 
     // Tecla J
-    loadAndResizeImageGif("j", "assets/HUD/teclas/J.gif", 0, 28);
+    loadAndResizeImageGif("j", "assets/HUD/teclas/J.gif");
 
     // Tecla K
-    loadAndResizeImageGif("k", "assets/HUD/teclas/k.gif", 0, 28);
+    loadAndResizeImageGif("k", "assets/HUD/teclas/k.gif");
 
     // Tecla O
-    loadAndResizeImageGif("o", "assets/HUD/teclas/o.gif", 0, 28);
+    loadAndResizeImageGif("o", "assets/HUD/teclas/o.gif");
 
     // Tecla U
-    loadAndResizeImageGif("u", "assets/HUD/teclas/u.gif", 0, 28);
+    loadAndResizeImageGif("u", "assets/HUD/teclas/u.gif");
 
     // Tecla Espacio
-    loadAndResizeImageGif("espacio", "assets/HUD/teclas/espacio.gif", 0, 28);
+    loadAndResizeImageGif("espacio", "assets/HUD/teclas/espacio.gif");
 
     // Pantalla de carga
-    loadAndResizeImageGif("carga", "assets/HUD/gifs/carga_elementos.gif", 0, 28);
+    loadAndResizeImageGif("carga", "assets/HUD/gifs/carga_elementos.gif");
 
     // Teclas WASD
-    loadAndResizeImageGif("wasd", "assets/HUD/teclas/WASD.gif", 0, 28);
+    loadAndResizeImageGif("wasd", "assets/HUD/teclas/WASD.gif");
 
     // Ejemplo pompa
-    loadAndResizeImageGif("exp_pompa", "assets/HUD/gifs/hechizos/exp_pompa.gif", 0, 28);
+    loadAndResizeImageGif("exp_pompa", "assets/HUD/gifs/hechizos/exp_pompa.gif", 1.1f);
 
     // Ejemplo dash de agua
-    loadAndResizeImageGif("exp_dash", "assets/HUD/gifs/hechizos/exp_dash.gif", 0, 28);
+    loadAndResizeImageGif("exp_dash", "assets/HUD/gifs/hechizos/exp_dash.gif", 1.1f);
 
     // Ejemplo bola de fuego
-    loadAndResizeImageGif("exp_bola_f", "assets/HUD/gifs/hechizos/exp_bola_f.gif", 0, 28);
+    loadAndResizeImageGif("exp_bola_f", "assets/HUD/gifs/hechizos/exp_bola_f.gif", 1.1f);
 
     // Botón L2
-    loadAndResizeImageGif("l2", "assets/HUD/botones/L2.gif", 0, 28);
+    loadAndResizeImageGif("l2", "assets/HUD/botones/L2.gif");
 
     // Botón R2
-    loadAndResizeImageGif("r2", "assets/HUD/botones/R2.gif", 0, 28);
+    loadAndResizeImageGif("r2", "assets/HUD/botones/R2.gif");
 
     // Botón L1
-    loadAndResizeImageGif("l1", "assets/HUD/botones/L1.gif", 0, 28);
+    loadAndResizeImageGif("l1", "assets/HUD/botones/L1.gif");
 
     // Botón R1
-    loadAndResizeImageGif("r1", "assets/HUD/botones/R1.gif", 0, 28);
+    loadAndResizeImageGif("r1", "assets/HUD/botones/R1.gif");
 
     //Detección por oído
-    loadAndResizeImageGif("Oido_parp1", "assets/HUD/gifs/Oido_parp1.gif", 0, 28);
-    loadAndResizeImageGif("Oido_parp2", "assets/HUD/gifs/Oido_parp2.gif", 0, 28);
-
-    SetExitKey(KEY_F8);
-}
-
-////// IMAGE AND TEXTURE //////
-
-Image ENGI::GameEngine::loadImage(const char* filename) {
-    return LoadImage(filename);
-}
-
-Image ENGI::GameEngine::loadImagenAnim(const char* filename, int& frames) {
-    return LoadImageAnim(filename, &frames);
-}
-
-void ENGI::GameEngine::imageResize(Image* image, int newWidth, int newHeight) {
-    ImageResize(image, newWidth, newHeight);
-}
-
-void ENGI::GameEngine::unloadImage(Image image) {
-    UnloadImage(image);
-}
-
-Texture2D ENGI::GameEngine::loadTextureFromImage(Image image) {
-    return LoadTextureFromImage(image);
+    loadAndResizeImageGif("Oido_parp1", "assets/HUD/gifs/Oido_parp1.gif");
+    loadAndResizeImageGif("Oido_parp2", "assets/HUD/gifs/Oido_parp2.gif");
+    nodes["TextCopy"] = dmeg.CreateNode("TextCopy", nodes["HUD"]);
 }
 
 ////// TIMIING RELATED FUNCTIONS //////
 
 void ENGI::GameEngine::setTargetFPS(int fps) {
-    SetTargetFPS(fps);
+    dmeg.SetTargetFPS(fps);
+}
+
+double ENGI::GameEngine::getTargetFPS() {
+    return dmeg.GetTargetFPS();
 }
 
 float ENGI::GameEngine::getFrameTime() {
-    return GetFrameTime();
+    return static_cast<float>(dmeg.GetFrameTime());
+}
+
+double ENGI::GameEngine::getFrameTimeDouble() {
+    return dmeg.GetFrameTime();
 }
 
 ////// DRAWING //////
 
 void ENGI::GameEngine::beginDrawing() {
-    BeginDrawing();
+    dmeg.BeginDrawing();
 }
 
 void ENGI::GameEngine::clearBackground(Color color) {
-    ClearBackground(color);
-}
-
-void ENGI::GameEngine::drawGrid(int slices, float spacing) {
-    DrawGrid(slices, spacing);
+    dmeg.ClearBackground(color);
 }
 
 void ENGI::GameEngine::endDrawing() {
-    EndDrawing();
+    dmeg.EndDrawing();
+    // EndDrawing();
 }
 
 void ENGI::GameEngine::beginMode3D() {
-    BeginMode3D(camera);
+    // BeginMode3D(camera);
 }
 
 void ENGI::GameEngine::endMode3D() {
-    EndMode3D();
+    // EndMode3D();
 }
 
-void ENGI::GameEngine::drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color) {
-    DrawLine(startPosX, startPosY, endPosX, endPosY, color);
+void ENGI::GameEngine::drawCubeWires(vec3d position, vec3d size, Color color) {
+    dmeg.CreateCubeWires(position.toGlm(), size.toGlm(), color, "wires", nodes["Copy"]);
 }
 
-void ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, Color color) {
-    DrawLine3D(startPos.toRaylib(), endPos.toRaylib(), color);
+// void ENGI::GameEngine::drawModel(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint) {
+//     DrawModelEx(model, position.toRaylib(), rotationAxis.toRaylib(), rotationAngle, scale.toRaylib(), tint);
+// }
+
+// void ENGI::GameEngine::drawModelWires(ModelType model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint) {
+//     DrawModelWiresEx(model, position.toRaylib(), rotationAxis.toRaylib(), rotationAngle, scale.toRaylib(), tint);
+// }
+
+void ENGI::GameEngine::drawNode(Node* node, vec2i pos, vec2f scale) {
+    scale *= { widthRate, heightRate };
+
+    if (pos == vec2i(-1, -1))
+        pos = { static_cast<int>(node->getTranslation().x), static_cast<int>(node->getTranslation().y) };
+
+    node->setTranslation({ pos.x, pos.y, 0.0f });
+    node->setScale({ scale.x, scale.y, 1.0f });
+    node->setVisibleOne(true);
 }
 
-void ENGI::GameEngine::drawPoint3D(vec3d pos, Color color) {
-    DrawPoint3D(pos.toRaylib(), color);
+void ENGI::GameEngine::drawCircleSector(vec2d, float, float, float, int, Color) {
+    //DrawCircleSector(center.toRaylib(), radius, startAngle, endAngle, segments, color);
 }
 
-void ENGI::GameEngine::drawCube(vec3d pos, float width, float height, float lenght, Color color) {
-    DrawCube(pos.toRaylib(), width, height, lenght, color);
-}
-
-void ENGI::GameEngine::drawCubeWires(vec3d pos, float width, float height, float lenght, Color color) {
-    DrawCubeWires(pos.toRaylib(), width, height, lenght, color);
-}
-
-void ENGI::GameEngine::drawModel(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint) {
-    DrawModelEx(model, position.toRaylib(), rotationAxis.toRaylib(), rotationAngle, scale.toRaylib(), tint);
-}
-
-void ENGI::GameEngine::drawModelWires(Model model, vec3d position, vec3d rotationAxis, float rotationAngle, vec3d scale, Color tint) {
-    DrawModelWiresEx(model, position.toRaylib(), rotationAxis.toRaylib(), rotationAngle, scale.toRaylib(), tint);
-}
-
-void ENGI::GameEngine::drawRectangle(int posX, int posY, int width, int height, Color color) {
-    DrawRectangle(posX, posY, width, height, color);
-}
-
-void ENGI::GameEngine::drawRectangleLinesEx(Rectangle rec, float lineThick, Color color) {
-    DrawRectangleLinesEx(rec, lineThick, color);
-}
-
-void ENGI::GameEngine::drawRectangleRec(Rectangle rec, Color color) {
-    DrawRectangleRec(rec, color);
-}
-
-void ENGI::GameEngine::drawTexture(Texture2D texture, int posX, int posY, Color tint) {
-    DrawTexture(texture, posX, posY, tint);
-}
-
-void ENGI::GameEngine::drawTexture(Texture2D texture, int posX, int posY, Color tint, float scale) {
-    DrawTextureEx(texture, { static_cast<float>(posX), static_cast<float>(posY) }, 0.0f, scale, tint);
-}
-
-void ENGI::GameEngine::drawCircle(int posX, int posY, float radius, Color color) {
-    DrawCircle(posX, posY, radius, color);
-}
-
-void ENGI::GameEngine::drawCircleSector(vec2d center, float radius, float startAngle, float endAngle, int segments, Color color) {
-    DrawCircleSector(center.toRaylib(), radius, startAngle, endAngle, segments, color);
-}
-
-void ENGI::GameEngine::drawTriangle(vec2d v1, vec2d v2, vec2d v3, Color color) {
-    DrawTriangle(v1.toRaylib(), v2.toRaylib(), v3.toRaylib(), color);
-}
-
-////// TEXT //////
-
-void ENGI::GameEngine::drawText(const char* text, int posX, int posY, int fontSize, Color color) {
-    DrawText(text, posX, posY, fontSize, color);
-}
-
-void ENGI::GameEngine::drawTextEx(Font font, const char* text, vec2d position, float fontSize, float spacing, Color tint) {
-    DrawTextEx(font, text, position.toRaylib(), fontSize, spacing, tint);
-}
-
-vec2d ENGI::GameEngine::measureTextEx(Font font, const char* text, float fontSize, float spacing) {
-    Vector2 v = MeasureTextEx(font, text, fontSize, spacing);
-    return vec2d(v.x, v.y);
-}
-
-Font ENGI::GameEngine::getFontDefault() {
-    return GetFontDefault();
+void ENGI::GameEngine::drawTriangle(vec2d, vec2d, vec2d, Color) {
+    //DrawTriangle(v1.toRaylib(), v2.toRaylib(), v3.toRaylib(), color);
 }
 
 ////// WINDOW //////
 
 void ENGI::GameEngine::initWindow(int width, int height, const char* title)
 {
-    InitWindow(width, height, title);
+    dmeg.InitWindow(width, height, title);
 }
 
 void ENGI::GameEngine::closeWindow()
 {
-    CloseWindow();
+    dmeg.CloseWindow();
 }
 
 bool ENGI::GameEngine::windowShouldClose()
 {
-    return WindowShouldClose();
+    return dmeg.WindowShouldClose();
 }
 
 int ENGI::GameEngine::getScreenWidth()
 {
-    return GetScreenWidth();
+    return dmeg.GetScreenWidth();
 }
 
 int ENGI::GameEngine::getScreenHeight()
 {
-    return GetScreenHeight();
+    return dmeg.GetScreenHeight();
 }
 
 void ENGI::GameEngine::setWindowSize(int width, int height)
 {
-    if (IsWindowFullscreen())
-        ToggleFullscreen();
-    SetWindowSize(width, height);
+    if (dmeg.IsWindowFullscreen())
+        dmeg.ToggleFullscreen();
+
+    dmeg.SetWindowSize(width, height);
+    widthRate = static_cast<float>(width) / 1920.0f;
+    heightRate = static_cast<float>(height) / 1080.0f;
 }
 
 void ENGI::GameEngine::setWindowFullScreen()
 {
-    ToggleFullscreen();
+    dmeg.ToggleFullscreen();
+    if (dmeg.IsWindowFullscreen())
+    {
+        auto size = dmeg.GetMonitorSize();
+        widthRate = static_cast<float>(size.x) / 1920.0f;
+        heightRate = static_cast<float>(size.y) / 1080.0f;
+    }
+    else {
+        widthRate = static_cast<float>(dmeg.GetScreenWidth()) / 1920.0f;
+        heightRate = static_cast<float>(dmeg.GetScreenHeight()) / 1080.0f;
+    }
+}
+
+void ENGI::GameEngine::setExitKey(int key)
+{
+    dmeg.SetExitKey(key);
 }
 
 ////// CAMERA //////
 
 void ENGI::GameEngine::setPositionCamera(vec3d pos)
 {
-    camera.position = pos.toRaylib();
+    camera->position = { pos.x(), pos.y(), pos.z() };
 }
 
 void ENGI::GameEngine::setTargetCamera(vec3d tar)
 {
-    camera.target = tar.toRaylib();
+    camera->target = { tar.x(), tar.y(), tar.z() };
 }
 
 void ENGI::GameEngine::setUpCamera(vec3d up)
 {
-    camera.up = up.toRaylib();
+    camera->up = { up.x(), up.y(), up.z() };
 }
 
 void ENGI::GameEngine::setFovyCamera(float fovy)
 {
-    camera.fovy = fovy;
+    camera->fovy = fovy;
 }
 
-void ENGI::GameEngine::setProjectionCamera(int proj)
+void ENGI::GameEngine::setProjectionCamera(CameraProjection proj)
 {
-    camera.projection = proj;
+    camera->cameraProjection = proj;
 }
 
 vec3d ENGI::GameEngine::getPositionCamera()
 {
-    return vec3d(camera.position.x, camera.position.y, camera.position.z);
+    return vec3d(camera->position.x, camera->position.y, camera->position.z);
 }
 
 vec3d ENGI::GameEngine::getTargetCamera()
 {
-    return vec3d(camera.target.x, camera.target.y, camera.target.z);
+    return vec3d(camera->target.x, camera->target.y, camera->target.z);
 }
 
 vec3d ENGI::GameEngine::getUpCamera()
 {
-    return vec3d(camera.up.x, camera.up.y, camera.up.z);
+    return vec3d(camera->up.x, camera->up.y, camera->up.z);
 }
 
 float ENGI::GameEngine::getFovyCamera()
 {
-    return camera.fovy;
+    return camera->fovy;
+}
+
+glm::mat4 ENGI::GameEngine::getViewMatrix()
+{
+    return camera->getViewMatrix();
 }
 
 ////// INPUT HANDLING //////
@@ -467,11 +521,11 @@ bool ENGI::GameEngine::isKeyPressed(int key)
 {
     if (!replayMode)
     {
-        if (IsKeyPressed(key))
+        if (dmeg.IsKeyPressed(key))
         {
             switch (key)
             {
-            case KEY_E:
+            case D_KEY_E:
                 gameData->addInputEvent(InputEvent::Type::InteractKeyPressed);
                 break;
             default:
@@ -485,15 +539,20 @@ bool ENGI::GameEngine::isKeyPressed(int key)
         return gameData->isKeyPressed(key);
 }
 
+bool ENGI::GameEngine::isAnyKeyPressed()
+{
+    return dmeg.IsAnyKeyPressed();
+}
+
 bool ENGI::GameEngine::isKeyDown(int key)
 {
     if (!replayMode)
     {
-        if (IsKeyDown(key))
+        if (dmeg.IsKeyDown(key))
         {
             switch (key)
             {
-            case KEY_SPACE:
+            case D_KEY_SPACE:
                 gameData->addInputEvent(InputEvent::Type::AttackKeyDown);
                 break;
             default:
@@ -507,30 +566,35 @@ bool ENGI::GameEngine::isKeyDown(int key)
         return gameData->isKeyDown(key);
 }
 
+bool ENGI::GameEngine::isAnyKeyDown()
+{
+    return dmeg.IsAnyKeyDown();
+}
+
 bool ENGI::GameEngine::isKeyReleased(int key)
 {
     if (!replayMode)
     {
-        if (IsKeyReleased(key))
+        if (dmeg.IsKeyReleased(key))
         {
             switch (key)
             {
-            case KEY_ENTER:
+            case D_KEY_ENTER:
                 gameData->addInputEvent(InputEvent::Type::EnterReleased);
                 break;
-            case KEY_ESCAPE:
+            case D_KEY_ESCAPE:
                 gameData->addInputEvent(InputEvent::Type::EscapeReleased);
                 break;
-            case KEY_I:
+            case D_KEY_I:
                 gameData->addInputEvent(InputEvent::Type::InventoryReleased);
                 break;
-            case KEY_F:
+            case D_KEY_F:
                 gameData->addInputEvent(InputEvent::Type::LockInReleased);
                 break;
-            case KEY_Q:
+            case D_KEY_Q:
                 gameData->addInputEvent(InputEvent::Type::ChangeSpellReleased);
                 break;
-            case KEY_E:
+            case D_KEY_E:
                 gameData->addInputEvent(InputEvent::Type::InteractKeyReleased);
                 break;
             default:
@@ -544,240 +608,177 @@ bool ENGI::GameEngine::isKeyReleased(int key)
         return gameData->isKeyReleased(key);
 }
 
+bool ENGI::GameEngine::isAnyKeyReleased()
+{
+    return dmeg.IsAnyKeyReleased();
+}
+
 bool ENGI::GameEngine::isMouseButtonPressed(int button)
 {
-    return IsMouseButtonPressed(button);
+    return dmeg.IsMouseButtonPressed(button);
 }
 
 bool ENGI::GameEngine::isMouseButtonDown(int button)
 {
-    return IsMouseButtonDown(button);
+    return dmeg.IsMouseButtonDown(button);
 }
 
 bool ENGI::GameEngine::isGamepadAvailable(int gamepad)
 {
-    return IsGamepadAvailable(gamepad);
+    return dmeg.IsGamepadAvailable(gamepad);
 }
 
 bool ENGI::GameEngine::isGamepadButtonPressed(int gamepad, int button)
 {
     if (!replayMode)
     {
-        if (IsGamepadButtonPressed(gamepad, button))
+        if (dmeg.IsGamepadButtonPressed(gamepad, button))
         {
-            switch (button)
-            {
-            case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
-                gameData->addInputEvent(InputEvent::Type::InteractKeyPressed);
-                break;
-            case GAMEPAD_BUTTON_RIGHT_FACE_LEFT:
-                gameData->addInputEvent(InputEvent::Type::AttackKeyDown);
-                break;
-            default:
-                break;
-            }
+            // switch (button)
+            // {
+            // case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+            //     gameData->addInputEvent(InputEvent::Type::InteractKeyPressed);
+            //     break;
+            // case GAMEPAD_BUTTON_RIGHT_FACE_LEFT:
+            //     gameData->addInputEvent(InputEvent::Type::AttackKeyDown);
+            //     break;
+            // default:
+            //     break;
+            // }
             return true;
         }
         return false;
     }
-    else
-    {
-        switch (button)
-        {
-        case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
-            return gameData->isKeyPressed(KEY_E);
-            break;
-        case GAMEPAD_BUTTON_RIGHT_FACE_LEFT:
-            return gameData->isKeyDown(KEY_SPACE);
-            break;
-        default:
-            return false;
-        }
-    }
+    // else
+    // {
+    //     switch (button)
+    //     {
+    //     case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+    //         return gameData->isKeyPressed(D_KEY_E);
+    //         break;
+    //     case GAMEPAD_BUTTON_RIGHT_FACE_LEFT:
+    //         return gameData->isKeyDown(D_KEY_SPACE);
+    //         break;
+    //     default:
+    //         return false;
+    //     }
+    // }
+    return false;
 }
 
 bool ENGI::GameEngine::isGamepadButtonDown(int gamepad, int button)
 {
-    return IsGamepadButtonDown(gamepad, button);
+    return dmeg.IsGamepadButtonDown(gamepad, button);
 }
 
 bool ENGI::GameEngine::isGamepadButtonReleased(int gamepad, int button)
 {
     if (!replayMode)
     {
-        if (IsGamepadButtonReleased(gamepad, button))
+        if (dmeg.IsGamepadButtonReleased(gamepad, button))
         {
-            switch (button)
-            {
-            case GAMEPAD_BUTTON_MIDDLE_LEFT:
-                gameData->addInputEvent(InputEvent::Type::InventoryReleased);
-                break;
-            case GAMEPAD_BUTTON_RIGHT_FACE_RIGHT:
-                gameData->addInputEvent(InputEvent::Type::LockInReleased);
-                break;
-            case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
-                gameData->addInputEvent(InputEvent::Type::InteractKeyReleased);
-                break;
-            default:
-                break;
-            }
+            // switch (button)
+            // {
+            // case GAMEPAD_BUTTON_MIDDLE_LEFT:
+            //     gameData->addInputEvent(InputEvent::Type::InventoryReleased);
+            //     break;
+            // case GAMEPAD_BUTTON_RIGHT_FACE_RIGHT:
+            //     gameData->addInputEvent(InputEvent::Type::LockInReleased);
+            //     break;
+            // case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+            //     gameData->addInputEvent(InputEvent::Type::InteractKeyReleased);
+            //     break;
+            // default:
+            //     break;
+            // }
             return true;
         }
         return false;
     }
-    else
-    {
-        switch (button)
-        {
-        case GAMEPAD_BUTTON_MIDDLE_LEFT:
-            return gameData->isKeyReleased(KEY_I);
-            break;
-        case GAMEPAD_BUTTON_RIGHT_FACE_RIGHT:
-            return gameData->isKeyReleased(KEY_F);
-            break;
-        case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
-            return gameData->isKeyReleased(KEY_E);
-            break;
-        default:
-            return false;
-        }
-    }
+    // else
+    // {
+    //     switch (button)
+    //     {
+    //     case GAMEPAD_BUTTON_MIDDLE_LEFT:
+    //         return gameData->isKeyReleased(D_KEY_I);
+    //         break;
+    //     case GAMEPAD_BUTTON_RIGHT_FACE_RIGHT:
+    //         return gameData->isKeyReleased(D_KEY_F);
+    //         break;
+    //     case GAMEPAD_BUTTON_RIGHT_FACE_DOWN:
+    //         return gameData->isKeyReleased(D_KEY_E);
+    //         break;
+    //     default:
+    //         return false;
+    //     }
+    // }
+    return false;
 }
 
 float ENGI::GameEngine::getGamepadAxisMovement(int gamepad, int axis)
 {
-    return GetGamepadAxisMovement(gamepad, axis);
+    return dmeg.GetGamepadAxisMovement(gamepad, axis);
 }
 
-////// MOUSE COLLISION //////
-
-bool ENGI::GameEngine::checkCollisionPointRec(Vector2 point, Rectangle rec)
+Node* ENGI::GameEngine::loadModel(const char* filename)
 {
-    return CheckCollisionPointRec(point, rec);
+    return dmeg.CreateModel(filename, D_WHITE, filename, nodes["3D"]);
 }
 
-////// SHADERS //////
+// ModelType ENGI::GameEngine::loadModelRaylib(const char* filename)
+// {
+//     return LoadModel(filename);
+// }
 
-Shader ENGI::GameEngine::loadShader(const char* vsFileName, const char* fsFileName)
+Texture* ENGI::GameEngine::loadTexture2D(const char* filePath)
 {
-    return LoadShader(vsFileName, fsFileName);
+    return dmeg.LoadTexture2D(filePath);
 }
 
-void ENGI::GameEngine::unloadShader(Shader s)
+std::vector<Texture*> ENGI::GameEngine::loadTextures2DAnim(const char* filePath)
 {
-    UnloadShader(s);
+    return dmeg.LoadTexture2DAnim(filePath);
 }
 
-int ENGI::GameEngine::getShaderLocation(Shader s, const char* uniformName)
-{
-    return GetShaderLocation(s, uniformName);
-}
-
-void ENGI::GameEngine::setShaderValue(Shader s, int uniformLoc, const void* value, int uniformType)
-{
-    SetShaderValue(s, uniformLoc, value, uniformType);
-}
-
-////// AUX //////
-
-Mesh ENGI::GameEngine::genMeshCube(float width, float height, float lenght)
-{
-    return GenMeshCube(width, height, lenght);
-}
-
-Model ENGI::GameEngine::loadModelFromMesh(Mesh m)
-{
-    return LoadModelFromMesh(m);
-}
-
-Model ENGI::GameEngine::loadModel(const char* filename)
-{
-    return LoadModel(filename);
-}
-
-Texture2D ENGI::GameEngine::loadTexture(const char* filename)
-{
-    return LoadTexture(filename);
-}
-
-void ENGI::GameEngine::updateTexture(Texture2D texture, const void* data)
-{
-    UpdateTexture(texture, data);
-}
-
-void ENGI::GameEngine::unloadMesh(Mesh m)
-{
-    UnloadMesh(m);
-}
-
-void ENGI::GameEngine::unloadModel(Model m)
-{
-    UnloadModel(m);
-}
+// void ENGI::GameEngine::unloadModel(ModelType m)
+// {
+//     UnloadModel(m);
+// }
 
 float ENGI::GameEngine::getWorldToScreenX(vec3d pos)
 {
-    return GetWorldToScreen(pos.toRaylib(), camera).x;
+    return dmeg.GetWorldToScreen({ pos.x(), pos.y(), pos.z() }).x;
 }
 
 float ENGI::GameEngine::getWorldToScreenY(vec3d pos)
 {
-    return GetWorldToScreen(pos.toRaylib(), camera).y;
+    return dmeg.GetWorldToScreen({ pos.x(), pos.y(), pos.z() }).y;
 }
 
 RayCast ENGI::GameEngine::getMouseRay()
 {
-    Ray r = GetMouseRay(GetMousePosition(), camera);
-    return RayCast{ .origin = vec3d(r.position.x, r.position.y, r.position.z), .direction = vec3d(r.direction.x, r.direction.y, r.direction.z) };
+    auto ray = dmeg.GetMouseRay();
+    return RayCast{ {ray.origin.x, ray.origin.y, ray.origin.z}, {ray.direction.x, ray.direction.y, ray.direction.z} };
+    //Ray r = GetMouseRay(GetMousePosition(), camera);
+    //return RayCast{ .origin = vec3d(r.position.x, r.position.y, r.position.z), .direction = vec3d(r.direction.x, r.direction.y, r.direction.z) };
 }
 
-void ENGI::GameEngine::loadAndResizeImage(const std::string& name, const std::string& path, double reScaleX, double reScaleY) {
-    Image image = loadImage(path.c_str());
-    imageResize(&image, static_cast<int>(image.width / reScaleX), static_cast<int>(image.height / reScaleY));
-    textures[name] = loadTextureFromImage(image);
-    unloadImage(image);
+void ENGI::GameEngine::loadAndResizeImage(const char* name, const char* path, Node* parentNode) {
+    if (!nodes[name])
+        nodes[name] = dmeg.CreateTexture2D({ 0, 0 }, path, D_WHITE, name, parentNode);
 }
 
-void ENGI::GameEngine::loadAndResizeImageGif(const std::string& name, const std::string& path, int frames, int delay, double reScaleX, double reScaleY) {
-    Gif anim;
-    anim.name = name;
-    anim.frames = frames;
-    anim.frameDelay = delay;
-    anim.reScaleX = reScaleX;
-    anim.reScaleY = reScaleY;
-    anim.image = loadImagenAnim(path.c_str(), anim.frames);
-    // imageResize(&image, static_cast<int>(image.width / 1.3), static_cast<int>(image.height / 1.3));
-    anim.texture = loadTextureFromImage(anim.image);
-
-    gifs[name] = anim;
+void ENGI::GameEngine::loadAndResizeBillboard(const char* name, const char* path, Node* parentNode) {
+    if (!nodes[name])
+        nodes[name] = dmeg.CreateBillboard(path, { 0, 0, 0 }, { 1, 1 }, name, parentNode);
 }
 
-void ENGI::GameEngine::updateGif(Gif& anim) {
-    anim.frameCounter += 1;
-    if (anim.frameCounter >= anim.frameDelay)
-    {
-        anim.frameCounter = 0;
-        anim.currentFrame++;
+void ENGI::GameEngine::loadAndResizeImageGif(const char* name, const char* filePath, float frameTime) {
 
-        if (anim.currentFrame >= anim.frames) anim.currentFrame = 0;
+    auto textures = loadTextures2DAnim(filePath);
 
-        anim.nextFrameDataOffset = anim.image.width * anim.image.height * 4 * anim.currentFrame;
-
-        updateTexture(anim.texture, static_cast<char*>(anim.image.data) + anim.nextFrameDataOffset);
-    }
-}
-
-void ENGI::GameEngine::unloadGifsAndTextures() {
-    for (auto& gif : gifs)
-    {
-        UnloadTexture(gif.second.texture);
-        UnloadImage(gif.second.image);
-    }
-
-    for (auto& texture : textures)
-    {
-        UnloadTexture(texture.second);
-    }
+    if (!nodes[name])
+        nodes[name] = dmeg.CreateAnimatedTexture2D({ 0.0f, 0.0f }, textures, D_WHITE, frameTime, 0, name, nodes["Gifs"]);
 }
 
 void ENGI::GameEngine::setReplayMode(bool replay, GameData& gd)
@@ -794,7 +795,380 @@ double ENGI::GameEngine::getTime()
     return static_cast<double>(microseconds.count()) / 1e6;
 }
 
+Node* ENGI::GameEngine::createNode3D(const char* name)
+{
+    return dmeg.CreateNode(name, nodes["3D"]);
+}
+
+Node* ENGI::GameEngine::createNode(const char* name, Node* parentNode)
+{
+    if (!nodes[name])
+        nodes[name] = dmeg.CreateNode(name, parentNode);
+
+    return nodes[name];
+}
+
+Node* ENGI::GameEngine::createNode(Node* copyNode, Node* parentNode)
+{
+    return dmeg.CreateNodeCopy(copyNode, parentNode);
+}
+
+///// Circle /////
+
+Node* ENGI::GameEngine::createCircle(vec2i position, float radius, int segments, Color color, const char* nodeName, Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateCircle({ position.x, position.y }, radius, segments, color, nodeName, parentNode);
+    else
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {radius * 2, radius * 2} };
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::drawCircle(vec2i position, float radius, int segments, Color color)
+{
+    return dmeg.CreateCircle({ position.x, position.y }, radius, segments, color, "circle", nodes["TextCopy"]);
+}
+
+///// Rectangle /////
+
+Node* ENGI::GameEngine::createRectangle(vec2i pos, vec2i size, Color color, const char* name, Node* parentNode)
+{
+    if (!nodes[name])
+        nodes[name] = dmeg.CreateRectangle({ pos.x, pos.y }, size.toGlm(), color, name, parentNode);
+    else
+        nodesToDraw[nodes[name]] = { vec2i(pos.x, pos.y), size.to_other<float>() };
+
+    return nodes[name];
+}
+
+Node* ENGI::GameEngine::drawRectangle(vec2i pos, vec2i size, Color color)
+{
+    return dmeg.CreateRectangle({ pos.x, pos.y }, size.toGlm(), color, "rectangle", nodes["Copy"]);
+}
+
+Node* ENGI::GameEngine::drawRectangle(vec2i pos, vec2i size, Color color, Node* parent)
+{
+    return dmeg.CreateRectangle({ pos.x, pos.y }, size.toGlm(), color, "rectangle", parent);
+}
+
+
+///// TextBox /////
+
+Node* ENGI::GameEngine::createTextBox(vec2i position, vec2i size, Color boxColor, std::string text, Font* font, int fontSize, Color textColor, Aligned verticalAligned, Aligned horizontalAligned, const char* nodeName, Node* parentNode, bool cbc)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateTextBox(position.toGlm(), size.toGlm(), boxColor, text, font, fontSize, textColor, verticalAligned, horizontalAligned, cbc, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), size.to_other<float>() };
+        nodes[nodeName]->getEntity<TextBox>()->text.setText(text);
+    }
+
+    return nodes[nodeName];
+}
+
+///// Text /////
+
+Node* ENGI::GameEngine::createText(vec2i position, std::string text, Font* font, int fontSize, Color color, const char* nodeName, Node* parentNode, Aligned align, bool cbc)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateText(position.toGlm(), text, font, fontSize, color, align, cbc, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {1.f, 1.f} };
+        nodes[nodeName]->getEntity<Text>()->setText(text);
+    }
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::createText(vec2i position, std::string text, Color c, const char* nodeName, Node* parentNode, int fontSize, Aligned align)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateText(position.toGlm(), text, getDefaultFont(), fontSize, c, align, false, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {1.f, 1.f} };
+        nodes[nodeName]->getEntity<Text>()->setText(text);
+    }
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::drawText(const char* text, int x, int y, int fontSize, Color c, Aligned align) {
+    return dmeg.CreateText({ x, y }, text, getDefaultFont(), fontSize, c, align, false, "text", nodes["TextCopy"]);
+}
+
+Font* ENGI::GameEngine::getFontDefault() {
+    return dmeg.GetDefaultFont();
+}
+
+
+///// Slider /////
+
+Node* ENGI::GameEngine::createSlider(vec2i position, vec2i size, float value, Color backColor, Color sliderColor, const char* nodeName, Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateSlider(position.toGlm(), size.toGlm(), value, backColor, sliderColor, nodeName, parentNode);
+    else
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), size.to_other<float>() };
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::drawSlider(vec2i position, vec2i size, float value, Color backColor, Color sliderColor)
+{
+    return dmeg.CreateSlider(position.toGlm(), size.toGlm(), value, backColor, sliderColor, "slider", nodes["TextCopy"]);
+}
+
+///// Option Slider /////
+
+Node* ENGI::GameEngine::drawOptionSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, std::vector<std::string> opts, std::string firstOption)
+{
+    return dmeg.CreateOptionSlider(pos.toGlm(), sz.toGlm(), bCol, txt, f, fS, fsArrows, tCol, verAl, horAl, nColor, hColor, cColor, opts, firstOption, "optionSlider", nodes["TextCopy"]);
+}
+
+Node* ENGI::GameEngine::createOptionSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, std::vector<std::string> opts, std::string firstOption, const char* nodeName, Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateOptionSlider(pos.toGlm(), sz.toGlm(), bCol, txt, f, fS, fsArrows, tCol, verAl, horAl, nColor, hColor, cColor, opts, firstOption, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(pos.x, pos.y), sz.to_other<float>() };
+        nodes[nodeName]->getEntity<OptionSlider>()->name.setText(txt);
+    }
+
+    return nodes[nodeName];
+}
+
+///// Float Slider /////
+
+Node* ENGI::GameEngine::drawFloatSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, float initialValue)
+{
+    return dmeg.CreateFloatSlider(pos.toGlm(), sz.toGlm(), bCol, txt, f, fS, fsArrows, tCol, verAl, horAl, nColor, hColor, cColor, initialValue, "floatSlider", nodes["TextCopy"]);
+}
+
+Node* ENGI::GameEngine::createFloatSlider(vec2i pos, vec2i sz, Color bCol, std::string txt, Font* f, int fS, int fsArrows, Color tCol, Aligned verAl, Aligned horAl, Color nColor, Color hColor, Color cColor, float initialValue, const char* nodeName, Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateFloatSlider(pos.toGlm(), sz.toGlm(), bCol, txt, f, fS, fsArrows, tCol, verAl, horAl, nColor, hColor, cColor, initialValue, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(pos.x, pos.y), sz.to_other<float>() };
+        nodes[nodeName]->getEntity<FloatSlider>()->name.setText(txt);
+    }
+
+    return nodes[nodeName];
+}
+
+///// Button /////
+
+Node* ENGI::GameEngine::createButton(vec2i position, vec2i size, std::string text, Font* font, int fontSize, DarkMoon::Color textColor, DarkMoon::Aligned verticalAligned, DarkMoon::Aligned horizontalAligned, DarkMoon::Color normalColor, DarkMoon::Color hoverColor, DarkMoon::Color clickColor, const char* nodeName, DarkMoon::Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateButton(position.toGlm(), size.toGlm(), text, font, fontSize, textColor, verticalAligned, horizontalAligned, normalColor, hoverColor, clickColor, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), size.to_other<float>() };
+        nodes[nodeName]->getEntity<Button>()->textBox.text.setText(text);
+    }
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::createButton(vec2i position, vec2i size, std::string text, const char* nodeName, Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateButton(position.toGlm(), size.toGlm(), text, dmeg.GetDefaultFont(), 20, D_WHITE, Aligned::CENTER, Aligned::CENTER, D_MINT_LIGHT, D_MINT, D_MINT_DARK, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), size.to_other<float>() };
+        nodes[nodeName]->getEntity<Button>()->textBox.text.setText(text);
+    }
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::drawButton(vec2i position, vec2i size, std::string text, Font* font, int fontSize, DarkMoon::Color textColor, DarkMoon::Aligned verticalAligned, DarkMoon::Aligned horizontalAligned, DarkMoon::Color normalColor, DarkMoon::Color hoverColor, DarkMoon::Color clickColor)
+{
+    return dmeg.CreateButton(position.toGlm(), size.toGlm(), text, font, fontSize, textColor, verticalAligned, horizontalAligned, normalColor, hoverColor, clickColor, "button", nodes["TextCopy"]);
+}
+
+///// CheckBox /////
+
+Node* ENGI::GameEngine::createCheckBox(vec2i position, float size, bool checked, Color backgroundColor, DarkMoon::Color normalColor, DarkMoon::Color hoverColor, const char* nodeName, DarkMoon::Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateCheckbox(position.toGlm(), size, checked, backgroundColor, normalColor, hoverColor, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {size, size} };
+    }
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::createCheckBoxPtr(vec2i position, float size, bool* checked, Color backgroundColor, DarkMoon::Color normalColor, DarkMoon::Color hoverColor, const char* nodeName, DarkMoon::Node* parentNode)
+{
+    if (!nodes[nodeName])
+        nodes[nodeName] = dmeg.CreateCheckboxPtr(position.toGlm(), size, checked, backgroundColor, normalColor, hoverColor, nodeName, parentNode);
+    else
+    {
+        nodesToDraw[nodes[nodeName]] = { vec2i(position.x, position.y), {size, size} };
+    }
+
+    return nodes[nodeName];
+}
+
+Node* ENGI::GameEngine::drawCheckBox(vec2i position, float size, bool checked, Color backgroundColor, DarkMoon::Color normalColor, DarkMoon::Color hoverColor)
+{
+    return dmeg.CreateCheckbox(position.toGlm(), size, checked, backgroundColor, normalColor, hoverColor, "checkbox", nodes["TextCopy"]);
+}
+
+///// Cube /////
+
+Node* ENGI::GameEngine::createCube(vec3d position, vec3d size, DarkMoon::Color color, const char* nodeName, DarkMoon::Node* parentNode)
+{
+    return dmeg.CreateCube(position.toGlm(), size.toGlm(), color, nodeName, parentNode);
+}
+
+Node* ENGI::GameEngine::drawCube(vec3d position, vec3d size, DarkMoon::Color color)
+{
+    return dmeg.CreateCube(position.toGlm(), size.toGlm(), color, "cube", nodes["Copy"]);
+}
+
+///// Line 3D /////
+
+Node* ENGI::GameEngine::createLine3D(vec3d startPos, vec3d endPos, float lSize, Color color, const char* nodeName, Node* parentNode)
+{
+    return dmeg.CreateLine3D(startPos.toGlm(), endPos.toGlm(), lSize, color, nodeName, parentNode);
+}
+
+Node* ENGI::GameEngine::drawLine3D(vec3d startPos, vec3d endPos, float lSize, Color color)
+{
+    return dmeg.CreateLine3D(startPos.toGlm(), endPos.toGlm(), lSize, color, "line", nodes["Copy"]);
+}
+
+///// Point 3D /////
+
+Node* ENGI::GameEngine::createPoint3D(vec3d position, float pointSize, Color color, const char* nodeName, Node* parentNode)
+{
+    return dmeg.CreatePoint3D(position.toGlm(), pointSize, color, nodeName, parentNode);
+}
+
+Node* ENGI::GameEngine::drawPoint3D(vec3d position, float pointSize, Color color)
+{
+    return dmeg.CreatePoint3D(position.toGlm(), pointSize, color, "point", nodes["TextCopy"]);
+}
+
+///// Lights /////
+
+void ENGI::GameEngine::toggleLights()
+{
+    dmeg.ToggleLights();
+}
+
+void ENGI::GameEngine::activateLights()
+{
+    dmeg.ActivateLights();
+}
+
+void ENGI::GameEngine::deactivateLights()
+{
+    dmeg.DeactivateLights();
+}
+
+///// Point Light /////
+
+Node* ENGI::GameEngine::drawPointLight(vec3d position, Color color)
+{
+    return dmeg.CreatePointLight(position.toGlm(), color, "pointLight", nodes["TextCopy"]);
+}
+
+Node* ENGI::GameEngine::createPointLight(vec3d position, Color color, const char* nodeName, Node* parentNode)
+{
+    return dmeg.CreatePointLight(position.toGlm(), color, nodeName, parentNode);
+}
+
+///// Billboard /////
+
+Node* ENGI::GameEngine::drawBillboard(std::string path, vec3d position, vec2f size)
+{
+    return dmeg.CreateBillboard(path.c_str(), position.toGlm(), size.toGlm(), "billboard", nodes["TextCopy"]);
+}
+
+Font* ENGI::GameEngine::getDefaultFont()
+{
+    return dmeg.GetDefaultFont();
+}
+
+float ENGI::GameEngine::getWidthRate()
+{
+    return widthRate;
+}
+
+float ENGI::GameEngine::getHeightRate()
+{
+    return heightRate;
+}
+
 float ENGI::GameEngine::getAspectRat()
 {
     return static_cast<float>(width_) / static_cast<float>(height_);
+}
+
+Node* ENGI::GameEngine::get2D()
+{
+    return nodes["2D"];
+}
+
+Node* ENGI::GameEngine::get3D()
+{
+    return nodes["3D"];
+}
+
+void ENGI::GameEngine::traverseRoot()
+{
+    for (auto& [node, pair] : nodesToDraw)
+        drawNode(node, pair.first);
+
+    dmeg.GetRootNode()->traverse(glm::mat4());
+
+    nodesToDraw.clear();
+}
+
+void ENGI::GameEngine::nodeClear(Node* node)
+{
+    for (auto& child : node->getChildren())
+    {
+        if (nodesToDraw.find(child) != nodesToDraw.end())
+            nodesToDraw.erase(child);
+    }
+}
+
+///// Animations /////
+
+std::size_t ENGI::GameEngine::playAnimation(Animation* panimation) {
+    return dmeg.PlayAnimation(panimation);
+}
+
+void ENGI::GameEngine::stopAnimation(std::size_t idanim) {
+    dmeg.StopAnimation(idanim);
+}
+
+std::vector<Animation*> ENGI::GameEngine::createAnimations(const std::string& path, std::vector<BoneInfo>& vecbones) {
+    return dmeg.CreateAnimations(path, vecbones);
+}
+
+void ENGI::GameEngine::updateAnimation(float dt, float mult, std::size_t id) {
+    dmeg.UpdateAnimation(dt, mult, id);
+}
+
+float ENGI::GameEngine::getAnimationTime(std::size_t id) {
+    return dmeg.GetAnimationTime(id);
+}
+
+void ENGI::GameEngine::resetAnimations() {
+    dmeg.ResetAnimations();
 }

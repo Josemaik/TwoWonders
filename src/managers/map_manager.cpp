@@ -13,26 +13,48 @@ void MapManager::createMap(EntityManager& em, uint8_t mapID, Ia_man& iam) {
         {
             li.mapID = 0;
             map = loadMap("assets/Niveles/Lvl_0/Lvl_0.kaiwa");
+            em.getSingleton<SoundSystem>().music_stop_level();
+            em.getSingleton<SoundSystem>().ambient_stop();
             em.getSingleton<SoundSystem>().sonido_amb_bosque();
+            em.getSingleton<SoundSystem>().sonido_pasos_pradera();
             break;
         }
         case 1:
         {
             li.mapID = 1;
             map = loadMap("assets/Niveles/Lvl_1/Lvl_1.kaiwa");
-
+            em.getSingleton<SoundSystem>().music_stop_level();
+            em.getSingleton<SoundSystem>().ambient_stop();
+            em.getSingleton<SoundSystem>().SFX_pasos_stop();
             em.getSingleton<SoundSystem>().sonido_mazmorra();
             em.getSingleton<SoundSystem>().sonido_music_mazmorra();
+            em.getSingleton<SoundSystem>().sonido_pasos_prision();
             break;
         }
         case 2:
+        {
             li.mapID = 2;
             map = loadMap("assets/Niveles/Lvl_2/Lvl_2.kaiwa");
+            em.getSingleton<SoundSystem>().music_stop_level();
+            em.getSingleton<SoundSystem>().ambient_stop();
+            em.getSingleton<SoundSystem>().SFX_pasos_stop();
             em.getSingleton<SoundSystem>().sonido_amb_volcan();
             em.getSingleton<SoundSystem>().sonido_music_volcan();
+            em.getSingleton<SoundSystem>().sonido_pasos_volcan();
 
             break;
-
+        }
+        case 3:
+        {
+            li.mapID = 3;
+            map = loadMap("assets/Niveles/Lvl_3/Lvl_3.kaiwa");
+            em.getSingleton<SoundSystem>().music_stop_level();
+            em.getSingleton<SoundSystem>().ambient_stop();
+            em.getSingleton<SoundSystem>().sonido_amb_pradera();
+            em.getSingleton<SoundSystem>().sonido_music_pradera();
+            em.getSingleton<SoundSystem>().sonido_pasos_pradera();
+            break;
+        }
         default:
             break;
         }
@@ -145,8 +167,9 @@ void MapManager::generateMapFromJSON(EntityManager& em, const mapType& map, Ia_m
             }
             case LoadState::LOAD_NAVMESHES:
             {
-                if (li.mapID != 0 || li.mapID != 1)
-                    generateNavmeshes(em);
+                // if (li.mapID == 2)
+                generateNavmeshes(em, li.mapID);
+                generateCheats(em);
                 break;
             }
             default:
@@ -191,6 +214,7 @@ void MapManager::generateChunkModel(EntityManager& em, mapSizeType& i)
         em.addTag<Chunk6Tag>(modelEntity);
         break;
     }
+    em.addTag<ChunkTag>(modelEntity);
     em.addComponent<RenderComponent>(modelEntity, RenderComponent{ .position = vec3d::zero(), .scale = vec3d::zero(), .orientation = 90.0 * DEGTORAD, .rotationVec = { 0.0, -1.0, 0.0 } });
 }
 
@@ -210,34 +234,40 @@ void MapManager::generateGround(EntityManager& em, const valueType& groundArray,
         vec3d rotationVec{ ground["rotVector"][1].GetDouble(), ground["rotVector"][2].GetDouble(), ground["rotVector"][0].GetDouble() };
         double orientation{ ground["rotation"].GetDouble() };
         double rot = orientation * DEGTORAD;
-        Color color{ WHITE };
+        Color color{ D_WHITE };
 
         // Sacamos los máximos y los mínimos
+        vec3d groundMax = groundPosition + groundScale / 2;
+        vec3d groundMin = groundPosition - groundScale / 2;
         if (i == 0)
         {
-            min.x = groundPosition.x() - groundScale.x() / 2;
-            min.y = groundPosition.z() - groundScale.z() / 2;
+            min.x = groundMin.x();
+            min.y = groundMin.z();
 
-            max.x = groundPosition.x() + groundScale.x() / 2;
-            max.y = groundPosition.z() + groundScale.z() / 2;
+            max.x = groundMax.x();
+            max.y = groundMax.z();
 
             minHeigth = groundPosition.y();
         }
         else
         {
-            if (min.x > groundPosition.x() - groundScale.x() / 2)
-                min.x = groundPosition.x() - groundScale.x() / 2;
-            if (min.y > groundPosition.z() - groundScale.z() / 2)
-                min.y = groundPosition.z() - groundScale.z() / 2;
+            if (min.x > groundMin.x())
+                min.x = groundMin.x();
+            if (min.y > groundMin.z())
+                min.y = groundMin.z();
 
-            if (max.x < groundPosition.x() + groundScale.x() / 2)
-                max.x = groundPosition.x() + groundScale.x() / 2;
-            if (max.y < groundPosition.z() + groundScale.z() / 2)
-                max.y = groundPosition.z() + groundScale.z() / 2;
+            if (max.x < groundMax.x())
+                max.x = groundMax.x();
+            if (max.y < groundMax.z())
+                max.y = groundMax.z();
 
             if (minHeigth > groundPosition.y())
                 minHeigth = groundPosition.y();
         }
+
+        auto& li = em.getSingleton<LevelInfo>();
+        if (li.mapID == 0)
+            em.addComponent<GrassComponent>(groundEntity);
 
         // Creamos los componentes del suelo
         auto& r = em.addComponent<RenderComponent>(groundEntity, RenderComponent{ .position = groundPosition, .scale = groundScale, .color = color, .visible = false, .orientation = rot, .rotationVec = rotationVec });
@@ -250,14 +280,15 @@ void MapManager::generateGround(EntityManager& em, const valueType& groundArray,
     vec3d center = { (min.x + max.x) / 2, minHeigth, (min.y + max.y) / 2 };
 
     auto& li = em.getSingleton<LevelInfo>();
-    double zoneHeight = 20.0;
-    if (li.mapID == 1)
-        zoneHeight = 30.0;
-    else if (li.mapID == 2)
-        zoneHeight = 65.0;
+
+    static std::map<uint8_t, double> zoneHeights = {
+        {1, 30.0},
+        {2, 65.0},
+        {3, 100.0}
+    };
 
     // Creamos 4 zonas para el chunk
-    vec3d zoneScale = { (max.x - min.x) / 2, zoneHeight, (max.y - min.y) / 2 };
+    vec3d zoneScale = { (max.x - min.x) / 2, zoneHeights[li.mapID], (max.y - min.y) / 2 };
     int k = 0;
     int limit = j + 4;
     for (; j < limit; j++)
@@ -295,7 +326,7 @@ void MapManager::generateWalls(EntityManager& em, const valueType& wallArray)
         vec3d scale{ wall["scale"][1].GetDouble(), wall["scale"][2].GetDouble(), wall["scale"][0].GetDouble() };
         vec3d rotationVec{ wall["rotVector"][1].GetDouble(), wall["rotVector"][2].GetDouble(), wall["rotVector"][0].GetDouble() };
         double orientation{ wall["rotation"].GetDouble() };
-        Color color{ LIME };
+        Color color{ D_GREEN_LIGHT };
 
         double rot = orientation * DEGTORAD;
 
@@ -351,7 +382,7 @@ void MapManager::generateObjects(EntityManager& em, const valueType& objectArray
         // Extraemos los datos del json
         vec3d position{ obj["position"][0].GetDouble(), obj["position"][2].GetDouble(), obj["position"][1].GetDouble() };
         vec3d scale{ obj["scale"][0].GetDouble(), obj["scale"][2].GetDouble(), obj["scale"][1].GetDouble() };
-        Color color{ RED };
+        Color color{ D_RED };
         ObjectType type{ static_cast<ObjectType>(obj["type"].GetDouble()) };
 
         auto& entity = em.newEntity();
@@ -385,7 +416,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         vec3d scale{ interactable["scale"][1].GetDouble(), interactable["scale"][2].GetDouble(), interactable["scale"][0].GetDouble() };
         vec3d rotationVec{ interactable["rotVector"][1].GetDouble(), interactable["rotVector"][2].GetDouble(), interactable["rotVector"][0].GetDouble() };
         double orientation{ interactable["rotation"].GetDouble() };
-        Color color{ LIGHTGRAY };
+        Color color{ D_GRAY };
         InteractableType type{ static_cast<InteractableType>(interactable["type"].GetInt()) };
 
         double rot = orientation * DEGTORAD;
@@ -408,8 +439,9 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             addMessageCmp(em, entity, interactable);
 
             ic.range = 7.5;
+            em.addComponent<PointLightComponent>(entity);
             em.addComponent<OneUseComponent>(entity, OneUseComponent{ .id = unique_ids++ });
-            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
+            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 10, .spawnRate = 0.1f });
             [[maybe_unused]] auto& cc = em.addComponent<ChestComponent>(entity, ChestComponent{ .content = content });
 
             if (interactable.HasMember("offsetZ"))
@@ -431,6 +463,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             auto& li = em.getSingleton<LevelInfo>();
             em.addTag<DestructibleTag>(entity);
             em.addTag<WallTag>(entity);
+            em.addTag<LockableTag>(entity);
 
             int life{ interactable["life"].GetInt() };
             em.addComponent<LifeComponent>(entity, LifeComponent{ .life = life });
@@ -449,7 +482,12 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
 
             if (li.mapID == 1)
             {
+                em.addTag<SeparateModelTag>(entity);
+                r.orientation += 90.0 * DEGTORAD;
+                // r.position.setY(r.position.y() + 4.0);
+
                 em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = Effects::PRISONDOOR, .maxParticles = 16, .spawnRate = 0.1f, .lifeTime = 0.3f });
+                em.addComponent<AnimationComponent>(entity);
             }
 
             em.destroyComponent<InteractiveComponent>(entity);
@@ -469,6 +507,9 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             }
             case 1:
             {
+                em.addTag<SeparateModelTag>(entity);
+                r.orientation += 90.0 * DEGTORAD;
+                r.position.setY(r.position.y() + 4.0);
                 em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = Effects::PRISONDOOR, .maxParticles = 16, .spawnRate = 0.1f, .lifeTime = 0.3f });
                 break;
             }
@@ -518,7 +559,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
 
             auto& pos = p.position;
             auto posY = pos.y() - 2.0;
-            auto rotCopy = rot;
+            double rotCopy = rot;
 
             if (rotationVec[1] > 0.0)
                 rotCopy *= -1;
@@ -550,14 +591,15 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
             {
                 auto& wall{ em.newEntity() };
                 em.addTag<WallTag>(wall);
-                em.addComponent<RenderComponent>(wall, RenderComponent{ .position = wallPoints[j].first, .scale = wallPoints[j].second, .color = color, .visible = false, .orientation = 0.0, .rotationVec = rotationVec });
+                auto& rWall = em.addComponent<RenderComponent>(wall, RenderComponent{ .position = wallPoints[j].first, .scale = wallPoints[j].second, .color = color, .visible = false, .orientation = 0.0, .rotationVec = rotationVec });
                 em.addComponent<PhysicsComponent>(wall, PhysicsComponent{ .position = wallPoints[j].first, .velocity = vec3d::zero(), .scale = wallPoints[j].second, .gravity = 0, .orientation = 0.0, .rotationVec = rotationVec });
                 em.addComponent<ColliderComponent>(wall, ColliderComponent{ position, scale, BehaviorType::STATIC });
 
                 if (j > 5)
                 {
+                    auto& plc = em.addComponent<PointLightComponent>(wall);
                     auto& p = em.addComponent<ParticleMakerComponent>(wall, ParticleMakerComponent{ .active = true, .effect = std::get<0>(particleParts[j]), .maxParticles = std::get<1>(particleParts[j]), .spawnRate = std::get<2>(particleParts[j]), .lifeTime = std::get<3>(particleParts[j]) });
-                    spc.parts[static_cast<SpawnComponent::SpawnParts>(j)] = &p;
+                    spc.parts.push_back({ &rWall, &p, &plc });
                 }
             }
 
@@ -578,7 +620,7 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         case InteractableType::DamageObj:
         {
             em.addTag<LavaTag>(entity);
-            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::LAVA, .maxParticles = 20, .spawnRate = 0.1f });
+            em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::LAVA, .maxParticles = 10, .spawnRate = 0.1f });
             c.behaviorType = BehaviorType::LAVA;
 
             if (interactable.HasMember("offsetZ"))
@@ -589,7 +631,6 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         }
         case InteractableType::Roca:
         {
-            //em.addTag<WallTag>(entity);
             em.addTag<ObstacleTag>(entity);
             r.visible = false;
             break;
@@ -604,8 +645,8 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
 
             auto yMin = c.bbox.min.y();
             auto yMax = c.bbox.max.y();
-            auto rot2 = (orientation - 90.0) * DEGTORAD;
-            em.addComponent<LadderComponent>(entity, LadderComponent{ .orientation = rot2, .yMin = yMin, .yMax = yMax });
+            // auto rot2 = (orientation - 90.0) * DEGTORAD;
+            em.addComponent<LadderComponent>(entity, LadderComponent{ .orientation = rot, .yMin = yMin, .yMax = yMax });
             break;
         }
         case InteractableType::Sign:
@@ -633,12 +674,12 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
         case InteractableType::MissionOBJ:
         {
             auto& li = em.getSingleton<LevelInfo>();
+            em.addTag<MissionObjTag>(entity);
             switch (li.mapID)
             {
             case 2:
             {
-                em.addTag<MissionObjTag>(entity);
-                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::CHEST, .maxParticles = 15, .spawnRate = 0.1f });
+                em.addComponent<ParticleMakerComponent>(entity, ParticleMakerComponent{ .active = true, .effect = ParticleMakerComponent::ParticleEffect::MISSIONOBJ, .maxParticles = 10, .spawnRate = 0.1f });
                 auto& bc = em.addComponent<BoatComponent>(entity);
                 bc.setPart(boatParts);
                 ic.range = 7.0;
@@ -648,6 +689,15 @@ void MapManager::generateInteractables(EntityManager& em, const valueType& inter
                 {
                     r.offset = interactable["offsetZ"][0].GetDouble();
                 }
+                break;
+            }
+            case 3:
+            {
+                em.addTag<LockableTag>(entity);
+                c.behaviorType = BehaviorType::RELAY;
+                auto relayType = static_cast<ElementalType>(interactable["relay"].GetUint());
+                em.addComponent<TypeComponent>(entity, TypeComponent({ .type = relayType }));
+                em.addComponent<LifeComponent>(entity, LifeComponent({ .life = 20 }));
                 break;
             }
             default:
@@ -691,10 +741,15 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
         auto& entity{ em.newEntity() };
         em.addTag<NPCTag>(entity);
 
+        auto& wr = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color,.orientation = rot,.rotationVec = rotationVec });
+        auto& wp = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.rotationVec = rotationVec, .max_speed = max_speed });
+        em.addComponent<ColliderComponent>(entity, ColliderComponent{ wp.position, wp.scale, BehaviorType::STATIC });
+
         double range = 0.0;
         switch (npcType)
         {
         case NPCType::NOMAD:
+        {
             em.addTag<NomadTag>(entity);
             switch (li.mapID)
             {
@@ -706,6 +761,7 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
                 break;
             }
             break;
+        }
         case NPCType::INVESTIGATOR:
             em.addTag<InvestigatorTag>(entity);
             range = 21.0;
@@ -714,9 +770,6 @@ void MapManager::generateNPCs(EntityManager& em, const valueType& npcArray)
             break;
         }
 
-        auto& wr = em.addComponent<RenderComponent>(entity, RenderComponent{ .position = position, .scale = scale, .color = color,.orientation = rot,.rotationVec = rotationVec });
-        auto& wp = em.addComponent<PhysicsComponent>(entity, PhysicsComponent{ .position = wr.position, .scale = wr.scale,.orientation = rot,.rotationVec = rotationVec, .max_speed = max_speed });
-        em.addComponent<ColliderComponent>(entity, ColliderComponent{ wp.position, wp.scale, BehaviorType::STATIC });
         em.addComponent<InteractiveComponent>(entity, InteractiveComponent{ .range = range });
         em.addComponent<NPCComponent>(entity, NPCComponent{ .path = path, .type = npcType, .behaviourTree = &tree,.arrival_radius = arrival_radius });
 
@@ -736,11 +789,18 @@ vec3d getNodeVec3d(uint16_t nodeId, const std::map<uint16_t, vec3d>& nodes) {
     // Si no se encuentra el nodo, se devuelve un vec3d con valores predeterminados o se maneja el error de alguna otra manera
     return { 0.0f, 0.0f, 0.0f };
 }
-void MapManager::generateNavmeshes(EntityManager& em)
+void MapManager::generateNavmeshes(EntityManager& em, uint8_t map)
 {
-    auto& navs = em.getSingleton<NavmeshInfo>();
-    mapType navmeshkaiwa = loadMap("assets/Niveles/Lvl_2/Lvl_2-navmeshes.kaiwa");
 
+    auto& navs = em.getSingleton<NavmeshInfo>();
+    mapType navmeshkaiwa{};
+    //Comprobamos mapa
+    if (map == 2) {
+        navmeshkaiwa = loadMap("assets/Niveles/Lvl_2/Lvl_2-navmeshes.kaiwa");
+    }
+    else {
+        navmeshkaiwa = loadMap("assets/Niveles/Lvl_4/Lvl_4-navmeshes.kaiwa");
+    }
     const valueType& navmeshes = navmeshkaiwa["NavMesh"];
     for (mapSizeType i = 0; i < navmeshes.Size(); i++) {
         std::array<vec3d, 9> vecnodes{};
@@ -791,16 +851,27 @@ void MapManager::generateNavmeshes(EntityManager& em)
             navs.midpoints.insert(vecnodes[k + 5]);
         }
 
+        //Rampa?
+        bool hasramp{ false };
+
+        //comprobar si tiene rampa
+        const rapidjson::Value::ConstMemberIterator& xd = navmesh.FindMember("ramp");
+        if (xd != navmesh.MemberEnd()) {
+            if (xd->value.GetBool())
+                hasramp = true;
+        }
+
+
         //Creamos NavMesh BBox
         double scalex{}, scalez{};
 
         scalex = (max.x() - min.x());
         scalez = (max.z() - min.z());
-        BBox b(vecnodes[0], vec3d{ scalex, (max.y() - min.y()) + 0.5, scalez });
+        BBox b(vecnodes[0], vec3d{ scalex, (max.y() - min.y()) + 0.7, scalez });
         //BBox b{ min,max };
         navs.boundingnavmesh.push_back(b);
         //Creamos NavMesh
-        Navmesh nav{ .box = b };
+        Navmesh nav{ .box = b,.ramp = hasramp };
         //Rellenamos los nodos
         for (auto& n : vecnodes) {
             auto pair = std::make_pair(navs.num_nodes, n);
@@ -816,174 +887,146 @@ void MapManager::generateNavmeshes(EntityManager& em)
             navs.num_nodes++;
         }
         navs.NavMeshes.push_back(nav);
-        // Conection c6{1, }; auxconex.push_back(c6);
-        // Conection c7{1, }; auxconex.push_back(c7);
-        // Conection c8{1, }; auxconex.push_back(c8);
+
         //Creamos conexiones de el navmesh
-        // for (auto it = nav.nodes.begin(); it != std::prev(nav.nodes.end()); ++it) {
-        //     auto& currentNode = it->second;
-        //     auto& nextNode = std::next(it)->second;
+        if (nav.ramp == false) {
+            for (auto it = nav.nodes.begin(); it != std::prev(nav.nodes.end()); ++it) {
+                auto& currentNode = it->second;
+                auto& nextNode = std::next(it)->second;
 
-        //     // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
-        //     if (navs.insert_ids(it->first, std::next(it)->first) &&
-        //         navs.checkmidpoints(currentNode, nextNode)) {
-        //         Conection c{ 1, it->first, std::next(it)->first };
-        //         navs.conexiones.push_back(c);
-        //         //debug
-        //         auto pair = std::make_pair(it->second, std::next(it)->second);
-        //         navs.conexpos.insert(pair);
-        //     }
-        // }
-    }
-    // Guardamos info 
-    std::vector<Conection> auxconex;
-    auxconex.push_back(Conection{ 1,27,7 });
-    auxconex.push_back(Conection{ 1,7,26 });
-    auxconex.push_back(Conection{ 1,26,45 });
-    auxconex.push_back(Conection{ 1,45,50 });
-    auxconex.push_back(Conection{ 1,10,26 });
-    auxconex.push_back(Conection{ 1,0,26 });
-    auxconex.push_back(Conection{ 1,44,0 });
-    auxconex.push_back(Conection{ 1,54,50 });
-    auxconex.push_back(Conection{ 1,59,54 });
-    auxconex.push_back(Conection{ 1,98,59 });
-    auxconex.push_back(Conection{ 1,116,98 });
-    auxconex.push_back(Conection{ 1,124,116 });
-    auxconex.push_back(Conection{ 1,123,124 });
-    auxconex.push_back(Conection{ 1,134,123 });
-    auxconex.push_back(Conection{ 1,242,134 });
-    auxconex.push_back(Conection{ 1,468,473 });
-    auxconex.push_back(Conection{ 1,583,572 });
-    auxconex.push_back(Conection{ 1,473,583 });
-    auxconex.push_back(Conection{ 1,637,816 });
-    auxconex.push_back(Conection{ 1,637,639 });
-    auxconex.push_back(Conection{ 1,639,643 });
-    auxconex.push_back(Conection{ 1,643,837 });
-    auxconex.push_back(Conection{ 1,837,846 });
-    auxconex.push_back(Conection{ 1,639,620 });
-    auxconex.push_back(Conection{ 1,620,639 });
-    auxconex.push_back(Conection{ 1,846,895 });
-    auxconex.push_back(Conection{ 1,816,827 });
-    auxconex.push_back(Conection{ 1,822,827 });
-    auxconex.push_back(Conection{ 1,288,297 });
-    auxconex.push_back(Conection{ 1,297,320 });
-    auxconex.push_back(Conection{ 1,320,333 });
-
-    for (auto& c : auxconex) {
-        navs.conexiones.push_back(c);
-        //debug
-        auto pair = std::make_pair(getNodeVec3d(c.fromNode, navs.nodes), getNodeVec3d(c.toNode, navs.nodes));
-        navs.conexpos.insert(pair);
-        //nodes
-        for (auto& [n, vec] : navs.nodes) {
-            // if(n == 583){
-            //     vec = vec3d{vec.x(),vec.y(),vec.z()+10.0};
-            // }
-            if (n == c.toNode) {
-                navs.selectednodes.insert(std::make_pair(n, vec));
-            }
-            if (n == c.fromNode) {
-                navs.selectednodes.insert(std::make_pair(n, vec));
+                // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
+                if (navs.insert_ids(it->first, std::next(it)->first) &&
+                    navs.checkmidpoints(currentNode, nextNode)) {
+                    Conection c{ 1, it->first, std::next(it)->first };
+                    navs.conexiones.push_back(c);
+                    //debug
+                    auto pair = std::make_pair(it->second, std::next(it)->second);
+                    navs.conexpos.insert(pair);
+                }
             }
         }
     }
 
+    //Crear conexiones de navmesh con otros con los que colisiona
+    for (auto it = navs.NavMeshes.begin(); it != navs.NavMeshes.end(); ++it) {
+        for (auto nextnavmesh = std::next(it); nextnavmesh != navs.NavMeshes.end(); ++nextnavmesh) {
+            if (!it->ramp && !nextnavmesh->ramp) {
+                auto& currentbbox = it->box;
+                auto& nextbbox = nextnavmesh->box;
+                //auto& currentnodes = it->nodes;
+                auto& currentcenter = it->centerpoint;
+
+                // Conexiones con navmeshes colisionables
+                if (currentbbox.intersects(nextbbox)) {
+
+                    // Recorremos nodos del primer navmesh
+                    for (auto it2 = it->nodes.begin(); it2 != it->nodes.end(); ++it2) {
+                        const auto& currentNode = it2;
+
+                        // Solo consideramos nodos en el borde de la intersección
+                        if (!nextbbox.intersects(currentNode->second)
+                            && currentNode != it->nodes.begin()) continue;
+
+                        // Recorremos nodos del segundo navmesh
+                        for (auto it3 = nextnavmesh->nodes.begin(); it3 != nextnavmesh->nodes.end(); ++it3) {
+                            const auto& nextNode = it3;
+
+                            //Solo consideramos nodos en el borde de la intersección
+                            if (!currentbbox.intersects(nextNode->second)
+                                && nextNode != nextnavmesh->nodes.begin()) continue;
+
+                            // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
+                            if (navs.insert_ids(currentNode->first, nextNode->first)) {
+                                Conection c{ 1, currentcenter.first, nextNode->first };
+                                navs.conexiones.push_back(c);
+                                // debug
+                                auto pair = std::make_pair(currentcenter.second, nextNode->second);
+                                navs.conexpos.insert(pair);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    //Conexiones a mano de las rampas 
+    //rampa muñeco izquierda
+    std::vector<Conection> auxconex;
+    if (map == 2) {
+        auxconex.push_back(Conection{ 1,2,18 });
+        auxconex.push_back(Conection{ 1,5,18 });
+        auxconex.push_back(Conection{ 1,26,18 });
+        auxconex.push_back(Conection{ 1,18,53 });
+        auxconex.push_back(Conection{ 1,53,50 });
+        auxconex.push_back(Conection{ 1,44,0 });
+        auxconex.push_back(Conection{ 1,14,2 });
+        auxconex.push_back(Conection{ 1,27,14 });
+        auxconex.push_back(Conection{ 1,21,18 });
+        // rampa derecha muñeco
+        auxconex.push_back(Conection{ 1,63,59 });
+        auxconex.push_back(Conection{ 1,98,63 });
+        auxconex.push_back(Conection{ 1,64,63 });
+        auxconex.push_back(Conection{ 1,65,63 });
+        // rampa mas abajo
+        auxconex.push_back(Conection{ 1,124,116 });
+        auxconex.push_back(Conection{ 1,121,116 });
+        auxconex.push_back(Conection{ 1,119,116 });
+        //
+        auxconex.push_back(Conection{ 1,576,572 });
+        auxconex.push_back(Conection{ 1,572,567 });
+        auxconex.push_back(Conection{ 1,567,536 });
+        auxconex.push_back(Conection{ 1,620,572 });
+        auxconex.push_back(Conection{ 1,583,572 });
+        auxconex.push_back(Conection{ 1,470,576 });
+        auxconex.push_back(Conection{ 1,473,576 });
+        auxconex.push_back(Conection{ 1,484,473 });
+        //
+        auxconex.push_back(Conection{ 1,333,346 });
+        auxconex.push_back(Conection{ 1,303,333 });
+        //
+        auxconex.push_back(Conection{ 1,643,843 });
+        auxconex.push_back(Conection{ 1,646,843 });
+        auxconex.push_back(Conection{ 1,652,843 });
+        auxconex.push_back(Conection{ 1,843,837 });
+        auxconex.push_back(Conection{ 1,647,648 });
+        auxconex.push_back(Conection{ 1,630,639 });
+        //
+        auxconex.push_back(Conection{ 1,801,808 });
+        auxconex.push_back(Conection{ 1,808,819 });
+        auxconex.push_back(Conection{ 1,742,801 });
+        auxconex.push_back(Conection{ 1,799,801 });
+        auxconex.push_back(Conection{ 1,731,801 });
+        auxconex.push_back(Conection{ 1,736,801 });
+        auxconex.push_back(Conection{ 1,745,801 });
+        auxconex.push_back(Conection{ 1,792,742 });
+        auxconex.push_back(Conection{ 1,800,742 });
+        auxconex.push_back(Conection{ 1,644,808 });
+        auxconex.push_back(Conection{ 1,632,639 });
+    }
+    else {
+        auxconex.push_back(Conection{ 1,457,448 });
+        auxconex.push_back(Conection{ 1,448,419 });
+        auxconex.push_back(Conection{ 1,419,421 });
+    }
+    // guardar conexiones
+    if (auxconex.size() != 0) {
+        for (auto& c : auxconex) {
+            navs.conexiones.push_back(c);
+            //debug
+            auto pair = std::make_pair(getNodeVec3d(c.fromNode, navs.nodes), getNodeVec3d(c.toNode, navs.nodes));
+            navs.conexpos.insert(pair);
+            // //nodes
+            // if (n == c.toNode) {
+            //     navs.selectednodes.insert(std::make_pair(n, vec));
+            // }
+            // if (n == c.fromNode) {
+            //     navs.selectednodes.insert(std::make_pair(n, vec));
+            // }
+        }
+    }
+    //crear grafo
     auto& li = em.getSingleton<LevelInfo>();
     li.level_graph.createGraph(navs.conexiones, navs.selectednodes);
-    // Crear conexiones de navmesh con otros con los que colisiona
-    // for (auto it = navs.NavMeshes.begin(); it != navs.NavMeshes.end(); ++it) {
-    //     for (auto nextnavmesh = std::next(it); nextnavmesh != navs.NavMeshes.end(); ++nextnavmesh) {
-    //         auto& currentbbox = it->box;
-    //         auto& nextbbox = nextnavmesh->box;
-
-    //         // Conexiones con navmeshes colisionables
-    //         if (currentbbox.intersects(nextbbox)) {
-    //             // Obtenemos el centro (primer nodo) del primer navmesh
-    //             const auto& currentNode = it->nodes.begin();
-
-    //             // Obtenemos el centro (primer nodo) del segundo navmesh
-    //             const auto& nextNode = nextnavmesh->nodes.begin();
-
-    //             // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
-    //             if (navs.insert_ids(currentNode->first, nextNode->first)) {
-    //                 Conection c{ 1, currentNode->first, nextNode->first };
-    //                 navs.conexiones.push_back(c);
-    //                 // debug
-    //                 auto pair = std::make_pair(currentNode->second, nextNode->second);
-    //                 navs.conexpos.insert(pair);
-    //             }
-    //         }
-    //     }
-    // }
-
-    // Crear conexiones de navmesh con otros con los que colisiona
-    // for (auto it = navs.NavMeshes.begin(); it != navs.NavMeshes.end(); ++it) {
-    //     for (auto nextnavmesh = std::next(it); nextnavmesh != navs.NavMeshes.end(); ++nextnavmesh) {
-    //         auto& currentbbox = it->box;
-    //         auto& nextbbox = nextnavmesh->box;
-    //         auto& currentnodes = it->nodes;
-    //         auto& currentcenter = it->centerpoint;
-
-    //         // Conexiones con navmeshes colisionables
-    //         if (currentbbox.intersects(nextbbox)) {
-
-    //             // Recorremos nodos del primer navmesh
-    //             for (auto it2 = it->nodes.begin(); it2 != it->nodes.end(); ++it2) {
-    //                 const auto& currentNode = it2;
-
-    //                 // Solo consideramos nodos en el borde de la intersección
-    //                 // if (!nextbbox.intersects(currentNode->second)
-    //                 //     && currentNode != it->nodes.begin()) continue;
-
-    //                 // Recorremos nodos del segundo navmesh
-    //                 for (auto it3 = nextnavmesh->nodes.begin(); it3 != nextnavmesh->nodes.end(); ++it3) {
-    //                     const auto& nextNode = it3;
-
-    //                     //Solo consideramos nodos en el borde de la intersección
-    //                     // if (!currentbbox.intersects(nextNode->second)
-    //                     //     && nextNode != nextnavmesh->nodes.begin()) continue;
-
-    //                     // Comprobamos que no se repitan y que no hayan conexiones que pasen por puntos medios
-    //                     //(navs.checkcousinsnodes())
-    //                     //navs.insert_ids(currentNode->first, nextNode->first
-    //                     //navs.checkcousins(nextNode->second.x(),nextNode->second.z(),it->nodes)
-    //                     if (navs.checkcousins(nextNode->second,currentNode->second)) {
-    //                         Conection c{ 1, currentcenter.first, nextNode->first };
-    //                         navs.conexiones.push_back(c);
-    //                         // debug
-    //                         auto pair = std::make_pair(currentcenter.second, nextNode->second);
-    //                         navs.conexpos.insert(pair);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-
-    //Crear conexiones entre los centros
-    // Crear conexiones entre los centros
-    // for (auto it = navs.centers.begin(); it != navs.centers.end(); ++it) {
-    //     auto currentCenter = it->first;
-    //     auto currentcenterpos = it->second;
-    //     // Recorrer todos los centros nuevamente para encontrar conexiones
-    //     for (auto nextCenter = std::next(it); nextCenter != navs.centers.end(); ++nextCenter) {
-    //         double distance = currentcenterpos.distance(nextCenter->second);
-
-    //         // Establecer la distancia máxima para crear una conexión (ajusta el valor según sea necesario)
-    //         double maxDistance = 60.0; // Por ejemplo, 10 unidades
-
-    //         // Si la distancia entre los centros es menor o igual a la distancia máxima, crear una conexión
-    //         if (distance <= maxDistance) {
-    //             // Crea la conexión si no existe ya
-    //             // if (navs.insert_ids(currentCenter, nextCenter->first)) {
-    //                 Conection c{ 1, currentCenter, nextCenter->first };
-    //                 navs.conexiones.push_back(c);
-    //                 auto pair = std::make_pair(currentcenterpos, nextCenter->second);
-    //                 navs.conexpos.insert(pair);
-    //             // }
-    //        }
-    //     }
-    // }
 }
 
 vec3d MapManager::rotateY(const vec3d& v, double angle) {
@@ -1045,31 +1088,21 @@ void MapManager::addToZone(EntityManager& em, Entity& e, InteractableType type)
         }
 }
 
-void MapManager::spawnReset(EntityManager& em, Ia_man& iam)
+void MapManager::spawnReset(EntityManager& em, Ia_man&)
 {
-    if (!reSpawn)
-    {
-        using TAGs = MP::TypeList<EnemyTag>;
-        // using TAGs2 = MP::TypeList<NPCTag>;
-        destroyParts<TAGs>(em);
-        // destroyParts<TAGs2>(em);
-        reSpawn = true;
-    }
-    else
-    {
-        const valueType& chunks = map["Chunks"];
-        for (mapSizeType i = 0; i < chunks.Size(); i++)
-        {
-            std::string chunkName = "Chunk" + std::to_string(i);
-            const valueType& chunk = chunks[i][chunkName.c_str()];
-            const valueType& enemyArray = chunk[1]["underworld"]["Enemies"];
-            // const valueType& npcArray = chunk[1]["underworld"]["NPCs"];
+    using CMPS = MP::TypeList<PhysicsComponent, LifeComponent, AIComponent>;
+    using TAGS = MP::TypeList<EnemyTag>;
+    //auto& li = em.getSingleton<LevelInfo>();
 
-            generateEnemies(em, enemyArray, iam);
-            // generateNPCs(em, npcArray);
-        }
-        reSpawn = false;
-    }
+    em.forEach<CMPS, TAGS>([&](Entity& e, PhysicsComponent& phy, LifeComponent& lic, AIComponent& aic)
+    {
+        if (e.hasTag<EnemyDeathTag>())
+            em.destroyTag<EnemyDeathTag>(e);
+        lic.life = lic.maxLife;
+        lic.markedForDeletion = false;
+        lic.onDeathAnim = false;
+        phy.position = aic.initialPos;
+    });
 }
 
 void MapManager::addMessageCmp(EntityManager& em, Entity& e, const valueType& value)
@@ -1198,6 +1231,28 @@ void MapManager::checkDispatcher(EntityManager& em, Entity& e, const valueType& 
         for (mapSizeType j = 0; j < value["events"].Size(); j++)
         {
             dc.eventCodes.push_back(value["events"][j].GetInt());
+        }
+    }
+}
+
+void MapManager::generateCheats(EntityManager& em)
+{
+    auto& cheatPositions = em.getSingleton<CheatsInfo>().cheatPositions;
+    if (!cheatPositions.empty())
+        return;
+
+    mapType cheatsKaiwa = loadMap("assets/cheats.kaiwa");
+    const valueType& levels = cheatsKaiwa["Niveles"];
+    for (mapSizeType i = 0; i < levels.Size(); i++)
+    {
+        uint8_t levelNum = static_cast<uint8_t>(levels[i]["Nombre"].GetUint());
+        auto& positions = levels[i]["Puntos"];
+        for (mapSizeType j = 0; j < positions.Size(); j++)
+        {
+            std::string positionName = positions[j]["Nombre"].GetString();
+            auto& positionLabel = positions[j]["Posición"];
+            vec3d position = { positionLabel[0].GetDouble(), positionLabel[1].GetDouble(), positionLabel[2].GetDouble() };
+            cheatPositions[cheatPositions.size()] = std::make_tuple(levelNum, positionName, position);
         }
     }
 }

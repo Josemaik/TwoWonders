@@ -1,30 +1,32 @@
 #include "particle_system.hpp"
+#include <variant>
 
 void ParticleSystem::update(EntityManager& em)
 {
     // Definimos el mapa de efectos de partículas
-    static std::map<Effects, std::pair<vec3f, std::vector<Color>>> particleEffects = {
-    { Effects::CHEST, { { 10.0f, 0.1f, 5.0f }, { {255, 215, 0, 255} } } },
-    { Effects::SPARKS, { { 5.0f, 0.1f, 5.0f }, { {255, 215, 0, 255} } } },
-    { Effects::FIRE, { { 2.0f, 0.01f, 2.0f }, { {255, 0, 0, 255}, {156, 50, 52, 255} } } },
-    { Effects::SPARKLES, { { 1.0f, 0.01f, 1.0f }, { {255, 0, 0, 255}, {156, 50, 52, 255} } } },
-    { Effects::SMOKE, { { 3.0f, 0.01f, 3.0f }, { {56, 50, 52, 255}, {130, 129, 129, 255 } } } },
-    { Effects::PURPLEM, { { 1.0f, 0.0001f, 1.0f }, { {128, 0, 0, 255} } } },
-    { Effects::LAVA, { { 5.0f, 0.01f, 15.0f }, {{255, 0, 0, 255}, {156, 50, 52, 255}, { 130, 129, 129, 255 }} } },
-    { Effects::WATER, { { 2.0f, -0.5f, 2.0f }, { {0, 121, 241, 255}, { 102, 191, 255, 255 } } } },
-    { Effects::FIREBALL, { { 2.0f, 0.5f, 2.0f }, { {255, 0, 0, 255}, {130, 129, 129, 255} } } },
-    { Effects::OBJECT, { { 1.0f, 0.2f, 1.0f }, {  {255, 215, 0, 255}, { 255, 119, 0, 255 } } } },
-    { Effects::WATERSPLASH, { { 2.0f, 0.1f, 2.0f }, { {0, 121, 241, 255}, { 102, 191, 255, 255 } } } },
-    { Effects::FIRESPLASH, { { 2.0f, 0.1f, 2.0f }, { {255, 0, 0, 255}, {156, 50, 52, 255} } } },
-    { Effects::PRISONDOOR, { { .2f, 0.1f, .2f }, { {255, 0, 0, 255}, {156, 50, 52, 255} } } }
+    static std::map<Effects, std::pair<vec3f, std::variant<std::vector<Color>, std::vector<std::string>>>> particleEffects = {
+    { Effects::CHEST, { { 10.0f, 0.1f, 5.0f }, std::vector<std::string>{ "p_est1", "p_est2", "p_est3", "p_est4"} } },
+    { Effects::FIRE, { { 2.0f, 0.01f, 2.0f }, std::vector<Color>{ {255, 215, 0, 255} } } },
+    { Effects::SPARKLES, { { 1.0f, 0.01f, 1.0f }, std::vector<Color>{ {255, 215, 0, 255} } } },
+    { Effects::SMOKE, { { 3.0f, 0.01f, 3.0f }, std::vector<Color>{ {56, 50, 52, 255}, {130, 129, 129, 255 } } } },
+    { Effects::PURPLEM, { { 1.0f, 0.0001f, 1.0f }, std::vector<Color>{ {128, 0, 0, 255} } } },
+    { Effects::LAVA, { { 5.0f, 0.01f, 15.0f }, std::vector<Color>{ {255, 0, 0, 255}, {156, 50, 52, 255}, { 130, 129, 129, 255 }} } },
+    { Effects::WATER, { { 2.0f, -0.5f, 2.0f }, std::vector<Color>{ {0, 121, 241, 255}, { 102, 191, 255, 255 } } } },
+    { Effects::FIREBALL, { { 2.0f, 0.5f, 2.0f }, std::vector<Color>{ {255, 0, 0, 255}, {130, 129, 129, 255} } } },
+    { Effects::OBJECT, { { 1.0f, 0.2f, 1.0f }, std::vector<Color>{  {255, 215, 0, 255}, { 255, 119, 0, 255 } } } },
+    { Effects::WATERSPLASH, { { 2.0f, 0.1f, 2.0f }, std::vector<Color>{ {0, 121, 241, 255}, { 102, 191, 255, 255 } } } },
+    { Effects::FIRESPLASH, { { 2.0f, 0.1f, 2.0f }, std::vector<Color>{  {255, 215, 0, 255} } } },
+    { Effects::PRISONDOOR, { { .2f, 0.1f, .2f }, std::vector<Color>{  {255, 215, 0, 255} } } },
+    { Effects::PLAYER, { { 3.0f, 0.1f, 3.0f }, std::vector<std::string>{ "p_est1", "p_est2", "p_est3", "p_est4"} } },
+    { Effects::MISSIONOBJ, { { 10.0f, 0.1f, 5.0f },  std::vector<Color>{ { {255, 215, 0, 255} } } } }
     };
 
     // La parte del motor gráfico será poder colocar puntos de luz desde donde se generen las partículas sjsjsj
 
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col, ParticleMakerComponent& pmc)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ParticleMakerComponent& pmc)
     {
-        if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+        if (!frti.inFrustum(e.getID()))
             return;
 
         // Si el componente tiene activo su efecto de partículas
@@ -62,11 +64,10 @@ void ParticleSystem::update(EntityManager& em)
                     {
                         p.position = { randomFloatX, static_cast<float>(phy.position.y()), randomFloatZ };
                         p.initialPos = p.position;
-
                     }
                     else
                     {
-                        auto offSetY = e.hasTag<DestructibleTag>() ? 5.5f : 4.0f;
+                        auto offSetY = e.hasTag<DestructibleTag>() ? 5.5f : 8.0f;
                         float xOffset = 0.0f, zOffset = 0.0f;
 
                         if (std::abs(std::sin(phy.orientation)) == 1)
@@ -90,25 +91,32 @@ void ParticleSystem::update(EntityManager& em)
                     p.velocity = { randomFloatX, particleEffects[pmc.effect].first.y(), randomFloatZ };
 
                     // Asignamos el color
-                    std::vector<Color>& colors = particleEffects[pmc.effect].second;
-                    Color& color = colors[std::rand() % colors.size()];
-                    p.r = color.r;
-                    p.g = color.g;
-                    p.b = color.b;
-                    p.a = color.a;
+                    std::variant<std::vector<Color>, std::vector<std::string>>& variant = particleEffects[pmc.effect].second;
+                    std::visit([&](auto&& arg) {
+                        using T = std::decay_t<decltype(arg)>;
+                        if constexpr (std::is_same_v<T, std::vector<Color>>) {
+                            Color& color = arg[static_cast<std::size_t>(std::rand()) % arg.size()];
+                            p.color = color;
+                        }
+                        else if constexpr (std::is_same_v<T, std::vector<std::string>>) {
+                            std::string& colorName = arg[static_cast<std::size_t>(std::rand()) % arg.size()];
+                            p.texture = colorName;
+                            p.type = Particle::ParticleType::Texture;
+                        }
+                    }, variant);
 
                     // La metemos en el vector de partículas
-                    pmc.particles.push_back(p);
+                    pmc.particles.push_back({ nullptr, p });
                 }
             }
 
             // Actualizamos las partículas
-            for (auto& p : pmc.particles)
+            for (auto& [_, p] : pmc.particles)
             {
                 p.remainingLife -= timeStep;
                 if (p.remainingLife <= 0.f)
                 {
-                    if (pmc.effect != Effects::WATER && pmc.effect != Effects::FIREBALL)
+                    if (pmc.effect != Effects::WATER && pmc.effect != Effects::FIREBALL && pmc.effect != Effects::PLAYER)
                         p.position = p.initialPos;
                     else
                         p.position = phy.position.to_other<float>();
@@ -116,14 +124,29 @@ void ParticleSystem::update(EntityManager& em)
                 }
                 else
                 {
+                    // Si el efecto es de agua, hacemos que suba para dar efecto de splash
                     if (pmc.effect == Effects::WATERSPLASH && p.remainingLife <= p.lifeTime / 1.3 && p.velocity.y() > 0)
                         p.velocity.setY(-p.velocity.y() * 4);
+
                     // Movemos las partículas acorde con el efecto del creador de partículas
                     if (pmc.multiply)
                         p.position += p.velocity * 1.2f;
                     else
                         p.position += p.velocity;
+
+                    if (pmc.effect == Effects::FIRE || pmc.effect == Effects::SPARKLES || pmc.effect == Effects::FIREBALL || pmc.effect == Effects::PRISONDOOR)
+                    {
+                        // Ir cambiando p.color cuanto más se acerque a la vida final
+                        float lifeRatio = p.remainingLife / p.lifeTime; // ratio de vida restante
+                        p.color = Color{
+                            255, // R siempre es 255
+                            static_cast<unsigned char>(215 * lifeRatio), // G disminuye de 215 a 0
+                            0, // B siempre es 0
+                            255 // A siempre es 255
+                        };
+                    }
                 }
+
             }
         }
     });

@@ -23,13 +23,13 @@ struct NavmeshInfo
     std::set<vec3d> midpoints{};
     //centers
     std::set<std::pair<uint16_t, vec3d>> centers{};
-    //only nodes og quads
+    //only nodes of quads
     std::set<vec3d> corners{};
     //Conexiones
     std::vector<Conection> conexiones;
-    //Conexiones pero con pos
+    //Conexiones pero con posiciones
     std::set<std::pair<vec3d, vec3d>> conexpos{};
-    //vector de boxes
+    //vector de bounding boxes
     std::vector<BBox> boundingnavmesh{};
 
     // recorrer navmeshes y rellenar array de nodos sin repetir
@@ -69,24 +69,11 @@ struct NavmeshInfo
     //hacer una funcion que compruebe que los nodos sean primos excepto
     //cuando sean centros que se encuentran a la misma altura.
     bool checkcousins(vec3d p, vec3d c){
-        // // si son centros y estan a la misma altura
-        // //  if(centers.find(std::make_pair(id1,pos1)) == centers.end()
-        // //  && centers.find(std::make_pair(id2,pos2)) == centers.end()){
-        // //     if(std::abs(pos1.y() - pos2.y() < 1.0)){
-        // //         return true;
-        // //     }
-        // //  }
-        //  //Si no son centros pero son primos
-        // for (const auto& node : nodes) {
-            if(std::abs(c.x() - p.x()) < 0.05 && std::abs(c.z() - p.z()) < 0.05 && 
-            std::abs(c.y() - p.y()) < 0.05){
-                return true;
-            }
-        // }
+        //Si no son centros pero son primos
+        if(std::abs(c.x() - p.x()) < 0.05 && std::abs(c.z() - p.z()) < 0.05 && 
+        std::abs(c.y() - p.y()) < 0.05){
+            return true;
+        }
         return false;
-        //  if(std::abs(pos1.x() - pos2.x()) < 0.05 && std::abs(pos1.z() - pos2.z()) < 0.05)
-        //     return true;
-        //  // Si no cumplen nada false
-    //     //  return false;
     }
 };

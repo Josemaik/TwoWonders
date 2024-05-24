@@ -3,6 +3,7 @@
 #define IA_MAN
 
 #include "../utils/types.hpp"
+#include "../managers/game_engine.hpp"
 #include <cstdint>
 #include <cmath>
 
@@ -23,6 +24,7 @@
 #include "../utils/bt/action_heal_mate.hpp"
 #include "../utils/bt/action_generatesubditos.hpp"
 #include "../utils/bt/action_pendulum.hpp"
+#include "../utils/bt/actiion_evade.hpp"
 //decision
 #include "../utils/bt/decision_playerdetected.hpp"
 #include "../utils/bt/decision_readyforattack.hpp"

@@ -2,6 +2,7 @@
 #include <vector>
 #include <cstdint>
 #include "../utils/vec3D.hpp"
+#include "../motor/src/darkmoon.hpp"
 
 struct Particle
 {
@@ -14,13 +15,14 @@ struct Particle
 
     float lifeTime{ .6f };
     float remainingLife{ lifeTime };
-    unsigned char r{}, g{}, b{}, a{};
+    DarkMoon::Color color{};
+    std::string texture{};
     ParticleType type{ ParticleType::Pixel };
 };
 
 struct ParticleMakerComponent
 {
-    enum struct ParticleEffect { FIRE, FIREBALL, FIRESPLASH, SPARKLES, LAVA, CHEST, WATERSPLASH, SPARKS, WATER, SMOKE, OBJECT, PURPLEM, PRISONDOOR, MAX };
+    enum struct ParticleEffect { FIRE, FIREBALL, FIRESPLASH, SPARKLES, LAVA, CHEST, WATERSPLASH, WATER, SMOKE, OBJECT, PURPLEM, PRISONDOOR, PLAYER, MISSIONOBJ, MAX };
 
     bool active{ false };
     ParticleEffect effect{ ParticleEffect::CHEST };
@@ -30,5 +32,5 @@ struct ParticleMakerComponent
     float elapsed{ 0.f };
     bool multiply{ false };
 
-    std::vector<Particle> particles{};
+    std::vector<std::pair<DarkMoon::Node*, Particle>> particles{};
 };

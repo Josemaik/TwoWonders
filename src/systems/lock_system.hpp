@@ -6,8 +6,8 @@
 
 struct LockSystem
 {
-    using SYSCMPs = MP::TypeList<PhysicsComponent, ColliderComponent>;
-    using SYSTAGs = MP::TypeList<>;
+    using SYSCMPs = MP::TypeList<PhysicsComponent>;
+    using SYSTAGs = MP::TypeList<LockableTag>;
 
     void update(EntityManager& em);
     void reset() { enemies.clear(); }

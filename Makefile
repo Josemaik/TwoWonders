@@ -1,21 +1,22 @@
 APP		   	:= TwoWonders
-CCFLAGS    	:= -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/
+CCFLAGS    	:= -std=c++2b -Wall -Wpedantic -Wextra -Wconversion -Isrc/ -I/usr/include/freetype2 -I/mingw64/include/freetype2
 
 ifeq ($(OS),Windows_NT)
 	CC 	   		:= g++
-	CCACHE 	   	:=
-    LIBS 	   	:= -L./ libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll -lwinmm -lgdi32
+	CCACHE 	   	:= ccache
+    LIBS 	   	:= -L./ libs/fmod.dll libs/fmodstudio.dll -lwinmm -lgdi32 -lglfw3 -lopengl32 -lglew32 -lglu32 -lm -lassimp -lfreetype -lgif
 	SANITIZE   	:=
-	LIBS_COPY  	:= libs/raylib.dll libs/raygui.dll libs/fmod.dll libs/fmodstudio.dll libs/libstdc++-6.dll libs/libgcc_s_seh-1.dll libs/libwinpthread-1.dll
+	LIBS_COPY  	:= libs/*.dll
 else
 	CC 		   	:= g++-12
 	CCACHE 	   	:= ccache
-    LIBS 		:= -lraylib -L./fmodlibs -lfmod -lfmodstudio libs/raygui.so
-	SANITIZE   	:= -fsanitize=address
-	LIBS_COPY  	:= /usr/lib/libraylib.so.420 libs/raygui.so fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13
+    LIBS 		:= -L./fmodlibs -lfmod -lfmodstudio -lglfw -lGLEW -lGLU -lGL -lm -lassimp -lfreetype -lgif
+	SANITIZE   	:= -fsanitize=address,undefined
+	LIBS_COPY  	:= fmodlibs/libfmod.so.13 fmodlibs/libfmodstudio.so.13 libs/*.so* 
 endif
 
 # agregar g++ | clang++
+# gprof: -pg -fprofile-arcs -ftest-coverage | luego se hace gprof -l TwoWonders > analysis.txt
 
 MKDIR      	:= mkdir -p
 SRC  	   	:= src
@@ -44,6 +45,9 @@ endif
 # Regla principal (enlazado de los .o)
 $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
 	$(CCACHE) $(CC) -o $(APP) $(patsubst $(SRC)%,$(OBJ)%,$(ALLCPPOBJ)) $(LIBS) $(SANITIZE) -Wl,-rpath=libs -Wl,-rpath,./fmodlibs
+ifeq ($(OS),Windows_NT)
+	mv $(APP) ./libs/
+endif
 
 # Regla que compila los .cpp
 %.o : %.cpp
@@ -52,12 +56,13 @@ $(APP) : $(OBJSUBDIRS) $(ALLCPPOBJ)
 # Regla que crea una release
 $(RELEASE) : $(APP) $(ASSETS)
 	$(MKDIR) $(RELEASE)
-	cp $(APP) $(RELEASE)/
 	cp -r $(ASSETS) $(RELEASE)/
 ifeq ($(OS),Windows_NT)
 	cp $(LIBS_COPY) $(RELEASE)/
+	mv $(LIBS_DIR)/$(APP) $(RELEASE)/
 else
 	$(MKDIR) $(RELEASE)/$(LIBS_DIR)
+	cp $(APP) $(RELEASE)/
 	cp $(LIBS_COPY) $(RELEASE)/$(LIBS_DIR)
 endif
 	zip -r $(ZIP_NAME) $(RELEASE)/
@@ -75,7 +80,11 @@ $(ASSETS):
 .PHONY : dir clean game
 
 game: $(APP)
+ifeq ($(OS),Windows_NT)
+	./$(LIBS_DIR)/$(APP)
+else
 	./$(APP)
+endif
 
 dir:
 	$(info $(ASSETS))
@@ -85,4 +94,8 @@ dir:
 	$(info $(ALLCPPOBJ))
 
 clean:
+ifeq ($(OS),Windows_NT)
+	rm -r ./$(OBJ)/ ./$(LIBS_DIR)/$(APP) ./$(RELEASE)/ ./$(ZIP_NAME) 
+else
 	rm -r ./$(OBJ)/ ./$(APP) ./$(RELEASE)/ ./$(ZIP_NAME)
+endif
