@@ -2,7 +2,7 @@
 #include "node.hpp"
 #include <utils/vec3D.hpp>
 
-
+//comprobar si tu vida es inferior a 3
 struct BTDecisionCheckLifes : BTNode_t{
 
     BTDecisionCheckLifes()  {}
@@ -15,6 +15,4 @@ struct BTDecisionCheckLifes : BTNode_t{
         return BTNodeStatus_t::fail;
     }
 
-// private:
-//     bool alternative { false };
 };

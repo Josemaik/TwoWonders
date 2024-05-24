@@ -1,7 +1,6 @@
 #pragma once
 #ifndef INPUT_MANAGER
 #define INPUT_MANAGER
-#include <raylib.h>
 #include "../utils/types.hpp"
 #include "../managers/game_engine.hpp"
 
@@ -18,6 +17,8 @@ struct InputSystem
 
 private:
     float elapsedLockInLimit{ 1.0f }, elapsedLockIn{ elapsedLockInLimit };
+    float elapsedParticleLimit{ .5f }, elapsedParticle{ elapsedParticleLimit };
+    bool playerSpelled{ false };
 };
 
 #endif // !INPUT_MANAGER

@@ -1,0 +1,8 @@
+Revisar luces direccionales
+Luces focales
+
+Checkbox
+Button with border radius
+
+Lineas blancas?
+Revisar input mando

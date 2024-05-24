@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <utils/sb/steeringbehaviour.hpp>
 
+//Hacer Arrive a un objetivo
 struct BTAction_Arrive : BTNode_t {
     // BTActionPatrol() = default;
 

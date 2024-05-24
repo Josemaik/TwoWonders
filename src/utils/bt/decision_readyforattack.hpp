@@ -2,11 +2,18 @@
 #include "node.hpp"
 #include <utils/vec3D.hpp>
 
-
+//Comprobar si estas preparado para atacar
 struct BTDecisionReadyforAttack : BTNode_t {
 
     BTDecisionReadyforAttack() {}
-
+    PhysicsComponent& getplayerphy(EntityContext_t& ectx) {
+        auto& li = ectx.em.getSingleton<LevelInfo>();
+        auto* playerEn = ectx.em.getEntityByID(li.playerID);
+        //if (not playerEn) return vec3d{}; // No hay player
+        // Si hay player
+        auto& plphy = ectx.em.getComponent<PhysicsComponent>(*playerEn);
+        return plphy;
+    };
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         ectx.ai->bh = "check ready attack";
         auto& li = ectx.em.getSingleton<LevelInfo>();
@@ -20,22 +27,10 @@ struct BTDecisionReadyforAttack : BTNode_t {
         //Compruebo si esta dentro del radio de ataque y se acabo el culldown
         //ectx.phy.orientated_before = false;
         if (ectx.ai->playerdetected) {
-            if (distance < (ectx.ai->attack_radius * ectx.ai->attack_radius)){
+            if (distance < (ectx.ai->attack_radius * ectx.ai->attack_radius)){     
+    
                 ectx.ai->on_attack_radius = true;
 
-                //Oriento hacia el jugador
-                // if(!ectx.phy.orientated_to_player){
-                //     vec3d direction = plphy.position - ectx.phy.position;
-                //     auto target_orientation = atan2(direction.z(), direction.x());
-                //     if (target_orientation < 0) target_orientation += 2 * K_PI;
-                //     adjustAnglePiMinusPi(target_orientation);
-                //     ectx.phy.orientation = target_orientation;
-                //     double angle_difference = std::abs(ectx.phy.orientation - target_orientation);
-                //     if (angle_difference < 0.1) {
-                //         ectx.phy.orientated_to_player = true;
-                //     }
-                // }
-                // // ectx.phy.orientated_before = true;
 
                 if (ectx.ai->elapsed_shoot >= ectx.ai->countdown_shoot) {
                     // paro al enemigo

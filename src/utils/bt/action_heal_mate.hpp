@@ -2,7 +2,7 @@
 #include "node.hpp"
 #include <utils/sb/steeringbehaviour.hpp>
 
-
+//Currar a un compañero
 struct BTAction_HealMate : BTNode_t{
     double calculatedistance(vec3d const& target, vec3d const& origin) {
         auto dx{ target.x() - origin.x() };
@@ -14,7 +14,7 @@ struct BTAction_HealMate : BTNode_t{
         ectx.ai->bh = "Healing mate";
         if(ectx.ent.hasTag<SlimeTag>()){
             auto const& phyTarget = ectx.em.getComponent<PhysicsComponent>(*ectx.em.getEntityByID(ectx.ai->slimetarget));
-            Steer_t steering = STBH::Pursue(phyTarget ,ectx.phy);
+            Steer_t steering = STBH::Pursue(phyTarget ,ectx.phy,ectx.phy.max_speed);
             double tdist = calculatedistance(phyTarget.position,ectx.phy.position);
             if(tdist < ectx.ai->arrival_radius){
                 //Nos matamos

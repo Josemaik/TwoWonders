@@ -13,27 +13,21 @@ void LockSystem::update(EntityManager& em)
         auto& playerPos = playerPhy.position;
         enemies.clear();
 
-        em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
+        em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy)
         {
-            if (e.hasTag<EnemyTag>() || e.hasTag<DestructibleTag>())
-            {
-                if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
-                    return;
+            if (!frti.inFrustum(e.getID()) || e.hasTag<EnemyDeathTag>())
+                return;
 
-                if (e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>())
-                    return;
+            auto& pos = phy.position;
 
-                auto& pos = phy.position;
+            // Calcula la distancia entre la posición del jugador y la posición del enemigo
+            if (std::abs(playerPos.y() - pos.y()) > 15.0)
+                return;
+            double distance = playerPos.distance(pos);
 
-                // Calcula la distancia entre la posición del jugador y la posición del enemigo
-                if (std::abs(playerPos.y() - pos.y()) > 15.0)
-                    return;
-                double distance = playerPos.distance(pos);
-
-                // Si el enemigo se encuentra a menos de x unidades de distancia del jugador se inserta en el set
-                if (distance < 35.0)
-                    enemies.push_back({ e.getID(), distance });
-            }
+            // Si el enemigo se encuentra a menos de x unidades de distancia del jugador se inserta en el set
+            if (distance < 35.0)
+                enemies.push_back({ e.getID(), distance });
         });
 
         // Ordenar de menor a mayor
@@ -59,7 +53,7 @@ void LockSystem::update(EntityManager& em)
 
                 auto& enemy = *em.getEntityByID(li.lockedEnemy);
 
-                if (!enemy.hasTag<EnemyTag>() && !enemy.hasTag<DestructibleTag>())
+                if (!enemy.hasTag<LockableTag>())
                 {
                     li.lockedEnemy = li.max;
                     inpi.lockOn = false;

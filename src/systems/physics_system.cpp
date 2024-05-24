@@ -4,19 +4,29 @@
 void PhysicsSystem::update(EntityManager& em)
 {
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, ColliderComponent& col)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy)
     {
-        if (!e.hasTags(FrustOut{}) && frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+        if (!frti.inFrustum(e.getID()))
             return;
+
+        if (e.hasTag<EnemyDeathTag>())
+        {
+            phy.position = vec3d::zero();
+            phy.velocity = phy.position;
+        }
 
         if (phy.notMove)
         {
             if (phy.velocity != vec3d::zero() && phy.target != vec3d::zero())
             {
                 if (phy.position.distance(phy.target) < 8.0)
+                {
+                    phy.prevPosition = phy.position;
                     phy.velocity = vec3d::zero();
+                }
                 else
                 {
+                    phy.prevPosition = phy.position;
                     phy.position += phy.velocity;
                 }
             }
@@ -25,7 +35,7 @@ void PhysicsSystem::update(EntityManager& em)
         // Cuando el jugador se para por un tiempo determinado
         if (phy.elapsed_afterStop < phy.countdown_afterStop)
         {
-            phy.plusDeltatime(timeStep30, phy.elapsed_afterStop);
+            phy.plusDeltatime(timeStep, phy.elapsed_afterStop);
             if (phy.stopped)
                 phy.stopped = false;
         }
@@ -40,7 +50,7 @@ void PhysicsSystem::update(EntityManager& em)
                 return;
             }
             else
-                phy.plusDeltatime(timeStep30, phy.elapsed_stopped);
+                phy.plusDeltatime(timeStep, phy.elapsed_stopped);
         }
 
         // Sacamos referencias a la posición y velocidad
@@ -98,16 +108,16 @@ void PhysicsSystem::update(EntityManager& em)
         }
 
         // Colocamos la posición
-        pos.setX((pos.x() + vel.x()));
-        pos.setY((pos.y() + vel.y()));
-        pos.setZ((pos.z() + vel.z()));
+        phy.prevPosition = pos;
+        pos += vel;
 
         if (!phy.stopped && (vel.x() != 0 || vel.z() != 0)) {
+            phy.prevOrientation = phy.orientation;
             phy.orientation = std::atan2(vel.x(), vel.z());
         }
 
         //Orientamos a enemigos hacia el player si están parados
-        if (e.hasTag<SpiderTag>() || e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>()) {
+        if (e.hasTag<SpiderTag>() || e.hasTag<SnowmanTag>() || e.hasTag<GolemTag>() || e.hasTag<SlimeTag>()) {
             if (e.hasComponent<AIComponent>())
             {
                 auto& ia = em.getComponent<AIComponent>(e);
@@ -120,26 +130,150 @@ void PhysicsSystem::update(EntityManager& em)
             }
         }
 
-        // auto& ss = em.getSingleton<SoundSystem>();
-        if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !playerWalking) {
-            auto& li = em.getSingleton<LevelInfo>();
-
-            switch (li.mapID)
-            {
-            case 0:
-                //ss.sonido_pasos_pradera();
-                break;
-            case 1:
-                //ss.sonido_pasos_prision();
-                break;
-            }
-            playerWalking = true;
-        }
-        else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) && playerWalking)
+        // SONIDOS Y ANIMACIONES DE MOVIMIENTO
+        auto& ss = em.getSingleton<SoundSystem>();
+        if (e.hasTag<PlayerTag>())
         {
-            playerWalking = false;
-            //ss.SFX_stop();
+            if (phy.velocity.x() != 0 || phy.velocity.z() != 0) {
+
+                if (!playerWalking)
+                {
+                    ss.play_pasos();
+                    playerWalking = true;
+
+                }
+
+                if (e.hasComponent<AnimationComponent>())
+                {
+                    auto& plfi = em.getSingleton<PlayerInfo>();
+                    auto& anc = em.getComponent<AnimationComponent>(e);
+                    if (anc.animToPlay == anc.max && anc.currentAnimation == static_cast<std::size_t>(PlayerAnimations::IDLE))
+                    {
+                        if (!plfi.hasStaff)
+                            anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::NORMAL_WALK);
+                        else
+                            anc.animToPlay = static_cast<std::size_t>(PlayerAnimations::STAFF_WALK);
+                    }
+                }
+            }
+            else if (phy.velocity.x() == 0 && phy.velocity.z() == 0)
+            {
+                if (playerWalking)
+                {
+                    playerWalking = false;
+                    ss.SFX_pasos_stop();
+
+                    if (e.hasComponent<AnimationComponent>())
+                    {
+                        auto& anc = em.getComponent<AnimationComponent>(e);
+
+                        if (anc.animToPlay == anc.max && anc.currentAnimation != 1 && anc.currentAnimation != 2 && anc.currentAnimation != 4)
+                            anc.animToPlay = (static_cast<std::size_t>(PlayerAnimations::IDLE));
+                    }
+                }
+
+            }
         }
-        // }
+        auto& li = em.getSingleton<LevelInfo>();
+
+        if (e.hasTag<GolemTag>()) {
+
+            auto& player = *em.getEntityByID(li.playerID);
+            auto& playerPhy = em.getComponent<PhysicsComponent>(player);
+            auto& playerPos = playerPhy.position;
+            auto& ss = em.getSingleton<SoundSystem>();
+            auto& ia = em.getComponent<AIComponent>(e);
+
+            if (e.hasComponent<SoundComponent>()) {
+                auto& sc = em.getComponent<SoundComponent>(e);
+                if (phy.position.distance(playerPos) < 40.0)
+                {
+                    if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !ia.ismoving)
+                    {
+                        ss.sonido_golem_mov(sc.sound_mov);
+                        ia.ismoving = true;
+
+                    }
+                    else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) && ia.ismoving)
+                    {
+                        ia.ismoving = false;
+                        ss.stop_enemigo_mov(sc.sound_mov);
+
+                    }
+                }
+                else  if (ia.ismoving)
+                {
+                    ss.stop_enemigo_mov(sc.sound_mov);
+                    ia.ismoving = false;
+
+                }
+            }
+        }
+        if (e.hasTag<SnowmanTag>()) {
+            auto& player = *em.getEntityByID(li.playerID);
+            auto& playerPhy = em.getComponent<PhysicsComponent>(player);
+            auto& playerPos = playerPhy.position;
+            auto& ss = em.getSingleton<SoundSystem>();
+            auto& ia = em.getComponent<AIComponent>(e);
+
+            if (e.hasComponent<SoundComponent>()) {
+                auto& sc = em.getComponent<SoundComponent>(e);
+                if (phy.position.distance(playerPos) < 40.0)
+                {
+                    if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !ia.ismoving)
+                    {
+                        ss.sonido_munyeco_mov(sc.sound_mov);
+                        ia.ismoving = true;
+
+                    }
+                    else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) && ia.ismoving)
+                    {
+                        ia.ismoving = false;
+                        ss.stop_enemigo_mov(sc.sound_mov);
+
+                    }
+                }
+                else  if (ia.ismoving)
+                {
+                    ss.stop_enemigo_mov(sc.sound_mov);
+                    ia.ismoving = false;
+
+                }
+            }
+
+
+        }
+        if (e.hasTag<SlimeTag>()) {
+            auto& player = *em.getEntityByID(li.playerID);
+            auto& playerPhy = em.getComponent<PhysicsComponent>(player);
+            auto& playerPos = playerPhy.position;
+            auto& ss = em.getSingleton<SoundSystem>();
+            auto& ia = em.getComponent<AIComponent>(e);
+
+            if (e.hasComponent<SoundComponent>()) {
+                auto& sc = em.getComponent<SoundComponent>(e);
+                if (phy.position.distance(playerPos) < 40.0)
+                {
+                    if ((phy.velocity.x() != 0 || phy.velocity.z() != 0) && !ia.ismoving)
+                    {
+                        ss.sonido_slime_mov(sc.sound_mov);
+                        ia.ismoving = true;
+
+                    }
+                    else if ((phy.velocity.x() == 0 && phy.velocity.z() == 0) && ia.ismoving)
+                    {
+                        ia.ismoving = false;
+                        ss.stop_enemigo_mov(sc.sound_mov);
+
+                    }
+                }
+                else  if (ia.ismoving)
+                {
+                    ss.stop_enemigo_mov(sc.sound_mov);
+                    ia.ismoving = false;
+
+                }
+            }
+        }
     });
 }

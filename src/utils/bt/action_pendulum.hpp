@@ -2,6 +2,7 @@
 #include "node.hpp"
 #include <utils/sb/steeringbehaviour.hpp>
 
+//Movimiento de péndulo
 struct BTAction_Pendulum : BTNode_t {
 
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
@@ -11,25 +12,28 @@ struct BTAction_Pendulum : BTNode_t {
             auto& abc = ectx.em.getComponent<AngryBushComponent>(ectx.ent);
 
             if (abc.chargeAttack && !abc.move) {
+                auto& anc = ectx.em.getComponent<AnimationComponent>(ectx.ent);
                 ectx.phy.velocity = vec3d{};
-                if (ectx.ai->elapsed_stop >= ectx.ai->countdown_stop) {
+                if (anc.aboutToEnd) {
+                    anc.aboutToEnd = false;
                     ectx.ai->elapsed_stop = 0;
                     abc.chargeAttack = false;
                     abc.move = true;
                     abc.vel = -abc.vel;
                     ectx.phy.max_speed = abc.max_speed;
                     abc.angrySoundOneTime = true;
+                    ectx.em.getComponent<AnimationComponent>(ectx.ent).animToPlay = static_cast<std::size_t>(RockAnimations::ROLL);
                 }
-                else {
-                    ectx.ai->plusDeltatime(ectx.deltaTime, ectx.ai->elapsed_stop);
-                    if (abc.angrySound)
-                    {
-                        auto& li = ectx.em.getSingleton<LevelInfo>();
-                        auto& playerPos = ectx.em.getComponent<PhysicsComponent>(*ectx.em.getEntityByID(li.playerID)).position;
-                        if (playerPos.distance(ectx.phy.position) < 28.0)
-                            ectx.em.getSingleton<SoundSystem>().sonido_piedras_golpe();
-                        abc.angrySound = false;
-                    }
+                else if (abc.angrySound)
+                {
+                    auto vel = (ectx.ai->path.m_waypoints[0] - ectx.phy.position).normalize();
+                    ectx.phy.orientation = atan2(vel.x(), vel.z());
+
+                    auto& li = ectx.em.getSingleton<LevelInfo>();
+                    auto& playerPos = ectx.em.getComponent<PhysicsComponent>(*ectx.em.getEntityByID(li.playerID)).position;
+                    if (playerPos.distance(ectx.phy.position) < 28.0)
+                        ectx.em.getSingleton<SoundSystem>().sonido_piedras_golpe();
+                    abc.angrySound = false;
                 }
             }
 

@@ -59,13 +59,17 @@ struct LevelInfo
     std::size_t lockedEnemy{ max };
     std::size_t closestEnemy{ max };
 
+    // Variables de menú
+    bool anyButtonPressed{ false };
+    float elapsedPause{ 0.0f }, pauseLimit{ 0.5f };
+
     // Variables de carga de entidades
     notLoadSet dontLoad{};
+    bool showParticles{ true };
 
     // Pantalla de carga
     double loadingLimit{ 3.0 }, loadingTime{ loadingLimit };
     bool loading{ false };
-    bool keyboardControls{ false };
 
     // Variables relacionadas con los eventos
     std::size_t chestToOpen{ max };
@@ -87,6 +91,8 @@ struct LevelInfo
     // Variables de zona y el nivel
     uint16_t num_zone{};
     uint8_t mapID{ 0 };
+    static constexpr uint8_t u8max = std::numeric_limits<uint8_t>::max();
+    uint8_t mapToLoad{ u8max };
     bool levelChanged{ false };
 
     // Para estado de pausa y cerrar el juego
@@ -160,6 +166,7 @@ struct LevelInfo
         loadingTime = loadingLimit;
         loading = false;
         dontLoad.clear();
+        showParticles = true;
         dead_entities.clear();
         debugIA2 = false;
         resetGame = false;

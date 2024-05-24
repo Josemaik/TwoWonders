@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <utils/sb/steeringbehaviour.hpp>
 
+//Perseguir player
 struct BTAction_Pursue : BTNode_t {
     BTNodeStatus_t run(EntityContext_t& ectx) noexcept final { // final es como override sin dejar sobreescribir
         if (!ectx.ai->tactive) return BTNodeStatus_t::fail;
@@ -13,7 +14,7 @@ struct BTAction_Pursue : BTNode_t {
         auto const& e_opt{ ectx.em.getEntityByID(ectx.ai->teid) };
         if (!e_opt) { ectx.ai->tactive = false; return BTNodeStatus_t::running; };
         auto const& phyTarget = ectx.em.getComponent<PhysicsComponent>(*e_opt);
-        Steer_t steering = STBH::Pursue(phyTarget, ectx.phy);
+        Steer_t steering = STBH::Pursue(phyTarget, ectx.phy,ectx.phy.max_speed);
         // ectx.phy.a_linear = steering.linear;
         // ectx.phy.v_angular = steering.angular;
 
@@ -48,17 +49,6 @@ struct BTAction_Pursue : BTNode_t {
                     steering.v_x += avoidanceForce.x();
                     steering.v_z += avoidanceForce.z();
                 }
-                // // Calculate a vector perpendicular to the orientation
-                // double angle = phy.orientation + K_PI / 2; // Add 90 degrees to the orientation
-                // vec3d perpendicular(cos(angle), 0, sin(angle));
-
-                // // Scale the perpendicular vector by a factor that depends on the distance to the obstacle
-                // float scale = 1.0 - (pos.distance(phy.position) / 15.0);
-                // vec3d avoidanceForce = perpendicular * scale;
-
-                // // Add the avoidance force to the steering velocity
-                // steering.v_x += avoidanceForce.x();
-                // steering.v_z += avoidanceForce.z();
             }
         });
 

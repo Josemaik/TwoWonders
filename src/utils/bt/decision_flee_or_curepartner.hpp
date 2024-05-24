@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 
+//comprobar si se huye o curas a tu compañero
 struct BTDecisionFleeorCurePartner : BTNode_t{
 
     BTDecisionFleeorCurePartner()  {}

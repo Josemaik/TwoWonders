@@ -1,20 +1,16 @@
 #include "object_system.hpp"
 
-void ObjectSystem::update(EntityManager& em) {
+void ObjectSystem::update(EntityManager& em, GameEngine& engine) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ObjectComponent& obj)
     {
         if (obj.decreaseLifeTime(timeStep) && (!obj.inmortal))
         {
-            if (obj.type == ObjectType::BombExplode || obj.type == ObjectType::Heal_Spell)
-                obj.effect();
-            else
-            {
-                li.insertDeath(ent.getID());
-                if (ent.hasComponent<RenderComponent>())
-                    em.getComponent<RenderComponent>(ent).visible = false;
-            }
+            li.insertDeath(ent.getID());
+            if (ent.hasComponent<RenderComponent>())
+                em.getComponent<RenderComponent>(ent).visible = false;
+
         }
 
         // Recuperamos la entidad del player
@@ -36,12 +32,13 @@ void ObjectSystem::update(EntityManager& em) {
                 break;
 
             case ObjectType::Sword:
-                if (!playerEnt->hasComponent<AttackComponent>())
-                    em.addComponent<AttackComponent>(*playerEnt, AttackComponent{});
+                if (!playerEnt->hasComponent<AttackerComponent>())
+                    em.addComponent<AttackerComponent>(*playerEnt, AttackerComponent{});
                 break;
 
             case ObjectType::Mana_Potion:
                 plfi.mana += 40;
+                em.getSingleton<SoundSystem>().recoger_mana();
                 break;
 
             case ObjectType::Bomb:
@@ -56,10 +53,6 @@ void ObjectSystem::update(EntityManager& em) {
             case ObjectType::Coin30:
                 plfi.addCoin(30);
                 em.getSingleton<SoundSystem>().sonido_destello();
-                break;
-
-            case ObjectType::ShopItem_Bomb:
-                shop_object = buyBomb(em);
                 break;
 
             case ObjectType::ShopItem_Life:
@@ -78,38 +71,20 @@ void ObjectSystem::update(EntityManager& em) {
                 }
                 break;
             }
-            case ObjectType::BombExplode:
-                explodeBomb(em, ent);
-                break;
-            case ObjectType::Heal_Spell:
-                explodeBombHeal(em, ent);
-                break;
             case ObjectType::Key:
             {
                 plfi.addKey();
                 em.getSingleton<SoundSystem>().sonido_llave();
                 Item key = { "Llave", "Una llave, parece que solo puede abrir una puerta" };
                 plfi.addItem(std::make_unique<Item>(key));
-
-
-                break;
-            }
-            case ObjectType::Fire_Spell:
-            {
-                Spell fire_pell("Bola de fuego", "Una bola de destrucción masiva", Spells::FireBall, 15.0, 1.0);
-
-                plfi.addSpell(fire_pell);
-                // auto& type = em.getComponent<TypeComponent>(*playerEnt);
-                // if (!type.hasType(ElementalType::Fire))
-                //     type.addType(ElementalType::Fire);
                 break;
             }
             case ObjectType::Basic_Staff:
             {
                 Staff staff("Bastón Básico", "É un bastón", ElementalType::Neutral, 1.0);
                 plfi.addItem(std::make_unique<Staff>(staff));
-                if (!playerEnt->hasComponent<AttackComponent>())
-                    em.addComponent<AttackComponent>(*playerEnt, AttackComponent{});
+                if (!playerEnt->hasComponent<AttackerComponent>())
+                    em.addComponent<AttackerComponent>(*playerEnt, AttackerComponent{});
                 break;
             }
             default:
@@ -126,16 +101,10 @@ void ObjectSystem::update(EntityManager& em) {
     });
 
     if (!toCreate.empty())
-        createObjects(em);
+        createObjects(em, engine);
 }
 
 // ent->hasComponent<LifeComponent<()
-
-bool ObjectSystem::buyBomb(EntityManager& em) {
-    auto& plfi = em.getSingleton<PlayerInfo>();
-
-    return plfi.buyBomb();
-}
 
 bool ObjectSystem::buyLife(EntityManager& em, Entity* ent) {
     auto& plfi = em.getSingleton<PlayerInfo>();
@@ -163,36 +132,12 @@ bool ObjectSystem::buyExtraLife(EntityManager& em, Entity* ent) {
     return false;
 }
 
-void ObjectSystem::explodeBombHeal(EntityManager& em, Entity& ent) {
-    createExplodeBomb(em, ent, BehaviorType::HEAL, GREEN);
-    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY, GREEN);
-}
-
-void ObjectSystem::explodeBomb(EntityManager& em, Entity& ent) {
-    createExplodeBomb(em, ent, BehaviorType::ATK_PLAYER, BLACK);
-    createExplodeBomb(em, ent, BehaviorType::ATK_ENEMY, BLACK);
-}
-
-void ObjectSystem::createExplodeBomb(EntityManager& em, Entity& ent, BehaviorType type, Color color) {
-    if (ent.hasComponent<RenderComponent>()) {
-        auto& ren = em.getComponent<RenderComponent>(ent);
-        // Crear una entidad que quite vida
-        auto& e{ em.newEntity() };
-        em.addTag<HitPlayerTag>(e);
-        auto& r = em.addComponent<RenderComponent>(e, RenderComponent{ .position = ren.position, .scale = { 3.0f, 1.0f, 3.0f }, .color = color });
-        auto& p = em.addComponent<PhysicsComponent>(e, PhysicsComponent{ .position{ r.position }, .scale = r.scale, .gravity = 0 });
-        em.addComponent<LifeComponent>(e, LifeComponent{ .life = 5, .countdown = 0.0f });
-        em.addComponent<ProjectileComponent>(e, ProjectileComponent{ .range = 0.2f });
-        em.addComponent<ColliderComponent>(e, ColliderComponent{ p.position, r.scale, type });
-    }
-}
-
 void ObjectSystem::addObject(ObjectType type, vec3d pos)
 {
     toCreate.push_back(std::make_pair(type, pos));
 }
 
-void ObjectSystem::createObjects(EntityManager& em)
+void ObjectSystem::createObjects(EntityManager& em, GameEngine& engine)
 {
     // Se crean los objetos del vector
     for (auto& [obj, pos] : toCreate)
@@ -208,39 +153,45 @@ void ObjectSystem::createObjects(EntityManager& em)
         {
         case ObjectType::Life:
         {
-            color = RED;
+            em.addTag<LifeDropTag>(e);
+            color = D_RED;
             break;
         }
         case ObjectType::Coin:
         {
             em.addTag<CoinTag>(e);
-            color = YELLOW;
+            color = D_YELLOW;
             break;
         }
         case ObjectType::Bomb:
         {
-            color = GRAY;
+            color = D_GRAY;
             break;
         }
         case ObjectType::Mana_Potion:
         {
-            color = SKYBLUE;
+            em.addTag<ManaDropTag>(e);
+            color = D_BLUE_LIGHT;
             break;
         }
         case ObjectType::Basic_Staff:
         {
-            color = GRAY;
+            color = D_GRAY;
             scl = { 10.5, 10.3, 10.3 };
             inmortal = true;
             visible = false;
 
             auto& plfi = em.getSingleton<PlayerInfo>();
             plfi.hasStaff = true;
+
+            auto& player = *em.getEntityByID(em.getSingleton<LevelInfo>().playerID);
+            auto& playerRen = em.getComponent<RenderComponent>(player);
+            engine.dmeg.CreateModel("assets/Assets/Props/Objetos_equipables/Baston_malo.obj", D_WHITE, "playerStaff", playerRen.node);
             break;
         }
         case ObjectType::Key:
         {
-            color = GOLD;
+            color = D_YELLOW_LIGHT;
             scl = { 10.5, 10.3, 10.3 };
             inmortal = true;
             visible = false;
@@ -248,7 +199,7 @@ void ObjectSystem::createObjects(EntityManager& em)
         }
         case ObjectType::ShopItem_ExtraLife:
         {
-            color = RED;
+            color = D_RED;
             scl = { 10.5, 10.5, 10.5 };
             inmortal = true;
             visible = false;
@@ -256,35 +207,30 @@ void ObjectSystem::createObjects(EntityManager& em)
         }
         case ObjectType::Coin30:
         {
-            color = RED;
+            color = D_RED;
             scl = { 10.5, 10.5, 10.5 };
             inmortal = true;
             visible = false;
             break;
         }
-        case ObjectType::Fire_Spell:
-        {
-            color = RED;
-            scl = { 1.5, 0.3, 0.3 };
-            inmortal = true;
-            break;
-        }
         case ObjectType::GoodBoots:
         {
-            color = GREEN;
+            color = D_GREEN;
             scl = { 10.5, 10.5, 10.5 };
             inmortal = true;
             visible = false;
 
             auto& plfi = em.getSingleton<PlayerInfo>();
             plfi.hasBoots = true;
+            em.getSingleton<SoundSystem>().sonido_equipar_botas();
+            em.getSingleton<SoundSystem>().sonido_boost_pasos();
 
             Item boots = { "Botas de la suerte", "Botas que te hacen correr más rápido" };
             break;
         }
         case ObjectType::RegularHat:
         {
-            color = GREEN;
+            color = D_GREEN;
             scl = { 10.5, 10.5, 10.5 };
             inmortal = true;
             visible = false;
@@ -292,12 +238,14 @@ void ObjectSystem::createObjects(EntityManager& em)
             auto& plfi = em.getSingleton<PlayerInfo>();
             plfi.hasHat = true;
 
+            em.getSingleton<SoundSystem>().sonido_equipar_gorro();
+
             Item boots = { "Sombrero de Mago", "Te ayuda a canalizar mejor tu uso de magia" };
             break;
         }
         case ObjectType::AttackUpgrade:
         {
-            color = RED;
+            color = D_RED;
             scl = { 10.5, 10.5, 10.5 };
             inmortal = true;
             visible = false;

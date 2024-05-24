@@ -57,7 +57,7 @@
 							"rotVector":[0.0, 0.0, 0.0]
 						},
 						{
-							"position":[16.767, -1.847, 30.0],
+							"position":[16.767, -1.847, 20.0],
 							"scale":[3.0, 25.0, 32.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 0.0]
@@ -69,7 +69,7 @@
 							"rotVector":[0.0, 0.0, 0.0]
 						},
 						{
-							"position":[-13.233, -12.847, 24.0],
+							"position":[-13.233, -12.847, 20.0],
 							"scale":[3.0, 63.0, 32.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 1.0]
@@ -114,7 +114,7 @@
 					"Spawns":[],
 					"Enemies": [
 						{
-							"position": [5.41, 13.0, 53.26],
+							"position": [3.41, 13.0, 53.26],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 0.0,
 							"scale": [5.0, 3.0, 5.0],
@@ -132,15 +132,14 @@
 							"tactive": true,
 							"perceptionTime": 0.2,
 							"path": [
-								[5.41, 13.0, 43.26],
+								[3.41, 13.0, 43.26],
 								[-30.0, 4.0, 18.0],
 								[-25.0, 4.0, 6.0],
 								[-30.0, 4.0, 18.0]
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [-17.18, 13.0, 18.9],
@@ -168,8 +167,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [-47.15, 20.0, -28.6],
@@ -197,8 +195,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						}
 					],
 					"NPCs":[],
@@ -371,7 +368,7 @@
 							"scale":[7.101, 6.494, 10.0],
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0],
-							"content": 8,
+							"content": 6,
 							"message": [
 								"¡Encontraste una poción de vitalidad superior!", 
 								"Ahora te sientes mucho más vigoroso que antes."
@@ -384,7 +381,7 @@
 							"scale":[7.101, 6.494, 10.0],
 							"rotation": 90.0,
 							"rotVector":[0.0, 0.0, 0.0],
-							"content": 6,
+							"content": 5,
 							"message": ["¡Encontraste 30 destellos!"]
 						}
 					]
@@ -420,8 +417,7 @@
 							],
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [-145.34, 4.0, 7.52],
@@ -449,8 +445,7 @@
 							],
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						}
 					],
 					"NPCs":[],
@@ -614,7 +609,7 @@
 							"scale":[7.101, 6.494, 10.0],
 							"rotation": 180.0,
 							"rotVector":[0.0, 0.0, 0.0],
-							"content": 10,
+							"content": 8,
 							"message": [
 								"¡Encontraste una llave!", 
 								"Parece que es de un solo uso..."
@@ -663,8 +658,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [-114.17, 4.0, 133.68],
@@ -692,8 +686,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						}
 					],
 					"NPCs":[],
@@ -817,8 +810,7 @@
 							],
 							"countdown_stop": 0.8,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						}
 					],
 					"NPCs":[],
@@ -1004,7 +996,7 @@
 							"scale":[7.101, 6.494, 10.0],
 							"rotation": 180.0,
 							"rotVector":[0.0, 0.0, 0.0],
-							"content": 10,
+							"content": 8,
 							"message": [
 								"¡Encontraste una llave!", 
 								"Parece que es de un solo uso..."
@@ -1030,7 +1022,7 @@
 							"position": [-27.7, 22, 84.0],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 180.0,
-							"scale": [10.0, 17.0, 10.0],
+							"scale": [16.0, 17.0, 16.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.4,
 							"life": 6,
@@ -1052,14 +1044,13 @@
 							],
 							"countdown_stop": 0.0,
 							"countdown_shoot": 1.0,
-							"countdown_perception": 0.2,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.2
 						},
 						{
 							"position": [-8.8, 22, 98.85],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 270.0,
-							"scale": [10.0, 17.0, 10.0],
+							"scale": [16.0, 17.0, 16.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.4,
 							"life": 6,
@@ -1081,8 +1072,7 @@
 							],
 							"countdown_stop": 0.0,
 							"countdown_shoot": 1.0,
-							"countdown_perception": 0.2,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.2
 						},
 						{
 							"position": [41.38, 20.0, 122.51],
@@ -1110,8 +1100,7 @@
 							],
 							"countdown_stop": 2.5,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},{
 							"position": [17.38, 20.0, 122.51],
 							"rotVector": [0.0, 0.0, 1.0],
@@ -1138,8 +1127,7 @@
 							],
 							"countdown_stop": 2.5,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [42.53, 13.0, 155.43],
@@ -1167,8 +1155,7 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [41.38, 20.0, 177.1],
@@ -1196,8 +1183,7 @@
 							],
 							"countdown_stop": 2.5,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [17.38, 20.0, 177.1],
@@ -1225,8 +1211,7 @@
 							],
 							"countdown_stop": 2.5,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						},
 						{
 							"position": [16.65, 13.0, 202.2],
@@ -1254,13 +1239,12 @@
 							],
 							"countdown_stop": 1.25,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						}
 					],
 					"NPCs":[
 						{
-							"position": [-23.08, 4.0, 244.7],
+							"position": [-23.08, 18.0, 244.7],
 							"scale": [3.0, 7.0, 3.0],
 							"rotation": 225.0,
 							"rotVector": [0.0, 0.0, 1.0],
@@ -1377,7 +1361,7 @@
 							"scale":[13.0, 3.0, 20.0],
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, -1.0],
-							"life": 3,
+							"life": 2,
 							"weaknesses": [2]
 						},
 						{
@@ -1387,7 +1371,7 @@
 							"scale":[7.101, 6.494, 10.0],
 							"rotation": 0.0,
 							"rotVector":[0.0, 0.0, 0.0],
-							"content": 6,
+							"content": 5,
 							"message": ["¡Encontraste 30 destellos!"]
 						},
 						{
@@ -1428,7 +1412,7 @@
 							"position": [28.32, 22.0, 236.94],
 							"rotVector": [0.0, 0.0, 1.0],
 							"rotation": 270.0,
-							"scale": [10.0, 17.0, 10.0],
+							"scale": [16.0, 17.0, 16.0],
 							"color": [0, 121, 241, 255],
 							"max_speed": 0.4,
 							"life": 10,
@@ -1450,8 +1434,7 @@
 							],
 							"countdown_stop": 0.0,
 							"countdown_shoot": 1.0,
-							"countdown_perception": 0.2,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.2
 						},
 						{
 							"position": [38.24, 20.0, 228.41],
@@ -1479,8 +1462,7 @@
 							],
 							"countdown_stop": 2.5,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 1.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 1.5
 						},
 						{
 							"position": [-50.26, 20.0, 220.5],
@@ -1508,8 +1490,7 @@
 							],
 							"countdown_stop": 2.5,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 1.0,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 1.0
 						},
 						{
 							"position": [-50.26, 20.0, 246.5],
@@ -1537,8 +1518,7 @@
 							],
 							"countdown_stop": 2.5,
 							"countdown_shoot": 0.5,
-							"countdown_perception": 0.5,
-							"scale_to_respawn_attack": 7.0
+							"countdown_perception": 0.5
 						}
 					],
 					"NPCs":[

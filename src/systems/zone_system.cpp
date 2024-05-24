@@ -1,6 +1,6 @@
 #include "zone_system.hpp"
 
-void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, EventManager& evm, MapManager& map) {
+void ZoneSystem::update(EntityManager& em, ENGI::GameEngine& engine, Ia_man& iam, EventManager& evm, MapManager& map) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, ZoneComponent& zon)
@@ -16,8 +16,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
 
                 if (e.hasTag<LevelChangeTag>())
                 {
-                    em.getSingleton<SoundSystem>().ambient_stop();
-                    em.getSingleton<SoundSystem>().music_stop();
+
                     switch (li.mapID)
                     {
                     case 0:
@@ -30,6 +29,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         plfi.spawnPoint = spawnPoint;
                         p.position = spawnPoint;
                         em.getSingleton<SoundSystem>().update();
+                        engine.resetAnimations();
                         break;
                     }
                     case 1:
@@ -42,6 +42,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         plfi.spawnPoint = spawnPoint;
                         p.position = spawnPoint;
                         em.getSingleton<SoundSystem>().update();
+                        engine.resetAnimations();
                         break;
                     }
                     case 2:
@@ -52,6 +53,10 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
                         }
                         li.currentScreen = GameScreen::ENDING;
                         elapsedEnding = 0.0f;
+                        em.getSingleton<SoundSystem>().music_stop_level();
+                        em.getSingleton<SoundSystem>().ambient_stop();
+                        em.getSingleton<SoundSystem>().sonido_win();
+
                         // map.changeMap(em, 2, iam);
                         // li.transition = true;
                         // // em.getSingleton<SoundSystem>().ambient_stop();
@@ -158,7 +163,7 @@ void ZoneSystem::update(EntityManager& em, ENGI::GameEngine&, Ia_man& iam, Event
     checkZones(em, evm, zchi.getZones(InteractableType::Ladder), [&](EntityManager& em, EventManager&) { checkLadders(em); });
     checkZones(em, evm, zchi.getZones(InteractableType::Sign), [&](EntityManager& em, EventManager&) { checkSigns(em); });
     checkZones(em, evm, zchi.getZones(InteractableType::MissionOBJ), [&](EntityManager& em, EventManager& evm) { checkMissionObjs(em, evm); });
-    checkZones(em, evm, zchi.getZones(InteractableType::Spawn), [&](EntityManager& em, EventManager&) { checkSpawns(em); });
+    checkZones(em, evm, zchi.getZones(InteractableType::Spawn), [&](EntityManager& em, EventManager& evm) { checkSpawns(em, evm); });
 }
 
 void ZoneSystem::checkZones(EntityManager& em, EventManager& evm, checkType zones, checkFuncType checkFunction)
@@ -200,7 +205,7 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
             ch.closeEnemies = 0;
             em.forEach<crusherCMP, crusherTag>([&](Entity& e, PhysicsComponent& phyC)
             {
-                if (e.hasTag<AngryBushTag>() || e.hasTag<DummyTag>() || e.hasTag<AngryBushTag2>())
+                if (e.hasTag<AngryBushTag>() || e.hasTag<DummyTag>() || e.hasTag<AngryBushTag2>() || e.hasTag<EnemyDeathTag>())
                     return;
                 if (phy.position.distance(phyC.position) < 50.0 &&
                     std::abs(phy.position.y() - phyC.position.y()) < 4.0)
@@ -238,6 +243,15 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
                 li.dontLoad.insert(pair);
                 em.getSingleton<SoundSystem>().sonido_interaccion_e();
                 inpi.interact = false;
+
+                // FIXME
+                // Animación del cofre
+                // auto& ac = em.getComponent<AnimationComponent>(e);
+                // ac.animToPlay = 0;
+
+                // Apagamos la luz del cofre
+                auto& plc = em.getComponent<PointLightComponent>(e);
+                plc.light->enabled = false;
             }
         }
     });
@@ -327,7 +341,19 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
             li.doorToOpen = e.getID();
             evm.scheduleEvent(Event{ EventCodes::OpenDoor });
             em.getSingleton<SoundSystem>().sonido_interaccion_e();
+            if (e.hasComponent<AnimationComponent>())
+            {
+                if (li.mapID == 1) {
+                    em.getSingleton<SoundSystem>().sonido_puerta_prision();
+                }
+                em.getComponent<AnimationComponent>(e).animToPlay = static_cast<std::size_t>(DoorAnimations::OPEN);
 
+            }
+            else
+                li.insertDeath(e.getID());
+
+            em.getSingleton<SoundSystem>().sonido_abrir_puerta();
+            plfi.hasKey = false;
             inpi.interact = false;
         }
     });
@@ -347,6 +373,13 @@ void ZoneSystem::openDoorsZone(EntityManager& em, EventManager& evm, vec3d& leve
         {
             li.doorToOpen = e.getID();
             evm.scheduleEvent(Event{ EventCodes::OpenDoor });
+            if (li.mapID == 1) {
+                em.getSingleton<SoundSystem>().sonido_puerta_prision();
+            }
+            if (e.hasComponent<AnimationComponent>())
+                em.getComponent<AnimationComponent>(e).animToPlay = static_cast<std::size_t>(DoorAnimations::OPEN);
+            else
+                li.insertDeath(e.getID());
         }
     });
 }
@@ -363,6 +396,9 @@ void ZoneSystem::checkTutorialEnemies(EntityManager& em)
 
     em.forEachAny<noCMP, enemyTag>([&](Entity& e)
     {
+        if (e.hasTag<EnemyDeathTag>())
+            return;
+
         auto& phy = em.getComponent<PhysicsComponent>(e);
         double distance = playerPos.distance(phy.position);
 
@@ -384,13 +420,16 @@ void ZoneSystem::checkVolcanoLava(EntityManager& em)
     auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
     auto& playerPos = playerPhy.position;
     using noCMP = MP::TypeList<>;
-    using enemyTag = MP::TypeList<LavaTag>;
+    using lavaTag = MP::TypeList<LavaTag>;
     li.volcanoLava.clear();
 
-    em.forEachAny<noCMP, enemyTag>([&](Entity& e)
+    double minDistance = std::numeric_limits<double>::max();
+    em.forEachAny<noCMP, lavaTag>([&](Entity& e)
     {
         auto& phy = em.getComponent<PhysicsComponent>(e);
         double distance = playerPos.distance(phy.position);
+        if (distance < minDistance)
+            minDistance = distance;
 
         double range = 15.0;
 
@@ -399,6 +438,15 @@ void ZoneSystem::checkVolcanoLava(EntityManager& em)
             li.volcanoLava.push_back(e.getID());
         }
     });
+
+    auto& ss = em.getSingleton<SoundSystem>();
+    if (minDistance > 80.0) {
+        ss.ambiente_parameter_lava(2);
+    }
+    else if (minDistance > 45) {
+        ss.ambiente_parameter_lava(1);
+    }
+    else ss.ambiente_parameter_lava(0);
 }
 
 void ZoneSystem::checkLadders(EntityManager& em)
@@ -431,8 +479,7 @@ void ZoneSystem::checkLadders(EntityManager& em)
         {
             playerPos = { phy.position.x(), playerPos.y() + 0.5, phy.position.z() };
             playerPhy.gravity = 0;
-            playerPhy.orientation = ldc.orientation;
-
+            playerPhy.orientation = -(ldc.orientation * phy.rotationVec.y());
             plfi.onLadder = true;
             inpi.interact = false;
             ic.showButton = false;
@@ -519,7 +566,7 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager&)
     using noCMP = MP::TypeList<PhysicsComponent, InteractiveComponent, OneUseComponent, DispatcherComponent>;
     using npcTag = MP::TypeList<NPCTag>;
 
-    em.forEach<noCMP, npcTag>([&](Entity& e, PhysicsComponent& phy, InteractiveComponent& ic, OneUseComponent& ouc, DispatcherComponent& dc)
+    em.forEach<noCMP, npcTag>([&](Entity& e, PhysicsComponent& phy, InteractiveComponent& ic, OneUseComponent& ouc, DispatcherComponent&)
     {
         // Revisamos si ya se ha hablado con el npc
         std::pair<uint8_t, uint8_t> pair{ li.mapID, ouc.id };
@@ -541,27 +588,27 @@ void ZoneSystem::checkNPCs(EntityManager& em, EventManager&)
             phy.lookAt(playerPhy.position);
 
             li.viewPoint = phy.position;
-            li.events.insert(dc.eventCodes.begin(), dc.eventCodes.end());
-            dc.eventCodes.clear();
+            li.events.insert(static_cast<uint16_t>(EventCodes::NPCDialog));
+            // dc.eventCodes.clear();
             // if (dc.eventCodes.size() > 0)
             //     evm.scheduleEvent({ static_cast<EventCodes>(dc.eventCodes[0]) });
         }
     });
 }
 
-void ZoneSystem::checkSpawns(EntityManager& em)
+void ZoneSystem::checkSpawns(EntityManager& em, EventManager& evm)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto& playerEnt = *em.getEntityByID(li.playerID);
     auto& playerPhy = em.getComponent<PhysicsComponent>(playerEnt);
     auto& playerPos = playerPhy.position;
-    using CMPs = MP::TypeList<PhysicsComponent, ColliderComponent, InteractiveComponent, SpawnComponent>;
+    using CMPs = MP::TypeList<PhysicsComponent, InteractiveComponent, SpawnComponent>;
     using spawnTag = MP::TypeList<SpawnTag>;
 
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<CMPs, spawnTag>([&](Entity&, PhysicsComponent& phy, ColliderComponent& col, InteractiveComponent& ic, SpawnComponent& sc)
+    em.forEach<CMPs, spawnTag>([&](Entity& e, PhysicsComponent& phy, InteractiveComponent& ic, SpawnComponent& sc)
     {
-        if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+        if (!frti.inFrustum(e.getID()))
             return;
 
         // Calculamos la distancia entre el jugador y el spawn
@@ -569,41 +616,41 @@ void ZoneSystem::checkSpawns(EntityManager& em)
 
         if (distance < ic.range && !sc.active)
         {
-            for (auto& [_, part] : sc.parts)
-            {
-                part->multiply = true;
-            }
+            for (auto& [rc, pmc, plc] : sc.parts)
+                pmc->multiply = true;
+
             sc.active = true;
-            em.getSingleton<SoundSystem>().sonido_checkpoint();
+            ic.showButton = true;
         }
         else if (distance > ic.range && sc.active)
         {
-            for (auto& [_, part] : sc.parts)
-            {
-                part->multiply = false;
-            }
+            for (auto& [rc, pmc, plc] : sc.parts)
+                pmc->multiply = false;
+
             sc.active = false;
+            ic.showButton = false;
+            return;
+        }
+
+        auto& inpi = em.getSingleton<InputInfo>();
+        auto& plfi = em.getSingleton<PlayerInfo>();
+
+        if (sc.active && inpi.interact)
+        {
+            plfi.spawnPoint = phy.position;
+            evm.scheduleEvent(Event{ EventCodes::SetSpawn });
+            em.getSingleton<SoundSystem>().sonido_checkpoint();
+
+            // if (e.hasComponent<DispatcherComponent>())
+            // {
+            //     auto& dc = em.getComponent<DispatcherComponent>(e);
+            //     for (std::size_t i = 0; i < dc.eventCodes.size(); i++)
+            //     {
+            // evm.scheduleEvent(Event{ static_cast<EventCodes>(11) });
+            evm.scheduleEvent(Event{ EventCodes::DialogFirstSpawn });
+            //     }
+            // }
+            inpi.interact = false;
         }
     });
 }
-
-// void ZoneSystem::checkDungeonSlimes(EntityManager& em, EventManager& evm)
-// {
-//     auto& li = em.getSingleton<LevelInfo>();
-
-//     if (!li.dungeonKeyCreated)
-//     {
-//         using noCMPs = MP::TypeList<>;
-//         using enemyTag = MP::TypeList<EnemyTag>;
-//         bool slimesDead{ true };
-
-//         em.forEach<noCMPs, enemyTag>([&](Entity& ent)
-//         {
-//             if (slimesDead && ent.hasTag<SlimeTag>())
-//                 slimesDead = false;
-//         });
-
-//         if (slimesDead)
-//             evm.scheduleEvent(Event{ EventCodes::SpawnDungeonKey });
-//     }
-// }

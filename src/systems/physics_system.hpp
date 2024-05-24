@@ -6,14 +6,12 @@
 struct PhysicsSystem
 {
     // Se van a buscar las entidad que tengan estos componentes y tags
-    using SYSCMPs = MP::TypeList<PhysicsComponent, ColliderComponent>;
+    using SYSCMPs = MP::TypeList<PhysicsComponent>;
     using SYSTAGs = MP::TypeList<>;
 
     void update(EntityManager& em);
 
 private:
-    float elapsed{ 0.f }, elapsed_limit{ 1.0f };
-    float elapsedSound{ 0.f }, elapsedSound_limit{ 1.0f };
     bool playerWalking{ false };
 };
 

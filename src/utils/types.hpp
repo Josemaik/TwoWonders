@@ -22,14 +22,16 @@
 #include "../components/boat_component.hpp"
 #include "../components/particle_component.hpp"
 #include "../components/spawn_component.hpp"
-//ia
+#include "../components/pointlight_component.hpp"
+#include "../components/grass_component.hpp"
 #include "../components/ai_component.hpp"
 #include "../components/navmesh_component.hpp"
 #include "../components/npc_component.hpp"
 #include "../components/projectile_component.hpp"
 #include "../components/object_component.hpp"
 #include "../components/zone_component.hpp"
-#include "../components/shield_component.hpp"
+#include "../components/animation_component.hpp"
+#include "../components/sound_component.hpp"
 #include "../managers/entity_manager.hpp"
 #include "../utils/meta_program.hpp"
 #include "../utils/Item.hpp"
@@ -44,6 +46,7 @@
 #include "./sngtn/navmesh_info.hpp"
 #include "./sngtn/zonecheck_info.hpp"
 #include "./sngtn/frustum_info.hpp"
+#include "./sngtn/cheats_info.hpp"
 
 // GameData
 #include "../utils/sngtn/GameData.hpp"
@@ -57,15 +60,48 @@
 static constexpr double K_PI = 3.14159265358979323846;
 static constexpr double DEGTORAD = static_cast<double>(K_PI / 180.0);
 static constexpr float timeStep30 = 1.0f / 30.0f;  // Actualiza el juego 30 veces por segundo
+static constexpr float timeStep40 = 1.0f / 40.0f;  // Actualiza el juego 45 veces por segundo
 static constexpr float timeStep = 1.0f / 60.0f;  // Actualiza el juego 60 veces por segundo
 static constexpr float timeStep120 = 1.0f / 120.0f;  // Actualiza el juego 120 veces por segundo
 static constexpr float timeStep240 = 1.0f / 240.0f;  // Actualiza el juego 240 veces por segundo
 static constexpr float timeStep360 = 1.0f / 360.0f;  // Actualiza el juego 360 veces por segundo
 static constexpr float timeStep480 = 1.0f / 480.0f;  // Actualiza el juego 480 veces por segundo
 static constexpr double timeStepDouble = 1.0 / 60.0;  // Actualiza el juego 60 veces por segundo
+static constexpr double timeStepDouble120 = 1.0 / 120.0;  // Actualiza el juego 120 veces por segundo
 static constexpr double timeStepDouble240 = 1.0 / 240.0;  // Actualiza el juego 240 veces por segundo
+
 // Forward Declarations
 namespace ENGI { struct GameEngine; }
+
+// Eventos del juego
+enum EventCodes : uint16_t
+{
+    NoEvent,
+    SpawnKey,
+    SpawnDungeonKey,
+    OpenChest,
+    SetSpawn,
+    OpenDoor,
+    SpawnWallLevel0,
+    ViewPointCave,
+    NPCDialog,
+    DialogPrisonNomad1,
+    DialogPrisonNomad2,
+    DialogFirstSpawn,
+    ViewPointDoor,
+    BoatPartFound,
+    BoatDialog,
+    DialogNomadVolcano1,
+    DialogNomadVolcano2,
+    DialogCatVolcano1,
+    InitBoatParts,
+    DialogCatVolcano2,
+    DialogCatVolcano3,
+    DialogNomadVolcano3,
+    TPBoat,
+    ViewPointNomadDoor,
+    MAX
+};
 
 // Tags - Colocar en TL
 struct PlayerTag {};
@@ -91,6 +127,7 @@ struct SubjectTag {};
 struct DestructibleTag {};
 struct ChestTag {};
 struct SpawnTag {};
+struct ChunkTag {};
 struct Chunk0Tag {};
 struct Chunk1Tag {};
 struct Chunk2Tag {};
@@ -119,6 +156,11 @@ struct ObstacleTag {};
 struct FireBallTag {};
 struct SnowBallTag {};
 struct MagmaBallTag {};
+struct EnemyDeathTag {};
+struct LockableTag {};
+struct GrassTag {};
+struct ManaDropTag {};
+struct LifeDropTag {};
 
 //PatrolComponent, ShootPlayerComponent, RandomShootComponent, DiagonalComponent, DrakeComponent,
 using CL = MP::TypeList <
@@ -130,10 +172,10 @@ using CL = MP::TypeList <
     RampComponent,
     AIComponent,
     AttackComponent,
+    AttackerComponent,
     ProjectileComponent,
     ObjectComponent,
     ZoneComponent,
-    ShieldComponent,
     TypeComponent,
     ChestComponent,
     ListenerComponent,
@@ -149,7 +191,11 @@ using CL = MP::TypeList <
     MessageComponent,
     BoatComponent,
     ParticleMakerComponent,
-    SpawnComponent
+    SpawnComponent,
+    PointLightComponent,
+    GrassComponent,
+    AnimationComponent,
+    SoundComponent
 > ;
 using TL = MP::TypeList <
     PlayerTag,
@@ -170,6 +216,7 @@ using TL = MP::TypeList <
     DestructibleTag,
     ChestTag,
     SpawnTag,
+    ChunkTag,
     Chunk0Tag,
     Chunk1Tag,
     Chunk2Tag,
@@ -201,9 +248,14 @@ using TL = MP::TypeList <
     BoatTag,
     ObstacleTag,
     SnowBallTag,
-    MagmaBallTag
+    MagmaBallTag,
+    EnemyDeathTag,
+    LockableTag,
+    GrassTag,
+    ManaDropTag,
+    LifeDropTag
 > ;
-using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem, FrustumInfo>;
+using SCL = MP::TypeList<LevelInfo, BlackBoard_t, Debug_t, InputInfo, PlayerInfo, TextInfo, ZoneCheckInfo, GameData, NavmeshInfo, SoundSystem, FrustumInfo, CheatsInfo>;
 using EntityManager = ETMG::EntityManager<CL, SCL, TL>;
 using Entity = EntityManager::Entity;
 using GameEngine = ENGI::GameEngine;
@@ -211,6 +263,29 @@ using deathSet = std::set<std::size_t, std::greater<std::size_t>>;
 using mapType = rapidjson::Document;
 using valueType = rapidjson::Value;
 using mapSizeType = rapidjson::SizeType;
+using ShaderType = DarkMoon::Shader;
+using Model = DarkMoon::Model;
 using Effects = ParticleMakerComponent::ParticleEffect;
-using FrustPos = FrustumInfo::Position;
-using FrustOut = MP::TypeList<GroundTag, NPCTag>;
+using FrustOut = MP::TypeList<PlayerTag, GroundTag, NPCTag, ChunkTag, HitPlayerTag>;
+using Color = DarkMoon::Color;
+using Font = DarkMoon::Font;
+using Aligned = DarkMoon::Aligned;
+using Node = DarkMoon::Node;
+using Texture = DarkMoon::Texture;
+using Texture2D = DarkMoon::Texture2D;
+using Billboard = DarkMoon::Billboard;
+using Gif = DarkMoon::AnimatedTexture2D;
+using Circle = DarkMoon::Circle;
+using Rectangle = DarkMoon::Rectangle;
+using Slider = DarkMoon::Slider;
+using OptionSlider = DarkMoon::OptionSlider;
+using FloatSlider = DarkMoon::FloatSlider;
+using Camera = DarkMoon::Camera;
+using CameraProjection = DarkMoon::CameraProjection;
+using Button = DarkMoon::Button;
+using ButtonState = DarkMoon::ButtonState;
+using Text = DarkMoon::Text;
+using TextBox = DarkMoon::TextBox;
+using CheckBox = DarkMoon::CheckBox;
+using PointLight = DarkMoon::PointLight;
+using DarkMoonEngine = DarkMoon::DarkMoonEngine;

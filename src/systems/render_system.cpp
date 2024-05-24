@@ -1,165 +1,154 @@
 #include "render_system.hpp"
+#include "../motor/src/darkmoon.hpp"
 #include <iomanip>
-//#define RAYGUI_IMPLEMENTATION
-#include "../../libs/raygui.h"
 
-void RenderSystem::init()
-{
-    // Tamaño de la fuente
-    GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
+// using std::chrono::high_resolution_clock;
+// using std::chrono::duration_cast;
+// using std::chrono::duration;
+// using std::chrono::microseconds;
 
-    // Alineamiento del texto
-    GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+// auto t1 = high_resolution_clock::now();
 
-    // Color de la fuente de texto
-    GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, 0x000000ff);
+float ENGI::GameEngine::widthRate = 1.0;
+float ENGI::GameEngine::heightRate = 1.0f;
 
-    // Fondo de los botones
-    GuiSetStyle(DEFAULT, BASE_COLOR_NORMAL, 0xD6A8E6FF);
-
-    // Color de los bordes
-    GuiSetStyle(TEXTBOX, BORDER_COLOR_NORMAL, 0x000000FF);
-
-    // Hacemos que GuiDrawText() pueda tener más de una línea
-    GuiSetStyle(DEFAULT, TEXT_WRAP_MODE, 2);
-}
-
-void RenderSystem::update(EntityManager& em, GameEngine& engine)
+void RenderSystem::update(EntityManager& em, GameEngine& engine, double alpha)
 {
     // Actualizamos la posicion de render del componente de fisicas
-    em.forEach<SYSCMPs, SYSTAGs>([](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
+    em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, PhysicsComponent& phy, RenderComponent& ren)
     {
         if (e.hasTag<SeparateModelTag>())
             return;
-        ren.setPosition(phy.position);
+
+        // Interpolamos la posicion
+        auto interPos = phy.position;
+        if (phy.prevPosition != vec3d::zero() && phy.prevPosition != phy.position)
+            interPos = phy.prevPosition + (phy.position - phy.prevPosition) * alpha;
+
+        ren.setPosition(interPos);
         ren.setOrientation(phy.orientation);
         ren.setScale(phy.scale);
-        // ren.updateBBox();
     });
 
+    // t1 = high_resolution_clock::now();
     // Empezamos el frame
     beginFrame(engine, em);
 
     // Dibuja todas las entidades con componente de render
     drawEntities(em, engine);
-    drawParticles(em, engine);
+
+    auto& li = em.getSingleton<LevelInfo>();
+    if (li.showParticles)
+        drawParticles(em, engine);
 
     // Terminamos el frame
     endFrame(engine, em);
 }
 
+void RenderSystem::restartScene(GameEngine& engine)
+{
+    // engine.deactivateLights();
+    auto* tresde = getNode(engine, "3D");
+    auto* dosde = getNode(engine, "2D");
+    auto* menu = getNode(engine, "Menu");
+    auto* copyNode = getNode(engine, "Copy");
+    auto* textCopy = getNode(engine, "TextCopy");
+
+    copyNode->clearChildren();
+    textCopy->clearChildren();
+
+    tresde->setVisible(false);
+    dosde->setVisible(false);
+    menu->setVisible(false);
+    dosde->setVisibleOne(true);
+}
+
 void RenderSystem::drawLogoGame(GameEngine& engine, EntityManager& em, SoundSystem& ss) {
-    ss.ambient_stop();
-    ss.music_stop();
-    ss.ambient_started = false;
-
-    engine.beginDrawing();
-    engine.clearBackground(WHITE);
-    // Logo del videojuego
-    engine.textures["logo_twowonders"].width = static_cast<int>(engine.getScreenWidth() / 1.3);
-    engine.textures["logo_twowonders"].height = static_cast<int>(engine.getScreenHeight() / 1.5);
-    engine.drawTexture(engine.textures["logo_twowonders"],
-        engine.getScreenWidth() / 2 - engine.textures["logo_twowonders"].width / 2,
-        static_cast<int>(engine.getScreenHeight() / 2.0 - engine.textures["logo_twowonders"].height / 1.5),
-        { 255, 255, 255, 255 });
-
-    // Datos de los botones
-    float buttonWidth = 200.0f;
-    float buttonHeight = 50.0f;
-    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2.f);
-    float posY = static_cast<float>(engine.getScreenHeight() / 1.30) - (buttonHeight / 2.f);
-
-    // Funcionalidad de botones
-    Rectangle btn1Rec = { posX, posY, buttonWidth, buttonHeight };
-    Rectangle btn2Rec = { posX, posY + 55, buttonWidth, buttonHeight };
-    Rectangle btn3Rec = { posX, posY + 110, buttonWidth, buttonHeight };
 
     auto& li = em.getSingleton<LevelInfo>();
-    auto& inpi = em.getSingleton<InputInfo>();
 
-    // Define the current button selection
-    auto& currentButton = inpi.currentButton;
-    bool buttonTouched = false;
+    ss.ambient_started = false;
 
-    // Define the buttons
-    ButtonRect buttons[] = {
-        { btn1Rec, "JUGAR", 0 },
-        { btn2Rec, "CONFIGURACION", 1 },
-        { btn3Rec, "SALIR", 2 }
-    };
+    // restartScene(engine);
+    engine.beginDrawing();
+    engine.clearBackground(D_WHITE);
+    getNode(engine, "MenuOpciones")->setVisible(false);
+    auto* menuNode = getNode(engine, "MenuPrincipal");
 
-    // Control de botones de mando para cambiar el botón seleccionado
-    if (inpi.up || inpi.left) {
-        currentButton = (currentButton > 0) ? currentButton - 1 : sizeof(buttons) / sizeof(ButtonRect) - 1;
-        ss.sonido_mov();
-    }
-    if (inpi.down || inpi.right) {
-        currentButton = (currentButton < sizeof(buttons) / sizeof(ButtonRect) - 1) ? currentButton + 1 : 0;
-        ss.sonido_mov();
-    }
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
 
-    for (std::size_t i = 0; i < sizeof(buttons) / sizeof(ButtonRect); i++) {
-        ButtonRect& button = buttons[i];
-        bool isCurrent = (currentButton == i);
-        if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
-            (isCurrent && inpi.interact)) {
-            currentButton = i;
-            // Handle the button action
-            switch (button.action) {
-            case 0: // "JUGAR"
-                li.currentScreen = GameScreen::STORY;
-                ss.seleccion_menu();
-                ss.music_stop();
-                break;
-            case 1: // "CONFIGURACION"
-                li.currentScreen = GameScreen::OPTIONS;
-                li.previousScreen = GameScreen::TITLE;
-                ss.seleccion_menu();
-                break;
-            case 2: // "SALIR"
-                li.gameShouldEnd = true;
-                ss.sonido_salir();
-                break;
-            }
+    // Logo del videojuego
+    auto* fondoTwoWonders = getNode(engine, "fondo_inicio");
+    auto* logoTwoWonders = getNode(engine, "logo_twowonders");
 
-            inpi.interact = false;
-        }
+    auto* fondoText = dynamic_cast<Texture2D*>(fondoTwoWonders->getEntity())->texture;
+    auto* logoText = dynamic_cast<Texture2D*>(logoTwoWonders->getEntity())->texture;
 
-        if (engine.checkCollisionPointRec(GetMousePosition(), button.rect) && !buttonTouched)
-            buttonTouched = true;
-    }
+    auto fondoWidth = fondoText->getWidth();
+    auto fondoHeight = fondoText->getHeight();
+    auto logoWidth = logoText->getWidth();
+    auto logoHeight = logoText->getHeight();
 
-    if (buttonTouched && !ss.pushed)
+    int middleX = engine.getScreenWidth() / 2;
+    int middleY = engine.getScreenHeight() / 2;
+
+    int posBackX = static_cast<int>(static_cast<float>(middleX) - static_cast<float>(fondoWidth) * wRate / 2);
+    int posBackY = static_cast<int>(static_cast<float>(middleY) - static_cast<float>(fondoHeight) * hRate / 2);
+
+    int posX = static_cast<int>(static_cast<float>(middleX) - static_cast<float>(logoWidth) * wRate / 2);
+    int posY = static_cast<int>(static_cast<float>(middleY) - static_cast<float>(logoHeight) * hRate / 1.5f);
+
+    engine.drawNode(fondoTwoWonders, { posBackX, posBackY });
+    engine.drawNode(logoTwoWonders, { posX, posY });
+
+    if (!li.anyButtonPressed)
     {
-        ss.sonido_mov();
-        ss.pushed = true;
-    }
-    else if (!buttonTouched && ss.pushed)
-        ss.pushed = false;
+        engine.createText({ engine.getScreenWidth() / 2, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.2f) },
+            "[Pulsa cualquier tecla]", engine.getDefaultFont(), 40, D_LAVENDER_LIGHT, "Texto inicio", menuNode, Aligned::CENTER);
 
+        if (engine.isAnyKeyPressed())
+        {
+            auto& inpi = em.getSingleton<InputInfo>();
+            inpi.interact = false;
+            li.anyButtonPressed = true;
+            ss.seleccion_menu();
+        }
+    }
+    else
+    {
+        getNode(engine, "Texto inicio")->getEntity<Text>()->text = L" ";
+        drawPauseMenu(engine, em, li, ss);
+    }
+
+    // Dibujar
+    engine.traverseRoot();
     engine.endDrawing();
 }
 
 void RenderSystem::drawChargeScreen(GameEngine& engine, EntityManager& em)
 {
-    engine.beginDrawing();
     engine.clearBackground({ 171, 159, 197, 255 });
-    GameEngine::Gif& gif = engine.gifs.at("carga");
-    Texture2D gifCopy = gif.texture;
+    auto* chargeGif = getNode(engine, "carga");
 
-    // Redimensionamos la copia
-    gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
-    gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
+    // Redimensionamos
+    auto& gifInfo = *chargeGif->getEntity<Gif>();
+    auto& frames = gifInfo.frames;
+    auto& currentFrame = gifInfo.currentFrame;
 
-    int posX = static_cast<int>(engine.getScreenWidth() / 2 - gifCopy.width / 2);
-    int posY = static_cast<int>(engine.getScreenHeight() / 2 - gifCopy.height / 2);
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
 
-    displayGif(engine, gifCopy, gif, posX, posY);
+    float width = static_cast<float>(frames[currentFrame]->getWidth());
+    float height = static_cast<float>(frames[currentFrame]->getHeight());
+
+    int posX = static_cast<int>(engine.getScreenWidth() / 2 - static_cast<int>(width * wRate / 2));
+    int posY = static_cast<int>(engine.getScreenHeight() / 2 - static_cast<int>(height * hRate / 2));
+
+    engine.drawNode(chargeGif, { posX, posY });
 
     auto& li = em.getSingleton<LevelInfo>();
     li.loadingTime += timeStep;
-
-    engine.endDrawing();
 }
 
 void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
@@ -167,484 +156,883 @@ void RenderSystem::drawControls(EntityManager& em, GameEngine& engine)
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
 
-    if ((engine.isKeyDown(KEY_E) && inpi.interact) || engine.isKeyDown(KEY_ESCAPE))
+    if ((engine.isKeyDown(D_KEY_E) && inpi.interact) || engine.isKeyDown(D_KEY_ESCAPE))
     {
         li.currentScreen = li.previousScreen;
         li.previousScreen = li.evenMorePreviousScreen;
         inpi.interact = false;
     }
 
-    auto text = "mando_explicacion";
-    if (li.keyboardControls)
-        text = "teclado_explicacion";
+    auto text = "teclado_explicacion";
+    if (engine.isGamepadAvailable(0))
+        text = "mando_explicacion";
 
     engine.beginDrawing();
-    engine.drawRectangle(0, 0, engine.getScreenWidth(), engine.getScreenHeight(), Fade({ 113, 75, 146, 255 }, 0.5f));
-    engine.textures[text].width = static_cast<int>(engine.getScreenWidth() / 1.3);
-    engine.textures[text].height = static_cast<int>(engine.getScreenHeight() / 1.6);
-    engine.drawTexture(engine.textures[text],
-        engine.getScreenWidth() / 2 - engine.textures[text].width / 2,
-        engine.getScreenHeight() / 2 - engine.textures[text].height / 2,
-        WHITE);
+    engine.clearBackground(D_GRAY);
+
+    restartScene(engine);
+
+    // Controles
+    auto controles = getNode(engine, text);
+    auto cont = dynamic_cast<Texture2D*>(controles->getEntity());
+
+    int aux_width = cont->texture->getWidth();
+    int aux_height = cont->texture->getHeight();
+
+    float reScaleX = engine.getWidthRate();
+    float reScaleY = engine.getHeightRate();
+
+    int posX = static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 2 - (static_cast<float>(aux_width) * reScaleX) / 2);
+    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2 - (static_cast<float>(aux_height) * reScaleY) / 2);
+
+    auto* txtBox = engine.createText({ engine.getScreenWidth() / 2 - 100, engine.getScreenHeight() - 50 },
+        "DALE A [E] PARA SALIR", engine.getDefaultFont(), 20, D_WHITE,
+        "Texto controles", getNode(engine, "Menu"));
+
+    engine.drawNode(controles, { posX, posY });
+    engine.drawNode(txtBox);
+
+    engine.traverseRoot();
     engine.endDrawing();
 }
 
 void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSystem& ss) {
+
+    restartScene(engine);
     engine.beginDrawing();
-    engine.clearBackground(WHITE);
+    engine.clearBackground(D_WHITE);
+
+    // Fondo Opciones
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+    auto* fondoTwoWonders = getNode(engine, "fondo_opciones");
+
+    auto* fondoText = fondoTwoWonders->getEntity<Texture2D>()->texture;
+
+    auto fondoWidth = fondoText->getWidth();
+    auto fondoHeight = fondoText->getHeight();
+
+    int middleX = engine.getScreenWidth() / 2;
+    int middleY = engine.getScreenHeight() / 2;
+
+    int posBackX = static_cast<int>(static_cast<float>(middleX) - static_cast<float>(fondoWidth) * wRate / 2);
+    int posBackY = static_cast<int>(static_cast<float>(middleY) - static_cast<float>(fondoHeight) * hRate / 2);
+
+    engine.drawNode(fondoTwoWonders, { posBackX, posBackY });
+
+    auto* menuNode = getNode(engine, "MenuOpciones");
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
+    auto& currentButton = inpi.currentButton;
 
-    float buttonWidth = 200.0f;
-    float buttonHeight = 50.0f;
-    float middleScreen = static_cast<float>(engine.getScreenWidth() / 2);
+    // Datos de los botones
+    int middleScreen = engine.getScreenWidth() / 2;
+    int buttonWidth = 300;
+    int buttonHeight = 50;
 
-    // Slider del volumen
-    Rectangle volumenSlider = { middleScreen - buttonWidth, 100, buttonWidth, 20 };
-    auto& sosy = em.getSingleton<SoundSystem>();
-    float volumen = sosy.getVolumeMaster() * 100;
-    float* vol = &volumen;
+    // Título de Opciones
+    int posTitleY = engine.getScreenHeight() / 9;
+    engine.createText({ middleScreen,  posTitleY }, "Opciones", engine.getFontDefault(), 80, D_WHITE, "Titulo opciones", menuNode, Aligned::CENTER);
 
-    // Posición del botón de volver
-    float posX = middleScreen - (buttonWidth / 2);
-    float posY = static_cast<float>(engine.getScreenHeight() / 1.1) - (buttonHeight / .5f);
+    // Posición del slider
+    auto screenH = engine.getScreenHeight();
+    auto downRate = static_cast<int>(90.f * hRate);
+    int posX = middleScreen + buttonWidth / 3;
+    int posYRes = static_cast<int>(static_cast<float>(screenH) / 3.1f);
+    int posYPart = posYRes + downRate;
+    int posYVol = static_cast<int>(static_cast<float>(screenH) / 2.f);
+    int posYBack = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.1f);
 
-    // Botones de resolución
-    float posResX = static_cast<float>(middleScreen) - (buttonWidth / 2);
-    float posResY = static_cast<float>(200) - (buttonHeight / 2);
-    float offSetY = 150;
-
-    if (fullScreen)
+    std::string firstOpt = "";
+    switch (engine.getScreenWidth())
     {
-        engine.setWindowFullScreen();
-        fullScreen = false;
+    case 800:
+        firstOpt = "800x600";
+        break;
+    case 1280:
+        firstOpt = "1280x720";
+        break;
+    case 1920:
+        firstOpt = "1920x1080";
+        break;
+    default:
+        firstOpt = "FULLSCREEN";
+        break;
     }
 
-    // Boton de volver al inicio
-    Rectangle btn1Rec = { posX, posY, buttonWidth, buttonHeight };
-
-    // Botones de resolución
-    Rectangle btn2Rec = { posResX - offSetY, posResY, buttonWidth, buttonHeight };
-    Rectangle btn3Rec = { posResX + offSetY, posResY, buttonWidth, buttonHeight };
-    Rectangle btn4Rec = { posResX - offSetY, posResY + offSetY / 2.5f, buttonWidth, buttonHeight };
-    Rectangle btn5Rec = { posResX + offSetY, posResY + offSetY / 2.5f, buttonWidth, buttonHeight };
-    Rectangle btn6Rec = { posX - offSetY - 40, posY - 100, buttonWidth + 50, buttonHeight };
-    Rectangle btn7Rec = { posX + offSetY, posY - 100, buttonWidth + 50, buttonHeight };
-
-    // Define the current button selection
-    auto& currentButton = inpi.currentButton;
-    bool buttonTouched = false;
-
-    bool inpiCheck1 = inpi.up || inpi.left;
-    bool inpiCheck2 = inpi.down || inpi.right;
-
-    // Define the buttons
-    ButtonRect buttons[] = {
-        { btn1Rec, "VOLVER", 0 },
-        { btn2Rec, "800x600", 1 },
-        { btn3Rec, "1280x720", 2 },
-        { btn4Rec, "1920x1080", 3 },
-        { btn5Rec, "FULLSCREEN", 4 },
-        { volumenSlider, "Volumen", 5 },
-        { btn6Rec, "CONTROLES MANDO", 6},
-        { btn7Rec, "CONTROLES TECLADO", 7 }
+    std::map<std::size_t, std::pair<const char*, float>> volumeSliders =
+    {
+        {0, {"vol_gen", ss.getVolumeMaster()} },
+        {1, {"vol_sfx", ss.getVolumeSFX()} },
+        {2, {"vol_music", ss.getVolumeMusic()} },
+        {3, {"vol_ambient", ss.getVolumeAmbient()} }
     };
 
-    std::string volName = "Volumen";
-    for (std::size_t i = 0; i < sizeof(buttons) / sizeof(ButtonRect); i++) {
-        ButtonRect& button = buttons[i];
-        bool isCurrent = (currentButton == i);
-        if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
-            (isCurrent && inpi.interact)) {
-            currentButton = i;
-            // Handle the button action
-            switch (button.action) {
-            case 0: // "VOLVER"
-                li.currentScreen = li.previousScreen;
-                ss.seleccion_menu();
-                break;
-            case 1: // "800x600"
-                engine.setWindowSize(800, 600);
-                ss.seleccion_menu();
-                break;
-            case 2: // "1280x720"
-                engine.setWindowSize(1280, 720);
-                ss.seleccion_menu();
-                break;
-            case 3: // "1920x1080"
-                engine.setWindowSize(1920, 1080);
-                ss.seleccion_menu();
-                break;
-            case 4: // "FULLSCREEN"
-                engine.setWindowSize(1920, 1080);
-                fullScreen = true;
-                ss.seleccion_menu();
-                break;
-            case 5: // "Volumen"
-                break;
-            case 6: // "CONTROLES"
-                li.keyboardControls = false;
-                li.evenMorePreviousScreen = li.previousScreen;
-                li.currentScreen = GameScreen::CONTROLS;
-                li.previousScreen = GameScreen::OPTIONS;
-                break;
-            case 7: // "CONTROLES"
-                li.keyboardControls = true;
-                li.evenMorePreviousScreen = li.previousScreen;
-                li.currentScreen = GameScreen::CONTROLS;
-                li.previousScreen = GameScreen::OPTIONS;
-                break;
-            }
+    auto* sliderRes = engine.createOptionSlider({ posX, posYRes }, { buttonWidth, buttonHeight }, D_AQUA, "",
+        engine.getFontDefault(), 35, 45, D_AQUA, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA_LIGHT, D_AQUA_DARK,
+        { "800x600", "1280x720", "1920x1080", "FULLSCREEN" }, firstOpt, "Resolucion", menuNode);
 
-            inpi.interact = false;
-        }
-        if (i == 5 && currentButton == i)
-        {
-            if (engine.isGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT) || engine.isKeyDown(KEY_RIGHT)) {
-                *vol = (*vol < 100) ? *vol + 1 : 100;
-                // ss.sonido_mov();
-            }
-            if (engine.isGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT) || engine.isKeyDown(KEY_LEFT)) {
-                *vol = (*vol > 0) ? *vol - 1 : 0;
-                // ss.sonido_mov();
-            }
+    auto& sliderInfo = *sliderRes->getEntity<OptionSlider>();
+    checkSliderSound(ss, sliderInfo);
 
-            inpiCheck1 = inpi.up;
-            inpiCheck2 = inpi.down;
-            volName = "[Volumen]";
-        }
-
-        if (engine.checkCollisionPointRec(GetMousePosition(), button.rect) && !buttonTouched)
-            buttonTouched = true;
-    }
-    GuiSliderBar(volumenSlider, NULL, volName.c_str(), vol, 0, 100);
-    ss.setVolumeMaster(*vol / 100.0f);
-
-    // Control de botones de mando para cambiar el botón seleccionado
-    if (inpiCheck1) {
-        currentButton = (currentButton > 0) ? currentButton - 1 : sizeof(buttons) / sizeof(ButtonRect) - 1;
-        ss.sonido_mov();
-    }
-    else if (inpiCheck2) {
-        currentButton = (currentButton < sizeof(buttons) / sizeof(ButtonRect) - 1) ? currentButton + 1 : 0;
-        ss.sonido_mov();
-    }
-
-    if (buttonTouched && !ss.pushed)
+    std::vector<FloatSlider*> volSliders{};
+    for (std::size_t i = 0; i < volumeSliders.size(); i++)
     {
-        ss.sonido_mov();
-        ss.pushed = true;
-    }
-    else if (!buttonTouched && ss.pushed)
-        ss.pushed = false;
+        auto* sliderNode = engine.createFloatSlider({ posX, posYVol + downRate * static_cast<int>(i) }, { buttonWidth, buttonHeight }, D_AQUA, "",
+            engine.getFontDefault(), 35, 45, D_AQUA, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA_LIGHT, D_AQUA_DARK, volumeSliders[i].second, volumeSliders[i].first, menuNode);
 
+        auto* sldInfo = sliderNode->getEntity<FloatSlider>();
+        checkSliderSound(ss, *sldInfo);
+        volSliders.push_back(sldInfo);
+    }
+
+    // CheckBox de partículas
+    engine.createCheckBoxPtr({ posX, posYPart }, 40.f, &li.showParticles, D_WHITE, D_LAVENDER, D_LAVENDER_LIGHT, "particleCheckBox", menuNode);
+
+    std::map<std::string, std::function<void()>> SliderData =
+    {
+        {"800x600", [&]() { engine.setWindowSize(800, 600); }},
+        {"1280x720", [&]() { engine.setWindowSize(1280, 720); }},
+        {"1920x1080", [&]() { engine.setWindowSize(1920, 1080); }},
+        {"FULLSCREEN", [&]() { engine.setWindowFullScreen(); }}
+    };
+
+    // Comportamiendo volumen
+    auto createVolumeSliderBehavior = [&](std::size_t index) {
+        return [&, index]() {
+            auto& sliderInfoVol = *volSliders[index];
+            if (engine.isKeyDown(D_KEY_RIGHT))
+            {
+                sliderInfoVol.nextOption();
+                switch (index) {
+                case 0: ss.setVolumeMaster(sliderInfoVol.currentValue); break;
+                case 1: ss.setVolumeSFX(sliderInfoVol.currentValue); break;
+                case 2: ss.setVolumeMusic(sliderInfoVol.currentValue); break;
+                case 3: ss.setVolumeAmbient(sliderInfoVol.currentValue); break;
+                }
+                inpi.right = false;
+                ss.sonido_mov();
+            }
+            else if (engine.isKeyDown(D_KEY_LEFT))
+            {
+                sliderInfoVol.prevOption();
+                switch (index) {
+                case 0: ss.setVolumeMaster(sliderInfoVol.currentValue); break;
+                case 1: ss.setVolumeSFX(sliderInfoVol.currentValue); break;
+                case 2: ss.setVolumeMusic(sliderInfoVol.currentValue); break;
+                case 3: ss.setVolumeAmbient(sliderInfoVol.currentValue); break;
+                }
+                inpi.left = false;
+                ss.sonido_mov();
+            }
+        };
+    };
+
+    // Botones
+    std::map<std::string, std::tuple<Node*, std::string, std::function<void()>, vec2i>> buttonData = {
+    { "1_volver", { nullptr, "Volver", [&]() {
+        li.currentScreen = li.previousScreen;
+        ss.seleccion_menu();
+        return;
+    }, {middleScreen - buttonWidth, posYBack} } },
+    { "2_aceptar", { nullptr, "Aceptar", [&]() {
+
+        auto& action = SliderData[sliderInfo.options[sliderInfo.currentOption]];
+        action();
+
+        ss.setVolumeMaster(volSliders[0]->currentValue);
+        ss.setVolumeSFX(volSliders[1]->currentValue);
+        ss.setVolumeMusic(volSliders[2]->currentValue);
+        ss.setVolumeAmbient(volSliders[3]->currentValue);
+        ss.seleccion_menu();
+        return;
+    }, {middleScreen + buttonWidth / 3, posYBack} } },
+    { "3_controles", { nullptr, "Controles", [&]() {
+        li.evenMorePreviousScreen = li.previousScreen;
+        li.currentScreen = GameScreen::CONTROLS;
+        li.previousScreen = GameScreen::OPTIONS;
+        ss.seleccion_menu();
+    }, {middleScreen - buttonWidth / 3, static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 4.5f)} } },
+    { "4_sliderRes", { nullptr, "Resolución", [&]() {
+        if (inpi.right)
+        {
+            sliderInfo.nextOption();
+            inpi.right = false;
+
+            ss.sonido_mov();
+        }
+        else if (inpi.left)
+        {
+            sliderInfo.prevOption();
+            inpi.left = false;
+
+            ss.sonido_mov();
+        }
+    }, {middleScreen - buttonWidth, posYRes} } },
+    { "5_particleCheck", { nullptr, "Partículas", [&]() {
+        if (inpi.interact)
+            li.showParticles = !li.showParticles;
+    }, {middleScreen - buttonWidth, posYPart}}},
+    { "6_sliderVol", { nullptr, "Volumen", createVolumeSliderBehavior(0), {middleScreen - buttonWidth, posYVol} } },
+    { "7_sliderVol", { nullptr, "SFX", createVolumeSliderBehavior(1), {middleScreen - buttonWidth, posYVol + downRate} } },
+    { "8_sliderVol", { nullptr, "Música", createVolumeSliderBehavior(2), {middleScreen - buttonWidth, posYVol + downRate * 2} } },
+    { "9_sliderVol", { nullptr, "Ambiente", createVolumeSliderBehavior(3), {middleScreen - buttonWidth, posYVol + downRate * 3} } },
+    };
+
+    // Volver con escape
+    if (engine.isKeyReleased(D_KEY_ESCAPE))
+        std::get<2>(buttonData["1_volver"])();
+
+    int i{ 0 };
+    for (auto& [name, data] : buttonData)
+    {
+        auto& [button, buttonText, action, position] = data;
+
+        // Asignamos el botón
+        button = engine.createButton(position, { buttonWidth, buttonHeight },
+            buttonText,
+            engine.getFontDefault(), 40, D_BLACK,
+            Aligned::CENTER, Aligned::CENTER,
+            D_LAVENDER, D_LAVENDER_DARK, D_LAVENDER_LIGHT,
+            name.c_str(), menuNode);
+
+        // Sacamos la información del botón
+        auto& but = *button->getEntity<Button>();
+        but.textBox.drawBox = false;
+
+        // Sacamos la información del slider
+
+        if (currentButton == static_cast<std::size_t>(i) && but.state != ButtonState::CLICK)
+            but.isCurrent = true;
+
+        // Comprobar estado del boton
+        if (but.state == ButtonState::CLICK || (but.isCurrent && inpi.interact) || (i >= 3 && but.isCurrent)) {
+            action();
+            inpi.interact = false;
+            but.state = ButtonState::NORMAL;
+        }
+        else if (but.state == ButtonState::HOVER && but.prevState != ButtonState::HOVER) {
+            ss.sonido_mov();
+        }
+
+        i += 1;
+    }
+
+    if (inpi.up || inpi.left) {
+        currentButton = (currentButton > 0) ? currentButton - 1 : buttonData.size() - 1;
+        ss.sonido_mov();
+    }
+    if (inpi.down || inpi.right) {
+        currentButton = (currentButton < buttonData.size() - 1) ? currentButton + 1 : 0;
+        ss.sonido_mov();
+    }
+
+    engine.traverseRoot();
     engine.endDrawing();
 }
 
-void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em)
+void RenderSystem::checkSliderSound(SoundSystem& ss, OptionSlider& slider)
 {
-    auto& li = em.getSingleton<LevelInfo>();
-    if (li.currentScreen != GameScreen::CONTROLS)
+    auto& nextBut = slider.nextButton;
+    auto& prevBut = slider.prevButton;
+    if ((nextBut.state == ButtonState::HOVER && nextBut.prevState != ButtonState::HOVER)
+        || (prevBut.state == ButtonState::HOVER && prevBut.prevState != ButtonState::HOVER))
     {
-        auto& ss = em.getSingleton<SoundSystem>();
+        ss.sonido_mov();
+    }
 
-        float windowWidth = 330.0f;
-        float windowHeight = 460.0f;
-        float buttonWidth = 200.0f;
-        float buttonHeight = 50.0f;
+    if (prevBut.state == ButtonState::CLICK || nextBut.state == ButtonState::CLICK)
+    {
+        ss.seleccion_menu();
+    }
+}
 
-        Rectangle windowRect = {
-            static_cast<float>(engine.getScreenWidth()) / 2.0f - windowWidth / 2.0f,
-            static_cast<float>(engine.getScreenHeight()) / 2.0f - windowHeight / 2.0f,
-            windowWidth,
-            windowHeight
-        };
-        engine.drawRectangleLinesEx(windowRect, 2, BLACK);
-        engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
-        engine.drawTextEx(engine.getFontDefault(), "PAUSA", vec2d{ windowRect.x + 100, windowRect.y + 40 }, 40, 1, BLACK);
+void RenderSystem::drawPauseMenu(GameEngine& engine, EntityManager& em, LevelInfo& li, SoundSystem& ss)
+{
+    auto& inpi = em.getSingleton<InputInfo>();
 
-        float posX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2.0f);
-        float posY = static_cast<float>(engine.getScreenHeight() / 2) - (buttonHeight / .5f);
+    // Nodo de los botones
+    if (inpi.pause)
+    {
+        getNode(engine, "2D")->setVisible(false);
+        ss.sonido_pause(li.mapID);
+    }
 
-        auto& inpi = em.getSingleton<InputInfo>();
+    auto* menuNode = getNode(engine, "MenuPrincipal");
 
-        // Define the current button selection
-        auto& currentButton = inpi.currentButton;
-        bool buttonTouched = false;
+    // Datos de los botones
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
 
-        ButtonRect buttons[] = {
-        { { posX, posY, buttonWidth, buttonHeight }, "CONTINUAR", 0 },
-        { { posX, posY + 70, buttonWidth, buttonHeight }, "OPCIONES", 1 },
-        { { posX, posY + 140, buttonWidth, buttonHeight }, "VOLVER AL INICIO", 2 },
-        { { posX, posY + 210, buttonWidth, buttonHeight }, "SALIR", 3 },
-        };
+    int buttonWidth = 400;
+    int buttonHeight = 75;
+    int downRate = static_cast<int>(150.f * hRate);
 
-        for (std::size_t i = 0; i < sizeof(buttons) / sizeof(ButtonRect); i++) {
-            ButtonRect& button = buttons[i];
-            bool isCurrent = (currentButton == i);
-            if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
-                (isCurrent && inpi.interact)) {
-                currentButton = i;
-                inpi.mouseClick = true;
-                // Aquí puedes manejar la acción del botón
-                switch (button.action) {
-                case 0: // "CONTINUAR"
-                {
-                    inpi.pause = false;
-                    ss.seleccion_menu();
-                    ss.playAmbient();
-                    ss.play_music();
-                    break;
-                }
-                case 1: // "OPCIONES"
-                {
-                    inpi.currentButton = 0;
-                    li.currentScreen = GameScreen::OPTIONS;
-                    li.previousScreen = GameScreen::GAMEPLAY;
-                    ss.seleccion_menu();
-                    break;
-                }
-                case 2: // "VOLVER AL INICIO"
-                {
-                    li.currentScreen = GameScreen::TITLE;
-                    li.resetGame = true;
-                    ss.seleccion_menu();
-                    break;
-                }
-                case 3: // "SALIR"
-                {
-                    ss.sonido_salir();
-                    li.gameShouldEnd = true;
-                    return;
-                }
-                }
+    int posX = engine.getScreenWidth() / 7 - static_cast<int>(static_cast<float>(buttonWidth) * wRate / 2.f);
+    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 3.8f) - static_cast<int>(static_cast<float>(buttonHeight) * hRate / 2.f);
 
-                inpi.interact = false;
+    // Fondo de los botones
+    int initX = -static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 3.3f);
+    int initButtonX = posX + initX;
+    int finalX = 0;
+    float multiplier = 750.f;
+    if (!inpi.pause)
+        multiplier = 500.f;
+
+    int movement = static_cast<int>(multiplier * li.elapsedPause);
+
+    if (initX + movement > finalX)
+        movement = finalX - initX;
+    else
+        li.elapsedPause += engine.getFrameTime();
+
+    initX += movement;
+    initButtonX += movement;
+
+    engine.createRectangle({ initX, 0 },
+        { static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 3.3f), static_cast<int>(static_cast<float>(engine.getScreenHeight()) / hRate) },
+        { 0, 0, 0, 120 }, "Fondo_botones", menuNode);
+
+    // Botones
+    auto& currentButton = inpi.currentButton;
+    engine.clearBackground(D_WHITE);
+    std::map<std::string, std::tuple<Node*, std::string, std::function<void()>>> buttonData = {
+        { "1_jugar", { nullptr, inpi.pause ? "Reanudar" : "Jugar" , [&]() {
+
+            if (!inpi.pause)
+            {
+                li.currentScreen = GameScreen::STORY;
+                li.anyButtonPressed = false;
+            }
+            else
+            {
+                inpi.pause = false;
+                ss.sonido_unpause(li.mapID);
             }
 
-            if (engine.checkCollisionPointRec(GetMousePosition(), button.rect) && !buttonTouched)
-                buttonTouched = true;
+            ss.seleccion_menu();
+            li.elapsedPause = 0.f;
+        } } },
+        { "2_opciones", { nullptr, "Opciones", [&]() {
+            li.previousScreen = li.currentScreen;
+            li.currentScreen = GameScreen::OPTIONS;
+            ss.seleccion_menu();
+        } } },
+        { "3_creditos", { nullptr, "Créditos", [&]() {
+        // Por definir
+        } } },
+        { "4_salir", { nullptr, inpi.pause ? "Ir al menú" : "Salir", [&]() {
+            if (!inpi.pause)
+            {
+                li.gameShouldEnd = true;
+                ss.sonido_salir();
+            }
+            else
+            {
+                li.currentScreen = GameScreen::TITLE;
+                inpi.pause = false;
+                engine.nodeClear(menuNode);
+                engine.clearBackground(D_WHITE);
+            }
+        } } }
+    };
+
+    int i{ 0 };
+    for (auto& [name, data] : buttonData)
+    {
+        auto& [button, buttonText, action] = data;
+
+        // Asignamos el botón
+        button = engine.createButton({ initButtonX, posY + i * downRate }, { buttonWidth, buttonHeight },
+            buttonText,
+            engine.getFontDefault(), 50, D_BLACK,
+            Aligned::CENTER, Aligned::RIGHT,
+            D_LAVENDER, D_LAVENDER_DARK, D_LAVENDER_LIGHT,
+            name.c_str(), menuNode);
+
+        // Sacamos la información del botón
+        auto& but = *button->getEntity<Button>();
+        but.textBox.drawBox = false;
+
+        if (currentButton == static_cast<std::size_t>(i) && but.state != ButtonState::CLICK)
+            but.isCurrent = true;
+
+        // Comprobar estado del boton
+        if (but.state == ButtonState::CLICK || (but.isCurrent && inpi.interact)) {
+            action();
+            inpi.interact = false;
+            but.state = ButtonState::NORMAL;
+        }
+        else if (but.state == ButtonState::HOVER && but.prevState != ButtonState::HOVER) {
+            ss.sonido_mov();
         }
 
-        if (buttonTouched && !ss.pushed)
-        {
-            ss.sonido_mov();
-            ss.pushed = true;
-        }
-        else if (!buttonTouched && ss.pushed)
-            ss.pushed = false;
+        i += 1;
+    }
 
-        // Control de botones de mando para cambiar el botón seleccionado
-        if (inpi.up || inpi.left) {
-            currentButton = (currentButton > 0) ? currentButton - 1 : sizeof(buttons) / sizeof(ButtonRect) - 1;
-            ss.sonido_mov();
-        }
-        if (inpi.down || inpi.right) {
-            currentButton = (currentButton < sizeof(buttons) / sizeof(ButtonRect) - 1) ? currentButton + 1 : 0;
-            ss.sonido_mov();
-        }
+    if (inpi.up || inpi.left) {
+        currentButton = (currentButton > 0) ? currentButton - 1 : buttonData.size() - 1;
+        ss.sonido_mov();
+    }
+    if (inpi.down || inpi.right) {
+        currentButton = (currentButton < buttonData.size() - 1) ? currentButton + 1 : 0;
+        ss.sonido_mov();
     }
 }
 
 void RenderSystem::drawInventory(GameEngine& engine, EntityManager& em)
 {
-    float windowWidth = 450.0f;
-    float windowHeight = 450.0f;
-    float buttonWidth = 200.0f;
-    float buttonHeight = 50.0f;
-    float posButtonX = static_cast<float>(engine.getScreenWidth() / 2) - (buttonWidth / 2);
-    float posButtonY = static_cast<float>(engine.getScreenHeight() / 3) - (buttonHeight / 2);
-    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (windowWidth / 2);
-    float posY = static_cast<float>(engine.getScreenHeight() / 2) - (windowHeight / 2);
-    // float augment = 55.f;
-
-    Rectangle windowRect = {
-        posX,
-        posY,
-        windowWidth,
-        windowHeight
-    };
-    engine.drawRectangleLinesEx(windowRect, 2, BLACK);
-    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 178 });
-    engine.drawTextEx(engine.getFontDefault(), "INVENTARIO", vec2d{ windowRect.x + 110, windowRect.y + 20 }, 40, 1, BLACK);
-
     auto& plfi = em.getSingleton<PlayerInfo>();
-    auto& inpi = em.getSingleton<InputInfo>();
+    auto& ss = em.getSingleton<SoundSystem>();
+    auto* menuNode = getNode(engine, "MenuInventory");
 
-    auto& currentButton = inpi.currentButton;
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
 
-    // Definimos los botones
-    auto size = plfi.inventory.size() + 1;
-    std::vector<ButtonRect> buttons(size);
-    for (std::size_t i = 0; i < plfi.inventory.size(); i++) {
-        buttons[i] = { { posButtonX, posButtonY + 55 * static_cast<float>(i), buttonWidth, buttonHeight }, plfi.inventory[i]->name.c_str(), static_cast<int>(i) };
-    }
-    buttons[plfi.inventory.size()] = { { posButtonX, posButtonY + 55 * static_cast<float>(plfi.inventory.size()), buttonWidth, buttonHeight }, "VOLVER", static_cast<int>(plfi.inventory.size()) };
+    // Logo del videojuego
+    auto* fondoTwoWonders = getNode(engine, "fondo_inventario");
 
-    if (plfi.selectedItem == plfi.max)
-    {
-        // Control de botones de mando para cambiar el botón seleccionado
-        if (inpi.up || inpi.left) {
-            currentButton = (currentButton > 0) ? currentButton - 1 : plfi.inventory.size();
-        }
-        else if (inpi.down || inpi.right) {
-            currentButton = (currentButton < plfi.inventory.size()) ? currentButton + 1 : 0;
-        }
+    auto* fondoText = dynamic_cast<Texture2D*>(fondoTwoWonders->getEntity())->texture;
 
-        for (std::size_t i = 0; i < buttons.size(); i++) {
-            ButtonRect& button = buttons[i];
-            bool isCurrent = (currentButton == i);
-            if (GuiButton(button.rect, isCurrent ? ("[" + std::string(button.text) + "]").c_str() : button.text) ||
-                (isCurrent && inpi.interact)) {
-                currentButton = i;
-                // Aquí puedes manejar la acción del botón
-                if (i < plfi.inventory.size()) {
-                    // Select an item from the inventory
-                    plfi.selectedItem = plfi.inventory[i]->getID();
-                    currentButton = 0;
-                    return;
-                }
-                else {
-                    // "VOLVER" button
-                    auto& inpi = em.getSingleton<InputInfo>();
-                    inpi.inventory = false;
-                }
+    auto fondoWidth = fondoText->getWidth();
+    auto fondoHeight = fondoText->getHeight();
 
-                inpi.interact = false;
+    int middleX = engine.getScreenWidth() / 2;
+    int middleY = engine.getScreenHeight() / 2;
+
+    int posBackX = static_cast<int>(static_cast<float>(middleX) - static_cast<float>(fondoWidth) * wRate / 2);
+    int posBackY = static_cast<int>(static_cast<float>(middleY) - static_cast<float>(fondoHeight) * hRate / 2);
+
+    engine.drawNode(fondoTwoWonders, { posBackX, posBackY });
+    engine.createText({ middleX, middleY / 3 }, "Inventario", D_LAVENDER_LIGHT, "Titulo inventario", menuNode, 60, Aligned::CENTER);
+
+    // Variables para los botones
+    std::map<std::string, std::pair<Node*, std::function<void()>>> buttonData = {
+        { "01_spell1", { nullptr, [&]()
+        {
+            if (!plfi.spells.empty() && plfi.spells[0] != plfi.noSpell)
+                spellSelected = &plfi.spells[0];
+        }}},
+        { "02_spell2", { nullptr, [&]()
+        {
+            if (!plfi.spells.empty() && plfi.spells[1] != plfi.noSpell)
+                spellSelected = &plfi.spells[1];
+        }}},
+        { "03_spell3", { nullptr, [&]()
+        {
+            if (!plfi.spells.empty() && plfi.spells[2] != plfi.noSpell)
+                spellSelected = &plfi.spells[2];
+        }}},
+        { "04_spell4", { nullptr, [&]()
+        {
+            if (!plfi.spells.empty() && plfi.spells[3] != plfi.noSpell)
+                spellSelected = &plfi.spells[3];
+        }}},
+        { "05_spell5", { nullptr, [&]()
+        {
+            if (!plfi.spells.empty() && plfi.spells[4] != plfi.noSpell)
+                spellSelected = &plfi.spells[4];
+        }}},
+        { "06_spell6", { nullptr, [&]()
+        {
+            if (!plfi.spells.empty() && plfi.spells[5] != plfi.noSpell)
+                spellSelected = &plfi.spells[5];
+        }}},
+        { "07_obj1", { nullptr, [&]() {}}},
+        { "08_obj2", { nullptr, [&]() {}}},
+        { "09_obj3", { nullptr, [&]() {}}},
+        { "10_obj4", { nullptr, [&]() {}}},
+        { "11_obj5", { nullptr, [&]() {}}},
+        { "12_obj6", { nullptr, [&]() {}}},
+    };
+
+    std::map<std::string, std::pair<Node*, std::function<void()>>> spellButtData = {
+        { "1_spell1", { nullptr, [&]()
+        {
+            plfi.spellSlots[0] = *spellSelected;
+
+            if (plfi.spellSlots[1] == *spellSelected)
+            {
+                plfi.spellSlots[1] = plfi.noSpell;
             }
+            else if (plfi.spellSlots[2] == *spellSelected)
+            {
+                plfi.spellSlots[2] = plfi.noSpell;
+            }
+            spellSelected = nullptr;
+        }}},
+        { "2_spell2", { nullptr, [&]()
+        {
+            plfi.spellSlots[1] = *spellSelected;
+
+            if (plfi.spellSlots[0] == *spellSelected)
+            {
+                plfi.spellSlots[0] = plfi.noSpell;
+            }
+            else if (plfi.spellSlots[2] == *spellSelected)
+            {
+                plfi.spellSlots[2] = plfi.noSpell;
+            }
+            spellSelected = nullptr;
+        }}},
+        { "3_spell3", { nullptr, [&]()
+        {
+            plfi.spellSlots[2] = *spellSelected;
+
+            if (plfi.spellSlots[0] == *spellSelected)
+            {
+                plfi.spellSlots[0] = plfi.noSpell;
+            }
+            else if (plfi.spellSlots[1] == *spellSelected)
+            {
+                plfi.spellSlots[1] = plfi.noSpell;
+            }
+            spellSelected = nullptr;
+        }}}
+    };
+
+    // std::map<std::string, std::pair<Node*, std::function<void()>>> objButtData = {
+    //     { "1_obj1", { nullptr, [&]() {}}},
+    //     { "2_obj2", { nullptr, [&]() {}}},
+    //     { "3_obj3", { nullptr, [&]() {}}},
+    //     { "4_obj4", { nullptr, [&]() {}}},
+    //     { "5_obj5", { nullptr, [&]() {}}},
+    //     { "6_obj6", { nullptr, [&]() {}}},
+    // };
+
+    std::map<AttackType, std::pair<Node*, Node*>> spellButtNodes = {
+        { AttackType::WaterBombShot, { getNode(engine, "pompasInv"), getNode(engine, "pompasInv2")} },
+        { AttackType::WaterDashArea, { getNode(engine, "dashInv"), getNode(engine, "dashInv2")} },
+        { AttackType::FireBallShot, { getNode(engine, "bola_fuegoInv"), getNode(engine, "bola_fuegoInv2")} },
+        { AttackType::IceShield, { getNode(engine, "escudo_hieloInv"), getNode(engine, "escudo_hieloInv2")} },
+        { AttackType::IceShard, { getNode(engine, "estacasInv"), getNode(engine, "estacasInv2")} },
+        { AttackType::MeteoritePlayer, { getNode(engine, "meteoritosInv"), getNode(engine, "meteoritosInv2")} },
+    };
+
+    // Creamos los botones
+    auto& inpi = em.getSingleton<InputInfo>();
+    auto& currentButton = inpi.currentButton;
+    std::string itemName = " ";
+    int initButtonX = static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 12.9f);
+    int initButtonY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 3.18f);
+    int buttonWidth = static_cast<int>(270.f * wRate);
+    int buttonHeight = static_cast<int>(270.f * hRate);
+    int downRate = static_cast<int>(226.f * hRate);
+    int rightRate = static_cast<int>(274.5f * hRate);
+    int hoverRate = static_cast<int>(30.f * hRate);
+    int spellRate = static_cast<int>(15.f * hRate);
+
+    int i{ 0 }, k{ 0 };
+    std::size_t j{ 0 };
+    for (auto& [name, data] : buttonData)
+    {
+        auto& [button, action] = data;
+
+        // Asignamos el botón
+        button = engine.createButton({ initButtonX + k * rightRate, initButtonY + i * downRate }, { buttonWidth, buttonHeight },
+            " ",
+            engine.getFontDefault(), 50, D_BLACK,
+            Aligned::CENTER, Aligned::RIGHT,
+            { 0,0,0,120 }, { 0,0,0,120 }, { 0,0,0,120 },
+            name.c_str(), menuNode);
+
+        // Sacamos la información del botón
+        auto& but = *button->getEntity<Button>();
+        but.textBox.drawBox = false;
+
+        if (!spellSelected)
+        {
+            if (but.state == ButtonState::HOVER || currentButton == j)
+            {
+                engine.drawNode(getNode(engine, "hover_inventario"), { initButtonX + k * rightRate - hoverRate, initButtonY + i * downRate - hoverRate });
+
+                if (j < plfi.spells.size() && !plfi.spells.empty() && plfi.spells[j] != plfi.noSpell)
+                    itemName = plfi.spells[j].name;
+
+                if (but.state == ButtonState::HOVER)
+                    currentButton = static_cast<std::size_t>(j);
+            }
+
+            // Comprobar estado del boton
+            if ((but.state == ButtonState::CLICK || (currentButton == j && inpi.interact))) {
+                action();
+                inpi.interact = false;
+                but.state = ButtonState::NORMAL;
+                currentButton = 0;
+            }
+        }
+
+        if (j < plfi.spells.size() && !plfi.spells.empty() && plfi.spells[j] != plfi.noSpell)
+            engine.drawNode(spellButtNodes[plfi.spells[j].atkType].first, { initButtonX + k * rightRate + spellRate, initButtonY + i * downRate + spellRate }, { 1.4f, 1.4f });
+
+        i += 1;
+        j += 1;
+        if (i == 3)
+        {
+            k += 1;
+            i = 0;
+        }
+    }
+
+    // Texto con el nombre del objeto hovereado
+    engine.createText({ initButtonX, initButtonY - static_cast<int>(80.f * hRate) },
+        itemName, engine.getFontDefault(), 30, D_WHITE, "Texto Nombre inventario", menuNode);
+
+    // Map de los hechizos seleccionados
+    static std::map<std::size_t, std::pair<Node*, Node*>> spellButtNodesMap = {
+        { 0, { getNode(engine, "placeholderInv1"), getNode(engine, engine.isGamepadAvailable(0) ? "boton_cuadradoInv" : "tecla_jInv")} },
+        { 1, { getNode(engine, "placeholderInv2"), getNode(engine, engine.isGamepadAvailable(0) ? "boton_circuloInv" : "tecla_kInv")} },
+        { 2, { getNode(engine, "placeholderInv3"), getNode(engine, engine.isGamepadAvailable(0) ? "boton_trianguloInv" : "tecla_lInv")} },
+    };
+
+    // Dibujamos los hechizos seleccionados
+    initButtonX = static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 1.55f);
+    initButtonY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 2.35f);
+    downRate = static_cast<int>(120.f * hRate);
+    rightRate = static_cast<int>(180.f * hRate);
+    int leftRate = static_cast<int>(2.f * hRate);
+    spellRate = static_cast<int>(25.f * hRate);
+
+    int posX{ 0 };
+    bool alreadySelected{ false };
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+        posX = initButtonX + static_cast<int>(i) * rightRate;
+
+        std::string name = "placeholderInv" + std::to_string(i);
+        engine.drawNode(spellButtNodesMap[i].first, { posX, initButtonY }, { 1.3f, 1.3f });
+
+        engine.drawNode(spellButtNodesMap[i].second, { posX + downRate, initButtonY + downRate }, { 1.1f, 1.1f });
+
+        if (plfi.spellSlots[i] != plfi.noSpell)
+        {
+            if (!alreadySelected && spellSelected)
+            {
+                if (plfi.spellSlots[i] == *spellSelected)
+                {
+                    engine.drawNode(getNode(engine, "placeholderSelected"), { posX - leftRate, initButtonY - leftRate }, { 1.04f, 1.04f });
+                    alreadySelected = true;
+                }
+                else
+                    engine.drawNode(getNode(engine, "placeholderSelected"), { initButtonX - leftRate, initButtonY - leftRate }, { 1.04f, 1.04f });
+            }
+            engine.drawNode(spellButtNodes[plfi.spellSlots[i].atkType].second, { posX + spellRate, initButtonY + spellRate }, { 1.1f, 1.1f });
+        }
+
+        if (spellSelected)
+        {
+            auto name = std::to_string(i + 1) + "_spell" + std::to_string(i + 1);
+            auto& [button, action] = spellButtData[name];
+
+            // Asignamos el botón
+            button = engine.createButton({ posX, initButtonY }, { buttonWidth, buttonHeight },
+                " ",
+                engine.getFontDefault(), 50, D_BLACK,
+                Aligned::CENTER, Aligned::RIGHT,
+                { 0,0,0,120 }, { 0,0,0,120 }, { 0,0,0,120 },
+                name.c_str(), menuNode);
+
+            // Sacamos la información del botón
+            auto& but = *button->getEntity<Button>();
+            but.textBox.drawBox = false;
+
+            if (but.state == ButtonState::HOVER || currentButton == i)
+            {
+                engine.drawNode(getNode(engine, "placeholderSelected"), { posX - leftRate, initButtonY - leftRate }, { 1.04f, 1.04f });
+                alreadySelected = true;
+
+                if (but.state == ButtonState::HOVER)
+                    currentButton = i;
+            }
+
+            // Comprobar estado del boton
+            if (but.state == ButtonState::CLICK || (currentButton == i && inpi.interact)) {
+                action();
+                inpi.interact = false;
+                but.state = ButtonState::NORMAL;
+                currentButton = 0;
+            }
+        }
+    }
+
+    int initObjY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.5f);
+    engine.drawNode(getNode(engine, "objSelection"), { initButtonX, initObjY });
+
+    auto& lfc = em.getComponent<LifeComponent>(*em.getEntityByID(em.getSingleton<LevelInfo>().playerID));
+
+    const char* face = "";
+    if (lfc.life > lfc.maxLife / 2)
+        face = "mago_happyInv";
+    // Mago Meh
+    else if (lfc.life > 2)
+        face = "mago_mehInv";
+    // Mago sos
+    else
+        face = "mago_sosInv";
+
+    engine.drawNode(getNode(engine, face), { static_cast<int>(static_cast<float>(engine.getScreenWidth()) / 1.4f), engine.getScreenHeight() / 6 }, { 1.8f, 1.8f });
+
+    if (!spellSelected)
+    {
+        if (inpi.right) {
+            currentButton = (currentButton < buttonData.size() - 3) ? currentButton + 3 : currentButton - 9;
+            ss.sonido_mov();
+        }
+        if (inpi.left) {
+            currentButton = (currentButton > 2) ? currentButton - 3 : currentButton + 9;
+            ss.sonido_mov();
+        }
+        if (inpi.up) {
+            currentButton = (currentButton != 0 && currentButton % 3 != 0) ? currentButton - 1 : currentButton + 2;
+            ss.sonido_mov();
+        }
+        if (inpi.down) {
+            currentButton = (currentButton != 9 && currentButton % 3 != 2) ? currentButton + 1 : currentButton - 2;
+            ss.sonido_mov();
         }
     }
     else
     {
-        // Dibujamos la descripción del objeto seleccionado
-        auto& item = *plfi.getItem(plfi.selectedItem);
-        auto text = const_cast<char*>(item.description.c_str());
-
-        GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_LEFT);
-
-        float descWidth = 300.f, descHeight = 150.f;
-        float posDescX = static_cast<float>(engine.getScreenWidth() / 2) - (descWidth / 2.0f);
-        float posDescY = static_cast<float>(engine.getScreenHeight() / 2) - (descHeight / 1.25f);
-        GuiTextBox({ posDescX, posDescY, descWidth, descHeight }, text, static_cast<int>(item.description.size()), false);
-
-        if (inpi.interact) {
-            // Press the currently selected button
-            switch (currentButton) {
-            case 0: // "USAR"
-                if (dynamic_cast<Potion*>(&item) != nullptr) {
-                    auto& potion = static_cast<Potion&>(item);
-                    plfi.usePotion(potion);
-                    plfi.selectedItem = plfi.max;
-                    auto& inpi = em.getSingleton<InputInfo>();
-                    inpi.inventory = false;
-                    GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
-                    return;
-                }
-                break;
-            case 1: // "VOLVER"
-                plfi.selectedItem = plfi.max;
-                GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
-                break;
-            }
+        if (inpi.up || inpi.left) {
+            currentButton = (currentButton > 0) ? currentButton - 1 : 2;
+            ss.sonido_mov();
         }
-        else if (inpi.up || inpi.left) {
-            // Move the selection up
-            currentButton = (currentButton > 0) ? currentButton - 1 : 1;
-        }
-        else if (inpi.down || inpi.right) {
-            // Move the selection down
-            currentButton = (currentButton < 1) ? currentButton + 1 : 0;
-        }
-
-        if (dynamic_cast<Potion*>(&item) != nullptr) {
-            Rectangle btn1Rec = { posButtonX, posButtonY + 100, buttonWidth, buttonHeight };
-            if (GuiButton(btn1Rec, (currentButton == 0) ? "[USAR]" : "USAR")) {
-                auto& potion = static_cast<Potion&>(item);
-                plfi.usePotion(potion);
-                plfi.selectedItem = plfi.max;
-                auto& inpi = em.getSingleton<InputInfo>();
-                inpi.inventory = false;
-                GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
-            }
-        }
-
-        // Boton de volver al inventario
-        Rectangle btn2Rec = { posButtonX, posButtonY + 170, buttonWidth, buttonHeight };
-        if (GuiButton(btn2Rec, (currentButton == 1) ? "[VOLVER]" : "VOLVER")) {
-            plfi.selectedItem = plfi.max;
-            GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+        if (inpi.down || inpi.right) {
+            currentButton = (currentButton < 2) ? currentButton + 1 : 0;
+            ss.sonido_mov();
         }
     }
 }
 
 void RenderSystem::drawLogoKaiwa(GameEngine& engine) {
+
     engine.beginDrawing();
-    engine.clearBackground(Color({ 136, 219, 152, 255 }));
-    engine.textures["logo_kaiwagames"].width = engine.getScreenWidth();
-    engine.textures["logo_kaiwagames"].height = static_cast<int>(engine.getScreenHeight() / 1.6);
-    engine.drawTexture(engine.textures["logo_kaiwagames"],
-        engine.getScreenWidth() / 2 - engine.textures["logo_kaiwagames"].width / 2,
-        engine.getScreenHeight() / 2 - engine.textures["logo_kaiwagames"].height / 2,
-        WHITE);
+    engine.clearBackground({ 136, 219, 152, 255 });
+
+    restartScene(engine);
+
+    // DrawLogoKaiwa
+    auto* logoKaiwa = getNode(engine, "logo_kaiwa");
+    auto* logoText = dynamic_cast<Texture2D*>(logoKaiwa->getEntity())->texture;
+
+    auto width = logoText->getWidth();
+    auto height = logoText->getHeight();
+
+    auto wRate = 0.81f / engine.getWidthRate();
+    auto hRate = 0.81f / engine.getHeightRate();
+
+    int posX = engine.getScreenWidth() / 2 - static_cast<int>(static_cast<float>(width) * 0.81f / 2);
+    int posY = engine.getScreenHeight() / 2 - static_cast<int>(static_cast<float>(height) * 0.81f / 2);
+
+    engine.drawNode(logoKaiwa, { posX, posY }, { wRate, hRate });
+
+    // Dibujar arbol
+    engine.traverseRoot();
+
     engine.endDrawing();
 }
 
 void RenderSystem::drawEnding(GameEngine& engine) {
     engine.beginDrawing();
-    engine.clearBackground(WHITE);
+    engine.clearBackground(D_WHITE);
 
-    // Valores de la caja de texto
-    float boxWidth = 600.f;
-    float boxHeight = 100.f;
-    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth / 2.f);
-    float posY = static_cast<float>(engine.getScreenHeight() / 2) - (boxHeight / 2.f);
+    restartScene(engine);
+
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+    int boxWidth = 1050;
+    int boxHeight = 600;
+    int posX = static_cast<int>(engine.getScreenWidth() / 2 - static_cast<int>(static_cast<float>(boxWidth) * wRate / 2.f));
+    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 3.f - static_cast<float>(boxHeight) * hRate / 2.f);
+    int downRate = static_cast<int>(75.f * hRate);
 
     std::string text = "[ENTER] PARA VOLVER AL TÍTULO";
 
     if (engine.isGamepadAvailable(0))
         text = "[X] PARA VOLVER AL TÍTULO";
 
-    GuiSetStyle(DEFAULT, TEXT_SIZE, 40);
-    GuiSetStyle(LABEL, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+    if (!nodeExists(engine, "ending")) {
+        auto* hist = engine.createNode("ending", getNode(engine, "Dialog"));
 
-    GuiLabelButton(Rectangle{ posX, posY, boxWidth, boxHeight },
-        "¡Gracias por jugar a nuestra demo!");
+        engine.createTextBox({ posX, posY }, { boxWidth, boxHeight }, D_WHITE,
+            "¡Fin de la demo!", engine.getDefaultFont(), 40,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
+            "Texto1_ending", hist);
+        engine.createTextBox({ posX, posY + downRate }, { boxWidth, boxHeight }, D_WHITE,
+            "¡Gracias por jugar!", engine.getDefaultFont(), 40,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
+            "Texto2_ending", hist);
+        engine.createTextBox({ posX, posY + downRate * 3 }, { boxWidth, boxHeight }, D_WHITE,
+            text.c_str(), engine.getDefaultFont(), 40,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
+            "Texto 3", hist);
 
-    GuiLabelButton(Rectangle{ posX, posY + 50, boxWidth + 100, boxHeight },
-        text.c_str());
+        for (auto& txtEl : hist->getChildren())
+            dynamic_cast<TextBox*>(txtEl->getEntity())->drawBox = false;
+    }
 
-    GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
+    auto* hist = getNode(engine, "ending");
+    hist->setVisible(true);
 
+    engine.traverseRoot();
     engine.endDrawing();
 }
 
 void RenderSystem::drawStory(GameEngine& engine) {
     engine.beginDrawing();
-    engine.clearBackground(WHITE);
-    float boxWidth = 700.f;
-    float boxHeight = 400.f;
-    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth / 2);
-    float posY = static_cast<float>(engine.getScreenHeight() / 2.5) - (boxHeight / 2);
+    engine.clearBackground(D_WHITE);
 
-    Rectangle boxRect = { posX, posY, boxWidth, boxHeight };
+    restartScene(engine);
 
-    // Tamaño de la fuente
-    GuiSetStyle(DEFAULT, TEXT_SIZE, 40);
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+    int boxWidth = 1050;
+    int boxHeight = 600;
+    int posX = static_cast<int>(engine.getScreenWidth() / 2 - static_cast<int>(static_cast<float>(boxWidth) * wRate / 2.f));
+    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 3.f - static_cast<float>(boxHeight) * hRate / 2.f);
+    int downRate = static_cast<int>(75.f * hRate);
 
-    // Alineamiento del texto
-    GuiSetStyle(LABEL, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+    if (!nodeExists(engine, "historia")) {
+        auto* hist = engine.createNode("historia", getNode(engine, "Dialog"));
 
-    GuiLabel(boxRect, "¡Bienvenido a la aventura!");
-    GuiLabel({ posX, posY + 50, boxWidth, boxHeight }, "Estas perdido por el bosque y");
-    GuiLabel({ posX, posY + 100, boxWidth, boxHeight }, "debes encontrar a tu maestro.");
-    GuiLabel({ posX, posY + 150, boxWidth, boxHeight }, "¡Mucha suerte!");
+        engine.createTextBox({ posX, posY }, { boxWidth, boxHeight }, D_WHITE,
+            "¡Bienvenido a la aventura!", engine.getDefaultFont(), 40,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
+            "Texto 1", hist);
+        engine.createTextBox({ posX, posY + downRate }, { boxWidth, boxHeight }, D_WHITE,
+            "Estas perdido por el bosque y", engine.getDefaultFont(), 40,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
+            "Texto 2", hist);
+        engine.createTextBox({ posX, posY + downRate * 2 }, { boxWidth, boxHeight }, D_WHITE,
+            "debes encontrar a tu maestro.", engine.getDefaultFont(), 40,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
+            "Texto 3", hist);
+        engine.createTextBox({ posX, posY + downRate * 3 }, { boxWidth, boxHeight }, D_WHITE,
+            "¡Mucha suerte!", engine.getDefaultFont(), 40,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
+            "Texto 4", hist);
 
-    std::string text = "DALE A [E] PARA JUGAR";
+        engine.createTextBox({ posX, posY + downRate * 5 }, { boxWidth, boxHeight }, D_WHITE,
+            "", engine.getDefaultFont(), 40,
+            D_BLACK, Aligned::CENTER, Aligned::CENTER,
+            "Texto 5", hist);
+
+        for (auto& txtEl : hist->getChildren())
+            dynamic_cast<TextBox*>(txtEl->getEntity())->drawBox = false;
+    }
+
+    auto* hist = getNode(engine, "historia");
+    hist->setVisible(true);
+
+    auto auxText = dynamic_cast<TextBox*>(hist->getChildren().back()->getEntity());
+    std::string textGame = "DALE A [E] PARA JUGAR";
+
     if (engine.isGamepadAvailable(0))
-        text = "DALE A [X] PARA JUGAR";
-    GuiLabel({ posX, posY + 250, boxWidth, boxHeight }, text.c_str());
+        textGame = "DALE A [X] PARA JUGAR";
 
-    init();
+    auxText->text.setText(textGame);
+    engine.traverseRoot();
+
     engine.endDrawing();
 }
 
@@ -655,54 +1043,23 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& e, RenderComponent& r)
     {
-        if (!e.hasTags(FrustOut{}) && r.meshLoaded && e.hasComponent<ColliderComponent>())
-        {
-            auto& col = em.getComponent<ColliderComponent>(e);
-            if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
-                return;
-        }
+        if (!frti.inFrustum(e.getID()) && r.meshLoaded)
+            return;
+
+        if (e.hasTag<EnemyDeathTag>())
+            return;
 
         if (r.visible) {
-            Color colorEntidad = r.color;
-
-            // Comprobar el tipo y si es enemigo cambiarle el color
-            if (!e.hasTag<PlayerTag>() && e.hasComponent<TypeComponent>()) {
-                auto& t{ em.getComponent<TypeComponent>(e) };
-
-                switch (t.type)
-                {
-                case ElementalType::Neutral:
-                    colorEntidad = GRAY;
-                    break;
-
-                case ElementalType::Water:
-                    colorEntidad = BLUE;
-                    break;
-
-                case ElementalType::Fire:
-                    colorEntidad = RED;
-                    break;
-
-                case ElementalType::Ice:
-                    colorEntidad = SKYBLUE;
-                    break;
-
-                default:
-                    break;
-                }
-            }
-
-            if (e.hasTag<SubjectTag>() && e.hasComponent<SubjectComponent>() && em.getComponent<SubjectComponent>(e).activeShield)
-                colorEntidad = GREEN;
+            Color colorEntidad = D_WHITE;
 
             if (e.hasComponent<LifeComponent>()) {
                 auto& l{ em.getComponent<LifeComponent>(e) };
                 if (l.elapsed < l.countdown)
                 {
-                    colorEntidad = MAROON;
+                    colorEntidad = D_CORAL_PINK;
 
                     if (e.hasTag<DestructibleTag>())
-                        r.position.setZ(shakeDouble(r.position.z()));
+                        r.position.setX(shakeDouble(r.position.x()));
                 }
             }
             if (!e.hasTag<ZoneTag>())
@@ -717,429 +1074,554 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
                 if (li.isCharging())
                     return;
 
-                bool in{ false };
                 if (e.hasTag<PlayerTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 2.4);
-                    in = true;
                 }
                 else if (e.hasTag<SlimeTag>())
                 {
                     //scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - .6);
-                    in = true;
                 }
                 else if (e.hasTag<SnowmanTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 3.0);
-                    in = true;
                 }
                 else if (e.hasTag<SpiderTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 0.7);
-                    in = true;
                 }
                 else if (e.hasTag<GolemTag>())
                 {
                     // scl = { 0.4, 0.4, 0.4 };
                     pos.setY(pos.y() - 4.0);
-                    in = true;
                 }
                 else if (e.hasTag<DummyTag>())
                 {
                     // scl = { 0.4, 0.4, 0.4 };
                     pos.setY(pos.y() - 5.7);
-                    in = true;
                 }
                 else if (e.hasTag<BossFinalTag>())
                 {
                     scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
                     colorEntidad = { 125, 125, 125, 255 };
-                    in = true;
                 }
                 else if (e.hasTag<SubjectTag>())
                 {
                     scl = { 0.33, 0.33, 0.33 };
                     pos.setY(pos.y() - 1.1);
-                    in = true;
                 }
                 else if (e.hasTag<CrusherTag>())
                 {
-                    // scl = { 0.33, 0.33, 0.33 };
+                    scl = { 0.8, 0.8, 0.8 };
                     pos.setY(pos.y() - 8.6);
-                    in = true;
                 }
                 else if (e.hasTag<AngryBushTag>())
                 {
                     // scl = { 0.33, 0.33, 0.33 };
                     // pos.setY(pos.y() - 0.5);
-                    in = true;
                 }
                 else if (e.hasTag<AngryBushTag2>())
                 {
                     //pos.setY(pos.y() - 0.5);
-                    in = true;
                 }
                 else if (e.hasTag<ChestTag>() || e.hasTag<SpawnTag>() || e.hasTag<LavaTag>() || e.hasTag<SignTag>() || e.hasTag<TableTag>() || e.hasTag<MissionObjTag>())
                 {
                     pos.setY(pos.y() - r.offset);
-                    in = true;
                 }
                 else if (e.hasTag<DestructibleTag>())
                 {
                     pos.setY(pos.y() - r.offset / 1.5);
-                    in = true;
                 }
                 else if (e.hasTag<NomadTag>() || e.hasTag<InvestigatorTag>())
                 {
                     pos.setY(pos.y() - 3.54);
-                    in = true;
                 }
-                else if (e.hasTag<DoorTag>() || e.hasTag<LeverTag>() || e.hasTag<FireBallTag>()
-                    || e.hasTag<CoinTag>() || e.hasTag<WaterBombTag>() || e.hasTag<BoatTag>())
-                {
-                    in = true;
-                }
+
+                // else if (e.hasTag<HitPlayerTag>() && e.hasComponent<PhysicsComponent>())
+                // {
+                //     auto& phy = em.getComponent<PhysicsComponent>(e);
+                //     if (phy.position == phy.prevPosition)
+                //         return;
+                // }
 
                 if (r.rotationVec == vec3d::zero())
                     r.rotationVec = { 0.0, -1.0, 0.0 };
 
                 float orientationInDegrees = static_cast<float>(r.orientation * (180.0f / K_PI));
-                engine.drawModel(r.model, pos, r.rotationVec, orientationInDegrees, scl, colorEntidad);
 
-                if (!in)
-                {
-                    int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
-                    if (orientationInDegreesInt % 90 == 0 && std::abs(orientationInDegreesInt) != 270 && std::abs(orientationInDegreesInt) != 90)
-                        engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), BLACK);
+                if (r.node) {
+                    r.node->setTranslation({ pos.x(), pos.y(), pos.z() });
+                    r.node->setScale({ scl.x(), scl.y(), scl.z() });
+                    if (e.hasComponent<AnimationComponent>())
+                    {
+                        r.node->setRotation({ 1.0, 0.0, 0.0 }, -90.0);
+                        r.node->rotate({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees - 90);
+                    }
                     else
-                        engine.drawModelWires(r.model, pos, r.rotationVec, orientationInDegrees, scl, BLACK);
+                        r.node->setRotation({ r.rotationVec.x(), r.rotationVec.y(), r.rotationVec.z() }, orientationInDegrees);
+
+                    r.node->setVisibleOne(true);
+                    r.node->setVisible(true);
+
+                    if (auto model = r.node->getEntity<Model>())
+                        model->color = colorEntidad;
+
+                    if (e.hasTag<PlayerTag>())
+                    {
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+                        if (plfi.hasStaff)
+                        {
+                            auto& am = AnimationManager::getInstance();
+                            auto& staffNode = *r.node->getChildren()[0];
+                            auto& playerBoneMatrix = am.GetFinalBoneMatrices(0);
+
+                            glm::mat4 boneTransform = playerBoneMatrix[15];
+
+                            glm::mat4 bastonInitMatrix = glm::mat4(1.0f);
+                            glm::vec3 initTranslation = { +0.6563f, -2.6283f,  3.4105f };
+                            bastonInitMatrix = glm::translate(bastonInitMatrix, initTranslation);
+
+                            glm::mat4 newMatrix = boneTransform * bastonInitMatrix;
+
+                            staffNode.setTransformationMatrix(newMatrix);
+                            staffNode.setRotation({ 1.0, 0.0, 0.0 }, 90.0);
+                        }
+                    }
+                    else if (e.hasTag<NomadTag>())
+                    {
+                        auto& anc = em.getComponent<AnimationComponent>(e);
+                        if (anc.idCurrent != anc.max)
+                        {
+                            auto& am = AnimationManager::getInstance();
+                            Node* staffNode = nullptr;
+                            if (r.node->getChildren().empty())
+                                staffNode = engine.dmeg.CreateModel("assets/Personajes/NPCs/Nomada/Nomada_palo.obj", D_WHITE, "NomadStaff", r.node);
+                            else
+                                staffNode = r.node->getChildren()[0];
+
+                            auto& playerBoneMatrix = am.GetFinalBoneMatrices(anc.idCurrent);
+
+                            glm::mat4 boneTransform = playerBoneMatrix[15];
+
+                            glm::mat4 bastonInitMatrix = glm::mat4(1.0f);
+                            glm::vec3 initTranslation = { +0.6563f, -2.6283f,  3.4105f };
+                            bastonInitMatrix = glm::translate(bastonInitMatrix, initTranslation);
+
+                            glm::mat4 newMatrix = boneTransform * bastonInitMatrix;
+
+                            staffNode->setTransformationMatrix(newMatrix);
+                            staffNode->setRotation({ 1.0, 0.0, 0.0 }, 90.0);
+                        }
+                    }
+                    // Luces cofre
+                    // if (e.hasTag<ChestTag>()) {
+                    //     auto& chest = em.getComponent<ChestComponent>(e);
+                    //     for (auto& child : r.node->getChildren())
+                    //         if (auto ent = child->getEntity<DarkMoon::PointLight>()) {
+                    //             ent->position = pos.toGlm() + glm::vec3{ 0, 5, 0 };
+                    //             ent->enabled = !chest.isOpen;
+                    //         }
+                    //     r.node->setVisible(true);
+                    // }
+                    /*
+                    if (!in)
+                    {
+                        int orientationInDegreesInt = static_cast<int>(orientationInDegrees);
+                        if (orientationInDegreesInt % 90 == 0 && std::abs(orientationInDegreesInt) != 270 && std::abs(orientationInDegreesInt) != 90)
+                        {
+                            // engine.drawCubeWires(r.position, static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()), D_BLACK);
+                            //std::cout << "Dibujando cubo\n";
+                        }
+                        else
+                        {
+                            // engine.drawModelWires(r.model, pos, r.rotationVec, orientationInDegrees, scl, D_BLACK);
+                            //auto eModel = dynamic_cast<ModelType*>(r.node->getEntity());
+                            //eModel->drawModel = true;
+                            //eModel->drawWires = true;
+                        }
+                    }
+                    */
                 }
             }
         }
+        // else if (e.hasTag<GroundTag>() && e.hasComponent<GrassComponent>())
+        // {
+        //     drawGrass(engine, r, em.getComponent<GrassComponent>(e));
+        // }
     });
+
+    // engine.activateLights();
+}
+
+void RenderSystem::drawGrass(GameEngine& engine, RenderComponent& ren, GrassComponent& grc)
+{
+    // TODO implementar textura con billboards
+    vec3d surfaceMax = ren.position + ren.scale / 2;
+    if (!grc.created)
+    {
+        // Conseguimos 20 posiciones random que estén entre la x y la z de la superficie
+        vec3d surfaceMin = ren.position - ren.scale / 2;
+
+        for (auto& grass : grc.grass)
+        {
+            double x = engine.getRandomValue(surfaceMin.x(), surfaceMax.x());
+            double z = engine.getRandomValue(surfaceMin.z(), surfaceMax.z());
+            double wiggleX = engine.getRandomValue(-0.5, 0.5);
+            double wiggleZ = engine.getRandomValue(-0.5, 0.5);
+            double y = engine.getRandomValue(1.0, 3.0);
+
+            grass.startPos = { x, surfaceMax.y(), z };
+            grass.endPos = { x + wiggleX, surfaceMax.y() + y, z + wiggleZ };
+        }
+
+        grc.created = true;
+    }
+    else
+    {
+        for (auto& grass : grc.grass)
+        {
+            engine.drawLine3D(grass.startPos, grass.endPos, 1.1f, D_GREEN_DARK);
+        }
+    }
 }
 
 void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, RenderComponent& r)
 {
     auto& li = em.getSingleton<LevelInfo>();
 
-    if (e.hasTag<PlayerTag>())
-    {
-        r.model = engine.loadModel("assets/models/main_character.obj");
-        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/main_character_uv_V2.png");
-        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/main_character_texture_V2.png");
-        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+    if (e.hasTag<PlayerTag>()) {
+        std::string path = "assets/Personajes/Principal/Main_character.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 2.0);
     }
     else if (e.hasTag<SlimeTag>())
-    {
-        r.model = engine.loadModel("assets/models/Slime.obj");
-        // Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Slime_uv.png");
-        // Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Slime_texture.png");
-        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-        // r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-    }
+        r.node = engine.loadModel("assets/models/Slime.obj");
     else if (e.hasTag<SnowmanTag>())
     {
-        r.model = engine.loadModel("assets/Personajes/Enemigos/Snowman/Snowman.obj");
+        std::string path = "assets/Personajes/Enemigos/Snowman/Snowman.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 2.0);
 
-        Texture t{};
-        if (li.mapID != 2)
-            t = engine.loadTexture("assets/Personajes/Enemigos/Snowman/Snowman_texture.png");
-        else
-            t = engine.loadTexture("assets/Personajes/Enemigos/Snowman/snowman_fuego_texture.png");
+        if (li.mapID == 2)
+            for (auto& mesh : r.node->getEntity<Model>()->getMeshes())
+                mesh->material->texture = engine.loadTexture2D("assets/Personajes/Enemigos/Snowman/snowman_fuego_texture.png");
 
-        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/snowman_uv.png");
-        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+        // r.model = engine.loadModel("assets/Personajes/Enemigos/Snowman/Snowman.obj");
 
-        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+        // Texture t{};
+        // if (li.mapID != 2)
+        //     t = engine.loadTexture("assets/Personajes/Enemigos/Snowman/Snowman_texture.png");
+        // else
+        //     t = engine.loadTexture("assets/Personajes/Enemigos/Snowman/snowman_fuego_texture.png");
+
+        // Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/snowman_uv.png");
+        // r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
+
+        // r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
     }
     else if (e.hasTag<GolemTag>())
     {
-        r.model = engine.loadModel("assets/Personajes/Enemigos/Golem/Golem.obj");
-        loadShaders(r.model);
+        // FIXME
+        std::string path = "assets/Personajes/Enemigos/Golem/Golem.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 2.0);
+        // r.node = engine.loadModel("assets/Personajes/Enemigos/Golem/Golem.obj");
     }
     else if (e.hasTag<SpiderTag>())
-    {
-        r.model = engine.loadModel("assets/models/Spider.obj");
-        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Spider_UV.png");
-        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Spider_texture.png");
-        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-    }
+        r.node = engine.loadModel("assets/models/Spider.obj");
     else if (e.hasTag<BossFinalTag>())
-    {
-        r.model = engine.loadModel("assets/models/Boss.obj");
-        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Boss_uv.png");
-        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Boss_texture.png");
-        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-    }
+        r.node = engine.loadModel("assets/models/Boss.obj");
     else if (e.hasTag<SubjectTag>())
-    {
-        r.model = engine.loadModel("assets/models/Boss_sub_1.obj");
-        Texture2D t0 = engine.loadTexture("assets/models/textures/entity_textures/Boss_sub_1_uv.png");
-        Texture2D t = engine.loadTexture("assets/models/textures/entity_textures/Boss_sub_1_texture.png");
-
-        r.model.materials[0].maps[MATERIAL_MAP_NORMAL].texture = t0;
-        r.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-    }
+        r.node = engine.loadModel("assets/models/Boss_sub_1.obj");
     else if (e.hasTag<Chunk0Tag>())
-    {
         switch (li.mapID)
         {
         case 0:
-            r.model = engine.loadModel("assets/Niveles/Lvl_0/Objs/lvl_0-cnk_0.obj");
+            r.node = engine.loadModel("assets/Niveles/Lvl_0/Objs/lvl_0-cnk_0.obj");
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_0.obj");
+            r.node = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_0.obj");
             break;
         case 2:
-            r.model = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_0.obj");
+            r.node = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_0.obj");
+            break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_3/Objs/lvl_3-cnk_0.obj");
             break;
         }
-
-        loadShaders(r.model);
-    }
     else if (e.hasTag<Chunk1Tag>())
-    {
         switch (li.mapID)
         {
         case 0:
-            r.model = engine.loadModel("assets/Niveles/Lvl_0/Objs/lvl_0-cnk_1.obj");
+            r.node = engine.loadModel("assets/Niveles/Lvl_0/Objs/lvl_0-cnk_1.obj");
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_1.obj");
+            r.node = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_1.obj");
             break;
         case 2:
-            r.model = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_1.obj");
+            r.node = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_1.obj");
+            break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_3/Objs/lvl_3-cnk_1.obj");
             break;
         }
-        loadShaders(r.model);
-    }
     else if (e.hasTag<Chunk2Tag>())
-    {
         switch (li.mapID)
         {
         case 0:
-            r.model = engine.loadModel("assets/Niveles/Lvl_0/Objs/lvl_0-cnk_2.obj");
+            r.node = engine.loadModel("assets/Niveles/Lvl_0/Objs/lvl_0-cnk_2.obj");
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_2.obj");
+            r.node = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_2.obj");
             break;
         case 2:
-            r.model = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_2.obj");
+            r.node = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_2.obj");
+            break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_3/Objs/lvl_3-cnk_2.obj");
             break;
         }
-        loadShaders(r.model);
-    }
     else if (e.hasTag<Chunk3Tag>())
     {
         switch (li.mapID)
         {
         case 0:
-            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_3.obj");
+            // r.model = engine.loadModelRaylib("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_3.obj");
+            r.node = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_3.obj");
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_3.obj");
+            // r.model = engine.loadModelRaylib("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_3.obj");
+            r.node = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_3.obj");
             break;
         case 2:
-            r.model = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_3.obj");
+            r.node = engine.loadModel("assets/Niveles/Lvl_2/Objs/lvl_2-cnk_3.obj");
+            break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_4/Objs/lvl_4-cnk_0.obj");
             break;
         }
-        loadShaders(r.model);
+        // loadShaders(r.model);
     }
     else if (e.hasTag<Chunk4Tag>())
     {
         switch (li.mapID)
         {
         case 0:
-            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_4.obj");
+            // r.model = engine.loadModelRaylib("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_4.obj");
+            r.node = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_4.obj");
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_4.obj");
+            // r.model = engine.loadModelRaylib("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_4.obj");
+            r.node = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_4.obj");
+            break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_4/Objs/lvl_4-cnk_1.obj");
             break;
         }
-        loadShaders(r.model);
+        // loadShaders(r.model);
     }
     else if (e.hasTag<Chunk5Tag>())
     {
         switch (li.mapID)
         {
         case 0:
-            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_5.obj");
+            // r.model = engine.loadModelRaylib("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_5.obj");
+            r.node = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_5.obj");
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_5.obj");
+            // r.model = engine.loadModelRaylib("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_5.obj");
+            r.node = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_5.obj");
+            break;
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_4/Objs/lvl_4-cnk_2.obj");
             break;
         }
-        loadShaders(r.model);
+        // loadShaders(r.model);
     }
     else if (e.hasTag<Chunk6Tag>())
     {
         switch (li.mapID)
         {
-        case 0:
-            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/lvl_0-cnk_6.obj");
-            break;
-
-        case 1:
-            r.model = engine.loadModel("assets/levels/Zona_1-Mazmorra/objs/versionDevcom/lvl_1-cnk_6.obj");
+        case 3:
+            r.node = engine.loadModel("assets/Niveles/Lvl_4/Objs/lvl_4-cnk_3.obj");
             break;
         }
-        loadShaders(r.model);
+        // loadShaders(r.model);
     }
     else if (e.hasTag<ChestTag>())
     {
-        r.model = engine.loadModel("assets/models/Cofre.obj");
-        loadShaders(r.model);
+        // FIXME
+        // std::string path = "assets/Assets/Cofre/Cofre0.fbx";
+        // r.node = engine.loadModel(path.c_str());
+        // loadAnimations(engine, em, e, r, path, 1.0f);
+        r.node = engine.loadModel("assets/Assets/Cofre/Cofre.obj");
+        setPointLight(engine, em, e, *r.node, r.position + vec3d{ 0, 5, 0 });
     }
     else if (e.hasTag<DestructibleTag>())
     {
         switch (li.mapID)
         {
         case 0:
-            r.model = engine.loadModel("assets/models/Troncos.obj");
+            // r.model = engine.loadModelRaylib("assets/models/Troncos.obj");
+            r.node = engine.loadModel("assets/models/Troncos.obj");
             break;
 
         case 1:
-            r.model = engine.loadModel("assets/models/Puerta_prision_agua.obj");
+        {
+            std::string path = "assets/Assets/Puerta_prision_agua/Puerta_prision_agua.fbx";
+            r.node = engine.loadModel(path.c_str());
+            loadAnimations(engine, em, e, r, "assets/Assets/Puerta_prision_base/Puerta_prision.fbx", 1.0f);
+            for (auto& mesh : r.node->getEntity<Model>()->getMeshes())
+                mesh->material->texture = engine.loadTexture2D("assets/Assets/Texturas/lvl_1_extras-texture.png");
+
+            setPointLight(engine, em, e, *r.node, r.position, 2.5f, D_BLUE_DARK);
             break;
         }
-        loadShaders(r.model);
+        }
+        // loadShaders(r.model);
     }
     else if (e.hasTag<DoorTag>())
     {
         switch (li.mapID)
         {
         case 0:
-            r.model = engine.loadModel("assets/levels/Zona_0-Bosque/objs/Barricada_cambio_lvl.obj");
-            break;
-
-        case 1:
-            r.model = engine.loadModel("assets/models/Puerta_prision_base.obj");
+        {
+            std::string path = "assets/Assets/Barricada_cueva/Barricada_cueva.obj";
+            r.node = engine.loadModel(path.c_str());
+            // loadAnimations(engine, em, e, r, path, 1.0f);
             break;
         }
+        case 1:
+        {
+            std::string path = "assets/Assets/Puerta_prision_base/Puerta_prision.fbx";
+            r.node = engine.loadModel(path.c_str());
+            loadAnimations(engine, em, e, r, path, 1.0f);
+            setPointLight(engine, em, e, *r.node, r.position, 2.5f, D_LAVENDER_DARK);
+            break;
+        }
+        }
 
-        loadShaders(r.model);
+        // loadShaders(r.model);
     }
     else if (e.hasTag<AngryBushTag>())
     {
+        // r.model = engine.loadModelRaylib("assets/models/Piedra.obj");
+        std::string path = "";
         if (li.mapID == 0)
-            r.model = engine.loadModel("assets/Personajes/Enemigos/Piedra/Piedra_2.obj");
+            path = "assets/Personajes/Enemigos/Piedra/Piedra_2.fbx";
         else
-            r.model = engine.loadModel("assets/Personajes/Enemigos/Piedra/Piedra_3.obj");
+            path = "assets/Personajes/Enemigos/Piedra/Piedra_3.fbx";
 
-        loadShaders(r.model);
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, "assets/Personajes/Enemigos/Piedra/Piedra_3.fbx", 4.5f);
+
+        // loadShaders(r.model);
     }
     else if (e.hasTag<AngryBushTag2>())
     {
-        r.model = engine.loadModel("assets/Personajes/Enemigos/Piedra/Piedra_1.obj");
-
-        loadShaders(r.model);
+        std::string path = "assets/Personajes/Enemigos/Piedra/Piedra_1.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, "assets/Personajes/Enemigos/Piedra/Piedra_3.fbx", 1.0f);
     }
     else if (e.hasTag<CrusherTag>())
     {
-        r.model = engine.loadModel("assets/models/Apisonadora.obj");
-
-        loadShaders(r.model);
+        std::string path = "assets/Personajes/Enemigos/Apisonadora/Apisonadora.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 1.95f);
+        // loadShaders(r.model);
     }
     else if (e.hasTag<DummyTag>())
     {
-        r.model = engine.loadModel("assets/models/Dummy.obj");
+        // FIXME
+        // std::string path = "assets/Personajes/Enemigos/Dummy/Dummy.fbx";
+        // r.node = engine.loadModel(path.c_str());
+        // loadAnimations(engine, em, e, r, path, 1.0f);
+        r.node = engine.loadModel("assets/Personajes/Enemigos/Dummy/Dummy.obj");
 
         if (li.mapID == 2)
-        {
-            for (int j = 0; j < r.model.materialCount; j++)
-            {
-                for (int k = 0; k < 11; k++)
-                    r.model.materials[j].maps[k].texture = engine.loadTexture("assets/Personajes/Enemigos/Dummy/Dummy_fire-texture.png");
-            }
-        }
-
-        loadShaders(r.model);
+            for (auto& mesh : r.node->getEntity<Model>()->getMeshes())
+                mesh->material->texture = engine.loadTexture2D("assets/Personajes/Enemigos/Dummy/Dummy_fire-texture.png");
     }
     else if (e.hasTag<BarricadeTag>())
     {
-        r.model = engine.loadModel("assets/Assets/Barricada_arboles/Barricada_arboles.obj");
-
-        loadShaders(r.model);
+        r.node = engine.loadModel("assets/Assets/Barricada_arboles/Barricada_arboles.obj");
     }
     else if (e.hasTag<SpawnTag>())
     {
-        r.model = engine.loadModel("assets/Assets/Checkpoint/Checkpoint.obj");
-
-        loadShaders(r.model);
+        r.node = engine.loadModel("assets/Assets/Checkpoint/Checkpoint.obj");
+        auto& spc = em.getComponent<SpawnComponent>(e);
+        for (auto& [ren, _, plc] : spc.parts)
+        {
+            ren->node = r.node;
+            setPointLight(engine, *plc, *r.node, ren->position, 0.5, D_ORANGE_DARK);
+        }
     }
     else if (e.hasTag<LevelChangeTag>())
     {
-        r.model = engine.loadModel("assets/Assets/Tp/Tp.obj");
-
-        loadShaders(r.model);
+        r.node = engine.loadModel("assets/Assets/Tp/Tp.obj");
     }
     else if (e.hasTag<LeverTag>())
     {
-        r.model = engine.loadModel("assets/Assets/Palanca/Palanca-prision.obj");
-
-        loadShaders(r.model);
+        r.node = engine.loadModel("assets/Assets/Palanca/Palanca-prision.obj");
     }
     else if (e.hasTag<CoinTag>())
     {
-        r.model = engine.loadModel("assets/Assets/Props/Destellos.obj");
-
-        loadShaders(r.model);
+        r.node = engine.loadModel("assets/Assets/Props/Destellos.obj");
+    }
+    else if (e.hasTag<ManaDropTag>())
+    {
+        r.node = engine.loadModel("assets/Assets/Props/Dropeable_Mana.obj");
+    }
+    else if (e.hasTag<LifeDropTag>())
+    {
+        r.node = engine.loadModel("assets/Assets/Props/Dropeable_Vida.obj");
     }
     else if (e.hasTag<WaterBombTag>())
     {
-        r.model = engine.loadModel("assets/Assets/Props/Hechizos/Agua_1.obj");
-
-        loadShaders(r.model);
+        r.node = engine.loadModel("assets/Assets/Props/Hechizos/Agua_1.obj");
     }
     else if (e.hasTag<FireBallTag>())
     {
-        r.model = engine.loadModel("assets/Assets/Props/Hechizos/Fuego_1.obj");
-
-        loadShaders(r.model);
+        r.node = engine.loadModel("assets/Assets/Props/Hechizos/Fuego_1.obj");
     }
     else if (e.hasTag<NomadTag>())
     {
-        r.model = engine.loadModel("assets/Personajes/NPCs/Nomada/Nomada.obj");
-
-        loadShaders(r.model);
+        std::string path = "assets/Personajes/NPCs/Nomada/Nomada.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 1.0f);
     }
     else if (e.hasTag<InvestigatorTag>())
     {
-        r.model = engine.loadModel("assets/Personajes/NPCs/Investigador/Investigador.obj");
-        loadShaders(r.model);
+        // FIXME
+        std::string path = "assets/Personajes/NPCs/Investigador/Investigador.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 1.0f);
+        // r.node = engine.loadModel("assets/Personajes/NPCs/Investigador/Investigador.obj");
+        setPointLight(engine, em, e, *r.node, r.position, 1.f, D_YELLOW);
     }
     else if (e.hasTag<LavaTag>())
     {
-        r.model = engine.loadModel("assets/Assets/Charco_lava/Charco_lava.obj");
-
-        loadShaders(r.model);
+        r.node = engine.loadModel("assets/Assets/Charco_lava/Charco_lava.obj");
+        setPointLight(engine, em, e, *r.node, r.position, 1.0f, D_RED);
     }
     else if (e.hasTag<SignTag>())
     {
-        r.model = engine.loadModel("assets/Assets/Cartel/Cartel.obj");
-
-        loadShaders(r.model);
+        r.node = engine.loadModel("assets/Assets/Cartel/Cartel.obj");
     }
     else if (e.hasTag<TableTag>())
     {
-        r.model = engine.loadModel("assets/Assets/Mesa_investigador/Mesa-investigador.obj");
-
-        loadShaders(r.model);
+        r.node = engine.loadModel("assets/Assets/Mesa_investigador/Mesa-investigador.obj");
     }
     else if (e.hasTag<MissionObjTag>())
     {
@@ -1155,92 +1637,169 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
                 {
                 case BoatParts::Base:
                 {
-                    r.model = engine.loadModel("assets/Assets/Barca/Barca_base.obj");
+                    r.node = engine.loadModel("assets/Assets/Barca/Barca_base.obj");
                     break;
                 }
                 case BoatParts::Motor:
                 {
-                    r.model = engine.loadModel("assets/Assets/Barca/Barca_motor.obj");
+                    r.node = engine.loadModel("assets/Assets/Barca/Barca_motor.obj");
                     break;
                 }
                 case BoatParts::SteeringWheel:
                 {
-                    r.model = engine.loadModel("assets/Assets/Barca/Barca_volante.obj");
+                    r.node = engine.loadModel("assets/Assets/Barca/Barca_volante.obj");
                     break;
                 }
                 case BoatParts::Propeller:
                 {
-                    r.model = engine.loadModel("assets/Assets/Barca/Barca_helice.obj");
+                    r.node = engine.loadModel("assets/Assets/Barca/Barca_helice.obj");
                     break;
                 }
                 }
             }
+            break;
+        }
+        case 3:
+        {
+            if (e.hasComponent<TypeComponent>())
+            {
+                auto& rc = em.getComponent<TypeComponent>(e);
+
+                switch (rc.type)
+                {
+                case ElementalType::Water:
+                    // if (engine.isKeyReleased(D_KEY_Y))
+                    r.node = engine.loadModel("assets/Assets/Balizas/Baliza_agua.obj");
+                    // else return;
+                    break;
+                case ElementalType::Fire:
+                    r.node = engine.loadModel("assets/Assets/Balizas/Baliza_fuego.obj");
+                    break;
+                case ElementalType::Ice:
+                    // if (engine.isKeyReleased(D_KEY_O))
+                    r.node = engine.loadModel("assets/Assets/Balizas/Baliza_hielo.obj");
+                    // else return;
+                    break;
+                default:
+                    break;
+                }
+            }
+            break;
         }
 
         default:
             break;
         }
-
-        loadShaders(r.model);
     }
     else if (e.hasTag<BoatTag>())
     {
-        r.model = engine.loadModel("assets/Assets/Barca/Barca_completa.obj");
-
-        loadShaders(r.model);
+        r.node = engine.loadModel("assets/Assets/Barca/Barca_completa.obj");
     }
     else if (e.hasTag<SnowBallTag>())
     {
-        r.model = engine.loadModel("assets/Personajes/Enemigos/Snowman/Snow_ball.obj");
-
-        loadShaders(r.model);
+        r.node = engine.loadModel("assets/Personajes/Enemigos/Snowman/Snow_ball.obj");
     }
     else if (e.hasTag<MagmaBallTag>())
     {
-        r.model = engine.loadModel("assets/Personajes/Enemigos/Snowman/Magma_ball.obj");
+        r.node = engine.loadModel("assets/Personajes/Enemigos/Snowman/Magma_ball.obj");
 
-        loadShaders(r.model);
+        // loadShaders(r.model);
     }
     else
     {
-        r.mesh = engine.genMeshCube(static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()));
-        r.model = engine.loadModelFromMesh(r.mesh);
+        r.node = engine.createCube({ 0.0f, 0.0f, 0.0f },
+            { static_cast<float>(r.scale.x()), static_cast<float>(r.scale.y()), static_cast<float>(r.scale.z()) },
+            D_GRAY, "cubo 3D", getNode(engine, "3D"));
     }
     r.meshLoaded = true;
 }
 
-void RenderSystem::loadShaders(Model& model)
+void RenderSystem::loadAnimations(GameEngine& engine, EntityManager& em, Entity& ent, RenderComponent& rc, const std::string& path, float mult)
 {
-    for (int i = 0; i < model.materialCount; i++)
-    {
-        model.materials[i].shader = *shaderPtr;
-    }
+    auto& model = *rc.node->getEntity<Model>();
+    auto& vecBones = model.getboneInfoMap();
+    auto& ac = em.addComponent<AnimationComponent>(ent);
+    ac.animationList = engine.createAnimations(path, vecBones);
+    ac.multiplier = mult;
 
+    if (ent.hasTag<CrusherTag>())
+        ac.animToPlay = static_cast<std::size_t>(CrusherAnimations::ATTACK);
+    else if (ent.hasTag<PlayerTag>())
+        ac.animToPlay = static_cast<std::size_t>(PlayerAnimations::IDLE);
+    else if (ent.hasTag<DoorTag>() || ent.hasTag<DestructibleTag>())
+    {
+        for (auto& mesh : model.getMeshes())
+            mesh->rotateBones = false;
+    }
+    else if (ent.hasTag<AngryBushTag>() || ent.hasTag<AngryBushTag2>())
+        ac.animToPlay = static_cast<std::size_t>(RockAnimations::ROLL);
+    // else if (ent.hasTag<DummyTag>())
+    //     ac.animToPlay = 0;
+    else if (ent.hasTag<NomadTag>())
+        ac.animToPlay = static_cast<std::size_t>(NomadAnimations::IDLE);
+    else if (ent.hasTag<InvestigatorTag>())
+        ac.animToPlay = static_cast<std::size_t>(InvestAnimations::IDLE);
+    else if (ent.hasTag<SnowmanTag>())
+        ac.animToPlay = static_cast<std::size_t>(SnowmanAnimations::IDLE);
+    else if (ent.hasTag<GolemTag>())
+        ac.animToPlay = static_cast<std::size_t>(GolemAnimations::WALK);
+}
+
+void RenderSystem::setPointLight(GameEngine& engine, EntityManager& em, Entity& e, Node& n, vec3d pos, float intensity, Color c)
+{
+    PointLightComponent* plc{ nullptr };
+    if (e.hasComponent<PointLightComponent>())
+        plc = &em.getComponent<PointLightComponent>(e);
+    else
+        plc = &em.addComponent<PointLightComponent>(e);
+
+    setPointLight(engine, *plc, n, pos, intensity, c);
+}
+
+void RenderSystem::setPointLight(GameEngine& engine, PointLightComponent& plc, Node& n, vec3d pos, float intensity, Color c)
+{
+    if (!plc.light)
+    {
+        auto* light = engine.createPointLight(pos, c, "light", &n);
+        plc.light = light->getEntity<PointLight>();
+    }
+    else
+        plc.light->position = pos.toGlm();
+
+    plc.light->setIntensity(intensity);
 }
 
 void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
 {
-    using partCMPs = MP::TypeList<ColliderComponent, ParticleMakerComponent>;
+    using partCMPs = MP::TypeList<ParticleMakerComponent>;
     using noTAGs = MP::TypeList<>;
 
+    [[maybe_unused]] auto wRate = engine.getWidthRate();
+    [[maybe_unused]] auto hRate = engine.getHeightRate();
+
     auto& frti = em.getSingleton<FrustumInfo>();
-    em.forEach<partCMPs, noTAGs>([&](Entity&, ColliderComponent& col, ParticleMakerComponent& pmc)
+    em.forEach<partCMPs, noTAGs>([&](Entity& e, ParticleMakerComponent& pmc)
     {
-        if (frti.bboxIn(col.bbox) == FrustPos::OUTSIDE)
+        if (!frti.inFrustum(e.getID()))
             return;
 
         if (pmc.active)
         {
-            for (auto& p : pmc.particles)
+            for (auto& [node, p] : pmc.particles)
             {
                 if (p.type == Particle::ParticleType::Pixel)
+                    // Dibujamos la partícula en un punto de 3x3 píxeles
+                    engine.drawPoint3D(p.position.to_other<double>(), 3.f, p.color);
+                else
                 {
-                    // Dibujamos 4 partćulas arriba, abajo, izquierda y derecha de la posición
-                    engine.drawPoint3D(p.position.to_other<double>(), { p.r, p.g, p.b, p.a });
-                    engine.drawPoint3D((p.position + vec3f{ 0.0f, 0.1f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
-                    engine.drawPoint3D((p.position + vec3f{ 0.1f, 0.0f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
-                    engine.drawPoint3D((p.position + vec3f{ 0.0f, -0.1f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
-                    engine.drawPoint3D((p.position + vec3f{ -0.1f, 0.0f, 0.0f }).to_other<double>(), { p.r, p.g, p.b, p.a });
+                    if (!node)
+                        node = engine.createNode(getNode(engine, p.texture.c_str()), getNode(engine, "HUD"));
+
+                    auto& textureInfo = *node->getEntity<Texture2D>()->texture;
+                    int posX = static_cast<int>(engine.getWorldToScreenX(p.position.toDouble()) - static_cast<float>(textureInfo.getWidth()) * wRate / 2);
+                    int posY = static_cast<int>(engine.getWorldToScreenY(p.position.toDouble()) - static_cast<float>(textureInfo.getHeight()) * hRate / 2);
+
+                    engine.drawNode(node, { posX, posY });
                 }
             }
         }
@@ -1250,15 +1809,16 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
 // Empieza el dibujado y se limpia la pantalla
 void RenderSystem::beginFrame(GameEngine& engine, EntityManager& em)
 {
+    restartScene(engine);
     engine.beginDrawing();
 
     auto& li = em.getSingleton<LevelInfo>();
 
-    Color bgColor = RAYWHITE;
+    Color bgColor = D_WHITE;
     switch (li.mapID)
     {
     case 0:
-        bgColor = RAYWHITE;
+        bgColor = D_WHITE;
         break;
     case 1:
         bgColor = { 103, 49, 71, 255 };
@@ -1266,32 +1826,34 @@ void RenderSystem::beginFrame(GameEngine& engine, EntityManager& em)
     }
 
     engine.clearBackground(bgColor);
-
-    engine.beginMode3D();
-    //engine.drawGrid(50, 1.f);
 }
-//dibujar rayo 3d
-void RenderSystem::drawRay(vec3d origin, vec3d dir) {
+
+//dibujar rayo 3d 
+void RenderSystem::drawRay(vec3d, vec3d) {
+    /*
     BeginDrawing();
     DrawLine3D(origin.toRaylib(), (origin + dir * 100).toRaylib(), RED);
     EndDrawing();
+    */
 }
+
 // Se termina el dibujado
 void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
 {
-    engine.endMode3D();
-
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
     auto& txti = em.getSingleton<TextInfo>();
 
     if (li.isCharging())
-        return;
-
-    drawHUD(em, engine);
+    {
+        restartScene(engine);
+        drawChargeScreen(engine, em);
+    }
+    else
+        drawHUD(em, engine);
 
     if (inpi.debugPhy)
-        drawDebugPhysics(engine, em, li);
+        drawDebugPhysics(engine, em);
 
     drawAlerts_IA(em, engine);
 
@@ -1299,9 +1861,10 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
         drawTextBox(engine, em);
 
     if (inpi.pause)
-        drawPauseMenu(engine, em);
-    else if (inpi.pause)
-        inpi.pause = false;
+    {
+        auto& ss = em.getSingleton<SoundSystem>();
+        drawPauseMenu(engine, em, li, ss);
+    }
 
     else if (inpi.inventory)
         drawInventory(engine, em);
@@ -1315,24 +1878,272 @@ void RenderSystem::endFrame(GameEngine& engine, EntityManager& em)
         drawDebuggerInGameIA(engine, em);
 
     else if (inpi.pathfind)
-        drawTestPathfindinf(engine, em);
+        drawTestPathfinding(engine, em);
 
+    else if (inpi.cheats)
+        drawCheats(em, engine);
+
+    if (li.elapsedPause > 0 && !inpi.pause)
+        li.elapsedPause = 0;
+
+    getNode(engine, "TextCopy")->setVisibleOne(true);
+
+    // auto t2 = std::chrono::high_resolution_clock::now();
+    // auto dur = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    // std::cout << "Tiempo de renderizado: " << dur << " mc" << std::endl;
+
+    inpi.interact = false;
+    engine.traverseRoot();
     engine.endDrawing();
 }
 
-//Dibuja Slider en función de los parámetros
-double SelectValue(GameEngine& engine, double value, float posx, float posy, float height, float width, const char* text, float min_value, float max_value) {
-    // pasamos a float el valor
-    float floatvalue = static_cast<float>(value);
-    // dibujamos el slider para modificar su valor
-    int new_detect_radius = GuiSliderBar(Rectangle(posx, posy, height, width), text, NULL, &floatvalue, min_value, max_value);
-    new_detect_radius = new_detect_radius + 1;
-    engine.drawText(std::to_string(floatvalue).c_str(), 300, static_cast<int>(posy + 5.0f), 20, BLUE);
-    // seteamos el nuevo valor
-    return static_cast<double>(floatvalue);
+// Interfaz para probar el pathfinding
+void RenderSystem::drawTestPathfinding(GameEngine& engine, EntityManager& em) {
+    // Se obtienen los singletons
+    auto& debug = em.getSingleton<Debug_t>();
+    auto& navs = em.getSingleton<NavmeshInfo>();
+    auto& li = em.getSingleton<LevelInfo>();
+    //Dibujado de titulo y ventana
+    auto* debugNode = getNode(engine, "DebugAI4");
+    engine.createRectangle({ engine.getScreenWidth() - 550, 300 }, { 550, 645 }, { 255, 255, 255, 128 }, "pathfinding", debugNode);
+    engine.createText({ engine.getScreenWidth() - 370, 310 }, "PATHFINDING", D_RED, "pathfinding_title", debugNode);
+
+    // Datos de los botones
+    int buttonWidth = 225;
+    int buttonHeight = 45;
+    int posX = engine.getScreenWidth() - 370;
+    int posY = 350;
+    //botones
+    auto& butt1 = *engine.createButton({ posX - 100, posY + 150 }, { buttonWidth, buttonHeight }, "CALCULATE", "pathfinding_butt1", debugNode)->getEntity<Button>();
+    auto& butt2 = *engine.createButton({ posX + 140, posY + 150 }, { buttonWidth, buttonHeight }, "CLEAR", "pathfinding_butt2", debugNode)->getEntity<Button>();
+    auto& butt3 = *engine.createButton({ posX + 140, posY }, { buttonWidth, buttonHeight }, "CORNERS", "pathfinding_butt3", debugNode)->getEntity<Button>();
+    auto& butt4 = *engine.createButton({ posX - 100, posY }, { buttonWidth, buttonHeight }, "CENTERS", "pathfinding_butt4", debugNode)->getEntity<Button>();
+    auto& butt5 = *engine.createButton({ posX + 140, posY + 80 }, { buttonWidth, buttonHeight }, "MIDPOINTS", "pathfinding_butt5", debugNode)->getEntity<Button>();
+    auto& butt6 = *engine.createButton({ posX - 100, posY + 80 }, { buttonWidth, buttonHeight }, "CONEXIONES", "pathfinding_butt6", debugNode)->getEntity<Button>();
+
+    // evento click en botón CALCULAR
+    if (butt1.state == ButtonState::CLICK) {
+
+        // Función para encontrar el nodo más cercano a una posición dada
+        vec3d posplayer = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
+        uint16_t startnode = findNearestNode(em, posplayer, navs.nodes);
+        // uint16_t targetnode = findNearestNode(em, vec3d{ -12.33, 40.0, 22.41 }, navs.nodes);
+        std::cout << startnode << "\n";
+        //Creamos Grafo
+        Graph graph{};
+        graph.createGraph(navs.conexiones, navs.nodes);
+        std::vector<vec3d> path = graph.PathFindAStar(debug, startnode, 423);
+
+
+        if (path.size() == 0) {
+            std::cout << "CAGUEEEEEEEE \n";
+        }
+        else {
+            //     // Copiar el path devuelto por PathFindAStar() a debug.path
+            debug.path.resize(path.size());
+            //     //Rellenamos
+            std::copy(path.begin(), path.end(), debug.path.begin());
+        }
+    }
+    //Evento click botones
+    if (butt2.state == ButtonState::CLICK) {
+        debug.path.clear();
+        debug.nodes.clear();
+        debug.closedlist.clear();
+    }
+    if (butt3.state == ButtonState::CLICK) {
+        debug.seecorners = !debug.seecorners;
+    }
+    if (butt4.state == ButtonState::CLICK) {
+        debug.seecenters = !debug.seecenters;
+    }
+    if (butt5.state == ButtonState::CLICK) {
+        debug.seemidpoint = !debug.seemidpoint;
+    }
+    if (butt6.state == ButtonState::CLICK) {
+        debug.seeconex = !debug.seeconex;
+    }
+    //resultado
+    engine.createText({ posX, 580 }, "PATH RESULT", D_RED, "path_result", debugNode);
+
+    //Dibujar path
+    int posyt = 510;
+    for (auto pos : debug.path) {
+        std::string text = std::to_string(pos.x()) + " " + std::to_string(pos.y()) + " " + std::to_string(pos.z());
+        engine.createText({ posX, posyt }, text, D_RED, "path_numbers", debugNode);
+        posyt += 20;
+    }
+
+    //DIbujar nodos de la lista cerrada y nodos del path resultado
+    for (auto& closenode : debug.closedlist) {
+        engine.drawCube(closenode, { 2, 2, 2 }, D_YELLOW);
+    }
+    for (auto& node : debug.nodes) {
+        engine.drawCube(node, { 2, 2, 2 }, D_GREEN);
+    }
+
+    //Dibujar corners y conexiones
+    if (debug.seecorners) {
+        for (auto& node : navs.corners) {
+            engine.drawCube(node, { 2, 2, 2 }, D_RED);
+        }
+    }
+    if (debug.seecenters) {
+        for (auto it = navs.centers.begin(); it != std::prev(navs.centers.end()); ++it) {
+            engine.drawCube(it->second, { 2, 2, 2 }, D_BLUE);
+        }
+    }
+    if (debug.seemidpoint) {
+        for (auto& node : navs.midpoints) {
+            engine.drawCube(node, { 2, 2, 2 }, D_VIOLET);
+        }
+    }
+    if (debug.seeconex) {
+        for (auto& conex : navs.conexpos) {
+            engine.drawLine3D(conex.first, conex.second, .5f, D_GREEN);
+        }
+        for (auto& bbox : navs.boundingnavmesh) {
+            auto boxSize = bbox.max - bbox.min;
+            vec3d boxPosition = (bbox.min + bbox.max) / 2;
+            //boxPosition.setY(boxPosition.y + 20.0);
+            engine.drawCubeWires(boxPosition,
+                { static_cast<float>(boxSize.x()),
+                static_cast<float>(boxSize.y()),
+                static_cast<float>(boxSize.z()), },
+                D_VIOLET);
+        }
+    }
+    // dibujar posición de los nodos
+    for (auto& node : debug.nodes) {
+        std::string text = std::to_string(node.x()) + " " + std::to_string(node.y()) + " " + std::to_string(node.z());
+        int posx = static_cast<int>(engine.getWorldToScreenX(node));
+        int posy = static_cast<int>(engine.getWorldToScreenY(node));
+        engine.createText({ posx, posy }, text, D_RED, "path_numbers2", debugNode, 15);
+    }
 }
 
-uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::map<uint16_t, vec3d>& nodes) {
+//Debugger visual in-game
+void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
+{
+    auto& debugsnglt = em.getSingleton<Debug_t>();
+
+    int posX = engine.getScreenWidth() - 530;
+    int posText = static_cast<int>(posX + 10);
+
+    auto* debugNode = getNode(engine, "DebugAI2");
+    engine.createRectangle({ posX, 80 }, { 330, 500 }, { 255, 255, 255, 128 }, "debugAI2_rect", debugNode);
+    engine.createText({ posText, 90 }, "INFO", D_BLACK, "debugAI2_info", debugNode);
+
+    using SYSCMPss = MP::TypeList<AIComponent, ColliderComponent, RenderComponent>;
+    using SYSTAGss = MP::TypeList<EnemyTag>;
+
+    // Reccorremos las entidades
+    em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, ColliderComponent& col, RenderComponent& ren)
+    {
+        RayCast ray = engine.getMouseRay();
+        if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
+            if (engine.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+                isSelectedfordebug = !isSelectedfordebug;
+                debugsnglt.IA_id_debug = e.getID();
+            }
+        }
+        if (isSelectedfordebug && e.getID() == debugsnglt.IA_id_debug) {
+            auto& bb = em.getSingleton<BlackBoard_t>();
+            engine.drawCubeWires(ren.position, { ren.scale.x(), ren.scale.y(), ren.scale.z() }, D_VIOLET_DARK);
+            engine.createText({ posText, 120 }, "ID:", D_BLACK, "debugAI2_id", debugNode);
+            engine.createText({ posText + 90 ,120 }, std::to_string(e.getID()), D_GRAY, "debugAI2_id2", debugNode);
+            engine.createText({ posText, 140 }, "Node active:", D_BLACK, "debugAI2_node", debugNode);
+            // std::cout << debugsnglt.elapsed << "\n";
+             // std::cout << debugsnglt.countdown << "\n";
+            if (debugsnglt.elapsed >= debugsnglt.countdown) {
+                debugsnglt.elapsed = 0;
+                debugsnglt.text = aic.bh;
+            }
+            else {
+                debugsnglt.plusDeltatime(timeStep, debugsnglt.elapsed);
+            }
+            if (!debugsnglt.text)
+                debugsnglt.text = "a";
+            engine.createText({ posText + 180, 140 }, debugsnglt.text, D_GRAY, "debugAI2_text", debugNode);
+
+            engine.createText({ posText, 170 }, "TEID:", D_BLACK, "debugAI2_teid", debugNode);
+            engine.createText({ posText + 90, 170 }, std::to_string(aic.teid), D_GRAY, "debugAI2_teid2", debugNode);
+
+            engine.createText({ posText, 200 }, "TX:", D_BLACK, "debugAI2_tx", debugNode);
+            engine.createText({ posText + 80, 200 }, std::to_string(aic.tx), D_GRAY, "debugAI2_tx2", debugNode);
+
+            engine.createText({ posText, 230 }, "TZ:", D_BLACK, "debugAI2_tz", debugNode);
+            engine.createText({ posText + 80, 230 }, std::to_string(aic.tz), D_GRAY, "debugAI2_tz2", debugNode);
+
+            engine.createText({ posText, 260 }, "Culldown:", D_BLACK, "debugAI2_culldown", debugNode);
+            engine.createText({ posText + 140, 260 }, std::to_string(aic.elapsed_shoot), D_GRAY, "debugAI2_culldown2", debugNode);
+
+            engine.createText({ posText, 290 }, "Player Detected?:", D_BLACK, "debugAI2_playerdetected", debugNode);
+            engine.createText({ posText + 240, 290 }, (aic.playerdetected == 0) ? "No" : "Sí", D_GRAY, "debugAI2_playerdetected2", debugNode);
+
+            engine.createText({ posText, 320 }, "Player hunted?:", D_BLACK, "debugAI2_playerhunted", debugNode);
+            engine.createText({ posText + 240, 320 }, (bb.playerhunted == 0) ? "No" : "Sí", D_GRAY, "debugAI2_playerhunted2", debugNode);
+
+            engine.createText({ posText, 360 }, "Subditos alive:", D_BLACK, "debugAI2_subditos", debugNode);
+            engine.createText({ posText + 240, 360 }, std::to_string(bb.subditosData.size()), D_GRAY, "debugAI2_subditos2", debugNode);
+
+            engine.createText({ posText, 390 }, "Subditos id alive:", D_BLACK, "debugAI2_subditosid", debugNode);
+            engine.createText({ posText + 240, 390 }, std::to_string(bb.idsubditos.size()), D_GRAY, "debugAI2_subditosid2", debugNode);
+
+            engine.createText({ posText, 420 }, "Alert state:", D_BLACK, "debugAI2_alertstate", debugNode);
+            engine.createText({ posText + 220, 420 }, (aic.alert_state == 0) ? "No" : "Sí", D_GRAY, "debugAI2_alertstate2", debugNode);
+
+            //raycast
+            if (bb.launched) {
+                auto dir = bb.direction * 100;
+                engine.drawLine3D(bb.position_origin, dir, 0.5f, D_BLUE);
+                bb.launched = false;
+            }
+            //Cone
+            //if(e.hasTag<SnowmanTag>())
+            auto& phy = em.getComponent<PhysicsComponent>(e);
+            drawVisionCone(phy.position, phy.orientation, bb.horizontalFOV);
+            // if(e.hasTag<GolemTag>())
+            //     drawVisionCone(bb.conegolem.first, bb.conegolem.second, bb.horizontalFOV);
+
+        }
+    });
+}
+
+// Dentro de tu clase BTDecisionPlayerDetected, podrías tener un método para dibujar el cono de visión
+void RenderSystem::drawVisionCone(vec3d, double, double) {
+    // // Calcula las direcciones de las líneas del cono
+    // Vector3 direction1 = { static_cast<float>(std::sin(orientation - horizontalFOV / 2.0)), 0.0f, static_cast<float>(std::cos(orientation - horizontalFOV / 2.0)) };
+    // Vector3 direction2 = { static_cast<float>(std::sin(orientation + horizontalFOV / 2.0)), 0.0f, static_cast<float>(std::cos(orientation + horizontalFOV / 2.0)) };
+
+    // // Calcula los puntos de inicio de las líneas
+    // Vector3 start1 = pos_enemy.toRaylib();
+    // Vector3 start2 = pos_enemy.toRaylib();
+
+    // // Calcula los puntos finales de las líneas (multiplica por una distancia adecuada para hacerlas visibles)
+    // Vector3 end1 = { start1.x + direction1.x * 10.0f, start1.y + direction1.y * 10.0f, start1.z + direction1.z * 10.0f };
+    // Vector3 end2 = { start2.x + direction2.x * 10.0f, start2.y + direction2.y * 10.0f, start2.z + direction2.z * 10.0f };
+
+    // // Dibuja las líneas
+    // DrawLine3D(start1, end1, PURPLE);
+    // DrawLine3D(start2, end2, PURPLE);
+}
+
+//Dibuja Slider en función de los parámetros
+double RenderSystem::SelectValue(GameEngine& engine, double value, int posx, int posy, int height, int width, const char* name, Node* parent) {
+    // pasamos a float el valor
+    float floatValue = static_cast<float>(value) / 100.f;
+    // dibujamos el slider para modificar su valor
+    auto* slider = engine.createSlider({ posx, posy }, { height, width }, floatValue, D_VIOLET, D_BLUE_LIGHT, name, parent);
+    auto& sliderInfo = *slider->getEntity<Slider>();
+
+    floatValue = sliderInfo.valor * 100.f;
+    engine.createText({ posx + width + 100, posy + 5 }, std::to_string(floatValue).c_str(), D_BLUE, (std::string(name) + "_text").c_str(), parent);    // seteamos el nuevo valor
+    return static_cast<double>(floatValue);
+}
+
+//Función para buscar nodo más cercano al player
+uint16_t RenderSystem::findNearestNode(EntityManager& em, const vec3d& position, const std::map<uint16_t, vec3d>& nodes) {
     uint16_t nearestNodeId = 0; // Suponemos que el primer nodo es el más cercano inicialmente
     double minDistance = std::numeric_limits<double>::max(); // Inicializamos la distancia mínima con un valor muy grande
     vec3d nearestpos{};
@@ -1348,432 +2159,99 @@ uint16_t findNearestNode(EntityManager& em, const vec3d& position, const std::ma
     debug.nodes.push_back(nearestpos);
     return nearestNodeId;
 }
-//Interfaz para probar el pathfinding
-void RenderSystem::drawTestPathfindinf(GameEngine& engine, EntityManager& em) {
-    auto& debug = em.getSingleton<Debug_t>();
-    auto& navs = em.getSingleton<NavmeshInfo>();
-    auto& li = em.getSingleton<LevelInfo>();
-    //Dibujado de titulo y ventana
-    Rectangle windowRect = { static_cast<float>(engine.getScreenWidth() - 400), 300, 330, 430 };
-    engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
-    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
-    vec2d textPositionInfo = { static_cast<float>(engine.getScreenWidth() - 370), 320 };
-    engine.drawTextEx(GetFontDefault(), "PATHFINDING", textPositionInfo, 20, 1, RED);
-
-    // Datos de los botones
-    float buttonWidth = 150.0f;
-    float buttonHeight = 30.0f;
-    float posX = static_cast<float>(engine.getScreenWidth() - 370);
-    float posY = 350.0f;
-
-    // Slider para startnode
-    // float startMinValue = 1.0f;
-    // float startMaxValue = 100.0f;
-    // const char* startNodeText = "Start Node";
-    // posX = 600.0f; // Reseteamos la posición X
-    // posY = 355.0f; // Posición Y para el slider de startnode
-    // int startnodenew = GuiSliderBar(Rectangle(posX, posY, buttonWidth, buttonHeight), startNodeText, NULL, &debug.startnode, startMinValue, startMaxValue);
-    // engine.drawText(std::to_string(static_cast<int>(debug.startnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY), 20, BLUE);
-    // startnodenew += 1;
-    // // Slider para goalnode
-    // float goalMinValue = 1.0f;
-    // float goalMaxValue = 100.0f;
-    // const char* goalNodeText = "Goal Node";
-    // int goalnodenew = GuiSliderBar(Rectangle(posX, posY + 40, buttonWidth, buttonHeight), goalNodeText, NULL, &debug.goalnode, goalMinValue, goalMaxValue);
-    // engine.drawText(std::to_string(static_cast<int>(debug.goalnode)).c_str(), static_cast<int>(posX + 160), static_cast<int>(posY + 40), 20, BLUE);
-    // goalnodenew += 1;
-
-    Rectangle btn1Rec = { posX - 10, posY + 80, buttonWidth, buttonHeight };
-    Rectangle btn2Rec = { posX + 140, posY + 80, buttonWidth, buttonHeight };
-    Rectangle btn3Rec = { posX + 140, posY  , buttonWidth, buttonHeight };
-    Rectangle btn4Rec = { posX - 10, posY  , buttonWidth, buttonHeight };
-    Rectangle btn5Rec = { posX + 140, posY + 40, buttonWidth, buttonHeight };
-    Rectangle btn6Rec = { posX - 10, posY + 40, buttonWidth, buttonHeight };
-    // Botón
-    if (GuiButton(btn1Rec, "CALCULATE")) {
-        //std::size_t idcenter{};
-        // if(em.getEntityByID(li.playerID)->hasComponent<ColliderComponent>()){
-        //     auto& playerbbox = em.getComponent<ColliderComponent>(*em.getEntityByID(li.playerID)).boundingBox;
-        //     for (auto& navmesh : navs.NavMeshes){
-        //         //auto center = it->centerpoint.second;
-        //         auto& currentbbox = navmesh.box;
-        //         if(currentbbox.intersects(playerbbox)){
-        //             vec3d center = {navmesh.centerpoint.second.x(),navmesh.centerpoint.second.y(),navmesh.centerpoint.second.z()};
-        //             idcenter = navmesh.centerpoint.first;
-        //             break;
-        //             // DrawCube(Vector3{static_cast<float>(center.x()),
-        //             // static_cast<float>(center.y()),
-        //             // static_cast<float>(center.z())},500,500,500,RED);
-        //         }
-        //     }
-        // }
-        //Recorre navs.nodes //    std::set<std::pair<uint16_t, vec3d>> nodes;
-        // recorrelos y devuelve
-        // Función para encontrar el nodo más cercano a una posición dada
-        vec3d posplayer = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
-        uint16_t startnode = findNearestNode(em, posplayer, navs.nodes);
-        uint16_t targetnode = findNearestNode(em, vec3d{ -12.33, 40.0, 22.41 }, navs.nodes);
-        std::cout << startnode << "\n";
-        //Creamos Grafo
-        Graph graph{};
-        graph.createGraph(navs.conexiones, navs.nodes);
-        std::vector<vec3d> path = graph.PathFindAStar(debug, startnode, targetnode);
-
-        std::size_t lengthpath = path.size();
-        std::cout << lengthpath;
-        //calcular camnino desde el centro hasta un punto
-
-    //     std::vector<vec3d> nodes;
-    //     nodes.push_back({ -106.9, 4.0, 116.0 });
-    //     nodes.push_back({ -119.0, 4.0, 114.0 });
-    //     nodes.push_back({ -131.0, 4.0, 105.1 });
-    //     nodes.push_back({ -105.0, 4.0, 97.3 });
-    //     nodes.push_back({ -118.0, 4.0, 92.0 });
-    //     nodes.push_back({ -132.0, 4.0, 87.0 });
-    //     nodes.push_back({ -117.0, 4.0, 78.0 });
-    //     nodes.push_back({ -127.4, 4.0, 69.6 });
-    //     //Creamos puntos y conexiones
-    //     std::vector<Conection> conexiones;
-    //     Conection cone12(1, 1, 2);
-    //     conexiones.push_back(cone12);
-    //     Conection cone14(1, 1, 4);
-    //     conexiones.push_back(cone14);
-    //     Conection cone15(1, 1, 5);
-    //     conexiones.push_back(cone15);
-    //     Conection cone25(1, 2, 5);
-    //     conexiones.push_back(cone25);
-    //     Conection cone23(1, 2, 3);
-    //     conexiones.push_back(cone23);
-    //     Conection cone36(1, 3, 6);
-    //     conexiones.push_back(cone36);
-    //     Conection cone45(1, 4, 5);
-    //     conexiones.push_back(cone45);
-    //     Conection cone56(1, 5, 6);
-    //     conexiones.push_back(cone56);
-    //     Conection cone57(1, 5, 7);
-    //     conexiones.push_back(cone57);
-    //     Conection cone58(1, 5, 8);
-    //     conexiones.push_back(cone58);
-    //     Conection cone68(1, 6, 8);
-    //     conexiones.push_back(cone68);
-    //     Conection cone78(1, 7, 8);
-    //     conexiones.push_back(cone78);
-    //     Lammamos a creargrafo
-    //     Creamos el grafo
-    //     Graph graph{};
-    //     graph.createGraph(navs.conexiones, navs.nodes);
-    //     graph.createGraph(conexiones,nodes);
-    //     Calcular pathfinding
-    //     std::cout << static_cast<uint16_t>(debug.startnode) << static_cast<uint16_t>(debug.goalnode) << "\n";
-    //     std::vector<vec3d> path = graph.PathFindAStar(static_cast<uint16_t>(debug.startnode), static_cast<uint16_t>(debug.goalnode));
-        if (path.size() == 0) {
-            std::cout << "CAGUEEEEEEEE \n";
-        }
-        else {
-            //     // Copiar el path devuelto por PathFindAStar() a debug.path
-            debug.path.resize(path.size());
-            //     //Rellenamos
-            std::copy(path.begin(), path.end(), debug.path.begin());
-            //     Mostrar el camino copiado
-                //    std::cout << "Camino en debug.path:" << std::endl;
-            // for (const auto& node : debug.path) {
-            //     std::cout << "(" << node.x() << ", " << node.y() << ", " << node.z() << ")" << std::endl;
-            //     debug.nodes.push_back(node);
-            // }
-        }
-        //    debug.path.resize(3); // Cambiar el tamaño del vector a 3 elementos
-        //    std::fill(debug.path.begin(), debug.path.end(), vec3d(1.0, 2.0, 3.0)); // Rellenar el vector con vec3d con los valores dados
-    }
-    if (GuiButton(btn2Rec, "CLEAR")) {
-        debug.path.clear();
-        debug.nodes.clear();
-        debug.closedlist.clear();
-    }
-    if (GuiButton(btn3Rec, "CORNERS")) {
-        debug.seecorners = !debug.seecorners;
-    }
-    if (GuiButton(btn4Rec, "CENTERS")) {
-        debug.seecenters = !debug.seecenters;
-    }
-    if (GuiButton(btn5Rec, "MIDPOINTS")) {
-        debug.seemidpoint = !debug.seemidpoint;
-    }
-    if (GuiButton(btn6Rec, "CONEXIONES")) {
-        debug.seeconex = !debug.seeconex;
-    }
-    //resultado
-    vec2d textPositionInfo2 = { static_cast<double>(engine.getScreenWidth() - 370), 480 };
-    engine.drawTextEx(GetFontDefault(), "PATH RESULT", textPositionInfo2, 20, 1, RED);
-    //Dibujar path
-    float posyt = 510.0f;
-    for (auto pos : debug.path) {
-        std::string text = std::to_string(pos.x()) + " " + std::to_string(pos.y()) + " " + std::to_string(pos.z());
-        engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{ static_cast<double>(engine.getScreenWidth() - 370),posyt }, 20, 1, RED);
-        posyt += 20.0f;
-    }
-    engine.beginMode3D();
-    //DIbujar nodos de la lista cerrada y nodos del path resultado
-    for (auto& closenode : debug.closedlist) {
-        engine.drawCube(closenode, 2, 2, 2, YELLOW);
-    }
-    for (auto& node : debug.nodes) {
-        engine.drawCube(node, 2, 2, 2, GREEN);
-    }
-
-    // for (auto& node : navs.nodes) {
-    //     engine.drawCube(node.second, 2, 2, 2, RED);
-    // }
-//Dibujar corners
-    if (debug.seecorners) {
-        for (auto& node : navs.corners) {
-            engine.drawCube(node, 2, 2, 2, RED);
-        }
-    }
-    if (debug.seecenters) {
-        for (auto it = navs.centers.begin(); it != std::prev(navs.centers.end()); ++it) {
-            engine.drawCube(it->second, 2, 2, 2, BLUE);
-        }
-    }
-    if (debug.seemidpoint) {
-        for (auto& node : navs.midpoints) {
-            engine.drawCube(node, 2, 2, 2, PURPLE);
-        }
-    }
-    if (debug.seeconex) {
-        for (auto& conex : navs.conexpos) {
-            engine.drawLine3D(conex.first, conex.second, GREEN);
-        }
-        for (auto& bbox : navs.boundingnavmesh) {
-            auto boxSize = bbox.max - bbox.min;
-            vec3d boxPosition = (bbox.min + bbox.max) / 2;
-            //boxPosition.setY(boxPosition.y + 20.0);
-            engine.drawCubeWires(boxPosition,
-                static_cast<float>(boxSize.x()),
-                static_cast<float>(boxSize.y()),
-                static_cast<float>(boxSize.z()),
-                PURPLE);
-        }
-    }
-
-    engine.endMode3D();
-    engine.beginDrawing();
-    for (auto& node : debug.nodes) {
-        std::string text = std::to_string(node.x()) + " " + std::to_string(node.y()) + " " + std::to_string(node.z());
-        float posx = engine.getWorldToScreenX(node);
-        float posy = engine.getWorldToScreenY(node);
-        engine.drawTextEx(GetFontDefault(), text.c_str(), vec2d{ static_cast<double>(posx),static_cast<double>(posy) }, 15, 1, RED);
-    }
-
-    //engine.endDrawing();
-
-}
-//Debugger visual in-game
-void RenderSystem::drawDebuggerInGameIA(GameEngine& engine, EntityManager& em)
-{
-    // engine.beginDrawing();
-    float posX = static_cast<float>(engine.getScreenWidth() - 330);
-    int posText = static_cast<int>(posX + 10);
-    Rectangle windowRect = { posX, 80, 330, 230 };
-    engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
-    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
-    vec2d textPositionInfo = { static_cast<double>(posText), 90 };
-    engine.drawTextEx(engine.getFontDefault(), "INFO", textPositionInfo, 20, 1, RED);
-    auto& debugsnglt = em.getSingleton<Debug_t>();
-
-    using SYSCMPss = MP::TypeList<AIComponent, ColliderComponent, RenderComponent>;
-    using SYSTAGss = MP::TypeList<EnemyTag>;
-
-    // AQUI PONDRIA
-    em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, ColliderComponent& col, RenderComponent& ren)
-    {
-        RayCast ray = engine.getMouseRay();
-        if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
-            if (engine.isMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                isSelectedfordebug = !isSelectedfordebug;
-                debugsnglt.IA_id_debug = e.getID();
-            }
-        }
-        if (isSelectedfordebug && e.getID() == debugsnglt.IA_id_debug) {
-            auto& bb = em.getSingleton<BlackBoard_t>();
-            engine.beginMode3D();
-            engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
-            engine.endMode3D();
-            engine.drawText("ID:", posText, 110, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(e.getID()).c_str(), vec2d{ static_cast<double>(posText) + 90.0,110 }, 20, 1, DARKGRAY);
-            engine.drawText("Node active:", posText, 130, 20, BLACK);
-            // std::cout << debugsnglt.elapsed << "\n";
-             // std::cout << debugsnglt.countdown << "\n";
-            if (debugsnglt.elapsed >= debugsnglt.countdown) {
-                debugsnglt.elapsed = 0;
-                debugsnglt.text = aic.bh;
-            }
-            else {
-                debugsnglt.plusDeltatime(timeStep, debugsnglt.elapsed);
-            }
-            engine.drawTextEx(engine.getFontDefault(), debugsnglt.text, vec2d{ static_cast<double>(posText) + 130.0,130 }, 20, 1, DARKGRAY);
-            engine.drawText("TEID:", posText, 150, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.teid).c_str(), vec2d{ static_cast<double>(posText) + 90.0,150 }, 20, 1, DARKGRAY);
-            engine.drawText("TX:", posText, 170, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tx).c_str(), vec2d{ static_cast<double>(posText) + 80.0,170 }, 20, 1, DARKGRAY);
-            engine.drawText("TZ:", posText, 190, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.tz).c_str(), vec2d{ static_cast<double>(posText) + 80.0,190 }, 20, 1, DARKGRAY);
-            engine.drawText("Culldown:", posText, 210, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(aic.elapsed_shoot).c_str(), vec2d{ static_cast<double>(posText) + 90.0,210 }, 20, 1, DARKGRAY);
-            engine.drawText("Player Detected?:", posText, 230, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), (aic.playerdetected == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,230 }, 20, 1, RED);
-            engine.drawText("Player hunted?:", posText, 250, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), (bb.playerhunted == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,250 }, 20, 1, RED);
-            engine.drawText("Subditos alive:", posText, 270, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.subditosData.size()).c_str(), vec2d{ static_cast<double>(posText) + 180.0,270 }, 20, 1, RED);
-            engine.drawText("Subditos id alive:", posText, 290, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), std::to_string(bb.idsubditos.size()).c_str(), vec2d{ static_cast<double>(posText) + 180.0,290 }, 20, 1, RED);
-            engine.drawText("Alert state:", posText, 310, 20, BLACK);
-            engine.drawTextEx(engine.getFontDefault(), (aic.alert_state == 0) ? "No" : "Sí", vec2d{ static_cast<double>(posText) + 180.0,310 }, 20, 1, RED);
-
-            engine.beginMode3D();
-            //raycast
-            if (bb.launched) {
-                // engine.beginMode3D();
-
-                auto dir = bb.direction * 100;
-                DrawLine3D(bb.position_origin.toRaylib(), dir.toRaylib(), BLUE);
-                // engine.endMode3D();
-                bb.launched = false;
-            }
-            //Cone
-            //if(e.hasTag<SnowmanTag>())
-            auto& phy = em.getComponent<PhysicsComponent>(e);
-            drawVisionCone(phy.position, phy.orientation, bb.horizontalFOV);
-            // if(e.hasTag<GolemTag>())
-            //     drawVisionCone(bb.conegolem.first, bb.conegolem.second, bb.horizontalFOV);
-            engine.endMode3D();
-        }
-    });
-    //  engine.endDrawing();
-}
-
-
-// Dentro de tu clase BTDecisionPlayerDetected, podrías tener un método para dibujar el cono de visión
-void RenderSystem::drawVisionCone(vec3d pos_enemy, double orientation, double horizontalFOV) {
-    // Calcula las direcciones de las líneas del cono
-    Vector3 direction1 = { static_cast<float>(std::sin(orientation - horizontalFOV / 2.0)), 0.0f, static_cast<float>(std::cos(orientation - horizontalFOV / 2.0)) };
-    Vector3 direction2 = { static_cast<float>(std::sin(orientation + horizontalFOV / 2.0)), 0.0f, static_cast<float>(std::cos(orientation + horizontalFOV / 2.0)) };
-
-    // Calcula los puntos de inicio de las líneas
-    Vector3 start1 = pos_enemy.toRaylib();
-    Vector3 start2 = pos_enemy.toRaylib();
-
-    // Calcula los puntos finales de las líneas (multiplica por una distancia adecuada para hacerlas visibles)
-    Vector3 end1 = { start1.x + direction1.x * 10.0f, start1.y + direction1.y * 10.0f, start1.z + direction1.z * 10.0f };
-    Vector3 end2 = { start2.x + direction2.x * 10.0f, start2.y + direction2.y * 10.0f, start2.z + direction2.z * 10.0f };
-
-    // Dibuja las líneas
-    DrawLine3D(start1, end1, PURPLE);
-    DrawLine3D(start2, end2, PURPLE);
-}
 
 //Editor In-Game
 void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
-    // engine.beginDrawing();
+    // Parametros ventana editor in-game
+    int windowRectX = 0;
+    int windowRectY = 100;
 
-    // Dibujar un rectángulo que simula una ventana
-    Rectangle windowRect = { 0, 100, 390, 550 };
-    engine.drawRectangleLinesEx(windowRect, 2, DARKGRAY);
-    engine.drawRectangleRec(windowRect, Color{ 255, 255, 255, 128 });
+    int windowRectWidth = 610;
+    int windowRectHeight = 550;
 
-    // Dibujar el texto "debugger IA" en el centro de la ventana
-    vec2d textSize = engine.measureTextEx(engine.getFontDefault(), "Debugger IA", 20, 1);
-    vec2d textPosition = { windowRect.x + 20,
-                             windowRect.y + 10 };
+    auto* debugAI = getNode(engine, "DebugAI1");
+    engine.createTextBox({ windowRectX, windowRectY }, { windowRectWidth, windowRectHeight }, { 255, 255, 255, 128 }, "Editor IA", engine.getFontDefault(), 20, D_BLUE_DARK, Aligned::TOP, Aligned::LEFT, "Editor IA", debugAI);
+    engine.createText({ windowRectX + 20, windowRectY + 50 }, "PARAMETROS", engine.getFontDefault(), 20, D_RED, "text_parametros", debugAI);
 
-    engine.drawTextEx(engine.getFontDefault(), "Editor IA", textPosition, 20, 1, DARKBLUE);
-
-    // Dibujar una línea recta debajo del texto
-    float lineY = static_cast<float>(textPosition.y + textSize.y + 5);  // Ajusta la posición de la línea según tus necesidades
-    engine.drawLine(static_cast<int>(windowRect.x), static_cast<int>(lineY), static_cast<int>(windowRect.x) + static_cast<int>(windowRect.width),
-        static_cast<int>(lineY), DARKGRAY);
-    // Dibujar el texto "INFO" debajo de la línea
-
-    vec2d textPositionParameters = { windowRect.x + 5, 150 };
-
-    engine.drawTextEx(engine.getFontDefault(), "PARÁMETROS", textPositionParameters, 20, 1, RED);
-
-    auto& debugsnglt = em.getSingleton<Debug_t>();
-
+    auto& debugsglt = em.getSingleton<Debug_t>();
     using SYSCMPss = MP::TypeList<AIComponent, PhysicsComponent, ColliderComponent, RenderComponent>;
     using SYSTAGss = MP::TypeList<EnemyTag>;
 
-    // AQUI PONDRIA
+    RayCast ray = engine.getMouseRay();
     em.forEach<SYSCMPss, SYSTAGss>([&](Entity& e, AIComponent& aic, PhysicsComponent& phy, ColliderComponent& col, RenderComponent& ren)
     {
-        RayCast ray = engine.getMouseRay();
         // Comprobar si el rayo intersecta con el collider
         if (col.bbox.intersectsRay(ray.origin, ray.direction) && !(col.behaviorType & BehaviorType::STATIC || col.behaviorType & BehaviorType::ZONE)) {
-            if (engine.isMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            if (engine.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
                 isSelected = !isSelected;
-                debugsnglt.IA_id = e.getID();
+                debugsglt.IA_id = e.getID();
             }
-            //     // si es seleccionada => wires morados
-            //     // no es seleccionada => wires rojos
-            engine.beginMode3D();
-            engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
-            engine.endMode3D();
+            // si es seleccionada => wires morados
+            // no es seleccionada => wires rojos
+
+            engine.drawCubeWires(ren.position, { ren.scale.x(), ren.scale.y(), ren.scale.z() }, D_RED);
         }
-        if (isSelected && e.getID() == debugsnglt.IA_id) {
-            engine.beginMode3D();
-            engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), PURPLE);
-            engine.endMode3D();
+
+        if (isSelected && e.getID() == debugsglt.IA_id) {
+
+            engine.drawCubeWires(ren.position, { ren.scale.x(), ren.scale.y(), ren.scale.z() }, D_VIOLET_DARK);
             // si se seleccionada una entidad se muestra el Editor de parámetros
             if (isSelected) {
                 // ID DE LA ENTIDAD SELECCIONADA
-                engine.drawText("EID:", 15, 170, 20, BLACK);
-                engine.drawText(std::to_string(debugsnglt.IA_id).c_str(), 55, 170, 20, DARKGRAY);
+                engine.createText({ 15, 170 }, "EID:", D_BLACK, "text_eid", debugAI);
+                engine.createText({ 75, 170 }, std::to_string(debugsglt.IA_id).c_str(), D_GRAY, "text_eid_value", debugAI);
                 //Detect Radius
-                aic.detect_radius = SelectValue(engine, aic.detect_radius, 145.0, 200.0, 120.0, 30.0, "Detect Radius", 0.0, 100.0);
+                engine.createText({ 15, 200 }, "Detect Radius:", D_BLACK, "detect radius", debugAI);
+                aic.detect_radius = SelectValue(engine, aic.detect_radius, 260.0, 200.0, 120.0, 30.0, "detect_radius", debugAI);
                 // Attack Radius
-                aic.attack_radius = SelectValue(engine, aic.attack_radius, 145.0, 240.0, 120.0, 30.0, "Attack Radius", 0.0, 100.0);
+                engine.createText({ 15, 240 }, "Attack Radius:", D_BLACK, "attack radius", debugAI);
+                aic.attack_radius = SelectValue(engine, aic.attack_radius, 260.0, 240.0, 120.0, 30.0, "attack_radius", debugAI);
                 // Arrival Radius
-                aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 145.0, 280.0, 120.0, 30.0, "Arrival Radius", 0.0, 100.0);
+                engine.createText({ 15, 280 }, "Arrival Radius:", D_BLACK, "arrival radius", debugAI);
+                aic.arrival_radius = SelectValue(engine, aic.arrival_radius, 260.0, 280.0, 120.0, 30.0, "arriv_rad", debugAI);
                 // Max Speed
-                phy.max_speed = SelectValue(engine, phy.max_speed, 145.0, 320.0, 120.0, 30.0, "Max_Speed", 0.0, 10.0);
+                engine.createText({ 15, 320 }, "Max speed:", D_BLACK, "max speed", debugAI);
+                phy.max_speed = SelectValue(engine, phy.max_speed, 260.0, 320.0, 120.0, 30.0, "max_speed", debugAI);
                 //COuntdown Perception
-                aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 145.0, 360.0, 120.0, 30.0, "Perception", 0.0, 10.0);
+                engine.createText({ 15, 360 }, "Perception:", D_BLACK, "perception", debugAI);
+                aic.countdown_perception = SelectValue(engine, aic.countdown_perception, 260.0, 360.0, 120.0, 30.0, "countdown_perception", debugAI);
                 //Countdown Shoot
-                aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 145.0, 400.0, 120.0, 30.0, "Culldown Shoot", 0.0, 8.0);
+                engine.createText({ 15, 400 }, "Countdown attack:", D_BLACK, "countdown attack", debugAI);
+                aic.countdown_shoot = SelectValue(engine, aic.countdown_shoot, 290.0, 400.0, 120.0, 30.0, "countdown_shoot", debugAI);
                 //Countdown stop
-                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 145.0, 440.0, 120.0, 30.0, "Culldown Stop", 0.0, 8.0);
+                engine.createText({ 15, 440 }, "Countdown Stop:", D_BLACK, "countdown stop", debugAI);
+                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 290.0, 440.0, 120.0, 30.0, "countdown_stop", debugAI);
+
+                engine.createText({ 15, 440 }, "Countdown Stop:", D_BLACK, "countdown stop", debugAI);
+                aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 290.0, 440.0, 120.0, 30.0, "countdown_stop", debugAI);
             }
         }
     });
-    // engine.endDrawing();
 }
+
 //Dibujado alertas de detección de enemigos
 void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
     for (auto const& e : em.getEntities())
     {
         //Alert state
-        if (e.hasTag<EnemyTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>()) {
+        if (e.hasTag<EnemyTag>() && e.hasComponent<RenderComponent>() && e.hasComponent<AIComponent>() && !e.hasTag<EnemyDeathTag>()) {
             auto& aic = em.getComponent<AIComponent>(e);
             auto& r = em.getComponent<RenderComponent>(e);
 
-            float barX = engine.getWorldToScreenX(r.position);
-            float barY = engine.getWorldToScreenY(r.position);
+            auto wRate = engine.getWidthRate();
+            auto hRate = engine.getHeightRate();
+            int barX = static_cast<int>(engine.getWorldToScreenX(r.position));
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position));
 
             if (!aic.playerdetected) {
                 aic.show_icon = true;
             }
 
             if (aic.playerdetected && aic.show_icon) {
-                // vec2d point1 = { barX, barY - 120.0f };
-                // vec2d point2 = { barX - 30.0f, barY - 50.0f };
-                // vec2d point3 = { barX + 30.0f, barY - 50.0f };
-                // //dibujar icono alerta
-                // // Dibuja el triángulo
-                // engine.drawTriangle(point1, point2, point3, BLACK);
-                // // Dibuja el signo de exclamación dentro del triángulo
-                // engine.drawText("!", static_cast<int>(barX - 2), static_cast<int>(barY - 100), 50, YELLOW);
-                auto& icon = engine.textures["detectionicon"];
-                engine.drawTexture(icon, static_cast<int>(barX - 15.0f), static_cast<int>(barY - 135.0f), WHITE);
+                auto* icon = engine.createNode(getNode(engine, "detectionIcon"), getNode(engine, "Copy"));
+                int offSetX = static_cast<int>(22.5f * wRate);
+                int offSetY = static_cast<int>(202.5f * hRate);
+                engine.drawNode(icon, { barX - offSetX, barY - offSetY });
 
                 //emepezar contador para borrar
                 if (aic.elapsed_show_icon >= aic.countdown_show_icon) {
@@ -1786,12 +2264,7 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
             }
 
             //vec2d center = { barX, barY - 120.0f };
-            int centerx = static_cast<int>(barX - 25.0f);
-            int centery = static_cast<int>(barY - 150.0f);
             if (aic.alert_state) {
-                // if(e.getID() == 148){
-                //     std::cout << aic.endangle << "\n";
-                // }
                 //Se escuahn pasos
                 if (aic.listen_steps) {
                     aic.endangle -= aic.increase_angle;
@@ -1802,38 +2275,41 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
                         aic.endangle += aic.increase_angle;
                     }
                 }
-                ENGI::GameEngine::Gif* oido{ nullptr };
-                Texture2D copy{};
-                if (std::abs(aic.endangle) >= 0.0 && std::abs(aic.endangle) <= 180.0) {
-                    oido = &engine.gifs.at("Oido_parp1");
-                    copy = oido->texture;
+
+                const char* icon = "";
+                if (std::abs(aic.endangle) >= 0.f && std::abs(aic.endangle) <= 180.f) {
+                    icon = "Oido_parp1";
                 }
-                else if (std::abs(aic.endangle) >= 180.0 && std::abs(aic.endangle <= 360.0)) {
-                    oido = &engine.gifs.at("Oido_parp2");
-                    copy = oido->texture;
+                else if (std::abs(aic.endangle) >= 180.f && std::abs(aic.endangle) <= 360.f) {
+                    icon = "Oido_parp2";
                 }
-                copy.width = static_cast<int>(copy.width / oido->reScaleX);
-                copy.height = static_cast<int>(copy.height / oido->reScaleY);
-                displayGif(engine, copy, *oido, centerx, centery);
-                //engine.drawCircleSector(center, 30.0f, 0.0f, aic.endangle, 30, RED);
+
+                auto* gif = getNode(engine, icon);
+                auto& gifInfo = *dynamic_cast<Gif*>(gif->getEntity());
+                auto& frames = gifInfo.frames;
+                auto& currentFrame = frames[gifInfo.currentFrame];
+
+                int centerX = barX - static_cast<int>(static_cast<float>(currentFrame->getWidth() / 2) * wRate);
+                int centerY = barY - static_cast<int>(static_cast<float>(currentFrame->getHeight() / 2) * hRate) * 4;
+
+                engine.drawNode(gif, { centerX, centerY });
             }
-            else {
-                if (aic.endangle != 0.0f) {
-                    aic.endangle += aic.increase_angle;
-                }
+            else if (aic.endangle != 0.0f) {
+                aic.endangle += aic.increase_angle;
             }
         }
     }
 }
+
 // Se dibuja el HUD
 void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
 {
     auto& li = em.getSingleton<LevelInfo>();
     auto& inpi = em.getSingleton<InputInfo>();
+
     if (li.isDead)
     {
-        em.getComponent<RenderComponent>(*em.getEntityByID(li.playerID)).visible = false;
-        drawDeath(engine);
+        li.resetFromDeath = true;
         return;
     }
 
@@ -1846,164 +2322,216 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
     if (inpi.debugPhy)
         pointedEntity = std::numeric_limits<std::size_t>::max();
 
+    auto& frti = em.getSingleton<FrustumInfo>();
     for (auto const& e : em.getEntities())
     {
-        if (e.hasTag<PlayerTag>())
+        if (!frti.inFrustum(e.getID()) || e.hasTag<PlayerTag>())
             continue;
 
-        if (e.hasTag<CrusherTag>()) {
-            auto& phy = em.getComponent<PhysicsComponent>(e);
-            auto& ai = em.getComponent<AIComponent>(e);
-            int posx = static_cast<int>(engine.getWorldToScreenX(phy.position) + 30);
-            int posz = static_cast<int>(engine.getWorldToScreenY(phy.position) - 70);
-            // if (ai.playerdetected) {
-            engine.drawRectangle(posx, posz, 10, 100, BLACK);
-            int barHeight = static_cast<int>((ai.elapsed_shoot / ai.countdown_shoot) * 100);
-            engine.drawRectangle(posx, posz, 10, barHeight, BLUE);
-            // }
-        }
+        // Barra de las apisonadoras
+        // if (e.hasTag<CrusherTag>() && !e.hasTag<EnemyDeathTag>()) {
+        //     auto& phy = em.getComponent<PhysicsComponent>(e);
+        //     auto& ai = em.getComponent<AIComponent>(e);
+
+        //     auto wRate = engine.getWidthRate();
+        //     auto hRate = engine.getHeightRate();
+
+        //     int posx = static_cast<int>(engine.getWorldToScreenX(phy.position) + 45.f * wRate);
+        //     int posz = static_cast<int>(engine.getWorldToScreenY(phy.position) - 105.f * hRate);
+
+        //     engine.drawRectangle({ posx, posz }, { 10, 100 }, D_BLACK);
+
+        //     int barHeight = static_cast<int>((ai.elapsed_shoot / ai.countdown_shoot) * 100);
+        //     engine.drawRectangle({ posx, posz }, { 10, barHeight }, D_BLUE_LIGHT);
+        // }
 
         // Vidas HUD
         if (e.hasTag<EnemyTag>() && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible &&
-            !(e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>()))
+            !(e.hasTag<AngryBushTag>() || e.hasTag<AngryBushTag2>() || e.hasTag<EnemyDeathTag>()))
         {
             auto const& r{ em.getComponent<RenderComponent>(e) };
             auto& l{ em.getComponent<LifeComponent>(e) };
 
             // Datos para la barra para la barra de vida
-            int barWidth = 40;
-            int barHeight = 4;
-            int barX = static_cast<int>(engine.getWorldToScreenX(r.position) - 18);
-            int barY = static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 10);
+            auto wRate = engine.getWidthRate();
+            auto hRate = engine.getHeightRate();
+            int barWidth = static_cast<int>(60.f * wRate);
+            int barHeight = static_cast<int>(6.f * hRate);
+            auto point = r.position.y() + r.scale.y() / 2 + 120 * hRate;
+            int barX = static_cast<int>(engine.getWorldToScreenX(r.position)) - static_cast<int>(static_cast<float>(barWidth) / 2);
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position)) - static_cast<int>(point);
 
-            engine.drawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
+            engine.drawRectangle({ barX, barY }, { barWidth, barHeight }, { D_GRAY });
 
             // Normaliza la vida actual del personaje
             float normalizedLife = (static_cast<float>(l.life) / static_cast<float>(l.maxLife));
 
             // Calcula la anchura de la barra de vida
-            int lifeWidth = static_cast<int>(static_cast<float>(barWidth) * normalizedLife);
+            float lifeWidth = static_cast<float>(barWidth) * normalizedLife;
 
             if (!l.vidaMax())
-                lifeWidth = l.life_width + static_cast<int>((static_cast<float>(lifeWidth) - static_cast<float>(l.life_width)) * 0.25);
+                lifeWidth = l.life_width + (static_cast<float>(lifeWidth) - static_cast<float>(l.life_width)) * 0.25f;
 
             // Dibujamos la barra de vida
-            engine.drawRectangle(barX, barY, lifeWidth, barHeight, RED);
+            engine.drawRectangle({ barX, barY }, { static_cast<int>(lifeWidth), barHeight }, { D_RED });
 
             l.life_width = lifeWidth;
 
-            if (e.hasTag<SubjectTag>() && e.hasComponent<SubjectComponent>())
-            {
-                auto& sub{ em.getComponent<SubjectComponent>(e) };
+            // TODO: Dibujar barra de vida del escudo de los súbditos
+            // if (e.hasTag<SubjectTag>() && e.hasComponent<SubjectComponent>())
+            // {
+            //     auto& sub{ em.getComponent<SubjectComponent>(e) };
 
-                // Dibujamos una barra de vida para el escudo si es que tiene uno activo
-                if (sub.activeShield)
-                {
-                    engine.drawRectangle(barX, barY - 10, barWidth, barHeight, DARKGRAY);
-                    float normalizedShieldLife = (static_cast<float>(sub.shieldLife) / static_cast<float>(sub.maxShieldLife));
+            //     // Dibujamos una barra de vida para el escudo si es que tiene uno activo
+            //     if (sub.activeShield)
+            //     {
+            //         engine.drawRectangle(barX, barY - 10, barWidth, barHeight, D_GRAY);
+            //         float normalizedShieldLife = (static_cast<float>(sub.shieldLife) / static_cast<float>(sub.maxShieldLife));
 
-                    // Calcula la anchura de la barra de vida
-                    int shieldWidth = static_cast<int>(static_cast<float>(barWidth) * normalizedShieldLife);
+            //         // Calcula la anchura de la barra de vida
+            //         int shieldWidth = static_cast<int>(static_cast<float>(barWidth) * normalizedShieldLife);
 
-                    if (sub.shieldLife != sub.maxShieldLife)
-                        shieldWidth = sub.shieldLifeWidth + static_cast<int>((shieldWidth - sub.shieldLifeWidth) * 0.25);
+            //         if (sub.shieldLife != sub.maxShieldLife)
+            //             shieldWidth = sub.shieldLifeWidth + static_cast<int>((shieldWidth - sub.shieldLifeWidth) * 0.25);
 
-                    // Dibujamos la barra de vida
-                    engine.drawRectangle(barX, barY - 10, shieldWidth, barHeight, GREEN);
+            //         // Dibujamos la barra de vida
+            //         engine.drawRectangle(barX, barY - 10, shieldWidth, barHeight, GREEN);
 
-                    sub.shieldLifeWidth = shieldWidth;
-                }
-            }
+            //         sub.shieldLifeWidth = shieldWidth;
+            //     }
+            // }
+        }
+
+        // Vidas Relay HUD
+        if (li.mapID == 3 && e.hasTag<MissionObjTag>() && e.hasComponent<LifeComponent>())
+        {
+            auto const& r{ em.getComponent<RenderComponent>(e) };
+            auto& l{ em.getComponent<LifeComponent>(e) };
+
+            // Datos para la barra para la barra de vida
+            auto wRate = engine.getWidthRate();
+            auto hRate = engine.getHeightRate();
+            int barWidth = static_cast<int>(60.f * wRate);
+            int barHeight = static_cast<int>(6.f * hRate);
+            int barX = static_cast<int>(engine.getWorldToScreenX(r.position)) - static_cast<int>(static_cast<float>(barWidth) / 2);
+            int barY = static_cast<int>(engine.getWorldToScreenY(r.position)) - static_cast<int>(r.scale.y() * 13 * hRate);
+
+            engine.drawRectangle({ barX, barY }, { barWidth, barHeight }, { D_GRAY });
+
+            // Normaliza la vida perdida del relay
+            float normalizedLostLife = 1.0f - (static_cast<float>(l.life) / static_cast<float>(l.maxLife));
+
+            // Calcula la anchura de la barra de vida
+            float lifeWidth = static_cast<float>(barWidth) * normalizedLostLife;
+
+            if (!l.vidaMax())
+                lifeWidth = l.life_width + (static_cast<float>(lifeWidth) - static_cast<float>(l.life_width)) * 0.25f;
+
+            // Dibujamos la barra de vida
+            engine.drawRectangle({ barX, barY }, { static_cast<int>(lifeWidth), barHeight }, { D_VIOLET });
+
+            l.life_width = lifeWidth;
         }
 
         if (e.hasComponent<InteractiveComponent>() && (e.hasComponent<RenderComponent>() || e.hasComponent<PhysicsComponent>()))
         {
             auto& inter{ em.getComponent<InteractiveComponent>(e) };
             vec3d pos{};
-            double sclY{};
+            double point{};
+            int pointSum = 150;
+            if (e.hasTag<ChestTag>())
+                pointSum = 60;
             if (e.hasTag<SeparateModelTag>())
             {
                 auto phy = em.getComponent<PhysicsComponent>(e);
                 pos = phy.position;
-                sclY = phy.scale.y();
+                point = phy.position.y() + phy.scale.y() / 2 + pointSum;
             }
             else
             {
                 auto& ren = em.getComponent<RenderComponent>(e);
                 pos = ren.position;
-                sclY = ren.scale.y();
+                point = ren.position.y() + ren.scale.y() / 2 + pointSum;
             }
 
             if (inter.showButton)
             {
-                GameEngine::Gif* gif;
-                Texture2D gifCopy;
-                int sum = 0;
+
+                std::string text = "";
+                int sum;
+
                 if (engine.isGamepadAvailable(0))
-                    gif = &engine.gifs.at("x");
+                    text = "x";
                 else
                 {
-                    gif = &engine.gifs.at("e");
+                    text = "e";
                     sum = 13;
                 }
 
-                gifCopy = gif->texture;
+                auto* gif = getNode(engine, text.c_str());
+                auto* gifInfo = dynamic_cast<Gif*>(gif->getEntity());
+                auto& frames = gifInfo->frames;
+                auto width = frames[gifInfo->currentFrame]->getWidth();
 
-                // Redimensionamos la copia
-                gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
-                gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
-
-                int offSetX = gifCopy.width / 2;
+                float offSetX = static_cast<float>(width / 2);
                 if (e.hasTag<DoorTag>())
-                    offSetX = -(gifCopy.width / 2 + sum);
+                    offSetX = -static_cast<float>(width / 2 + sum);
 
-                int posX = static_cast<int>(engine.getWorldToScreenX(pos)) - offSetX;
-                int posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 11);
+                offSetX *= engine.getWidthRate() * 0.75f;
 
-                displayGif(engine, gifCopy, *gif, posX, posY);
+                int posX = static_cast<int>(engine.getWorldToScreenX(pos) - offSetX);
+                int posY = static_cast<int>(engine.getWorldToScreenY(pos) - point);
+
+                engine.drawNode(gif, { posX, posY }, { 0.75f, 0.75f });
 
                 if (e.hasTag<DoorTag>())
                 {
-                    auto& lock = engine.textures["candado_abierto"];
-                    engine.drawTexture(lock,
-                        static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(lock.width / 2)),
-                        static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13),
-                        { 255, 255, 255, 255 });
+                    auto* lock = getNode(engine, "candado_abierto");
+                    auto& lockText = *dynamic_cast<Texture2D*>(lock->getEntity());
+                    posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(lockText.texture->getWidth() / 2));
+                    posY = static_cast<int>(engine.getWorldToScreenY(pos) - point - 50);
+                    engine.drawNode(lock, { posX, posY });
                 }
             }
             else if (inter.showLock)
             {
-                auto& lock = engine.textures["candado_cerrado"];
-                engine.drawTexture(lock,
-                    static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(lock.width / 2)),
-                    static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 13),
-                    { 255, 255, 255, 255 });
+                auto* lock = getNode(engine, "candado_cerrado");
+                auto& lockText = *dynamic_cast<Texture2D*>(lock->getEntity());
+                int posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(lockText.texture->getWidth() / 2));
+                int posY = static_cast<int>(engine.getWorldToScreenY(pos) - point - 50);
+                engine.drawNode(lock, { posX, posY });
 
                 if (e.hasTag<ChestTag>())
                 {
-                    auto swordText = engine.textures["batalla"];
-                    swordText.width = static_cast<int>(swordText.width / 2);
-                    swordText.height = static_cast<int>(swordText.height / 2);
-                    engine.drawTexture(swordText,
-                        static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(swordText.width / 2)),
-                        static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9.5),
-                        { 255, 255, 255, 255 });
+                    auto* sword = getNode(engine, "batalla");
+                    auto& swordText = *dynamic_cast<Texture2D*>(sword->getEntity());
+                    posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(swordText.texture->getWidth() / 2));
+                    posY = static_cast<int>(engine.getWorldToScreenY(pos) - point + 50);
+                    engine.drawNode(sword, { posX, posY }, { 0.5f, 0.5f });
 
                     auto& ch = em.getComponent<ChestComponent>(e);
                     if (ch.closeEnemies > 0)
                     {
                         // Dibujamos el número de partes de barco encontradas
-                        auto& textureNum = engine.textures.at(std::to_string(ch.closeEnemies));
-                        auto& textureMax = engine.textures.at(std::to_string(ch.maxEnemies));
-                        auto& textureBar = engine.textures.at("barra");
+                        auto* copyNode = getNode(engine, "Copy");
+                        auto* textureNum = engine.createNode(getNode(engine, std::to_string(ch.closeEnemies).c_str()), copyNode);
+                        auto* textureMax = engine.createNode(getNode(engine, std::to_string(ch.maxEnemies).c_str()), copyNode);
+                        auto* textureBar = engine.createNode(getNode(engine, "barra"), copyNode);
 
-                        auto posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(textureNum.width / 2) - 100);
-                        auto posY = static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 12);
+                        auto* numText = dynamic_cast<Texture2D*>(textureNum->getEntity())->texture;
+                        auto* barText = dynamic_cast<Texture2D*>(textureBar->getEntity())->texture;
+
+                        auto posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(numText->getWidth() / 2) - 100);
+                        auto posY = static_cast<int>(engine.getWorldToScreenY(pos) - point);
 
                         // Dibujamos el num / 4
-                        engine.drawTexture(textureNum, posX + 3, posY, { 255, 255, 255, 255 });
-                        engine.drawTexture(textureBar, posX + textureNum.width / 3, posY, { 255, 255, 255, 255 });
-                        engine.drawTexture(textureMax, posX + textureNum.width / 2 + textureBar.width / 2, posY + 20, { 255, 255, 255, 255 });
+                        engine.drawNode(textureNum, { posX, posY });
+
+                        // Dibujamos la barra
+                        engine.drawNode(textureBar, { posX + numText->getWidth() / 3, posY });
+
+                        // Dibujamos el num / 4
+                        engine.drawNode(textureMax, { posX + numText->getWidth() / 2 + barText->getWidth() / 2, posY });
                     }
                 }
             }
@@ -2019,11 +2547,11 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                     {
                         if (elapsed_Lock < elapsed_limit_Lock)
                         {
-                            auto& openLock = engine.textures["candado_abierto"];
-                            engine.drawTexture(openLock,
-                                static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(openLock.width / 2)),
-                                static_cast<int>(engine.getWorldToScreenY(pos) - sclY * 9),
-                                { 255, 255, 255, 255 });
+                            auto* lock = getNode(engine, "candado_abierto");
+                            auto& lockText = *dynamic_cast<Texture2D*>(lock->getEntity());
+                            int posX = static_cast<int>(engine.getWorldToScreenX(pos) - static_cast<float>(lockText.texture->getWidth() / 2));
+                            int posY = static_cast<int>(engine.getWorldToScreenY(pos) - point);
+                            engine.drawNode(lock, { posX, posY });
 
                             elapsed_Lock += timeStep;
                         }
@@ -2048,13 +2576,14 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
         // Dibujar vidas restantes del player en el HUD
         if (pl.hasComponent<LifeComponent>())
         {
-            drawHealthBar(engine, em, pl);
+            updateHealthBar(engine, em, pl);
         }
 
         // Dibujamos el número de monedas en pantalla
         drawCoinBar(engine, em);
 
         // drawFPSCounter(engine);
+        // engine.node_sceneTextures->clearChildren();
 
         // Dibujar el bastón
         drawStaff(engine, em);
@@ -2067,72 +2596,62 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
         if (li.mapID == 2 && li.volcanoMission)
             drawBoatParts(engine, em);
 
-        if ((li.mapID == 0 || li.mapID == 1) && pl.hasComponent<AttackComponent>())
+        if ((li.mapID == 0 || li.mapID == 1) && pl.hasComponent<AttackerComponent>() && !li.tutorialEnemies.empty())
         {
-            if (!li.tutorialEnemies.empty())
-            {
-                for (auto& enemy : li.tutorialEnemies)
-                {
-                    auto& ene = *em.getEntityByID(enemy);
-                    if (ene.hasComponent<RenderComponent>())
-                    {
-                        auto& ren{ em.getComponent<RenderComponent>(ene) };
-                        auto& phy{ em.getComponent<PhysicsComponent>(ene) };
-                        if (ren.visible && (ene.hasTag<DummyTag>() || ene.hasTag<DestructibleTag>()))
-                        {
-                            double multiplier = 28.0;
 
-                            GameEngine::Gif* gif{ nullptr };
-                            Texture2D gifCopy{};
-                            if (li.lockedEnemy == li.max)
+            for (auto& enemy : li.tutorialEnemies)
+            {
+                auto& ene = *em.getEntityByID(enemy);
+                if (ene.hasComponent<RenderComponent>())
+                {
+                    auto& ren{ em.getComponent<RenderComponent>(ene) };
+                    auto& phy{ em.getComponent<PhysicsComponent>(ene) };
+                    if (ren.visible && (ene.hasTag<DummyTag>() || ene.hasTag<DestructibleTag>()))
+                    {
+                        std::string gifName = "cuadrado";
+                        if (li.lockedEnemy == li.max)
+                        {
+                            if (engine.isGamepadAvailable(0))
+                                gifName = "l2";
+                            else
+                                gifName = "q";
+                        }
+                        else
+                        {
+                            switch (li.mapID)
+                            {
+                            case 0:
                             {
                                 if (engine.isGamepadAvailable(0))
-                                    gif = &engine.gifs.at("l2");
+                                    gifName = "r2";
                                 else
-                                    gif = &engine.gifs.at("q");
+                                    gifName = "espacio";
+
+                                break;
                             }
-                            else
+                            case 1:
                             {
-                                switch (li.mapID)
-                                {
-                                case 0:
-                                {
-                                    if (engine.isGamepadAvailable(0))
-                                        gif = &engine.gifs.at("r2");
-                                    else {
-                                        gif = &engine.gifs.at("espacio");
-                                    }
-                                    break;
-                                }
-                                case 1:
-                                {
-                                    if (engine.isGamepadAvailable(0))
-                                        gif = &engine.gifs.at("cuadrado");
-                                    else
-                                        gif = &engine.gifs.at("j");
-                                    break;
-                                }
-                                }
+                                if (engine.isGamepadAvailable(0))
+                                    gifName = "cuadrado";
+                                else
+                                    gifName = "j";
+                                break;
                             }
-
-                            gifCopy = gif->texture;
-
-                            // Redimensionamos la copia
-                            gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
-                            gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
-
-                            multiplier = 20.0;
-
-                            if (ene.hasTag<DestructibleTag>())
-                                multiplier = 8.0;
-                            else if (li.mapID == 1)
-                                multiplier = 25.0;
-
-                            int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - gifCopy.width / 2;
-                            int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * multiplier);
-
-                            displayGif(engine, gifCopy, *gif, posX, posY);
+                            }
                         }
+
+                        auto* gif = getNode(engine, gifName.c_str());
+
+                        auto& textEntity = *dynamic_cast<Gif*>(gif->getEntity());
+                        auto& frames = textEntity.frames;
+                        auto& currentFrame = textEntity.currentFrame;
+                        auto wRate = engine.getWidthRate() * 0.75f;
+                        auto hRate = engine.getHeightRate();
+                        auto point = phy.position.y() + phy.scale.y() / 2 + 200 * hRate;
+                        int posX = static_cast<int>(engine.getWorldToScreenX(phy.position) - static_cast<float>(frames[currentFrame]->getWidth()) * wRate / 2);
+                        int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - point);
+
+                        engine.drawNode(gif, { posX, posY }, { 0.75f, 0.75f });
                     }
                 }
             }
@@ -2142,28 +2661,29 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
         {
             auto& phy{ em.getComponent<PhysicsComponent>(pl) };
 
-            GameEngine::Gif* gif;
-            Texture2D gifCopy;
+            // Mostramos gif de joystick para moverse o texto WASD
+            auto text = "wasd";
             if (engine.isGamepadAvailable(0))
-                gif = &engine.gifs.at("joystick_izq");
-            else
-                gif = &engine.gifs.at("wasd");
+            {
+                text = "joystick_izq";
+            }
 
-            gifCopy = gif->texture;
+            auto joystickL = getNode(engine, text);
+            auto& gifInfo = *joystickL->getEntity<Gif>();
+            auto& frames = gifInfo.frames;
+            auto& currentFrame = frames[gifInfo.currentFrame];
+            auto wRate = engine.getWidthRate() * 0.5f;
 
-            // Redimensionamos la copia
-            gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
-            gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
+            auto point = phy.position.y() + phy.scale.y() / 2 + 150;
+            int posX = static_cast<int>(engine.getWorldToScreenX(phy.position) - static_cast<float>(currentFrame->getWidth()) * wRate * 0.5f);
+            int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - point);
 
-            int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - gifCopy.width / 2;
-            int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 37);
-
-            displayGif(engine, gifCopy, *gif, posX, posY);
+            engine.drawNode(joystickL, { posX, posY }, { 0.5f, 0.5f });
 
             elapsed_WASD += 1.0f / 60.0f;
         }
 
-        if (li.mapID == 2 && pl.hasComponent<AttackComponent>() && !li.volcanoLava.empty())
+        if (li.mapID == 2 && pl.hasComponent<AttackerComponent>() && !li.volcanoLava.empty())
         {
             auto& plfi = em.getSingleton<PlayerInfo>();
             std::size_t spellID{ 5 };
@@ -2177,7 +2697,7 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
 
             for (std::size_t i = 0; i < plfi.spellSlots.size(); ++i)
             {
-                if (plfi.spellSlots[i].spell == Spells::WaterDash)
+                if (plfi.spellSlots[i].atkType == AttackType::WaterDashArea)
                 {
                     spellID = i;
                     break;
@@ -2192,33 +2712,45 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
                     auto& lav = *em.getEntityByID(lava);
                     auto& phy{ em.getComponent<PhysicsComponent>(lav) };
 
-                    GameEngine::Gif* gif;
-                    Texture2D gifCopy;
+                    // Nombre del gif
+                    std::string gifName = "";
 
                     // Usar el mapa para obtener el nombre del gif
                     if (engine.isGamepadAvailable(0))
-                        gif = &engine.gifs.at(spellToGif[spellID].first);
+                        gifName = spellToGif[spellID].first;
                     else
-                        gif = &engine.gifs.at(spellToGif[spellID].second);
+                        gifName = spellToGif[spellID].second;
 
-                    gifCopy = gif->texture;
+                    // Pillamos el nodo del gif
+                    auto* gif = getNode(engine, gifName.c_str());
+                    auto& gifInfo = *dynamic_cast<Gif*>(gif->getEntity());
+                    auto& frames = gifInfo.frames;
+                    auto& currentFrame = frames[gifInfo.currentFrame];
+                    auto wRate = engine.getWidthRate() * 0.75f;
 
-                    // Redimensionamos la copia
-                    gifCopy.width = static_cast<int>(gifCopy.width / 2.0);
-                    gifCopy.height = static_cast<int>(gifCopy.height / 2.0);
-
-                    int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - gifCopy.width / 2;
+                    // Posición del gif
+                    int posX = static_cast<int>(engine.getWorldToScreenX(phy.position)) - static_cast<int>(static_cast<float>(currentFrame->getWidth()) * wRate / 2);
                     int posY = static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 10);
 
-                    displayGif(engine, gifCopy, *gif, posX, posY);
+                    engine.drawNode(gif, { posX, posY }, { 0.75f, 0.75f });
                 }
             }
+        }
+
+        if (li.showParticles && li.mapID == 3 && pl.hasComponent<PhysicsComponent>())
+        {
+            auto& phy = em.getComponent<PhysicsComponent>(pl);
+            drawSnowEffect(engine, phy.position.z() >= 137, { static_cast<float>(phy.velocity.x()), static_cast<float>(phy.velocity.z()) });
         }
     }
 }
 
-void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, LevelInfo& li)
+void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em)
 {
+    RayCast ray = engine.getMouseRay();
+    pointedEntity = std::numeric_limits<std::size_t>::max();
+    pointedDistance = std::numeric_limits<double>::max();
+    vec3d auxPointed{};
     for (auto const& e : em.getEntities())
     {
         if (e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible)
@@ -2226,38 +2758,40 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, Level
             auto const& r{ em.getComponent<RenderComponent>(e) };
             auto const& l{ em.getComponent<LifeComponent>(e) };
 
+            auto point = r.position.y() + r.scale.y() / 2 + 50;
             engine.drawText(std::to_string(l.life).c_str(),
-                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 8.0),
+                static_cast<int>(engine.getWorldToScreenX(r.position)),
+                static_cast<int>(engine.getWorldToScreenY(r.position) - point),
                 20,
-                BLACK);
+                D_BLACK, Aligned::CENTER);
 
             if (e.hasComponent<TypeComponent>())
             {
                 auto const& t{ em.getComponent<TypeComponent>(e) };
 
                 std::string tipo = "Hielo";
-                Color color = SKYBLUE;
+                Color color = D_BLUE_LIGHT;
 
                 if (t.type == ElementalType::Neutral)
                 {
                     tipo = "Neutral";
-                    color = BLACK;
+                    color = D_BLACK;
                 }
                 else if (t.type == ElementalType::Water)
                 {
                     tipo = "Agua";
-                    color = BLUE;
+                    color = D_BLUE;
                 }
                 else if (t.type == ElementalType::Fire)
                 {
                     tipo = "Fuego";
-                    color = RED;
+                    color = D_RED;
                 }
 
+                auto point = r.position.y() + r.scale.y() / 2 - 40;
                 engine.drawText(tipo.c_str(),
                     static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                    static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 70),
+                    static_cast<int>(engine.getWorldToScreenY(r.position) - point),
                     20,
                     color);
             }
@@ -2272,119 +2806,112 @@ void RenderSystem::drawDebugPhysics(GameEngine& engine, EntityManager& em, Level
                 static_cast<int>(engine.getWorldToScreenX(ren.position) - 5),
                 static_cast<int>(engine.getWorldToScreenY(ren.position) - ren.scale.y() * 5),
                 20,
-                RED);
+                D_RED);
+        }
+
+        if (e.hasComponent<PointLightComponent>())
+        {
+            auto& plc = em.getComponent<PointLightComponent>(e);
+            auto& lightPos = plc.light->position;
+
+            engine.drawCubeWires({ lightPos.x, lightPos.y, lightPos.z }, { 5,5,5 }, D_RED);
         }
 
         if (e.hasComponent<RampComponent>() && e.hasComponent<PhysicsComponent>())
         {
-            // Dibujamos el rectángulo de la rampa
+            // // Dibujamos el rectángulo de la rampa
             auto& phy = em.getComponent<PhysicsComponent>(e);
             auto& rc = em.getComponent<RampComponent>(e);
             // La rampa solo tiene vec2d mínimos y máximos, vamos a dibujar el rectángulo que los une
             engine.drawText(std::to_string(rc.offset.y()).c_str(),
                 static_cast<int>(engine.getWorldToScreenX(phy.position) - 5),
                 static_cast<int>(engine.getWorldToScreenY(phy.position) - phy.scale.y() * 5),
-                20, RED);
-            engine.beginMode3D();
-            engine.drawCubeWires(phy.position, static_cast<float>(phy.scale.x()), static_cast<float>(phy.scale.y()), static_cast<float>(phy.scale.z()), RED);
-            engine.endMode3D();
+                20, D_RED);
+            engine.drawCubeWires(phy.position, { phy.scale.x(), phy.scale.y(), phy.scale.z() }, D_RED);
         }
 
         if (e.hasComponent<PhysicsComponent>() && e.hasComponent<ColliderComponent>() && e.hasComponent<RenderComponent>())
         {
             auto& col{ em.getComponent<ColliderComponent>(e) };
 
-            // Calcular la posición y el tamaño de la bounding box
+            // // Calcular la posición y el tamaño de la bounding box
             vec3d boxPosition = (col.bbox.min + col.bbox.max) / 2;
             vec3d boxSize = col.bbox.max - col.bbox.min;
 
-            Color color = BLUE;
+            Color color = D_BLUE;
             if (col.behaviorType & BehaviorType::ZONE)
-                color = GREEN;
+                color = D_GREEN;
 
-            // Dibujar la bounding box
-            engine.beginMode3D();
-            engine.drawCubeWires(boxPosition,
-                static_cast<float>(boxSize.x()),
-                static_cast<float>(boxSize.y()),
-                static_cast<float>(boxSize.z()),
-                color);
-            engine.endMode3D();
-
-            auto& phy = em.getComponent<PhysicsComponent>(e);
-
-            RayCast ray = engine.getMouseRay();
-
-            //std::cout << ray.origin << " " << ray.direction << std::endl;
-
-            auto& ren = em.getComponent<RenderComponent>(e);
             bool notStatic = !(col.behaviorType & BehaviorType::ZONE);
+
             // Comprobar si el rayo intersecta con el collider
-
-            if (col.bbox.intersectsRay(ray.origin, ray.direction) && notStatic && pointedEntity != li.playerID)
+            if (col.bbox.intersectsRay(ray.origin, ray.direction, auxPointed) && notStatic)
             {
-                pointedEntity = e.getID();
-
-                auto& col{ em.getComponent<ColliderComponent>(e) };
-
-                // Calcular la posición y el tamaño de la bounding box
-                vec3d boxPosition = (col.bbox.min + col.bbox.max) / 2;
-                vec3d boxSize = col.bbox.max - col.bbox.min;
-
-                // Dibujar la bounding box
-                engine.beginMode3D();
-                engine.drawCubeWires(boxPosition,
-                    static_cast<float>(boxSize.x()),
-                    static_cast<float>(boxSize.y()),
-                    static_cast<float>(boxSize.z()),
-                    PURPLE);
-                engine.endMode3D();
-
-                engine.beginMode3D();
-                engine.drawCubeWires(ren.position, static_cast<float>(ren.scale.x()), static_cast<float>(ren.scale.y()), static_cast<float>(ren.scale.z()), RED);
-                engine.endMode3D();
-
-                // Dibujar el HUD de debug
-                engine.drawRectangle(0, 65, 150, 360, WHITE);
-                engine.drawText("Posición", 10, 70, 20, BLACK);
-                std::string posX = "X: " + std::to_string(phy.position.x());
-                engine.drawText(posX.c_str(), 10, 95, 20, BLACK);
-                std::string posY = "Y: " + std::to_string(phy.position.y());
-                engine.drawText(posY.c_str(), 10, 120, 20, BLACK);
-                std::string posZ = "Z: " + std::to_string(phy.position.z());
-                engine.drawText(posZ.c_str(), 10, 145, 20, BLACK);
-
-                engine.drawText("Escala", 10, 175, 20, BLACK);
-                std::string sclX = "X: " + std::to_string(phy.scale.x());
-                engine.drawText(sclX.c_str(), 10, 200, 20, BLACK);
-                std::string sclY = "Y: " + std::to_string(phy.scale.y());
-                engine.drawText(sclY.c_str(), 10, 225, 20, BLACK);
-                std::string sclZ = "Z: " + std::to_string(phy.scale.z());
-                engine.drawText(sclZ.c_str(), 10, 250, 20, BLACK);
-
-                engine.drawText("Velocidad", 10, 280, 20, BLACK);
-                std::string velX = "X: " + std::to_string(phy.velocity.x());
-                engine.drawText(velX.c_str(), 10, 305, 20, BLACK);
-                std::string velY = "Y: " + std::to_string(phy.velocity.y());
-                engine.drawText(velY.c_str(), 10, 330, 20, BLACK);
-                std::string velZ = "Z: " + std::to_string(phy.velocity.z());
-                engine.drawText(velZ.c_str(), 10, 355, 20, BLACK);
-
-                std::string id = "ID: " + std::to_string(e.getID());
-                engine.drawText(id.c_str(), 10, 385, 20, BLACK);
+                auto dist = auxPointed.distance(ray.origin);
+                if (pointedDistance > dist)
+                {
+                    pointedEntity = e.getID();
+                    pointedDistance = dist;
+                }
             }
-        }
 
-        // Dibujar el ID de las entidades // DEBUG
-        if (e.hasComponent<RenderComponent>())
-        {
-            auto const& r{ em.getComponent<RenderComponent>(e) };
-            engine.drawText(std::to_string(e.getID()).c_str(),
-                static_cast<int>(engine.getWorldToScreenX(r.position) - 5),
-                static_cast<int>(engine.getWorldToScreenY(r.position) - r.scale.y() * 50),
-                20,
-                BLACK);
+            if (e.getID() != pointedEntity)
+                engine.drawCubeWires(boxPosition,
+                    { static_cast<float>(boxSize.x()),
+                    static_cast<float>(boxSize.y()),
+                    static_cast<float>(boxSize.z()), },
+                    color);
+
+            // Dibujar el ID de las entidades // DEBUG
+            // if (e.hasComponent<RenderComponent>())
+            // {
+            //     auto const& r{ em.getComponent<RenderComponent>(e) };
+            //     auto point = r.position.y() + r.scale.y() / 2;
+            //     engine.drawText(std::to_string(e.getID()).c_str(),
+            //         static_cast<int>(engine.getWorldToScreenX(r.position)),
+            //         static_cast<int>(engine.getWorldToScreenY(r.position) - point - 30),
+            //         20,
+            //         c);
+            // }
         }
+    }
+
+    if (pointedEntity != std::numeric_limits<std::size_t>::max())
+    {
+        auto& e = *em.getEntityByID(pointedEntity);
+        auto& phy = em.getComponent<PhysicsComponent>(e);
+        engine.drawCubeWires(phy.position, { phy.scale.x(), phy.scale.y(), phy.scale.z() }, D_RED);
+
+        // Dibujar el HUD de debug
+        auto posTextX = 15;
+        engine.drawNode(getNode(engine, "debugRectPhy"));
+        auto* debugNode = getNode(engine, "DebugPhy");
+        engine.createText({ posTextX,70 }, "Posición", D_BLACK, "debugPhyPos", debugNode);
+        std::string posX = "X: " + std::to_string(phy.position.x());
+        engine.createText({ posTextX,95 }, posX.c_str(), D_BLACK, "debugPhyPosX", debugNode);
+        std::string posY = "Y: " + std::to_string(phy.position.y());
+        engine.createText({ posTextX,120 }, posY.c_str(), D_BLACK, "debugPhyPosY", debugNode);
+        std::string posZ = "Z: " + std::to_string(phy.position.z());
+        engine.createText({ posTextX,145 }, posZ.c_str(), D_BLACK, "debugPhyPosZ", debugNode);
+
+        engine.createText({ posTextX,175 }, "Escala", D_BLACK, "debugPhyScale", debugNode);
+        std::string sclX = "X: " + std::to_string(phy.scale.x());
+        engine.createText({ posTextX,200 }, sclX.c_str(), D_BLACK, "debugPhyScaleX", debugNode);
+        std::string sclY = "Y: " + std::to_string(phy.scale.y());
+        engine.createText({ posTextX,225 }, sclY.c_str(), D_BLACK, "debugPhyScaleY", debugNode);
+        std::string sclZ = "Z: " + std::to_string(phy.scale.z());
+        engine.createText({ posTextX,250 }, sclZ.c_str(), D_BLACK, "debugPhyScaleZ", debugNode);
+
+        engine.createText({ posTextX,280 }, "Velocidad", D_BLACK, "debugPhyVel", debugNode);
+        std::string velX = "X: " + std::to_string(phy.velocity.x());
+        engine.createText({ posTextX,305 }, velX.c_str(), D_BLACK, "debugPhyVelX", debugNode);
+        std::string velY = "Y: " + std::to_string(phy.velocity.y());
+        engine.createText({ posTextX,330 }, velY.c_str(), D_BLACK, "debugPhyVelY", debugNode);
+        std::string velZ = "Z: " + std::to_string(phy.velocity.z());
+        engine.createText({ posTextX,355 }, velZ.c_str(), D_BLACK, "debugPhyVelZ", debugNode);
+
+        std::string id = "ID: " + std::to_string(e.getID());
+        engine.createText({ posTextX,385 }, id.c_str(), D_BLACK, "debugPhyID", debugNode);
     }
 }
 
@@ -2399,7 +2926,7 @@ void RenderSystem::drawLockInfo(GameEngine& ge, EntityManager& em)
     if (li.lockedEnemy != li.max)
     {
         enemyID = li.lockedEnemy;
-        color = WHITE;
+        color = D_WHITE;
     }
     else if (li.closestEnemy != li.max)
     {
@@ -2413,27 +2940,29 @@ void RenderSystem::drawLockInfo(GameEngine& ge, EntityManager& em)
         if (enemy.hasComponent<RenderComponent>())
         {
             auto& r = em.getComponent<RenderComponent>(enemy);
+            auto wRate = ge.getWidthRate();
+            auto hRate = ge.getHeightRate();
             if (color.a == 100)
             {
-                auto& destellin = ge.textures["destellin"];
-                ge.drawTexture(destellin,
-                    static_cast<int>(ge.getWorldToScreenX(r.position)) - destellin.width / 2,
-                    static_cast<int>(ge.getWorldToScreenY(r.position)) - destellin.height / 2,
-                    { 255, 255, 255, 255 });
+                auto* destellin = getNode(ge, "destellin");
+                auto* destellinText = dynamic_cast<Texture2D*>(destellin->getEntity())->texture;
+
+
+                int posX = static_cast<int>(ge.getWorldToScreenX(r.position) - static_cast<float>(destellinText->getWidth()) * wRate / 2);
+                int posY = static_cast<int>(ge.getWorldToScreenY(r.position) - static_cast<float>(destellinText->getHeight()) * hRate / 2);
+
+                ge.drawNode(destellin, { posX, posY });
             }
             else
             {
-                auto& fijado = ge.gifs.at("fijado");
-                auto copy = fijado.texture;
+                auto* fijado = getNode(ge, "fijado");
+                auto* fijadoInfo = dynamic_cast<Gif*>(fijado->getEntity());
+                auto& frames = fijadoInfo->frames;
+                auto& current = frames[fijadoInfo->currentFrame];
+                int posX = static_cast<int>(ge.getWorldToScreenX(r.position) - static_cast<float>(current->getWidth()) * wRate * 1.1f / 2);
+                int posY = static_cast<int>(ge.getWorldToScreenY(r.position) - static_cast<float>(current->getHeight()) * hRate * 1.1f / 2);
 
-                // Redimensionamos la copia
-                copy.width = static_cast<int>(copy.width / fijado.reScaleX);
-                copy.height = static_cast<int>(copy.height / fijado.reScaleY);
-
-                int posX = static_cast<int>(ge.getWorldToScreenX(r.position)) - copy.width / 2;
-                int posY = static_cast<int>(ge.getWorldToScreenY(r.position)) - copy.height / 2;
-
-                displayGif(ge, copy, fijado, posX, posY);
+                ge.drawNode(fijado, { posX, posY }, { 1.1f, 1.1f });
             }
         }
     }
@@ -2441,138 +2970,189 @@ void RenderSystem::drawLockInfo(GameEngine& ge, EntityManager& em)
 
 void RenderSystem::drawDeath(GameEngine& engine)
 {
-    engine.drawRectangle(0, 0, engine.getScreenWidth(), engine.getScreenHeight(), Fade(BLACK, 0.5f));
+    engine.drawRectangle({ 0, 0 }, { engine.getScreenWidth(), engine.getScreenHeight() }, { 0, 0, 0, 200 });
 
     // Valores de la caja de texto
-    float boxWidth = 300.f;
-    float boxWidth2 = 500.f;
-    float boxHeight = 100.f;
-    float posX = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth / 2.f);
-    float posX2 = static_cast<float>(engine.getScreenWidth() / 2) - (boxWidth2 / 2.f);
-    float posY = static_cast<float>(engine.getScreenHeight() / 2) - (boxHeight / 2.f);
+    int boxWidth = 300.f;
+    int boxWidth2 = 500.f;
+    int boxHeight = 100.f;
+    auto hRate = engine.getHeightRate();
+    int posX = engine.getScreenWidth() / 2 - boxWidth / 2;
+    int posX2 = engine.getScreenWidth() / 2 - boxWidth2 / 2;
+    int posY = engine.getScreenHeight() / 2 - boxHeight / 2;
 
-    // Tamaño de la fuente
-    GuiSetStyle(DEFAULT, TEXT_SIZE, 40);
-
-    // Color de la fuente de texto
-    GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, 0xFF0000ff);
-
-    GuiLabelButton(Rectangle{ posX, posY, boxWidth, boxHeight }, "HAS MUERTO");
+    engine.drawText("Has Muerto", posX, posY, 40, D_RED);
 
     std::string text = "[ENTER] para volver a jugar";
     if (engine.isGamepadAvailable(0))
         text = "Pulsa [X] para volver a jugar";
-    GuiLabelButton(Rectangle{ posX2, posY + 50, boxWidth2, boxHeight }, text.c_str());
-    init();
+    engine.drawText(text.c_str(), posX2, posY + static_cast<int>(75.f * hRate), 20, D_RED);
 }
 
-void RenderSystem::unloadModels(EntityManager& em, GameEngine& engine)
+void RenderSystem::unloadModels(EntityManager& em, GameEngine&)
 {
     using SYSCMPs = MP::TypeList<RenderComponent>;
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity&, RenderComponent& ren)
     {
         // engine.unloadMesh(ren.mesh);
-        engine.unloadModel(ren.model);
+        // engine.unloadModel(ren.model);
         ren.meshLoaded = false;
     });
 }
 
-void RenderSystem::drawHealthBar(GameEngine& engine, EntityManager& em, const Entity& e)
+// ---------- //
+// Update HUD //
+// ---------- //
+
+void RenderSystem::updateHealthBar(GameEngine& engine, EntityManager& em, const Entity& e)
 {
-    auto const& l{ em.getComponent<LifeComponent>(e) };
+    auto& l{ em.getComponent<LifeComponent>(e) };
     auto& plfi = em.getSingleton<PlayerInfo>();
 
+    if (plfi.invincible)
+        l.life = l.maxLife;
+
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+
     // Datos de la barra de vida
-    int barWidth = 40;
-    int barX = 155;
-    int barY = 30;
-    int spacing = 10;
-    int currentX = 0;
+    int barWidth = static_cast<int>(60.6f * wRate);
+    int barX = static_cast<int>(234.84f * wRate);
+    int barY = static_cast<int>(45.45f * hRate);
+    int spacing = static_cast<int>(15.15f * wRate);
+    int posFaceX = static_cast<int>(30.3f * wRate);
+    int posFaceY = static_cast<int>(30.3f * hRate);
 
-    // Dibujamos cara del maguito
+    // ------------------- //
+    // Node: Cara del mago //
+    // ------------------- //
+    std::string face = "";
+
+    // Mago Happy
     if (l.life > l.maxLife / 2)
-        engine.drawTexture(engine.textures["mago_happy"], 25, 20, { 255, 255, 255, 255 });
+        face = "mago_happy";
+    // Mago Meh
     else if (l.life > 2)
-        engine.drawTexture(engine.textures["mago_meh"], 25, 20, { 255, 255, 255, 255 });
+        face = "mago_meh";
+    // Mago sos
     else
-        engine.drawTexture(engine.textures["mago_sos"], 25, 20, { 255, 255, 255, 255 });
+        face = "mago_sos";
+    engine.drawNode(getNode(engine, face.c_str()), { posFaceX, posFaceY }, { 1.2f, 1.2f });
 
-    // Dibujamos cada parte de la barra de vida
+    // -------------------- //
+    // Node: Puntos de vida //
+    // -------------------- //
+
+    auto* copyNode = getNode(engine, "Copy");
+
     int i{};
+
+    // Corazon
     for (; i < l.life / 2; ++i)
     {
-        // Posición X de cada trozo
-        currentX = barX + i * (barWidth + spacing);
-
-        // Dibujamos el corazón
-        engine.drawTexture(engine.textures["heart"], currentX, barY, { 255, 255, 255, 255 });
+        auto* heart = engine.createNode(getNode(engine, "heart"), copyNode);
+        engine.drawNode(heart, { barX + i * (barWidth + spacing), barY });
     }
 
-    // Si la vida es impar, dibujamos un medio corazón
+    // Corazon medio
     if (l.life & 1)
     {
-        currentX = barX + i * (barWidth + spacing);
-        engine.drawTexture(engine.textures["half_heart"], currentX, barY, { 255, 255, 255, 255 });
+        auto* half = engine.createNode(getNode(engine, "half_heart"), copyNode);
+        engine.drawNode(half, { barX + i * (barWidth + spacing), barY });
         ++i;
     }
 
+    // Corazon vacio
     for (; i < l.maxLife / 2; ++i)
     {
-        // Posición X de cada trozo
-        currentX = barX + i * (barWidth + spacing);
-
-        // Dibujamos el corazón vacío
-        engine.drawTexture(engine.textures["empty_heart"], currentX, barY, { 255, 255, 255, 255 });
+        auto* empty = engine.createNode(getNode(engine, "empty_heart"), copyNode);
+        engine.drawNode(empty, { barX + i * (barWidth + spacing), barY });
     }
 
     // Si la vida máxima es impar, dibujamos un corazón vacío
     if ((l.maxLife & 1) && l.life < l.maxLife)
     {
-        currentX = barX + i * (barWidth + spacing);
-        engine.drawTexture(engine.textures["empty_heart"], currentX, barY, { 255, 255, 255, 255 });
+        auto* empty = engine.createNode(getNode(engine, "empty_heart"), copyNode);
+        engine.drawNode(empty, { barX + i * (barWidth + spacing), barY });
         ++i;
     }
 
-    // Dibujamos la armadura
+    // Armadura
     if (plfi.armor > 0)
     {
         auto& armor = plfi.armor;
         int armorLife = l.maxLife + plfi.armor;
         int maxArmorLife = l.maxLife + plfi.max_armor;
+
+        // Dibujamos el corazón de armadura lleno
         for (; i < armorLife / 2; ++i)
         {
-            // Posición X de cada trozo
-            currentX = barX + i * (barWidth + spacing);
-
-            // Dibujamos el corazón
-            engine.drawTexture(engine.textures["ice_heart"], currentX, barY, SKYBLUE);
+            auto* ice_heart = engine.createNode(getNode(engine, "ice_heart"), copyNode);
+            engine.drawNode(ice_heart, { barX + i * (barWidth + spacing), barY });
         }
 
         // Si la vida es impar, dibujamos un medio corazón
         if (armor & 1)
         {
-            currentX = barX + i * (barWidth + spacing);
-            engine.drawTexture(engine.textures["half_ice_heart"], currentX, barY, SKYBLUE);
+            auto* ice_half = engine.createNode(getNode(engine, "half_ice_heart"), copyNode);
+            engine.drawNode(ice_half, { barX + i * (barWidth + spacing), barY });
             ++i;
         }
 
         for (; i < maxArmorLife / 2; ++i)
         {
-            // Posición X de cada trozo
-            currentX = barX + i * (barWidth + spacing);
-
             // Dibujamos el corazón vacío
-            engine.drawTexture(engine.textures["empty_ice_heart"], currentX, barY, SKYBLUE);
+            auto* ice_empty = engine.createNode(getNode(engine, "empty_ice_heart"), copyNode);
+            engine.drawNode(ice_empty, { barX + i * (barWidth + spacing), barY });
         }
 
         // Si la vida máxima es impar, dibujamos un corazón vacío
         if ((maxArmorLife & 1) && armor < plfi.max_armor)
         {
-            currentX = barX + i * (barWidth + spacing);
-            engine.drawTexture(engine.textures["empty_ice_heart"], currentX, barY, SKYBLUE);
+            auto* ice_empty = engine.createNode(getNode(engine, "empty_ice_heart"), copyNode);
+            engine.drawNode(ice_empty, { barX + i * (barWidth + spacing), barY });
         }
     }
 }
+
+void RenderSystem::updateManaBar(GameEngine& engine, EntityManager& em)
+{
+    auto& plfi{ em.getSingleton<PlayerInfo>() };
+
+    if (plfi.mana > plfi.max_mana)
+        plfi.mana = plfi.max_mana - 2;
+
+    // Datos para la barra para el maná
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+    int barX = static_cast<int>(220.84f * wRate);
+    int barY = static_cast<int>(110.78f * hRate);
+    int barWidth = 236;
+
+    float manaWidth = static_cast<float>(barWidth * plfi.mana / plfi.max_mana);
+
+    // Interpolación
+    if (plfi.mana != plfi.max_mana)
+        manaWidth = plfi.mana_width + (static_cast<float>(manaWidth) - static_cast<float>(plfi.mana_width)) * 0.175f;
+
+    // ------------------- //
+    // Node: Barra de mana //
+    // ------------------- //
+
+    auto* rect = getNode(engine, "mana_rect");
+    int offSetX = static_cast<int>(18 * wRate);
+    int offSetY = static_cast<int>(12 * hRate);
+    engine.drawNode(rect, { barX + offSetX, barY + offSetY }, { manaWidth, 0.9f });
+
+    auto* border = getNode(engine, "borde_mana");
+    engine.drawNode(border, { barX, barY });
+
+    plfi.mana_width = manaWidth;
+}
+
+// -------- //
+// Draw HUD //
+// -------- //
 
 void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
 {
@@ -2580,17 +3160,17 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
     if (plfi.coins == 0)
         return;
 
-    const float multip = 3.5f;
+    const float multip = 5.5f;
     if (plfi.elapsed_coins < plfi.elapsed_limit_coins)
     {
-        elapsed_CoinBar += timeStep30 * multip;
+        elapsed_CoinBar += engine.getFrameTime() * multip;
         if (elapsed_CoinBar > elapsed_limit_CoinBar) elapsed_CoinBar = elapsed_limit_CoinBar;
 
-        plfi.elapsed_coins += timeStep30;
+        plfi.elapsed_coins += engine.getFrameTime() * 2;
     }
     else
     {
-        elapsed_CoinBar -= timeStep30 * multip;
+        elapsed_CoinBar -= engine.getFrameTime() * multip;
         if (elapsed_CoinBar < 0) elapsed_CoinBar = 0;
     }
 
@@ -2611,22 +3191,34 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
         coinsCopy2 /= 10;
     }
 
-    double div = elapsed_CoinBar / elapsed_limit_CoinBar;
+    float div = elapsed_CoinBar / elapsed_limit_CoinBar;
 
     // Posición de la barra de destellos
-    auto sum = static_cast<double>(digits.size()) * 16.5; // 16.5 es la mitad del ancho de la textura de la moneda
-    int offSetX = static_cast<int>(120 + sum);
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+
+    auto sum = static_cast<float>(digits.size()) * 16.5f; // 16.5 es la mitad del ancho de la textura de la moneda
+    float offSetX = 180.f * wRate + sum;
+    float screenWidth = static_cast<float>(engine.getScreenWidth());
+    float screenHeight = static_cast<float>(engine.getScreenHeight());
 
     // Interpolación
-    coinBarX = static_cast<int>((1.f - div) * static_cast<float>(engine.getScreenWidth()) + div * static_cast<float>(engine.getScreenWidth() - offSetX));
+    coinBarX = static_cast<int>(((1.f - div) * screenWidth + div * (screenWidth - offSetX)));
 
     // Barra para los destellos
-    engine.drawTexture(engine.textures["destellos"], coinBarX, engine.getScreenHeight() - 130, { 255, 255, 255, 255 });
+    int posX = coinBarX;
+    int posY = static_cast<int>(screenHeight - 195 * hRate);
+
+    auto* numsCopy = getNode(engine, "Copy");
+    auto* destellos = getNode(engine, "destellos");
+
+    engine.drawNode(destellos, { posX, posY });
 
     // Interpolación de la posición de los números
-    int offSetCoinNum = static_cast<int>(40 + sum);
-    coinNumberX = static_cast<int>((1.f - div) * (static_cast<float>(engine.getScreenWidth() + (offSetX - offSetCoinNum))) + div * static_cast<float>(engine.getScreenWidth() - offSetCoinNum));
-    int posY = engine.getScreenHeight() - 117;
+    int offSetCoinNum = static_cast<int>(60.f * wRate + sum);
+    coinNumberX = static_cast<int>((1.f - div) * (screenWidth + offSetX - static_cast<float>(offSetCoinNum)) + div * (screenWidth - static_cast<float>(offSetCoinNum)));
+    posY = static_cast<int>(screenHeight - 175.5f * hRate);
+
     auto coinNumberX2 = coinNumberX;
     std::string plusMinus = "+";
 
@@ -2636,69 +3228,52 @@ void RenderSystem::drawCoinBar(GameEngine& engine, EntityManager& em)
     // Dibujamos el número de destellos
     if (elapsed_CoinBar > 0 && plfi.coins > 0)
     {
-        // Dibujamos el número de monedas totales
-        engine.drawTexture(engine.textures[plusMinus.c_str()], coinNumberX - 15, posY - 40, { 255, 255, 255, 255 });
+        // Dibujamos el símbolo de más o menos
+        auto* symbol = getNode(engine, plusMinus.c_str());
+        int symbolX = coinNumberX - static_cast<int>(30.5f * wRate);
+        int symbolY = posY - static_cast<int>(63.f * hRate);
+        engine.drawNode(symbol, { symbolX, symbolY });
+
+        // Dibujamos los destellos actuales
         for (std::size_t i = digits.size(); i-- > 0; )
         {
-            auto& texture = engine.textures.at(std::to_string(digits[i]));
-            engine.drawTexture(texture, coinNumberX, posY, { 255, 255, 255, 255 });
-            coinNumberX += static_cast<int>(texture.width / 1.7);
+            // Numero
+            int posX = coinNumberX;
+            auto* numero = engine.createNode(getNode(engine, std::to_string(digits[i]).c_str()), numsCopy);
+
+            engine.drawNode(numero, { posX, posY });
+
+            coinNumberX += static_cast<int>(30 * wRate);
         }
 
+        // Dibujamos los destellos ganados
         for (std::size_t i = digits2.size(); i-- > 0; )
         {
-            auto& texture = engine.textures.at(std::to_string(digits2[i]));
-            engine.drawTexture(texture, coinNumberX2, posY - 45, { 255, 255, 255, 255 });
-            coinNumberX2 += static_cast<int>(texture.width / 1.7);
+            // Numero
+            int posX = coinNumberX2;
+            int offSetY = static_cast<int>(67.5f * hRate);
+            auto* numero = engine.createNode(getNode(engine, std::to_string(digits2[i]).c_str()), numsCopy);
+
+            engine.drawNode(numero, { posX, posY - offSetY });
+
+            coinNumberX2 += static_cast<int>(30 * wRate);
         }
     }
     else if (plfi.minusCoins)
         plfi.minusCoins = false;
 }
 
-void RenderSystem::drawManaBar(GameEngine& engine, EntityManager& em)
-{
-    auto& plfi{ em.getSingleton<PlayerInfo>() };
-
-    if (plfi.mana > plfi.max_mana)
-        plfi.mana = plfi.max_mana - 2;
-
-    // Datos para la barra para el maná
-    int barWidth = static_cast<int>(plfi.max_mana * 1.8);
-    // int barHeight = 20;
-    int barX = 155;
-    int barY = 85;
-
-    int manaWidth = static_cast<int>(static_cast<float>(barWidth) * (static_cast<float>(plfi.mana) / static_cast<float>(plfi.max_mana)));
-
-    // Interpolación
-    if (plfi.mana != plfi.max_mana)
-        manaWidth = plfi.mana_width + static_cast<int>((static_cast<float>(manaWidth) - static_cast<float>(plfi.mana_width)) * 0.175f);
-
-    // Idea para el movimiento de la barra
-    // Dos capas, la barra primero y luego el borde
-    // Entre medias algo que tape la barra dependiendo de la cantidad de maná en la barra.
-
-    // Dibujamos la barra de maná
-    engine.drawRectangle(barX + 14, barY + 9, manaWidth, 25, { 154, 222, 235, 255 });
-
-    // Ponemos la textura de la barra de maná
-    engine.drawTexture(engine.textures["mana"], barX, barY, { 255, 255, 255, 255 });
-
-
-    plfi.mana_width = manaWidth;
-}
-
-void RenderSystem::handleAnimatedTexture(const std::string& name, const std::string& textureName, int x, int y, const Texture2D& texture, float scaleFactor)
+void RenderSystem::handleAnimatedTexture(const std::string& name, const std::string& textureName, int x, int y, float scaleFactor)
 {
     if (animatedTextures.find(name) == animatedTextures.end())
     {
-        animatedTextures[name] = { textureName, x, y, texture.width, texture.height, scaleFactor };
+        animatedTextures[name] = { textureName, x, y, scaleFactor };
     }
     else
     {
         animatedTextures[name].targetPosX = x;
         animatedTextures[name].targetPosY = y;
+        animatedTextures[name].textureName = textureName;
     }
 }
 
@@ -2709,42 +3284,48 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
     if (!plfi.spells.empty())
     {
         // Dibujamos la cantidad de mana restante del player en el HUD
-        drawManaBar(engine, em);
+        updateManaBar(engine, em);
 
-        std::map<std::size_t, std::pair<int, int>> spellPositions = {
-            {0, {engine.getScreenWidth() - 280, 20}},
-            {1, {engine.getScreenWidth() - 210, 125}},
-            {2, {engine.getScreenWidth() - 110, 165}}
+        auto wRate = engine.getWidthRate();
+        auto hRate = engine.getHeightRate();
+        float screenWidth = static_cast<float>(engine.getScreenWidth());
+
+        std::map<std::size_t, std::pair<float, float>> spellPositions = {
+            {0, {screenWidth - 420 * wRate, 30 * hRate}},
+            {1, {screenWidth - 315 * wRate, 187.5f * hRate}},
+            {2, {screenWidth - 165 * wRate, 247.5f * hRate}}
         };
 
-        static std::map<Spells, std::tuple<std::string, std::string, int, int, float>> spellToTexture = {
-            {Spells::WaterBomb, {"pompas", "exp_pompa", 10, 15, 2.5f}},
-            {Spells::WaterDash, {"dash", "exp_dash", 5, 5, 2.5f}},
-            {Spells::FireBall, {"bola_fuego", "exp_bola_f", 15, 17, 2.55f}},
-            {Spells::FireMeteorites, {"meteoritos", "exp_pompa", 15, 17, 2.5f}},
-            {Spells::IceShards, {"estacas", "exp_pompa", 15, 17, 2.5f}},
-            {Spells::IceShield, {"escudo", "exp_pompa", 15, 17, 2.5f}},
+        static std::map<AttackType, std::tuple<std::string, std::string, float, float, float>> spellToTexture = {
+            {AttackType::WaterBombShot, {"pompas", "exp_pompa", 10.0f, 15.5f, 2.5f}},
+            {AttackType::WaterDashArea, {"dash", "exp_dash", 7.5f, 7.5f, 2.5f}},
+            {AttackType::FireBallShot, {"bola_fuego", "exp_bola_f", 22.5f, 25.5f, 2.55f}},
+            {AttackType::MeteoritePlayer, {"meteoritos", "exp_pompa", 22.5f, 25.5f, 2.5f}},
+            {AttackType::IceShard, {"estacas", "exp_pompa", 22.5f, 25.5f, 2.5f}},
+            {AttackType::IceShield, {"escudo_hielo", "exp_pompa", 22.5f, 25.5f, 2.5f}},
         };
 
         for (std::size_t i = 0; i < plfi.spellSlots.size(); i++)
         {
             auto& spell = plfi.spellSlots[i];
-            if (spell.spell != plfi.noSpell)
+            if (spell != plfi.noSpell)
             {
                 if (!plfi.showBook)
                 {
                     std::string spellName = "hechizo" + std::to_string(i + 1);
-                    handleAnimatedTexture(std::to_string(i + 1) + "_pl", "placeholder", spellPositions[i].first, spellPositions[i].second, engine.textures["placeholder"], 2.5f);
+                    handleAnimatedTexture(std::to_string(i + 1) + "_pl", "placeholder", static_cast<int>(spellPositions[i].first), static_cast<int>(spellPositions[i].second), 2.45f);
 
                     // Usar el mapa para obtener el nombre de la textura, posiciones y factor de escala
-                    auto textureDetails = spellToTexture[spell.spell];
-                    handleAnimatedTexture(spellName, std::get<0>(textureDetails), spellPositions[i].first + std::get<2>(textureDetails), spellPositions[i].second + std::get<3>(textureDetails), engine.textures[std::get<0>(textureDetails)], std::get<4>(textureDetails));
+                    auto textureDetails = spellToTexture[spell.atkType];
+                    handleAnimatedTexture(spellName, std::get<0>(textureDetails), static_cast<int>(spellPositions[i].first + std::get<2>(textureDetails) * wRate), static_cast<int>(spellPositions[i].second + std::get<3>(textureDetails) * hRate), std::get<4>(textureDetails));
                 }
                 else
                 {
+                    if (getNode(engine, "libro")->isVisible())
+                        break;
                     // Usar el mapa para obtener el nombre de la textura de explosión
-                    auto textureDetails = spellToTexture[spell.spell];
-                    drawSpellExp(engine, std::get<1>(textureDetails));
+                    auto textureDetails = spellToTexture[plfi.spells.back().atkType];
+                    drawSpellExplanation(engine, std::get<1>(textureDetails));
 
                     auto& inpi = em.getSingleton<InputInfo>();
                     auto& txti = em.getSingleton<TextInfo>();
@@ -2764,44 +3345,45 @@ void RenderSystem::drawSpellSlots(GameEngine& engine, EntityManager& em)
     }
 }
 
-void RenderSystem::drawSpellExp(GameEngine& engine, std::string name)
+void RenderSystem::drawSpellExplanation(GameEngine& engine, std::string name)
 {
     // Dibujamos textura del libro
-    auto& libroText = engine.textures["libro"];
-
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+    auto* libro = getNode(engine, "libro");
+    auto* libroText = dynamic_cast<Texture2D*>(libro->getEntity())->texture;
     // Calculamos la posición inicial fuera de la pantalla
-    int initialPosY = -libroText.height;
-    int posX = engine.getScreenWidth() / 2 - libroText.width / 2;
+    int initialPosY = -libroText->getHeight();
+    int posX = engine.getScreenWidth() / 2 - static_cast<int>(static_cast<float>(libroText->getWidth()) * wRate / 2);
 
     // Calculamos la posición final en el centro de la pantalla
-    int finalPosY = engine.getScreenHeight() / 2 - libroText.height / 2;
+    int finalPosY = engine.getScreenHeight() / 2 - static_cast<int>(static_cast<float>(libroText->getHeight()) * hRate / 2);
 
     // Animamos la posición Y
     int posY = initialPosY + static_cast<int>(static_cast<float>(finalPosY - initialPosY) * elapsed_book);
 
-    engine.drawTexture(libroText, posX, posY, { 255, 255, 255, 255 });
+    // Dibujamos el libro
+    engine.drawNode(libro, { posX, posY });
 
     // Dibujamos el gif de la explicación por encima
-    auto& gif = engine.gifs.at(name);
-    auto copy = gif.texture;
-
-    // Redimensionamos la copia
-    copy.width = static_cast<int>(copy.width / gif.reScaleX);
-    copy.height = static_cast<int>(copy.height / gif.reScaleY);
+    auto* gif = getNode(engine, name.c_str());
+    auto* gifInfo = dynamic_cast<Gif*>(gif->getEntity());
+    auto& gifFrames = gifInfo->frames;
+    auto& gifCurrent = gifFrames[gifInfo->currentFrame];
 
     // Calculamos la posición inicial y final para el gif
-    initialPosY = -copy.height;
-    finalPosY = engine.getScreenHeight() / 2 - copy.height / 2;
+    initialPosY = -gifCurrent->getHeight();
+    finalPosY = engine.getScreenHeight() / 2 - static_cast<int>(static_cast<float>(gifCurrent->getHeight()) * hRate / 2);
 
     // Animamos la posición Y del gif
     posY = initialPosY + static_cast<int>(static_cast<float>(finalPosY - initialPosY) * elapsed_book);
 
-    posX = engine.getScreenWidth() / 2 - copy.width / 2;
+    posX = engine.getScreenWidth() / 2 - static_cast<int>(static_cast<float>(gifCurrent->getWidth()) * wRate / 2);
 
-    displayGif(engine, copy, gif, posX, posY);
+    engine.drawNode(gif, { posX, posY });
 
     // Incremento
-    elapsed_book += timeStep * 0.5f;
+    elapsed_book += timeStep120;
 
     if (elapsed_book > 1.0f)
         elapsed_book = 1.0f;
@@ -2813,35 +3395,58 @@ void RenderSystem::drawStaff(GameEngine& engine, EntityManager& em)
 
     if (plfi.hasStaff)
     {
-        handleAnimatedTexture("4_pl", "placeholder", engine.getScreenWidth() - 110, 45, engine.textures["placeholder"], 2.75f);
-        handleAnimatedTexture("palo", "palo", engine.getScreenWidth() - 95, 60, engine.textures["palo"], 2.85f);
+        auto wRate = engine.getWidthRate();
+        auto hRate = engine.getHeightRate();
+        float screenWidth = static_cast<float>(engine.getScreenWidth());
+
+        // Posiciones
+        int posPLX = static_cast<int>(screenWidth - 165.f * wRate);
+        int posPLY = static_cast<int>(67.5f * hRate);
+        int posPalX = static_cast<int>(screenWidth - 142.5f * wRate);
+        int posPalY = static_cast<int>(90.f * hRate);
+
+        handleAnimatedTexture("4_pl", "placeholder", posPLX, posPLY, 2.7f);
+        handleAnimatedTexture("palo", "palo", posPalX, posPalY, 2.8f);
     }
 }
 
 void RenderSystem::drawAnimatedTextures(GameEngine& engine)
 {
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+
     for (auto& [_, textureInfo] : animatedTextures)
     {
-        // Calculamos el factor de escala
-        textureInfo.scaleFactor = 3.5f - textureInfo.scaleChange * textureInfo.lerpFactor;
-        int& width = textureInfo.width;
-        int& height = textureInfo.height;
+        // Calculamos los factores de escala
+        textureInfo.scaleFactorX = 3.5f - textureInfo.scaleChange * textureInfo.lerpFactor;
+        textureInfo.scaleFactorY = 3.5f - textureInfo.scaleChange * textureInfo.lerpFactor;
+        Node* texture = nullptr;
+        if (textureInfo.textureName == "placeholder")
+            texture = engine.createNode(getNode(engine, textureInfo.textureName.c_str()), getNode(engine, "Copy"));
+        else
+            texture = getNode(engine, textureInfo.textureName.c_str());
+
+        // Información de la textura
+        auto* textureData = dynamic_cast<Texture2D*>(texture->getEntity());
+        float width = static_cast<float>(textureData->texture->getWidth()) * wRate;
+        float height = static_cast<float>(textureData->texture->getHeight()) * hRate;
 
         // Calcula la posición del centro de la pantalla
-        int centerX = static_cast<int>(static_cast<float>(engine.getScreenWidth() / 2) - static_cast<float>(width) * textureInfo.scaleFactor / 2);
-        int centerY = static_cast<int>(static_cast<float>(engine.getScreenHeight() / 2 - (50)) - static_cast<float>(width) * textureInfo.scaleFactor / 2);
+        int centerX = engine.getScreenWidth() / 2 - static_cast<int>(width * textureInfo.scaleFactorX / 2);
+        int centerY = engine.getScreenHeight() / 2 - static_cast<int>(200.f * hRate);
 
         // Interpola entre el centro de la pantalla y la posición objetivo
-        int posX = static_cast<int>(static_cast<float>(centerX) + textureInfo.lerpFactor * static_cast<float>(textureInfo.targetPosX - centerX));
-        int posY = static_cast<int>(static_cast<float>(centerY) + textureInfo.lerpFactor * static_cast<float>(textureInfo.targetPosY - centerY));
+        int posX = centerX + static_cast<int>(textureInfo.lerpFactor * static_cast<float>(textureInfo.targetPosX - centerX));
+        int posY = centerY + static_cast<int>(textureInfo.lerpFactor * static_cast<float>(textureInfo.targetPosY - centerY));
 
-        engine.drawTexture(engine.textures[textureInfo.textureName], posX, posY, { 255, 255, 255, 255 }, textureInfo.scaleFactor);
+        // Dibujamos la textura
+        engine.drawNode(texture, { posX, posY }, { textureInfo.scaleFactorX, textureInfo.scaleFactorY });
 
         // Si el tiempo transcurrido es menor que 1.5 segundos, no hagas nada
-        if (textureInfo.elapsed < 2.5f)
+        if (textureInfo.elapsed < 1.5f)
         {
             // Incrementamos el tiempo transcurrido
-            textureInfo.elapsed += timeStep30;
+            textureInfo.elapsed += engine.getFrameTime();
         }
         else
         {
@@ -2852,7 +3457,7 @@ void RenderSystem::drawAnimatedTextures(GameEngine& engine)
 
             if (textureInfo.textureName == "placeholder")
             {
-                drawSmallButtons(engine, _, posX, posY, width, height);
+                drawSmallButtons(engine, _, posX, posY, static_cast<int>(width), static_cast<int>(height));
             }
         }
     }
@@ -2861,8 +3466,8 @@ void RenderSystem::drawAnimatedTextures(GameEngine& engine)
 void RenderSystem::drawSmallButtons(GameEngine& engine, const std::string& name, int posX, int posY, int width, int height)
 {
     std::string texture = "";
-    posX += static_cast<int>(width / 1.6);
-    posY += static_cast<int>(height / 1.4);
+    posX += static_cast<int>(static_cast<float>(width) / 1.6f);
+    posY += static_cast<int>(static_cast<float>(height) / 1.4f);
 
     if (name == "1_pl")
     {
@@ -2890,18 +3495,19 @@ void RenderSystem::drawSmallButtons(GameEngine& engine, const std::string& name,
         if (engine.isGamepadAvailable(0))
         {
             texture = "boton_r2";
-            posX -= static_cast<int>(width / 2.5);
-            posY -= static_cast<int>(height / 6.5);
+            posX -= static_cast<int>(static_cast<float>(width) / 2.5f);
+            posY -= static_cast<int>(static_cast<float>(height) / 6.5f);
         }
         else
         {
             texture = "tecla_espacio";
-            posX -= static_cast<int>(width / 1.6);
-            posY -= static_cast<int>(height / 6.5);
+            posX -= static_cast<int>(static_cast<float>(width) / 1.7f);
+            posY -= static_cast<int>(static_cast<float>(height) / 7.f);
         }
     }
 
-    engine.drawTexture(engine.textures[texture], posX, posY, { 255, 255, 255, 255 });
+    auto* button = getNode(engine, texture.c_str());
+    engine.drawNode(button, { posX, posY });
 }
 
 void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
@@ -2910,102 +3516,130 @@ void RenderSystem::drawTextBox(GameEngine& engine, EntityManager& em)
     auto& txti = em.getSingleton<TextInfo>();
     auto& textQueue = txti.getTextQueue();
 
-    float boxWidth = 600;
-    float boxHeight = 100;
-
-    // Centramos la posición del cuadro de texto
-    float posX = static_cast<float>(engine.getScreenWidth() / 2) - boxWidth / 2;
-    float posY = static_cast<float>(engine.getScreenHeight() / 1.25) - boxHeight / 2;
-
     // Sacamos el texto en formatos para GuiTextBox
     auto& str = textQueue.front();
     auto text = const_cast<char*>(str.second.c_str());
 
-    GuiSetStyle(DEFAULT, TEXT_LINE_SPACING, 20);
+    auto& ss = em.getSingleton<SoundSystem>();
 
-    // Dibujamos el cuadro de diálogo con RayGui
-    engine.drawRectangle(static_cast<int>(posX), static_cast<int>(posY), static_cast<int>(boxWidth), static_cast<int>(boxHeight), WHITE);
-    GuiTextBox({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.second.size()), false);
-
-    std::map<SpeakerType, std::string> speakerTextures = {
-        {SpeakerType::PLAYER, "mago_happy"},
-        {SpeakerType::PLAYER_SAD, "mago_meh"},
-        {SpeakerType::PLAYER_DANGER, "mago_sos"},
-        {SpeakerType::CAT, "investigador"},
-        {SpeakerType::NOMAD, "nomada"},
-        {SpeakerType::INVESTIGATOR, "investigador"}
+    static std::map<SpeakerType, std::pair<std::string, std::function<void()>>> speakerTextures = {
+        {SpeakerType::PLAYER, {"mago_happy", [&]() {ss.sonido_DPlayer();}}},
+        {SpeakerType::PLAYER_SAD, {"mago_meh", [&]() {ss.sonido_DPlayer();}}},
+        {SpeakerType::PLAYER_DANGER, {"mago_sos", [&]() {ss.sonido_DPlayer();}}},
+        {SpeakerType::CAT, {"investigador", [&]() {ss.sonido_DInvestigador();}}},
+        {SpeakerType::NOMAD, {"nomada", [&]() {ss.sonido_DCalabaza();}}},
+        {SpeakerType::INVESTIGATOR, {"investigador", [&]() {ss.sonido_DInvestigador();}}}
     };
 
-    engine.drawRectangle(static_cast<int>(posX), static_cast<int>(posY), static_cast<int>(boxWidth), static_cast<int>(boxHeight), WHITE);
-    GuiTextBox({ posX, posY, boxWidth, boxHeight }, text, static_cast<int>(str.second.size()), false);
+    auto* box = getNode(engine, "cuadroDialogo");
+    auto& boxInfo = *dynamic_cast<TextBox*>(box->getEntity());
+    auto& boxRect = boxInfo.box.size;
+    auto& boxWidth = boxRect.x;
+    auto& boxHeight = boxRect.y;
 
-    float offSetX = 40.0;
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+
+    // Centramos la posición del cuadro de texto
+    int posX = engine.getScreenWidth() / 2 - static_cast<int>(boxWidth * wRate / 2);
+    int posY = static_cast<int>(static_cast<float>(engine.getScreenHeight()) / 1.25f) - static_cast<int>(boxHeight * hRate / 2);
+
+    boxInfo.text.setText(text);
+    engine.drawNode(box, { posX, posY });
+
+    int offSetX = static_cast<int>(60.f * wRate);
+    int offSetY = static_cast<int>(75.f * hRate);
     if (speakerTextures.count(str.first) > 0) {
-        engine.drawTexture(engine.textures[speakerTextures[str.first]], static_cast<int>(posX - offSetX), static_cast<int>(posY - 50), { 255, 255, 255, 255 });
+        auto& [name, sound] = speakerTextures[str.first];
+        auto* speaker = engine.createNode(getNode(engine, name.c_str()), getNode(engine, "Copy"));
+        engine.drawNode(speaker, { posX - offSetX, posY - offSetY });
+
+        if (boxInfo.text.charChanged() || boxInfo.text.charIndex == 0)
+            sound();
     }
 
     auto& inpi = em.getSingleton<InputInfo>();
     if (inpi.interact && !txti.notPass)
     {
-        txti.popText();
-        inpi.interact = false;
+        if (boxInfo.text.isTextFinished())
+            txti.popText();
+        else
+            boxInfo.text.skipText();
 
-        if (textQueue.empty() && li.openChest)
+        if (textQueue.empty())
         {
-            em.getSingleton<SoundSystem>().sonido_cerrar_cofre();
-            li.openChest = false;
+            if (li.openChest)
+            {
+                em.getSingleton<SoundSystem>().sonido_cerrar_cofre();
+                li.openChest = false;
+            }
+
+            auto& playerAnim = em.getComponent<AnimationComponent>(*em.getEntityByID(li.playerID));
+            if (playerAnim.currentAnimation == static_cast<std::size_t>(PlayerAnimations::SPEAKING))
+            {
+                using animCMP = MP::TypeList<NPCComponent, AnimationComponent>;
+                using npcTAG = MP::TypeList<NPCTag>;
+
+                em.forEach<animCMP, npcTAG>([&](Entity&, NPCComponent& npcC, AnimationComponent& anim)
+                {
+                    switch (npcC.type)
+                    {
+                    case NPCType::INVESTIGATOR:
+                    {
+                        anim.animToPlay = static_cast<std::size_t>(InvestAnimations::IDLE);
+                        break;
+                    }
+                    case NPCType::NOMAD:
+                    {
+                        anim.animToPlay = static_cast<std::size_t>(NomadAnimations::IDLE);
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+                });
+            }
         }
+        inpi.interact = false;
     }
 
-    int posButtonX = static_cast<int>(posX + boxWidth - 8);
-    int posButtonY = static_cast<int>(posY + boxHeight - 8);
+    int posButtonX = posX + static_cast<int>(boxWidth * wRate);
+    int posButtonY = posY + static_cast<int>(boxHeight * hRate);
+
+    bool isLast = true;
     if (textQueue.size() > 1)
     {
-        auto& sig = engine.textures["sig"];
-        auto copy = sig;
-        copy.width /= 2;
-        copy.height /= 2;
+        isLast = false;
+        auto* arrowNode = getNode(engine, "sig");
+        auto& flecha = *dynamic_cast<Texture2D*>(arrowNode->getEntity())->texture;
 
-        posButtonX -= copy.width;
-        posButtonY -= copy.height;
+        posButtonX -= static_cast<int>(static_cast<float>(flecha.getWidth()) * wRate * 0.5f);
+        posButtonY -= static_cast<int>(static_cast<float>(flecha.getHeight()) * 1.2f * hRate * 0.5f);
 
-        engine.drawTexture(copy,
-            posButtonX,
-            posButtonY,
-            { 255, 255, 255, 255 });
-
-        posButtonY += copy.height;
+        engine.drawNode(arrowNode, { posButtonX, posButtonY }, { 0.5f, 0.5f });
     }
 
-    GameEngine::Gif* gif;
-    Texture2D gifCopy;
-    int rest = 5;
-    if (engine.isGamepadAvailable(0))
+    std::string textGif = "x";
+    int rest{};
+    if (!engine.isGamepadAvailable(0))
     {
-        gif = &engine.gifs.at("x");
+        textGif = "e";
+        rest = static_cast<int>(7.57f * hRate);
     }
+
+    auto* gif = getNode(engine, textGif.c_str());
+    auto& textEntity = *dynamic_cast<Gif*>(gif->getEntity());
+    auto& frames = textEntity.frames;
+    posButtonX -= static_cast<int>(static_cast<float>(frames[textEntity.currentFrame]->getWidth()) * wRate * 0.4f);
+    if (!isLast)
+        posButtonY -= rest;
     else
     {
-        gif = &engine.gifs.at("e");
-        rest = 0;
+        posButtonX -= static_cast<int>(6 * wRate);
+        posButtonY -= static_cast<int>(static_cast<float>(frames[textEntity.currentFrame]->getHeight()) * hRate * 0.5f);
     }
 
-    gifCopy = gif->texture;
-
-    // Redimensionamos la copia
-    gifCopy.width = static_cast<int>(gifCopy.width / 3.5);
-    gifCopy.height = static_cast<int>(gifCopy.height / 3.5);
-
-    posButtonX -= gifCopy.width;
-    posButtonY -= gifCopy.height - rest;
-
-    displayGif(engine, gifCopy, *gif, posButtonX, posButtonY);
-}
-
-void RenderSystem::displayGif(GameEngine& engine, Texture2D& copy, GameEngine::Gif& gif, int& posX, int& posY)
-{
-    engine.drawTexture(copy, posX, posY, WHITE);
-    engine.updateGif(gif);
+    engine.drawNode(gif, { posButtonX, posButtonY }, { 0.4f, 0.4f });
 }
 
 double RenderSystem::shakeDouble(double value)
@@ -3031,12 +3665,24 @@ void RenderSystem::drawFPSCounter(GameEngine& engine)
 
     // Dibuja el FPS
     std::string fpsStr = "FPS: " + std::to_string(fps);
-    engine.drawText(fpsStr.c_str(), engine.getScreenWidth() - 100, 10, 20, RED);
+    if (!nodeExists(engine, "fpstext"))
+    {
+        auto* fpsText = engine.createText({ engine.getScreenWidth() - 150, 10 }, fpsStr.c_str(), engine.getDefaultFont(), 20, D_RED, "fpstext", getNode(engine, "HUD"));
+        fpsText->setVisibleOne(true);
+    }
+    else
+    {
+        auto* fpsNode = getNode(engine, "fpstext");
+        dynamic_cast<Text*>(fpsNode->getEntity())->setText(fpsStr);
+        fpsNode->setVisibleOne(true);
+    }
 }
 
 void RenderSystem::drawBoatParts(GameEngine& ge, EntityManager& em)
 {
     auto& plfi = em.getSingleton<PlayerInfo>();
+    auto wRate = ge.getWidthRate();
+    auto hRate = ge.getHeightRate();
 
     if (elapsed_boat < elapsed_limit_boat)
     {
@@ -3045,10 +3691,11 @@ void RenderSystem::drawBoatParts(GameEngine& ge, EntityManager& em)
     }
 
     // Dibujamos la textura de la barra que sale desde la derecha
-    auto& barca = ge.textures["barco"];
+    auto* barca = getNode(ge, "barco");
+    auto* barcaText = dynamic_cast<Texture2D*>(barca->getEntity())->texture;
 
     // Calculamos la posición inicial y final de la barra
-    int initialPosX = 0 - barca.width;
+    int initialPosX = 0 - barcaText->getWidth();
     int finalPosX = 0;
 
     // Interpolamos la posición X
@@ -3056,16 +3703,182 @@ void RenderSystem::drawBoatParts(GameEngine& ge, EntityManager& em)
     int posY = ge.getScreenHeight() / 4;
 
     // Dibujamos la barra
-    ge.drawTexture(barca, posX, posY, { 255, 255, 255, 255 });
+    ge.drawNode(barca, { posX, posY });
 
-    // Dibujamos el número de partes de barco encontradas
-    auto& textureNum = ge.textures.at(std::to_string(plfi.boatParts.size()));
-    auto& texture4 = ge.textures.at("4");
-    auto& textureBar = ge.textures.at("barra");
-    int offSetX = 105;
+    auto* copyNode = getNode(ge, "BoatCopy");
+    copyNode->clearChildren();
+
+    auto* textureNum = ge.createNode(getNode(ge, std::to_string(plfi.boatParts.size()).c_str()), copyNode);
+    auto* texture4 = ge.createNode(getNode(ge, "4"), copyNode);
+    auto* textureBar = ge.createNode(getNode(ge, "barra"), copyNode);
+
+    auto* numText = dynamic_cast<Texture2D*>(textureNum->getEntity())->texture;
+    auto* barText = dynamic_cast<Texture2D*>(textureBar->getEntity())->texture;
+    int offSetX1 = static_cast<int>(157.5f * wRate);
+    int offSetX2 = offSetX1 - static_cast<int>(19.5f * wRate);
+    int offSetX3 = offSetX1 - static_cast<int>(15.f * wRate);
+    int textWidth = static_cast<int>(static_cast<float>(numText->getWidth()) * wRate);
+    int barWidth = static_cast<int>(static_cast<float>(barText->getWidth()) * wRate);
+    int offSetY1 = static_cast<int>(3 * hRate);
+    int offSetY2 = static_cast<int>(30 * hRate);
 
     // Dibujamos el num / 4
-    ge.drawTexture(textureNum, posX + offSetX, posY + 2, { 255, 255, 255, 255 });
-    ge.drawTexture(textureBar, posX + (offSetX - 15) + textureNum.width / 2, posY + 2, { 255, 255, 255, 255 });
-    ge.drawTexture(texture4, posX + (offSetX - 10) + textureNum.width / 2 + textureBar.width / 2, posY + 20, { 255, 255, 255, 255 });
+    ge.drawNode(textureNum, { posX + offSetX1, posY + offSetY1 });
+
+    // Dibujamos la barra
+    ge.drawNode(textureBar, { posX + offSetX2 + textWidth / 2, posY + offSetY1 });
+
+    // Dibujamos el num / 4
+    ge.drawNode(texture4, { posX + offSetX3 + textWidth / 2 + barWidth / 2, posY + offSetY2 });
+}
+
+Node* RenderSystem::getNode(GameEngine& engine, const char* name)
+{
+    return engine.nodes.at(name);
+}
+
+bool RenderSystem::nodeExists(GameEngine& engine, const char* name)
+{
+    return engine.nodes.find(name) != engine.nodes.end();
+}
+
+void RenderSystem::drawCheats(EntityManager& em, GameEngine& engine)
+{
+    auto& li = em.getSingleton<LevelInfo>();
+    auto& player = *em.getEntityByID(li.playerID);
+    auto& phy = em.getComponent<PhysicsComponent>(player);
+    auto& cheatPositions = em.getSingleton<CheatsInfo>().cheatPositions;
+
+    auto wRate = engine.getWidthRate();
+    auto hRate = engine.getHeightRate();
+    float middleScreenX = static_cast<float>(engine.getScreenWidth()) * wRate / 2;
+    float middleScreenY = static_cast<float>(engine.getScreenHeight()) * hRate / 2;
+
+    int posRectX = 0;
+    int posRectY = engine.getScreenHeight() / 4;
+    int rectWidth = static_cast<int>(middleScreenX * 1.5f);
+    int rectHeight = static_cast<int>(middleScreenY * 3.5f);
+
+    auto* cheatsNode = getNode(engine, "MenuCheats");
+    auto* rect = engine.createRectangle({ posRectX, posRectY }, { rectWidth, rectHeight }, D_WHITE, "cheatRect", cheatsNode);
+    engine.drawNode(rect);
+
+    int posTextX = 20;
+    int posY = posRectY + static_cast<int>(30.f * hRate);
+    int posButtonX = static_cast<int>(360.f * wRate);
+    int posButtonY = posY - static_cast<int>(10.f * hRate);
+    int posButtonWidth = static_cast<int>(230.f * wRate);
+    int posButtonHeight = static_cast<int>(90.f * hRate);
+    int downRate = static_cast<int>(60.f * hRate);
+
+    int i{ 0 };
+    std::vector<Button*> buttons{};
+    for (auto& [_, data] : cheatPositions)
+    {
+        auto& [levelNum, posName, pos] = data;
+        if (levelNum == li.mapID)
+        {
+            engine.createText({ posTextX, posY + i * downRate }, posName.c_str(), D_BLACK, (posName + std::to_string(levelNum)).c_str(), cheatsNode);
+            auto* btn = engine.createButton({ posButtonX, posButtonY + i * downRate }, { posButtonWidth, posButtonHeight }, pos.toString(), pos.toString().c_str(), cheatsNode);
+            buttons.push_back(btn->getEntity<Button>());
+            i++;
+        }
+    }
+
+    for (auto& btn : buttons)
+    {
+        if (btn->state == ButtonState::CLICK)
+        {
+            phy.position = vec3d::fromWString(btn->textBox.text.getText());
+        }
+    }
+
+    std::vector<std::string> levels = { "0", "1", "2", "3" };
+    for (auto it = levels.begin(); it != levels.end();)
+    {
+        if (li.mapID == static_cast<uint8_t>(std::stoi(*it)))
+            it = levels.erase(it);
+        else
+            ++it;
+    }
+
+    auto* slider = engine.createOptionSlider({ posButtonX + 45, posButtonY + i * downRate }, { posButtonWidth / 5, posButtonHeight }, D_BLACK, "",
+        engine.getDefaultFont(), 20, 30, D_LAVENDER_DARK, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA, D_AQUA, levels,
+        levels[0], "levelSlider", cheatsNode);
+    auto* sliderInfo = slider->getEntity<OptionSlider>();
+    sliderInfo->setOptions(levels);
+
+    auto* btnLevel = engine.createButton({ posTextX, posButtonY + i * downRate }, { static_cast<int>(static_cast<float>(posButtonWidth) * 1.5f), posButtonHeight },
+        "Cambiar Nivel", "levelChangeButton", cheatsNode);
+
+    auto* btnInfo = btnLevel->getEntity<Button>();
+    if (btnInfo->state == ButtonState::CLICK)
+    {
+        li.mapToLoad = static_cast<uint8_t>(std::stoi(sliderInfo->options[sliderInfo->currentOption]));
+        li.transition = true;
+    }
+
+    i += 1;
+    engine.createText({ posTextX, posY + i * downRate }, "Gravedad", D_BLACK, "gravityCheckText", cheatsNode);
+
+    bool grav = phy.gravity > 0;
+    auto* gravCheckBox = engine.createCheckBox({ posButtonX + 45, posButtonY + i * downRate }, 40.f, grav, D_WHITE, D_LAVENDER, D_LAVENDER_LIGHT, "gravCheckBox", cheatsNode);
+    auto* gravInfo = gravCheckBox->getEntity<CheckBox>();
+
+    if (gravInfo->isClicked())
+    {
+        if (gravInfo->checked)
+            phy.gravity = phy.KGravity;
+        else
+            phy.gravity = 0;
+    }
+
+    i += 1;
+
+    engine.createText({ posTextX, posY + i * downRate }, "Llave", D_BLACK, "keyCheckText", cheatsNode);
+
+    auto& plfi = em.getSingleton<PlayerInfo>();
+    engine.createCheckBoxPtr({ posButtonX + 45, posButtonY + i * downRate }, 40.f, &plfi.hasKey, D_WHITE, D_LAVENDER, D_LAVENDER_LIGHT, "keyCheckBox", cheatsNode);
+
+    i += 1;
+
+    engine.createText({ posTextX, posY + i * downRate }, "Invencible", D_BLACK, "invincibleCheckText", cheatsNode);
+    engine.createCheckBoxPtr({ posButtonX + 45, posButtonY + i * downRate }, 40.f, &plfi.invincible, D_WHITE, D_LAVENDER, D_LAVENDER_LIGHT, "invincibleCheckBox", cheatsNode);
+}
+
+void RenderSystem::drawSnowEffect(GameEngine& engine, bool generate, vec2f)
+{
+    // auto cameraPos = engine.getPositionCamera();
+    auto screenH = engine.getScreenHeight();
+    auto* snowNode = getNode(engine, "SnowStarfield");
+    for (std::size_t i = 0; i < 80; i++)
+    {
+        auto& snow = snowList[i];
+        if ((snow.position.x < 0 || snow.position.y > static_cast<float>(screenH)) && generate)
+            generateSnow(engine, i);
+        else if (snow.position.x > 0 && snow.position.y < static_cast<float>(screenH))
+        {
+            engine.createCircle(snow.position.to_other<int>(), snow.size / 2, 5, D_WHITE, ("snow" + std::to_string(i)).c_str(), snowNode);
+
+            // Update snow position
+            snow.position -= snow.speed;
+            snow.speed *= 1.01f;
+        }
+    }
+
+    // Pa cuando se arregle el shader de transparencia
+    // if (generate)
+        // engine.drawRectangle({ 0, 0 }, { engine.getScreenWidth(), engine.getScreenHeight() }, { 255, 255, 255, 10 });
+}
+
+void RenderSystem::generateSnow(GameEngine& engine, std::size_t num)
+{
+    snowList[num] = {
+        vec2i{engine.getScreenWidth() + engine.getRandomValue(-300, 300), engine.getRandomValue(-300, 300)}.to_other<float>(),
+        {engine.getRandomValue(10.f, 30.f), engine.getRandomValue(-25.f, 0.f)},
+       engine.getRandomValue(8.f, 18.f)
+    };
+
+    if (snowList[num].position.x < static_cast<float>(engine.getScreenWidth()) && snowList[num].position.y > 0)
+        generateSnow(engine, num);
 }

@@ -35,7 +35,7 @@ struct MapManager
     inline void resetParts(EntityManager& em)
     {
         // Primero, destruye las partes
-        destroyParts<Tags...>(em);
+        resetEnemies<Tags...>(em);
 
         // Luego, resetea cada parte
         (resetTag<Tags>(em), ...);
@@ -54,13 +54,15 @@ private:
     void generateEnemies(EntityManager& em, const valueType& enemyArray, Ia_man& iam);
     void generateNPCs(EntityManager& em, const valueType& npcArray);
     void generateInteractables(EntityManager& em, const valueType& interactableArray);
-    void generateNavmeshes(EntityManager& em);
+    void generateNavmeshes(EntityManager& em, uint8_t map);
+    void generateCheats(EntityManager& em);
     void addToZone(EntityManager& em, Entity& e, InteractableType type);
     void checkDispatcher(EntityManager& em, Entity& e, const valueType& value);
     void addMessageCmp(EntityManager& em, Entity& e, const valueType& value);
     vec3d rotateY(const vec3d& v, double angle);
     vec3d rotateAroundPoint(const vec3d& point, const vec3d& pivot, double angle);
     vec3d rotateScale(const vec3d& v, double angle);
+    void resetEnemies(EntityManager& em);
 
     std::string fileMap{};
     LoadState state{ LoadState::LOAD_CHUNKS };
@@ -69,20 +71,7 @@ private:
     uint8_t unique_ids{ 0 }, boatParts{ 0 };
     bool reSpawn{ false };
 
-    template <typename... Tags>
-    void destroyParts(EntityManager& em)
-    {
-        using CMPS = MP::TypeList<>;
-        auto& li = em.getSingleton<LevelInfo>();
-
-        (em.forEachAny<CMPS, Tags>([&](Entity& entity) { li.insertDeath(entity.getID()); }), ...);
-    }
-
-    template <typename Tag>
-    inline void resetTag(EntityManager&) {}
-    template <typename Tag>
-    inline void resetTag(EntityManager& em, Ia_man& iam) {}
-
+    int doorCount = 0;
     std::vector<std::unique_ptr<BehaviourTree_t>> vec_t{};
 };
 
