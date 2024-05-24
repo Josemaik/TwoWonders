@@ -155,7 +155,7 @@ namespace ENGI {
         RayCast getMouseRay();
         void loadAndResizeImage(const char* name, const char* path, Node* parentNode);
         void loadAndResizeBillboard(const char* name, const char* path, Node* parentNode);
-        void loadAndResizeImageGif(const char* name, const char* filePath);
+        void loadAndResizeImageGif(const char* name, const char* filePath, float frameTime = 0.5f);
         void unloadGifsAndTextures();
         void setReplayMode(bool replay, GameData& gd);
         double getTime();

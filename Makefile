@@ -8,7 +8,7 @@ ifeq ($(OS),Windows_NT)
 	SANITIZE   	:=
 	LIBS_COPY  	:= libs/*.dll
 else
-	CC 		   	:= g++-12 -fopenmp
+	CC 		   	:= g++-12
 	CCACHE 	   	:= ccache
     LIBS 		:= -L./fmodlibs -lfmod -lfmodstudio -lglfw -lGLEW -lGLU -lGL -lm -lassimp -lfreetype -lgif
 	SANITIZE   	:= -fsanitize=address,undefined

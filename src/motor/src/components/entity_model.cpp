@@ -1,10 +1,11 @@
 #include "entity_model.hpp"
+#include <set>
 
 namespace DarkMoon {
     void Model::load(const char* filePath, ResourceManager& rm) {
         // Read file
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+        const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_FlipWindingOrder);
         if (!scene || !scene->mRootNode) {
             std::cerr << "[ERROR ASSIMP] : " << importer.GetErrorString() << std::endl;
             return;
@@ -75,7 +76,7 @@ namespace DarkMoon {
         }
     }
 
-    void Model::processMesh(aiMesh* mesh, aiMaterial* aiMaterial, const aiScene* scene, ResourceManager& rm) {
+    void Model::processMesh(aiMesh* mesh, aiMaterial* mat, const aiScene* scene, ResourceManager& rm) {
         // Process the vertices
         std::vector<Vertex> vertices(mesh->mNumVertices);
         std::vector<glm::ivec4> boneIDs(mesh->mNumVertices);
@@ -152,19 +153,19 @@ namespace DarkMoon {
         {
             processBone(boneIDs, weights, mesh, scene);
             hasBones = true;
+
+            for (std::size_t i = 0; i < vertices.size(); i++) {
+                vertices[i].boneIDs = boneIDs[i];
+                vertices[i].weights = weights[i];
+            }
         }
 
-        for (std::size_t i = 0; i < vertices.size(); i++) {
-            vertices[i].boneIDs = boneIDs[i];
-            vertices[i].weights = weights[i];
-        }
-
-        //std::cout << aiMaterial->GetName().C_Str() << "\n";
+        //std::cout << mat->GetName().C_Str() << "\n";
         //std::cout << mesh->mName.C_Str() << "\n";
 
         // Process material
-        auto material = processMaterial(aiMaterial, rm);
-        processTextures(aiMaterial, material, rm);
+        auto material = processMaterial(mat, rm);
+        processTextures(mat, material, rm);
 
         std::string name = std::string(m_name) + mesh->mName.C_Str();
         std::string meshName = mesh->mName.C_Str();

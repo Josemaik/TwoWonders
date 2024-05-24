@@ -106,12 +106,12 @@ void ParticleSystem::update(EntityManager& em)
                     }, variant);
 
                     // La metemos en el vector de partículas
-                    pmc.particles.push_back(p);
+                    pmc.particles.push_back({ nullptr, p });
                 }
             }
 
             // Actualizamos las partículas
-            for (auto& p : pmc.particles)
+            for (auto& [_, p] : pmc.particles)
             {
                 p.remainingLife -= timeStep;
                 if (p.remainingLife <= 0.f)

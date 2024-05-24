@@ -1,6 +1,6 @@
 #include "object_system.hpp"
 
-void ObjectSystem::update(EntityManager& em) {
+void ObjectSystem::update(EntityManager& em, GameEngine& engine) {
     auto& li = em.getSingleton<LevelInfo>();
 
     em.forEach<SYSCMPs, SYSTAGs>([&](Entity& ent, ObjectComponent& obj)
@@ -101,7 +101,7 @@ void ObjectSystem::update(EntityManager& em) {
     });
 
     if (!toCreate.empty())
-        createObjects(em);
+        createObjects(em, engine);
 }
 
 // ent->hasComponent<LifeComponent<()
@@ -137,7 +137,7 @@ void ObjectSystem::addObject(ObjectType type, vec3d pos)
     toCreate.push_back(std::make_pair(type, pos));
 }
 
-void ObjectSystem::createObjects(EntityManager& em)
+void ObjectSystem::createObjects(EntityManager& em, GameEngine& engine)
 {
     // Se crean los objetos del vector
     for (auto& [obj, pos] : toCreate)
@@ -183,6 +183,10 @@ void ObjectSystem::createObjects(EntityManager& em)
 
             auto& plfi = em.getSingleton<PlayerInfo>();
             plfi.hasStaff = true;
+
+            auto& player = *em.getEntityByID(em.getSingleton<LevelInfo>().playerID);
+            auto& playerRen = em.getComponent<RenderComponent>(player);
+            engine.dmeg.CreateModel("assets/Assets/Props/Objetos_equipables/Baston_malo.obj", D_WHITE, "playerStaff", playerRen.node);
             break;
         }
         case ObjectType::Key:

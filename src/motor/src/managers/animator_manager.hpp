@@ -223,7 +223,7 @@ struct AnimationManager
     {
         std::vector<Animation*> animations;
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+        const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
         assert(scene && scene->mRootNode);
 
         for (std::size_t i = 0; i < scene->mNumAnimations; i++)

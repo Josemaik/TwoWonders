@@ -140,6 +140,17 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
     if (phy.stopped && phy.elapsed_afterStop >= phy.countdown_afterStop)
         return;
 
+    if (ge.isKeyPressed(D_KEY_0))
+        plfi.hasKey = true;
+
+    if (ge.isKeyPressed(D_KEY_1))
+    {
+        if (li.mapID == 0)
+            phy.position = { -116.0, 6.0, 111.0 };
+        else if (li.mapID == 1)
+            phy.position = { 30.0, 13.0, 213.0 };
+    }
+
     auto& in = em.getComponent<InputComponent>(player);
 
     // Actualizar la velocidad
@@ -260,28 +271,28 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             gami.setVel(vel);
     }
 
-    // if (ge.isKeyReleased(D_KEY_Z))
-    // {
-    //     Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", AttackType::WaterBombShot };
-    //     plfi.addSpell(spell);
-    // }
+    if (ge.isKeyReleased(D_KEY_Z))
+    {
+        Spell spell{ "Pompa de agua", "Disparas una potente concentración de agua que explota al impacto", AttackType::WaterBombShot };
+        plfi.addSpell(spell);
+    }
 
-    // if (ge.isKeyReleased(D_KEY_X))
-    // {
-    //     Spell spell{ "Pompa de fuego", "Disparas una potente concentración de fuego que explota al impacto", AttackType::WaterDashArea };
-    //     plfi.addSpell(spell);
-    // }
+    if (ge.isKeyReleased(D_KEY_X))
+    {
+        Spell spell{ "Pompa de fuego", "Disparas una potente concentración de fuego que explota al impacto", AttackType::WaterDashArea };
+        plfi.addSpell(spell);
+    }
 
-    // if (ge.isKeyReleased(D_KEY_C))
-    // {
-    //     Spell spell{ "Pompa de aire", "Disparas una potente concentración de aire que explota al impacto", AttackType::FireBallShot };
-    //     plfi.addSpell(spell);
-    // }
+    if (ge.isKeyReleased(D_KEY_C))
+    {
+        Spell spell{ "Pompa de aire", "Disparas una potente concentración de aire que explota al impacto", AttackType::FireBallShot };
+        plfi.addSpell(spell);
+    }
 
-    // if (ge.isKeyReleased(D_KEY_V))
-    // {
-    //     plfi.hasStaff = true;
-    // }
+    if (ge.isKeyReleased(D_KEY_V))
+    {
+        plfi.hasStaff = true;
+    }
 
     // Código para el lock-in
     if ((ge.isKeyReleased(in.lockIn) || ge.getGamepadAxisMovement(0, in.m_lockIn) > 0.5) && elapsedLockIn >= elapsedLockInLimit)

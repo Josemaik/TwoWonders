@@ -244,8 +244,8 @@ void ZoneSystem::checkChests(EntityManager& em, EventManager& evm)
 
                 // FIXME
                 // Animación del cofre
-                // auto& ac = em.getComponent<AnimationComponent>(e);
-                // ac.animToPlay = 0;
+                auto& ac = em.getComponent<AnimationComponent>(e);
+                ac.animToPlay = 0;
 
                 // Apagamos la luz del cofre
                 auto& plc = em.getComponent<PointLightComponent>(e);
@@ -341,11 +341,11 @@ void ZoneSystem::checkDoors(EntityManager& em, EventManager& evm)
             em.getSingleton<SoundSystem>().sonido_interaccion_e();
             if (e.hasComponent<AnimationComponent>())
             {
-                if(li.mapID == 1){
+                if (li.mapID == 1) {
                     em.getSingleton<SoundSystem>().sonido_puerta_prision();
                 }
                 em.getComponent<AnimationComponent>(e).animToPlay = static_cast<std::size_t>(DoorAnimations::OPEN);
-               
+
             }
             else
                 li.insertDeath(e.getID());
@@ -371,8 +371,8 @@ void ZoneSystem::openDoorsZone(EntityManager& em, EventManager& evm, vec3d& leve
         {
             li.doorToOpen = e.getID();
             evm.scheduleEvent(Event{ EventCodes::OpenDoor });
-            if(li.mapID == 1){
-                    em.getSingleton<SoundSystem>().sonido_puerta_prision();
+            if (li.mapID == 1) {
+                em.getSingleton<SoundSystem>().sonido_puerta_prision();
             }
             if (e.hasComponent<AnimationComponent>())
                 em.getComponent<AnimationComponent>(e).animToPlay = static_cast<std::size_t>(DoorAnimations::OPEN);

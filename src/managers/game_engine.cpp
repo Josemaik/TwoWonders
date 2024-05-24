@@ -308,13 +308,13 @@ ENGI::GameEngine::GameEngine(u16 const width, u16 const height)
     loadAndResizeImageGif("wasd", "assets/HUD/teclas/WASD.gif");
 
     // Ejemplo pompa
-    loadAndResizeImageGif("exp_pompa", "assets/HUD/gifs/hechizos/exp_pompa.gif");
+    loadAndResizeImageGif("exp_pompa", "assets/HUD/gifs/hechizos/exp_pompa.gif", 1.1f);
 
     // Ejemplo dash de agua
-    loadAndResizeImageGif("exp_dash", "assets/HUD/gifs/hechizos/exp_dash.gif");
+    loadAndResizeImageGif("exp_dash", "assets/HUD/gifs/hechizos/exp_dash.gif", 1.1f);
 
     // Ejemplo bola de fuego
-    loadAndResizeImageGif("exp_bola_f", "assets/HUD/gifs/hechizos/exp_bola_f.gif");
+    loadAndResizeImageGif("exp_bola_f", "assets/HUD/gifs/hechizos/exp_bola_f.gif", 1.1f);
 
     // Botón L2
     loadAndResizeImageGif("l2", "assets/HUD/botones/L2.gif");
@@ -773,12 +773,12 @@ void ENGI::GameEngine::loadAndResizeBillboard(const char* name, const char* path
         nodes[name] = dmeg.CreateBillboard(path, { 0, 0, 0 }, { 1, 1 }, name, parentNode);
 }
 
-void ENGI::GameEngine::loadAndResizeImageGif(const char* name, const char* filePath) {
+void ENGI::GameEngine::loadAndResizeImageGif(const char* name, const char* filePath, float frameTime) {
 
     auto textures = loadTextures2DAnim(filePath);
 
     if (!nodes[name])
-        nodes[name] = dmeg.CreateAnimatedTexture2D({ 0.0f, 0.0f }, textures, D_WHITE, 0.5f, 0, name, nodes["Gifs"]);
+        nodes[name] = dmeg.CreateAnimatedTexture2D({ 0.0f, 0.0f }, textures, D_WHITE, frameTime, 0, name, nodes["Gifs"]);
 }
 
 void ENGI::GameEngine::setReplayMode(bool replay, GameData& gd)

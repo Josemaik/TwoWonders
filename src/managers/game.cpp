@@ -278,7 +278,7 @@ void Game::run()
                     physics_system.update(em);
                     collision_system.update(em);
                     zone_system.update(em, engine, iam, evm, map);
-                    object_system.update(em);
+                    object_system.update(em, engine);
                     attack_system.update(em, am);
                     life_system.update(em, object_system);
                     // if (elapsed < timeStepDouble12045) - Descomentar si queremos que la cámara se actualice solo cuando se actualice el render

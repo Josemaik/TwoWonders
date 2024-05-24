@@ -32,5 +32,5 @@ struct ParticleMakerComponent
     float elapsed{ 0.f };
     bool multiply{ false };
 
-    std::vector<Particle> particles{};
+    std::vector<std::pair<DarkMoon::Node*, Particle>> particles{};
 };

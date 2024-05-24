@@ -1174,6 +1174,54 @@ void RenderSystem::drawEntities(EntityManager& em, GameEngine& engine)
 
                     if (auto model = r.node->getEntity<Model>())
                         model->color = colorEntidad;
+
+                    if (e.hasTag<PlayerTag>())
+                    {
+                        auto& plfi = em.getSingleton<PlayerInfo>();
+                        if (plfi.hasStaff)
+                        {
+                            auto& am = AnimationManager::getInstance();
+                            auto& staffNode = *r.node->getChildren()[0];
+                            auto& playerBoneMatrix = am.GetFinalBoneMatrices(0);
+
+                            glm::mat4 boneTransform = playerBoneMatrix[15];
+
+                            glm::mat4 bastonInitMatrix = glm::mat4(1.0f);
+                            glm::vec3 initTranslation = { +0.6563f, -2.6283f,  3.4105f };
+                            bastonInitMatrix = glm::translate(bastonInitMatrix, initTranslation);
+
+                            glm::mat4 newMatrix = boneTransform * bastonInitMatrix;
+
+                            staffNode.setTransformationMatrix(newMatrix);
+                            staffNode.setRotation({ 1.0, 0.0, 0.0 }, 90.0);
+                        }
+                    }
+                    else if (e.hasTag<NomadTag>())
+                    {
+                        auto& anc = em.getComponent<AnimationComponent>(e);
+                        if (anc.idCurrent != anc.max)
+                        {
+                            auto& am = AnimationManager::getInstance();
+                            Node* staffNode = nullptr;
+                            if (r.node->getChildren().empty())
+                                staffNode = engine.dmeg.CreateModel("assets/Personajes/NPCs/Nomada/Nomada_palo.obj", D_WHITE, "NomadStaff", r.node);
+                            else
+                                staffNode = r.node->getChildren()[0];
+
+                            auto& playerBoneMatrix = am.GetFinalBoneMatrices(anc.idCurrent);
+
+                            glm::mat4 boneTransform = playerBoneMatrix[15];
+
+                            glm::mat4 bastonInitMatrix = glm::mat4(1.0f);
+                            glm::vec3 initTranslation = { +0.6563f, -2.6283f,  3.4105f };
+                            bastonInitMatrix = glm::translate(bastonInitMatrix, initTranslation);
+
+                            glm::mat4 newMatrix = boneTransform * bastonInitMatrix;
+
+                            staffNode->setTransformationMatrix(newMatrix);
+                            staffNode->setRotation({ 1.0, 0.0, 0.0 }, 90.0);
+                        }
+                    }
                     // Luces cofre
                     // if (e.hasTag<ChestTag>()) {
                     //     auto& chest = em.getComponent<ChestComponent>(e);
@@ -1418,9 +1466,10 @@ void RenderSystem::loadModels(Entity& e, GameEngine& engine, EntityManager& em, 
     else if (e.hasTag<ChestTag>())
     {
         // FIXME
-        // r.node = engine.loadModel("assets/Assets/Cofre/Cofre0.fbx");
-        // loadAnimations(engine, em, e, r, "assets/Assets/Cofre/Cofre0.fbx", 1.0f);
-        r.node = engine.loadModel("assets/Assets/Cofre/Cofre.obj");
+        std::string path = "assets/Assets/Cofre/Cofre0.fbx";
+        r.node = engine.loadModel(path.c_str());
+        loadAnimations(engine, em, e, r, path, 1.0f);
+        // r.node = engine.loadModel("assets/Assets/Cofre/Cofre.obj");
         setPointLight(engine, em, e, *r.node, r.position + vec3d{ 0, 5, 0 });
     }
     else if (e.hasTag<DestructibleTag>())
@@ -1741,7 +1790,7 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
 
         if (pmc.active)
         {
-            for (auto& p : pmc.particles)
+            for (auto& [node, p] : pmc.particles)
             {
                 std::variant<Color, std::string>& variant = p.color;
                 std::visit([&](auto&& arg) {
@@ -1753,13 +1802,17 @@ void RenderSystem::drawParticles(EntityManager& em, GameEngine& engine)
                     }
                     else if constexpr (std::is_same_v<T, std::string>)
                     {
-                        std::string& textura = std::get<std::string>(p.color);
-                        auto* p_texture = engine.createNode(getNode(engine, textura.c_str()), getNode(engine, "TextCopy"));
-                        auto& textureInfo = *p_texture->getEntity<Texture2D>()->texture;
+                        if (!node)
+                        {
+                            std::string& textura = std::get<std::string>(p.color);
+                            node = engine.createNode(getNode(engine, textura.c_str()), getNode(engine, "HUD"));
+                        }
+
+                        auto& textureInfo = *node->getEntity<Texture2D>()->texture;
                         int posX = static_cast<int>(engine.getWorldToScreenX(p.position.toDouble()) - static_cast<float>(textureInfo.getWidth()) * wRate / 2);
                         int posY = static_cast<int>(engine.getWorldToScreenY(p.position.toDouble()) - static_cast<float>(textureInfo.getHeight()) * hRate / 2);
 
-                        engine.drawNode(p_texture, { posX, posY });
+                        engine.drawNode(node, { posX, posY });
                     }
                 }, variant);
             }
@@ -1888,7 +1941,7 @@ void RenderSystem::drawTestPathfinding(GameEngine& engine, EntityManager& em) {
 
     // evento click en botón CALCULAR
     if (butt1.state == ButtonState::CLICK) {
-        
+
         // Función para encontrar el nodo más cercano a una posición dada
         vec3d posplayer = em.getComponent<PhysicsComponent>(*em.getEntityByID(li.playerID)).position;
         uint16_t startnode = findNearestNode(em, posplayer, navs.nodes);
@@ -1899,7 +1952,7 @@ void RenderSystem::drawTestPathfinding(GameEngine& engine, EntityManager& em) {
         graph.createGraph(navs.conexiones, navs.nodes);
         std::vector<vec3d> path = graph.PathFindAStar(debug, startnode, 423);
 
-        
+
         if (path.size() == 0) {
             std::cout << "CAGUEEEEEEEE \n";
         }
@@ -2186,7 +2239,7 @@ void RenderSystem::drawEditorInGameIA(GameEngine& engine, EntityManager& em) {
                 //Countdown stop
                 engine.createText({ 15, 440 }, "Countdown Stop:", D_BLACK, "countdown stop", debugAI);
                 aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 290.0, 440.0, 120.0, 30.0, "countdown_stop", debugAI);
-                
+
                 engine.createText({ 15, 440 }, "Countdown Stop:", D_BLACK, "countdown stop", debugAI);
                 aic.countdown_stop = SelectValue(engine, aic.countdown_stop, 290.0, 440.0, 120.0, 30.0, "countdown_stop", debugAI);
             }
@@ -2293,21 +2346,22 @@ void RenderSystem::drawHUD(EntityManager& em, GameEngine& engine)
         if (!frti.inFrustum(e.getID()) || e.hasTag<PlayerTag>())
             continue;
 
-        if (e.hasTag<CrusherTag>() && !e.hasTag<EnemyDeathTag>()) {
-            auto& phy = em.getComponent<PhysicsComponent>(e);
-            auto& ai = em.getComponent<AIComponent>(e);
+        // Barra de las apisonadoras
+        // if (e.hasTag<CrusherTag>() && !e.hasTag<EnemyDeathTag>()) {
+        //     auto& phy = em.getComponent<PhysicsComponent>(e);
+        //     auto& ai = em.getComponent<AIComponent>(e);
 
-            auto wRate = engine.getWidthRate();
-            auto hRate = engine.getHeightRate();
+        //     auto wRate = engine.getWidthRate();
+        //     auto hRate = engine.getHeightRate();
 
-            int posx = static_cast<int>(engine.getWorldToScreenX(phy.position) + 45.f * wRate);
-            int posz = static_cast<int>(engine.getWorldToScreenY(phy.position) - 105.f * hRate);
+        //     int posx = static_cast<int>(engine.getWorldToScreenX(phy.position) + 45.f * wRate);
+        //     int posz = static_cast<int>(engine.getWorldToScreenY(phy.position) - 105.f * hRate);
 
-            engine.drawRectangle({ posx, posz }, { 10, 100 }, D_BLACK);
+        //     engine.drawRectangle({ posx, posz }, { 10, 100 }, D_BLACK);
 
-            int barHeight = static_cast<int>((ai.elapsed_shoot / ai.countdown_shoot) * 100);
-            engine.drawRectangle({ posx, posz }, { 10, barHeight }, D_BLUE_LIGHT);
-        }
+        //     int barHeight = static_cast<int>((ai.elapsed_shoot / ai.countdown_shoot) * 100);
+        //     engine.drawRectangle({ posx, posz }, { 10, barHeight }, D_BLUE_LIGHT);
+        // }
 
         // Vidas HUD
         if (e.hasTag<EnemyTag>() && e.hasComponent<LifeComponent>() && em.getComponent<RenderComponent>(e).visible &&
