@@ -43,4 +43,24 @@ struct BTNode_t {
     BTNode_t& operator=(BTNode_t&&) = delete;
     //Constructor virtual
     virtual BTNodeStatus_t run(EntityContext_t& ectx) noexcept = 0;
+
+    //funciones auxiliares para los nodos
+    // Obtengo la posición del player
+    PhysicsComponent& getplayerphy(EntityContext_t& ectx) {
+        auto& li = ectx.em.getSingleton<LevelInfo>();
+        auto* playerEn = ectx.em.getEntityByID(li.playerID);
+        //if (not playerEn) return vec3d{}; // No hay player
+        // Si hay player
+        auto& plphy = ectx.em.getComponent<PhysicsComponent>(*playerEn);
+        return plphy;
+    };
+    //Obtengo el colision component del player
+    ColliderComponent& getplayercollider(EntityContext_t& ectx) {
+        auto& li = ectx.em.getSingleton<LevelInfo>();
+        auto* playerEn = ectx.em.getEntityByID(li.playerID);
+        //if (not playerEn) return ColliderComponent{}; // No hay player
+        // Si hay player
+        auto& col = ectx.em.getComponent<ColliderComponent>(*playerEn);
+        return col;
+    };
 };
