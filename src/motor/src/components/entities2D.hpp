@@ -119,9 +119,9 @@ namespace DarkMoon {
         Color color{};
         float frameDuration{ .6f };
         float elapsedTime{ 0.0f };
-        int currentFrame{ 0 };
+        std::size_t currentFrame{ 0 };
 
-        AnimatedTexture2D(glm::vec2 pos = { 0.0f, 0.0f }, Color col = D_WHITE, float framD = 1.0f, int currF = 0)
+        AnimatedTexture2D(glm::vec2 pos = { 0.0f, 0.0f }, Color col = D_WHITE, float framD = 1.0f, std::size_t currF = 0)
             : position(pos), color(col), frameDuration(framD), currentFrame(currF) {};
 
         void draw(glm::mat4 transMatrix) override {
@@ -130,7 +130,7 @@ namespace DarkMoon {
 
             elapsedTime += 1 / 60.0f;
             if (elapsedTime > frameDuration) {
-                if (currentFrame + 1 > static_cast<int>(frames.size() - 1))
+                if (currentFrame + 1 > frames.size() - 1)
                     currentFrame = 0;
                 else
                     currentFrame += 1;
@@ -426,8 +426,8 @@ namespace DarkMoon {
 #ifdef _WIN32
             bool checkSpecial = false;
 #endif
-            int k{ 1 }; // Pa la anchura de las líneas
-            for (size_t i = 0; i < charIndex; ++i) {
+            std::size_t k{ 1 }; // Pa la anchura de las líneas
+            for (std::size_t i = 0; i < charIndex; ++i) {
                 wchar_t c = text[i];
                 if (c == '\n') {
                     // Reset the x position to the start of the line

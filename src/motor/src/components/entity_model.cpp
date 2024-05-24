@@ -247,13 +247,13 @@ namespace DarkMoon {
                 glm::mat4 offset = aiMatrix4x4ToGlm(&mesh->mBones[boneIndex]->mOffsetMatrix);
                 //std::cout << "\n";
                 boneVector.push_back({ boneName, offset });
-                boneID = boneIndex;
+                boneID = static_cast<int>(boneIndex);
                 m_BoneCounter++;
             }
             else {
                 for (unsigned int i = 0; i < boneVector.size(); i++) {
                     if (boneVector[i].name == boneName) {
-                        boneID = i;
+                        boneID = static_cast<int>(i);
                         break;
                     }
                 }

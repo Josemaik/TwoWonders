@@ -4,9 +4,9 @@ void RenderComponent::destroyMesh()
 {
     //UnloadModel(model);
     meshLoaded = false;
-    if (node){
+    if (node) {
         for (auto& child : node->getChildren()) {
-            if(auto pLight = child->getEntity<DarkMoon::PointLight>())
+            if (auto pLight = child->getEntity<DarkMoon::PointLight>())
                 pLight->enabled = false;
             //if(auto sLight = child->getEntity<DarkMoon::SpotLight>())
             //    sLight->enabled = false;
@@ -58,9 +58,4 @@ void RenderComponent::setRotationVec(vec3d r)
     rotationVec.setX(r.x());
     rotationVec.setY(r.y());
     rotationVec.setZ(r.z());
-}
-
-void RenderComponent::updateBBox()
-{
-    bbox = BBox(position, scale);
 }

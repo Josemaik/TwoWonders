@@ -125,7 +125,7 @@ struct AnimationManager
             }
         }
 
-        for (int i = 0; i < node->childrenCount; i++)
+        for (std::size_t i = 0; i < node->childrenCount; i++)
             calculateBoneTransform(&node->children[i], globalTransformation, animation, currentTime, id);
     }
 
@@ -188,7 +188,7 @@ struct AnimationManager
             }
         }
 
-        for (int i = 0; i < curNode->childrenCount; i++)
+        for (std::size_t i = 0; i < curNode->childrenCount; i++)
             calculateBoneTransition(&curNode->children[i], globalTransformation, prevAnimation, nextAnimation, haltTime, currentTime, transitionTime, id);
     }
 
@@ -198,7 +198,7 @@ struct AnimationManager
     }
 
     float myFmod(float a, float b) {
-        float result = a - (b * static_cast<int>(a / b));
+        float result = a - static_cast<float>(static_cast<int>(b) * static_cast<int>(a / b));
         if (result < 0) {
             result += b;
         }

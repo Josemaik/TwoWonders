@@ -71,10 +71,6 @@ private:
     uint8_t unique_ids{ 0 }, boatParts{ 0 };
     bool reSpawn{ false };
 
-    template <typename Tag>
-    inline void resetTag(EntityManager&) {}
-    template <typename Tag>
-    inline void resetTag(EntityManager& em, Ia_man& iam) {}
     int doorCount = 0;
     std::vector<std::unique_ptr<BehaviourTree_t>> vec_t{};
 };

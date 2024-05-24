@@ -30,8 +30,8 @@ namespace DarkMoon {
         m_height = img->Height;
         m_nrChannels = 4;
 
-        unsigned char* data = (unsigned char*)stbi__malloc(m_width * m_height * m_nrChannels);
-        memset(data, 0, m_width * m_height * m_nrChannels);
+        unsigned char* data = (unsigned char*)stbi__malloc(static_cast<std::size_t>(m_width * m_height * m_nrChannels));
+        memset(data, 0, static_cast<std::size_t>(m_width * m_height * m_nrChannels));
 
         int transparentColor = -1;
         if (gifFile->SavedImages[frameIndex].ExtensionBlockCount > 0) {

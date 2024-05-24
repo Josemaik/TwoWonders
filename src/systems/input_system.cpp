@@ -153,9 +153,6 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
 
     auto& in = em.getComponent<InputComponent>(player);
 
-    // Actualizar la velocidad
-    int keysPressed = 0;
-
     // Código de movimiento
     // std::chrono::duration<float, std::milli> velTime{};
     if (!phy.notMove)
@@ -168,35 +165,25 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
         {
             if (!plfi.onLadder)
             {
-
                 if (ge.isKeyDown(in.right))
                 {
                     vel.setX(vel.x() - INP_SPEED);
                     vel.setZ(vel.z() + INP_SPEED);
-
-                    keysPressed++;
                 }
                 if (ge.isKeyDown(in.left))
                 {
                     vel.setX(vel.x() + INP_SPEED);
                     vel.setZ(vel.z() - INP_SPEED);
-
-                    keysPressed++;
                 }
                 if (ge.isKeyDown(in.up))
                 {
                     vel.setX(vel.x() + INP_SPEED);
                     vel.setZ(vel.z() + INP_SPEED);
-
-                    keysPressed++;
                 }
                 if (ge.isKeyDown(in.down))
                 {
-
                     vel.setX(vel.x() - INP_SPEED);
                     vel.setZ(vel.z() - INP_SPEED);
-
-                    keysPressed++;
                 }
 
                 if (ge.isGamepadAvailable(0))
@@ -228,15 +215,9 @@ void InputSystem::update(EntityManager& em, GameEngine& ge)
             else
             {
                 if (ge.isKeyDown(in.up))
-                {
                     vel.setY(vel.y() + INP_SPEED);
-                    keysPressed++;
-                }
                 if (ge.isKeyDown(in.down))
-                {
                     vel.setY(vel.y() - INP_SPEED);
-                    keysPressed++;
-                }
 
                 if (ge.isGamepadAvailable(0))
                 {

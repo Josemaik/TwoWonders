@@ -357,7 +357,7 @@ void Ia_man::createSubdito(EntityManager& em, double generate_radius) {
     em.addComponent<SubjectComponent>(e, SubjectComponent{});
 
     em.addComponent<AIComponent>(e, AIComponent{ .arrival_radius = 0.1, .detect_radius = 18.0, .attack_radius = attack_radius_p, .tx = 0.0, .tz = 0.0,.time2arrive = 1.0, .tactive = true, .perceptionTime = static_cast<float>(0.2),
-    .path = vec3d{}, .countdown_stop = countdown_stop_p, .countdown_shoot = countdown_shoot_p, .countdown_perception = 0.2, .behaviourTree = &tree });
+    .path = { vec3d::zero() }, .countdown_stop = countdown_stop_p, .countdown_shoot = countdown_shoot_p, .countdown_perception = 0.2, .behaviourTree = &tree });
 
     em.addComponent<AttackerComponent>(e);
 }

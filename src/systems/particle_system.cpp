@@ -95,11 +95,11 @@ void ParticleSystem::update(EntityManager& em)
                     std::visit([&](auto&& arg) {
                         using T = std::decay_t<decltype(arg)>;
                         if constexpr (std::is_same_v<T, std::vector<Color>>) {
-                            Color& color = arg[std::rand() % arg.size()];
+                            Color& color = arg[static_cast<std::size_t>(std::rand()) % arg.size()];
                             p.color = color;
                         }
                         else if constexpr (std::is_same_v<T, std::vector<std::string>>) {
-                            std::string& colorName = arg[std::rand() % arg.size()];
+                            std::string& colorName = arg[static_cast<std::size_t>(std::rand()) % arg.size()];
                             p.texture = colorName;
                             p.type = Particle::ParticleType::Texture;
                         }

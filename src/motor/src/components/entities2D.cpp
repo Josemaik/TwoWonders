@@ -193,7 +193,7 @@ namespace DarkMoon {
             changeVAO(transMatrix);
 
         // Set the uniform color in the shader
-        GLuint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+        GLuint colorUniform = static_cast<unsigned int>(glGetUniformLocation(rm.getShader()->getIDShader(), "customColor"));
         glUseProgram(rm.getShader()->getIDShader());
         glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
@@ -267,7 +267,7 @@ namespace DarkMoon {
             changeVAO(transMatrix);
 
         // Set the uniform color in the shader
-        GLuint colorUniform = glGetUniformLocation(rm.getShader()->getIDShader(), "customColor");
+        GLuint colorUniform = static_cast<unsigned int>(glGetUniformLocation(rm.getShader()->getIDShader(), "customColor"));
         glUseProgram(rm.getShader()->getIDShader());
         glUniform4fv(colorUniform, 1, glm::value_ptr(rm.normalizeColor(color)));
 
@@ -286,10 +286,10 @@ namespace DarkMoon {
         glGenBuffers(1, &m_VBO);
 
         // Generate unit circle vertices
-        int vertexCount = segments * 2;
+        std::size_t vertexCount = static_cast<std::size_t>(segments * 2);
         vertices.resize(vertexCount);
-        for (int i = 0; i < vertexCount; i += 2) {
-            float theta = static_cast<float>((i / 2) * (2.0f * K_PI2 / segments));
+        for (std::size_t i = 0; i < vertexCount; i += 2) {
+            float theta = static_cast<float>(static_cast<float>(i / 2) * (2.0f * K_PI2 / segments));
             vertices[i] = std::cos(theta);
             vertices[i + 1] = std::sin(theta);
         }
@@ -328,10 +328,10 @@ namespace DarkMoon {
             oldSegments = segments;
 
             int vertexCount = segments * 2;
-            vertices.resize(vertexCount);
+            vertices.resize(static_cast<std::size_t>(vertexCount));
 
-            for (int i = 0; i < vertexCount; i += 2) {
-                float theta = static_cast<float>((i / 2) * (2.0f * K_PI2 / segments));
+            for (std::size_t i = 0; i < static_cast<std::size_t>(vertexCount); i += 2) {
+                float theta = static_cast<float>(static_cast<float>(i / 2) * (2.0f * K_PI2 / segments));
                 vertices[i] = rm.normalizeX(position.x + (radius * scale) * std::cos(theta));
                 vertices[i + 1] = rm.normalizeY(position.y + (radius * scale) * std::sin(theta));
             }

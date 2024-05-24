@@ -43,7 +43,7 @@ private:
 public:
     Bone(const std::string& inName, int inId, const aiNodeAnim* channel) {
         name = inName;
-        id = inId;
+        id = static_cast<unsigned int>(inId);
         transform = glm::mat4(1.0f);
 
         numPositions = channel->mNumPositionKeys;

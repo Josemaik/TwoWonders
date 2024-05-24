@@ -34,7 +34,7 @@ void DSphereTree::subdivide(Entity& entity, ColliderComponent& collider) {
     }
 
     // Encuentra el eje de mayor varianza
-    std::size_t axis = std::max_element(variance.begin(), variance.end()) - variance.begin();
+    std::size_t axis = static_cast<std::size_t>(std::max_element(variance.begin(), variance.end()) - variance.begin());
 
     // Ordena los datos a lo largo de ese eje
     std::sort(sphereEntities_.begin(), sphereEntities_.end(),
@@ -44,8 +44,8 @@ void DSphereTree::subdivide(Entity& entity, ColliderComponent& collider) {
 
     // Divide los datos en dos a lo largo de ese eje
     std::size_t mid = sphereEntities_.size() / 2;
-    SphereMap left(sphereEntities_.begin(), sphereEntities_.begin() + mid);
-    SphereMap right(sphereEntities_.begin() + mid, sphereEntities_.end());
+    SphereMap left(sphereEntities_.begin(), sphereEntities_.begin() + static_cast<long>(mid));
+    SphereMap right(sphereEntities_.begin() + static_cast<long>(mid), sphereEntities_.end());
 
     std::vector<vec3d> leftCenters{}, rightCenters{};
     for (const auto& entity : left) {

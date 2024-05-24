@@ -24,8 +24,8 @@ void BVHNode::insert(BVHVector& entities)
 
         // Split the list of entities in two and create children
         std::size_t mid = entities.size() / 2;
-        BVHVector leftEntities(entities.begin(), entities.begin() + mid);
-        BVHVector rightEntities(entities.begin() + mid, entities.end());
+        BVHVector leftEntities(entities.begin(), entities.begin() + static_cast<long>(mid));
+        BVHVector rightEntities(entities.begin() + static_cast<long>(mid), entities.end());
         left = std::make_unique<BVHNode>(leftEntities);
         right = std::make_unique<BVHNode>(rightEntities);
     }

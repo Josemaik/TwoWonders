@@ -50,8 +50,8 @@ namespace DarkMoon {
                     GL_TEXTURE_2D,
                     0,
                     GL_RED,
-                    face->glyph->bitmap.width,
-                    face->glyph->bitmap.rows,
+                    static_cast<GLint>(face->glyph->bitmap.width),
+                    static_cast<GLint>(face->glyph->bitmap.rows),
                     0,
                     GL_RED,
                     GL_UNSIGNED_BYTE,
@@ -75,7 +75,7 @@ namespace DarkMoon {
             // Load special characters
             std::wstring special_chars = L"áéíóúñÁÉÍÓÚÑ¿¡";
             for (wchar_t wc : special_chars) {
-                if (FT_Load_Char(face, wc, FT_LOAD_RENDER)) {
+                if (FT_Load_Char(face, static_cast<FT_ULong>(wc), FT_LOAD_RENDER)) {
                     std::cerr << "Error loading Glyph" << std::endl;
                     continue;
                 }
@@ -87,8 +87,8 @@ namespace DarkMoon {
                     GL_TEXTURE_2D,
                     0,
                     GL_RED,
-                    face->glyph->bitmap.width,
-                    face->glyph->bitmap.rows,
+                    static_cast<GLsizei>(face->glyph->bitmap.width),
+                    static_cast<GLsizei>(face->glyph->bitmap.rows),
                     0,
                     GL_RED,
                     GL_UNSIGNED_BYTE,

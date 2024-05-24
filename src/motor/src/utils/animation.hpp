@@ -18,7 +18,7 @@ struct AssimpNodeData
 {
     glm::mat4 transformation{};
     std::string name{};
-    int childrenCount{};
+    std::size_t childrenCount{};
     std::vector<AssimpNodeData> children{};
     Bone* bone = nullptr;
 };
@@ -95,9 +95,9 @@ private:
             std::string boneName = channel->mNodeName.data;
             int boneId = -1;
 
-            for (unsigned int i = 0; i < boneProps.size(); i++) {
+            for (std::size_t i = 0; i < boneProps.size(); i++) {
                 if (boneProps[i].name == boneName) {
-                    boneId = i;
+                    boneId = static_cast<int>(i);
                     break;
                 }
             }

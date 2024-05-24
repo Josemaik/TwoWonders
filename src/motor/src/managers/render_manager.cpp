@@ -7,7 +7,7 @@
 namespace DarkMoon {
 
     // Get position from 3D world to 2D world
-    glm::vec2 RenderManager::getWorldToScreen(glm::vec3 pos3D){
+    glm::vec2 RenderManager::getWorldToScreen(glm::vec3 pos3D) {
         // Transform world position to clip space
         glm::vec4 clipSpace = m_camera->getProjectionMatrix(m_width, m_height) * m_camera->getViewMatrix() * glm::vec4(pos3D, 1.0f);
 
@@ -38,18 +38,18 @@ namespace DarkMoon {
         useShader(shaders["color"]);
     }
 
-    void RenderManager::updateLights(){
+    void RenderManager::updateLights() {
         pointLights.clear();
         directionalLights.clear();
         spotLights.clear();
     }
 
-    void RenderManager::checkLights(){
+    void RenderManager::checkLights() {
         useShader(shaders["3D"]);
         glUniform1i(glGetUniformLocation(shaders["3D"]->getIDShader(), "activeLights"), activeLights ? 1 : 0);
         glUniform1i(glGetUniformLocation(shaders["3D"]->getIDShader(), "activeShaderCartoon"), activeShaderCartoon ? 1 : 0);
 
-        if(activeLights){
+        if (activeLights) {
 
             //std::cout << "-----------------------------\n";
             //std::cout << "Luces direccionales: " << directionalLights.size() << "\n";
@@ -58,12 +58,12 @@ namespace DarkMoon {
 
             // Directional Lights //
 
-            if(!directionalLights.empty()){
-                for(int i=0; i<static_cast<int>(directionalLights.size()); i++){
-                    std::string directionUniformName  = "gDirectionalLight.direction";
-                    std::string colorUniformName      = "gDirectionalLight.base.color";
-                    std::string ambientUniformName    = "gDirectionalLight.base.ambientIntensity"; 
-                    std::string diffuseUniformName    = "gDirectionalLight.base.diffuseIntensity"; 
+            if (!directionalLights.empty()) {
+                for (std::size_t i = 0; i < directionalLights.size(); i++) {
+                    std::string directionUniformName = "gDirectionalLight.direction";
+                    std::string colorUniformName = "gDirectionalLight.base.color";
+                    std::string ambientUniformName = "gDirectionalLight.base.ambientIntensity";
+                    std::string diffuseUniformName = "gDirectionalLight.base.diffuseIntensity";
 
                     glUniform3fv(glGetUniformLocation(shaders["3D"]->getIDShader(), directionUniformName.c_str()), 1, glm::value_ptr(directionalLights[i]->direction));
                     glUniform3fv(glGetUniformLocation(shaders["3D"]->getIDShader(), colorUniformName.c_str()), 1, glm::value_ptr(normalizeColor(directionalLights[i]->color)));
@@ -76,16 +76,16 @@ namespace DarkMoon {
 
             // Point Lights //
 
-            if(!pointLights.empty()){
-                for(int i=0; i<static_cast<int>(pointLights.size()); i++){
-                    std::string positionUniformName  = "gPointLights[" + std::to_string(i) + "].position";
-                    std::string colorUniformName     = "gPointLights[" + std::to_string(i) + "].base.color";
-                    std::string constantUniformName  = "gPointLights[" + std::to_string(i) + "].attenuation.constant";
-                    std::string linearUniformName    = "gPointLights[" + std::to_string(i) + "].attenuation.linear";
+            if (!pointLights.empty()) {
+                for (std::size_t i = 0; i < pointLights.size(); i++) {
+                    std::string positionUniformName = "gPointLights[" + std::to_string(i) + "].position";
+                    std::string colorUniformName = "gPointLights[" + std::to_string(i) + "].base.color";
+                    std::string constantUniformName = "gPointLights[" + std::to_string(i) + "].attenuation.constant";
+                    std::string linearUniformName = "gPointLights[" + std::to_string(i) + "].attenuation.linear";
                     std::string quadraticUniformName = "gPointLights[" + std::to_string(i) + "].attenuation.exp";
-                    std::string ambientUniformName   = "gPointLights[" + std::to_string(i) + "].base.ambientIntensity"; 
-                    std::string diffuseUniformName   = "gPointLights[" + std::to_string(i) + "].base.diffuseIntensity"; 
-                
+                    std::string ambientUniformName = "gPointLights[" + std::to_string(i) + "].base.ambientIntensity";
+                    std::string diffuseUniformName = "gPointLights[" + std::to_string(i) + "].base.diffuseIntensity";
+
                     glUniform3fv(glGetUniformLocation(shaders["3D"]->getIDShader(), positionUniformName.c_str()), 1, glm::value_ptr(pointLights[i]->position));
                     glUniform3fv(glGetUniformLocation(shaders["3D"]->getIDShader(), colorUniformName.c_str()), 1, glm::value_ptr(normalizeColor(pointLights[i]->color)));
                     glUniform1f(glGetUniformLocation(shaders["3D"]->getIDShader(), constantUniformName.c_str()), pointLights[i]->constant);
@@ -99,20 +99,20 @@ namespace DarkMoon {
 
             // Spot Lights //
 
-            if(!spotLights.empty()){
-                for(int i=0; i<static_cast<int>(spotLights.size()); i++){
-                    std::string colorUniformName      = "gSpotLights[" + std::to_string(i) + "].base.base.color";
-                    std::string positionUniformName   = "gSpotLights[" + std::to_string(i) + "].base.position";
-                    std::string directionUniformName  = "gSpotLights[" + std::to_string(i) + "].direction";
-                    std::string cutOffUniformName     = "gSpotLights[" + std::to_string(i) + "].cutOff";
+            if (!spotLights.empty()) {
+                for (std::size_t i = 0; i < spotLights.size(); i++) {
+                    std::string colorUniformName = "gSpotLights[" + std::to_string(i) + "].base.base.color";
+                    std::string positionUniformName = "gSpotLights[" + std::to_string(i) + "].base.position";
+                    std::string directionUniformName = "gSpotLights[" + std::to_string(i) + "].direction";
+                    std::string cutOffUniformName = "gSpotLights[" + std::to_string(i) + "].cutOff";
 
-                    std::string constantUniformName   = "gSpotLights[" + std::to_string(i) + "].base.attenuation.constant";
-                    std::string linearUniformName     = "gSpotLights[" + std::to_string(i) + "].base.attenuation.linear";
-                    std::string quadraticUniformName  = "gSpotLights[" + std::to_string(i) + "].base.attenuation.exp";
+                    std::string constantUniformName = "gSpotLights[" + std::to_string(i) + "].base.attenuation.constant";
+                    std::string linearUniformName = "gSpotLights[" + std::to_string(i) + "].base.attenuation.linear";
+                    std::string quadraticUniformName = "gSpotLights[" + std::to_string(i) + "].base.attenuation.exp";
 
-                    std::string ambientUniformName    = "gSpotLights[" + std::to_string(i) + "].base.base.ambientIntensity"; 
-                    std::string diffuseUniformName    = "gSpotLights[" + std::to_string(i) + "].base.base.diffuseIntensity"; 
-                
+                    std::string ambientUniformName = "gSpotLights[" + std::to_string(i) + "].base.base.ambientIntensity";
+                    std::string diffuseUniformName = "gSpotLights[" + std::to_string(i) + "].base.base.diffuseIntensity";
+
                     glUniform3fv(glGetUniformLocation(shaders["3D"]->getIDShader(), positionUniformName.c_str()), 1, glm::value_ptr(spotLights[i]->position));
                     glUniform3fv(glGetUniformLocation(shaders["3D"]->getIDShader(), directionUniformName.c_str()), 1, glm::value_ptr(spotLights[i]->direction));
                     glUniform1f(glGetUniformLocation(shaders["3D"]->getIDShader(), cutOffUniformName.c_str()), spotLights[i]->cutOff);
@@ -129,8 +129,8 @@ namespace DarkMoon {
             glUniform1i(glGetUniformLocation(shaders["3D"]->getIDShader(), "gNumSpotLights"), static_cast<int>(spotLights.size()));
 
         }
-    
-        if(activeShaderCartoon){
+
+        if (activeShaderCartoon) {
             glUniform1f(glGetUniformLocation(shaders["3D"]->getIDShader(), "depthThreshold"), depthThreshold);
             glUniform1f(glGetUniformLocation(shaders["3D"]->getIDShader(), "normalThreshold"), normalThreshold);
             glUniform4f(glGetUniformLocation(shaders["3D"]->getIDShader(), "_outlineColor"), outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a);

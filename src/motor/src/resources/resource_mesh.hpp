@@ -69,7 +69,7 @@ namespace DarkMoon {
         GLuint m_VAO; // Vertex Array Object
         GLuint m_VBO; // Vertex Buffer Object
         GLuint m_EBO; // Element Buffer Object
-        GLuint m_BAO; // Bones Array Object
+        // GLuint m_BAO; // Bones Array Object
         std::string m_name;
 
         void setupMesh();

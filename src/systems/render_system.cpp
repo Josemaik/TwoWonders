@@ -28,7 +28,6 @@ void RenderSystem::update(EntityManager& em, GameEngine& engine, double alpha)
         ren.setPosition(interPos);
         ren.setOrientation(phy.orientation);
         ren.setScale(phy.scale);
-        // ren.updateBBox();
     });
 
     // t1 = high_resolution_clock::now();
@@ -277,9 +276,9 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     checkSliderSound(ss, sliderInfo);
 
     std::vector<FloatSlider*> volSliders{};
-    for (int i = 0; i < static_cast<int>(volumeSliders.size()); i++)
+    for (std::size_t i = 0; i < volumeSliders.size(); i++)
     {
-        auto* sliderNode = engine.createFloatSlider({ posX, posYVol + downRate * i }, { buttonWidth, buttonHeight }, D_AQUA, "",
+        auto* sliderNode = engine.createFloatSlider({ posX, posYVol + downRate * static_cast<int>(i) }, { buttonWidth, buttonHeight }, D_AQUA, "",
             engine.getFontDefault(), 35, 45, D_AQUA, Aligned::CENTER, Aligned::CENTER, D_AQUA, D_AQUA_LIGHT, D_AQUA_DARK, volumeSliders[i].second, volumeSliders[i].first, menuNode);
 
         auto* sldInfo = sliderNode->getEntity<FloatSlider>();
@@ -299,7 +298,7 @@ void RenderSystem::drawOptions(GameEngine& engine, EntityManager& em, SoundSyste
     };
 
     // Comportamiendo volumen
-    auto createVolumeSliderBehavior = [&](int index) {
+    auto createVolumeSliderBehavior = [&](std::size_t index) {
         return [&, index]() {
             auto& sliderInfoVol = *volSliders[index];
             if (engine.isKeyDown(D_KEY_RIGHT))
@@ -2280,10 +2279,10 @@ void RenderSystem::drawAlerts_IA(EntityManager& em, GameEngine& engine) {
                 }
 
                 const char* icon = "";
-                if (std::abs(aic.endangle) >= 0.0 && std::abs(aic.endangle) <= 180.0) {
+                if (std::abs(aic.endangle) >= 0.f && std::abs(aic.endangle) <= 180.f) {
                     icon = "Oido_parp1";
                 }
-                else if (std::abs(aic.endangle) >= 180.0 && std::abs(aic.endangle <= 360.0)) {
+                else if (std::abs(aic.endangle) >= 180.f && std::abs(aic.endangle) <= 360.f) {
                     icon = "Oido_parp2";
                 }
 
