@@ -39,3 +39,20 @@
 
 # debug information files
 *.dwo
+
+#Visual
+.vscode
+.vscode/*
+
+#TwoWonders
+ZeldaWonders
+TwoWonders.exe
+TwoWonders
+*.zip
+release
+motor/Motor
+motor/obj
+motor/release
+motor/Motor
+assets/data/output/*.cereal
+assets/data/input/*.cereal
