@@ -17,10 +17,22 @@ Two Wonders is a 3D action-adventure game with an isometric view, inspired by ga
 
 The game combines strategic puzzle-solving with elemental combat, where players must use different elemental abilities to defeat enemies, each possessing unique elemental strengths and weaknesses.
 
+
+
+
+
+
+
+
+
+
+
+
+
 <div align="center" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-  <video src="./assets/gameplay0.mp4" width="400" controls style="border: none; outline: none; border-radius: 10px;"></video>
-  <video src="./assets/gameplay1.mp4" width="400" controls style="border: none; outline: none; border-radius: 10px;"></video>
-<video src="./assets/gameplay3.mp4" width="400" controls style="border: none; outline: none; border-radius: 10px;"></video>
+  <video src="https://github.com/user-attachments/assets/dbb5e6b1-cd3c-48a3-a1ef-ef1b57cb5153" width="100" controls style="border: none; outline: none; border-radius: 10px;"></video>
+  <video src="https://github.com/user-attachments/assets/cc0e609c-431a-4a9c-9fee-fec2ccaea5f2" width="400" controls style="border: none; outline: none; border-radius: 10px;"></video>
+  <video src="https://github.com/user-attachments/assets/da6d4903-49d3-4f2f-88a9-979b2731c11f" width="400" controls style="border: none; outline: none; border-radius: 10px;"></video>
 </div>
 
 ### 🛠️ Contributions - Custom Engine
