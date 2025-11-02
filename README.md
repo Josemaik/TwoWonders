@@ -1,7 +1,7 @@
 
 <br />
 <p align="center">
-  <img width="3840" height="1240" alt="MainKeyArt" src="Assets/Principal_fondo.png" />
+  <img width="3840" height="1240" alt="MainKeyArt" src="/assets/Principal_fondo.png" />
   <br />
   <h1 align="center">🧙 Two Wonders 🧙
 	<br /><br />
