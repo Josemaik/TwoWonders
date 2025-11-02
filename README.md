@@ -37,7 +37,7 @@ I developed an AI engine from scratch in c++ which would be in charge of process
 
 [AIComponent](src/components/ai_component.hpp) | [AIManager](src/managers/ia_manager.hpp) | [AISystem](src/systems/ai_system.hpp)
 
-[BehaviorTrees](src/utils/bt) | [Blackboard](src/utils/sngtn/blackboard.hpp) | [PathFinding](src/utils/pf) | [SensorialPerception](src/utils/sp/SensorialPerception.hpp) | Parameter Editor and Debugger [RenderSystem](src/systems/render_system.hpp)
+[BehaviorTrees](src/utils/bt) | [Blackboard](src/utils/sngtn/blackboard.hpp) | [PathFinding](src/utils/pf) | [SensorialPerception](src/utils/sp/SensorialPerception.hpp) | [Parameter Editor and Debugger - RenderSystem](src/systems/render_system.hpp)
 
 ## Skelal Animation System
 
