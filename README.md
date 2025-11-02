@@ -17,10 +17,11 @@ Two Wonders is a 3D action-adventure game with an isometric view, inspired by ga
 
 The game combines strategic puzzle-solving with elemental combat, where players must use different elemental abilities to defeat enemies, each possessing unique elemental strengths and weaknesses.
 
-<!-- <img src="https://github.com/user-attachments/assets/4aee6508-691b-43ef-b264-813fc3abeb55" width="400">
-<img src="https://github.com/user-attachments/assets/cec211ad-5ac2-4f94-b322-ba4f90247155" width="400">
-<img src="https://github.com/user-attachments/assets/8d223ce6-e1df-46c6-a53f-65ac19cfe8fe" width="400">
-<img src="https://github.com/user-attachments/assets/f140a235-c668-46b4-8b40-988defa0bb5a" width="400"> -->
+<div align="center" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+  <video src="./assets/gameplay0.mp4" width="400" controls style="border: none; outline: none; border-radius: 10px;"></video>
+  <video src="./assets/gameplay1.mp4" width="400" controls style="border: none; outline: none; border-radius: 10px;"></video>
+<video src="./assets/gameplay3.mp4" width="400" controls style="border: none; outline: none; border-radius: 10px;"></video>
+</div>
 
 ### 🛠️ Contributions - Custom Engine
 ---
