@@ -6,7 +6,7 @@
   <h1 align="center">🧙 Two Wonders 🧙
 	<br /><br />
     <p>
-      <a href="https://itch.io/your-game-or-page" target="_blank" rel="noopener noreferrer">
+      <a href="https://kaiwagames.itch.io/two-wonders" target="_blank" rel="noopener noreferrer">
   <img src="https://img.shields.io/badge/Find%20us%20on-Itch.io-111111?style=for-the-badge&logo=itchdotio&logoColor=white" alt="Find us on Itch.io" />
     </a>
     </p>
